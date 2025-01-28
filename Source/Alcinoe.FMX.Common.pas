@@ -973,11 +973,6 @@ type
     FTransitionAnimation: TALfloatAnimation; // 8 bytes
     FTransitionFrom: TALBaseStateStyle; // 8 bytes
     FTransitionTo: TALBaseStateStyle; // 8 bytes
-    {$IF NOT DEFINED(ALSkiaCanvas)}
-    FTransitionBufSurface: TALSurface; // 8 bytes
-    FTransitionBufCanvas: TALCanvas; // 8 bytes
-    FTransitionBufDrawable: TALDrawable; // 8 bytes
-    {$ENDIF}
     FTransitionClickDelayed: Boolean; // 1 byte
     FLastPaintedRawStyle: TALBaseStateStyle; // 8 bytes
     FCurrentAdjustedStyle: TALBaseStateStyle; // 8 bytes
@@ -990,20 +985,6 @@ type
     procedure TransitionAnimationProcess(Sender: TObject); virtual;
     procedure TransitionAnimationFinish(Sender: TObject); virtual;
     property Transition: TALStateTransition read FTransition write SetTransition;
-    {$IF NOT DEFINED(ALSkiaCanvas)}
-    /// <summary>
-    ///   When not using Skia, we cannot draw the component directly onto the main form.
-    ///   Instead, we must first draw it onto a buffer surface, which can then be drawn
-    ///   onto the main form. This function provides the buffer surface, canvas, and drawable
-    ///   necessary for rendering the transition.
-    /// </summary>
-    procedure GetTransitionBufSurface(
-                var ARect: TrectF;
-                const AScale: Single;
-                out ABufSurface: TALSurface;
-                out ABufCanvas: TALCanvas;
-                out ABufDrawable: TALDrawable); virtual;
-    {$ENDIF}
     property TransitionClickDelayed: Boolean read FTransitionClickDelayed write FTransitionClickDelayed;
   public
     constructor Create(const AParent: TALControl); reintroduce; virtual;
@@ -1028,6 +1009,8 @@ type
     /// </summary>
     function GetCurrentAdjustedStyle: TALBaseStateStyle; virtual;
     function IsTransitionAnimationRunning: Boolean; virtual;
+    property TransitionFrom: TALBaseStateStyle read FTransitionFrom;
+    property TransitionTo: TALBaseStateStyle read FTransitionTo;
     procedure UpdateLastPaintedRawStyle; virtual;
     Property Parent: TALControl read FParent;
   end;
@@ -5073,11 +5056,6 @@ begin
   //--
   FTransitionFrom := nil;
   FTransitionTo := nil;
-  {$IF NOT DEFINED(ALSkiaCanvas)}
-  FTransitionBufSurface := ALNullSurface;
-  FTransitionBufCanvas := ALNullCanvas;
-  FTransitionBufDrawable := ALNullDrawable;
-  {$ENDIF}
   FTransitionClickDelayed := False;
   //--
   FLastPaintedRawStyle := nil;
@@ -5090,10 +5068,6 @@ begin
   ALFreeAndNil(FTransitionAnimation);
   ALfreeandNil(FTransitionFrom);
   ALfreeandNil(FTransitionTo);
-  {$IF NOT DEFINED(ALSkiaCanvas)}
-  ALFreeAndNilDrawable(FTransitionBufDrawable);
-  ALFreeAndNilSurface(FTransitionBufSurface, FTransitionBufCanvas);
-  {$ENDIF}
   //FLastPaintedRawStyle
   ALfreeandNil(FCurrentAdjustedStyle);
   ALFreeAndNil(FTransition);
@@ -5339,67 +5313,6 @@ procedure TALBaseStateStyles.UpdateLastPaintedRawStyle;
 begin
   FLastPaintedRawStyle := GetCurrentRawStyle;
 end;
-
-{*****************************}
-{$IF NOT DEFINED(ALSkiaCanvas)}
-procedure TALBaseStateStyles.GetTransitionBufSurface(
-            var ARect: TrectF;
-            const AScale: Single;
-            out ABufSurface: TALSurface;
-            out ABufCanvas: TALCanvas;
-            out ABufDrawable: TALDrawable);
-begin
-  var LSurfaceRect := ARect;
-  if FTransitionFrom <> nil then begin
-    var LFromSurfaceRect := ALGetShapeSurfaceRect(
-                              ARect, // const ARect: TRectF;
-                              FTransitionFrom.Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
-                              FTransitionFrom.StateLayer, // const AStateLayer: TALStateLayer;
-                              FTransitionFrom.Shadow); // const AShadow: TALShadow): TRectF;
-    LSurfaceRect := TRectF.Union(LSurfaceRect, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
-  end;
-  if FTransitionTo <> nil then begin
-    var LToSurfaceRect := ALGetShapeSurfaceRect(
-                            ARect, // const ARect: TRectF;
-                            FTransitionTo.Fill, // const AFill: TALBrush;
-                            nil, // const AFillResourceStream: TStream;
-                            FTransitionTo.StateLayer, // const AStateLayer: TALStateLayer;
-                            FTransitionTo.Shadow); // const AShadow: TALShadow): TRectF;
-    LSurfaceRect := TRectF.Union(LSurfaceRect, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
-  end;
-  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
-
-  if (ALIsDrawableNull(FTransitionBufDrawable)) or
-     (CompareValue(ALGetDrawableWidth(FTransitionBufDrawable), LSurfaceRect.Width * AScale, TEpsilon.Position) < 0) or
-     (CompareValue(ALGetDrawableHeight(FTransitionBufDrawable), LSurfaceRect.Height * AScale, TEpsilon.Position) < 0) then begin
-    LSurfaceRect.Width := LSurfaceRect.Width * 1.5{to be on the safe side};
-    LSurfaceRect.height := LSurfaceRect.height * 1.5{to be on the safe side};
-    ALFreeAndNilDrawable(FTransitionBufDrawable);
-    ALFreeAndNilSurface(FTransitionBufSurface, FTransitionBufCanvas);
-    ALCreateSurface(
-      FTransitionBufSurface, // out ASurface: TALSurface;
-      FTransitionBufCanvas, // out ACanvas: TALCanvas;
-      AScale{Ascale},
-      LSurfaceRect.width, // const w: Single;
-      LSurfaceRect.height, // const h: Single);
-      false); // const AAddPixelForAlignment: Boolean = true
-    {$IF defined(ALSkiaCanvas)}
-    Raise Exception.create('Error 71AD6B8B-AF32-468D-818A-168EFC96C368')
-    {$ELSEIF defined(ALGpuCanvas)}
-    FTransitionBufDrawable := TALTexture.Create;
-    FTransitionBufDrawable.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-    FTransitionBufDrawable.SetSize(ALCeil(LSurfaceRect.width * AScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * AScale, TEpsilon.Position));
-    FTransitionBufDrawable.PixelFormat := ALGetDefaultPixelFormat;
-    {$ELSE}
-    FTransitionBufDrawable := FMX.Graphics.TBitmap.Create(ALCeil(LSurfaceRect.width * AScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * AScale, TEpsilon.Position));
-    {$ENDIF};
-  end;
-  ABufSurface := FTransitionBufSurface;
-  ABufCanvas := FTransitionBufCanvas;
-  ABufDrawable := FTransitionBufDrawable;
-end;
-{$ENDIF}
 
 {**************************************************************************}
 procedure TALBaseStateStyles.SetTransition(const Value: TALStateTransition);

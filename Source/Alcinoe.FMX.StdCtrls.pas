@@ -573,6 +573,11 @@ type
     FDoubleBuffered: boolean;
     FXRadius: Single;
     FYRadius: Single;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FRenderTargetSurface: TALSurface; // 8 bytes
+    FRenderTargetCanvas: TALCanvas; // 8 bytes
+    fRenderTargetDrawable: TALDrawable; // 8 bytes
+    {$ENDIF}
     FOnChange: TNotifyEvent;
     procedure SetCheckMark(const Value: TCheckMarkBrush);
     procedure SetStateStyles(const AValue: TStateStyles);
@@ -617,6 +622,14 @@ type
                 const AStroke: TALStrokeBrush;
                 const ACheckMark: TCheckMarkBrush;
                 const AShadow: TALShadow); virtual;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
+    procedure InitRenderTargets(var ARect: TrectF); virtual;
+    procedure ClearRenderTargets; virtual;
+    Property RenderTargetSurface: TALSurface read FRenderTargetSurface;
+    Property RenderTargetCanvas: TALCanvas read FRenderTargetCanvas;
+    Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
+    {$ENDIF}
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -987,6 +1000,11 @@ type
         FDoubleBuffered: boolean;
         FXRadius: Single;
         FYRadius: Single;
+        {$IF NOT DEFINED(ALSkiaCanvas)}
+        FRenderTargetSurface: TALSurface; // 8 bytes
+        FRenderTargetCanvas: TALCanvas; // 8 bytes
+        fRenderTargetDrawable: TALDrawable; // 8 bytes
+        {$ENDIF}
         procedure SetStateStyles(const AValue: TStateStyles);
         function IsXRadiusStored: Boolean;
         function IsYRadiusStored: Boolean;
@@ -1020,6 +1038,14 @@ type
                     const AStateLayer: TALStateLayer;
                     const AStroke: TALStrokeBrush;
                     const AShadow: TALShadow); virtual;
+        {$IF NOT DEFINED(ALSkiaCanvas)}
+        function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
+        procedure InitRenderTargets(var ARect: TrectF); virtual;
+        procedure ClearRenderTargets; virtual;
+        Property RenderTargetSurface: TALSurface read FRenderTargetSurface;
+        Property RenderTargetCanvas: TALCanvas read FRenderTargetCanvas;
+        Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
+        {$ENDIF}
         procedure Paint; override;
         property Checked: Boolean read GetChecked write SetChecked default False;
       public
@@ -1598,6 +1624,9 @@ type
     procedure PressedChanged; override;
     procedure Click; override;
     Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); override;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    function GetRenderTargetRect(const ARect: TrectF): TRectF; override;
+    {$ENDIF}
     procedure Paint; override;
     procedure Loaded; override;
   public
@@ -2133,6 +2162,9 @@ type
         procedure ValueRangeChanged(Sender: TObject); Virtual;
         procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
         function HasCustomDraw: Boolean; override;
+        {$IF NOT DEFINED(ALSkiaCanvas)}
+        function GetRenderTargetRect(const ARect: TrectF): TRectF; override;
+        {$ENDIF}
         procedure Paint; override;
       public
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
@@ -2929,6 +2961,10 @@ uses
   fmx.utils,
   Alcinoe.StringUtils,
   Alcinoe.Common;
+
+{**}
+Type
+  _TALBaseStateStyleAccessProtected = class(TALBaseStateStyle);
 
 {*****************************************************}
 constructor TALAniIndicator.Create(AOwner: TComponent);
@@ -3794,6 +3830,53 @@ begin
   end;
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALCustomTrack.TThumb.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  if StateStyles.IsTransitionAnimationRunning then begin
+    Result := ARect;
+    if StateStyles.TransitionFrom <> nil then begin
+      var LFromSurfaceRect := ALGetShapeSurfaceRect(
+                                ARect, // const ARect: TRectF;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                nil, // const AFillResourceStream: TStream;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+    if StateStyles.TransitionTo <> nil then begin
+      var LToSurfaceRect := ALGetShapeSurfaceRect(
+                              ARect, // const ARect: TRectF;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              nil, // const AFillResourceStream: TStream;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+  end
+  else begin
+    var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
+    if LStateStyle <> nil then begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  LStateStyle.Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+                  LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
+    end
+    else begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  nil, // const AStateLayer: TALStateLayer;
+                  Shadow); // const AShadow: TALShadow): TRectF;
+    end;
+  end;
+end;
+{$ENDIF}
+
 {************************************}
 procedure TALCustomTrack.TThumb.Paint;
 begin
@@ -3867,87 +3950,67 @@ begin
 
     {$ELSE}
 
-    if StateStyles.IsTransitionAnimationRunning then begin
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(RenderTargetCanvas) then
+    try
 
-      var LRect := LocalRect;
-      var LBufSurface: TALSurface;
-      var LBufCanvas: TALCanvas;
-      var LBufDrawable: TALDrawable;
-      StateStyles.GetTransitionBufSurface(
-        LRect, // var ARect: TrectF;
-        ALGetScreenScale, // const AScale: Single;
-        LBufSurface, // out ABufSurface: TALSurface;
-        LBufCanvas, // out ABufCanvas: TALCanvas;
-        LBufDrawable); // out ABufDrawable: TALDrawable);
+      ALClearCanvas(RenderTargetCanvas, TAlphaColors.Null);
 
-      if ALCanvasBeginScene(LBufCanvas) then
-      try
+      TALDrawRectangleHelper.Create(RenderTargetCanvas)
+        .SetScale(ALGetScreenScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LRect)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFill(LCurrentAdjustedStateStyle.Fill)
+        .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TalphaColors.Null)
+        .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+        .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+        .SetSides(Sides)
+        .SetCorners(Corners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
-        ALClearCanvas(LBufCanvas, TAlphaColors.Null);
+    finally
+      ALCanvasEndScene(RenderTargetCanvas)
+    end;
 
-        TALDrawRectangleHelper.Create(LBufCanvas)
-          .SetScale(ALGetScreenScale)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
-          .SetDstRect(LRect)
-          .SetOpacity(AbsoluteOpacity)
-          .SetFill(LCurrentAdjustedStateStyle.Fill)
-          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TalphaColors.Null)
-          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
-          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
-          .SetSides(Sides)
-          .SetCorners(Corners)
-          .SetXRadius(XRadius)
-          .SetYRadius(YRadius)
-          .Draw;
+    ALUpdateDrawableFromSurface(RenderTargetSurface, RenderTargetDrawable);
 
-      finally
-        ALCanvasEndScene(LBufCanvas)
-      end;
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
 
-      ALUpdateDrawableFromSurface(LBufSurface, LBufDrawable);
+    // LRect must include the LScale
+    LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
+    LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
+    LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
+    LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
 
-      // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
-      // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
-      LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+    // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
+    // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
+    // within the main BufDrawableRect to ensure that all changes are visually centered.
+    var LMainDrawableRect := BufDrawableRect;
+    LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
+    var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
+    LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 
-      // LRect must include the LScale
-      LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
-      LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
-      LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
-      LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
-
-      // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
-      // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
-      // within the main BufDrawableRect to ensure that all changes are visually centered.
-      var LMainDrawableRect := BufDrawableRect;
-      LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
-      var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
-      LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
-
-      // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
-      // will be ineffective since the matrix will no longer be a simple translation matrix.
-      // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
-      // if the texture is not perfectly pixel-aligned.
-      var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(LBufDrawable), ALGetDrawableHeight(LBufDrawable));
-      LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.SetLocation(
-        LRect.Left,
-        LRect.Top);
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufDrawable, // const ADrawable: TALDrawable;
-        LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
-        AbsoluteOpacity); // const AOpacity: Single)
-
-    end
-
-    {$IF defined(DEBUG)}
-    else if not doublebuffered then begin
-      ALLog('TALCustomTrack.TThumb.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
-    end
-    {$ENDIF};
+    // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
+    // will be ineffective since the matrix will no longer be a simple translation matrix.
+    // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
+    // if the texture is not perfectly pixel-aligned.
+    var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(RenderTargetDrawable), ALGetDrawableHeight(RenderTargetDrawable));
+    LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.SetLocation(
+      LRect.Left,
+      LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      RenderTargetDrawable, // const ADrawable: TALDrawable;
+      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
 
     {$ENDIF}
 
@@ -7612,6 +7675,11 @@ begin
   FDoubleBuffered := true;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FRenderTargetSurface := ALNullSurface;
+  FRenderTargetCanvas := ALNullCanvas;
+  FRenderTargetDrawable := ALNullDrawable;
+  {$ENDIF}
   FOnChange := nil;
   //--
   // Must be created at the end because it requires FCheckMark to
@@ -7625,6 +7693,9 @@ destructor TALBaseCheckBox.Destroy;
 begin
   ALFreeAndNil(FStateStyles);
   ALFreeAndNil(FCheckMark);
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ClearRenderTargets;
+  {$ENDIF}
   inherited;
 end;
 
@@ -7664,7 +7735,10 @@ procedure TALBaseCheckBox.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then ClearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    else ClearRenderTargets;
+    {$ENDIF}
   end;
 end;
 
@@ -8193,6 +8267,76 @@ begin
 
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALBaseCheckBox.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  if StateStyles.IsTransitionAnimationRunning then begin
+    Result := ARect;
+    if StateStyles.TransitionFrom <> nil then begin
+      var LFromSurfaceRect := ALGetShapeSurfaceRect(
+                                ARect, // const ARect: TRectF;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                nil, // const AFillResourceStream: TStream;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+    if StateStyles.TransitionTo <> nil then begin
+      var LToSurfaceRect := ALGetShapeSurfaceRect(
+                              ARect, // const ARect: TRectF;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              nil, // const AFillResourceStream: TStream;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+  end
+  else begin
+    var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
+    if LStateStyle <> nil then begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  LStateStyle.Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+                  LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
+    end
+    else begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  nil, // const AStateLayer: TALStateLayer;
+                  Shadow); // const AShadow: TALShadow): TRectF;
+    end;
+  end;
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseCheckBox.InitRenderTargets(var ARect: TrectF);
+begin
+  var LSurfaceRect := GetRenderTargetRect(ARect);
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+  ALInitControlRenderTargets(
+    LSurfaceRect, // Const ARect: TrectF;
+    FRenderTargetSurface, // var ARenderTargetSurface: TALSurface;
+    FRenderTargetCanvas, // var ARenderTargetCanvas: TALCanvas;
+    FRenderTargetDrawable); // var ARenderTargetDrawable: TALDrawable):
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseCheckBox.ClearRenderTargets;
+begin
+  ALFreeAndNilDrawable(FRenderTargetDrawable);
+  ALFreeAndNilSurface(FRenderTargetSurface, FRenderTargetCanvas);
+end;
+{$ENDIF}
+
 {******************************}
 procedure TALBaseCheckBox.Paint;
 begin
@@ -8305,94 +8449,74 @@ begin
 
     {$ELSE}
 
-    if StateStyles.IsTransitionAnimationRunning then begin
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(RenderTargetCanvas) then
+    try
 
-      var LRect := LocalRect;
-      var LBufSurface: TALSurface;
-      var LBufCanvas: TALCanvas;
-      var LBufDrawable: TALDrawable;
-      StateStyles.GetTransitionBufSurface(
-        LRect, // var ARect: TrectF;
+      ALClearCanvas(RenderTargetCanvas, TAlphaColors.Null);
+
+      TALDrawRectangleHelper.Create(RenderTargetCanvas)
+        .SetScale(ALGetScreenScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LRect)
+        .SetFill(LCurrentAdjustedStateStyle.Fill)
+        .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.CheckMark.Color)
+        .SetDrawStateLayerOnTop(False)
+        .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+        .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+        .SetSides(AllSides)
+        .SetCorners(AllCorners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
+
+      DrawCheckMark(
+        RenderTargetCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
-        LBufSurface, // out ABufSurface: TALSurface;
-        LBufCanvas, // out ABufCanvas: TALCanvas;
-        LBufDrawable); // out ABufDrawable: TALDrawable);
+        LRect, // const ADstRect: TrectF;
+        // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+        // Without this, the checkMark disappears immediately.
+        Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+        LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
 
-      if ALCanvasBeginScene(LBufCanvas) then
-      try
+    finally
+      ALCanvasEndScene(RenderTargetCanvas)
+    end;
 
-        ALClearCanvas(LBufCanvas, TAlphaColors.Null);
+    ALUpdateDrawableFromSurface(RenderTargetSurface, RenderTargetDrawable);
 
-        TALDrawRectangleHelper.Create(LBufCanvas)
-          .SetScale(ALGetScreenScale)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
-          .SetDstRect(LRect)
-          .SetFill(LCurrentAdjustedStateStyle.Fill)
-          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.CheckMark.Color)
-          .SetDrawStateLayerOnTop(False)
-          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
-          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
-          .SetSides(AllSides)
-          .SetCorners(AllCorners)
-          .SetXRadius(XRadius)
-          .SetYRadius(YRadius)
-          .Draw;
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
 
-        DrawCheckMark(
-          LBufCanvas, // const ACanvas: TALCanvas;
-          ALGetScreenScale, // const AScale: Single;
-          LRect, // const ADstRect: TrectF;
-          // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
-          // Without this, the checkMark disappears immediately.
-          Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
-          LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+    // LRect must include the LScale
+    LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
+    LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
+    LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
+    LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
 
-      finally
-        ALCanvasEndScene(LBufCanvas)
-      end;
+    // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect (LocalRect)
+    // (due to scale), we must center LStateStyle.BufDrawableRect within the main BufDrawableRect (LocalRect)
+    // to ensure that all changes are visually centered.
+    var LCenteredRect := LRect.CenterAt(LocalRect);
+    LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 
-      ALUpdateDrawableFromSurface(LBufSurface, LBufDrawable);
-
-      // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
-      // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
-      LRect.Offset(-2*LRect.Left, -2*LRect.Top);
-
-      // LRect must include the LScale
-      LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
-      LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
-      LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
-      LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
-
-      // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect (LocalRect)
-      // (due to scale), we must center LStateStyle.BufDrawableRect within the main BufDrawableRect (LocalRect)
-      // to ensure that all changes are visually centered.
-      var LCenteredRect := LRect.CenterAt(LocalRect);
-      LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
-
-      // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
-      // will be ineffective since the matrix will no longer be a simple translation matrix.
-      // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
-      // if the texture is not perfectly pixel-aligned.
-      var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(LBufDrawable), ALGetDrawableHeight(LBufDrawable));
-      LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.SetLocation(
-        LRect.Left,
-        LRect.Top);
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufDrawable, // const ADrawable: TALDrawable;
-        LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
-        AbsoluteOpacity); // const AOpacity: Single)
-
-    end
-
-    {$IF defined(DEBUG)}
-    else if not doublebuffered then begin
-      ALLog('TALBaseCheckBox.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
-    end
-    {$ENDIF};
+    // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
+    // will be ineffective since the matrix will no longer be a simple translation matrix.
+    // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
+    // if the texture is not perfectly pixel-aligned.
+    var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(RenderTargetDrawable), ALGetDrawableHeight(RenderTargetDrawable));
+    LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.SetLocation(
+      LRect.Left,
+      LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      RenderTargetDrawable, // const ADrawable: TALDrawable;
+      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
 
     {$ENDIF}
 
@@ -9124,6 +9248,11 @@ begin
   FDoubleBuffered := true;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FRenderTargetSurface := ALNullSurface;
+  FRenderTargetCanvas := ALNullCanvas;
+  FRenderTargetDrawable := ALNullDrawable;
+  {$ENDIF}
   //--
   // Must be created at the end because it requires FCheckMark to
   // be already created.
@@ -9135,6 +9264,9 @@ end;
 destructor TALSwitch.TTrack.Destroy;
 begin
   ALFreeAndNil(FStateStyles);
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ClearRenderTargets;
+  {$ENDIF}
   inherited;
 end;
 
@@ -9185,7 +9317,10 @@ procedure TALSwitch.TTrack.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then ClearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    else ClearRenderTargets;
+    {$ENDIF}
   end;
 end;
 
@@ -9469,6 +9604,76 @@ begin
 
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALSwitch.TTrack.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  if StateStyles.IsTransitionAnimationRunning then begin
+    Result := ARect;
+    if StateStyles.TransitionFrom <> nil then begin
+      var LFromSurfaceRect := ALGetShapeSurfaceRect(
+                                ARect, // const ARect: TRectF;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                nil, // const AFillResourceStream: TStream;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+    if StateStyles.TransitionTo <> nil then begin
+      var LToSurfaceRect := ALGetShapeSurfaceRect(
+                              ARect, // const ARect: TRectF;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              nil, // const AFillResourceStream: TStream;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+  end
+  else begin
+    var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
+    if LStateStyle <> nil then begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  LStateStyle.Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+                  LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
+    end
+    else begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  nil, // const AStateLayer: TALStateLayer;
+                  Shadow); // const AShadow: TALShadow): TRectF;
+    end;
+  end;
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALSwitch.TTrack.InitRenderTargets(var ARect: TrectF);
+begin
+  var LSurfaceRect := GetRenderTargetRect(ARect);
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+  ALInitControlRenderTargets(
+    LSurfaceRect, // Const ARect: TrectF;
+    FRenderTargetSurface, // var ARenderTargetSurface: TALSurface;
+    FRenderTargetCanvas, // var ARenderTargetCanvas: TALCanvas;
+    FRenderTargetDrawable); // var ARenderTargetDrawable: TALDrawable):
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALSwitch.TTrack.ClearRenderTargets;
+begin
+  ALFreeAndNilDrawable(FRenderTargetDrawable);
+  ALFreeAndNilSurface(FRenderTargetSurface, FRenderTargetCanvas);
+end;
+{$ENDIF}
+
 {*******************************}
 procedure TALSwitch.TTrack.Paint;
 begin
@@ -9572,85 +9777,65 @@ begin
 
     {$ELSE}
 
-    if StateStyles.IsTransitionAnimationRunning then begin
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(RenderTargetCanvas) then
+    try
 
-      var LRect := LocalRect;
-      var LBufSurface: TALSurface;
-      var LBufCanvas: TALCanvas;
-      var LBufDrawable: TALDrawable;
-      StateStyles.GetTransitionBufSurface(
-        LRect, // var ARect: TrectF;
-        ALGetScreenScale, // const AScale: Single;
-        LBufSurface, // out ABufSurface: TALSurface;
-        LBufCanvas, // out ABufCanvas: TALCanvas;
-        LBufDrawable); // out ABufDrawable: TALDrawable);
+      ALClearCanvas(RenderTargetCanvas, TAlphaColors.Null);
 
-      if ALCanvasBeginScene(LBufCanvas) then
-      try
+      TALDrawRectangleHelper.Create(RenderTargetCanvas)
+        .SetScale(ALGetScreenScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LRect)
+        .SetFill(LCurrentAdjustedStateStyle.Fill)
+        .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TAlphaColors.Null)
+        .SetDrawStateLayerOnTop(False)
+        .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+        .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+        .SetSides(AllSides)
+        .SetCorners(AllCorners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
-        ALClearCanvas(LBufCanvas, TAlphaColors.Null);
+    finally
+      ALCanvasEndScene(RenderTargetCanvas)
+    end;
 
-        TALDrawRectangleHelper.Create(LBufCanvas)
-          .SetScale(ALGetScreenScale)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
-          .SetDstRect(LRect)
-          .SetFill(LCurrentAdjustedStateStyle.Fill)
-          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TAlphaColors.Null)
-          .SetDrawStateLayerOnTop(False)
-          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
-          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
-          .SetSides(AllSides)
-          .SetCorners(AllCorners)
-          .SetXRadius(XRadius)
-          .SetYRadius(YRadius)
-          .Draw;
+    ALUpdateDrawableFromSurface(RenderTargetSurface, RenderTargetDrawable);
 
-      finally
-        ALCanvasEndScene(LBufCanvas)
-      end;
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
 
-      ALUpdateDrawableFromSurface(LBufSurface, LBufDrawable);
+    // LRect must include the LScale
+    LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
+    LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
+    LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
+    LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
 
-      // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
-      // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
-      LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+    // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect (LocalRect)
+    // (due to scale), we must center LStateStyle.BufDrawableRect within the main BufDrawableRect (LocalRect)
+    // to ensure that all changes are visually centered.
+    var LCenteredRect := LRect.CenterAt(LocalRect);
+    LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 
-      // LRect must include the LScale
-      LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
-      LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
-      LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
-      LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
-
-      // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect (LocalRect)
-      // (due to scale), we must center LStateStyle.BufDrawableRect within the main BufDrawableRect (LocalRect)
-      // to ensure that all changes are visually centered.
-      var LCenteredRect := LRect.CenterAt(LocalRect);
-      LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
-
-      // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
-      // will be ineffective since the matrix will no longer be a simple translation matrix.
-      // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
-      // if the texture is not perfectly pixel-aligned.
-      var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(LBufDrawable), ALGetDrawableHeight(LBufDrawable));
-      LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.SetLocation(
-        LRect.Left,
-        LRect.Top);
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufDrawable, // const ADrawable: TALDrawable;
-        LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
-        AbsoluteOpacity); // const AOpacity: Single)
-
-    end
-
-    {$IF defined(DEBUG)}
-    else if not doublebuffered then begin
-      ALLog('TALSwitch.TTrack.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
-    end
-    {$ENDIF};
+    // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
+    // will be ineffective since the matrix will no longer be a simple translation matrix.
+    // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
+    // if the texture is not perfectly pixel-aligned.
+    var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(RenderTargetDrawable), ALGetDrawableHeight(RenderTargetDrawable));
+    LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.SetLocation(
+      LRect.Left,
+      LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      RenderTargetDrawable, // const ADrawable: TALDrawable;
+      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
 
     {$ENDIF}
 
@@ -11121,6 +11306,53 @@ begin
 
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALButton.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  if StateStyles.IsTransitionAnimationRunning then begin
+    Result := ARect;
+    if StateStyles.TransitionFrom <> nil then begin
+      var LFromSurfaceRect := ALGetShapeSurfaceRect(
+                                ARect, // const ARect: TRectF;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                nil, // const AFillResourceStream: TStream;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+    if StateStyles.TransitionTo <> nil then begin
+      var LToSurfaceRect := ALGetShapeSurfaceRect(
+                              ARect, // const ARect: TRectF;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              nil, // const AFillResourceStream: TStream;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+      Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+    end;
+  end
+  else begin
+    var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
+    if LStateStyle <> nil then begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  LStateStyle.Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+                  LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
+    end
+    else begin
+      Result := ALGetShapeSurfaceRect(
+                  ARect, // const ARect: TRectF;
+                  Fill, // const AFill: TALBrush;
+                  nil, // const AFillResourceStream: TStream;
+                  nil, // const AStateLayer: TALStateLayer;
+                  Shadow); // const AShadow: TALShadow): TRectF;
+    end;
+  end;
+end;
+{$ENDIF}
+
 {************************}
 procedure TALButton.Paint;
 begin
@@ -11202,93 +11434,73 @@ begin
 
     {$ELSE}
 
-    if StateStyles.IsTransitionAnimationRunning then begin
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(RenderTargetCanvas) then
+    try
 
-      var LRect := LocalRect;
-      var LBufSurface: TALSurface;
-      var LBufCanvas: TALCanvas;
-      var LBufDrawable: TALDrawable;
-      StateStyles.GetTransitionBufSurface(
-        LRect, // var ARect: TrectF;
-        ALGetScreenScale, // const AScale: Single;
-        LBufSurface, // out ABufSurface: TALSurface;
-        LBufCanvas, // out ABufCanvas: TALCanvas;
-        LBufDrawable); // out ABufDrawable: TALDrawable);
+      ALClearCanvas(RenderTargetCanvas, TAlphaColors.Null);
 
-      if ALCanvasBeginScene(LBufCanvas) then
-      try
+      var LTextBroken: Boolean;
+      var LAllTextDrawn: Boolean;
+      var LElements: TALTextElements;
+      DrawMultilineText(
+        RenderTargetCanvas, // const ACanvas: TALCanvas;
+        LRect, // out ARect: TRectF;
+        LTextBroken, // out ATextBroken: Boolean;
+        LAllTextDrawn, // out AAllTextDrawn: Boolean;
+        LElements, // out AElements: TALTextElements;
+        ALGetScreenScale{Ascale},
+        1, // const AOpacity: Single;
+        LCurrentAdjustedStateStyle.Text, // const AText: String;
+        LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
+        LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+        LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+        LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+        LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+        LCurrentAdjustedStateStyle.Shadow); // const AShadow: TALShadow);
 
-        ALClearCanvas(LBufCanvas, TAlphaColors.Null);
+    finally
+      ALCanvasEndScene(RenderTargetCanvas)
+    end;
 
-        var LTextBroken: Boolean;
-        var LAllTextDrawn: Boolean;
-        var LElements: TALTextElements;
-        DrawMultilineText(
-          LBufCanvas, // const ACanvas: TALCanvas;
-          LRect, // out ARect: TRectF;
-          LTextBroken, // out ATextBroken: Boolean;
-          LAllTextDrawn, // out AAllTextDrawn: Boolean;
-          LElements, // out AElements: TALTextElements;
-          ALGetScreenScale{Ascale},
-          1, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Text, // const AText: String;
-          LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
-          LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
-          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
-          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-          LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
-          LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow); // const AShadow: TALShadow);
+    ALUpdateDrawableFromSurface(RenderTargetSurface, RenderTargetDrawable);
 
-      finally
-        ALCanvasEndScene(LBufCanvas)
-      end;
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
 
-      ALUpdateDrawableFromSurface(LBufSurface, LBufDrawable);
+    // LRect must include the LScale
+    LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
+    LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
+    LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
+    LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
 
-      // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
-      // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
-      LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+    // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
+    // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
+    // within the main BufDrawableRect to ensure that all changes are visually centered.
+    var LMainDrawableRect := BufDrawableRect;
+    LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
+    var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
+    LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 
-      // LRect must include the LScale
-      LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
-      LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
-      LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
-      LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
-
-      // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
-      // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
-      // within the main BufDrawableRect to ensure that all changes are visually centered.
-      var LMainDrawableRect := BufDrawableRect;
-      LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
-      var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
-      LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
-
-      // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
-      // will be ineffective since the matrix will no longer be a simple translation matrix.
-      // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
-      // if the texture is not perfectly pixel-aligned.
-      var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(LBufDrawable), ALGetDrawableHeight(LBufDrawable));
-      LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-      LDstRect.SetLocation(
-        LRect.Left,
-        LRect.Top);
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufDrawable, // const ADrawable: TALDrawable;
-        LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
-        AbsoluteOpacity); // const AOpacity: Single)
-
-    end
-
-    {$IF defined(DEBUG)}
-    else if not doublebuffered then begin
-      ALLog('TALButton.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
-    end
-    {$ENDIF};
+    // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
+    // will be ineffective since the matrix will no longer be a simple translation matrix.
+    // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
+    // if the texture is not perfectly pixel-aligned.
+    var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(RenderTargetDrawable), ALGetDrawableHeight(RenderTargetDrawable));
+    LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+    LDstRect.SetLocation(
+      LRect.Left,
+      LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      RenderTargetDrawable, // const ADrawable: TALDrawable;
+      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
 
     {$ENDIF}
 

@@ -123,7 +123,7 @@ end;
 destructor TALTexture.Destroy;
 begin
   {$IFDEF DEBUG}
-  if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
   inherited Destroy;
 end;
@@ -156,7 +156,7 @@ procedure TALTexture.Assign(Source: TPersistent);
 begin
 
   {$IFDEF DEBUG}
-  if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
   if Source is TBitmap then begin
@@ -186,7 +186,7 @@ begin
 
   {$IFDEF DEBUG}
   {$WARNINGS OFF}
-  if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
     ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsW) +' MB', TalLogType.verbose);
@@ -204,61 +204,82 @@ procedure TALTexture.Assign(Source: jbitmap);
 begin
 
   {$IFDEF DEBUG}
-  if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign and FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture are still the same as below and adjust the IFDEF'}
   {$ENDIF}
-  if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-  Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-  SetSize(Source.getWidth, Source.getHeight);
-  if not (IsEmpty) then begin
-    if PixelFormat = TPixelFormat.None then PixelFormat := TCustomAndroidContext.PixelFormat;
-    if TCustomAndroidContext.Valid then
-    begin
-      glActiveTexture(GL_TEXTURE0);
-      var Tex: GLuint;
-      glGenTextures(1, @Tex);
-      glBindTexture(GL_TEXTURE_2D, Tex);
-      {$IFDEF IOS}
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      {$ELSE}
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      {$ENDIF}
-      case MagFilter of
-        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      end;
-      if TTextureStyle.MipMaps in Style then
+  if (Handle <> 0) and
+     (width = Source.getWidth) and
+     (Height = Source.getHeight) then begin
+    Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    if not (IsEmpty) then begin
+      if PixelFormat = TPixelFormat.None then PixelFormat := TCustomAndroidContext.PixelFormat;
+      if TCustomAndroidContext.Valid then
       begin
-        case MinFilter of
-          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        end;
-      end
-      else
-      begin
-        case MinFilter of
-          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        end;
+        glBindTexture(GL_TEXTURE_2D, Handle);
+        TJGLUtils.JavaClass.texImage2D(
+          GL_TEXTURE_2D, // target: Integer;
+          0, // level: Integer;
+          Source, // bitmap: JBitmap;
+          0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [ClassName]);
       end;
-      TJGLUtils.JavaClass.texImage2D(
-        GL_TEXTURE_2D, // target: Integer;
-        0, // level: Integer;
-        Source, // bitmap: JBitmap;
-        0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
-      glBindTexture(GL_TEXTURE_2D, 0);
-      ITextureAccess(self).Handle := Tex;
-      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [ClassName]);
+    end;
+  end
+  else begin
+    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+    Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    SetSize(Source.getWidth, Source.getHeight);
+    if not (IsEmpty) then begin
+      if PixelFormat = TPixelFormat.None then PixelFormat := TCustomAndroidContext.PixelFormat;
+      if TCustomAndroidContext.Valid then
+      begin
+        glActiveTexture(GL_TEXTURE0);
+        var Tex: GLuint;
+        glGenTextures(1, @Tex);
+        glBindTexture(GL_TEXTURE_2D, Tex);
+        {$IFDEF IOS}
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        {$ELSE}
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        {$ENDIF}
+        case MagFilter of
+          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        end;
+        if TTextureStyle.MipMaps in Style then
+        begin
+          case MinFilter of
+            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+          end;
+        end
+        else
+        begin
+          case MinFilter of
+            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          end;
+        end;
+        TJGLUtils.JavaClass.texImage2D(
+          GL_TEXTURE_2D, // target: Integer;
+          0, // level: Integer;
+          Source, // bitmap: JBitmap;
+          0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        ITextureAccess(self).Handle := Tex;
+        TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [ClassName]);
+      end;
     end;
   end;
 
   {$IFDEF DEBUG}
-  if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
     ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsW) +' MB', TalLogType.verbose);

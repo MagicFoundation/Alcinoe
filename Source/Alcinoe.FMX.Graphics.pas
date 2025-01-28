@@ -217,12 +217,19 @@ function ALGetShapeSurfaceRect(
            const AShadowOffsetX: Single;
            const AShadowOffsetY: Single): TRectF; overload;
 function ALGetShapeSurfaceRect(
-           var ARect: TrectF;
+           const ARect: TrectF;
            const AFill: TALBrush;
            const AFillResourceStream: TStream;
            const AStateLayer: TALStateLayer;
            const AShadow: TALShadow): TRectF; overload;
 function ALCreateEmptyDrawable1x1: TALDrawable;
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure ALInitControlRenderTargets(
+            Const ARect: TrectF;
+            var ARenderTargetSurface: TALSurface;
+            var ARenderTargetCanvas: TALCanvas;
+            var ARenderTargetDrawable: TALDrawable);
+{$ENDIF}
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
@@ -1464,7 +1471,7 @@ end;
 
 {*****************************}
 function ALGetShapeSurfaceRect(
-           var ARect: TrectF;
+           const ARect: TrectF;
            const AFill: TALBrush;
            const AFillResourceStream: TStream;
            const AStateLayer: TALStateLayer;
@@ -1569,6 +1576,43 @@ begin
     ALFreeAndNilSurface(LSurface, LCanvas);
   end;
 end;
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure ALInitControlRenderTargets(
+            Const ARect: TrectF;
+            var ARenderTargetSurface: TALSurface;
+            var ARenderTargetCanvas: TALCanvas;
+            var ARenderTargetDrawable: TALDrawable);
+begin
+  if (ALIsDrawableNull(ARenderTargetDrawable)) or
+     (CompareValue(ALGetDrawableWidth(ARenderTargetDrawable), ARect.Width * ALGetScreenScale, TEpsilon.Position) < 0) or
+     (CompareValue(ALGetDrawableHeight(ARenderTargetDrawable), ARect.Height * ALGetScreenScale, TEpsilon.Position) < 0) then begin
+    var LSurfaceRect := ARect;
+    LSurfaceRect.Width := LSurfaceRect.Width * 1.5{to be on the safe side};
+    LSurfaceRect.height := LSurfaceRect.height * 1.5{to be on the safe side};
+    ALFreeAndNilDrawable(ARenderTargetDrawable);
+    ALFreeAndNilSurface(ARenderTargetSurface, ARenderTargetCanvas);
+    ALCreateSurface(
+      ARenderTargetSurface, // out ASurface: TALSurface;
+      ARenderTargetCanvas, // out ACanvas: TALCanvas;
+      ALGetScreenScale{Ascale},
+      LSurfaceRect.width, // const w: Single;
+      LSurfaceRect.height, // const h: Single);
+      false); // const AAddPixelForAlignment: Boolean = true
+    {$IF defined(ALSkiaCanvas)}
+    Raise Exception.create('Error 71AD6B8B-AF32-468D-818A-168EFC96C368')
+    {$ELSEIF defined(ALGpuCanvas)}
+    ARenderTargetDrawable := TALTexture.Create;
+    ARenderTargetDrawable.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    ARenderTargetDrawable.SetSize(ALCeil(LSurfaceRect.width * ALGetScreenScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * ALGetScreenScale, TEpsilon.Position));
+    ARenderTargetDrawable.PixelFormat := ALGetDefaultPixelFormat;
+    {$ELSE}
+    ARenderTargetDrawable := FMX.Graphics.TBitmap.Create(ALCeil(LSurfaceRect.width * ALGetScreenScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * ALGetScreenScale, TEpsilon.Position));
+    {$ENDIF};
+  end;
+end;
+{$ENDIF}
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
@@ -5372,6 +5416,8 @@ begin
           _ClearShadow(LPaint);
 
           // Second pass fill the rect
+          // NOTE: The blend mode will not function correctly if we draw directly on the form
+          // and LFillColor has transparency, as the form itself does not support transparency.
           var LBlender := ALSkCheckHandle(
                             sk4d_blender_make_mode(
                               sk_blendmode_t.SRC_SK_BLENDMODE));
@@ -5440,6 +5486,9 @@ begin
             else
               raise Exception.Create('Error EADEA97C-5440-46F0-A44A-47BCF4CFAC2F');
           end;
+          // Specify an opaque color to ensure the gradient is drawn without the
+          // transparency effect of the current color.
+          sk4d_paint_set_color(LPaint, TAlphaColors.White);
           if not LDrawnWithSolidColor then _SetShadow(LPaint);
           _DrawRect(FCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, False{aNoRadius});
           if not LDrawnWithSolidColor then _ClearShadow(LPaint);
@@ -5500,7 +5549,7 @@ begin
 
               // Specify an opaque color to ensure the image is drawn without the
               // transparency effect of the current color.
-              sk4d_paint_set_color(LPaint, $FFFFFFFF);
+              sk4d_paint_set_color(LPaint, TAlphaColors.White);
               if not LDrawnWithSolidColor then _SetShadow(LPaint);
               _DrawRect(FCanvas, LPaint, LScaledImageDstRect, false{aDrawOnlyBorder}, FFillImageNoRadius{aNoRadius});
               if not LDrawnWithSolidColor then _ClearShadow(LPaint);
@@ -5659,11 +5708,18 @@ begin
         // First pass draw the shadow if not already drawn
         // We must do this because else the shadow will be drawn with
         // the color of the gradient :(
-        if not LDrawnWithSolidColor then begin
-          LPaint.setColor(integer(ALSetColorAlpha(LFillColor, 1{AOpacity})));
+        if (LShadowColor <> TalphaColorRec.Null) and (not LDrawnWithSolidColor) then begin
+          LPaint.setColor(integer(ALSetColorAlpha(LShadowColor, 1{AOpacity})));
           _SetShadow(LPaint);
           _DrawRect(FCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, false{aClipPath}, False{aNoRadius});
           _ClearShadow(LPaint);
+          // We must now remove the solid color in case the
+          // background contains transparent colors.
+          var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.CLEAR);
+          LPaint.setXfermode(LPorterDuffXfermode);
+          _DrawRect(FCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, false{aClipPath}, False{aNoRadius});
+          LPaint.setXfermode(nil);
+          LPorterDuffXfermode := nil;
         end;
 
         // Second pass fill the rect
@@ -5698,6 +5754,9 @@ begin
             else
               raise Exception.Create('Error EAB4DED3-CF02-495B-9CB8-8F82479D2839');
           end;
+          // On android the gradient is drawed with the opacity of the paint color
+          // so set the color to white to make the bitmap fully opaque
+          LPaint.setColor(integer(TAlphaColors.White));
           LPaint.setShader(LShader);
           _DrawRect(FCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, (LFillWithImage) and (LScaledBackgroundDstRect.EqualsTo(LScaledImageDstRect, TEpsilon.position)){aClipPath}, False{aNoRadius});
           LPaint.setShader(nil);
@@ -5730,8 +5789,8 @@ begin
         try
 
           // On android the bitmap is drawed with the opacity of the paint color
-          // so set the color to black to make the bitmap fully opaque
-          LPaint.setColor(integer(TAlphaColors.Black));
+          // so set the color to white to make the bitmap fully opaque
+          LPaint.setColor(integer(TAlphaColors.White));
 
           // The shadow is made directly on the bitmap
           if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
@@ -5943,12 +6002,17 @@ begin
 
         // First pass draw the shadow if not already drawn
         // We must do this because else the shadow will not be drawn
-        if not LDrawnWithSolidColor then begin
-          var LFillColorF := TAlphaColorCGFloat.Create(LFillColor);
+        if (LShadowColor <> TalphaColorRec.Null) and (not LDrawnWithSolidColor) then begin
+          var LFillColorF := TAlphaColorCGFloat.Create(LShadowColor);
           CGContextSetRGBFillColor(FCanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
           _SetShadow(FCanvas);
           _DrawRect(FCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, false{aClipPath}, False{aNoRadius});
           _ClearShadow(FCanvas);
+          // We must now remove the solid color in case the
+          // background contains transparent colors.
+          CGContextSetBlendMode(FCanvas, kCGBlendModeClear);
+          _DrawRect(FCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, false{aClipPath}, False{aNoRadius});
+          CGContextSetBlendMode(FCanvas, kCGBlendModeNormal);
         end;
 
         // Second pass fill the rect

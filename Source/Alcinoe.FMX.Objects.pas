@@ -497,6 +497,11 @@ type
     FYRadius: Single;
     FCorners: TCorners;
     FSides: TSides;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FRenderTargetSurface: TALSurface; // 8 bytes
+    FRenderTargetCanvas: TALCanvas; // 8 bytes
+    fRenderTargetDrawable: TALDrawable; // 8 bytes
+    {$ENDIF}
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
     function IsCornersStored: Boolean;
@@ -516,6 +521,7 @@ type
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
+    function IsSimpleRenderPossible: Boolean;
     procedure Paint; override;
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
@@ -529,9 +535,18 @@ type
                 const ADrawStateLayerOnTop: Boolean;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow); virtual;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
+    procedure InitRenderTargets(var ARect: TrectF); virtual;
+    procedure ClearRenderTargets; virtual;
+    Property RenderTargetSurface: TALSurface read FRenderTargetSurface;
+    Property RenderTargetCanvas: TALCanvas read FRenderTargetCanvas;
+    Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
+    {$ENDIF}
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
@@ -617,6 +632,11 @@ type
   TALEllipse = class(TALShape)
   private
     fDoubleBuffered: boolean;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FRenderTargetSurface: TALSurface; // 8 bytes
+    FRenderTargetCanvas: TALCanvas; // 8 bytes
+    fRenderTargetDrawable: TALDrawable; // 8 bytes
+    {$ENDIF}
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
   protected
@@ -638,9 +658,18 @@ type
                 const ADrawStateLayerOnTop: Boolean;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow); virtual;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
+    procedure InitRenderTargets(var ARect: TrectF); virtual;
+    procedure ClearRenderTargets; virtual;
+    Property RenderTargetSurface: TALSurface read FRenderTargetSurface;
+    Property RenderTargetCanvas: TALCanvas read FRenderTargetCanvas;
+    Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
+    {$ENDIF}
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     function PointInObjectLocal(X, Y: Single): Boolean; override;
@@ -711,6 +740,11 @@ type
   TALCircle = class(TALShape)
   private
     fDoubleBuffered: boolean;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FRenderTargetSurface: TALSurface; // 8 bytes
+    FRenderTargetCanvas: TALCanvas; // 8 bytes
+    fRenderTargetDrawable: TALDrawable; // 8 bytes
+    {$ENDIF}
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
   protected
@@ -732,9 +766,18 @@ type
                 const ADrawStateLayerOnTop: Boolean;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow); virtual;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
+    procedure InitRenderTargets(var ARect: TrectF); virtual;
+    procedure ClearRenderTargets; virtual;
+    Property RenderTargetSurface: TALSurface read FRenderTargetSurface;
+    Property RenderTargetCanvas: TALCanvas read FRenderTargetCanvas;
+    Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
+    {$ENDIF}
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     function PointInObjectLocal(X, Y: Single): Boolean; override;
@@ -914,6 +957,11 @@ type
     FOnElementMouseLeave: TElementNotifyEvent;
     FHoveredElement: TALTextElement;
     FPressedElement: TALTextElement;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FRenderTargetSurface: TALSurface; // 8 bytes
+    FRenderTargetCanvas: TALCanvas; // 8 bytes
+    fRenderTargetDrawable: TALDrawable; // 8 bytes
+    {$ENDIF}
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
     fTextBroken: Boolean;
@@ -1032,6 +1080,14 @@ type
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
+    procedure InitRenderTargets(var ARect: TrectF); virtual;
+    procedure ClearRenderTargets; virtual;
+    Property RenderTargetSurface: TALSurface read FRenderTargetSurface;
+    Property RenderTargetCanvas: TALCanvas read FRenderTargetCanvas;
+    Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
+    {$ENDIF}
     property Elements: TALTextElements read fElements;
     property OnElementClick: TElementNotifyEvent read FOnElementClick write FOnElementClick;
     property OnElementMouseDown: TElementMouseEvent read FOnElementMouseDown write FOnElementMouseDown;
@@ -2885,7 +2941,21 @@ begin
   FYRadius := DefaultYRadius;
   FCorners := AllCorners;
   FSides := AllSides;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FRenderTargetSurface := ALNullSurface;
+  FRenderTargetCanvas := ALNullCanvas;
+  FRenderTargetDrawable := ALNullDrawable;
+  {$ENDIF}
   fBufDrawable := ALNullDrawable;
+end;
+
+{**********************************}
+destructor TALBaseRectangle.Destroy;
+begin
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ClearRenderTargets;
+  {$ENDIF}
+  inherited;
 end;
 
 {***********************************}
@@ -2947,7 +3017,10 @@ procedure TALBaseRectangle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then ClearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    else ClearRenderTargets;
+    {$ENDIF}
   end;
 end;
 
@@ -3026,6 +3099,24 @@ begin
   inherited;
 end;
 
+{********************************************************}
+function TALBaseRectangle.IsSimpleRenderPossible: Boolean;
+begin
+  Result := (not HasCustomDraw)
+            and
+            ((not Stroke.HasStroke) or
+             (sides = []))
+            and
+            ((SameValue(xRadius, 0, TEpsilon.Vector)) or
+             (SameValue(yRadius, 0, TEpsilon.Vector)) or
+             (corners=[]))
+            and
+            (not Shadow.HasShadow)
+            and
+            ((not Fill.HasFill) or
+             (Fill.Styles = [TALBrushStyle.solid]));
+end;
+
 {*******************************************}
 Procedure TALBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
@@ -3102,20 +3193,7 @@ begin
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
      //--- Do not create BufDrawable if only fill with solid color
-     ((not HasCustomDraw)
-      and
-      ((not Stroke.HasStroke) or
-       (sides = []))
-      and
-      ((SameValue(xRadius, 0, TEpsilon.Vector)) or
-       (SameValue(yRadius, 0, TEpsilon.Vector)) or
-       (corners=[]))
-      and
-      (not Shadow.HasShadow)
-      and
-      ((not Fill.HasFill) or
-       (Fill.Styles = [TALBrushStyle.solid])))
-  then begin
+     (IsSimpleRenderPossible) then begin
     ClearBufDrawable;
     exit;
   end;
@@ -3139,6 +3217,42 @@ begin
 
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALBaseRectangle.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  Result := ALGetShapeSurfaceRect(
+              ARect, // const ARect: TRectF;
+              Fill, // const AFill: TALBrush;
+              nil, // const AFillResourceStream: TStream;
+              nil, // const AStateLayer: TALStateLayer;
+              Shadow); // const AShadow: TALShadow): TRectF;
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseRectangle.InitRenderTargets(var ARect: TrectF);
+begin
+  var LSurfaceRect := GetRenderTargetRect(ARect);
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+  ALInitControlRenderTargets(
+    LSurfaceRect, // Const ARect: TrectF;
+    FRenderTargetSurface, // var ARenderTargetSurface: TALSurface;
+    FRenderTargetCanvas, // var ARenderTargetCanvas: TALCanvas;
+    FRenderTargetDrawable); // var ARenderTargetDrawable: TALDrawable):
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseRectangle.ClearRenderTargets;
+begin
+  ALFreeAndNilDrawable(FRenderTargetDrawable);
+  ALFreeAndNilSurface(FRenderTargetSurface, FRenderTargetCanvas);
+end;
+{$ENDIF}
+
 {*******************************}
 procedure TALBaseRectangle.Paint;
 begin
@@ -3160,18 +3274,44 @@ begin
       .SetYRadius(YRadius)
       .Draw;
     {$ELSE}
-    {$IF defined(DEBUG)}
-    if not doublebuffered then begin
-      ALLog('TALBaseRectangle.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
-    end;
-    {$ENDIF}
-    If Fill.Styles = [TALBrushStyle.Solid] then begin
-      Canvas.Fill.kind := TBrushKind.solid;
-      Canvas.Fill.color := Fill.color;
-      Canvas.FillRect(ALAlignToPixelRound(LocalRect, Canvas.Matrix, Canvas.Scale, TEpsilon.position), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
+    if IsSimpleRenderPossible then begin
+      If Fill.Styles = [TALBrushStyle.Solid] then begin
+        Canvas.Fill.kind := TBrushKind.solid;
+        Canvas.Fill.color := Fill.color;
+        Canvas.FillRect(ALAlignToPixelRound(LocalRect, Canvas.Matrix, Canvas.Scale, TEpsilon.position), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
+      end;
     end
-    else if Fill.HasFill then raise Exception.Create('Error 87B5E7C8-55AF-41C7-88D4-B840C7D0F78F');
+    else begin
+      var LRect := LocalRect;
+      InitRenderTargets(LRect);
+      if ALCanvasBeginScene(FRenderTargetCanvas) then
+      try
+        ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
+        TALDrawRectangleHelper.Create(FRenderTargetCanvas)
+          .SetScale(ALGetScreenScale)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LRect)
+          .SetFill(Fill)
+          .SetStroke(Stroke)
+          .SetShadow(Shadow)
+          .SetSides(Sides)
+          .SetCorners(Corners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
+      finally
+        ALCanvasEndScene(FRenderTargetCanvas)
+      end;
+      ALUpdateDrawableFromSurface(FRenderTargetSurface, FRenderTargetDrawable);
+      // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+      // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+      LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        FRenderTargetDrawable, // const ADrawable: TALDrawable;
+        LRect.TopLeft, // const ADstTopLeft: TpointF;
+        AbsoluteOpacity); // const AOpacity: Single)
+    end;
     {$ENDIF}
     exit;
   end;
@@ -3189,7 +3329,21 @@ constructor TALEllipse.Create(AOwner: TComponent);
 begin
   inherited;
   fDoubleBuffered := true;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FRenderTargetSurface := ALNullSurface;
+  FRenderTargetCanvas := ALNullCanvas;
+  FRenderTargetDrawable := ALNullDrawable;
+  {$ENDIF}
   fBufDrawable := ALNullDrawable;
+end;
+
+{****************************}
+destructor TALEllipse.Destroy;
+begin
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ClearRenderTargets;
+  {$ENDIF}
+  inherited;
 end;
 
 {************************************}
@@ -3214,7 +3368,10 @@ procedure TALEllipse.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then ClearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    else ClearRenderTargets;
+    {$ENDIF}
   end;
 end;
 
@@ -3335,6 +3492,42 @@ begin
 
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALEllipse.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  Result := ALGetShapeSurfaceRect(
+              ARect, // const ARect: TRectF;
+              Fill, // const AFill: TALBrush;
+              nil, // const AFillResourceStream: TStream;
+              nil, // const AStateLayer: TALStateLayer;
+              Shadow); // const AShadow: TALShadow): TRectF;
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALEllipse.InitRenderTargets(var ARect: TrectF);
+begin
+  var LSurfaceRect := GetRenderTargetRect(ARect);
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+  ALInitControlRenderTargets(
+    LSurfaceRect, // Const ARect: TrectF;
+    FRenderTargetSurface, // var ARenderTargetSurface: TALSurface;
+    FRenderTargetCanvas, // var ARenderTargetCanvas: TALCanvas;
+    FRenderTargetDrawable); // var ARenderTargetDrawable: TALDrawable):
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALEllipse.ClearRenderTargets;
+begin
+  ALFreeAndNilDrawable(FRenderTargetDrawable);
+  ALFreeAndNilSurface(FRenderTargetSurface, FRenderTargetCanvas);
+end;
+{$ENDIF}
+
 {*************************}
 procedure TALEllipse.Paint;
 begin
@@ -3354,12 +3547,33 @@ begin
       .SetYRadius(Height / 2)
       .Draw;
     {$ELSE}
-    {$IF defined(DEBUG)}
-    if not doublebuffered then begin
-      ALLog('TALEllipse.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(FRenderTargetCanvas) then
+    try
+      ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
+      TALDrawRectangleHelper.Create(FRenderTargetCanvas)
+        .SetScale(ALGetScreenScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LRect)
+        .SetFill(Fill)
+        .SetStroke(Stroke)
+        .SetShadow(Shadow)
+        .SetXRadius(Width / 2)
+        .SetYRadius(Height / 2)
+        .Draw;
+    finally
+      ALCanvasEndScene(FRenderTargetCanvas)
     end;
-    {$ENDIF}
+    ALUpdateDrawableFromSurface(FRenderTargetSurface, FRenderTargetDrawable);
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FRenderTargetDrawable, // const ADrawable: TALDrawable;
+      LRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ENDIF}
     exit;
   end;
@@ -3395,7 +3609,21 @@ constructor TALCircle.Create(AOwner: TComponent);
 begin
   inherited;
   fDoubleBuffered := true;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FRenderTargetSurface := ALNullSurface;
+  FRenderTargetCanvas := ALNullCanvas;
+  FRenderTargetDrawable := ALNullDrawable;
+  {$ENDIF}
   fBufDrawable := ALNullDrawable;
+end;
+
+{***************************}
+destructor TALCircle.Destroy;
+begin
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ClearRenderTargets;
+  {$ENDIF}
+  inherited;
 end;
 
 {***********************************}
@@ -3420,7 +3648,10 @@ procedure TALCircle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then ClearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    else ClearRenderTargets;
+    {$ENDIF}
   end;
 end;
 
@@ -3541,6 +3772,42 @@ begin
 
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALCircle.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  Result := ALGetShapeSurfaceRect(
+              ARect, // const ARect: TRectF;
+              Fill, // const AFill: TALBrush;
+              nil, // const AFillResourceStream: TStream;
+              nil, // const AStateLayer: TALStateLayer;
+              Shadow); // const AShadow: TALShadow): TRectF;
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALCircle.InitRenderTargets(var ARect: TrectF);
+begin
+  var LSurfaceRect := GetRenderTargetRect(ARect);
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+  ALInitControlRenderTargets(
+    LSurfaceRect, // Const ARect: TrectF;
+    FRenderTargetSurface, // var ARenderTargetSurface: TALSurface;
+    FRenderTargetCanvas, // var ARenderTargetCanvas: TALCanvas;
+    FRenderTargetDrawable); // var ARenderTargetDrawable: TALDrawable):
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALCircle.ClearRenderTargets;
+begin
+  ALFreeAndNilDrawable(FRenderTargetDrawable);
+  ALFreeAndNilSurface(FRenderTargetSurface, FRenderTargetCanvas);
+end;
+{$ENDIF}
+
 {************************}
 procedure TALCircle.Paint;
 begin
@@ -3550,7 +3817,6 @@ begin
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetScale(1)
       .SetAlignToPixel(IsPixelAlignmentEnabled)
       .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect))
       .SetOpacity(AbsoluteOpacity)
@@ -3561,12 +3827,33 @@ begin
       .SetYRadius(-50)
       .Draw;
     {$ELSE}
-    {$IF defined(DEBUG)}
-    if not doublebuffered then begin
-      ALLog('TALCircle.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(FRenderTargetCanvas) then
+    try
+      ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
+      TALDrawRectangleHelper.Create(FRenderTargetCanvas)
+        .SetScale(ALGetScreenScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LRect))
+        .SetFill(Fill)
+        .SetStroke(Stroke)
+        .SetShadow(Shadow)
+        .SetXRadius(-50)
+        .SetYRadius(-50)
+        .Draw;
+    finally
+      ALCanvasEndScene(FRenderTargetCanvas)
     end;
-    {$ENDIF}
+    ALUpdateDrawableFromSurface(FRenderTargetSurface, FRenderTargetDrawable);
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FRenderTargetDrawable, // const ADrawable: TALDrawable;
+      LRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ENDIF}
     exit;
   end;
@@ -4007,6 +4294,11 @@ begin
   //FHoveredElement := TALTextElement.Empty;
   //FPressedElement := TALTextElement.Empty;
   //-----
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FRenderTargetSurface := ALNullSurface;
+  FRenderTargetCanvas := ALNullCanvas;
+  FRenderTargetDrawable := ALNullDrawable;
+  {$ENDIF}
   fBufDrawable := ALNullDrawable;
   //-----
   fTextBroken := False;
@@ -4034,6 +4326,9 @@ destructor TALBaseText.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FMultiLineTextOptions);
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ClearRenderTargets;
+  {$ENDIF}
   inherited;
 end;
 
@@ -4369,6 +4664,42 @@ begin
   FTextSettings.Assign(Value);
 end;
 
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+function TALBaseText.GetRenderTargetRect(const ARect: TrectF): TRectF;
+begin
+  Result := ALGetShapeSurfaceRect(
+              ARect, // const ARect: TRectF;
+              Fill, // const AFill: TALBrush;
+              nil, // const AFillResourceStream: TStream;
+              nil, // const AStateLayer: TALStateLayer;
+              Shadow); // const AShadow: TALShadow): TRectF;
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseText.InitRenderTargets(var ARect: TrectF);
+begin
+  var LSurfaceRect := GetRenderTargetRect(ARect);
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+  ALInitControlRenderTargets(
+    LSurfaceRect, // Const ARect: TrectF;
+    FRenderTargetSurface, // var ARenderTargetSurface: TALSurface;
+    FRenderTargetCanvas, // var ARenderTargetCanvas: TALCanvas;
+    FRenderTargetDrawable); // var ARenderTargetDrawable: TALDrawable):
+end;
+{$ENDIF}
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseText.ClearRenderTargets;
+begin
+  ALFreeAndNilDrawable(FRenderTargetDrawable);
+  ALFreeAndNilSurface(FRenderTargetSurface, FRenderTargetCanvas);
+end;
+{$ENDIF}
+
 {**************************}
 procedure TALBaseText.Paint;
 begin
@@ -4396,12 +4727,40 @@ begin
       Stroke, // const AStroke: TALStrokeBrush;
       Shadow); // const AShadow: TALShadow);
     {$ELSE}
-    {$IF defined(DEBUG)}
-    if not doublebuffered then begin
-      ALLog('TALBaseText.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
-      exit;
+    var LRect := LocalRect;
+    InitRenderTargets(LRect);
+    if ALCanvasBeginScene(FRenderTargetCanvas) then
+    try
+      ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
+      DrawMultilineText(
+        FRenderTargetCanvas, // const ACanvas: TALCanvas;
+        LRect, // out ARect: TRectF;
+        FTextBroken, // out ATextBroken: Boolean;
+        FAllTextDrawn, // out AAllTextDrawn: Boolean;
+        FElements, // out AElements: TALTextElements;
+        ALGetScreenScale, // const AScale: Single;
+        1, // const AOpacity: Single;
+        Text, // const AText: String;
+        TextSettings.Font, // const AFont: TALFont;
+        TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+        TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+        TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+        Fill, // const AFill: TALBrush;
+        nil, // const AStateLayer: TALStateLayer;
+        Stroke, // const AStroke: TALStrokeBrush;
+        Shadow); // const AShadow: TALShadow);
+    finally
+      ALCanvasEndScene(FRenderTargetCanvas)
     end;
-    {$ENDIF}
+    ALUpdateDrawableFromSurface(FRenderTargetSurface, FRenderTargetDrawable);
+    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FRenderTargetDrawable, // const ADrawable: TALDrawable;
+      LRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ENDIF}
     exit;
   end;
@@ -4428,7 +4787,10 @@ procedure TALBaseText.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then ClearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    else ClearRenderTargets;
+    {$ENDIF}
   end;
 end;
 

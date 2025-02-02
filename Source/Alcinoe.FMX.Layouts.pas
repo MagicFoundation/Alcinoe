@@ -237,12 +237,12 @@ type
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetShowScrollBars(const Value: Boolean);
     procedure SetAutoHide(const Value: Boolean);
-    function isMaxContentHeightStored: Boolean;
-    function isMaxContentWidthStored: Boolean;
-    procedure internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure internalMouseMove(Shift: TShiftState; X, Y: Single);
-    procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure internalMouseLeave;
+    function IsMaxContentHeightStored: Boolean;
+    function IsMaxContentWidthStored: Boolean;
+    procedure InternalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure InternalMouseMove(Shift: TShiftState; X, Y: Single);
+    procedure InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure InternalMouseLeave;
     { IALScrollableControl }
     function GetScrollEngine: TALScrollEngine;
   protected
@@ -265,8 +265,8 @@ type
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     property HScrollBar: TScrollBar read fHScrollBar;
     property VScrollBar: TScrollBar read fVScrollBar;
-    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored nodefault;
-    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored nodefault;
+    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored IsMaxContentWidthStored nodefault;
+    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored IsMaxContentHeightStored nodefault;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -785,13 +785,13 @@ begin
 end;
 
 {************************************************************}
-function TALCustomScrollBox.isMaxContentHeightStored: Boolean;
+function TALCustomScrollBox.IsMaxContentHeightStored: Boolean;
 begin
   result := not sameValue(fMaxContentHeight, 0, Tepsilon.Position);
 end;
 
 {***********************************************************}
-function TALCustomScrollBox.isMaxContentWidthStored: Boolean;
+function TALCustomScrollBox.IsMaxContentWidthStored: Boolean;
 begin
   result := not sameValue(fMaxContentWidth, 0, Tepsilon.Position);
 end;
@@ -974,10 +974,9 @@ begin
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
-  //  'TALCustomScrollBox.ScrollCapturedByOtherHandler',
+  //  ClassName + '.ScrollCapturedByOtherHandler',
   //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
-  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down),
-  //  TalLogType.verbose);
+  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down));
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
     {$IFDEF DEBUG}
@@ -992,13 +991,12 @@ begin
 end;
 
 {*****************************************************************************************************}
-procedure TALCustomScrollBox.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+procedure TALCustomScrollBox.InternalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
-  //  'TALCustomScrollBox.MouseDown',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  ClassName + '.MouseDown',
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if (Button = TMouseButton.mbLeft) then begin
     FMouseEvents := true;
@@ -1008,13 +1006,12 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TALCustomScrollBox.internalMouseMove(Shift: TShiftState; X, Y: Single);
+procedure TALCustomScrollBox.InternalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
-  //  'TALCustomScrollBox.internalMouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  ClassName + '.InternalMouseMove',
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if FMouseEvents then begin
     if (not fScrollCapturedByMe) and
@@ -1032,13 +1029,12 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALCustomScrollBox.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+procedure TALCustomScrollBox.InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
-  //  'TALCustomScrollBox.internalMouseUp',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  ClassName + '.InternalMouseUp',
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
     FScrollCapturedByMe := False;
@@ -1048,10 +1044,10 @@ begin
 end;
 
 {**********************************************}
-procedure TALCustomScrollBox.internalMouseLeave;
+procedure TALCustomScrollBox.InternalMouseLeave;
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALCustomScrollBox.internalMouseLeave', TalLogType.verbose);
+  //ALLog(ClassName + '.InternalMouseLeave');
   {$ENDIF}
   if FMouseEvents then begin
     FScrollCapturedByMe := False;
@@ -1064,28 +1060,28 @@ end;
 procedure TALCustomScrollBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  internalMouseDown(Button, Shift, X, Y);
+  InternalMouseDown(Button, Shift, X, Y);
 end;
 
 {***********************************************************************}
 procedure TALCustomScrollBox.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  internalMouseMove(Shift, X, Y);
+  InternalMouseMove(Shift, X, Y);
 end;
 
 {*******************************************************************************************}
 procedure TALCustomScrollBox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  internalMouseUp(Button, Shift, X, Y);
+  InternalMouseUp(Button, Shift, X, Y);
 end;
 
 {****************************************}
 procedure TALCustomScrollBox.DoMouseLeave;
 begin
   inherited;
-  internalMouseLeave;
+  InternalMouseLeave;
 end;
 
 {*************}
@@ -1101,7 +1097,7 @@ begin
       _TControlAccessProtected(aObject).capture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
-  internalMouseDown(Button, Shift, P.X, P.Y);
+  InternalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
 end;
 {$ENDIF}
@@ -1111,7 +1107,7 @@ end;
 procedure TALCustomScrollBox.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
 begin
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
-  internalMouseMove(Shift, P.X, P.Y);
+  InternalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
 {$ENDIF}
@@ -1129,7 +1125,7 @@ begin
       _TControlAccessProtected(aObject).releasecapture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
-  internalMouseUp(Button, Shift, P.X, P.Y);
+  InternalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
 end;
 {$ENDIF}
@@ -1138,7 +1134,7 @@ end;
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseLeave(const AObject: TControl);
 begin
-  internalMouseLeave;
+  InternalMouseLeave;
   inherited;
 end;
 {$ENDIF}

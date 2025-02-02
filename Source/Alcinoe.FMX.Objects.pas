@@ -107,10 +107,11 @@ type
   protected
     type
       TResourceDownloadContext = Class(TObject)
-      public
+      private
         Lock: TObject;
-        Owner: TALImage;
         FreeByThread: Boolean;
+      public
+        Owner: TALImage;
         Rect: TRectF;
         Scale: Single;
         AlignToPixel: Boolean;
@@ -1375,8 +1376,8 @@ constructor TALImage.TResourceDownloadContext.Create(const AOwner: TALImage);
 begin
   inherited Create;
   Lock := TObject.Create;
-  Owner := AOwner;
   FreeByThread := True;
+  Owner := AOwner;
   Rect := Owner.LocalRect;
   Scale := ALGetScreenScale;
   AlignToPixel := Owner.IsPixelAlignmentEnabled;

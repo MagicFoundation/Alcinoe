@@ -402,7 +402,7 @@ procedure TALFacebookLogin.ActivityResultHandler(const Sender: TObject; const M:
 begin
 
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.ActivityResultHandler', TalLogType.VERBOSE);
+  allog('TALFacebookLogin.ActivityResultHandler');
   {$ENDIF}
 
   if M is TMessageResultNotification then begin
@@ -709,8 +709,7 @@ begin
     'TALFacebookGraphRequest.TGraphRequestCallback.onCompleted',
     'response: ' + LRawResponse + ' | ' +
     'ErrorCode: ' + ALIntToStrW(LErrorCode) + ' | ' +
-    'ErrorMsg: ' + LErrorMsg,
-    TalLogType.verbose);
+    'ErrorMsg: ' + LErrorMsg);
   {$ENDIF}
 
   if assigned(fFacebookGraphRequest.fOnCompleted) then
@@ -758,8 +757,7 @@ begin
     'TALFacebookGraphRequest.GraphRequestCompletionHandler',
     'response: ' + LRawResponse + ' | ' +
     'ErrorCode: ' + ALIntToStrW(LErrorCode) + ' | ' +
-    'ErrorMsg: ' + LErrorMsg,
-    TalLogType.verbose);
+    'ErrorMsg: ' + LErrorMsg);
   {$ENDIF}
 
   if assigned(fOnCompleted) then

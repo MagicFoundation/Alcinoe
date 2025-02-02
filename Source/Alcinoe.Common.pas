@@ -786,8 +786,7 @@ begin
             //  ClassName + '.Execute',
             //  'Request.Priority:' + ALIntToStrW(LWorkerThreadRequest.Priority) + ' | ' +
             //  'PriorityStartingPoint:' + ALIntToStrW(FWorkerThreadPool.PriorityStartingPoint) + ' | ' +
-            //  'PriorityDirection:' + TRttiEnumerationType.GetName(FWorkerThreadPool.PriorityDirection),
-            //  TalLogType.verbose);
+            //  'PriorityDirection:' + TRttiEnumerationType.GetName(FWorkerThreadPool.PriorityDirection));
             {$ENDIF}
             if assigned(LWorkerThreadRequest.ObjProc) then LWorkerThreadRequest.ObjProc(LWorkerThreadRequest.FContext)
             else LWorkerThreadRequest.RefProc(LWorkerThreadRequest.FContext);

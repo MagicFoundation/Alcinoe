@@ -710,7 +710,7 @@ var LNativeWin: JWindow;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.Start', TalLogType.verbose);
+  allog('TALWebRTC.Start');
   {$ENDIF}
 
   {$REGION ' ANDROID'}
@@ -756,7 +756,7 @@ var LNativeWin: JWindow;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.Stop', TalLogType.verbose);
+  allog('TALWebRTC.Stop');
   {$ENDIF}
 
   {$REGION ' ANDROID'}
@@ -1085,8 +1085,7 @@ begin
   //  'textureId: ' + ALIntToStrW(textureId) + ' | ' +
   //  'width: ' + ALIntToStrW(width) + ' | ' +
   //  'height: ' + ALIntToStrW(height) + ' | ' +
-  //  'rotation: ' + ALIntToStrW(rotation),
-  //  TalLogType.VERBOSE);
+  //  'rotation: ' + ALIntToStrW(rotation));
   {$ENDIF}
 
   TALTextureAccessPrivate(fWebRTC.fLocalBitmap).FHandle := textureId;
@@ -1108,8 +1107,7 @@ begin
   //  'textureId: ' + ALIntToStrW(textureId) + ' | ' +
   //  'width: ' + ALIntToStrW(width) + ' | ' +
   //  'height: ' + ALIntToStrW(height) + ' | ' +
-  //  'rotation: ' + ALIntToStrW(rotation),
-  //  TalLogType.VERBOSE);
+  //  'rotation: ' + ALIntToStrW(rotation));
   {$ENDIF}
 
   TALTextureAccessPrivate(fWebRTC.fRemoteBitmap).FHandle := textureId;
@@ -1127,7 +1125,7 @@ var LSDPType: TALWebRTCSDPType;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onLocalDescription','sdp.description: ' + JstringToString(sdp.description), TalLogType.VERBOSE);
+  allog('TALWebRTC.TAndroidWebRTCListener.onLocalDescription','sdp.description: ' + JstringToString(sdp.description));
   {$ENDIF}
 
   if assigned(fWebRTC.fonLocalDescriptionEvent) then begin
@@ -1150,8 +1148,7 @@ begin
     'candidate.sdpMLineIndex: ' + ALIntToStrW(candidate.sdpMLineIndex) + ' | ' +
     'candidate.sdpMid: ' + JstringToString(candidate.sdpMid) + ' | ' +
     'candidate.serverUrl: ' + JstringToString(candidate.serverUrl) + ' | ' +
-    'candidate.sdp: ' + JstringToString(candidate.sdp),
-    TalLogType.VERBOSE);
+    'candidate.sdp: ' + JstringToString(candidate.sdp));
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidateEvent) then
@@ -1171,7 +1168,7 @@ var LIceCandidates: TALWebRTCIceCandidates;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidatesRemoved', TalLogType.VERBOSE);
+  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidatesRemoved');
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidatesRemovedEvent) then begin
@@ -1193,7 +1190,7 @@ var LState: TALWebRTCIceConnectionState;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onIceConnectionChange','newState: ' + JstringToString(newState.toString), TalLogType.VERBOSE);
+  allog('TALWebRTC.TAndroidWebRTCListener.onIceConnectionChange','newState: ' + JstringToString(newState.toString));
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceConnectionChangeEvent) then begin
@@ -1249,7 +1246,7 @@ Var LWebRTCConfig: RTCAudioSessionConfiguration;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Create', TalLogType.verbose);
+  allog('TALiOSWebRTC.Create');
   {$ENDIF}
 
   FreeOnTerminate := True;
@@ -1299,7 +1296,7 @@ destructor TALiOSWebRTC.Destroy;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Destroy', TalLogType.verbose);
+  allog('TALiOSWebRTC.Destroy');
   {$ENDIF}
 
   if not terminated then begin
@@ -1368,7 +1365,7 @@ begin
   end;
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Execute', 'Terminating', TalLogType.verbose);
+  allog('TALiOSWebRTC.Execute', 'Terminating');
   {$ENDIF}
 
   //release all retained object
@@ -1921,7 +1918,7 @@ begin
 
   {$IFDEF DEBUG}
   if (error <> nil) then allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Failed to create session description. Error: ' + NSStrToStr(error.localizedDescription), TalLogType.error)
-  else allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Session description successfully created', TalLogType.verbose);
+  else allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Session description successfully created');
   {$ENDIF}
 
   //check if error
@@ -1999,7 +1996,7 @@ begin
 
       // We've just set our local SDP so time to send it.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully | sdp.description: ' + NSStrToStr(fLocalSdp.sdp), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully | sdp.description: ' + NSStrToStr(fLocalSdp.sdp));
       {$ENDIF}
 
       if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
@@ -2026,7 +2023,7 @@ begin
       // We've just set remote description, so drain remote
       // and send local ICE candidates.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully', TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully');
       {$ENDIF}
 
       Enqueue(
@@ -2047,7 +2044,7 @@ begin
       // We've just set our local SDP so time to send it, drain
       // remote and send local ICE candidates.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully | sdp.description: ' + NsStrToStr(fLocalSdp.sdp), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully | sdp.description: ' + NsStrToStr(fLocalSdp.sdp));
       {$ENDIF}
 
       if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
@@ -2080,7 +2077,7 @@ begin
       // We've just set remote SDP - do nothing for now -
       // answer will be created soon.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully', TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully');
       {$ENDIF}
 
     end;
@@ -2201,7 +2198,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeSignalingState(peerConnection: RTCPeerConnection; didChangeSignalingState: RTCSignalingState);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeSignalingState', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeSignalingState');
   {$ENDIF}
 end;
 
@@ -2209,7 +2206,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidAddStream(peerConnection: RTCPeerConnection; didAddStream: RTCMediaStream);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddStream', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddStream');
   {$ENDIF}
 end;
 
@@ -2217,7 +2214,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveStream(peerConnection: RTCPeerConnection; didRemoveStream: RTCMediaStream);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveStream', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveStream');
   {$ENDIF}
 end;
 
@@ -2226,7 +2223,7 @@ procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionShouldNegotiate(pee
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionShouldNegotiate', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionShouldNegotiate');
   {$ENDIF}
 
   // No need to do anything; AppRTC follows a pre-agreed-upon
@@ -2240,7 +2237,7 @@ var LState: TALWebRTCIceConnectionState;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceConnectionState', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceConnectionState');
   {$ENDIF}
 
   if didChangeIceConnectionState = RTCIceConnectionStateCONNECTED then LState := TALWebRTCIceConnectionState.CONNECTED
@@ -2267,7 +2264,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceGatheringState(peerConnection: RTCPeerConnection; didChangeIceGatheringState: RTCIceGatheringState);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceGatheringState', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceGatheringState');
   {$ENDIF}
 end;
 
@@ -2277,7 +2274,7 @@ var LWebRTCIceCandidate: TALWebRTCIceCandidate;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidGenerateIceCandidate', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidGenerateIceCandidate');
   {$ENDIF}
 
   LWebRTCIceCandidate := TALWebRTCIceCandidate.Create(
@@ -2303,7 +2300,7 @@ var LWebRTCIceCandidates: TALWebRTCIceCandidates;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveIceCandidates', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveIceCandidates');
   {$ENDIF}
 
   setlength(LWebRTCIceCandidates, didRemoveIceCandidates.count);
@@ -2329,7 +2326,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidOpenDataChannel(peerConnection: RTCPeerConnection; didOpenDataChannel: RTCDataChannel);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidOpenDataChannel', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidOpenDataChannel');
   {$ENDIF}
 end;
 
@@ -2337,7 +2334,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidStartReceivingOnTransceiver(peerConnection: RTCPeerConnection; didStartReceivingOnTransceiver: RTCRtpTransceiver);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidStartReceivingOnTransceiver', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidStartReceivingOnTransceiver');
   {$ENDIF}
 end;
 
@@ -2345,7 +2342,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidAddReceiverStreams(peerConnection: RTCPeerConnection; didAddReceiver: RTCRtpReceiver; streams: NSArray);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddReceiverStreams', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddReceiverStreams');
   {$ENDIF}
 end;
 
@@ -2353,7 +2350,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveReceiver(peerConnection: RTCPeerConnection; didRemoveReceiver: RTCRtpReceiver);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveReceiver', TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveReceiver');
   {$ENDIF}
 end;
 
@@ -2368,7 +2365,7 @@ end;
 procedure TALiOSWebRTC.TLocalVideoTrackRenderer.setSize(size: CGSize);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TLocalVideoTrackRenderer.setSize', TalLogType.verbose);
+  allog('TALWebRTC.TLocalVideoTrackRenderer.setSize');
   {$ENDIF}
 end;
 
@@ -2377,7 +2374,7 @@ procedure TALiOSWebRTC.TLocalVideoTrackRenderer.renderFrame(frame: RTCVideoFrame
 begin
 
   {$IFDEF DEBUG}
-  //allog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame', TalLogType.verbose);
+  //allog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame');
   {$ENDIF}
 
   TThread.synchronize(nil,
@@ -2579,7 +2576,7 @@ procedure TALiOSWebRTC.TRemoteVideoTrackRenderer.setSize(size: CGSize);
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TRemoteVideoTrackRenderer.setSize', TalLogType.verbose);
+  allog('TALWebRTC.TRemoteVideoTrackRenderer.setSize');
   {$ENDIF}
 
 end;
@@ -2589,7 +2586,7 @@ procedure TALiOSWebRTC.TRemoteVideoTrackRenderer.renderFrame(frame: RTCVideoFram
 begin
 
   {$IFDEF DEBUG}
-  //allog('TALWebRTC.TRemoteVideoTrackRenderer.renderFrame', TalLogType.verbose);
+  //allog('TALWebRTC.TRemoteVideoTrackRenderer.renderFrame');
   {$ENDIF}
 
   //-----

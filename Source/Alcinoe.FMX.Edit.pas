@@ -1374,7 +1374,7 @@ begin
     {$IF defined(android)}
     ALVirtualKeyboardVisible := True;
     {$IF defined(DEBUG)}
-    ALLog('TALBaseEditControl.showVirtualKeyboard', 'control.name: ' + Name, TalLogType.VERBOSE);
+    ALLog('TALBaseEditControl.showVirtualKeyboard', 'control.name: ' + Name);
     {$ENDIF}
     MainActivity.getVirtualKeyboard.showFor(NativeView.View);
     {$ENDIF}
@@ -1395,7 +1395,7 @@ begin
     begin
       If not ALVirtualKeyboardVisible then begin
         {$IF defined(DEBUG)}
-        ALLog('TALBaseEditControl.hideVirtualKeyboard', TalLogType.VERBOSE);
+        ALLog('TALBaseEditControl.hideVirtualKeyboard');
         {$ENDIF}
         MainActivity.getVirtualKeyboard.hide;
       end;
@@ -1472,14 +1472,12 @@ begin
       'TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme',
       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
       'keyCode: ' + inttostr(keyCode) + ' | ' +
-      'event: ' + JstringToString(event.toString),
-      TalLogType.VERBOSE)
+      'event: ' + JstringToString(event.toString))
   else
     ALLog(
       'TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme',
       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
-      'keyCode: ' + inttostr(keyCode),
-      TalLogType.VERBOSE);
+      'keyCode: ' + inttostr(keyCode));
   {$ENDIF}
   if ((event = nil) or (event.getAction = AKEY_EVENT_ACTION_UP)) and
      (keyCode = AKEYCODE_BACK) then begin
@@ -1549,7 +1547,7 @@ end;
 procedure TALAndroidEditText.TALTextWatcher.afterTextChanged(s: JEditable);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEditText.TALTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALAndroidEditText.TALTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name);
   {$ENDIF}
   FEditText.fEditControl.DoChange;
 end;
@@ -1583,14 +1581,12 @@ begin
        'TALAndroidEditText.TALEditorActionListener.onEditorAction',
        'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
        'actionId: ' + inttostr(actionId) + ' | ' +
-       'event: ' + JstringToString(event.toString),
-       TalLogType.VERBOSE)
+       'event: ' + JstringToString(event.toString))
    else
      ALLog(
        'TALAndroidEditText.TALEditorActionListener.onEditorAction',
        'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
-       'actionId: ' + inttostr(actionId),
-       TalLogType.VERBOSE);
+       'actionId: ' + inttostr(actionId));
   {$ENDIF}
   //IME_ACTION_DONE: the action key performs a "done" operation, typically meaning there is nothing more to input and the IME will be closed.
   //IME_ACTION_GO: the action key performs a "go" operation to take the user to the target of the text they typed. Typically used, for example, when entering a URL.
@@ -2099,15 +2095,15 @@ begin
   if isfocused and
      (M is TApplicationEventMessage) then begin
     case (M as TApplicationEventMessage).Value.Event of
-      TApplicationEvent.FinishedLaunching: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.FinishedLaunching', TalLogType.VERBOSE);
-      TApplicationEvent.BecameActive: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.BecameActive', TalLogType.VERBOSE);
-      TApplicationEvent.WillBecomeInactive: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.WillBecomeInactive', TalLogType.VERBOSE);
-      TApplicationEvent.EnteredBackground: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.EnteredBackground', TalLogType.VERBOSE);
-      TApplicationEvent.WillBecomeForeground: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.WillBecomeForeground', TalLogType.VERBOSE);
-      TApplicationEvent.WillTerminate: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.WillTerminate', TalLogType.VERBOSE);
-      TApplicationEvent.LowMemory: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.LowMemory', TalLogType.VERBOSE);
-      TApplicationEvent.TimeChange: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.TimeChange', TalLogType.VERBOSE);
-      TApplicationEvent.OpenURL: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.OpenURL', TalLogType.VERBOSE);
+      TApplicationEvent.FinishedLaunching: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.FinishedLaunching');
+      TApplicationEvent.BecameActive: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.BecameActive');
+      TApplicationEvent.WillBecomeInactive: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.WillBecomeInactive');
+      TApplicationEvent.EnteredBackground: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.EnteredBackground');
+      TApplicationEvent.WillBecomeForeground: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.WillBecomeForeground');
+      TApplicationEvent.WillTerminate: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.WillTerminate');
+      TApplicationEvent.LowMemory: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.LowMemory');
+      TApplicationEvent.TimeChange: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.TimeChange');
+      TApplicationEvent.OpenURL: ALLog('TALAndroidEditControl.ApplicationEventHandler', 'Event: TApplicationEvent.OpenURL');
     end;
   end;
   {$ENDIF}
@@ -2239,7 +2235,7 @@ end;
 function TALIosEditTextField.canBecomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextField.canBecomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALIosEditTextField.canBecomeFirstResponder', 'control.name: ' + fEditControl.parent.Name);
   {$ENDIF}
   Result := UITextField(Super).canBecomeFirstResponder and TControl(fEditControl.Owner).canFocus;
 end;
@@ -2248,7 +2244,7 @@ end;
 function TALIosEditTextField.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALIosEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name);
   {$ENDIF}
   Result := UITextField(Super).becomeFirstResponder;
   if (not TControl(fEditControl.Owner).IsFocused) then
@@ -2259,7 +2255,7 @@ end;
 procedure TALIosEditTextField.ControlEventEditingChanged;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALIosEditTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name);
   {$ENDIF}
   fEditControl.DoChange;
 end;
@@ -2292,8 +2288,7 @@ begin
   ALLog(
     'TALIosEditTextFieldDelegate.textField',
     'control.name: ' + FEditControl.parent.Name + ' | ' +
-    'replacementString: ' + NSStrToStr(replacementString),
-    TalLogType.VERBOSE);
+    'replacementString: ' + NSStrToStr(replacementString));
   {$ENDIF}
   if FEditControl.maxLength > 0 then begin
     var LText: NSString := TNSString.Wrap(textField.text);
@@ -2336,7 +2331,7 @@ end;
 function TALIosEditTextFieldDelegate.textFieldShouldReturn(textField: UITextField): Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextFieldDelegate.textFieldShouldReturn', 'control.name: ' + FEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALIosEditTextFieldDelegate.textFieldShouldReturn', 'control.name: ' + FEditControl.parent.Name);
   {$ENDIF}
   if assigned(fEditControl.OnReturnKey) then begin
     fEditControl.DoReturnKey;
@@ -2704,7 +2699,7 @@ end;
 function TALMacEditTextField.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacEditTextField.acceptsFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacEditTextField.acceptsFirstResponder', 'control.name: ' + fEditControl.parent.Name);
   {$ENDIF}
   Result := NSTextField(Super).acceptsFirstResponder and TControl(fEditControl.Owner).canFocus;
 end;
@@ -2713,7 +2708,7 @@ end;
 function TALMacEditTextField.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name);
   {$ENDIF}
   Result := NSTextField(Super).becomeFirstResponder;
   if (not TControl(fEditControl.Owner).IsFocused) then
@@ -4841,7 +4836,7 @@ end;
 procedure TALBaseEdit.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALBaseEdit.DoEnter', 'control.name: ' + Name, TalLogType.VERBOSE);
+  ALLog('TALBaseEdit.DoEnter', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoEnter;
   StateStyles.startTransition;
@@ -4862,7 +4857,7 @@ begin
   if IsFocused then begin
     ALVirtualKeyboardVisible := True;
     {$IF defined(DEBUG)}
-    ALLog('TALBaseEdit.showVirtualKeyboard', 'control.name: ' + Name, TalLogType.VERBOSE);
+    ALLog('TALBaseEdit.showVirtualKeyboard', 'control.name: ' + Name);
     {$ENDIF}
     MainActivity.getVirtualKeyboard.showFor(NativeView.View);
   end;
@@ -4873,7 +4868,7 @@ end;
 procedure TALBaseEdit.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALBaseEdit.DoExit', 'control.name: ' + Name, TalLogType.VERBOSE);
+  ALLog('TALBaseEdit.DoExit', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoExit;
   StateStyles.startTransition;
@@ -4898,7 +4893,7 @@ begin
     begin
       If not ALVirtualKeyboardVisible then begin
         {$IF defined(DEBUG)}
-        ALLog('TALBaseEdit.hideVirtualKeyboard', TalLogType.VERBOSE);
+        ALLog('TALBaseEdit.hideVirtualKeyboard');
         {$ENDIF}
         MainActivity.getVirtualKeyboard.hide;
       end;

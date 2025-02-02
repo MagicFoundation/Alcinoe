@@ -445,7 +445,7 @@ constructor TALFirebaseMessaging.Create;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.Create', 'begin', TalLogType.verbose);
+  allog('TALFirebaseMessaging.Create', 'begin');
   {$ENDIF}
 
   inherited Create;
@@ -493,7 +493,7 @@ begin
   TThread.ForceQueue(nil, DeliverStartupNotificationMessages);
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.Create', 'end', TalLogType.verbose);
+  allog('TALFirebaseMessaging.Create', 'end');
   {$ENDIF}
 
 end;
@@ -503,7 +503,7 @@ destructor TALFirebaseMessaging.Destroy;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.Destroy', TalLogType.verbose);
+  allog('TALFirebaseMessaging.Destroy');
   {$ENDIF}
 
   if FGetTokenTaskIsRunning then
@@ -628,13 +628,13 @@ begin
     if (LMessageId = '') then exit;
     if (FDeliveredMessageIDs.TryAdd(LMessageId,true)) then begin
       {$IF defined(debug)}
-      allog('TALFirebaseMessaging.doMessageReceived', aPayload.Text, TalLogType.VERBOSE);
+      allog('TALFirebaseMessaging.doMessageReceived', aPayload.Text);
       {$endif}
       fOnMessageReceived(aPayload)
     end
     else begin
       {$IF defined(debug)}
-      allog('TALFirebaseMessaging.doMessageReceived', 'Duplicate message skipped (google.message_id:'+LMessageId+')', TalLogType.VERBOSE);
+      allog('TALFirebaseMessaging.doMessageReceived', 'Duplicate message skipped (google.message_id:'+LMessageId+')');
       {$endif}
     end;
   end;
@@ -743,8 +743,7 @@ begin
   allog(
     'TALFirebaseMessaging.StartupNotificationMessageHandler',
     'M.Classname: ' + M.ClassName + ' | ' +
-    'Notification: ' + StartupNotificationMessages[high(StartupNotificationMessages)],
-    TalLogType.verbose);
+    'Notification: ' + StartupNotificationMessages[high(StartupNotificationMessages)]);
   {$ENDIF}
 
   DeliverStartupNotificationMessages;
@@ -766,7 +765,7 @@ begin
         LJsonDoc.LoadFromJSONString(LStartupNotificationMessage);
 
         {$IFDEF DEBUG}
-        allog('TALFirebaseMessaging.DeliverStartupNotificationMessages', LJsonDoc.JSON, TalLogType.verbose);
+        allog('TALFirebaseMessaging.DeliverStartupNotificationMessages', LJsonDoc.JSON);
         {$ENDIF}
 
         {$REGION ' ANDROID'}
@@ -811,7 +810,7 @@ procedure TALFirebaseMessaging.TNewMessageObserver.onChanged(t: JObject);
 begin
   var LMessage := JStringToString(TJString.Wrap(t));
   {$IF defined(debug)}
-  allog('TALFirebaseMessaging.TNewMessageObserver.onChanged', 'Message: ' + LMessage, TalLogType.VERBOSE);
+  allog('TALFirebaseMessaging.TNewMessageObserver.onChanged', 'Message: ' + LMessage);
   {$ENDIF}
   FFirebaseMessaging.doMessageReceived(LMessage);
 end;
@@ -828,7 +827,7 @@ procedure TALFirebaseMessaging.TNewTokenObserver.onChanged(t: JObject);
 begin
   var LNewToken := JStringToString(TJString.Wrap(t));
   {$IF defined(debug)}
-  allog('TALFirebaseMessaging.TNewTokenObserver.onChanged', 'NewToken: ' + LNewToken, TalLogType.VERBOSE);
+  allog('TALFirebaseMessaging.TNewTokenObserver.onChanged', 'NewToken: ' + LNewToken);
   {$ENDIF}
   FFirebaseMessaging.doTokenRefresh(LNewToken);
 end;
@@ -914,8 +913,7 @@ begin
     {$IFDEF DEBUG}
     allog(
       'TALFirebaseMessaging.ReceiveStartupNotificationMessage',
-      'Message: ' + LMessage,
-      TalLogType.verbose);
+      'Message: ' + LMessage);
     {$ENDIF}
     doMessageReceived(LMessage);
   end;
@@ -951,7 +949,7 @@ end;
 procedure TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification);
 begin
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification', TalLogType.verbose);
+  allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification');
   {$ENDIF}
 end;
 
@@ -967,7 +965,7 @@ begin
     if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);
 
     {$IFDEF DEBUG}
-    allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler', LJsonStr, TalLogType.verbose);
+    allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler', LJsonStr);
     {$ENDIF}
 
     if ALStrToBool(LJsonDoc.GetChildNodeValuetext('alcinoe.present_notification', '0')) then begin
@@ -1014,7 +1012,7 @@ begin
     if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);
 
     {$IFDEF DEBUG}
-    allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler', 'Message: ' + LJsonDoc.JSON, TalLogType.verbose);
+    allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler', 'Message: ' + LJsonDoc.JSON);
     {$ENDIF}
 
     LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
@@ -1098,7 +1096,7 @@ end;
 procedure TALFirebaseMessaging.TFIRMessagingDelegate.messaging(messaging: FIRMessaging; fcmToken: NSString);
 begin
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.TFIRMessagingDelegate.messaging', 'Token: ' + NSStrToStr(fcmToken), TalLogType.VERBOSE);
+  allog('TALFirebaseMessaging.TFIRMessagingDelegate.messaging', 'Token: ' + NSStrToStr(fcmToken));
   {$ENDIF}
   FFirebaseMessaging.doTokenRefresh(NSStrToStr(fcmToken));
 end;
@@ -1109,7 +1107,7 @@ begin
   if (M is TPushRemoteNotificationMessage) then begin
     var LMessage := TPushRemoteNotificationMessage(M).Value.Notification;
     {$IFDEF DEBUG}
-    allog('TALFirebaseMessaging.applicationDidReceiveRemoteNotification', 'Message: ' + LMessage, TalLogType.verbose);
+    allog('TALFirebaseMessaging.applicationDidReceiveRemoteNotification', 'Message: ' + LMessage);
     {$ENDIF}
     doMessageReceived(LMessage);
   end;
@@ -1137,8 +1135,7 @@ begin
   else
     allog(
       'TALFirebaseMessaging.applicationdidFailToRegisterForRemoteNotificationsWithError',
-      'Unable to register for remote notifications',
-      TalLogType.VERBOSE);
+      'Unable to register for remote notifications');
   {$ENDIF}
 
 end;

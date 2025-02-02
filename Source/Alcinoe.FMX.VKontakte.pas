@@ -320,7 +320,7 @@ procedure TALVKontakteLogin.ActivityResultHandler(const Sender: TObject; const M
 begin
 
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.ActivityResultHandler', TalLogType.VERBOSE);
+  allog('TALVKontakteLogin.ActivityResultHandler');
   {$ENDIF}
 
   if M is TMessageResultNotification then begin
@@ -415,8 +415,7 @@ begin
       'TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onSuccess',
       'UserID: ' + NSStrToStr(result.token.userId) + ' | ' +
       'Email: ' + NSStrToStr(result.token.Email) + ' | ' +
-      'Token: ' + NSStrToStr(result.token.accessToken),
-      TalLogType.verbose)
+      'Token: ' + NSStrToStr(result.token.accessToken))
   else if (result <> nil) and (result.error <> nil) then
     allog(
       'TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError',
@@ -664,8 +663,7 @@ begin
         'ALVKontakteApplicationEventMessageHandler',
         'Event: OpenURL | '+
         'ALVKontakteInitialised: '+ALBoolToStrW(_ALVKontakteInitialised)+' | '+
-        'Url: ' + Lcontext.URL,
-        TalLogType.VERBOSE);
+        'Url: ' + Lcontext.URL);
       {$ENDIF}
       if not _ALVKontakteInitialised then exit;
       if (Lcontext.Context <> nil) then begin

@@ -189,7 +189,7 @@ begin
     {$IF defined(android)}
 
     {$IFDEF DEBUG}
-    allog('ALInitFacebook', 'sdkInitialize | isInitialized: '+ALBoolToStrW(TJFacebookSdk.JavaClass.isInitialized), TalLogType.VERBOSE);
+    allog('ALInitFacebook', 'sdkInitialize | isInitialized: '+ALBoolToStrW(TJFacebookSdk.JavaClass.isInitialized));
     {$ENDIF}
 
     TJFacebookSdk.JavaClass.sdkInitialize(TAndroidHelper.Context);
@@ -201,7 +201,7 @@ begin
     {$IF defined(ios)}
 
     {$IFDEF DEBUG}
-    allog('ALInitFacebook', 'initializeSDK', TalLogType.VERBOSE);
+    allog('ALInitFacebook', 'initializeSDK');
     {$ENDIF}
 
     //https://github.com/facebook/facebook-ios-sdk/issues/1731
@@ -238,8 +238,7 @@ begin
         'ALFmxFacebookCoreApplicationEventHandler',
         'Event: OpenURL | '+
         'ALFacebookInitialised: '+ALBoolToStrW(_ALFacebookInitialised)+' | '+
-        'Url: ' + Lcontext.URL,
-        TalLogType.VERBOSE);
+        'Url: ' + Lcontext.URL);
       {$ENDIF}
       if not _ALFacebookInitialised then exit;
       {$IFNDEF ALCompilerVersionSupported122}
@@ -264,8 +263,7 @@ begin
       {$IFDEF DEBUG}
       ALLog(
         'ALFmxFacebookCoreApplicationEventHandler',
-        'Event: FinishedLaunching',
-        TalLogType.VERBOSE);
+        'Event: FinishedLaunching');
       {$ENDIF}
       {$IFNDEF ALCompilerVersionSupported122}
         {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40351 is implemented like expected (With TiOSOpenApplicationContext)'}

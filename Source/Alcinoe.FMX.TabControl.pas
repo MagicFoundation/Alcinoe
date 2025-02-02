@@ -744,8 +744,7 @@ begin
   //ALLog(
   //  'TALTabControl.ScrollCapturedByOtherHandler',
   //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
-  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down),
-  //  TalLogType.verbose);
+  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down));
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
     {$IFDEF DEBUG}
@@ -768,8 +767,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALTabControl.MouseDown',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if not AnimationEnabled then exit;
   if (Button = TMouseButton.mbLeft) then begin
@@ -785,14 +783,18 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALTabControl.internalMouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents then begin
     if (not fScrollCapturedByMe) and
        (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
        (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then begin
+      {$IFDEF DEBUG}
+      //ALLog(
+      //  'TALTabControl.internalMouseMove',
+      //  'ScrollCapturedByMe');
+      {$ENDIF}
       fScrollCapturedByMe := True;
       TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(true));
     end;
@@ -806,8 +808,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALTabControl.internalMouseUp',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
@@ -821,7 +822,7 @@ end;
 procedure TALTabControl.internalMouseLeave;
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALTabControl.internalMouseLeave', TalLogType.verbose);
+  //ALLog('TALTabControl.internalMouseLeave');
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents then begin
@@ -841,8 +842,8 @@ end;
 {******************************************************************}
 procedure TALTabControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
   internalMouseMove(Shift, X, Y);
+  inherited;
 end;
 
 {**************************************************************************************}

@@ -552,7 +552,7 @@ end;
 function TALIosMemoTextView.canBecomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemoTextView.canBecomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALIosMemoTextView.canBecomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := UITextView(Super).canBecomeFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
@@ -561,7 +561,7 @@ end;
 function TALIosMemoTextView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALIosMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := UITextView(Super).becomeFirstResponder;
   if (not TControl(FMemoControl.Owner).IsFocused) then
@@ -598,7 +598,7 @@ end;
 procedure TALIosMemoTextViewDelegate.textViewDidChange(textView: UITextView);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemoTextViewDelegate.textViewDidChange', TalLogType.VERBOSE);
+  ALLog('TALIosMemoTextViewDelegate.textViewDidChange');
   {$ENDIF}
   fMemoControl.DoChange;
 end;
@@ -624,7 +624,7 @@ end;
 function TALIosMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementText', TalLogType.VERBOSE);
+  ALLog('TALIosMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementText');
   {$ENDIF}
   if FMemoControl.maxLength > 0 then begin
     var LText: NSString := textView.text;
@@ -1047,7 +1047,7 @@ end;
 function TALMacMemoScrollView.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoScrollView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacMemoScrollView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := NSScrollView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
@@ -1056,7 +1056,7 @@ end;
 function TALMacMemoScrollView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoScrollView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacMemoScrollView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := NSScrollView(Super).becomeFirstResponder;
   if (not TControl(FMemoControl.Owner).IsFocused) then
@@ -1098,7 +1098,7 @@ end;
 function TALMacMemoTextView.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoTextView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacMemoTextView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := NSTextView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
@@ -1107,7 +1107,7 @@ end;
 function TALMacMemoTextView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := NSTextView(Super).becomeFirstResponder;
   if (not TControl(FMemoControl.Owner).IsFocused) then
@@ -1132,7 +1132,7 @@ end;
 procedure TALMacMemoTextViewDelegate.textDidChange(notification: NSNotification);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoTextViewDelegate.textDidChange', TalLogType.VERBOSE);
+  ALLog('TALMacMemoTextViewDelegate.textDidChange');
   {$ENDIF}
   fMemoControl.DoChange;
 end;
@@ -1153,7 +1153,7 @@ end;
 function TALMacMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementString(textView: NSTextView; shouldChangeTextInRange: NSRange; replacementString: NSString): boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementText', TalLogType.VERBOSE);
+  ALLog('TALMacMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementText');
   {$ENDIF}
   if FMemoControl.maxLength > 0 then begin
     var LText: NSString := TALNSText.wrap(NSObjectToID(textView)).&String;
@@ -1192,7 +1192,7 @@ end;
 function TALMacMemoPlaceHolder.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALMacMemoPlaceHolder.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  ALLog('TALMacMemoPlaceHolder.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
   {$ENDIF}
   Result := False;
   FmemoControl.NativeView.View.becomeFirstResponder;

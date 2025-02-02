@@ -923,7 +923,7 @@ procedure TALChoreographerThread.TChoreographerFrameCallback.doFrame(frameTimeNa
 begin
 
   {$IFDEF DEBUG}
-  //ALLog('TALChoreographerThread.TChoreographerFrameCallback.doFrame', TalLogType.verbose);
+  //ALLog('TALChoreographerThread.TChoreographerFrameCallback.doFrame');
   {$ENDIF}
 
   if assigned(fChoreographerThread.FTimerEvent) then
@@ -983,7 +983,7 @@ procedure TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated;
 begin
 
   {$IFDEF DEBUG}
-  //ALLog('TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated', TalLogType.verbose);
+  //ALLog('TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated');
   {$ENDIF}
 
   if assigned(fDisplayLinkThread.FTimerEvent) then

@@ -36,8 +36,7 @@ begin
       {$IF defined(debug)}
       allog(
         'ALFmxFirebaseCoreApplicationEventHandler',
-        'FinishedLaunching',
-        TalLogType.VERBOSE);
+        'FinishedLaunching');
       {$ENDIF}
       TFIRApp.OCClass.configure;
 

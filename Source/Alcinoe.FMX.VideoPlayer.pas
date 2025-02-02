@@ -597,7 +597,7 @@ begin
   {$IF defined(DEBUG)}
   if (fTotalFramesProcessed mod 1000 = 0) then begin
     fFpsStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable', 'fps: ' + ALFormatFloatW('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable', 'fps: ' + ALFormatFloatW('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), ALDefaultFormatSettingsW));
     fTotalFramesProcessed := 0;
     fFpsStopWatch := TStopWatch.StartNew;
   end;
@@ -670,7 +670,7 @@ begin
   {$IFDEF DEBUG}
   if (fTotalFramesProcessed mod 1000 = 0) then begin
     LStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   end;
   {$ENDIF}
 
@@ -712,7 +712,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onEvents(player: JPlayer; events: JPlayer_Events);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onEvents', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onEvents');
   {$ENDIF}
 end;
 
@@ -720,7 +720,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onTimelineChanged(timeline: JTimeline; reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTimelineChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTimelineChanged');
   {$ENDIF}
 end;
 
@@ -728,7 +728,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onMediaItemTransition(mediaItem: JMediaItem; reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMediaItemTransition', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMediaItemTransition');
   {$ENDIF}
 end;
 
@@ -736,7 +736,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onTracksChanged(tracks: JTracks);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTracksChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTracksChanged');
   {$ENDIF}
 end;
 
@@ -744,7 +744,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onMediaMetadataChanged(mediaMetadata: JMediaMetadata);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMediaMetadataChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMediaMetadataChanged');
   {$ENDIF}
 end;
 
@@ -752,7 +752,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlaylistMetadataChanged(mediaMetadata: JMediaMetadata);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaylistMetadataChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaylistMetadataChanged');
   {$ENDIF}
 end;
 
@@ -760,7 +760,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onIsLoadingChanged(isLoading: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onIsLoadingChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onIsLoadingChanged');
   {$ENDIF}
 end;
 
@@ -768,7 +768,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onLoadingChanged(isLoading: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onLoadingChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onLoadingChanged');
   {$ENDIF}
 end;
 
@@ -776,7 +776,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onAvailableCommandsChanged(availableCommands: JPlayer_Commands);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAvailableCommandsChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAvailableCommandsChanged');
   {$ENDIF}
 end;
 
@@ -784,7 +784,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onTrackSelectionParametersChanged(parameters: JTrackSelectionParameters);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTrackSelectionParametersChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTrackSelectionParametersChanged');
   {$ENDIF}
 end;
 
@@ -804,8 +804,7 @@ begin
   ALLog(
     'TALAndroidVideoPlayer.onPlayerStateChanged',
     'playWhenReady: ' + ALBoolToStrW(playWhenReady) + ' | ' +
-    'playbackState: ' + ALIntToStrW(playbackState),
-    TalLogType.verbose);
+    'playbackState: ' + ALIntToStrW(playbackState));
   {$ENDIF}
 
   if (playbackState = TJPlayer.JavaClass.STATE_READY) and
@@ -822,7 +821,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlaybackStateChanged(playbackState: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackStateChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackStateChanged');
   {$ENDIF}
 end;
 
@@ -830,7 +829,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlayWhenReadyChanged(playWhenReady: boolean; reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayWhenReadyChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayWhenReadyChanged');
   {$ENDIF}
 end;
 
@@ -838,7 +837,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackSuppressionReasonChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackSuppressionReasonChanged');
   {$ENDIF}
 end;
 
@@ -846,7 +845,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onIsPlayingChanged(isPlaying: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onIsPlayingChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onIsPlayingChanged');
   {$ENDIF}
 end;
 
@@ -854,7 +853,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onRepeatModeChanged(repeatMode: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onRepeatModeChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onRepeatModeChanged');
   {$ENDIF}
 end;
 
@@ -862,7 +861,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onShuffleModeEnabledChanged(shuffleModeEnabled: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onShuffleModeEnabledChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onShuffleModeEnabledChanged');
   {$ENDIF}
 end;
 
@@ -886,7 +885,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlayerErrorChanged(error: JPlaybackException);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerErrorChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerErrorChanged');
   {$ENDIF}
 end;
 
@@ -894,7 +893,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity(reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity');
   {$ENDIF}
 end;
 
@@ -902,7 +901,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity(oldPosition: JPlayer_PositionInfo; newPosition: JPlayer_PositionInfo; reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity');
   {$ENDIF}
 end;
 
@@ -910,7 +909,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlaybackParametersChanged(playbackParameters: JPlaybackParameters);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackParametersChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackParametersChanged');
   {$ENDIF}
 end;
 
@@ -918,7 +917,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onSeekBackIncrementChanged(seekBackIncrementMs: Int64);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekBackIncrementChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekBackIncrementChanged');
   {$ENDIF}
 end;
 
@@ -926,7 +925,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onSeekForwardIncrementChanged(seekForwardIncrementMs: Int64);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekForwardIncrementChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekForwardIncrementChanged');
   {$ENDIF}
 end;
 
@@ -934,7 +933,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Int64);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChanged');
   {$ENDIF}
 end;
 
@@ -942,7 +941,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onAudioSessionIdChanged(audioSessionId: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAudioSessionIdChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAudioSessionIdChanged');
   {$ENDIF}
 end;
 
@@ -950,7 +949,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onAudioAttributesChanged(audioAttributes: JAudioAttributes);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAudioAttributesChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAudioAttributesChanged');
   {$ENDIF}
 end;
 
@@ -958,7 +957,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onVolumeChanged(volume: Single);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onVolumeChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onVolumeChanged');
   {$ENDIF}
 end;
 
@@ -966,7 +965,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onSkipSilenceEnabledChanged(skipSilenceEnabled: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSkipSilenceEnabledChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSkipSilenceEnabledChanged');
   {$ENDIF}
 end;
 
@@ -974,7 +973,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onDeviceInfoChanged(deviceInfo: JDeviceInfo);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onDeviceInfoChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onDeviceInfoChanged');
   {$ENDIF}
 end;
 
@@ -982,7 +981,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onDeviceVolumeChanged(volume: Integer; muted: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onDeviceVolumeChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onDeviceVolumeChanged');
   {$ENDIF}
 end;
 
@@ -997,8 +996,7 @@ begin
   ALLog(
     'TALAndroidVideoPlayer.onVideoSizeChanged',
     'width: ' + ALIntToStrW(videoSize.width) + ' | ' +
-    'height: ' + ALIntToStrW(videoSize.height),
-    TalLogType.verbose);
+    'height: ' + ALIntToStrW(videoSize.height));
   {$ENDIF}
 
   fVideoPlayerEngine.FVideoWidth := videoSize.width;
@@ -1012,7 +1010,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onSurfaceSizeChanged(width: Integer; height: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSurfaceSizeChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSurfaceSizeChanged');
   {$ENDIF}
 end;
 
@@ -1020,7 +1018,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onRenderedFirstFrame;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onRenderedFirstFrame', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onRenderedFirstFrame');
   {$ENDIF}
 end;
 
@@ -1028,7 +1026,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onCues(cues: JList);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onCues', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onCues');
   {$ENDIF}
 end;
 
@@ -1036,7 +1034,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onCues(cueGroup: JCueGroup);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onCues', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onCues');
   {$ENDIF}
 end;
 
@@ -1044,7 +1042,7 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onMetadata(metadata: JMetadata);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMetadata', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMetadata');
   {$ENDIF}
 end;
 
@@ -1100,7 +1098,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1151,7 +1149,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1233,7 +1231,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1251,7 +1249,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1269,7 +1267,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1290,7 +1288,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1319,8 +1317,7 @@ begin
   ALLog(
     'TALAndroidVideoPlayer.setLooping',
     'looping: ' + ALBoolToStrW(looping) + ' | ' +
-    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW),
-    TalLogType.VERBOSE);
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1340,8 +1337,7 @@ begin
   ALLog(
     'TALAndroidVideoPlayer.setVolume',
     'Value: ' + ALFloatToStrW(Value, ALDefaultFormatSettingsW) + ' | ' +
-    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW),
-    TalLogType.VERBOSE);
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1398,7 +1394,7 @@ end;
 procedure TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer);
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.observeValueForKeyPath', 'Status:' +  ALIntToStrW(TNSNumber.Wrap(change.allvalues.objectAtIndex(0)).integerValue()), TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.observeValueForKeyPath', 'Status:' +  ALIntToStrW(TNSNumber.Wrap(change.allvalues.objectAtIndex(0)).integerValue()));
   {$ENDIF}
   fVideoPlayerEngine.doOnReady;
 end;
@@ -1415,7 +1411,7 @@ end;
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemDidPlayToEndTime;
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemDidPlayToEndTime', TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.ItemDidPlayToEndTime');
   {$ENDIF}
   fVideoPlayerEngine.DoOnItemDidPlayToEndTime;
 end;
@@ -1427,7 +1423,7 @@ end;
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemFailedToPlayToEndTime;
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemFailedToPlayToEndTime', TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.ItemFailedToPlayToEndTime');
   {$ENDIF}
   fVideoPlayerEngine.DoOnItemFailedToPlayToEndTime;
 end;
@@ -1437,7 +1433,7 @@ end;
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemTimeJumped;
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemTimeJumped', TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.ItemTimeJumped');
   {$ENDIF}
 end;
 
@@ -1451,7 +1447,7 @@ end;
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemPlaybackStalled;
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemPlaybackStalled', TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.ItemPlaybackStalled');
   {$ENDIF}
   //we do nothing here, the fVideoPlayerEngine.FFrameRefreshAnimation will do himself the job
   //to detect when the playback stalled and will do himself a pause / restart
@@ -1462,7 +1458,7 @@ end;
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemNewAccessLogEntry;
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemNewAccessLogEntry', TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.ItemNewAccessLogEntry');
   {$ENDIF}
 end;
 
@@ -1473,7 +1469,7 @@ end;
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemNewErrorLogEntry;
 begin
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemNewErrorLogEntry', TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.ItemNewErrorLogEntry');
   {$ENDIF}
 end;
 
@@ -1557,7 +1553,7 @@ begin
   //--
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1623,7 +1619,7 @@ begin
   //--
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1748,8 +1744,7 @@ begin
                             'TALIOSVideoPlayer.prepare',
                             'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
                             'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
-                            'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status),
-                            TalLogType.VERBOSE);
+                            'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status));
                           {$ENDIF}
 
                         except
@@ -1777,7 +1772,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1796,7 +1791,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.start', 'TimeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.start', 'TimeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1814,7 +1809,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Stop', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.Stop', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -1848,8 +1843,7 @@ begin
   ALLog(
     'TALIOSVideoPlayer.setVolume',
     'Value: ' + ALFloatToStrW(Value, ALDefaultFormatSettingsW) + ' | ' +
-    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW),
-    TalLogType.VERBOSE);
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -2088,7 +2082,7 @@ begin
     if fFrameRefreshCounter mod 1000 = 0 then begin
       LStopWatch.Stop;
       fFrameRefreshCounter := 0;
-      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
     end;
     {$ENDIF}
 
@@ -2117,8 +2111,7 @@ begin
         'TALIOSVideoPlayer.FrameRefreshOnTimer',
         'hasNewPixelBufferForItemTime:NO ' + ' | ' +
         'Pause and Restart ' + ' | ' +
-        'currentTime: ' + ALIntToStrW(fPlayer.currentTime.value),
-        TalLogType.VERBOSE);
+        'currentTime: ' + ALIntToStrW(fPlayer.currentTime.value));
       {$ENDIF}
       fPlayer.pause;
       fPlayer.play;
@@ -2160,7 +2153,7 @@ begin
      (FPlayerItem.status = AVPlayerItemStatusReadyToPlay) then begin
 
     {$IFDEF DEBUG}
-    ALLog('TALIOSVideoPlayer.doOnReady', 'Ready', TalLogType.VERBOSE);
+    ALLog('TALIOSVideoPlayer.doOnReady', 'Ready');
     {$ENDIF}
 
     //i need to do this here because of bug like :
@@ -2195,7 +2188,7 @@ begin
           (FPlayerItem.status = AVPlayerItemStatusFailed) then begin
 
     {$IFDEF DEBUG}
-    ALLog('TALIOSVideoPlayer.doOnReady', 'Failed', TalLogType.VERBOSE);
+    ALLog('TALIOSVideoPlayer.doOnReady', 'Failed');
     {$ENDIF}
 
     //fire the fOnErrorEvent

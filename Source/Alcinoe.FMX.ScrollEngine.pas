@@ -1703,8 +1703,7 @@ begin
   ALLog(
     'TALSplineOverScroller.Create',
     'PixelsPerInch:' + ALFormatFloatW('0.##', PixelsPerInch, ALDefaultFormatSettingsW) + ' | ' +
-    'PhysicalCoeff:' + ALFormatFloatW('0.##', FPhysicalCoeff, ALDefaultFormatSettingsW),
-    TalLogType.verbose);
+    'PhysicalCoeff:' + ALFormatFloatW('0.##', FPhysicalCoeff, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -2473,7 +2472,7 @@ end;
 procedure TALScrollEngine.TDisplayLinkListener.displayLinkUpdated;
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALScrollEngine.TDisplayLinkListener.displayLinkUpdated', TalLogType.verbose);
+  //ALLog('TALScrollEngine.TDisplayLinkListener.displayLinkUpdated');
   {$ENDIF}
   if not fScrollEngine.Calculate then
     fScrollEngine.StopTimer;
@@ -2500,7 +2499,7 @@ end;
 procedure TALScrollEngine.TChoreographerFrameCallback.doFrame(frameTimeNanos: Int64);
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALScrollEngine.TChoreographerFrameCallback.doFrame', TalLogType.verbose);
+  //ALLog('TALScrollEngine.TChoreographerFrameCallback.doFrame');
   {$ENDIF}
   if not fScrollEngine.Calculate then
     fScrollEngine.StopTimer
@@ -2739,7 +2738,7 @@ end;
 procedure TALScrollEngine.DoStart;
 begin
   {$IFDEF DEBUG}
-  ALLog('TALScrollEngine.DoStart', TalLogType.verbose);
+  ALLog('TALScrollEngine.DoStart');
   {$ENDIF}
   if Assigned(FOnStart) then
     FOnStart(self);
@@ -2751,8 +2750,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.DoChanged',
-  //  'ViewPortPosition:' + ALFormatFloatW('0.##', ViewPortPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', ViewPortPosition.y, ALDefaultFormatSettingsW),
-  //TalLogType.verbose);
+  //  'ViewPortPosition:' + ALFormatFloatW('0.##', ViewPortPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', ViewPortPosition.y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if Assigned(FOnChanged) then
     FOnChanged(self);
@@ -2762,7 +2760,7 @@ end;
 procedure TALScrollEngine.DoStop;
 begin
   {$IFDEF DEBUG}
-  ALLog('TALScrollEngine.DoStop', TalLogType.verbose);
+  ALLog('TALScrollEngine.DoStop');
   {$ENDIF}
   if Assigned(FOnStop) then
     FOnStop(self);
@@ -2905,8 +2903,7 @@ begin
         {$IFDEF DEBUG}
         ALLog(
           'TALScrollEngine.Calculate',
-          'notifyVerticalEdgeReached',
-          TalLogType.verbose);
+          'notifyVerticalEdgeReached');
         {$ENDIF}
       end
       else if (LCurrVelocityY < 0) and
@@ -2918,8 +2915,7 @@ begin
         {$IFDEF DEBUG}
         ALLog(
           'TALScrollEngine.Calculate',
-          'notifyVerticalEdgeReached',
-          TalLogType.verbose);
+          'notifyVerticalEdgeReached');
         {$ENDIF}
       end;
     end;
@@ -2935,8 +2931,7 @@ begin
         {$IFDEF DEBUG}
         ALLog(
           'TALScrollEngine.Calculate',
-          'notifyHorizontalEdgeReached',
-          TalLogType.verbose);
+          'notifyHorizontalEdgeReached');
         {$ENDIF}
       end
       else if (LCurrVelocityX < 0) and
@@ -2948,8 +2943,7 @@ begin
         {$IFDEF DEBUG}
         ALLog(
           'TALScrollEngine.Calculate',
-          'notifyHorizontalEdgeReached',
-          TalLogType.verbose);
+          'notifyHorizontalEdgeReached');
         {$ENDIF}
       end;
     end;
@@ -3021,8 +3015,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //    'TALScrollEngine.MouseDown',
-  //    'Position:' + ALFormatFloatW('0.##', FDownPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FDownPosition.y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //    'Position:' + ALFormatFloatW('0.##', FDownPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FDownPosition.y, ALDefaultFormatSettingsW));
   {$ENDIF}
   FOverScroller.forceFinished(true{finished});
   FVelocityTracker.clear;
@@ -3084,8 +3077,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.MouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
 
   var xDiff: Single;
@@ -3191,8 +3183,7 @@ begin
   //ALLog(
   //  'TALScrollEngine.MouseUp',
   //  'Position:' + ALFormatFloatW('0.##', FUpPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FUpPosition.y, ALDefaultFormatSettingsW) + ' | ' +
-  //  'Velocity:' + ALFormatFloatW('0.##', FUpVelocity.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FUpVelocity.y, ALDefaultFormatSettingsW),
-  //TalLogType.verbose);
+  //  'Velocity:' + ALFormatFloatW('0.##', FUpVelocity.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FUpVelocity.y, ALDefaultFormatSettingsW));
   {$ENDIF}
 
   if (not FOverScroller.springBack(
@@ -3219,7 +3210,7 @@ end;
 procedure TALScrollEngine.MouseLeave;
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALScrollEngine.MouseLeave', TalLogType.verbose);
+  //ALLog('TALScrollEngine.MouseLeave');
   {$ENDIF}
   MouseUp(FLastMotionPos.X, FLastMotionPos.y);
 end;
@@ -3230,8 +3221,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.MouseWheel',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
-  //  TalLogType.verbose);
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
 
   if not FOverScroller.isFinished then begin

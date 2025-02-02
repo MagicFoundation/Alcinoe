@@ -182,8 +182,7 @@ begin
   //  'which: ' + ALIntToStrW(which) + ' | ' +
   //  'year: ' + ALIntToStrW(year) + ' | ' +
   //  'month: ' + ALIntToStrW(month) + ' | ' +
-  //  'dayOfMonth: ' + ALIntToStrW(dayOfMonth),
-  //  TalLogType.VERBOSE);
+  //  'dayOfMonth: ' + ALIntToStrW(dayOfMonth));
   {$ENDIF}
 
   if assigned(fDatePickerDialog.fOnClose) then begin
@@ -565,7 +564,7 @@ function TALDatePickerDialog.GetToolBarHeight: Single;
 begin
   result := FUIToolBar.frame.size.height;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetToolBarHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetToolBarHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -574,7 +573,7 @@ function TALDatePickerDialog.GetContentHeight: Single;
 begin
   Result := FUIDatePicker.frame.size.height;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetContentHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetContentHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -584,7 +583,7 @@ begin
   if assigned(FUITitle) then result := FUITitle.frame.size.height
   else Result := 0;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetTitleHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetTitleHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -594,7 +593,7 @@ begin
   if assigned(FUITitle) then result := _TitlePaddingTop
   else Result := 0;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetTitlePaddingTop','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetTitlePaddingTop','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -604,7 +603,7 @@ begin
   if assigned(FUITitle) then result := _TitlePaddingBottom
   else Result := 0;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetTitlePaddingBottom','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetTitlePaddingBottom','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -613,7 +612,7 @@ function TALDatePickerDialog.GetWidth: Single;
 begin
   result := FUIDatePicker.frame.size.width;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetWidth','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetWidth','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -626,7 +625,7 @@ begin
                   GetToolBarHeight +
                     GetContentHeight;
   {$IFDEF DEBUG}
-  allog('TALDatePickerDialog.GetHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
+  allog('TALDatePickerDialog.GetHeight','result: ' + ALFloatToStrW(result, ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 

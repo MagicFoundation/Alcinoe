@@ -1026,6 +1026,11 @@ begin
         ((ttVertical in fScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.y - y) > abs(fMouseDownPos.x - x)) and
          (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then begin
+      {$IFDEF DEBUG}
+      //ALLog(
+      //  ClassName + '.InternalMouseMove',
+      //  'ScrollCapturedByMe');
+      {$ENDIF}
       fScrollCapturedByMe := True;
       TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(True));
     end;
@@ -1071,8 +1076,8 @@ end;
 {***********************************************************************}
 procedure TALCustomScrollBox.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
   InternalMouseMove(Shift, X, Y);
+  inherited;
 end;
 
 {*******************************************************************************************}

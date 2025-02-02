@@ -3659,8 +3659,7 @@ begin
   //ALLog(
   //  'TALCustomTrack.TThumb.ScrollCapturedByOtherHandler',
   //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
-  //  'Pressed: ' + ALBoolToStrW(Pressed),
-  //  TalLogType.verbose);
+  //  'Pressed: ' + ALBoolToStrW(Pressed));
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
     {$IFDEF DEBUG}
@@ -3699,7 +3698,11 @@ procedure TALCustomTrack.TThumb.MouseMove(Shift: TShiftState; X, Y: Single);
   end;
 
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALCustomTrack.MouseMove',
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  {$ENDIF}
   if Pressed then begin
 
     if (not fScrollCapturedByMe) then begin
@@ -3711,6 +3714,11 @@ begin
          ((FCustomtrack.Orientation = TOrientation.Vertical) and
           (abs(FCustomTrackMouseDownPos.y - LCustomTrackMousePos.y) > abs(FCustomTrackMouseDownPos.x - LCustomTrackMousePos.x)) and
           (abs(FCustomTrackMouseDownPos.y - LCustomTrackMousePos.y) > TALScrollEngine.DefaultTouchSlop)) then begin
+        {$IFDEF DEBUG}
+        //ALLog(
+        //  'TALCustomTrack.MouseMove',
+        //  'ScrollCapturedByMe');
+        {$ENDIF}
         PressedPosition := PointF(X, Y);
         fCustomTrackMouseDownPos := LCustomTrackMousePos;
         fScrollCapturedByMe := true;
@@ -3740,6 +3748,7 @@ begin
     end;
 
   end;
+  inherited;
 end;
 
 {**********************************************************************************************}
@@ -10299,12 +10308,21 @@ end;
 {**************************************************************}
 procedure TALSwitch.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALSwitch.MouseMove',
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  {$ENDIF}
   if Pressed then begin
 
     if (not fScrollCapturedByMe) then begin
       If (abs(X - PressedPosition.X) > abs(Y - PressedPosition.Y)) and
          (abs(X - PressedPosition.X) > TALScrollEngine.DefaultTouchSlop) then begin
+        {$IFDEF DEBUG}
+        //ALLog(
+        //  'TALSwitch.MouseMove',
+        //  'ScrollCapturedByMe');
+        {$ENDIF}
         PressedPosition := TpointF.Create(X,Y);
         fScrollCapturedByMe := true;
         TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(true), True);
@@ -10319,6 +10337,7 @@ begin
     end;
 
   end;
+  inherited;
 end;
 
 {**********************************************************************************}
@@ -10411,8 +10430,7 @@ begin
   //ALLog(
   //  'TALSwitch.ScrollCapturedByOtherHandler',
   //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
-  //  'Pressed: ' + ALBoolToStrW(Pressed),
-  //  TalLogType.verbose);
+  //  'Pressed: ' + ALBoolToStrW(Pressed));
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
     {$IFDEF DEBUG}

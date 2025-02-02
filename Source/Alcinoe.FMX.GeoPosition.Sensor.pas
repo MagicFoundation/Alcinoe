@@ -444,7 +444,7 @@ begin
   {$ENDREGION}
 
   {$IFDEF DEBUG}
-  ALLog('TALGeoPositionSensor.IsGpsEnabled', 'Result: ' + ALBoolToStrW(result), TalLogType.verbose);
+  ALLog('TALGeoPositionSensor.IsGpsEnabled', 'Result: ' + ALBoolToStrW(result));
   {$ENDIF}
 
 end;
@@ -559,8 +559,7 @@ begin
     'Restricted: ' + ALBoolToStrW(ARestricted) + ' | '+
     'CoarseGeoPosition: ' + ALBoolToStrW(ACoarseGeoPosition) + ' | '+
     'PreciseGeoPosition: ' + ALBoolToStrW(APreciseGeoPosition) + ' | '+
-    'AuthorizedAlways: ' + ALBoolToStrW(AAuthorizedAlways),
-    TalLogType.verbose);
+    'AuthorizedAlways: ' + ALBoolToStrW(AAuthorizedAlways));
   {$ENDIF}
 
 end;
@@ -681,8 +680,7 @@ begin
     'Result: ' + ALBoolToStrW(Result) + ' | '+
     'CoarseGeoPosition: ' + ALBoolToStrW(ACoarseGeoPosition) + ' | '+
     'PreciseGeoPosition: ' + ALBoolToStrW(APreciseGeoPosition) + ' | '+
-    'AlwaysAuthorization: ' + ALBoolToStrW(AAlwaysAuthorization),
-    TalLogType.verbose);
+    'AlwaysAuthorization: ' + ALBoolToStrW(AAlwaysAuthorization));
   {$ENDIF}
 
 end;
@@ -1165,8 +1163,7 @@ begin
     {$IFDEF DEBUG}
     allog(
       'TALGeoPositionSensor.ApplicationEventHandler',
-      'Event: '+TRttiEnumerationType.GetName(LMsg.Value.Event),
-      TalLogType.verbose);
+      'Event: '+TRttiEnumerationType.GetName(LMsg.Value.Event));
     {$ENDIF}
 
     //retrieve the Permissions Granted
@@ -1225,7 +1222,7 @@ end;
 procedure TALGeoPositionSensor.TAndroidLocationListener.onFlushComplete(requestCode: Integer);
 begin
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TAndroidLocationListener.onFlushComplete', 'requestCode: '+ALInttostrW(requestCode), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onFlushComplete', 'requestCode: '+ALInttostrW(requestCode));
   {$ENDIF}
 end;
 
@@ -1234,7 +1231,7 @@ procedure TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged(locati
 begin
   if location = nil then exit;
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged', JstringToString(location.tostring), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged', JstringToString(location.tostring));
   {$ENDIF}
   if assigned(FGeoPositionSensor.OnGeoPositionUpdate) then begin
     FGeoPositionSensor.OnGeoPositionUpdate(
@@ -1258,7 +1255,7 @@ end;
 procedure TALGeoPositionSensor.TAndroidLocationListener.onProviderDisabled(provider: JString);
 begin
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TAndroidLocationListener.onProviderDisabled', 'provider: '+JstringToString(provider), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onProviderDisabled', 'provider: '+JstringToString(provider));
   {$ENDIF}
 end;
 
@@ -1266,7 +1263,7 @@ end;
 procedure TALGeoPositionSensor.TAndroidLocationListener.onProviderEnabled(provider: JString);
 begin
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TAndroidLocationListener.onProviderEnabled', 'provider: '+JstringToString(provider), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onProviderEnabled', 'provider: '+JstringToString(provider));
   {$ENDIF}
 end;
 
@@ -1274,7 +1271,7 @@ end;
 procedure TALGeoPositionSensor.TAndroidLocationListener.onStatusChanged(provider: JString; status: Integer; extras: JBundle);
 begin
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TAndroidLocationListener.onStatusChanged', 'provider: '+JstringToString(provider) + ' | status: ' + ALInttostrW(status), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onStatusChanged', 'provider: '+JstringToString(provider) + ' | status: ' + ALInttostrW(status));
   {$ENDIF}
 end;
 
@@ -1290,7 +1287,7 @@ procedure TALGeoPositionSensor.TGMSLocationListener.onLocationChanged(location: 
 begin
   if location = nil then exit;
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TGMSLocationListener.onLocationChanged', JstringToString(location.tostring), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TGMSLocationListener.onLocationChanged', JstringToString(location.tostring));
   {$ENDIF}
   if assigned(FGeoPositionSensor.OnGeoPositionUpdate) then begin
     FGeoPositionSensor.OnGeoPositionUpdate(
@@ -1353,8 +1350,7 @@ begin
     allog(
       'TALGeoPositionSensor.PermissionsRequestResultHandler',
       'Permissions: ' + LPermissionsStr  + ' | '+
-      'GrantResults: ' + LGrantResultsStr,
-      TalLogType.verbose);
+      'GrantResults: ' + LGrantResultsStr);
     {$ENDIF}
 
     //retrieve the Permissions Granted
@@ -1442,7 +1438,7 @@ begin
       'ErrorCode: ' + ALIntToStrW(didFailWithError.code),
       TalLogType.error)
   else
-    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didFailWithError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didFailWithError');
   {$ENDIF}
 
 end;
@@ -1463,7 +1459,7 @@ begin
   //headingFilter property of the location manager object.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didUpdateHeading', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didUpdateHeading');
   {$ENDIF}
 end;
 
@@ -1476,7 +1472,7 @@ begin
   //iOS 2.0–6.0 Deprecated
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didUpdateToLocation:fromLocation', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didUpdateToLocation:fromLocation');
   {$ENDIF}
 
 end;
@@ -1503,7 +1499,7 @@ begin
       'ErrorCode: ' + ALIntToStrW(withError.code),
       TalLogType.error)
   else
-    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:monitoringDidFailForRegion:withError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:monitoringDidFailForRegion:withError');
   {$ENDIF}
 
 end;
@@ -1588,7 +1584,7 @@ begin
     kCLAuthorizationStatusauthorizedAlways:    LAuthorizationStatusStr := 'kCLAuthorizationStatusauthorizedAlways';
     else                                       LAuthorizationStatusStr := '???';
   end;
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization', LAuthorizationStatusStr, TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization', LAuthorizationStatusStr);
   {$ENDIF}
 
   //exit if not flocationManagerDidChangeAuthorizationStatusEnabled
@@ -1647,8 +1643,7 @@ begin
       'Date: ' + ALDateTimeToStrW(ALNSDateToUTCDateTime(LLocation.timestamp), ALDefaultFormatSettingsW) + ' | ' +
       'Latitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.latitude, ALDefaultFormatSettingsW) + ' | ' +
       'Longitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.longitude, ALDefaultFormatSettingsW) + ' | ' +
-      'Accuracy: ' + ALFormatFloatW('#.##', LLocation.horizontalAccuracy, ALDefaultFormatSettingsW) + 'm',
-      TalLogType.VERBOSE);
+      'Accuracy: ' + ALFormatFloatW('#.##', LLocation.horizontalAccuracy, ALDefaultFormatSettingsW) + 'm');
     {$ENDIF}
     //The location’s latitude and longitude identify the center of the
     //circle, and this value indicates the radius of that circle.
@@ -1710,7 +1705,7 @@ begin
   //the uncalibrated readings.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration');
   {$ENDIF}
 
   Result := False;
@@ -1730,7 +1725,7 @@ begin
   //requestStateForRegion: method, which runs asynchronously.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion');
   {$ENDIF}
 
 end;
@@ -1743,7 +1738,7 @@ begin
   //that satisfies the provided constraint.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint');
   {$ENDIF}
 
 end;
@@ -1756,7 +1751,7 @@ begin
   //that satisfy the provided constraint.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError');
   {$ENDIF}
 
 end;
@@ -1775,7 +1770,7 @@ begin
   //of a beacon changes; for example, when a beacon gets closer.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion');
   {$ENDIF}
 
 end;
@@ -1801,7 +1796,7 @@ begin
       'ErrorCode: ' + ALIntToStrW(error.code),
       TalLogType.error)
   else
-    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError');
   {$ENDIF}
 
 end;
@@ -1824,7 +1819,7 @@ begin
   //determine if your delegate should respond.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidEnterRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidEnterRegion');
   {$ENDIF}
 
 end;
@@ -1848,7 +1843,7 @@ begin
 
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidExitRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidExitRegion');
   {$ENDIF}
 
 end;
@@ -1860,7 +1855,7 @@ begin
   //Tells the delegate that a new region is being monitored.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion');
   {$ENDIF}
 
 end;
@@ -1886,7 +1881,7 @@ begin
   //moving again.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates', TalLogType.VERBOSE)
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates')
   {$ENDIF}
 
 end;
@@ -1913,7 +1908,7 @@ begin
   //will be called automatiquelly !
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates', TalLogType.VERBOSE)
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates')
   {$ENDIF}
 
 end;
@@ -1939,7 +1934,7 @@ begin
       'ErrorCode: ' + ALIntToStrW(error.code),
       TalLogType.error)
   else
-    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError');
   {$ENDIF}
 
 end;
@@ -1954,7 +1949,7 @@ begin
   //to report to your app.
 
   {$IFDEF DEBUG}
-  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidVisit', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidVisit');
   {$ENDIF}
 
 end;

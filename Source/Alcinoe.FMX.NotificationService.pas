@@ -926,7 +926,7 @@ begin
 
     If MainActivity.checkSelfPermission(StringToJString('android.permission.POST_NOTIFICATIONS')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED then begin
       {$IFDEF DEBUG}
-      allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False), TalLogType.verbose);
+      allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False));
       {$ENDIF}
       FIsRequestingNotificationPermission := False;
       if assigned(fOnAuthorizationRefused) then
@@ -934,7 +934,7 @@ begin
     end
     else begin
       {$IFDEF DEBUG}
-      allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True), TalLogType.verbose);
+      allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True));
       {$ENDIF}
       FIsRequestingNotificationPermission := False;
       if assigned(fOnAuthorizationGranted) then
@@ -965,7 +965,7 @@ begin
   // app is allowed to do.
 
   {$IFDEF DEBUG}
-  allog('TALNotificationService.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted), TalLogType.verbose);
+  allog('TALNotificationService.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted));
   {$ENDIF}
 
  if (not granted) then begin

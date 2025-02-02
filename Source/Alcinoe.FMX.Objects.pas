@@ -288,7 +288,8 @@ type
     property ResourceName: String read fResourceName write setResourceName;
     property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow: TALShadow read GetShadow write SetShadow;
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
@@ -454,7 +455,8 @@ type
     // project directory (with the extensions .png or .jpg).
     property ResourceName: String read fResourceName write setResourceName;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     //property TabOrder;
@@ -591,7 +593,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Sides;
@@ -702,7 +705,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Size;
@@ -810,7 +814,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Size;
@@ -897,7 +902,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     property Stroke;
@@ -1168,7 +1174,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Sides;

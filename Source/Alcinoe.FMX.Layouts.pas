@@ -58,7 +58,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     property TabOrder;
@@ -178,6 +179,7 @@ type
         //property Position;
         //property RotationAngle;
         //property RotationCenter;
+        //property Pivot;
         //property Scale;
         property Size;
         property TabOrder;
@@ -321,7 +323,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property ShowScrollBars;
     property Size;
@@ -396,7 +399,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property ShowScrollBars;
     property Size;
@@ -471,7 +475,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property ShowScrollBars;
     property Size;

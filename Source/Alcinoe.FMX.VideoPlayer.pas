@@ -499,7 +499,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Sides;

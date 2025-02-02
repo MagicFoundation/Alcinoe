@@ -1100,6 +1100,7 @@ type
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     //property RotationAngle;
     //property RotationCenter;
+    //property Pivot;
     //property Scale;
     property Shadow;
     property Sides;

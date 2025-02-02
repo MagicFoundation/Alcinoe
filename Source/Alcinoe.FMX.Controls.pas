@@ -75,6 +75,7 @@ type
     FParentALControl: TALControl; // 8 bytes
     FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
+    FScale: Single; // 4 bytes
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
@@ -82,17 +83,23 @@ type
     FIsPixelAlignmentEnabled: Boolean; // 1 byte
     FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
+    function GetPivot: TPosition;
+    procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
     procedure MarginsChangedHandler(Sender: TObject);
+    function IsScaledStored: Boolean;
   protected
     FAutoSize: Boolean; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
+    procedure SetScale(const AValue: Single); virtual;
+    property Scale: Single read FScale write SetScale stored IsScaledStored nodefault;
+    property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
     // Dynamically adjusts the dimensions to accommodate child controls,
@@ -110,6 +117,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     function GetParentedVisible: Boolean; override;
+    procedure DoMatrixChanged(Sender: TObject); override;
     procedure DoRootChanged; override;
     procedure IsMouseOverChanged; virtual;
     procedure IsFocusedChanged; virtual;
@@ -190,7 +198,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     //property TabOrder;
@@ -252,6 +261,7 @@ begin
   FForm := nil;
   FParentALControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
+  FScale := 1;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
@@ -912,6 +922,17 @@ begin
   // Not supported
 end;
 
+{**************************************************}
+procedure TALControl.SetScale(const AValue: Single);
+begin
+  if not SameValue(FScale, AValue, TEpsilon.Scale) then begin
+    ClearBufDrawable;
+    FScale := AValue;
+    DoMatrixChanged(nil);
+    Repaint;
+  end;
+end;
+
 {***************************************}
 function TALControl.GetAutoSize: Boolean;
 begin
@@ -1021,6 +1042,18 @@ begin
   if LPrevPressed <> Pressed then PressedChanged;
   if LPrevIsFocused <> IsFocused then IsFocusedChanged;
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+end;
+
+{**************************************}
+function TALControl.GetPivot: TPosition;
+begin
+  Result := Inherited RotationCenter;
+end;
+
+{****************************************************}
+procedure TALControl.SetPivot(const Value: TPosition);
+begin
+  Inherited RotationCenter := Value;
 end;
 
 {**************************************}
@@ -1186,6 +1219,67 @@ begin
   {$ENDIF}
 end;
 
+{****************************************************}
+procedure TALControl.DoMatrixChanged(Sender: TObject);
+begin
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
+  {$ENDIF}
+  if not FInPaintTo and not IsUpdating then
+    Repaint;
+  if SameValue(Scale, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
+  begin
+    if (ParentControl <> nil) and not TALControlAccessPrivate(ParentControl).FSimpleTransform then
+      TALControlAccessPrivate(Self).FSimpleTransform := False
+    else
+      TALControlAccessPrivate(Self).FSimpleTransform := True;
+  end
+  else
+    TALControlAccessPrivate(Self).FSimpleTransform := False;
+
+  if not TALControlAccessPrivate(Self).FSimpleTransform then
+  begin
+    if not SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
+    begin
+      FLocalMatrix :=
+        TMatrix.CreateTranslation(-Pivot.X * FSize.Width, -Pivot.Y * FSize.Height) *
+        TMatrix.CreateScaling(Scale, Scale) *
+        TMatrix.CreateRotation(DegToRad(RotationAngle)) *
+        TMatrix.CreateTranslation(Pivot.X * FSize.Width + Position.X, Pivot.Y * FSize.Height + Position.Y);
+    end
+    else
+    begin
+      FLocalMatrix := TMatrix.Identity;
+      FLocalMatrix.m31 := Position.X + ((1 - Scale) * Pivot.X * FSize.Width);
+      FLocalMatrix.m32 := Position.Y + ((1 - Scale) * Pivot.Y * FSize.Height);
+      FLocalMatrix.m11 := Scale;
+      FLocalMatrix.m22 := Scale;
+    end;
+  end
+  else
+  begin
+    FLocalMatrix := TMatrix.Identity;
+    FLocalMatrix.m31 := Position.X;
+    FLocalMatrix.m32 := Position.Y;
+  end;
+
+  RecalcAbsolute;
+  RecalcUpdateRect;
+  if HasDisablePaintEffect then
+    UpdateEffects;
+  if Visible then
+    ParentContentChanged;
+
+  if not GetAnchorMove then
+  begin
+    UpdateExplicitBounds;
+    UpdateAnchorRules(True);
+  end;
+  if not FInPaintTo and not IsUpdating then
+    Repaint;
+end;
+
 {*********************************}
 procedure TALControl.DoRootChanged;
 begin
@@ -1245,6 +1339,12 @@ begin
   if Assigned(FFormerMarginsChangedHandler) then
     FFormerMarginsChangedHandler(Sender);
   MarginsChanged;
+end;
+
+{******************************************}
+function TALControl.IsScaledStored: Boolean;
+begin
+  Result := not SameValue(FScale, 1, TEpsilon.Scale);
 end;
 
 {*************************************}

@@ -51,7 +51,8 @@ type
     procedure DoRealign; override;
     property Align;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Position;
     property Margins;
   public
@@ -90,6 +91,7 @@ type
     //property Position;
     //property RotationAngle;
     //property RotationCenter;
+    //property Pivot;
     //property Scale;
     //property Size;
     //property TabOrder;
@@ -238,7 +240,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     //property TabOrder;

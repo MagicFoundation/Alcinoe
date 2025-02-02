@@ -309,7 +309,8 @@ type
     property RowCount: Integer read FRowCount write FRowCount default 4;
     property Interval: Single read FInterval write FInterval Stored IsIntervalStored noDefault;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     //property TabOrder;
@@ -696,7 +697,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Size;
@@ -1087,6 +1089,7 @@ type
         //property Position;
         //property RotationAngle;
         //property RotationCenter;
+        //property Pivot;
         //property Scale;
         property Shadow;
         //property Size;
@@ -1286,6 +1289,7 @@ type
         //property Position;
         //property RotationAngle;
         //property RotationCenter;
+        //property Pivot;
         //property Scale;
         property Shadow;
         property Size;
@@ -1391,7 +1395,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     property TabOrder;
@@ -1667,7 +1672,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Shadow;
     property Sides;
@@ -1952,6 +1958,7 @@ type
         //property Position;
         //property RotationAngle;
         //property RotationCenter;
+        //property Pivot;
         //property Scale;
         //property Shadow;
         //property Sides;
@@ -2210,6 +2217,7 @@ type
         //property Position;
         //property RotationAngle;
         //property RotationCenter;
+        //property Pivot;
         //property Scale;
         property Shadow;
         //property Sides;
@@ -2340,6 +2348,7 @@ type
         //property Position;
         //property RotationAngle;
         //property RotationCenter;
+        //property Pivot;
         //property Scale;
         property Shadow;
         property ShowOnInteraction: Boolean read FShowOnInteraction write FShowOnInteraction default false;
@@ -2508,7 +2517,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     property TabOrder;
@@ -2683,7 +2693,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     property TabOrder;
@@ -2893,7 +2904,8 @@ type
     property PopupMenu;
     property Position;
     property RotationAngle;
-    property RotationCenter;
+    //property RotationCenter;
+    property Pivot;
     property Scale;
     property Size;
     property TabOrder;
@@ -4061,6 +4073,7 @@ begin
   inherited create(ACustomTrack);
   AutoSize := True;
   Visible := False;
+  Pivot.Point := TPointF.Create(0.5,1);
   FCustomTrack := ACustomTrack;
   FFormat := DefaultFormat;
   FOnCustomFormat := nil;
@@ -4101,13 +4114,13 @@ procedure TALCustomTrack.TValueIndicator.AdjustPosition(const AThumb: TThumb);
 begin
   if FCustomTrack.Orientation = TOrientation.Horizontal then begin
     Position.Point := TpointF.Create(
-                        AThumb.Position.X - (((Width * Scale.X) - AThumb.Width) / 2),
-                        AThumb.Position.Y - (Height * Scale.Y) - Margins.Bottom);
+                        AThumb.Position.X - ((Width - AThumb.Width) / 2),
+                        AThumb.Position.Y - Height - Margins.Bottom);
   end
   else begin
     Position.Point := TpointF.Create(
                         AThumb.Position.X + AThumb.Width + Margins.Left,
-                        AThumb.Position.Y - (((Height * Scale.Y) - AThumb.Height) / 2));
+                        AThumb.Position.Y - ((Height - AThumb.Height) / 2));
   end;
 end;
 
@@ -4138,12 +4151,12 @@ begin
         TAnimation.ScaleInOut: begin
           AdjustPosition(AThumb);
           Opacity := 1;
-          Scale.Point := TPointF.Create(0,0);
+          Scale := 0;
         end;
         TAnimation.Opacity: begin
           AdjustPosition(AThumb);
           Opacity := 0;
-          Scale.Point := TPointF.Create(1,1);
+          Scale := 1;
         end
         else
           Raise Exception.Create('Error A2F4F658-97FC-4F92-AFA4-3BB8192003A8')
@@ -4183,20 +4196,9 @@ end;
 procedure TALCustomTrack.TValueIndicator.AnimationProcess(Sender: TObject);
 begin
   case FAnimation of
-    TAnimation.ScaleInOut: begin
-      var LThumb := TTHumb(FFloatAnimation.TagObject);
-      {$IFDEF DEBUG}
-      if LThumb = nil then
-        Raise Exception.Create('Error 5B1652DB-6068-48EE-862F-ADDBC256A86D');
-      {$ENDIF}
-      Scale.Point := TPointF.Create(FFloatAnimation.CurrentValue,FFloatAnimation.CurrentValue);
-      AdjustPosition(LThumb)
-    end;
-    TAnimation.Opacity: begin
-      Opacity := FFloatAnimation.CurrentValue
-    end
-    else
-      Raise Exception.Create('Error D6F17D76-E47E-4144-8FBA-5CAD3EBF84F3')
+    TAnimation.ScaleInOut: Scale := FFloatAnimation.CurrentValue;
+    TAnimation.Opacity: Opacity := FFloatAnimation.CurrentValue
+    else Raise Exception.Create('Error D6F17D76-E47E-4144-8FBA-5CAD3EBF84F3')
   end;
 end;
 
@@ -4206,11 +4208,12 @@ begin
   FFloatAnimation.Enabled := False;
   case FAnimation of
     TAnimation.ScaleInOut: begin
-      if SameValue(Scale.Point.x, 0, TEpsilon.Vector) or
-         SameValue(Scale.Point.y, 0, TEpsilon.Vector) then visible := False;
+      if SameValue(Scale, 0, TEpsilon.Scale) then
+        visible := False;
     end;
     TAnimation.Opacity: begin
-      if SameValue(Opacity, 0, TEpsilon.Vector) then visible := False;
+      if SameValue(Opacity, 0, TEpsilon.Vector) then
+        visible := False;
     end
     else
       Raise Exception.Create('Error D6F17D76-E47E-4144-8FBA-5CAD3EBF84F3')

@@ -31,7 +31,7 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -DProj="%ALBaseDir%\Demos\ALFmxGraphics\_Source\ALFmxGraphicsDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALFmxGraphics\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -Configurations="Debug;Debug_Skia;Debug_Skia_Vulkan;Debug_Skia_Metal;Debug_ALSkiaEngine;Debug_ALSkiaEngine_Vulkan;Debug_ALSkiaEngine_Metal;Debug_Metal;Release;Release_Skia;Release_Skia_Vulkan;Release_Skia_Metal;Release_ALSkiaEngine  ;Release_ALSkiaEngine_Vulkan;Release_ALSkiaEngine_Metal;Release_Metal"^
+ -Configurations="Debug;Debug_Skia;Debug_Skia_Vulkan;Debug_Skia_Metal;Debug_ALSkiaEngine;Debug_ALSkiaEngine_Vulkan;Debug_ALSkiaEngine_Metal;Debug_Metal;Release;Release_Skia;Release_Skia_Vulkan;Release_Skia_Metal;Release_ALSkiaEngine;Release_ALSkiaEngine_Vulkan;Release_ALSkiaEngine_Metal;Release_Metal"^
  -UseGradle=true^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 

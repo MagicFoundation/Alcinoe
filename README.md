@@ -1037,15 +1037,11 @@ undesired conversions.
 History
 =======
 
-#### 12/15/2024 #### 
+#### 02/02/2025 ####
 
-- **Default Fill Color Change**  
-  The default fill color of `TALBrush` has been updated to **white** (previously `$FFE0E0E0`).  
-  This change affects the default fill color of components such as `TALRectangle` and `TALCircle`.  
-
-- **Removal of `TALFont.AutoConvert` Property**  
-  The `AutoConvert` property has been removed from `TALFont`.  
-  Its behavior is now always **enabled** (equivalent to `AutoConvert = True`).
+- Replace **RotationCenter** with **Pivot** ([RSS-2824](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2824)).
+- The **Scale** property of controls now only affects their visual size (zoom in/out) and 
+  no longer impacts their alignment within the parent layout ([RSS-2823](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823)).
   
 #### 12/20/2024 ####
 
@@ -1080,3 +1076,13 @@ History
   `Corners`, `CropCenter`, `Shadow`, `Sides`, `Stroke`, `XRadius`, and `YRadius` properties.  
 - Added the `TALEllipse` component.  
 - Introduced the `AlIsHttpOrHttpsUrl` function.
+
+#### 12/15/2024 #### 
+
+- **Default Fill Color Change**  
+  The default fill color of `TALBrush` has been updated to **white** (previously `$FFE0E0E0`).  
+  This change affects the default fill color of components such as `TALRectangle` and `TALCircle`.  
+
+- **Removal of `TALFont.AutoConvert` Property**  
+  The `AutoConvert` property has been removed from `TALFont`.  
+  Its behavior is now always **enabled** (equivalent to `AutoConvert = True`).

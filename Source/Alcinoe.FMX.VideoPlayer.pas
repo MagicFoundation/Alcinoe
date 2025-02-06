@@ -1508,6 +1508,7 @@ begin
 
   //--
   If GlobalUseMetal then begin
+    fOpenGlVideoTextureCacheRef := 0;
     fMetalTextureRef := 0;
     if CVMetalTextureCacheCreate(
          kCFAllocatorDefault, // allocator: The memory allocator for the texture.
@@ -1517,6 +1518,7 @@ begin
          @fMetalVideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVMetalTextureCacheCreate failed!'); // cacheOut: Upon return, contains the newly created texture cache. When this value is NULL, an error occurred in texture creation.
   end
   else begin
+    fMetalvideoTextureCacheRef := nil;
     fOpenGLTextureRef := 0;
     if CVOpenGLESTextureCacheCreate(
          kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
@@ -1603,12 +1605,16 @@ begin
   // CVOpenGLESTextureCacheCreateTextureFromImage function, but can you can also flush the
   // cache explicitly by calling this function. The EAGLContext associated with the cache
   // may be used to delete or unbind textures.
-  CVOpenGLESTextureCacheFlush(fOpenGLvideoTextureCacheRef, 0);
-  CFrelease(pointer(fOpenGLVideoTextureCacheRef));
+  if fOpenGLvideoTextureCacheRef <> 0 then begin
+    CVOpenGLESTextureCacheFlush(fOpenGLvideoTextureCacheRef, 0);
+    CFrelease(pointer(fOpenGLVideoTextureCacheRef));
+  end;
   //--
   if fMetalTextureRef <> 0 then CFRelease(pointer(fMetalTextureRef));
-  CVMetalTextureCacheFlush(fMetalvideoTextureCacheRef, 0);
-  CFrelease(pointer(fMetalVideoTextureCacheRef));
+  If fMetalvideoTextureCacheRef <> nil then begin
+    CVMetalTextureCacheFlush(fMetalvideoTextureCacheRef, 0);
+    CFrelease(pointer(fMetalVideoTextureCacheRef));
+  end;
   //--
   if FPlayerItemVideoOutput <> nil then begin
     FPlayerItemVideoOutput.release;

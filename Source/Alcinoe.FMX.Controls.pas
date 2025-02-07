@@ -389,7 +389,7 @@ end;
 procedure TALControl.DoResized;
 begin
   {$IF defined(debug)}
-  //ALLog(ClassName + '.DoResized', 'Name: ' + Name);
+  //ALLog(ClassName+'.DoResized', 'Name: ' + Name);
   {$ENDIF}
   inherited;
   AdjustSize;
@@ -399,7 +399,7 @@ end;
 procedure TALControl.DoRealign;
 begin
   {$IF defined(debug)}
-  //ALLog(ClassName + '.DoRealign', 'Name: ' + Name);
+  //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
   {$IFNDEF ALCompilerVersionSupported122}
@@ -506,7 +506,7 @@ begin
       end;
 
       {$IF defined(debug)}
-      //ALLog(ClassName + '.SetFixedSizeBounds', 'Name: ' + Name + ' | X : '+ALFloatToStrW(X, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.X, ALDefaultFormatSettingsW)+') | Y : '+ALFloatToStrW(Y, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.Y, ALDefaultFormatSettingsW)+') | AWidth : '+ALFloatToStrW(AWidth, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Width, ALDefaultFormatSettingsW)+') | AHeight : '+ALFloatToStrW(AHeight, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Height, ALDefaultFormatSettingsW)+')');
+      //ALLog(ClassName+'.SetFixedSizeBounds', 'Name: ' + Name + ' | X : '+ALFloatToStrW(X, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.X, ALDefaultFormatSettingsW)+') | Y : '+ALFloatToStrW(Y, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.Y, ALDefaultFormatSettingsW)+') | AWidth : '+ALFloatToStrW(AWidth, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Width, ALDefaultFormatSettingsW)+') | AHeight : '+ALFloatToStrW(AHeight, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Height, ALDefaultFormatSettingsW)+')');
       {$ENDIF}
 
       inherited SetBounds(X, Y, AWidth, AHeight);
@@ -609,7 +609,7 @@ begin
   //var LMoved := not (SameValue(X, Position.X, TEpsilon.Position) and SameValue(Y, Position.Y, TEpsilon.Position));
   //var LSizeChanged := not (SameValue(AWidth, Width, TEpsilon.Position) and SameValue(AHeight, Height, TEpsilon.Position));
   //if LMoved or LSizeChanged then
-  //  ALLog(ClassName + '.SetBounds', 'Name: ' + Name + ' | X : '+ALFloatToStrW(X, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.X, ALDefaultFormatSettingsW)+') | Y : '+ALFloatToStrW(Y, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.Y, ALDefaultFormatSettingsW)+') | AWidth : '+ALFloatToStrW(AWidth, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Width, ALDefaultFormatSettingsW)+') | AHeight : '+ALFloatToStrW(AHeight, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Height, ALDefaultFormatSettingsW)+')');
+  //  ALLog(ClassName+'.SetBounds', 'Name: ' + Name + ' | X : '+ALFloatToStrW(X, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.X, ALDefaultFormatSettingsW)+') | Y : '+ALFloatToStrW(Y, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Position.Y, ALDefaultFormatSettingsW)+') | AWidth : '+ALFloatToStrW(AWidth, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Width, ALDefaultFormatSettingsW)+') | AHeight : '+ALFloatToStrW(AHeight, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Height, ALDefaultFormatSettingsW)+')');
   {$ENDIF}
 
   inherited;
@@ -634,7 +634,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
       {$ENDIF}
 
       var LSize := TSizeF.Create(0,0);
@@ -1180,11 +1180,11 @@ begin
      (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then begin
     {$IF defined(debug)}
     if (not FMouseDownAtLowVelocity) then
-      ALLog('MouseClick', 'Skipped | Mouse Down was not made at Low Velocity')
+      ALLog(Classname+'.MouseClick', 'Skipped | Mouse Down was not made at Low Velocity')
     else if (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) then
-      ALLog('MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x), ALDefaultFormatSettingsW) + ' horizontally')
+      ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x), ALDefaultFormatSettingsW) + ' horizontally')
     else if (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then
-      ALLog('MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y), ALDefaultFormatSettingsW) + ' vertically')
+      ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y), ALDefaultFormatSettingsW) + ' vertically')
     else
       raise Exception.Create('Error 79BF6F83-8725-476D-A283-507BE9CC671C');
     {$ENDIF}
@@ -1421,7 +1421,7 @@ end;
 procedure TALContent.ContentChanged;
 begin
   {$IF defined(debug)}
-  //ALLog(ClassName + '.ContentChanged', 'Name: ' + Name);
+  //ALLog(ClassName+'.ContentChanged', 'Name: ' + Name);
   {$ENDIF}
 end;
 

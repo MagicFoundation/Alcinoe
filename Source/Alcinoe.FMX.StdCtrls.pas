@@ -2611,7 +2611,7 @@ type
         procedure StrokeChanged(Sender: TObject); override;
         procedure ShadowChanged(Sender: TObject); override;
         procedure StateStylesChanged(Sender: TObject); override;
-        procedure TouchTargetExpansionChanged(Sender: TObject);
+        procedure TouchTargetExpansionChanged(Sender: TObject); virtual;
         procedure DoResized; override;
      public
        constructor Create(const ACustomTrack: TALCustomTrack); override;
@@ -3945,8 +3945,7 @@ begin
     var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
                                                 Canvas, // Const ACanvas: TCanvas;
                                                 AbsoluteRect, // Const AAbsoluteRect: TRectF;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleX: Single;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleY: Single;
+                                                LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
                                                 true); // Const ASaveState: Boolean);
     try
 
@@ -5848,7 +5847,7 @@ begin
     if not (csLoading in ComponentState) then begin
       BeginUpdate;
       Try
-        SetBounds(Position.X, Position.Y, Size.Height, Size.Width);
+        SetBounds(Position.X, Position.Y, Height, Width);
         Margins.Rect := SwapTopBottomWithLeftRight(Margins.Rect);
         Padding.Rect := SwapTopBottomWithLeftRight(Padding.Rect);
         if FActiveTrack <> nil then begin
@@ -6170,7 +6169,6 @@ end;
 {********************************************************************************}
 procedure TALRangeTrackBar.TMinThumb.TouchTargetExpansionChanged(Sender: TObject);
 begin
-  Inherited;
   if Assigned(FFormerTouchTargetExpansionChangedHandler) then
     FFormerTouchTargetExpansionChangedHandler(Sender);
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -8395,8 +8393,7 @@ begin
     var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
                                                 Canvas, // Const ACanvas: TCanvas;
                                                 AbsoluteRect, // Const AAbsoluteRect: TRectF;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleX: Single;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleY: Single;
+                                                LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
                                                 true); // Const ASaveState: Boolean);
     try
 
@@ -9732,8 +9729,7 @@ begin
     var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
                                                 Canvas, // Const ACanvas: TCanvas;
                                                 AbsoluteRect, // Const AAbsoluteRect: TRectF;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleX: Single;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleY: Single;
+                                                LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
                                                 true); // Const ASaveState: Boolean);
     try
 
@@ -11421,8 +11417,7 @@ begin
     var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
                                                 Canvas, // Const ACanvas: TCanvas;
                                                 AbsoluteRect, // Const AAbsoluteRect: TRectF;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleX: Single;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScaleY: Single;
+                                                LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
                                                 true); // Const ASaveState: Boolean);
     try
 

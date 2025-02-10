@@ -1025,6 +1025,8 @@ type
     procedure Loaded; override;
     procedure DoResized; override;
     procedure AdjustSize; override;
+    procedure BeginTextUpdate; override;
+    procedure EndTextUpdate; override;
     function GetMultiLineTextOptions(
                const AScale: Single;
                const AOpacity: Single;
@@ -1219,9 +1221,6 @@ type
     //property OnResize;
     property OnResized;
   end;
-
-procedure ALLockTexts(const aParentControl: Tcontrol);
-procedure ALUnLockTexts(const aParentControl: Tcontrol);
 
 procedure Register;
 
@@ -4481,6 +4480,20 @@ begin
   end;
 end;
 
+{*****************************}
+procedure TALBaseText.BeginTextUpdate;
+begin
+  BeginUpdate;
+  Inherited;
+end;
+
+{*******************************}
+procedure TALBaseText.EndTextUpdate;
+begin
+  EndUpdate;
+  Inherited;
+end;
+
 {************************************************************************}
 function TALBaseText.GetElementAtPos(const APos: TPointF): TALTextElement;
 begin
@@ -5426,46 +5439,6 @@ end;
 procedure TALText.SetTextSettings(const Value: TALTextSettings);
 begin
   Inherited SetTextSettings(Value);
-end;
-
-{*************************************************}
-// Unfortunately, the way BeginUpdate/EndUpdate and
-// Realign are implemented is not very efficient for TALText.
-// When calling EndUpdate, it first propagates to the most
-// deeply nested children in this hierarchy:
-//   Control1
-//     Control2
-//       AlText1
-// This means when Control1.EndUpdate is called,
-// it executes in the following order:
-//       AlText1.EndUpdate => AdjustSize and Realign
-//     Control2.EndUpdate => Realign and potentially calls AlText1.AdjustSize again
-//   Control1.EndUpdate => Realign and possibly triggers AlText1.AdjustSize once more
-// This poses a problem since the BufDrawable will be
-// recalculated multiple times.
-// To mitigate this, we can use:
-//   ALLockTexts(Control1);
-//   Control1.EndUpdate;
-//   ALUnLockTexts(Control1);
-procedure ALLockTexts(const aParentControl: Tcontrol);
-begin
-  if aParentControl is TALBaseText then begin
-    aParentControl.BeginUpdate;
-    exit;
-  end;
-  for var I := 0 to aParentControl.Controls.Count - 1 do
-    ALLockTexts(aParentControl.Controls[i]);
-end;
-
-{******************************************************}
-procedure ALUnLockTexts(const aParentControl: Tcontrol);
-begin
-  if aParentControl is TALBaseText then begin
-    aParentControl.EndUpdate;
-    exit;
-  end;
-  for var I := 0 to aParentControl.Controls.Count - 1 do
-    ALUnLockTexts(aParentControl.Controls[i]);
 end;
 
 {*****************}

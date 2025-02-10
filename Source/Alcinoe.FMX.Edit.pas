@@ -6234,8 +6234,7 @@ begin
       var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
                                                   Canvas, // Const ACanvas: TCanvas;
                                                   AbsoluteRect, // Const AAbsoluteRect: TRectF;
-                                                  LCurrentAdjustedStateStyle.Scale, // Const AScaleX: Single;
-                                                  LCurrentAdjustedStateStyle.Scale, // Const AScaleY: Single;
+                                                  LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
                                                   true); // Const ASaveState: Boolean);
       try
 

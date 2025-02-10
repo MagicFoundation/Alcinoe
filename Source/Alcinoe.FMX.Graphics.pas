@@ -82,8 +82,7 @@ procedure ALExtractMatrixFromCanvas(const ACanvas: TALCanvas; out ACanvasMatrix:
 function  ALScaleAndCenterCanvas(
             Const ACanvas: TCanvas;
             Const AAbsoluteRect: TRectF;
-            Const AScaleX: Single;
-            Const AScaleY: Single;
+            Const AScale: Single;
             Const ASaveState: Boolean): TCanvasSaveState;
 
 {$IF defined(ALSkiaAvailable)}
@@ -6777,20 +6776,18 @@ end;
 function  ALScaleAndCenterCanvas(
             Const ACanvas: TCanvas;
             Const AAbsoluteRect: TRectF;
-            Const AScaleX: Single;
-            Const AScaleY: Single;
+            Const AScale: Single;
             Const ASaveState: Boolean): TCanvasSaveState;
 begin
   Result := nil;
-  if (not samevalue(AScaleX, 1, TEpsilon.Scale)) or
-     (not samevalue(AScaleY, 1, TEpsilon.Scale)) then begin
+  if not samevalue(AScale, 1, TEpsilon.Scale) then begin
     if ASaveState then
       Result := ACanvas.SaveState;
     var LMatrix := TMatrix.CreateTranslation(-AAbsoluteRect.Left, -AAbsoluteRect.Top);
-    LMatrix := LMatrix * TMatrix.CreateScaling(AScalex, AScaley);
+    LMatrix := LMatrix * TMatrix.CreateScaling(AScale, AScale);
     LMatrix := LMatrix * TMatrix.CreateTranslation(
-                           AAbsoluteRect.Left - (((AAbsoluteRect.Width * AScalex) - AAbsoluteRect.Width) / 2),
-                           AAbsoluteRect.Top - (((AAbsoluteRect.height * AScaley) - AAbsoluteRect.Height) / 2));
+                           AAbsoluteRect.Left - (((AAbsoluteRect.Width * AScale) - AAbsoluteRect.Width) / 2),
+                           AAbsoluteRect.Top - (((AAbsoluteRect.height * AScale) - AAbsoluteRect.Height) / 2));
     ACanvas.SetMatrix(ACanvas.Matrix * LMatrix);
   end;
 end;

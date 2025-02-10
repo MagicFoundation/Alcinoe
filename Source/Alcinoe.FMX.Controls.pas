@@ -92,6 +92,7 @@ type
     procedure MarginsChangedHandler(Sender: TObject);
     function IsScaledStored: Boolean;
   protected
+    FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
@@ -134,10 +135,13 @@ type
     procedure DoResized; override;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
+    procedure BeginTextUpdate; virtual;
+    procedure EndTextUpdate; virtual;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
     function IsVisibleWithinFormBounds: Boolean;
     property Form: TCommonCustomForm read FForm;
@@ -276,6 +280,7 @@ begin
   FIsPixelAlignmentEnabled := True;
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
+  FTextUpdating := False;
   FAutoSize := False;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;
@@ -286,6 +291,57 @@ destructor TALControl.Destroy;
 begin
   ClearBufDrawable;
   inherited;
+end;
+
+{*****************************}
+procedure TALControl.EndUpdate;
+begin
+  if IsUpdating then
+  begin
+    if not FTextUpdating then begin
+      BeginTextUpdate;
+      Inherited;
+      EndTextUpdate;
+    end
+    else 
+      Inherited;
+  end;
+end;
+
+{*************************************************}
+// Unfortunately, the way BeginUpdate/EndUpdate and
+// Realign are implemented is not very efficient for TALText.
+// When calling EndUpdate, it first propagates to the most
+// deeply nested children in this hierarchy:
+//   Control1
+//     Control2
+//       AlText1
+// This means when Control1.EndUpdate is called,
+// it executes in the following order:
+//       AlText1.EndUpdate => AdjustSize and Realign
+//     Control2.EndUpdate => Realign and potentially calls AlText1.AdjustSize again
+//   Control1.EndUpdate => Realign and possibly triggers AlText1.AdjustSize once more
+// This poses a problem since the BufDrawable will be
+// recalculated multiple times.
+// To mitigate this, we can use:
+//   BeginTextUpdate;
+//   EndUpdate;
+//   EndTextUpdate;
+procedure TALControl.BeginTextUpdate;
+begin
+  FTextUpdating := True;
+  for var I := 0 to Controls.Count - 1 do
+    if Controls[i] is TALControl then
+      TALControl(Controls[i]).BeginTextUpdate;
+end;
+
+{*******************************}
+procedure TALControl.EndTextUpdate;
+begin
+  FTextUpdating := False;
+  for var I := 0 to Controls.Count - 1 do
+    if Controls[i] is TALControl then
+      TALControl(Controls[i]).EndTextUpdate;
 end;
 
 {**************************}

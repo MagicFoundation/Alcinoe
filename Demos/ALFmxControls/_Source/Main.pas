@@ -673,11 +673,7 @@ begin
   fline.LineType := TLineType.Diagonal;
   fline.HitTest := False;
 
-  ALLog('TMainForm.FormCreate', 'EndUpdate begin');
-  ALLockTexts(ALVertScrollBox1);
   EndUpdate;
-  ALUnLockTexts(ALVertScrollBox1);
-  ALLog('TMainForm.FormCreate', 'EndUpdate end');
 
   ALTabControl1Resized(nil);
   ALVertScrollBox1Resized(nil);

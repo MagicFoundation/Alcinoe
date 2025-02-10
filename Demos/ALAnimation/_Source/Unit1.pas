@@ -226,6 +226,7 @@ begin
   invalidate;
 end;
 
+{************************************************************}
 procedure TForm1.ComboBoxInterpolationChange(Sender: TObject);
 begin
   ComboBoxCustomInterpolation.Enabled := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex])) = TALInterpolationType.Custom;

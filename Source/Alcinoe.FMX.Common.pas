@@ -900,8 +900,8 @@ type
     procedure ShadowChanged(ASender: TObject);
     function IsScaleStored: Boolean;
   protected
-    BufDrawable: TALDrawable; // 8 bytes
-    BufDrawableRect: TRectF; // 16 bytes
+    FBufDrawable: TALDrawable; // 8 bytes
+    FBufDrawableRect: TRectF; // 16 bytes
     function CreateSavedState: TALPersistentObserver; override;
     function CreateFill(const AParent: TALBrush): TALInheritBrush; virtual;
     function CreateStateLayer: TALStateLayer; virtual;
@@ -909,6 +909,7 @@ type
     function CreateShadow(const AParent: TALShadow): TALInheritShadow; virtual;
     function GetDefaultScale: Single; virtual;
     function GetInherit: Boolean; virtual;
+    function GetCacheSubIndex: Integer; Virtual;
     procedure DoSupersede; virtual;
     property Fill: TALInheritBrush read FFill write SetFill;
     property Shadow: TALInheritShadow read FShadow write SetShadow;
@@ -932,6 +933,7 @@ type
     property StateStyleParent: TALBaseStateStyle read FStateStyleParent;
     property ControlParent: TALControl read FControlParent;
     property DefaultScale: Single read GetDefaultScale;
+    property CacheSubIndex: integer read GetCacheSubIndex;
   end;
 
   // ---------------------------------------------------------------------------------------------------------------------------------- //
@@ -4745,7 +4747,7 @@ begin
   //--
   fSuperseded := False;
   //--
-  BufDrawable := ALNullDrawable;
+  FBufDrawable := ALNullDrawable;
   //BufDisabledDrawableRect
 end;
 
@@ -4846,7 +4848,7 @@ end;
 {*******************************************}
 procedure TALBaseStateStyle.ClearBufDrawable;
 begin
-  ALFreeAndNilDrawable(BufDrawable);
+  ALFreeAndNilDrawable(FBufDrawable);
 end;
 
 {***************************************************************************************************}
@@ -5014,6 +5016,12 @@ begin
             Stroke.Inherit and
             Shadow.Inherit and
             Samevalue(Scale, DefaultScale, TEpsilon.Scale);
+end;
+
+{***************************************************}
+function TALBaseStateStyle.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
 end;
 
 {********************************************************}

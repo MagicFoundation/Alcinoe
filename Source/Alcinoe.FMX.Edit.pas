@@ -5901,12 +5901,12 @@ begin
      (not LStateStyle.StateLayer.HasFill) and
      LStateStyle.Stroke.Inherit and
      LStateStyle.Shadow.Inherit then exit;
-  if (not ALIsDrawableNull(LStateStyle.BufDrawable)) then exit;
+  if (not ALIsDrawableNull(LStateStyle.FBufDrawable)) then exit;
   LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
     CreateBufDrawable(
-      LStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
-      LStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
+      LStateStyle.FBufDrawable, // var ABufDrawable: TALDrawable;
+      LStateStyle.FBufDrawableRect, // var ABufDrawableRect: TRectF;
       ALGetScreenScale, // const AScale: Single;
       LStateStyle.Fill, // const AFill: TALBrush;
       LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -6097,10 +6097,10 @@ procedure TALBaseEdit.clearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
-     (ALIsDrawableNull(BufDrawable)) and // warn will be raise in inherited
-     ((not ALIsDrawableNull(FStateStyles.Disabled.BufDrawable)) or
-      (not ALIsDrawableNull(FStateStyles.Hovered.BufDrawable)) or
-      (not ALIsDrawableNull(FStateStyles.Focused.BufDrawable))) then
+     (ALIsDrawableNull(FBufDrawable)) and // warn will be raise in inherited
+     ((not ALIsDrawableNull(FStateStyles.Disabled.FBufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Hovered.FBufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Focused.FBufDrawable))) then
     ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   if FStateStyles <> nil then
@@ -6205,16 +6205,16 @@ begin
   end
   else begin
     if LStateStyle <> nil then begin
-      LDrawable := LStateStyle.BufDrawable;
-      LDrawableRect := LStateStyle.BufDrawableRect;
+      LDrawable := LStateStyle.FBufDrawable;
+      LDrawableRect := LStateStyle.FBufDrawableRect;
       if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := BufDrawable;
-        LDrawableRect := BufDrawableRect;
+        LDrawable := FBufDrawable;
+        LDrawableRect := FBufDrawableRect;
       end;
     end
     else begin
-      LDrawable := BufDrawable;
-      LDrawableRect := BufDrawableRect;
+      LDrawable := FBufDrawable;
+      LDrawableRect := FBufDrawableRect;
     end;
   end;
   //--
@@ -6296,10 +6296,12 @@ begin
       LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
       LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
 
-      // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
-      // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
+      // Since LStateStyle.FBufDrawableRect can have different dimensions than the main BufDrawableRect
+      // (due to autosizing with different font sizes), we must center LStateStyle.FBufDrawableRect
       // within the main BufDrawableRect to ensure that all changes are visually centered.
-      var LMainDrawableRect := BufDrawableRect;
+      var LMainDrawableRect: TRectF;
+      If AlIsDrawableNull(FBufDrawable) then LMainDrawableRect := LocalRect
+      else LMainDrawableRect := FBufDrawableRect;
       LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
       var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
       LRect.Offset(LCenteredRect.Left, LCenteredRect.top);

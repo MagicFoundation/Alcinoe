@@ -30,16 +30,16 @@ type
     MostLeft,
     MostRight,
     Client,
-    Contents,
+    //Contents,       // Removed from TAlignLayout
     Center,
     VertCenter,
     HorzCenter,
     Horizontal,
     Vertical,
-    Scale,
-    Fit,
-    FitLeft,
-    FitRight,
+    //Scale,          // Removed from TAlignLayout
+    //Fit,            // Removed from TAlignLayout
+    //FitLeft,        // Removed from TAlignLayout
+    //FitRight,       // Removed from TAlignLayout
     TopCenter,        // Added from TAlignLayout - Works like TAlignLayout.Top, then centers the control horizontally
     TopLeft,          // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the left.
     TopRight,         // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the right.
@@ -330,7 +330,7 @@ end;
 procedure TALControl.BeginTextUpdate;
 begin
   FTextUpdating := True;
-  for var I := 0 to Controls.Count - 1 do
+  for var I := 0 to ControlsCount - 1 do
     if Controls[i] is TALControl then
       TALControl(Controls[i]).BeginTextUpdate;
 end;
@@ -339,7 +339,7 @@ end;
 procedure TALControl.EndTextUpdate;
 begin
   FTextUpdating := False;
-  for var I := 0 to Controls.Count - 1 do
+  for var I := 0 to ControlsCount - 1 do
     if Controls[i] is TALControl then
       TALControl(Controls[i]).EndTextUpdate;
 end;
@@ -393,16 +393,16 @@ begin
       TALAlignLayout.MostLeft: LLegacyAlign := TAlignLayout.MostLeft;
       TALAlignLayout.MostRight: LLegacyAlign := TAlignLayout.MostRight;
       TALAlignLayout.Client: LLegacyAlign := TAlignLayout.Client;
-      TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
+      //TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
       TALAlignLayout.Center: LLegacyAlign := TAlignLayout.Center;
       TALAlignLayout.VertCenter: LLegacyAlign := TAlignLayout.VertCenter;
       TALAlignLayout.HorzCenter: LLegacyAlign := TAlignLayout.HorzCenter;
       TALAlignLayout.Horizontal: LLegacyAlign := TAlignLayout.Horizontal;
       TALAlignLayout.Vertical: LLegacyAlign := TAlignLayout.Vertical;
-      TALAlignLayout.Scale: LLegacyAlign := TAlignLayout.Scale;
-      TALAlignLayout.Fit: LLegacyAlign := TAlignLayout.Fit;
-      TALAlignLayout.FitLeft: LLegacyAlign := TAlignLayout.FitLeft;
-      TALAlignLayout.FitRight: LLegacyAlign := TAlignLayout.FitRight;
+      //TALAlignLayout.Scale: LLegacyAlign := TAlignLayout.Scale;
+      //TALAlignLayout.Fit: LLegacyAlign := TAlignLayout.Fit;
+      //TALAlignLayout.FitLeft: LLegacyAlign := TAlignLayout.FitLeft;
+      //TALAlignLayout.FitRight: LLegacyAlign := TAlignLayout.FitRight;
       TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
       TALAlignLayout.TopLeft: LLegacyAlign := TAlignLayout.Top;
       TALAlignLayout.TopRight: LLegacyAlign := TAlignLayout.Top;
@@ -819,12 +819,12 @@ begin
           end;
 
           //--
-          TALAlignLayout.Client,
-          TALAlignLayout.Contents,
-          TALAlignLayout.Scale,
-          TALAlignLayout.Fit,
-          TALAlignLayout.FitLeft,
-          TALAlignLayout.FitRight: Begin
+          //TALAlignLayout.Contents,
+          //TALAlignLayout.Scale,
+          //TALAlignLayout.Fit,
+          //TALAlignLayout.FitLeft,
+          //TALAlignLayout.FitRight,
+          TALAlignLayout.Client: Begin
             if LALChildControl <> nil then begin
               if LALChildControl.HasUnconstrainedAutosizeX then LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
               else LSize.Width := Max(LSize.Width, Width);
@@ -935,12 +935,12 @@ begin
         TALAlignLayout.HorzCenter:
           Size.Width := ALAlignDimensionToPixelRound(Size.Width, ALGetScreenScale, TEpsilon.Position);
         //--
-        TALAlignLayout.Client,
-        TALAlignLayout.Contents,
-        TALAlignLayout.Scale,
-        TALAlignLayout.Fit,
-        TALAlignLayout.FitLeft,
-        TALAlignLayout.FitRight:;
+        //TALAlignLayout.Contents,
+        //TALAlignLayout.Scale,
+        //TALAlignLayout.Fit,
+        //TALAlignLayout.FitLeft,
+        //TALAlignLayout.FitRight
+        TALAlignLayout.Client:;
         //--
         else
           Raise Exception.Create('Error AC54DF90-F880-4BD5-8474-E62BD8D099FB')
@@ -1011,7 +1011,7 @@ begin
   Result := GetAutoSize;
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
-                             TALAlignLayout.Contents,
+                             //TALAlignLayout.Contents,
                              TALAlignLayout.Top,
                              TALAlignLayout.Bottom,
                              TALAlignLayout.MostTop,
@@ -1029,7 +1029,7 @@ begin
   Result := GetAutoSize;
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
-                             TALAlignLayout.Contents,
+                             //TALAlignLayout.Contents,
                              TALAlignLayout.Left,
                              TALAlignLayout.Right,
                              TALAlignLayout.MostLeft,

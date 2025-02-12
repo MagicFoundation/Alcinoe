@@ -1406,7 +1406,7 @@ end;
 {*****************************************}
 procedure TALTextStopWatch.MakeBufDrawable;
 begin
-  if ALIsDrawableNull(BufDrawable) then begin
+  if ALIsDrawableNull(FBufDrawable) then begin
     var LStopWatch := TstopWatch.StartNew;
     inherited MakeBufDrawable;
     LStopWatch.stop;
@@ -1419,7 +1419,7 @@ end;
 procedure TALTextStopWatch.Paint;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(FBufDrawable);
   var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
@@ -1450,7 +1450,7 @@ end;
 {**********************************************}
 procedure TALRectangleStopWatch.MakeBufDrawable;
 begin
-  if ALIsDrawableNull(BufDrawable) then begin
+  if ALIsDrawableNull(FBufDrawable) then begin
     var LStopWatch := TstopWatch.StartNew;
     inherited MakeBufDrawable;
     LStopWatch.stop;
@@ -1463,7 +1463,7 @@ end;
 procedure TALRectangleStopWatch.Paint;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(FBufDrawable);
   var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
@@ -1484,7 +1484,7 @@ end;
 {*****************************************}
 procedure TALLineStopWatch.MakeBufDrawable;
 begin
-  if ALIsDrawableNull(BufDrawable) then begin
+  if ALIsDrawableNull(FBufDrawable) then begin
     var LStopWatch := TstopWatch.StartNew;
     inherited MakeBufDrawable;
     LStopWatch.stop;
@@ -1497,7 +1497,7 @@ end;
 procedure TALLineStopWatch.Paint;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(FBufDrawable);
   var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
@@ -1508,7 +1508,7 @@ end;
 {*******************************************}
 procedure TALCircleStopWatch.MakeBufDrawable;
 begin
-  if ALIsDrawableNull(BufDrawable) then begin
+  if ALIsDrawableNull(FBufDrawable) then begin
     var LStopWatch := TstopWatch.StartNew;
     inherited MakeBufDrawable;
     LStopWatch.stop;
@@ -1521,7 +1521,7 @@ end;
 procedure TALCircleStopWatch.Paint;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(FBufDrawable);
   var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;

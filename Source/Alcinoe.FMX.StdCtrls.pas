@@ -261,6 +261,8 @@ type
     FRowCount: Integer;
     FResourceName: String;
     FFrameIndex: TSmallPoint;
+    FCacheIndex: Integer; // 4 bytes
+    FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     procedure SetResourceName(const Value: String);
     procedure DoTimerProcess(sender: Tobject);
     function IsResourceNameStored: Boolean;
@@ -277,6 +279,13 @@ type
     destructor Destroy; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
+    // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
+    // prevent duplicate drawables across multiple identical controls.
+    // CacheIndex specifies the slot in the cache engine where an existing
+    // drawable can be retrieved.
+    property CacheIndex: Integer read FCacheIndex write FCacheIndex;
+    // CacheEngine is not owned by the current control.
+    property CacheEngine: TALBufDrawableCacheEngine read FCacheEngine write FCacheEngine;
   published
     //property Action;
     property Align;
@@ -3015,6 +3024,8 @@ begin
   FRowCount := 4;
   FResourceName := 'aniindicator_540x432';
   FFrameIndex := TSmallPoint.Create(0,0);
+  FCacheIndex := 0;
+  FCacheEngine := nil;
   FTimer := TALDisplayTimer.Create;
   FTimer.Enabled := False;
   FTimer.Interval := FInterval;
@@ -3068,6 +3079,10 @@ begin
   end;
 
   if (not ALIsDrawableNull(FBufDrawable)) then exit;
+
+  if (CacheIndex > 0) and
+     (CacheEngine <> nil) and
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
@@ -3130,18 +3145,34 @@ begin
     Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
   end;
 
-  MakeBufDrawable;
+  var LDrawable: TALDrawable;
+  var LDrawableRect: TRectF;
+  if (CacheIndex <= 0) or
+     (CacheEngine = nil) or
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+    MakeBufDrawable;
+    if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      else fBufDrawable := ALNullDrawable;
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+        raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
+    end
+    else begin
+      LDrawable := FBufDrawable;
+      LDrawableRect := FBufDrawableRect;
+    end;
+  end;
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
-    fBufDrawable, // const ADrawable: TALDrawable;
+    LDrawable, // const ADrawable: TALDrawable;
     TRectF.Create(
       TPointF.Create(
         fFrameIndex.x * Width * ALGetScreenScale,
         fFrameIndex.Y * Height * ALGetScreenScale),
       Width * ALGetScreenScale,
       Height * ALGetScreenScale), // const ASrcRect: TrectF; // IN REAL PIXEL !
-    fBufDrawableRect, // const ADestRect: TrectF; // IN virtual pixels !
+    LDrawableRect, // const ADestRect: TrectF; // IN virtual pixels !
     AbsoluteOpacity); // const AOpacity: Single);
 
 end;

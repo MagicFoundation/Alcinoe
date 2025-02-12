@@ -185,6 +185,8 @@ type
     function CreateCropCenter: TALPosition; virtual;
     function CreateStroke: TALStrokeBrush; virtual;
     function CreateShadow: TALShadow; virtual;
+    function GetCacheSubIndex: Integer; virtual;
+    function GetLoadingCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
@@ -525,6 +527,7 @@ type
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
     function HasCustomDraw: Boolean; virtual;
+    function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     function GetDefaultXRadius: Single; virtual;
@@ -665,6 +668,7 @@ type
   protected
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
+    function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure FillChanged(Sender: TObject); override;
@@ -781,6 +785,7 @@ type
   protected
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
+    function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure FillChanged(Sender: TObject); override;
@@ -897,6 +902,7 @@ type
   protected
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
+    function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure FillChanged(Sender: TObject); override;
@@ -1035,6 +1041,7 @@ type
   protected
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
+    function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetAlign(const Value: TALAlignLayout); override;
@@ -1533,6 +1540,18 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{*******************************************}
+function TALImage.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
+end;
+
+{*******************************************}
+function TALImage.GetLoadingCacheSubIndex: Integer;
+begin
+  Result := 0;
 end;
 
 {*******************************************}
@@ -2197,12 +2216,12 @@ begin
   If FResourceDownloadContext <> nil then begin
     if (LoadingCacheIndex > 0) and
        (CacheEngine <> nil) and
-       (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+       (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex})) then Exit;
   end
   else begin
     if (CacheIndex > 0) and
        (CacheEngine <> nil) and
-       (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+       (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
   end;
 
   if (FResourceDownloadContext = nil) and
@@ -2235,7 +2254,7 @@ begin
 
       if (LoadingCacheIndex > 0) and
          (CacheEngine <> nil) and
-         (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, 1{ASubIndex})) then Exit;
+         (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex})) then Exit;
 
       {$IFDEF debug}
       ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Creating loading content | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
@@ -2318,20 +2337,27 @@ begin
   end;
 
   var LCacheIndex: integer;
-  if FResourceDownloadContext <> nil then LCacheIndex := LoadingCacheIndex
-  else LCacheIndex := CacheIndex;
+  var LCacheSubIndex: Integer;
+  if FResourceDownloadContext <> nil then begin
+    LCacheIndex := LoadingCacheIndex;
+    LCacheSubIndex := GetLoadingCacheSubIndex;
+  end
+  else begin
+    LCacheIndex := CacheIndex;
+    LCacheSubIndex := GetCacheSubIndex;
+  end;
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
   if (LCacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
     if FResourceDownloadContext <> nil then LCacheIndex := LoadingCacheIndex
     else LCacheIndex := CacheIndex;
     if (LCacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(LCacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if not CacheEngine.TrySetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -3133,6 +3159,12 @@ begin
   Result := False;
 end;
 
+{*******************************************}
+function TALBaseRectangle.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
+end;
+
 {***************************************************}
 function TALBaseRectangle.GetDoubleBuffered: boolean;
 begin
@@ -3329,7 +3361,7 @@ begin
 
   if (CacheIndex > 0) and
      (CacheEngine <> nil) and
-     (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
@@ -3392,12 +3424,12 @@ begin
   var LDrawableRect: TRectF;
   if (CacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
     if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -3504,6 +3536,12 @@ begin
     ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
+end;
+
+{*******************************************}
+function TALEllipse.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
 end;
 
 {*********************************************}
@@ -3626,7 +3664,7 @@ begin
 
   if (CacheIndex > 0) and
      (CacheEngine <> nil) and
-     (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
@@ -3689,12 +3727,12 @@ begin
   var LDrawableRect: TRectF;
   if (CacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
     if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -3806,6 +3844,12 @@ begin
     ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
+end;
+
+{*******************************************}
+function TALCircle.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
 end;
 
 {********************************************}
@@ -3928,7 +3972,7 @@ begin
 
   if (CacheIndex > 0) and
      (CacheEngine <> nil) and
-     (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
@@ -3991,12 +4035,12 @@ begin
   var LDrawableRect: TRectF;
   if (CacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
     if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -4097,6 +4141,12 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
+{*******************************************}
+function TALLine.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
+end;
+
 {******************************************}
 function TALLine.GetDoubleBuffered: boolean;
 begin
@@ -4146,7 +4196,7 @@ begin
 
   if (CacheIndex > 0) and
      (CacheEngine <> nil) and
-     (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
@@ -4396,12 +4446,12 @@ begin
   var LDrawableRect: TRectF;
   if (CacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
     if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -4652,7 +4702,7 @@ begin
       var R: TrectF;
       If {$IF not DEFINED(ALDPK)}DoubleBuffered{$ELSE}True{$ENDIF} then begin
         if (CacheIndex > 0) and (CacheEngine <> nil) then begin
-          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, R{ARect}) then begin
+          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, R{ARect}) then begin
             MakeBufDrawable;
             R := FBufDrawableRect;
           end;
@@ -4946,12 +4996,12 @@ begin
   var LDrawableRect: TRectF;
   if (CacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
     if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, 0{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, 0{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -5028,6 +5078,12 @@ begin
   if (csDesigning in ComponentState) and not Locked then
     DrawDesignBorder;
 
+end;
+
+{*******************************************}
+function TALBaseText.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
 end;
 
 {**********************************************}
@@ -5519,7 +5575,7 @@ begin
 
   if (CacheIndex > 0) and
      (CacheEngine <> nil) and
-     (CacheEngine.HasEntry(CacheIndex{AIndex}, 0{ASubIndex})) then Exit;
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));

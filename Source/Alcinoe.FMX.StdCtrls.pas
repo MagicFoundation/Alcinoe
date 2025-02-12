@@ -29,6 +29,7 @@ uses
   FMX.StdCtrls,
   FMX.actnlist,
   FMX.ImgList,
+  Alcinoe.FMX.CacheEngines,
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Graphics,
@@ -463,7 +464,10 @@ type
       end;
       // ------------------
       // TDefaultStateStyle
-      TDefaultStateStyle = class(TBaseStateStyle);
+      TDefaultStateStyle = class(TBaseStateStyle)
+      protected
+        function GetCacheSubIndex: Integer; override;
+      end;
       // -------------------
       // TDisabledStateStyle
       TDisabledStateStyle = class(TBaseStateStyle)
@@ -473,6 +477,7 @@ type
         function IsOpacityStored: Boolean;
       protected
         function GetInherit: Boolean; override;
+        function GetCacheSubIndex: Integer; override;
       public
         constructor Create(const AParent: TObject); override;
         procedure Assign(Source: TPersistent); override;
@@ -483,18 +488,24 @@ type
       // ------------------
       // THoveredStateStyle
       THoveredStateStyle = class(TBaseStateStyle)
+      protected
+        function GetCacheSubIndex: Integer; override;
       published
         property StateLayer;
       end;
       // ------------------
       // TPressedStateStyle
       TPressedStateStyle = class(TBaseStateStyle)
+      protected
+        function GetCacheSubIndex: Integer; override;
       published
         property StateLayer;
       end;
       // ------------------
       // TFocusedStateStyle
       TFocusedStateStyle = class(TBaseStateStyle)
+      protected
+        function GetCacheSubIndex: Integer; override;
       published
         property StateLayer;
       end;
@@ -572,6 +583,8 @@ type
     FDoubleBuffered: boolean;
     FXRadius: Single;
     FYRadius: Single;
+    FCacheIndex: Integer; // 4 bytes
+    FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     {$IF NOT DEFINED(ALSkiaCanvas)}
     FRenderTargetSurface: TALSurface; // 8 bytes
     FRenderTargetCanvas: TALCanvas; // 8 bytes
@@ -630,6 +643,13 @@ type
     Property RenderTargetDrawable: TALDrawable read fRenderTargetDrawable;
     {$ENDIF}
     procedure Paint; override;
+    // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
+    // prevent duplicate drawables across multiple identical controls.
+    // CacheIndex specifies the slot in the cache engine where an existing
+    // drawable can be retrieved.
+    property CacheIndex: Integer read FCacheIndex write FCacheIndex;
+    // CacheEngine is not owned by the current control.
+    property CacheEngine: TALBufDrawableCacheEngine read FCacheEngine write FCacheEngine;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -673,6 +693,8 @@ type
     property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property CacheEngine;
+    property CacheIndex;
     property CheckMark;
     property Checked;
     property ClipChildren;
@@ -7286,6 +7308,12 @@ begin
   Change;
 end;
 
+{***************************************************************}
+function TALBaseCheckBox.TDefaultStateStyle.GetCacheSubIndex: Integer;
+begin
+  Result := 1;
+end;
+
 {********************************************************************}
 function TALBaseCheckBox.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
@@ -7342,6 +7370,30 @@ begin
   // disabledOpacity of the base control immediately every time it changes.
   // Essentially, it acts merely as a link to the disabledOpacity of the base control.
   Result := inherited GetInherit;
+end;
+
+{***************************************************************}
+function TALBaseCheckBox.TDisabledStateStyle.GetCacheSubIndex: Integer;
+begin
+  Result := 2;
+end;
+
+{***************************************************************}
+function TALBaseCheckBox.THoveredStateStyle.GetCacheSubIndex: Integer;
+begin
+  Result := 3;
+end;
+
+{***************************************************************}
+function TALBaseCheckBox.TPressedStateStyle.GetCacheSubIndex: Integer;
+begin
+  Result := 4;
+end;
+
+{***************************************************************}
+function TALBaseCheckBox.TFocusedStateStyle.GetCacheSubIndex: Integer;
+begin
+  Result := 5;
 end;
 
 {******************************************************************************}
@@ -7682,6 +7734,8 @@ begin
   FDoubleBuffered := true;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
+  FCacheIndex := 0;
+  FCacheEngine := nil;
   {$IF NOT DEFINED(ALSkiaCanvas)}
   FRenderTargetSurface := ALNullSurface;
   FRenderTargetCanvas := ALNullCanvas;
@@ -7992,12 +8046,28 @@ begin
     exit;
   end;
   //--
-  if Checked then _DoMakeBufDrawable(StateStyles.Checked.Default)
-  else _DoMakeBufDrawable(StateStyles.UnChecked.Default);
+  var LSubIndexOffset: Integer;
+  var LDefaultStateStyle: TBaseStateStyle;
+  if Checked then begin
+    LSubIndexOffset := 0;
+    LDefaultStateStyle := StateStyles.Checked.Default;
+  end
+  else begin
+    LSubIndexOffset := 5;
+    LDefaultStateStyle := StateStyles.UnChecked.Default;
+  end;
+  //--
+  if (CacheIndex = 0) or
+     (CacheEngine = nil) or
+     (not CacheEngine.HasEntry(CacheIndex{AIndex}, LSubIndexOffset+LDefaultStateStyle.CacheSubIndex{ASubIndex})) then
+    _DoMakeBufDrawable(LDefaultStateStyle);
   //--
   var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
   if LStateStyle = nil then exit;
   if LStateStyle.Inherit then exit;
+  if (CacheIndex > 0) and
+     (CacheEngine <> nil) and
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, LSubIndexOffset+LStateStyle.CacheSubIndex{ASubIndex})) then Exit;
   _DoMakeBufDrawable(LStateStyle);
   // No need to center LStateStyle.FBufDrawableRect on the main BufDrawableRect
   // because BufDrawableRect always has the width and height of the localRect.
@@ -8349,32 +8419,59 @@ procedure TALBaseCheckBox.Paint;
 begin
 
   StateStyles.UpdateLastPaintedRawStyle;
-  MakeBufDrawable;
 
-  var LDrawable: TALDrawable;
-  var LDrawableRect: TRectF;
-  if StateStyles.IsTransitionAnimationRunning then begin
-    LDrawable := ALNullDrawable;
-    LDrawableRect := TRectF.Empty;
-  end
-  else begin
+  var LDrawable: TALDrawable := ALNullDrawable;
+  var LDrawableRect: TRectF := TRectF.Empty;
+  if not StateStyles.IsTransitionAnimationRunning then begin
+    //--
+    var LSubIndexOffset: Integer;
+    var LDefaultStateStyle: TBaseStateStyle;
+    if Checked then begin
+      LSubIndexOffset := 0;
+      LDefaultStateStyle := StateStyles.Checked.Default;
+    end
+    else begin
+      LSubIndexOffset := 5;
+      LDefaultStateStyle := StateStyles.UnChecked.Default;
+    end;
+    //--
     var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
     if LStateStyle <> nil then begin
-      LDrawable := LStateStyle.FBufDrawable;
-      LDrawableRect := LStateStyle.FBufDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        if checked then begin
-          LDrawable := StateStyles.Checked.Default.FBufDrawable;
-          LDrawableRect := StateStyles.Checked.Default.FBufDrawableRect;
+      if (CacheIndex <= 0) or
+         (CacheEngine = nil) or
+         (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, LSubIndexOffset+LStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+        MakeBufDrawable;
+        if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(LStateStyle.FBufDrawable)) then begin
+          if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, LSubIndexOffset+LStateStyle.CacheSubIndex{ASubIndex}, LStateStyle.FBufDrawable{ADrawable}, LStateStyle.FBufDrawableRect{ARect}) then ALFreeAndNilDrawable(LStateStyle.FBufDrawable)
+          else LStateStyle.FBufDrawable := ALNullDrawable;
+          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, LSubIndexOffset+LStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+            raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
         end
         else begin
-          LDrawable := StateStyles.UnChecked.Default.FBufDrawable;
-          LDrawableRect := StateStyles.UnChecked.Default.FBufDrawableRect;
+          LDrawable := LStateStyle.FBufDrawable;
+          LDrawableRect := LStateStyle.FBufDrawableRect;
         end;
       end;
-    end
-    else
-      raise Exception.Create('Error #EA9B4064-F1D2-4E04-82FE-99FD3ED8B1F3');
+    end;
+    //--
+    If ALIsDrawableNull(LDrawable) then begin
+      if (CacheIndex <= 0) or
+         (CacheEngine = nil) or
+         (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, LSubIndexOffset+LDefaultStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+        if LStateStyle = nil then MakeBufDrawable;
+        if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(LDefaultStateStyle.fBufDrawable)) then begin
+          if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, LSubIndexOffset+LDefaultStateStyle.CacheSubIndex{ASubIndex}, LDefaultStateStyle.fBufDrawable{ADrawable}, LDefaultStateStyle.fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(LDefaultStateStyle.fBufDrawable)
+          else LDefaultStateStyle.fBufDrawable := ALNullDrawable;
+          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, LSubIndexOffset+LDefaultStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+            raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
+        end
+        else begin
+          LDrawable := LDefaultStateStyle.FBufDrawable;
+          LDrawableRect := LDefaultStateStyle.FBufDrawableRect;
+        end;
+      end;
+    end;
+    //--
   end;
 
   if ALIsDrawableNull(LDrawable) then begin

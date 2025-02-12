@@ -696,6 +696,9 @@ type
     procedure SetStateStyles(const AValue: TStateStyles);
   protected
     function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
+  public
+    property CacheEngine;
+    property CacheIndex;
   published
     //property Action;
     property Align;
@@ -704,8 +707,6 @@ type
     property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    property CacheEngine;
-    property CacheIndex;
     property CheckMark;
     property Checked;
     property ClipChildren;
@@ -1704,6 +1705,8 @@ type
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
+    property CacheEngine;
+    property CacheIndex;
   published
     //property Action;
     property Align;
@@ -1713,8 +1716,6 @@ type
     property CanFocus default true;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    property CacheEngine;
-    property CacheIndex;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -2461,7 +2462,6 @@ type
         //property OnResized;
       end;
   private
-    fDoubleBuffered: boolean;
     FTabStop: Boolean;
     FIsAligningTracks: Boolean;
     function FrequencyStored: Boolean;
@@ -3524,7 +3524,6 @@ begin
   cursor := crHandPoint;
   AutoCapture := True;
   Locked := True;
-  DoubleBuffered := ACustomTrack.DoubleBuffered;
   //--
   FValueRange := TValueRange.create(self);
   {$IFDEF debug}
@@ -4991,7 +4990,6 @@ begin
   FStopIndicator.OnChanged := StopIndicatorChanged;
   Locked := True;
   HitTest := False;
-  DoubleBuffered := ACustomTrack.DoubleBuffered;
   //--
   {$IF defined(ALDPK)}
   FPrevStateStyles := TStateStyles.Create(nil);
@@ -5491,7 +5489,6 @@ begin
   inherited TabStop := False;
   FTabStop := True;
   FIsAligningTracks := False;
-  fDoubleBuffered := True;
   FOrientation := TOrientation.Horizontal;
   FOnChange := nil;
   //--
@@ -5594,6 +5591,7 @@ begin
   if FInactiveTrack <> nil then FInactiveTrack.MakeBufDrawable;
   if FActiveTrack <> nil then FActiveTrack.MakeBufDrawable;
   if FThumb <> nil then FThumb.MakeBufDrawable;
+  //if FValueIndicator <> nil then FValueIndicator.MakeBufDrawable;
 end;
 
 {****************************************}
@@ -5602,6 +5600,7 @@ begin
   if FInactiveTrack <> nil then FInactiveTrack.ClearBufDrawable;
   if FActiveTrack <> nil then FActiveTrack.ClearBufDrawable;
   if FThumb <> nil then FThumb.ClearBufDrawable;
+  if FValueIndicator <> nil then FValueIndicator.ClearBufDrawable;
 end;
 
 {*******************************************}
@@ -5710,16 +5709,16 @@ end;
 {*************************************************}
 function TALCustomTrack.GetDoubleBuffered: boolean;
 begin
-  result := fDoubleBuffered;
+  result := FThumb.DoubleBuffered;
 end;
 
 {****************************************************************}
 procedure TALCustomTrack.SetDoubleBuffered(const AValue: Boolean);
 begin
-  fDoubleBuffered := AValue;
+  FThumb.DoubleBuffered := AValue;
   if FInactiveTrack <> nil then FInactiveTrack.DoubleBuffered := AValue;
   if FActiveTrack <> nil then FActiveTrack.DoubleBuffered := AValue;
-  if FThumb <> nil then FThumb.DoubleBuffered := AValue;
+  if FValueIndicator <> nil then FValueIndicator.DoubleBuffered := AValue;
 end;
 
 {********************************************}
@@ -5903,6 +5902,7 @@ begin
   if FInactiveTrack <> nil then FInactiveTrack.enabled := enabled;
   if FActiveTrack <> nil then FActiveTrack.enabled := enabled;
   if FThumb <> nil then FThumb.enabled := enabled;
+  if FValueIndicator <> nil then FValueIndicator.enabled := enabled;
 end;
 
 {*****************************************************************}
@@ -9515,7 +9515,7 @@ end;
 {*******************************************}
 function TALSwitch.TTrack.GetCacheSubIndex: Integer;
 begin
-  // The TALCheckBox uses 11 slots:
+  // The Thumb uses 11 slots:
   // 0     - Unused
   // 1..5  - Checked state drawables
   // 6..10 - Unchecked state drawables

@@ -584,6 +584,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALRectangle = class(TALBaseRectangle)
+  public
+    property CacheEngine;
+    property CacheIndex;
   published
     //property Action;
     property Align;
@@ -592,8 +595,6 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    property CacheEngine;
-    property CacheIndex;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -1197,6 +1198,8 @@ type
     procedure DefineProperties(Filer: TFiler); override;
   {$ENDIF}
   public
+    property CacheEngine;
+    property CacheIndex;
     property Elements;
   published
     //property Action;
@@ -1207,8 +1210,6 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    property CacheEngine;
-    property CacheIndex;
     property ClipChildren;
     //property ClipParent;
     property Corners;

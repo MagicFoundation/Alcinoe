@@ -568,6 +568,7 @@ type
       TCreateInstanceFunc = function: TALGraphicThreadPool;
     class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALGraphicThreadPool read GetInstance;
+    class function HasInstance: Boolean; inline;
   public
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
@@ -7691,6 +7692,13 @@ begin
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
+end;
+
+{*************}
+//[MultiThread]
+class function TALGraphicThreadPool.HasInstance: Boolean;
+begin
+  result := FInstance <> nil;
 end;
 
 {*****************************************}

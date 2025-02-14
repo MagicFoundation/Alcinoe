@@ -73,6 +73,7 @@ type
       TCreateInstanceFunc = function: TALNetHttpClientPool;
     class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALNetHttpClientPool read GetInstance;
+    class function HasInstance: Boolean; inline;
   private
     FCacheData: TALNetHttpClientPoolCacheDataProc;
     FRetrieveCachedData: TALNetHttpClientPoolRetrieveCachedDataProc;
@@ -275,6 +276,13 @@ begin
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
+end;
+
+{*************}
+//[MultiThread]
+class function TALNetHttpClientPool.HasInstance: Boolean;
+begin
+  result := FInstance <> nil;
 end;
 
 {**********************************************************}

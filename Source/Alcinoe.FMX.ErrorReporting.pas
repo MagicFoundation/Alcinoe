@@ -23,6 +23,7 @@ type
       TCreateInstanceFunc = function: TALErrorReporting;
     class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALErrorReporting read GetInstance;
+    class function HasInstance: Boolean; inline;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -69,6 +70,13 @@ begin
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
+end;
+
+{*************}
+//[MultiThread]
+class function TALErrorReporting.HasInstance: Boolean;
+begin
+  result := FInstance <> nil;
 end;
 
 {*************************************************************************************************}

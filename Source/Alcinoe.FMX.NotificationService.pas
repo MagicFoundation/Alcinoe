@@ -156,6 +156,7 @@ type
       TCreateInstanceFunc = function: TALNotificationService;
     class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALNotificationService read GetInstance;
+    class function HasInstance: Boolean; inline;
   public
     type
       TGetTokenEvent = procedure(const AToken: String; const AErrorMessage: String) of object;
@@ -506,6 +507,13 @@ begin
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
+end;
+
+{*************}
+//[MultiThread]
+class function TALNotificationService.HasInstance: Boolean;
+begin
+  result := FInstance <> nil;
 end;
 
 {*************************************************************}

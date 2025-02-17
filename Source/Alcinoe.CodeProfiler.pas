@@ -7,15 +7,18 @@ interface
 type
   TALProcMetrics = record
   public
-    RunID: Cardinal;
+    ExecutionID: Cardinal;
     ThreadID: Cardinal;
     ProcID: Cardinal;
-    ParentRunID: Cardinal;
-    TimeTaken: Double;
+    ParentExecutionID: Cardinal;
+    StartTimeStamp: Int64;
+    ElapsedTicks: Int64;
   end;
 
 procedure ALCodeProfilerEnterProc(const aProcID : Cardinal);
 procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
+procedure ALCodeProfilerStart;
+procedure ALCodeProfilerStop(Const ASaveHistory: Boolean = True);
 
 const
   ALCodeProfilerProcMetricsFilename = 'ALCodeProfilerProcMetrics.dat';
@@ -41,12 +44,12 @@ uses
 Type
   TALStopWatchProcMetrics = record
   private
-    class var RunIDSequence: cardinal;
+    class var ExecutionIDSequence: cardinal;
   public
-    RunID: Cardinal;
+    ExecutionID: Cardinal;
     ThreadID: Cardinal;
     ProcID: Cardinal;
-    ParentRunID: Cardinal;
+    ParentExecutionID: Cardinal;
     StopWatch: TStopWatch;
     constructor Create(const AProcID: Cardinal);
   end;
@@ -58,63 +61,77 @@ threadvar
 
 {*}
 var
+  ALCodeProfilerEnabled: Boolean;
   ALProcMetricsLock: TObject;
-  ALDataFilename: String;
+  ALProcMetricsFilename: String;
 
 {*********************************************************}
 constructor TALStopWatchProcMetrics.Create(const AProcID: Cardinal);
 begin
-  Self.RunID := AtomicIncrement(RunIDSequence);
+  Self.ExecutionID := AtomicIncrement(ExecutionIDSequence);
   Self.ThreadID := TThread.CurrentThread.ThreadID;
   if Self.ThreadID = MainThreadID then Self.ThreadID := 0;
   Self.ProcID := AProcID;
-  Self.ParentRunID := 0;
+  Self.ParentExecutionID := 0;
   Self.StopWatch := TStopWatch.StartNew;
 end;
 
 {**********************************}
 procedure ALCodeProfilerSaveHistory;
+
+  type
+    {$IFNDEF ALCompilerVersionSupported122}
+      {$MESSAGE WARN 'Check if System.Diagnostics.TStopwatch was not updated and adjust the IFDEF'}
+    {$ENDIF}
+    TStopwatchAccessPrivate = record
+    public
+      FElapsed: Int64;
+      FRunning: Boolean;
+      FStartTimeStamp: Int64;
+    end;
+
 begin
   var LProcMetricsHistory := ALProcMetricsHistory;
   if LProcMetricsHistory = nil then exit;
   var LMemoryStream := TMemoryStream.Create;
   try
-    LMemoryStream.Size := LProcMetricsHistory.Count * ({ThreadID}sizeOf(Cardinal) + {LoopID}sizeOf(Cardinal) + {ProcID}sizeOf(Cardinal) + {ParentProcID}sizeOf(Cardinal) + {TimeTaken}sizeOf(Double));
+    LMemoryStream.Size := LProcMetricsHistory.Count * SizeOf(TALProcMetrics);
     For var I := 0 to LProcMetricsHistory.Count - 1 do begin
       var LStopWatchProcMetrics := LProcMetricsHistory[i];
       var LProcMetrics: TALProcMetrics;
-      LProcMetrics.RunID := LStopWatchProcMetrics.RunID;
+      LProcMetrics.ExecutionID := LStopWatchProcMetrics.ExecutionID;
       LProcMetrics.ThreadID := LStopWatchProcMetrics.ThreadID;
       LProcMetrics.ProcID := LStopWatchProcMetrics.ProcID;
-      LProcMetrics.ParentRunID := LStopWatchProcMetrics.ParentRunID;
-      LProcMetrics.TimeTaken := LStopWatchProcMetrics.StopWatch.Elapsed.TotalMilliseconds;
+      LProcMetrics.ParentExecutionID := LStopWatchProcMetrics.ParentExecutionID;
+      LProcMetrics.StartTimeStamp := TStopwatchAccessPrivate(LStopWatchProcMetrics.StopWatch).FStartTimeStamp;
+      LProcMetrics.ElapsedTicks := LStopWatchProcMetrics.StopWatch.ElapsedTicks;
       LMemoryStream.WriteData(LProcMetrics);
     end;
     Tmonitor.Enter(ALProcMetricsLock);
     try
-      If ALDataFilename = '' then begin
+      If ALProcMetricsFilename = '' then begin
         {$IF defined(MSWindows)}
         var LRegistry := TRegistry.Create(KEY_READ);
         try
           LRegistry.RootKey := HKEY_CURRENT_USER;
           if LRegistry.OpenKeyReadOnly(ALCodeProfilerRegistryPath) then begin
             if LRegistry.ValueExists(ALCodeProfilerDataStoragePathKey) then
-              ALDataFilename := LRegistry.ReadString(ALCodeProfilerDataStoragePathKey);
+              ALProcMetricsFilename := LRegistry.ReadString(ALCodeProfilerDataStoragePathKey);
             LRegistry.CloseKey;
           end;
         finally
           LRegistry.Free;
         end;
-        If ALDataFilename <> '' then
-          ALDataFilename := TPath.Combine(ALDataFilename, ALCodeProfilerProcMetricsFilename)
+        If ALProcMetricsFilename <> '' then
+          ALProcMetricsFilename := TPath.Combine(ALProcMetricsFilename, ALCodeProfilerProcMetricsFilename)
         else
         {$ENDIF}
-          ALDataFilename := TPath.Combine(TPath.GetDownloadsPath, ALCodeProfilerProcMetricsFilename);
-        if TFile.Exists(ALDataFilename) then TFile.Delete(ALDataFilename);
+          ALProcMetricsFilename := TPath.Combine(TPath.GetDownloadsPath, ALCodeProfilerProcMetricsFilename);
+        if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
       end;
       var LfileStream: TFileStream;
-      if Tfile.Exists(ALDataFilename) then LfileStream := TFileStream.Create(ALDataFilename, fmOpenWrite)
-      else LfileStream := TFileStream.Create(ALDataFilename, fmCreate);
+      if Tfile.Exists(ALProcMetricsFilename) then LfileStream := TFileStream.Create(ALProcMetricsFilename, fmOpenWrite)
+      else LfileStream := TFileStream.Create(ALProcMetricsFilename, fmCreate);
       try
         LfileStream.Position := LfileStream.Size;
         LfileStream.CopyFrom(LMemoryStream);
@@ -134,6 +151,7 @@ end;
 {**********************************************************}
 procedure ALCodeProfilerEnterProc(const aProcID : Cardinal);
 begin
+  if not ALCodeProfilerEnabled then exit;
   var LProcMetricsStack := ALProcMetricsStack;
   if LProcMetricsStack = nil then begin
     ALProcMetricsStack := TStack<TALStopWatchProcMetrics>.Create;
@@ -142,8 +160,8 @@ begin
   var LProcMetrics: TALStopWatchProcMetrics;
   if LProcMetricsStack.Count > 0 then begin
     LProcMetrics := LProcMetricsStack.Peek;
-    LProcMetrics.ParentRunID := LProcMetrics.RunID;
-    LProcMetrics.RunID := AtomicIncrement(TALStopWatchProcMetrics.RunIDSequence);
+    LProcMetrics.ParentExecutionID := LProcMetrics.ExecutionID;
+    LProcMetrics.ExecutionID := AtomicIncrement(TALStopWatchProcMetrics.ExecutionIDSequence);
     LProcMetrics.ProcID := aProcID;
     LProcMetrics.StopWatch := TStopWatch.StartNew;
   end
@@ -156,6 +174,12 @@ procedure ALCodeProfilerExitProc(const aProcID : Cardinal);
 begin
   var LProcMetricsStack := ALProcMetricsStack;
   if LProcMetricsStack = nil then exit;
+  if not ALCodeProfilerEnabled then begin
+    ALProcMetricsStack.Free;
+    ALProcMetricsStack := nil;
+    ALCodeProfilerSaveHistory;
+    exit;
+  end;
   if LProcMetricsStack.Count > 0 then begin
     var LProcMetrics := LProcMetricsStack.Pop;
     LProcMetrics.StopWatch.Stop;
@@ -174,12 +198,35 @@ begin
   end;
 end;
 
+{****************************}
+procedure ALCodeProfilerStart;
+begin
+  ALCodeProfilerEnabled := True;
+end;
+
+{***************************}
+procedure ALCodeProfilerStop(Const ASaveHistory: Boolean = True);
+Begin
+  ALCodeProfilerEnabled := False;
+  if ALProcMetricsStack <> nil then begin
+    ALProcMetricsStack.Free;
+    ALProcMetricsStack := nil;
+  end;
+  if ASaveHistory then ALCodeProfilerSaveHistory
+  else if ALProcMetricsHistory <> nil then begin
+    ALProcMetricsHistory.Free;
+    ALProcMetricsHistory := nil;
+  end;
+End;
+
 initialization
-  TALStopWatchProcMetrics.RunIDSequence := 0;
+  TALStopWatchProcMetrics.ExecutionIDSequence := 0;
   ALProcMetricsLock := TObject.Create;
-  ALDataFilename := '';
+  ALCodeProfilerEnabled := True;
+  ALProcMetricsFilename := '';
 
 finalization
+  ALCodeProfilerEnabled := False;
   ALCodeProfilerSaveHistory;
   if ALProcMetricsStack <> nil then begin
     ALProcMetricsStack.Free;

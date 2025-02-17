@@ -2066,7 +2066,7 @@ var
       Exit;
 
     Result := CompareMem(@data1[0], @data2[0], Length(data1))
-   end;
+  end;
 const
   testPassword = AnsiString('The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick');
   //                                                                              56^               ^72

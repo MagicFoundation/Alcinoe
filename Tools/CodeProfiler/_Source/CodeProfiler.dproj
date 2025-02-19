@@ -1,0 +1,188 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{AF4D00F0-C14D-4232-9454-D8872D1FA1D1}</ProjectGuid>
+    <MainSource>CodeProfiler.dpr</MainSource>
+    <Base>True</Base>
+    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
+    <TargetedPlatforms>3</TargetedPlatforms>
+    <AppType>Application</AppType>
+    <FrameworkType>VCL</FrameworkType>
+    <ProjectVersion>20.2</ProjectVersion>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">CodeProfiler</ProjectName>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Win32)&#39;!=&#39;&#39;">
+    <Base_Win32>true</Base_Win32>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Win64)&#39;!=&#39;&#39;">
+    <Base_Win64>true</Base_Win64>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; or &#39;$(Cfg_1)&#39;!=&#39;&#39;">
+    <Cfg_1>true</Cfg_1>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+    <Cfg_1_Win32>true</Cfg_1_Win32>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <Cfg_1_Win64>true</Cfg_1_Win64>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; or &#39;$(Cfg_2)&#39;!=&#39;&#39;">
+    <Cfg_2>true</Cfg_2>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
+    <Cfg_2_Win32>true</Cfg_2_Win32>
+    <CfgParent>Cfg_2</CfgParent>
+    <Cfg_2>true</Cfg_2>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
+    <Cfg_2_Win64>true</Cfg_2_Win64>
+    <CfgParent>Cfg_2</CfgParent>
+    <Cfg_2>true</Cfg_2>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
+    <SanitizedProjectName>CodeProfiler</SanitizedProjectName>
+    <DCC_DcuOutput>.\Dcu</DCC_DcuOutput>
+    <Manifest_File>None</Manifest_File>
+    <DCC_CodePage>65001</DCC_CodePage>
+    <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Locale>1033</VerInfo_Locale>
+    <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
+    <DCC_ImageBase>00400000</DCC_ImageBase>
+    <DCC_E>false</DCC_E>
+    <DCC_N>false</DCC_N>
+    <DCC_S>false</DCC_S>
+    <DCC_F>false</DCC_F>
+    <DCC_K>false</DCC_K>
+    <DCC_UnitSearchPath>..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_ExeOutput>..\</DCC_ExeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Base_Win32)&#39;!=&#39;&#39;">
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+    <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+    <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Base_Win64)&#39;!=&#39;&#39;">
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+    <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
+    <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+    <DCC_DebugInformation>0</DCC_DebugInformation>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
+    <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+    <DCC_Optimize>false</DCC_Optimize>
+    <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <BT_BuildType>Debug</BT_BuildType>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
+    <BT_BuildType>Debug</BT_BuildType>
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+  </PropertyGroup>
+  <ItemGroup>
+    <DelphiCompile Include="$(MainSource)">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <BuildConfiguration Include="Base">
+      <Key>Base</Key>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Debug">
+      <CfgParent>Base</CfgParent>
+      <Key>Cfg_2</Key>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Release">
+      <CfgParent>Base</CfgParent>
+      <Key>Cfg_1</Key>
+    </BuildConfiguration>
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+    <Borland.ProjectType/>
+    <BorlandProject>
+      <Delphi.Personality>
+        <Source>
+          <Source Name="MainSource">CodeProfiler.dpr</Source>
+        </Source>
+        <VersionInfo>
+          <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+          <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+          <VersionInfo Name="MajorVer">1</VersionInfo>
+          <VersionInfo Name="MinorVer">0</VersionInfo>
+          <VersionInfo Name="Release">0</VersionInfo>
+          <VersionInfo Name="Build">0</VersionInfo>
+          <VersionInfo Name="Debug">False</VersionInfo>
+          <VersionInfo Name="PreRelease">False</VersionInfo>
+          <VersionInfo Name="Special">False</VersionInfo>
+          <VersionInfo Name="Private">False</VersionInfo>
+          <VersionInfo Name="DLL">False</VersionInfo>
+          <VersionInfo Name="Locale">1033</VersionInfo>
+          <VersionInfo Name="CodePage">1252</VersionInfo>
+        </VersionInfo>
+        <VersionInfoKeys>
+          <VersionInfoKeys Name="CompanyName"/>
+          <VersionInfoKeys Name="FileDescription"/>
+          <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+          <VersionInfoKeys Name="InternalName"/>
+          <VersionInfoKeys Name="LegalCopyright"/>
+          <VersionInfoKeys Name="LegalTrademarks"/>
+          <VersionInfoKeys Name="OriginalFilename"/>
+          <VersionInfoKeys Name="ProductName"/>
+          <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+          <VersionInfoKeys Name="Comments"/>
+        </VersionInfoKeys>
+        <Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+        </Excluded_Packages>
+      </Delphi.Personality>
+      <Platforms>
+        <Platform value="Win32">True</Platform>
+        <Platform value="Win64">True</Platform>
+      </Platforms>
+    </BorlandProject>
+    <ProjectFileVersion>12</ProjectFileVersion>
+  </ProjectExtensions>
+  <Import Condition="Exists(&#39;$(BDS)\Bin\CodeGear.Delphi.Targets&#39;)" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+  <Import Condition="Exists(&#39;$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj&#39;)" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+</Project>

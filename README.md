@@ -80,7 +80,7 @@ forced to apply patches to the original Delphi source files:
 * [TVirtualKeyboardAndroid.GetVirtualKeyboardState not accurate](https://quality.embarcadero.com/browse/RSP-24737)
 * [Add NSPersonNameComponents in iOSapi.Foundation.pas](https://quality.embarcadero.com/browse/RSP-28096)
 * [Comparison of 2 interfaces result in bad behavior in TCommonCustomForm.SetHovered and similar](https://quality.embarcadero.com/browse/RSP-36612)
-* [In android, TFormRender must use JChoreographer_FrameCallback not JRunnable](https://quality.embarcadero.com/browse/RSP-38660)
+* [Improve Rendering Timing by Using Choreographer Instead of Runnable](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865)
 * [Need JNotificationClass.AUDIO_ATTRIBUTES_DEFAULT and JNotificationChannel.setSound](https://quality.embarcadero.com/browse/RSP-39511)
 * [iOS/OSX: Declaration for CLRegion.initCircularRegionWithCenter is incorrect](https://quality.embarcadero.com/browse/RSP-15717)
 * [Missing Declaration of maximumFramesPerSecond Function in UIScreen Interface](https://quality.embarcadero.com/browse/RSP-43458)
@@ -516,6 +516,68 @@ far beyond the traditional ease-in or ease-out sequences.
 
 Learn more at 
 [Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+<br/>
+<br/>
+  
+
+AndroidMerger: Integrate AAR SDK in FMX Android App
+===================================================
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/androidmerger.jpg?raw=true"/>
+
+An Android library, also known as an Android Archive (AAR), 
+contains everything needed to build an app, including source 
+files, resource files, and the manifest. Unlike JARs, AARs 
+can include resource files in addition to compiled bytecode.
+
+Integrating an AAR into a Delphi project can be a long and 
+complex process, involving extracting resources, manually 
+adding them to Delphi deployment files, compiling the 
+**R.java** class, checking dependencies, and more.
+
+With **AndroidMerger**, this entire process is automated 
+in a single command line. In short, **AndroidMerger** will:
+
+- Use Gradle or an internal implementation to list all dependencies.
+- Download libraries and dependencies from local or central Maven repositories.
+- Merge the resources of all AARs into a single directory.
+- Combine the **AndroidManifest** files of all AARs into **AndroidManifest.template.xml**.
+- Merge **google-services.json** into the project's resources.
+- Create the **R.jar** with all resource IDs using **aapt** or **aapt2**.
+- Update the project file (*.dproj*) to include all resources.
+- Generate the Delphi native bridge file from the Java libraries.
+
+Learn more at [Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
+<br/>
+<br/>
+  
+
+Alcinoe Code Profiler
+=====================
+
+## Effortlessly Profile Your Delphi Code on Windows, macOS, iOS, and Android
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/codeprofiler.png?raw=true"/>
+
+Alcinoe Code Profiler is a powerful source code instrumentation 
+profiler for Delphi, designed to help developers identify 
+performance bottlenecks and optimize their applications across 
+multiple platforms, including Windows, macOS, iOS, and Android.  
+
+By automatically injecting performance markers into your Delphi 
+source code, Alcinoe Code Profiler logs execution times for each 
+procedure call. These logs can then be analyzed using the provided 
+graphical interface, enabling you to pinpoint inefficiencies 
+and enhance application performance with precision.  
+
+### **With Alcinoe Code Profiler, you can:**  
+
+✅ **Detect performance bottlenecks** with minimal effort
+✅ **Optimize critical code paths** for better efficiency
+✅ **Profile applications seamlessly** across all major platforms
+✅ **Visualize execution data** in an intuitive analysis tool
+
+Learn more at [Tools/CodeProfiler](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeProfiler)
 <br/>
 <br/>
   

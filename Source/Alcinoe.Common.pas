@@ -693,6 +693,7 @@ uses
   {$ENDIF}
   system.DateUtils,
   System.UIConsts,
+  System.Diagnostics,
   Alcinoe.StringUtils;
 
 {****************************************}
@@ -2544,6 +2545,11 @@ procedure _ALLog(
             Const ThreadID: TThreadID;
             Const CanPreserve: boolean);
 begin
+  {$IF defined(ALCodeProfiler)}
+  // Logging can consume time, so to ensure accurate performance statistics,
+  // ignore all verbose logs.
+  if &Type = TalLogType.VERBOSE then exit;
+  {$ENDIF}
   if CanPreserve and (ALMaxLogHistory > 0) then begin
     var LLogItem := _TALLogItem.Create(
                       Tag, // const ATag: String;
@@ -2579,10 +2585,25 @@ begin
     if &Type = TalLogType.ASSERT then ALPrintLogQueue
   end
   else begin
-    {$IF defined(ANDROID)}
     var LMsg: String;
-    if Msg <> '' then LMsg := msg
-    else LMsg := '<empty>';
+    {$IF defined(ALCodeProfiler)}
+    if ALCodeProfilerIsrunning then begin
+      var LMilliseconds: Double := (TStopwatch.GetTimeStamp - ALCodeProfilerAppStartTimeStamp) * ALCodeProfilerMillisecondsPerTick;
+      var LMinutes: integer := Trunc(LMilliseconds) div (1000 * 60);
+      LMilliseconds := LMilliseconds - (LMinutes * 1000 * 60);
+      var LSeconds: integer := Trunc(LMilliseconds) div 1000;
+      LMilliseconds := LMilliseconds - (LSeconds * 1000);
+      var LMicroSec: integer := Round(Frac(LMilliseconds) * 100000);
+      if Msg <> '' then
+        LMsg := Msg + ALFormatW(' | StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LMicroSec])
+      else
+        LMsg := ALFormatW('StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LMicroSec]);
+    end;
+    {$ELSE}
+    LMsg := msg;
+    {$IFEND}
+    {$IF defined(ANDROID)}
+    if LMsg = '' then LMsg := '<empty>';
     if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
     case &Type of
       TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
@@ -2593,8 +2614,7 @@ begin
       TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
     end;
     {$ELSEIF defined(IOS)}
-    var LMsg: String;
-    if msg <> '' then LMsg := Tag + ' | ' + msg
+    if LMsg <> '' then LMsg := Tag + ' | ' + LMsg
     else LMsg := Tag;
     var LThreadID: String;
     if ThreadID <> MainThreadID then LThreadID := '['+ALIntToStrW(ThreadID)+']'
@@ -2615,19 +2635,16 @@ begin
       end;
     end;
     {$ELSEIF defined(MSWINDOWS)}
-    //if &Type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
-      var LMsg: String;
-      if msg <> '' then LMsg := Tag + ' | ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
-      else LMsg := Tag;
-      case &Type of
-        TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + LMsg + ' |'));
-        TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + LMsg + ' |'));
-        TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + LMsg + ' |'));
-        TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + LMsg + ' |'));
-        TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + LMsg + ' |'));
-        TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + LMsg + ' |'));
-      end;
-    //end;
+    if LMsg <> '' then LMsg := Tag + ' | ' + stringReplace(LMsg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+    else LMsg := Tag;
+    case &Type of
+      TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + LMsg + ' |'));
+      TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + LMsg + ' |'));
+      TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + LMsg + ' |'));
+      TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + LMsg + ' |'));
+      TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + LMsg + ' |'));
+      TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + LMsg + ' |'));
+    end;
     {$IFEND}
   end;
 end;

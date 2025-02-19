@@ -121,26 +121,26 @@ begin
   end;
 end;
 
-{*************************************}
+{***************************************}
 constructor TALProcMetricsHistory.Create;
 begin
   inherited;
   FIsOrphaned := False;
 end;
 
-{*************************************}
+{***************************************}
 destructor TALProcMetricsHistory.Destroy;
 begin
   SetCapacity(0);
 end;
 
-{*********************************}
+{***********************************}
 procedure TALProcMetricsHistory.Grow;
 begin
   SetCapacity(GrowCollection(FCapacity, FCount + 1));
 end;
 
-{****************************************************************}
+{******************************************************************}
 procedure TALProcMetricsHistory.SetCapacity(NewCapacity: NativeInt);
 begin
   if NewCapacity <> FCapacity then begin
@@ -149,7 +149,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************}
+{**********************************************************************************************}
 procedure ALCodeProfilerSaveHistory(const AProcMetricsHistory: TALProcMetricsHistory); overload;
 begin
   if AProcMetricsHistory.FCount = 0 then exit;
@@ -338,14 +338,14 @@ begin
   ALCodeProfilerEnabled := True;
 end;
 
-{***************************}
+{*****************************************************************}
 procedure ALCodeProfilerStop(Const ASaveHistories: Boolean = True);
 Begin
   ALCodeProfilerEnabled := False;
   ALCodeProfilerPurgeHistories(ASaveHistories);
 End;
 
-{***************************}
+{****************************************}
 function ALCodeProfilerIsrunning: Boolean;
 begin
   Result := ALCodeProfilerEnabled;

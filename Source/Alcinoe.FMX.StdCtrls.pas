@@ -3205,7 +3205,7 @@ begin
 
 end;
 
-{*******************************************}
+{*************************************************}
 function TALAniIndicator.GetCacheSubIndex: Integer;
 begin
   Result := 0;
@@ -7373,7 +7373,7 @@ begin
   Change;
 end;
 
-{***************************************************************}
+{********************************************************************}
 function TALBaseCheckBox.TDefaultStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 1;
@@ -7437,25 +7437,25 @@ begin
   Result := inherited GetInherit;
 end;
 
-{***************************************************************}
+{*********************************************************************}
 function TALBaseCheckBox.TDisabledStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-{***************************************************************}
+{********************************************************************}
 function TALBaseCheckBox.THoveredStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 3;
 end;
 
-{***************************************************************}
+{********************************************************************}
 function TALBaseCheckBox.TPressedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 4;
 end;
 
-{***************************************************************}
+{********************************************************************}
 function TALBaseCheckBox.TFocusedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 5;
@@ -7850,7 +7850,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{*************************************************}
 function TALBaseCheckBox.GetCacheSubIndex: Integer;
 begin
   Result := 0;
@@ -9092,25 +9092,25 @@ begin
   Result := inherited GetInherit;
 end;
 
-{***************************************************************}
+{**********************************************************************}
 function TALSwitch.TTrack.TDisabledStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-{***************************************************************}
+{*********************************************************************}
 function TALSwitch.TTrack.THoveredStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 3;
 end;
 
-{***************************************************************}
+{*********************************************************************}
 function TALSwitch.TTrack.TPressedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 4;
 end;
 
-{***************************************************************}
+{*********************************************************************}
 function TALSwitch.TTrack.TFocusedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 5;
@@ -9512,7 +9512,7 @@ begin
   Result := TSizeF.Create(52, 32);
 end;
 
-{*******************************************}
+{**************************************************}
 function TALSwitch.TTrack.GetCacheSubIndex: Integer;
 begin
   // The Thumb uses 11 slots:
@@ -10687,26 +10687,26 @@ begin
   end;
 end;
 
-{*****************************************}
+{****************************************}
 function TALSwitch.GetCacheIndex: integer;
 begin
   Result := FThumb.CacheIndex;
 end;
 
-{*****************************************}
+{*******************************************************}
 procedure TALSwitch.SetCacheIndex(const AValue: Integer);
 begin
   FThumb.CacheIndex := AValue;
   FTrack.CacheIndex := AValue;
 end;
 
-{*****************************************}
+{***********************************************************}
 function TALSwitch.GetCacheEngine: TALBufDrawableCacheEngine;
 begin
   Result := FThumb.CacheEngine;
 end;
 
-{*****************************************}
+{**************************************************************************}
 procedure TALSwitch.SetCacheEngine(const AValue: TALBufDrawableCacheEngine);
 begin
   FThumb.CacheEngine := AValue;
@@ -11063,19 +11063,19 @@ begin
   Result := 1;
 end;
 
-{***************************************************************}
+{**************************************************************}
 function TALButton.THoveredStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-{***************************************************************}
+{**************************************************************}
 function TALButton.TPressedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 3;
 end;
 
-{***************************************************************}
+{**************************************************************}
 function TALButton.TFocusedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 4;

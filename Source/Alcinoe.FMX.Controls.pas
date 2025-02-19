@@ -303,7 +303,7 @@ begin
       Inherited;
       EndTextUpdate;
     end
-    else 
+    else
       Inherited;
   end;
 end;
@@ -335,7 +335,7 @@ begin
       TALControl(Controls[i]).BeginTextUpdate;
 end;
 
-{*******************************}
+{*********************************}
 procedure TALControl.EndTextUpdate;
 begin
   FTextUpdating := False;

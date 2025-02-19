@@ -5075,13 +5075,13 @@ begin
   SetBounds(Value.Left, Value.Top, Value.Width, Value.Height);
 end;
 
-{*****************************************************}
+{*******************************************************}
 function TALDynamicListBoxControl.GetLocalRect: TALRectD;
 begin
   Result := TALRectD.Create(0, 0, Width, Height);
 end;
 
-{*************************************************************}
+{***************************************************************}
 function TALDynamicListBoxControl.GetExpandedLocalRect: TALRectD;
 begin
   result := TALRectD.Create(
@@ -5107,13 +5107,13 @@ begin
               Bottom+TouchTargetExpansion.bottom);
 end;
 
-{**************************************************************}
+{**********************************************************************}
 procedure TALDynamicListBoxControl.SetPosition(const AValue: TALPointD);
 begin
   SetBounds(AValue.X, AValue.Y, FWidth, FHeight);
 end;
 
-{**************************************************************}
+{********************************************************************}
 procedure TALDynamicListBoxControl.SetPosition(const AValue: TPointf);
 begin
   SetBounds(AValue.X, AValue.Y, FWidth, FHeight);
@@ -5131,7 +5131,7 @@ begin
   SetBounds(Fleft, FTop, ASize.Width, ASize.Height);
 end;
 
-{**************************************************************}
+{************************************************************************}
 procedure TALDynamicListBoxControl.SetSize(const AWidth, AHeight: Double);
 begin
   SetBounds(Fleft, FTop, AWidth, AHeight);
@@ -5295,19 +5295,19 @@ begin
   end;
 end;
 
-{******************************************************************}
+{********************************************************************}
 function TALDynamicListBoxControl.GetFirstVisibleObjectIndex: Integer;
 begin
   Result := low(Fcontrols);
 end;
 
-{******************************************************************}
+{*******************************************************************}
 function TALDynamicListBoxControl.GetLastVisibleObjectIndex: Integer;
 begin
   Result := high(Fcontrols);
 end;
 
-{******************************************************************}
+{**********************************************************************}
 function TALDynamicListBoxControl.IsVisibleWithinListboxBounds: Boolean;
 begin
   Result := AbsoluteVisible;
@@ -21144,7 +21144,7 @@ begin
   result := FCreateContentContext <> nil;
 end;
 
-{********************************************************************************************}
+{************************************************************************************************}
 procedure TALDynamicListBoxItem.ActivateCoreContent(const AContent: TALDynamicListBoxItemContent);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -21316,7 +21316,7 @@ begin
 
 end;
 
-{********************************************************************}
+{*******************************************************************}
 function TALDynamicListBoxItem.IsVisibleWithinListboxBounds: Boolean;
 begin
   if (not AbsoluteVisible) or (OwnerView = nil) then exit(False)
@@ -21449,7 +21449,7 @@ begin
   end;
 end;
 
-{*********************************************************}
+{*******************************************************}
 procedure TALDynamicListBoxViewMainContent.ParentChanged;
 begin
   inherited;
@@ -21461,14 +21461,14 @@ begin
     Align := TALAlignLayout.horizontal;
 end;
 
-{*******************************************************************}
+{****************************************************************************}
 function TALDynamicListBoxViewMainContent.GetFirstVisibleObjectIndex: Integer;
 begin
   if OwnerView <> nil then Result := OwnerView.FFirstVisibleItemIndex
   else Result := Inherited;
 end;
 
-{*******************************************************************}
+{***************************************************************************}
 function TALDynamicListBoxViewMainContent.GetLastVisibleObjectIndex: Integer;
 begin
   if OwnerView <> nil then Result := OwnerView.FLastVisibleItemIndex
@@ -21806,28 +21806,28 @@ begin
   end;
 end;
 
-{*************************************************}
+{************************************************************************************************}
 procedure TALDynamicListBoxView.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   InternalMouseDown(Button, Shift, X, Y);
 end;
 
-{*************************************************}
+{**************************************************************************}
 procedure TALDynamicListBoxView.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   InternalMouseMove(Shift, X, Y);
   inherited;
 end;
 
-{*************************************************}
+{**********************************************************************************************}
 procedure TALDynamicListBoxView.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   InternalMouseUp(Button, Shift, X, Y);
 end;
 
-{*************************************************}
+{*****************************************}
 procedure TALDynamicListBoxView.MouseLeave;
 begin
   inherited;
@@ -21910,7 +21910,7 @@ begin
   else ScrollEngine.MaxScrollLimit := TALPointD.Create(0, max(0,FMainContent.Height - height));
 end;
 
-{*******************************************************************}
+{****************************************************************}
 function TALDynamicListBoxView.FindFirstVisibleItemIndex: integer;
 begin
 
@@ -21985,7 +21985,7 @@ begin
 
 end;
 
-{******************************************************************}
+{***************************************************************}
 function TALDynamicListBoxView.FindLastVisibleItemIndex: integer;
 begin
 
@@ -22060,7 +22060,7 @@ begin
 
 end;
 
-{**************************************************}
+{***********************************************************************}
 function TALDynamicListBoxView.FindLastActiveItem: TALDynamicListBoxItem;
 begin
   Result := nil;
@@ -22158,14 +22158,14 @@ begin
 end;
 {$ENDIF}
 
-{**************************************************}
+{************************************************************}
 function TALDynamicListBoxView.GetViewportPosition: TALPointD;
 begin
   If FMainContent = nil then Result := TALPointD.create(0,0)
   else Result := TALPointD.create(-FMainContent.left, -FMainContent.top);
 end;
 
-{*****************************************************************}
+{***************************************************************************}
 procedure TALDynamicListBoxView.SetViewportPosition(const AValue: TALPointD);
 begin
 
@@ -22807,7 +22807,7 @@ begin
   result := GetControlAtPos(APos, LControlPos, ACheckHitTest);
 end;
 
-{***************************************************************}
+{********************************************************************************************}
 procedure TALDynamicListBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   var LControlMousePos: TALPointD;
@@ -22819,7 +22819,7 @@ begin
   inherited;
 end;
 
-{***************************************************************}
+{**********************************************************************}
 procedure TALDynamicListBox.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   if FCaptured <> nil then begin
@@ -22841,7 +22841,7 @@ begin
   inherited;
 end;
 
-{***************************************************************}
+{******************************************************************************************}
 procedure TALDynamicListBox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if FCaptured <> nil then begin
@@ -22861,13 +22861,13 @@ begin
   inherited;
 end;
 
-{***************************************************************}
+{*********************************************************************************************}
 procedure TALDynamicListBox.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
 end;
 
-{***************************************************************}
+{***************************************}
 procedure TALDynamicListBox.DoMouseLeave;
 begin
   SetCaptured(Nil);
@@ -22875,13 +22875,13 @@ begin
   inherited;
 end;
 
-{***************************************************************}
+{*****************************************************************************}
 procedure TALDynamicListBox.SetCaptured(const Value: TALDynamicListBoxControl);
 begin
   FCaptured := Value;
 end;
 
-{***************************************************************}
+{****************************************************************************}
 procedure TALDynamicListBox.SetHovered(const Value: TALDynamicListBoxControl);
 begin
   if (Value <> FHovered) then begin
@@ -22898,7 +22898,7 @@ begin
   result := TALNetHttpClientPool.Instance.PriorityStartingPoint;
 end;
 
-{***********************************}
+{************************************************************}
 function TALDynamicListBox.GetHasActiveScrollEngines: Boolean;
 begin
   Result := FActiveScrollEnginesCount > 0;

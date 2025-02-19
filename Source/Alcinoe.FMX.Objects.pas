@@ -1543,13 +1543,13 @@ begin
   end;
 end;
 
-{*******************************************}
+{******************************************}
 function TALImage.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-{*******************************************}
+{*************************************************}
 function TALImage.GetLoadingCacheSubIndex: Integer;
 begin
   Result := 0;
@@ -3160,7 +3160,7 @@ begin
   Result := False;
 end;
 
-{*******************************************}
+{**************************************************}
 function TALBaseRectangle.GetCacheSubIndex: Integer;
 begin
   Result := 0;
@@ -3539,7 +3539,7 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-{*******************************************}
+{********************************************}
 function TALEllipse.GetCacheSubIndex: Integer;
 begin
   Result := 0;
@@ -4142,7 +4142,7 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-{*******************************************}
+{*****************************************}
 function TALLine.GetCacheSubIndex: Integer;
 begin
   Result := 0;
@@ -4748,14 +4748,14 @@ begin
   end;
 end;
 
-{*****************************}
+{************************************}
 procedure TALBaseText.BeginTextUpdate;
 begin
   BeginUpdate;
   Inherited;
 end;
 
-{*******************************}
+{**********************************}
 procedure TALBaseText.EndTextUpdate;
 begin
   EndUpdate;
@@ -5081,7 +5081,7 @@ begin
 
 end;
 
-{*******************************************}
+{*********************************************}
 function TALBaseText.GetCacheSubIndex: Integer;
 begin
   Result := 0;

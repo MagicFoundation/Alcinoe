@@ -540,10 +540,10 @@ and enhance application performance with precision.
 
 ### **With Alcinoe Code Profiler, you can:**  
 
-✅ **Detect performance bottlenecks** with minimal effort
-✅ **Optimize critical code paths** for better efficiency
-✅ **Profile applications seamlessly** across all major platforms
-✅ **Visualize execution data** in an intuitive analysis tool
+✅ **Detect performance bottlenecks** with minimal effort<br/>
+✅ **Optimize critical code paths** for better efficiency<br/>
+✅ **Profile applications seamlessly** across all major platforms<br/>
+✅ **Visualize execution data** in an intuitive analysis tool<br/>
 
 Learn more at [Tools/CodeProfiler](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeProfiler)
 <br/>

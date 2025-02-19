@@ -518,39 +518,7 @@ Learn more at
 [Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
 <br/>
 <br/>
-  
 
-AndroidMerger: Integrate AAR SDK in FMX Android App
-===================================================
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/androidmerger.jpg?raw=true"/>
-
-An Android library, also known as an Android Archive (AAR), 
-contains everything needed to build an app, including source 
-files, resource files, and the manifest. Unlike JARs, AARs 
-can include resource files in addition to compiled bytecode.
-
-Integrating an AAR into a Delphi project can be a long and 
-complex process, involving extracting resources, manually 
-adding them to Delphi deployment files, compiling the 
-**R.java** class, checking dependencies, and more.
-
-With **AndroidMerger**, this entire process is automated 
-in a single command line. In short, **AndroidMerger** will:
-
-- Use Gradle or an internal implementation to list all dependencies.
-- Download libraries and dependencies from local or central Maven repositories.
-- Merge the resources of all AARs into a single directory.
-- Combine the **AndroidManifest** files of all AARs into **AndroidManifest.template.xml**.
-- Merge **google-services.json** into the project's resources.
-- Create the **R.jar** with all resource IDs using **aapt** or **aapt2**.
-- Update the project file (*.dproj*) to include all resources.
-- Generate the Delphi native bridge file from the Java libraries.
-
-Learn more at [Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
-<br/>
-<br/>
-  
 
 Alcinoe Code Profiler
 =====================

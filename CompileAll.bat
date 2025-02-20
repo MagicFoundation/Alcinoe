@@ -12,6 +12,11 @@ echo --------
 echo Compiler
 echo --------
 echo.
+echo Before proceeding, ensure that the Android, iOS, and macOS 
+echo platforms are correctly added in the SDK Manager.
+echo For detailed setup instructions, visit: 
+echo https://github.com/MagicFoundation/PlatformSDKs
+echo.
 
 echo 1) Athens
 echo 2) Alexandria (deprecated)

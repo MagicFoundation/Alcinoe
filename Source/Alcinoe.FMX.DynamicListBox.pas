@@ -4664,6 +4664,9 @@ uses
   iOSapi.CoreGraphics,
   Alcinoe.iOSApi.AudioToolbox,
   {$ENDIF}
+  {$IF DEFINED(ALMacOS)}
+  Macapi.CoreGraphics,
+  {$ENDIF}
   {$IF defined(ALSkiaEngine)}
   System.Skia.API,
   FMX.Skia.Canvas,

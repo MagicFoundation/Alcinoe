@@ -21,7 +21,7 @@ type
   private
     FLock: TLightweightMREW;
     FRefCount: Integer;
-    FEntries: TArray<Tarray<TEntry>>;
+    FEntries: TArray<Tarray<TEntry>>; // [Index][SubIndex]
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -40,6 +40,7 @@ implementation
 
 uses
   FMX.Types3D,
+  FMX.Graphics,
   {$IF defined(ALSkiaAvailable)}
   System.Skia.API,
   {$ENDIF}

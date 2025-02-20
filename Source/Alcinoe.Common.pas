@@ -176,7 +176,7 @@ type
 type
   THorzRectAlign = (Center, Left, Right);
   TVertRectAlign = (Center, Top, Bottom);
-{$IFEND}
+{$ENDIF}
 
 type
 
@@ -193,7 +193,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
-  {$IFEND}
+  {$ENDIF}
   PALPointD = ^TALPointD;
   TALPointD = record
     class function Create(const AX, AY: Double): TALPointD; overload; static; inline;
@@ -269,7 +269,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
-  {$IFEND}
+  {$ENDIF}
   PALSizeD = ^TALSizeD;
   TALSizeD = record
     cx: Double;
@@ -309,7 +309,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
-  {$IFEND}
+  {$ENDIF}
   PALRectD = ^TALRectD;
   TALRectD = record
   private
@@ -459,7 +459,7 @@ type
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
 function ALRectWidth(const Rect: TRectF): Single; inline; overload;
 function ALRectWidth(const Rect: TALRectD): Double; inline; overload;
@@ -2601,7 +2601,7 @@ begin
     end;
     {$ELSE}
     LMsg := msg;
-    {$IFEND}
+    {$ENDIF}
     {$IF defined(ANDROID)}
     if LMsg = '' then LMsg := '<empty>';
     if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
@@ -2645,7 +2645,7 @@ begin
       TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + LMsg + ' |'));
       TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + LMsg + ' |'));
     end;
-    {$IFEND}
+    {$ENDIF}
   end;
 end;
 

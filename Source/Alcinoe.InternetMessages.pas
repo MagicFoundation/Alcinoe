@@ -751,7 +751,7 @@ end;
 {$WARN SYMBOL_DEPRECATED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -837,6 +837,6 @@ end;
 {$WARN SYMBOL_DEPRECATED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 end.

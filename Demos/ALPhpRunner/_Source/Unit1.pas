@@ -301,7 +301,7 @@ begin
       LBenchThread.Start;
       {$ELSE}
       aBenchThread.Resume;
-      {$IFEND}
+      {$ENDIF}
     Except
       LBenchThread.Free;
       raise;

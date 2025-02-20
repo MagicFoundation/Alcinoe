@@ -39,15 +39,15 @@ interface
 
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if System.classes.TStringsEnumerator didn''t change and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 
 Uses
   System.Classes,
@@ -5756,7 +5756,7 @@ begin
     Stream.ReadBuffer(Buffer, 0, Size);
     {$else}
     Stream.Read(Buffer, 0, Size);
-    {$ifend}
+    {$ENDIF}
     Size := TEncoding.GetBufferEncoding(Buffer, Encoding, FDefaultEncoding);
     SetEncoding(Encoding); // Keep Encoding in case the stream is saved
     SetTextStr(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));

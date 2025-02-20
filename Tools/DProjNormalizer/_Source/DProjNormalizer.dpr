@@ -74,7 +74,7 @@ uses
 
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if the structure of the *.dproj didn''t changed by following the instructions in References\BlankApplication\README.md'}
-{$IFEND}
+{$ENDIF}
 
 {***********************************************************}
 Procedure _SortAttributesByNodeName(const aNode: TalXmlNode);

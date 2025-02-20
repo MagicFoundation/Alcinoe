@@ -132,7 +132,7 @@ type
    PNativeInt = ^NativeInt;
    NativeUInt = Cardinal;
    PNativeUInt = ^NativeUInt;
-   {$IFEND}
+   {$ENDIF}
    {$ENDIF}
 
    {$IFDEF FPC}
@@ -251,7 +251,7 @@ procedure InitializeWithDefaultFormatSettings(var fmt : TFormatSettings);
 {$ifdef FPC}
    {$define NEED_FindDelimiter}
 {$else}
-   {$IF RTLVersion < 21}{$define NEED_FindDelimiter}{$ifend}
+   {$IF RTLVersion < 21}{$define NEED_FindDelimiter}{$ENDIF}
 {$endif}
 {$ifdef NEED_FindDelimiter}
 function FindDelimiter(const Delimiters, S: string; StartIdx: Integer = 1): Integer;
@@ -607,7 +607,7 @@ begin
       FormatSettings.DecimalSeparator:=c;
       {$ELSE}
       DecimalSeparator:=c;
-      {$IFEND}
+      {$ENDIF}
    {$ENDIF}
 end;
 
@@ -622,7 +622,7 @@ begin
       Result:=FormatSettings.DecimalSeparator;
       {$ELSE}
       Result:=DecimalSeparator;
-      {$IFEND}
+      {$ENDIF}
    {$ENDIF}
 end;
 
@@ -1098,7 +1098,7 @@ begin
    Result := TObject(T);
 //{$ELSE}
 //   Result := PObject(@T)^;
-//{$IFEND}
+//{$ENDIF}
 end;
 
 function TtoPointer(const T): Pointer;
@@ -1108,7 +1108,7 @@ begin
    Result := Pointer(T);
 //{$ELSE}
 //   Result := PPointer(@T)^;
-//{$IFEND}
+//{$ENDIF}
 end;
 
 procedure GetMemForT(var T; Size: integer); inline;

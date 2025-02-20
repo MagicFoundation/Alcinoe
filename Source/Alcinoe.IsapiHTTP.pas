@@ -6,7 +6,7 @@ interface
 
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if Web.Win.IsapiHTTP / Web.HTTPApp was not updated and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 
 uses
   System.SysUtils,

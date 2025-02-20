@@ -37,7 +37,7 @@ interface
 
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if https://github.com/project-jedi/jcl.git jcl\source\common\JclExprEval.pas was not updated from References\jcl\source\common\JclExprEval.pas and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 
 uses
   System.SysUtils,
@@ -2831,7 +2831,7 @@ begin
     for I := 0 to FCodeList.Count - 1 do
       TALExprVirtMachOp(FCodeList[I]).Execute; }
     I := FCodeList.Count;
-    pop := @FCodeList.List{$IF CompilerVersion < 23}{Delphi XE2}^{$IFEND}[0];
+    pop := @FCodeList.List{$IF CompilerVersion < 23}{Delphi XE2}^{$ENDIF}[0];
     while I > 0 do
     begin
       pop^.Execute;

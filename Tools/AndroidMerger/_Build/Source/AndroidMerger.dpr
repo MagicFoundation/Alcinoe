@@ -3247,7 +3247,7 @@ begin
           //init LDeployFilesToDeactivate
           {$IFNDEF ALCompilerVersionSupported122}
             {$MESSAGE WARN 'Check if no new Android resource files were added in DeployProjNormalizer'}
-          {$IFEND}
+          {$ENDIF}
           LDeployFilesToDeactivate.Add('Android_Strings=<PlatForm>\<Config>\strings.xml');
           LDeployFilesToDeactivate.Add('Android_Colors=<PlatForm>\<Config>\colors.xml');
           LDeployFilesToDeactivate.Add('Android_ColorsDark=<PlatForm>\<Config>\colors-night-v21.xml|colors.xml');

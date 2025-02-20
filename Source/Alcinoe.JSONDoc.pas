@@ -8256,7 +8256,7 @@ begin
 end;
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -8340,7 +8340,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -8421,7 +8421,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -8475,7 +8475,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -8517,7 +8517,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -8586,7 +8586,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -8655,7 +8655,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*****************************************************}
 procedure ALJSONDocErrorW(const Msg: String); overload;
@@ -8726,7 +8726,7 @@ Begin
 end;
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {***************************************************}
 class function TALJSONDocumentW.Create: TALJSONNodeW;
@@ -11663,7 +11663,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
@@ -12778,7 +12778,7 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
-{$IFEND}
+{$ENDIF}
 
 {***********************************}
 {Saves the JSON document to a stream.

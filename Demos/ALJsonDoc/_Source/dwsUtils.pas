@@ -1998,7 +1998,7 @@ type
    TStringListList = TStringItemList;
    {$ELSE}
    TStringListList = PStringItemList;
-   {$IFEND}
+   {$ENDIF}
    {$ELSE}
    TStringListList = PStringItemList;
    {$ENDIF}

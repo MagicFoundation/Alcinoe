@@ -1133,7 +1133,7 @@ begin
     //for a stupid warning (D2007)
     {$IF CompilerVersion <= 31} // berlin
     Result := nil;
-    {$IFEND}
+    {$ENDIF}
 
     //raise an exception if the object is destroying
     if FIsDestroying then raise exception.Create('Manager is destroying!');

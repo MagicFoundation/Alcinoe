@@ -461,7 +461,7 @@ begin
     LStressHttpThread.Start;
     {$ELSE}
     aStressHttpThread.Resume;
-    {$IFEND}
+    {$ENDIF}
   end;
 end;
 

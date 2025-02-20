@@ -1808,7 +1808,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    TTextServiceAndroid = class;
  
 -  TRender<T: class> = class(TJavaLocal, JRunnable)
-+  TRender<T: class> = class(TJavaLocal, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
++  TRender<T: class> = class(TJavaLocal, JChoreographer_FrameCallback) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    private
      [Weak] FContext: T;
      FIsNeededUpdate: Boolean;
@@ -1818,15 +1818,15 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  
 -    { JRunnable }
 -    procedure run; cdecl;
-+    { JChoreographer_FrameCallback } // https://quality.embarcadero.com/browse/RSP-38660
-+    procedure doFrame(frameTimeNanos: Int64); cdecl; // https://quality.embarcadero.com/browse/RSP-38660
++    { JChoreographer_FrameCallback } // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++    procedure doFrame(frameTimeNanos: Int64); cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    public
      property Context: T read FContext;
    end;
  
    /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
 -  TFormRender = class(TRender<TAndroidWindowHandle>, JRunnable)
-+  TFormRender = class(TRender<TAndroidWindowHandle>, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
++  TFormRender = class(TRender<TAndroidWindowHandle>, JChoreographer_FrameCallback) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    public
      /// <summary>Renders form Immediately.</summary>
      procedure Render; override;
@@ -1864,7 +1864,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
    AtomicIncrement(FRefCount);
 -  TAndroidHelper.MainHandler.removeCallbacks(Self);
-+  TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
++  TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    AtomicDecrement(FRefCount);
    inherited;
  end;
@@ -1873,7 +1873,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    begin
      FIsNeededUpdate := True;
 -    TAndroidHelper.MainHandler.post(Self);
-+    TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
++    TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    end;
  end;
  
@@ -1882,7 +1882,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
 -procedure TRender<T>.run;
-+procedure TRender<T>.doFrame(frameTimeNanos: Int64); // https://quality.embarcadero.com/browse/RSP-38660
++procedure TRender<T>.doFrame(frameTimeNanos: Int64); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
  begin
    Render;
    FIsNeededUpdate := False;
@@ -1896,7 +1896,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarca
  
    /// <summary>Render of native view.</summary>
 -  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JRunnable)
-+  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
++  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JChoreographer_FrameCallback) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    public
      procedure Render; override;
    end;

@@ -49,6 +49,8 @@ contains
   Alcinoe.FMX.ScrollEngine in 'Alcinoe.FMX.ScrollEngine.pas',
   Alcinoe.FMX.Edit in 'Alcinoe.FMX.Edit.pas',
   Alcinoe.FMX.DynamicListBox in 'Alcinoe.FMX.DynamicListBox.pas',
+  Alcinoe.FMX.CacheEngines in 'Alcinoe.FMX.CacheEngines.pas',
+  Alcinoe.GuardianThread in 'Alcinoe.GuardianThread.pas',
   Alcinoe.Common in 'Alcinoe.Common.pas',
   Alcinoe.StringList in 'Alcinoe.StringList.pas',
   Alcinoe.StringUtils in 'Alcinoe.StringUtils.pas',

@@ -20,43 +20,57 @@ set LocalDelphiDir=
 IF "%LocalDelphiVersion%"=="" (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\23.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 12 Athens
+    IF "!InitEnvironmentQuietMode!"=="" ( 
+      ECHO Found Delphi 12 Athens
+    )
     set LocalDelphiName=Athens
     set LocalDelphiVersion=23.0
   ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\22.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 11 Alexandria
+    IF "!InitEnvironmentQuietMode!"=="" (
+      ECHO Found Delphi 11 Alexandria
+    )
     set LocalDelphiName=Alexandria
     set LocalDelphiVersion=22.0
   ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\21.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 10.4 Sydney
+    IF "!InitEnvironmentQuietMode!"=="" (
+      ECHO Found Delphi 10.4 Sydney
+    )
     set LocalDelphiName=Sydney
     set LocalDelphiVersion=21.0
   ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\20.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 10.3 Rio
+    IF "!InitEnvironmentQuietMode!"=="" (
+      ECHO Found Delphi 10.3 Rio
+    )
     set LocalDelphiName=Rio
     set LocalDelphiVersion=20.0
   ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\19.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 10.2 Tokyo
+    IF "!InitEnvironmentQuietMode!"=="" (
+      ECHO Found Delphi 10.2 Tokyo
+    )
     set LocalDelphiName=Tokyo
     set LocalDelphiVersion=19.0
   ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\18.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 10.1 Berlin
+    IF "!InitEnvironmentQuietMode!"=="" (
+      ECHO Found Delphi 10.1 Berlin
+    )
     set LocalDelphiName=Berlin
     set LocalDelphiVersion=18.0
   ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\17.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
-    ECHO Found Delphi 10 Seattle
+    IF "!InitEnvironmentQuietMode!"=="" (
+      ECHO Found Delphi 10 Seattle
+    )
     set LocalDelphiName=Seattle
     set LocalDelphiVersion=17.0
   )))))))

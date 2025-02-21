@@ -307,17 +307,17 @@ goto BUILD_TOOLS
 
 :DO_BUILD_TOOLS
 
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Source" "AndroidMerger.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\AppIconGenerator" "_Source" "AppIconGenerator.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeRenaming" "_Source" "CodeRenaming.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Source" "AndroidMerger.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\AppIconGenerator" "_Source" "AppIconGenerator.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeRenaming" "_Source" "CodeRenaming.dproj" "Win64" || GOTO ERROR
 if "%DXVCL%"=="" goto BUILD_DEMOS
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeProfiler" "_Source" "CodeProfiler.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeProfiler" "_Source" "CodeProfiler.dproj" "Win64" || GOTO ERROR
 
 
 REM -----------
@@ -343,47 +343,148 @@ if "%ALBuildDemos%"=="" set ALBuildDemos=Y
 if "%ALBuildDemos%"=="y" set ALBuildDemos=Y
 if "%ALBuildDemos%"=="n" set ALBuildDemos=N
 if "%ALBuildDemos%"=="Y" goto DO_BUILD_DEMOS
-if "%ALBuildDemos%"=="N" goto FINISHED
+if "%ALBuildDemos%"=="N" goto BUILD_COMPILED_ZIP_FILES
 goto BUILD_DEMOS
 
 :DO_BUILD_DEMOS
 
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxControls" "_Source" "ALFmxControlsDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALAnimation" "_Source" "ALAnimationDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALConfetti" "_Source" "ALConfettiDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFacebookLogin" "_Source" "ALFacebookLoginDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALNotificationService" "_Source" "ALNotificationServiceDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_Source" "ALFmxFilterEffectsDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALGeoPositionSensor" "_Source" "ALGeoPositionSensorDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLibPhoneNumber" "_Source" "ALLibPhoneNumberDemo.dproj"
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Client" "_Source" "ALLiveVideoChatClient.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Server" "_Source" "ALLiveVideoChatServer.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALNNTPClient" "_Source" "ALNNTPClientDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPhpRunner" "_Source" "ALPhpRunnerDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPOP3Client" "_Source" "ALPOP3ClientDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_Source" "ALRTTIDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSMTPClient" "_Source" "ALSMTPClientDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSortedListBenchmark.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj"
-if "%DXVCL%"=="" goto COPY_TBBMALLOC
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_Source" "ALDatabaseBenchmark.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_Source" "ALWinHTTPClientDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_Source" "ALWinHTTPWebSocketClientDemo.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_Source" "ALWinInetHTTPClientDemo.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxControls" "_Source" "ALFmxControlsDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALAnimation" "_Source" "ALAnimationDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALConfetti" "_Source" "ALConfettiDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFacebookLogin" "_Source" "ALFacebookLoginDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALNotificationService" "_Source" "ALNotificationServiceDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_Source" "ALFmxFilterEffectsDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALGeoPositionSensor" "_Source" "ALGeoPositionSensorDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLibPhoneNumber" "_Source" "ALLibPhoneNumberDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Client" "_Source" "ALLiveVideoChatClient.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Server" "_Source" "ALLiveVideoChatServer.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALNNTPClient" "_Source" "ALNNTPClientDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPhpRunner" "_Source" "ALPhpRunnerDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPOP3Client" "_Source" "ALPOP3ClientDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_Source" "ALRTTIDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSMTPClient" "_Source" "ALSMTPClientDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSortedListBenchmark.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj" || PAUSE
+if "%DXVCL%"=="" goto BUILD_COMPILED_ZIP_FILES
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_Source" "ALDatabaseBenchmark.dproj" || PAUSE
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s  || PAUSE
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s  || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_Source" "ALWinHTTPClientDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_Source" "ALWinHTTPWebSocketClientDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_Source" "ALWinInetHTTPClientDemo.dproj" || PAUSE
 
-:COPY_TBBMALLOC
 
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s
+REM ------------------------
+REM Build Compiled ZIP Files
+REM ------------------------
+
+:BUILD_COMPILED_ZIP_FILES
+
+echo ------------------------
+echo Build Compiled ZIP Files
+echo ------------------------
+echo.
+
+SET FileName=%ALBaseDir%\Compiled\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
+mkdir "%FileName%"
+
+SET FileName=%ALBaseDir%\Demos\AllDemos.groupproj.local
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
+echo Copy %ALBaseDir%\Demos to %ALBaseDir%\Compiled\Demos
+xcopy "%ALBaseDir%\Demos" "%ALBaseDir%\Compiled\Demos\" /s >nul
 IF ERRORLEVEL 1 goto ERROR
 
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s
+echo Copy %ALBaseDir%\Tools to %ALBaseDir%\Compiled\Tools
+xcopy "%ALBaseDir%\Tools" "%ALBaseDir%\Compiled\Tools\" /s >nul
 IF ERRORLEVEL 1 goto ERROR
+
+echo Clean %ALBaseDir%\Compiled
+
+for /r "%ALBaseDir%\Compiled" %%D in (_Source) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (Android) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (Android64) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (iOSDevice64) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (OSX64) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (OSXARM64) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (_Build) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (_Design) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (tmp) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (Output) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (OutputAndroid) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+for /r "%ALBaseDir%\Compiled" %%D in (OutputIOS) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+SET FileName=%ALBaseDir%\Compiled\Demos\AllDemos.groupproj
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
+SET FileName=%ALBaseDir%\Compiled\Demos\ALLiveVideoChat\ALLiveVideoChat.groupproj
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
+SET FileName=%ALBaseDir%\Compiled\Demos\ALLiveVideoChat\ALLiveVideoChat.groupproj.local
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
+echo Pack %ALBaseDir%\Compiled\Demos
+PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Demos\*' -DestinationPath '%ALBaseDir%\Compiled\Demos-Compiled.zip' -Force"
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=%ALBaseDir%\Compiled\Demos\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
+
+echo Pack %ALBaseDir%\Compiled\Tools
+PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Tools\*' -DestinationPath '%ALBaseDir%\Compiled\Tools-Compiled.zip' -Force"
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=%ALBaseDir%\Compiled\Tools\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
 
 goto FINISHED
 
@@ -396,38 +497,51 @@ REM -----------------------
 
 SET FileName=%~1\Android\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\Android64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\iOSDevice64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\iOSSimARM64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\OSX64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\OSXARM64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 call "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe" -DProj="%~1\%~2\%~3" -Action=incMajorMinorPatchVersion -MajorNumber=2 -MinorNumber=0 -PatchBase=0 -CreateBackup="false"
-IF ERRORLEVEL 1 goto ERROR
+IF ERRORLEVEL 1 EXIT /B 1
 
 Call :BUILD_VCL_DEMO "%~1" "%~2" "%~3"
+IF ERRORLEVEL 1 EXIT /B 1
+
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android"
+REM IF ERRORLEVEL 1 EXIT /B 1
+
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android64"
+IF ERRORLEVEL 1 EXIT /B 1
+
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSDevice64"
+IF ERRORLEVEL 1 EXIT /B 1
+
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSSimARM64"
+REM IF ERRORLEVEL 1 EXIT /B 1
+
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSX64"
+REM IF ERRORLEVEL 1 EXIT /B 1
+
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSXARM64"
+IF ERRORLEVEL 1 EXIT /B 1
 
 EXIT /B 0
 
@@ -444,14 +558,17 @@ REM %~3 the dproj filename without path
 
 SET FileName=%~1\Win32\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\Win64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Win32"
+IF ERRORLEVEL 1 EXIT /B 1
+
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Win64"
+IF ERRORLEVEL 1 EXIT /B 1
 
 EXIT /B 0
 
@@ -468,51 +585,51 @@ REM %~3 the dproj filename without path
 REM %~4 the platform
 
 SET FileName=%~1\%~2\dbgout.log
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\*.skincfg
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\*.rsm
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\*.identcache
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\*.dproj.local
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\*.groupproj.local
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\*.deployproj.local
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 mkdir "%FileName%"
 
 if "%~4"=="Android" (
   echo [36mMerge Android Libraries for %~3[0m
   call "%~1\%~2\Android\MergeLibraries.bat"
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 EXIT /B 1
 )
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
-IF ERRORLEVEL 1 goto ERROR
+IF ERRORLEVEL 1 EXIT /B 1
 
 echo.
 echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4[0m
 MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Build /verbosity:minimal
-IF ERRORLEVEL 1 goto ERROR
+IF ERRORLEVEL 1 EXIT /B 1
 echo.
 
 SET ALDeploy=N
@@ -520,25 +637,25 @@ if "%~4"=="Android" Set ALDeploy=Y
 if "%~4"=="Android64" Set ALDeploy=Y
 if "%ALDeploy%"=="Y" (
 
-  if exist *.deployproj del *.deployproj /s
-  if exist *.deployproj goto ERROR
+  if exist *.deployproj del *.deployproj /s >nul
+  if exist *.deployproj EXIT /B 1
 
   call "%ALBaseDir%\Tools\DeployProjNormalizer\DeployProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 EXIT /B 1
 
   MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Deploy /verbosity:minimal
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 EXIT /B 1
 
 )
 
 SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" EXIT /B 1
 mkdir "%FileName%"
 
 SET FileName=%~1\%~2\dbgout.log
-if exist "%FileName%" del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
 
 EXIT /B 0
 

@@ -1925,22 +1925,25 @@ Var Buffer: AnsiString;
     else result := True;
   end;
 
-var BOMSequence: integer;
+var InitialStreamPosition: int64;
+    BOMSequence: integer;
     c: ansiChar;
 
 Begin
 
-  //init result
+  //--
   result := ntText;
 
-  //init Buffer
+  //--
   if assigned(RawJSONStream) then begin
+    InitialStreamPosition := RawJSONStream.Position;
     Buffer := '';
     BufferLength := 0;
     BufferPos := 1;
     ExpandBuffer;
   end
   else begin
+    InitialStreamPosition := 0; // To hide warning bug
     Buffer := RawJSONString;
     BufferLength := length(RawJSONString);
     BufferPos := 1;
@@ -1970,6 +1973,10 @@ Begin
       break;
     end;
   end;
+
+  //--
+  if assigned(RawJSONStream) then
+    RawJSONStream.Position := InitialStreamPosition;
 
 end;
 
@@ -8704,10 +8711,10 @@ Var BufferLength: Integer;
     c: Char;
 Begin
 
-  //init result
+  //--
   result := ntText;
 
-  //init Buffer
+  //--
   BufferLength := length(Buffer);
   BufferPos := 1;
 

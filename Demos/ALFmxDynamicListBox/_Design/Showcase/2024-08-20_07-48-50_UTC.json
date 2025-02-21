@@ -1,0 +1,1018 @@
+{
+    "instaloader": {
+        "node_type": "Post",
+        "version": "4.14.1"
+    },
+    "node": {
+        "__isXDTGraphMediaInterface": "XDTGraphSidecar",
+        "__typename": "GraphSidecar",
+        "accessibility_caption": "Photo shared by CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0 on August 20, 2024 tagging @glossparkett, and @artsdecosverbier.",
+        "can_see_insights_as_brand": false,
+        "caption_is_edited": true,
+        "coauthor_producers": [],
+        "commenting_disabled_for_viewer": false,
+        "comments_disabled": false,
+        "dimensions": {
+            "height": 1338,
+            "width": 1080
+        },
+        "display_resources": [
+            {
+                "config_height": 793,
+                "config_width": 640,
+                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDSv5tCQZfLEozKkYfowjgl3q6MxR5S5xF4U7pHMgPfVg&oe=67BE4344&_nc_sid=d885a2"
+            },
+            {
+                "config_height": 929,
+                "config_width": 750,
+                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYA6SXfoYDzuaYEJcMF0RAZwy9G63oAqWqpuV6v3lUwEKg&oe=67BE4344&_nc_sid=d885a2"
+            },
+            {
+                "config_height": 1338,
+                "config_width": 1080,
+                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYABFgLOvG8UZ0re0qY39TvCpgE7uXJj9pIWU1NtLyKu7A&oe=67BE4344&_nc_sid=d885a2"
+            }
+        ],
+        "display_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYABFgLOvG8UZ0re0qY39TvCpgE7uXJj9pIWU1NtLyKu7A&oe=67BE4344&_nc_sid=d885a2",
+        "edge_liked_by": {
+            "count": 1535
+        },
+        "edge_media_preview_comment": {
+            "count": 9,
+            "edges": [
+                {
+                    "node": {
+                        "created_at": 1735388960,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 0
+                        },
+                        "id": "17895892320038943",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "49299374169",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/285902962_1035828783986264_404177103021387754_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=108&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=zQAUsh_ZwIUQ7kNvgF4BOzB&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYBskC0pkU73zbfIknBXNkwcl39WjSODYqV7ArcNF-b5KA&oe=67BE479F&_nc_sid=d885a2",
+                            "username": "kolbe.chobi.vila04"
+                        },
+                        "text": "\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1736883331,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 0
+                        },
+                        "id": "18035722616148827",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "45504497862",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/465971820_556338337094350_2831739072101139307_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=110&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=ExXY11zUXdUQ7kNvgHC7lGn&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDWa_UBKMnLmdysEdxnPVzmnQWSFElfDRvjw6O1WYX_Pw&oe=67BE54DC&_nc_sid=d885a2",
+                            "username": "bricksandbeams_"
+                        },
+                        "text": "\ud83d\ude0d",
+                        "viewer_has_liked": false
+                    }
+                }
+            ]
+        },
+        "edge_media_preview_like": {
+            "count": 1535,
+            "edges": []
+        },
+        "edge_media_to_caption": {
+            "edges": [
+                {
+                    "node": {
+                        "created_at": "1739196641",
+                        "id": "18117474112441653",
+                        "text": "Time spent with family in such a place \ud83c\udfc6 the most prestigious chosen places to spend moments in Switzerland\ud83c\udde8\ud83c\udded \n.\n.\ud83d\udcf7 by @yves.garneau \ud83e\udef6\n. \n.\n.\n#verbier #interiordesign  #chaletdecoration  #yvesgarneau #stmoritztopoftheworld #architecture #interiors #switzerland #switzerlandhotels #cransmontana #interiorlovers  #chaletstyle #chaletinterior #chaletdesign #graub\u00fcnden\n#wallis #verbier4vallees #verbierfestival #celerina #verbier4vallees #chalet"
+                    }
+                }
+            ]
+        },
+        "edge_media_to_comment": {
+            "count": 9
+        },
+        "edge_media_to_hoisted_comment": {
+            "edges": []
+        },
+        "edge_media_to_parent_comment": {
+            "count": 9,
+            "edges": [
+                {
+                    "node": {
+                        "created_at": 1735388960,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 0
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "17895892320038943",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "49299374169",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/285902962_1035828783986264_404177103021387754_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=108&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=zQAUsh_ZwIUQ7kNvgF4BOzB&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYBskC0pkU73zbfIknBXNkwcl39WjSODYqV7ArcNF-b5KA&oe=67BE479F&_nc_sid=d885a2",
+                            "username": "kolbe.chobi.vila04"
+                        },
+                        "text": "\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f\u2764\ufe0f",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1724227726,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 1
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18039703934007703",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "309980351",
+                            "is_verified": true,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/309209629_800225084354105_236319135142055621_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=MsMmGG00wacQ7kNvgHprwul&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYD_yD-m1kv8ojMN5AUVqsyPOMamv2KOQB10Q3l8vrOuoA&oe=67BE436A&_nc_sid=d885a2",
+                            "username": "lecollectionist"
+                        },
+                        "text": "\ud83d\ude0d",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1727194582,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 1
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18064050199642230",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "68213552427",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/480651914_3883211538559063_2772682904500846131_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=107&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=0MSrK3ROTNEQ7kNvgEZPRtQ&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYD2I7QwNRCj_yk0ve1IHclHYz94Po2viNgSB5AIu-PGhQ&oe=67BE5211&_nc_sid=d885a2",
+                            "username": "artpina_official"
+                        },
+                        "text": "\ud83d\udc4f\ud83d\udd25\ud83d\ude0d",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1724140881,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 2
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18041310124959750",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "49341758711",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/454841752_515046940993252_1418254786703432919_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=0XnKR0iMzXgQ7kNvgGhSpT-&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYBFRSpwOjotkzX4DwkMHg3h032TheLr_0M8zDmUk9GOvQ&oe=67BE4E31&_nc_sid=d885a2",
+                            "username": "snezanafilipovicivanovic"
+                        },
+                        "text": "\ud83d\ude0d\ud83d\ude0d\ud83d\ude0d\ud83d\ude0dPrelepo",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1727378137,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 0
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18072440563583928",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "58032502228",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/477532945_1012780927381793_7443862701678385680_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=VtUo8442UTcQ7kNvgFzJK_v&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYB1FdDeJVN0T32ohN0OJOhzyMJWqJfITifZ_b0L3GRr3A&oe=67BE5DD9&_nc_sid=d885a2",
+                            "username": "nerosexplore"
+                        },
+                        "text": "Wow, dieses Chalet ist wirklich beeindruckend! Man bekommt direkt Lust, dort Zeit zu verbringen. Solche Orte haben echt ihren ganz eigenen Charme!\u2728\u201d",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1724150727,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 1
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18033124610276821",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "1164210743",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/149540335_970689630131072_8962654243843174912_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=108&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=OMWCcJbOtPcQ7kNvgHuZdVL&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDyueOhctyfQCcsaRgWkzNW3LHsZzhD5aUI4YeE4JbPpA&oe=67BE4103&_nc_sid=d885a2",
+                            "username": "benjamino_florentino"
+                        },
+                        "text": "Amazing pics \ud83d\udc4f\ud83d\udc4f\ud83d\udd25",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1724143849,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 1
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18004784207436647",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "6692022186",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/25009322_305543326615467_3994518210337570816_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=103&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=SoOaO4UpLpQQ7kNvgFyj-4w&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYCfxnDdDhbEvsfEex0P41_VfGtTGAaZ1RK_g1bL62CYVg&oe=67BE6361&_nc_sid=d885a2",
+                            "username": "holzwerkraum_felix_bischoff_"
+                        },
+                        "text": "Mega sch\u00f6n",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1736883331,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 0
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18035722616148827",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "45504497862",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/465971820_556338337094350_2831739072101139307_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=110&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=ExXY11zUXdUQ7kNvgHC7lGn&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDWa_UBKMnLmdysEdxnPVzmnQWSFElfDRvjw6O1WYX_Pw&oe=67BE54DC&_nc_sid=d885a2",
+                            "username": "bricksandbeams_"
+                        },
+                        "text": "\ud83d\ude0d",
+                        "viewer_has_liked": false
+                    }
+                },
+                {
+                    "node": {
+                        "created_at": 1724140484,
+                        "did_report_as_spam": false,
+                        "edge_liked_by": {
+                            "count": 2
+                        },
+                        "edge_threaded_comments": {
+                            "count": 0,
+                            "edges": [],
+                            "page_info": {
+                                "end_cursor": null,
+                                "has_next_page": false
+                            }
+                        },
+                        "id": "18015951977530554",
+                        "is_restricted_pending": false,
+                        "owner": {
+                            "id": "55633261953",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/446098698_3733878643551944_7008303874467910645_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=108&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=6RQB_ErsBpMQ7kNvgFfB7Km&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYA3-VLCGvXq-_8DzdcepgGyfMy7LBvLtWeWVshssWBkdw&oe=67BE3B71&_nc_sid=d885a2",
+                            "username": "jovic3080"
+                        },
+                        "text": "Traumhaft \ud83d\udc4f\ud83d\udc4f\ud83d\udc4f\ud83d\udc4f",
+                        "viewer_has_liked": false
+                    }
+                }
+            ],
+            "page_info": {
+                "end_cursor": null,
+                "has_next_page": false
+            }
+        },
+        "edge_media_to_sponsor_user": {
+            "edges": []
+        },
+        "edge_media_to_tagged_user": {
+            "edges": [
+                {
+                    "node": {
+                        "id": "3438659099932300928@3152991079",
+                        "user": {
+                            "followed_by_viewer": false,
+                            "full_name": "Gloss True Manufacture of the Chalet Floor Surface",
+                            "id": "3152991079",
+                            "is_verified": false,
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/403780800_261491809874956_3091208035976855314_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=LQEBTinBDGQQ7kNvgFlMyT5&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYA4OTQ0HHhHThsCcJbUGiswlLT8gRzpVTARhQAh_JP8AA&oe=67BE400E&_nc_sid=d885a2",
+                            "username": "glossparkett"
+                        },
+                        "x": 0.7054263448,
+                        "y": 0.9457364105
+                    }
+                }
+            ]
+        },
+        "edge_sidecar_to_children": {
+            "edges": [
+                {
+                    "node": {
+                        "__typename": "XDTGraphImage",
+                        "accessibility_caption": "Photo shared by CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0 on August 20, 2024 tagging @glossparkett, and @artsdecosverbier.",
+                        "dimensions": {
+                            "height": 1338,
+                            "width": 1080
+                        },
+                        "display_resources": [
+                            {
+                                "config_height": 793,
+                                "config_width": 640,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDSv5tCQZfLEozKkYfowjgl3q6MxR5S5xF4U7pHMgPfVg&oe=67BE4344&_nc_sid=d885a2"
+                            },
+                            {
+                                "config_height": 929,
+                                "config_width": 750,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYA6SXfoYDzuaYEJcMF0RAZwy9G63oAqWqpuV6v3lUwEKg&oe=67BE4344&_nc_sid=d885a2"
+                            },
+                            {
+                                "config_height": 1338,
+                                "config_width": 1080,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYABFgLOvG8UZ0re0qY39TvCpgE7uXJj9pIWU1NtLyKu7A&oe=67BE4344&_nc_sid=d885a2"
+                            }
+                        ],
+                        "display_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYABFgLOvG8UZ0re0qY39TvCpgE7uXJj9pIWU1NtLyKu7A&oe=67BE4344&_nc_sid=d885a2",
+                        "edge_media_to_tagged_user": {
+                            "edges": [
+                                {
+                                    "node": {
+                                        "id": "3438659086770627979@3152991079",
+                                        "user": {
+                                            "followed_by_viewer": false,
+                                            "full_name": "Gloss True Manufacture of the Chalet Floor Surface",
+                                            "id": "3152991079",
+                                            "is_verified": false,
+                                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/403780800_261491809874956_3091208035976855314_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=LQEBTinBDGQQ7kNvgFlMyT5&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYA4OTQ0HHhHThsCcJbUGiswlLT8gRzpVTARhQAh_JP8AA&oe=67BE400E&_nc_sid=d885a2",
+                                            "username": "glossparkett"
+                                        },
+                                        "x": 0.7054263448,
+                                        "y": 0.9457364105
+                                    }
+                                }
+                            ]
+                        },
+                        "fact_check_information": null,
+                        "fact_check_overall_rating": null,
+                        "gating_info": null,
+                        "id": "3438659086770627979",
+                        "is_video": false,
+                        "media_overlay_info": null,
+                        "media_preview": "ACIqYZJWHGI19f8APNNij5zln9T0H5mrWUPzcM3b/wCtn+dDLcS/dwoHoP69q59XodGi1GSpEfug49Uxx+HtTIzIOI3Dj+63X8j/AI0kUU7Dehzj2H9KsAF/9aFB9en69c/nQ7oFYb5sn/PP+dFSbkHG/wDU0UtQ0IXBEo5JJ9eg+g/DmrbXJTrgY/z60yRGn5PUDgkgc+3NYcl2/wDEvQ9eevSulaHO9TeW6KnaCFHJ/qainYyFOh+asP7WzH7oz14yOfzrRs3aXLkbdpGOp56k0N3VrDSs7lwzqOM9P8+lFHmyf3f0opfJDt6kJk9O1VbpRIgQcfMMflSjpTH6j60XAqxQeU4YnODWqJNpOO/NZz9fx/rU/YUh2LmR/k0VWopDP//Z",
+                        "sensitivity_friction_info": null,
+                        "sharing_friction_info": {
+                            "bloks_app_url": null,
+                            "should_have_sharing_friction": false
+                        },
+                        "shortcode": "C-4kjh6oeWL",
+                        "tracking_token": "eyJ2ZXJzaW9uIjo1LCJwYXlsb2FkIjp7ImlzX2FuYWx5dGljc190cmFja2VkIjp0cnVlLCJ1dWlkIjoiNTBlNDNhYjE5ZWFlNGZiMzhhZTg2NmU3N2Q2YzhhOTIzNDM4NjU5MDg2NzcwNjI3OTc5Iiwic2VydmVyX3Rva2VuIjoiMTc0MDE0MzE1ODMzOHwzNDM4NjU5MDg2NzcwNjI3OTc5fDcyMTc1NDc2MTQ3fGI0ZDMxZjcxM2U4ZDg5MDFjNjYxYTk1YzA3ZjgzNTBkMDFkMjA3MmZlMjEwMWJlODNjZmE0MmMxNTc2MThhNTIifSwic2lnbmF0dXJlIjoiIn0=",
+                        "upcoming_event": null
+                    }
+                },
+                {
+                    "node": {
+                        "__typename": "XDTGraphImage",
+                        "accessibility_caption": "Photo by CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0 on August 20, 2024.",
+                        "dimensions": {
+                            "height": 1334,
+                            "width": 1080
+                        },
+                        "display_resources": [
+                            {
+                                "config_height": 790,
+                                "config_width": 640,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456440448_873911364072870_2417962019804805442_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wn3yct4h11wQ7kNvgHw42Kr&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYA8rf4fQNGeOD5QivhJ81weN_eGlvAiKeABZ12PxHVYgQ&oe=67BE56E1&_nc_sid=d885a2"
+                            },
+                            {
+                                "config_height": 926,
+                                "config_width": 750,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456440448_873911364072870_2417962019804805442_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wn3yct4h11wQ7kNvgHw42Kr&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDYZhHqgHgRbasIflu1zUEFEjAD8CossAYlwEqYMOB-tw&oe=67BE56E1&_nc_sid=d885a2"
+                            },
+                            {
+                                "config_height": 1334,
+                                "config_width": 1080,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456440448_873911364072870_2417962019804805442_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wn3yct4h11wQ7kNvgHw42Kr&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYD7pYx_XdIbBrS4_w9dRUh4wV7zjkKyGjPMvpc7ftrp7Q&oe=67BE56E1&_nc_sid=d885a2"
+                            }
+                        ],
+                        "display_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456440448_873911364072870_2417962019804805442_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wn3yct4h11wQ7kNvgHw42Kr&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYD7pYx_XdIbBrS4_w9dRUh4wV7zjkKyGjPMvpc7ftrp7Q&oe=67BE56E1&_nc_sid=d885a2",
+                        "edge_media_to_tagged_user": {
+                            "edges": []
+                        },
+                        "fact_check_information": null,
+                        "fact_check_overall_rating": null,
+                        "gating_info": null,
+                        "id": "3438659087131383474",
+                        "is_video": false,
+                        "media_overlay_info": null,
+                        "media_preview": "ACIqqqOO3404gcdB60DBqxFEGO4nIHb3rM0LMcaomWALN7dB/wDXo8sdQMU5j3NNEoxx9fwNK1h3DFFRb6KQyvBbbzsbIPXkd6e8D/diJIU4JHA//WB161anu1xnmqzXashQZAPcdea103MtdilN8nBbJPFX7NYixyctzxzzwMn/AD61myRBuQxyPUVfsW4b6/0FTuVsX/Jj96KbmiiwXMGS5DjA4qHzPcVEAKdtHpQMk836fnVm0mIOccHqazWGDVu16H60MSN3cDRWdk0U+YLH/9k=",
+                        "sensitivity_friction_info": null,
+                        "sharing_friction_info": {
+                            "bloks_app_url": null,
+                            "should_have_sharing_friction": false
+                        },
+                        "shortcode": "C-4kjiQIpay",
+                        "tracking_token": "eyJ2ZXJzaW9uIjo1LCJwYXlsb2FkIjp7ImlzX2FuYWx5dGljc190cmFja2VkIjp0cnVlLCJ1dWlkIjoiNTBlNDNhYjE5ZWFlNGZiMzhhZTg2NmU3N2Q2YzhhOTIzNDM4NjU5MDg3MTMxMzgzNDc0Iiwic2VydmVyX3Rva2VuIjoiMTc0MDE0MzE1ODMzOHwzNDM4NjU5MDg3MTMxMzgzNDc0fDcyMTc1NDc2MTQ3fGY3NDU2NTZkYWQ1MzZiODBjMWZiNzc0ZTcwNjRjYjRjNmI3ZjkwZTA3NTFjOTVjODVkM2ZmMDRmMjMyODYxNTkifSwic2lnbmF0dXJlIjoiIn0=",
+                        "upcoming_event": null
+                    }
+                },
+                {
+                    "node": {
+                        "__typename": "XDTGraphImage",
+                        "accessibility_caption": "Photo by CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0 on August 20, 2024.",
+                        "dimensions": {
+                            "height": 1334,
+                            "width": 1080
+                        },
+                        "display_resources": [
+                            {
+                                "config_height": 790,
+                                "config_width": 640,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456137086_522887883535645_393165360909659682_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wzVUe75aKgkQ7kNvgGqbYsy&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYAQrl8Clum5wbdHQhq75pCJN_54hsVu6P05d305vRIIjQ&oe=67BE66EA&_nc_sid=d885a2"
+                            },
+                            {
+                                "config_height": 926,
+                                "config_width": 750,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456137086_522887883535645_393165360909659682_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wzVUe75aKgkQ7kNvgGqbYsy&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYBvcyfYKudMBrTbIKcgJetGGC9VQckko36TDhGchWcS1Q&oe=67BE66EA&_nc_sid=d885a2"
+                            },
+                            {
+                                "config_height": 1334,
+                                "config_width": 1080,
+                                "src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456137086_522887883535645_393165360909659682_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wzVUe75aKgkQ7kNvgGqbYsy&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDJk1QC0IV6hTOq-PKYblnydlm5Ub2M_gjEJMa0xg631w&oe=67BE66EA&_nc_sid=d885a2"
+                            }
+                        ],
+                        "display_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456137086_522887883535645_393165360909659682_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=wzVUe75aKgkQ7kNvgGqbYsy&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYDJk1QC0IV6hTOq-PKYblnydlm5Ub2M_gjEJMa0xg631w&oe=67BE66EA&_nc_sid=d885a2",
+                        "edge_media_to_tagged_user": {
+                            "edges": []
+                        },
+                        "fact_check_information": null,
+                        "fact_check_overall_rating": null,
+                        "gating_info": null,
+                        "id": "3438659086779073204",
+                        "is_video": false,
+                        "media_overlay_info": null,
+                        "media_preview": "ACIqzz0FaHnsw3KGRehz0B/wNZ56D61tQsGHzdDwR2PH86wtob31KjRORlgvrximiMtyNv4kVe8pIuCAwPKk9/8AZPv6etSBoD/Cv5VSjdbohys9jFZSCf8AGirLqu446ZOKKoRRboPrWpanCfj/AJ61kMcj8elXY2YR5X1oQMtKyqzbgNp/z/k1VLSAkIMjsdpqdtqj94ePQdTV1LpFUY6YoS63sHyuYxWY87T/AN8mitv7YnvRVadxa9jms8fjWhACRjqB+lZh6fjWtBwvHrUIpla9VlIbPB/TFQrchQAe1Wr/AJQfWscinuGxo/alorNxRRZBdn//2Q==",
+                        "sensitivity_friction_info": null,
+                        "sharing_friction_info": {
+                            "bloks_app_url": null,
+                            "should_have_sharing_friction": false
+                        },
+                        "shortcode": "C-4kjh7IsK0",
+                        "tracking_token": "eyJ2ZXJzaW9uIjo1LCJwYXlsb2FkIjp7ImlzX2FuYWx5dGljc190cmFja2VkIjp0cnVlLCJ1dWlkIjoiNTBlNDNhYjE5ZWFlNGZiMzhhZTg2NmU3N2Q2YzhhOTIzNDM4NjU5MDg2Nzc5MDczMjA0Iiwic2VydmVyX3Rva2VuIjoiMTc0MDE0MzE1ODMzOHwzNDM4NjU5MDg2Nzc5MDczMjA0fDcyMTc1NDc2MTQ3fDk4MjVmMzZkNjg2OTk5YmZmNmJiYzc3MTY5OWJjNGNkZmVkZmY5NmFlYmFhMWQxODE4ZTRmM2IyM2YwODZiNWQifSwic2lnbmF0dXJlIjoiIn0=",
+                        "upcoming_event": null
+                    }
+                }
+            ]
+        },
+        "edge_web_media_to_related_media": {
+            "edges": []
+        },
+        "fact_check_information": null,
+        "fact_check_overall_rating": null,
+        "gating_info": null,
+        "has_ranked_comments": true,
+        "id": "3438659099932300928",
+        "iphone_struct": {
+            "boost_unavailable_identifier": null,
+            "boost_unavailable_reason": null,
+            "boost_unavailable_reason_v2": null,
+            "can_modify_carousel": false,
+            "can_reply": false,
+            "can_see_insights_as_brand": false,
+            "can_view_more_preview_comments": false,
+            "can_viewer_reshare": true,
+            "can_viewer_save": true,
+            "caption": {
+                "bit_flags": 0,
+                "content_type": "comment",
+                "created_at": 1739196641,
+                "created_at_utc": 1739196641,
+                "did_report_as_spam": false,
+                "is_covered": false,
+                "is_ranked_comment": false,
+                "media_id": 3438659099932300928,
+                "pk": "18117474112441653",
+                "private_reply_status": 0,
+                "share_enabled": false,
+                "status": "Active",
+                "strong_id__": "18117474112441653",
+                "text": "Time spent with family in such a place \ud83c\udfc6 the most prestigious chosen places to spend moments in Switzerland\ud83c\udde8\ud83c\udded \n.\n.\ud83d\udcf7 by @yves.garneau \ud83e\udef6\n. \n.\n.\n#verbier #interiordesign  #chaletdecoration  #yvesgarneau #stmoritztopoftheworld #architecture #interiors #switzerland #switzerlandhotels #cransmontana #interiorlovers  #chaletstyle #chaletinterior #chaletdesign #graub\u00fcnden\n#wallis #verbier4vallees #verbierfestival #celerina #verbier4vallees #chalet",
+                "type": 1,
+                "user": {
+                    "fbid_v2": 17841426424831209,
+                    "full_name": "CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0",
+                    "id": "26569672827",
+                    "is_private": false,
+                    "is_unpublished": false,
+                    "is_verified": true,
+                    "pk": 26569672827,
+                    "pk_id": "26569672827",
+                    "profile_pic_id": "3524598930709088812_26569672827",
+                    "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/469965511_3758654134447745_6250644021867445735_n.jpg?stp=dst-jpg_e0_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=4vgAlIaoDGIQ7kNvgEw_fhn&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&oh=00_AYBlpYPlFSVHKHbu3nFHAnI6vcKnbjNQ6eL5crL4ywdGEA&oe=67BE3D12&_nc_sid=fc8dfb",
+                    "strong_id__": "26569672827",
+                    "username": "chaletinterior"
+                },
+                "user_id": 26569672827
+            },
+            "caption_is_edited": true,
+            "carousel_media": [
+                {
+                    "carousel_parent_id": "3438659099932300928_26569672827",
+                    "commerciality_status": "not_commercial",
+                    "explore_pivot_grid": false,
+                    "fb_user_tags": {
+                        "in": []
+                    },
+                    "featured_products": [],
+                    "id": "3438659086770627979_26569672827",
+                    "image_versions2": {
+                        "candidates": [
+                            {
+                                "height": 1785,
+                                "scans_profile": "e35",
+                                "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4Njc3MDYyNzk3OQ%3D%3D.3-ccb7-5&oh=00_AYDwUceTcgoigN3kTD7UuTYh8Gz5xopKMapUIYQyRIcRvQ&oe=67BE4344&_nc_sid=fc8dfb",
+                                "width": 1440
+                            },
+                            {
+                                "height": 930,
+                                "scans_profile": "e35",
+                                "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4Njc3MDYyNzk3OQ%3D%3D.3-ccb7-5&oh=00_AYB2kmq_6a_HQt5IHK4y_ni4W8It-7i_MAVsiQfBkNamlw&oe=67BE4344&_nc_sid=fc8dfb",
+                                "width": 750
+                            }
+                        ]
+                    },
+                    "media_type": 1,
+                    "original_height": 1785,
+                    "original_width": 1440,
+                    "pk": 3438659086770627979,
+                    "preview": "ACIqYZJWHGI19f8APNNij5zln9T0H5mrWUPzcM3b/wCtn+dDLcS/dwoHoP69q59XodGi1GSpEfug49Uxx+HtTIzIOI3Dj+63X8j/AI0kUU7Dehzj2H9KsAF/9aFB9en69c/nQ7oFYb5sn/PP+dFSbkHG/wDU0UtQ0IXBEo5JJ9eg+g/DmrbXJTrgY/z60yRGn5PUDgkgc+3NYcl2/wDEvQ9eevSulaHO9TeW6KnaCFHJ/qainYyFOh+asP7WzH7oz14yOfzrRs3aXLkbdpGOp56k0N3VrDSs7lwzqOM9P8+lFHmyf3f0opfJDt6kJk9O1VbpRIgQcfMMflSjpTH6j60XAqxQeU4YnODWqJNpOO/NZz9fx/rU/YUh2LmR/k0VWopDP//Z",
+                    "product_suggestions": [],
+                    "product_type": "carousel_item",
+                    "sharing_friction_info": {
+                        "bloks_app_url": null,
+                        "sharing_friction_payload": null,
+                        "should_have_sharing_friction": false
+                    },
+                    "shop_routing_user_id": null,
+                    "strong_id__": "3438659086770627979_26569672827",
+                    "taken_at": 1724140128,
+                    "usertags": {
+                        "in": [
+                            {
+                                "position": [
+                                    0.7054263448,
+                                    0.9457364105
+                                ],
+                                "show_category_of_user": false,
+                                "user": {
+                                    "full_name": "Gloss True Manufacture of the Chalet Floor Surface",
+                                    "id": "3152991079",
+                                    "is_private": false,
+                                    "is_verified": false,
+                                    "pk": 3152991079,
+                                    "pk_id": "3152991079",
+                                    "profile_pic_id": "3239901960700789582_3152991079",
+                                    "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/403780800_261491809874956_3091208035976855314_n.jpg?stp=dst-jpg_e0_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=LQEBTinBDGQQ7kNvgFlMyT5&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&oh=00_AYDCnOlildEjffvRzrsrZ-kAZGiLBz0belg-2jKpMdXcKQ&oe=67BE400E&_nc_sid=fc8dfb",
+                                    "strong_id__": "3152991079",
+                                    "username": "glossparkett"
+                                }
+                            }
+                        ]
+                    },
+                    "video_sticker_locales": []
+                },
+                {
+                    "carousel_parent_id": "3438659099932300928_26569672827",
+                    "commerciality_status": "not_commercial",
+                    "explore_pivot_grid": false,
+                    "fb_user_tags": {
+                        "in": []
+                    },
+                    "featured_products": [],
+                    "id": "3438659087131383474_26569672827",
+                    "image_versions2": {
+                        "candidates": [
+                            {
+                                "height": 1779,
+                                "scans_profile": "e35",
+                                "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456440448_873911364072870_2417962019804805442_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=wn3yct4h11wQ7kNvgHw42Kr&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4NzEzMTM4MzQ3NA%3D%3D.3-ccb7-5&oh=00_AYBSNK2ORRo4OhterX39sA-D45hQm_eohqJ84yD3nfRxww&oe=67BE56E1&_nc_sid=fc8dfb",
+                                "width": 1440
+                            },
+                            {
+                                "height": 927,
+                                "scans_profile": "e35",
+                                "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456440448_873911364072870_2417962019804805442_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=106&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=wn3yct4h11wQ7kNvgHw42Kr&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4NzEzMTM4MzQ3NA%3D%3D.3-ccb7-5&oh=00_AYC2O6t_zB9g4hjhKcazeYiO7g2yEG09wIlbB_WsqaJdgA&oe=67BE56E1&_nc_sid=fc8dfb",
+                                "width": 750
+                            }
+                        ]
+                    },
+                    "media_type": 1,
+                    "original_height": 1779,
+                    "original_width": 1440,
+                    "pk": 3438659087131383474,
+                    "preview": "ACIqqqOO3404gcdB60DBqxFEGO4nIHb3rM0LMcaomWALN7dB/wDXo8sdQMU5j3NNEoxx9fwNK1h3DFFRb6KQyvBbbzsbIPXkd6e8D/diJIU4JHA//WB161anu1xnmqzXashQZAPcdea103MtdilN8nBbJPFX7NYixyctzxzzwMn/AD61myRBuQxyPUVfsW4b6/0FTuVsX/Jj96KbmiiwXMGS5DjA4qHzPcVEAKdtHpQMk836fnVm0mIOccHqazWGDVu16H60MSN3cDRWdk0U+YLH/9k=",
+                    "product_suggestions": [],
+                    "product_type": "carousel_item",
+                    "sharing_friction_info": {
+                        "bloks_app_url": null,
+                        "sharing_friction_payload": null,
+                        "should_have_sharing_friction": false
+                    },
+                    "shop_routing_user_id": null,
+                    "strong_id__": "3438659087131383474_26569672827",
+                    "taken_at": 1724140128,
+                    "usertags": {
+                        "in": []
+                    },
+                    "video_sticker_locales": []
+                },
+                {
+                    "carousel_parent_id": "3438659099932300928_26569672827",
+                    "commerciality_status": "not_commercial",
+                    "explore_pivot_grid": false,
+                    "fb_user_tags": {
+                        "in": []
+                    },
+                    "featured_products": [],
+                    "id": "3438659086779073204_26569672827",
+                    "image_versions2": {
+                        "candidates": [
+                            {
+                                "height": 1779,
+                                "scans_profile": "e35",
+                                "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456137086_522887883535645_393165360909659682_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=wzVUe75aKgkQ7kNvgGqbYsy&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4Njc3OTA3MzIwNA%3D%3D.3-ccb7-5&oh=00_AYD4gdBaiTlRhCgowf9gQMxryiQqkdLaGOkviYLbHX0cbQ&oe=67BE66EA&_nc_sid=fc8dfb",
+                                "width": 1440
+                            },
+                            {
+                                "height": 927,
+                                "scans_profile": "e35",
+                                "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456137086_522887883535645_393165360909659682_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3Nzkuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=wzVUe75aKgkQ7kNvgGqbYsy&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4Njc3OTA3MzIwNA%3D%3D.3-ccb7-5&oh=00_AYDmmbscyFg5mvE9bnCn0_Lgz6Szk9lbaJaZQ7BEyAo1vw&oe=67BE66EA&_nc_sid=fc8dfb",
+                                "width": 750
+                            }
+                        ]
+                    },
+                    "media_type": 1,
+                    "original_height": 1779,
+                    "original_width": 1440,
+                    "pk": 3438659086779073204,
+                    "preview": "ACIqzz0FaHnsw3KGRehz0B/wNZ56D61tQsGHzdDwR2PH86wtob31KjRORlgvrximiMtyNv4kVe8pIuCAwPKk9/8AZPv6etSBoD/Cv5VSjdbohys9jFZSCf8AGirLqu446ZOKKoRRboPrWpanCfj/AJ61kMcj8elXY2YR5X1oQMtKyqzbgNp/z/k1VLSAkIMjsdpqdtqj94ePQdTV1LpFUY6YoS63sHyuYxWY87T/AN8mitv7YnvRVadxa9jms8fjWhACRjqB+lZh6fjWtBwvHrUIpla9VlIbPB/TFQrchQAe1Wr/AJQfWscinuGxo/alorNxRRZBdn//2Q==",
+                    "product_suggestions": [],
+                    "product_type": "carousel_item",
+                    "sharing_friction_info": {
+                        "bloks_app_url": null,
+                        "sharing_friction_payload": null,
+                        "should_have_sharing_friction": false
+                    },
+                    "shop_routing_user_id": null,
+                    "strong_id__": "3438659086779073204_26569672827",
+                    "taken_at": 1724140128,
+                    "usertags": {
+                        "in": []
+                    },
+                    "video_sticker_locales": []
+                }
+            ],
+            "carousel_media_count": 3,
+            "carousel_media_ids": [
+                3438659086770627979,
+                3438659087131383474,
+                3438659086779073204
+            ],
+            "carousel_media_pending_post_count": 0,
+            "client_cache_key": "MzQzODY1OTA5OTkzMjMwMDkyOA==.3",
+            "clips_tab_pinned_user_ids": [],
+            "coauthor_producer_can_see_organic_insights": false,
+            "coauthor_producers": [],
+            "code": "C-4kjuLIRaA",
+            "comment_count": 10,
+            "comment_inform_treatment": {
+                "action_type": null,
+                "should_have_inform_treatment": false,
+                "text": "",
+                "url": null
+            },
+            "comment_threading_enabled": true,
+            "commerce_integrity_review_decision": "",
+            "commerciality_status": "not_commercial",
+            "crosspost_metadata": {
+                "fb_downstream_use_xpost_metadata": {
+                    "downstream_use_xpost_deny_reason": "NONE"
+                }
+            },
+            "deleted_reason": 0,
+            "device_timestamp": 1724139905976873,
+            "enable_media_notes_production": false,
+            "explore_hide_comments": false,
+            "facepile_top_likers": [],
+            "fb_aggregated_comment_count": 0,
+            "fb_aggregated_like_count": 0,
+            "fb_user_tags": {
+                "in": []
+            },
+            "fbid": 18099401806441653,
+            "featured_products": [],
+            "filter_type": 0,
+            "gen_ai_detection_method": {
+                "detection_method": "NONE"
+            },
+            "has_delayed_metadata": false,
+            "has_high_risk_gen_ai_inform_treatment": false,
+            "has_liked": false,
+            "has_more_comments": true,
+            "has_privately_liked": false,
+            "has_shared_to_fb": 0,
+            "has_viewer_saved": true,
+            "has_views_fetching": true,
+            "hide_view_all_comment_entrypoint": false,
+            "id": "3438659099932300928_26569672827",
+            "ig_media_sharing_disabled": false,
+            "igbio_product": null,
+            "image_versions2": {
+                "candidates": [
+                    {
+                        "height": 1785,
+                        "scans_profile": "e35",
+                        "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4Njc3MDYyNzk3OQ%3D%3D.3-ccb7-5&oh=00_AYDwUceTcgoigN3kTD7UuTYh8Gz5xopKMapUIYQyRIcRvQ&oe=67BE4344&_nc_sid=fc8dfb",
+                        "width": 1440
+                    },
+                    {
+                        "height": 930,
+                        "scans_profile": "e35",
+                        "url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=dst-jpg_e35_p750x750_sh0.08_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xNDQweDE3ODUuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlIn0&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&ig_cache_key=MzQzODY1OTA4Njc3MDYyNzk3OQ%3D%3D.3-ccb7-5&oh=00_AYB2kmq_6a_HQt5IHK4y_ni4W8It-7i_MAVsiQfBkNamlw&oe=67BE4344&_nc_sid=fc8dfb",
+                        "width": 750
+                    }
+                ]
+            },
+            "inline_composer_display_condition": "impression_trigger",
+            "inline_composer_imp_trigger_time": 5,
+            "integrity_review_decision": "pending",
+            "invited_coauthor_producers": [],
+            "is_comments_gif_composer_enabled": true,
+            "is_cutout_sticker_allowed": false,
+            "is_eligible_content_for_post_roll_ad": false,
+            "is_eligible_for_media_note_recs_nux": false,
+            "is_eligible_for_meta_ai_share": false,
+            "is_in_profile_grid": false,
+            "is_open_to_public_submission": false,
+            "is_organic_product_tagging_eligible": true,
+            "is_paid_partnership": false,
+            "is_post_live_clips_media": false,
+            "is_quiet_post": false,
+            "is_reshare_of_text_post_app_media_in_ig": false,
+            "is_reuse_allowed": false,
+            "is_social_ufi_disabled": false,
+            "is_tagged_media_shared_to_viewer_profile_grid": false,
+            "is_unified_video": false,
+            "is_visual_reply_commenter_notice_enabled": true,
+            "lat": 46.1,
+            "like_and_view_counts_disabled": false,
+            "like_count": 1535,
+            "lng": 7.21667,
+            "location": {
+                "address": "",
+                "city": "",
+                "external_source": "facebook_places",
+                "facebook_places_id": 111225655569231,
+                "has_viewer_saved": false,
+                "lat": 46.1,
+                "lng": 7.21667,
+                "name": "Verbier, Switzerland",
+                "pk": 213375879,
+                "short_name": "Verbier"
+            },
+            "max_num_visible_preview_comments": 2,
+            "media_notes": {
+                "items": []
+            },
+            "media_type": 8,
+            "meta_ai_suggested_prompts": [],
+            "mezql_token": "",
+            "music_metadata": {
+                "audio_type": null,
+                "music_canonical_id": "0",
+                "music_info": null,
+                "original_sound_info": null,
+                "pinned_media_ids": null
+            },
+            "open_carousel_show_follow_button": false,
+            "open_carousel_submission_state": "closed",
+            "organic_tracking_token": "eyJ2ZXJzaW9uIjo1LCJwYXlsb2FkIjp7ImlzX2FuYWx5dGljc190cmFja2VkIjp0cnVlLCJ1dWlkIjoiNTM3NTQ1ZDg4YTIzNDkzOThjMmQ5NTA3NTU5NTg0MmYzNDM4NjU5MDk5OTMyMzAwOTI4Iiwic2VydmVyX3Rva2VuIjoiMTc0MDE0MzE2NjMzMHwzNDM4NjU5MDk5OTMyMzAwOTI4fDcyMTc1NDc2MTQ3fGFmZTgzNDQ2NWM1MjM3YjYwMGIyOWU2YWZhNmJkZDE3NDAyZWZkYzQ3YjAwNmNiYjg3NGNmNjk1MGJlOTJkNDQifSwic2lnbmF0dXJlIjoiIn0=",
+            "original_height": 612,
+            "original_media_has_visual_reply_media": false,
+            "original_width": 612,
+            "photo_of_you": false,
+            "pk": 3438659099932300928,
+            "preview_comments": [],
+            "product_suggestions": [],
+            "product_type": "carousel_container",
+            "profile_grid_control_enabled": false,
+            "saved_collection_ids": [],
+            "share_count_disabled": false,
+            "sharing_friction_info": {
+                "bloks_app_url": null,
+                "sharing_friction_payload": null,
+                "should_have_sharing_friction": false
+            },
+            "shop_routing_user_id": null,
+            "should_request_ads": false,
+            "should_show_author_pog_for_tagged_media_shared_to_profile_grid": false,
+            "strong_id__": "3438659099932300928_26569672827",
+            "subscribe_cta_visible": false,
+            "taken_at": 1724140130,
+            "timeline_pinned_user_ids": [],
+            "top_likers": [],
+            "user": {
+                "account_badges": [],
+                "account_type": 2,
+                "can_see_quiet_post_attribution": true,
+                "fan_club_info": {
+                    "autosave_to_exclusive_highlight": null,
+                    "connected_member_count": null,
+                    "fan_club_id": null,
+                    "fan_club_name": null,
+                    "fan_consideration_page_revamp_eligiblity": null,
+                    "has_created_ssc": null,
+                    "has_enough_subscribers_for_ssc": null,
+                    "is_fan_club_gifting_eligible": null,
+                    "is_fan_club_referral_eligible": null,
+                    "is_free_trial_eligible": null,
+                    "largest_public_bc_id": null,
+                    "subscriber_count": null
+                },
+                "fbid_v2": 17841426424831209,
+                "feed_post_reshare_disabled": false,
+                "friendship_status": {
+                    "following": false,
+                    "is_bestie": false,
+                    "is_feed_favorite": false,
+                    "is_restricted": false
+                },
+                "full_name": "CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0",
+                "has_anonymous_profile_picture": false,
+                "id": "26569672827",
+                "is_active_on_text_post_app": false,
+                "is_favorite": false,
+                "is_private": false,
+                "is_unpublished": false,
+                "is_verified": true,
+                "latest_reel_media": 0,
+                "pk": 26569672827,
+                "pk_id": "26569672827",
+                "profile_pic_id": "3524598930709088812_26569672827",
+                "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/469965511_3758654134447745_6250644021867445735_n.jpg?stp=dst-jpg_e0_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=4vgAlIaoDGIQ7kNvgEw_fhn&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&oh=00_AYBlpYPlFSVHKHbu3nFHAnI6vcKnbjNQ6eL5crL4ywdGEA&oe=67BE3D12&_nc_sid=fc8dfb",
+                "show_account_transparency_details": true,
+                "strong_id__": "26569672827",
+                "text_post_app_is_private": true,
+                "third_party_downloads_enabled": 1,
+                "transparency_product_enabled": false,
+                "username": "chaletinterior"
+            },
+            "usertags": {
+                "in": [
+                    {
+                        "position": [
+                            0.7054263448,
+                            0.9457364105
+                        ],
+                        "show_category_of_user": false,
+                        "user": {
+                            "full_name": "Gloss True Manufacture of the Chalet Floor Surface",
+                            "id": "3152991079",
+                            "is_private": false,
+                            "is_verified": false,
+                            "pk": 3152991079,
+                            "pk_id": "3152991079",
+                            "profile_pic_id": "3239901960700789582_3152991079",
+                            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/403780800_261491809874956_3091208035976855314_n.jpg?stp=dst-jpg_e0_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2AHX91HU19sXbNumzTR5dIeFHHkv-ErmAI88X0chm4ok6HeISLR_l6j-g1yhfjMJITw&_nc_ohc=LQEBTinBDGQQ7kNvgFlMyT5&_nc_gid=537545d88a2349398c2d95075595842f&edm=ALQROFkBAAAA&ccb=7-5&oh=00_AYDCnOlildEjffvRzrsrZ-kAZGiLBz0belg-2jKpMdXcKQ&oe=67BE400E&_nc_sid=fc8dfb",
+                            "strong_id__": "3152991079",
+                            "username": "glossparkett"
+                        }
+                    }
+                ]
+            },
+            "video_sticker_locales": []
+        },
+        "is_ad": false,
+        "is_affiliate": false,
+        "is_paid_partnership": false,
+        "is_video": false,
+        "like_and_view_counts_disabled": false,
+        "location": {
+            "address_json": "{\"street_address\": \"\", \"zip_code\": \"\", \"city_name\": \"Verbier, Switzerland\", \"region_name\": \"\", \"country_code\": \"\", \"exact_city_match\": true, \"exact_region_match\": false, \"exact_country_match\": false}",
+            "has_public_page": true,
+            "id": "213375879",
+            "name": "Verbier, Switzerland",
+            "slug": "verbier-switzerland"
+        },
+        "media_overlay_info": null,
+        "media_preview": null,
+        "nft_asset_info": null,
+        "owner": {
+            "blocked_by_viewer": false,
+            "edge_followed_by": {
+                "count": 63880
+            },
+            "edge_owner_to_timeline_media": {
+                "count": 816
+            },
+            "followed_by_viewer": false,
+            "full_name": "CHALET iNTERIOR FOR MOUNTAIN LOVERS\u26f0",
+            "has_blocked_viewer": false,
+            "id": "26569672827",
+            "is_embeds_disabled": false,
+            "is_private": false,
+            "is_unpublished": false,
+            "is_verified": true,
+            "pass_tiering_recommendation": true,
+            "profile_pic_url": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.2885-19/469965511_3758654134447745_6250644021867445735_n.jpg?stp=dst-jpg_s150x150_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=4vgAlIaoDGIQ7kNvgEw_fhn&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYAV56OQERVOodf4XWQXj5bMXJIcWWQ_szOow3RQiWuJog&oe=67BE3D12&_nc_sid=d885a2",
+            "requested_by_viewer": false,
+            "restricted_by_viewer": false,
+            "username": "chaletinterior"
+        },
+        "pinned_for_users": [],
+        "sensitivity_friction_info": null,
+        "sharing_friction_info": {
+            "bloks_app_url": null,
+            "should_have_sharing_friction": false
+        },
+        "shortcode": "C-4kjuLIRaA",
+        "taken_at_timestamp": 1724140130,
+        "thumbnail_src": "https://instagram.fzrh2-2.fna.fbcdn.net/v/t51.29350-15/456031466_934755665047289_7647772499911046207_n.jpg?stp=c0.172.1440.1440a_dst-jpg_e35_s640x640_sh0.08_tt6&_nc_ht=instagram.fzrh2-2.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2AHQPJxvSOhUel2bwRY1H72JEcHIRmDcz4CmLXEwJnORBXk80sB58wGN2FzL-DZ456I&_nc_ohc=1QJ-L1-ngXYQ7kNvgFlQNuz&_nc_gid=50e43ab19eae4fb38ae866e77d6c8a92&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_AYB91AQDIUC_BRUkA8x21-rn-5XCUNnC9eNOJxBgnCkzQg&oe=67BE4344&_nc_sid=d885a2",
+        "tracking_token": "eyJ2ZXJzaW9uIjo1LCJwYXlsb2FkIjp7ImlzX2FuYWx5dGljc190cmFja2VkIjp0cnVlLCJ1dWlkIjoiNTBlNDNhYjE5ZWFlNGZiMzhhZTg2NmU3N2Q2YzhhOTIzNDM4NjU5MDk5OTMyMzAwOTI4Iiwic2VydmVyX3Rva2VuIjoiMTc0MDE0MzE1ODI5NXwzNDM4NjU5MDk5OTMyMzAwOTI4fDcyMTc1NDc2MTQ3fGI3NWMzMjEyZWU0ODMzMWIxYjA1OGQ5MWQ4MDUxNmUwNDBlZDU0NTlhMTg0YTFhZDNjYTk5MmY0YzZhMTYyZTQifSwic2lnbmF0dXJlIjoiIn0=",
+        "upcoming_event": null,
+        "viewer_can_reshare": true,
+        "viewer_has_liked": false,
+        "viewer_has_saved": true,
+        "viewer_has_saved_to_collection": false,
+        "viewer_in_photo_of_you": false
+    }
+}

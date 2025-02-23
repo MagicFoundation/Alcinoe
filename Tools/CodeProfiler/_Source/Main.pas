@@ -107,6 +107,8 @@ type
     FFilterProcIDs: THashSet<Cardinal>;
     FFilterExecutionIDs: THashSet<Cardinal>;
     FFilterParentExecutionIDs: THashSet<Cardinal>;
+    FFilterStartTimeStampMin: Int64;
+    FFilterStartTimeStampMax: Int64;
     FOverrideFilterParentExecutionID: Cardinal;
     procedure ResetFilters;
     Procedure RemoveMarkers(const AFileName: String);
@@ -182,6 +184,8 @@ begin
   FFilterProcIDs.Clear;
   FFilterExecutionIDs.Clear;
   FFilterParentExecutionIDs.Clear;
+  FFilterStartTimeStampMin := 0;
+  FFilterStartTimeStampMax := 0;
   FOverrideFilterParentExecutionID := 0;
 end;
 
@@ -252,10 +256,28 @@ begin
     var LCurrentProcIndent: AnsiString := '';
     var LAddMarkerAfterNextProcBegin: Boolean := False;
     var LAddMarkerBeforeNextProcEnd: Boolean := False;
+    var LImplementationFound: Boolean := false;
     For var I := 0 to LSourceCode.Count - 1 do begin
 
       var LLine := LSourceCode[i];
       var LTrimedLine := ALTrim(LSourceCode[i]);
+
+      // Handle "uses"
+      if (not LUseAdded) and
+         (ALPosIgnoreCaseA(LCurrentProcIndent + 'uses', LLine) = 1) then begin
+        var LNewLine := LLine;
+        Insert('{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}Alcinoe.CodeProfiler,{<<ALCodeProfiler}', LNewLine, length(LCurrentProcIndent + 'uses')+1);
+        LSourceCode[i] := LNewLine;
+        LUseAdded := True;
+        Continue;
+      end;
+
+      // Ignore Interface section
+      if ALSameTextA(LTrimedLine, 'implementation') then begin
+        LImplementationFound := True;
+        continue;
+      end;
+      if not LImplementationFound then continue;
 
       // Ignore lines like:
       //
@@ -295,6 +317,7 @@ begin
       //   end).Start;
       If (ALPosIgnoreCaseA('class function ', LTrimedLine) = 1) or
          (ALPosIgnoreCaseA('class procedure ', LTrimedLine) = 1) or
+         (ALPosIgnoreCaseA('class operator ', LTrimedLine) = 1) or
          (ALPosIgnoreCaseA('constructor ', LTrimedLine) = 1) or
          (ALPosIgnoreCaseA('destructor ', LTrimedLine) = 1) or
          (ALPosIgnoreCaseA('function', LTrimedLine) = 1) or
@@ -305,17 +328,13 @@ begin
         // Ignore lines like:
         // function PMSessionValidatePrintSettings: OSStatus; cdecl; external libPrintCore name '_PMSessionValidatePrintSettings';
         // function PMSessionSetDestination: OSStatus; cdecl; external libPrintCore name '_PMSessionSetDestination';
-        If (LAddMarkerAfterNextProcBegin) and (LProcIndent = LCurrentProcIndent) then begin
-          LProcStack.Pop;
-          LCurrentProcIndent := '';
-          LAddMarkerAfterNextProcBegin := False;
-          LAddMarkerBeforeNextProcEnd := False;
-          Continue;
-        end;
+        If (LAddMarkerAfterNextProcBegin) and (LProcIndent = LCurrentProcIndent) then
+          LProcStack.Clear;
         LCurrentProcIndent := LProcIndent;
         var LProcName: AnsiString;
         If (ALPosIgnoreCaseA('class function ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'class function', '', [rfIgnoreCase])
         else If (ALPosIgnoreCaseA('class procedure ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'class procedure', '', [rfIgnoreCase])
+        else If (ALPosIgnoreCaseA('class operator ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'class operator', '', [rfIgnoreCase])
         else If (ALPosIgnoreCaseA('constructor ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'constructor ', '', [rfIgnoreCase])
         else If (ALPosIgnoreCaseA('destructor ', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'destructor ', '', [rfIgnoreCase])
         else If (ALPosIgnoreCaseA('function', LTrimedLine) = 1) then LProcName := ALStringReplaceA(LTrimedLine,'function', '', [rfIgnoreCase])
@@ -397,15 +416,6 @@ begin
           LAddMarkerAfterNextProcBegin := False;
           LAddMarkerBeforeNextProcEnd := False;
         end;
-      end
-
-      // Handle "use"
-      else if (not LUseAdded) and
-              (ALPosIgnoreCaseA(LCurrentProcIndent + 'uses', LLine) = 1) then begin
-        var LNewLine := LLine;
-        Insert('{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}Alcinoe.CodeProfiler,{<<ALCodeProfiler}', LNewLine, length(LCurrentProcIndent + 'uses')+1);
-        LSourceCode[i] := LNewLine;
-        LUseAdded := True;
       end;
 
     end;
@@ -456,7 +466,22 @@ begin
     if LFailedFilenames.Count > 0 then
       MessageDlg('The operation completed successfully, except for the following file(s), which are badly formatted and could not be updated:' + sLineBreak + LFailedFilenames.Text, mtError, [mbOK], 0)
     else
-      MessageDlg('The operation completed successfully', mtInformation, [mbOK], 0);
+      MessageDlg(
+        'The operation completed successfully. Now, you must recompile your '+
+        'project and run it. After you close the application (or move it '+
+        'between background and foreground on Android/iOS), a performance '+
+        'file (ALCodeProfilerProcMetrics.dat) will be generated in the user''s '+
+        'download folder.'#13#10+
+        #13#10+
+        'You need to copy this file into the data subfolder where Alcinoe '+
+        'Code Profiler is located. Once copied, you can perform a performance '+
+        'analysis.'#13#10+
+        #13#10+
+        'Note: On Windows, the ALCodeProfilerProcMetrics.dat file is '+
+        'directly saved in the data subfolder of Alcinoe Code Profiler, '+
+        'so no manual copying is required.',
+        mtInformation,
+        [mbOK], 0);
   Finally
     ALFreeAndNil(LSourceFilenames);
     ALFreeAndNil(LFailedFilenames);
@@ -472,17 +497,29 @@ begin
     GridTableViewProcMetrics.DataController.RecordCount := 0;
     for var I := low(FProcMetrics) to high(FProcMetrics) do begin
       if FOverrideFilterParentExecutionID <> 0 then begin
-        if FProcMetrics[i].ParentExecutionID <> FOverrideFilterParentExecutionID then continue;
+        if FProcMetrics[i].ParentExecutionID <> FOverrideFilterParentExecutionID then
+          continue;
+        //--
+        if (FFilterStartTimeStampMin > 0) and
+           (FProcMetrics[i].StartTimeStamp + FProcMetrics[i].ElapsedTicks < FFilterStartTimeStampMin) then
+          continue;
+        //--
+        if (FFilterStartTimeStampMax > 0) and
+           (FProcMetrics[i].StartTimeStamp > FFilterStartTimeStampMax) then
+          continue;
       end
       else begin
         if (FFilterParentExecutionIDs.Count > 0) and
-           (not FFilterParentExecutionIDs.Contains(FProcMetrics[i].ParentExecutionID)) then continue;
+           (not FFilterParentExecutionIDs.Contains(FProcMetrics[i].ParentExecutionID)) then
+          continue;
         //--
         if (FFilterExecutionIDs.Count > 0) and
-           (not FFilterExecutionIDs.Contains(FProcMetrics[i].ExecutionID)) then continue;
+           (not FFilterExecutionIDs.Contains(FProcMetrics[i].ExecutionID)) then
+          continue;
         //--
         if (FFilterProcIDs.Count > 0) and
-           (not FFilterProcIDs.Contains(FProcMetrics[i].ProcID)) then continue;
+           (not FFilterProcIDs.Contains(FProcMetrics[i].ProcID)) then
+          continue;
       end;
       var LRecordCount := GridTableViewProcMetrics.DataController.RecordCount;
       inc(LRecordCount);
@@ -504,8 +541,11 @@ procedure TMainForm.LoadDataBtnClick(Sender: TObject);
 begin
   var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
   If not TFile.Exists(LProcMetricsFilename) then
-    raise Exception.CreateFmt('The required file "%s" does not exist. Please ensure it is available before proceeding', [ALCodeProfilerProcMetricsFilename]);
-
+    raise Exception.CreateFmt(
+            'The required file "%s" is missing. Please make '+
+            'sure it is available in the data subfolder where '+
+            'Alcinoe Code Profiler is located before proceeding.',
+            [ALCodeProfilerProcMetricsFilename]);
   LoadDataBtn.Cursor := crHourGlass;
   Try
 
@@ -552,6 +592,8 @@ begin
   Finally
     LoadDataBtn.Cursor := crDefault;
   End;
+
+  MessageDlg(ALIntToStrW(Length(FProcMetrics)) + ' records have been loaded successfully.', mtInformation, [mbOK], 0);
 end;
 
 {*****************************************************}
@@ -713,8 +755,8 @@ begin
 
     ResetFilters;
 
-    var LFilterStartTimeStampMin: Int64 := TimeStringToMilliseconds(ALTrim(StartTimeStampMinEdit.Text));
-    var LFilterStartTimeStampMax: Int64 := TimeStringToMilliseconds(ALTrim(StartTimeStampMaxEdit.Text));
+    FFilterStartTimeStampMin := TimeStringToMilliseconds(ALTrim(StartTimeStampMinEdit.Text));
+    FFilterStartTimeStampMax := TimeStringToMilliseconds(ALTrim(StartTimeStampMaxEdit.Text));
     var LProcNameFilter: AnsiString := ALTrim(AnsiString(ProcNameFilterEdit.Text));
 
     if LProcNameFilter <> '' then begin
@@ -731,17 +773,17 @@ begin
       End;
     end;
 
-    if (LFilterStartTimeStampMin > 0) or
-       (LFilterStartTimeStampMax > 0) then begin
+    if (FFilterStartTimeStampMin > 0) or
+       (FFilterStartTimeStampMax > 0) then begin
       var LExecutionDict := TDictionary<Cardinal, Cardinal>.create;
       Try
         for var I := low(FProcMetrics) to high(FProcMetrics) do begin
-          if (LFilterStartTimeStampMin > 0) and
-             (FProcMetrics[i].StartTimeStamp + FProcMetrics[i].ElapsedTicks < LFilterStartTimeStampMin) then
+          if (FFilterStartTimeStampMin > 0) and
+             (FProcMetrics[i].StartTimeStamp + FProcMetrics[i].ElapsedTicks < FFilterStartTimeStampMin) then
             continue;
           //--
-          if (LFilterStartTimeStampMax > 0) and
-             (FProcMetrics[i].StartTimeStamp > LFilterStartTimeStampMax) then
+          if (FFilterStartTimeStampMax > 0) and
+             (FProcMetrics[i].StartTimeStamp > FFilterStartTimeStampMax) then
             continue;
           //--
           LExecutionDict.Add(FProcMetrics[i].ExecutionID, FProcMetrics[i].ParentExecutionID);

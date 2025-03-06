@@ -393,9 +393,8 @@ type
     procedure DoChanged; override;
   public
     constructor Create(const ATabControl: TALTabControl); reintroduce;
-    procedure MouseDown(X, Y: Single); override;
-    procedure MouseUp(X, Y: Single); override;
-    procedure MouseLeave; override;
+    procedure DoMouseDown; override;
+    procedure DoMouseUp; override;
     property TabControl: TALTabControl read FTabControl;
   end;
 
@@ -435,10 +434,10 @@ begin
      (not (csDestroying in FTabControl.ComponentState)) then FTabControl.fOnAniStop(FTabControl);
 end;
 
-{**********************************************************}
-procedure TALTabControlScrollEngine.MouseDown(X, Y: Single);
+{**********************************************}
+procedure TALTabControlScrollEngine.DoMouseDown;
 begin
-  inherited MouseDown(X, Y);
+  inherited;
   if down then FTabControl.FAniTransition.StopAtCurrent;
 end;
 
@@ -479,19 +478,11 @@ begin
 
 end;
 
-{********************************************************}
-procedure TALTabControlScrollEngine.MouseUp(X, Y: Single);
+{********************************************}
+procedure TALTabControlScrollEngine.DoMouseUp;
 begin
   var LWasDown := Down;
-  inherited MouseUp(X, Y);
-  if LWasDown then LaunchAniTransition;
-end;
-
-{*********************************************}
-procedure TALTabControlScrollEngine.MouseLeave;
-begin
-  var LWasDown := Down;
-  inherited MouseLeave;
+  inherited;
   if LWasDown then LaunchAniTransition;
 end;
 
@@ -773,7 +764,12 @@ begin
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
     fMouseDownPos := TPointF.Create(X,Y);
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseDown(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseDown(X, Y);
+    {$ENDIF}
   end;
 end;
 
@@ -798,7 +794,12 @@ begin
       fScrollCapturedByMe := True;
       TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(true));
     end;
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseMove(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseMove(X, Y);
+    {$ENDIF}
   end;
 end;
 
@@ -813,7 +814,12 @@ begin
   if not AnimationEnabled then exit;
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     FScrollCapturedByMe := False;
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseUp(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseUp(X, Y);
+    {$ENDIF}
     FHandleMouseEvents := False;
   end;
 end;

@@ -27,7 +27,6 @@ type
   private
     FFreeObjectsCurrList: TObjectList<Tobject>;
     fFreeObjectsEmptyList: TObjectList<Tobject>;
-    FFreeObjectsWorkList: TObjectList<Tobject>;
     fFreeObjectsCounter: Integer;
     FCanExecute: boolean;
     FForceExecute: Boolean;
@@ -72,7 +71,6 @@ begin
   inherited Create(true{CreateSuspended});
   FFreeObjectsCurrList := TObjectList<Tobject>.create(false{aOwnObject});
   FFreeObjectsEmptyList := TObjectList<Tobject>.Create(false{aOwnObject});
-  //FFreeObjectsWorkList
   fFreeObjectsCounter := 0;
   FCanExecute := True;
   FForceExecute := False;
@@ -178,28 +176,31 @@ end;
 procedure TALGuardianThread.FreeObjects;
 begin
 
-  //get the count items
+  // Temporary list to store objects to be freed
+  var LFreeObjectsWorkList: TObjectList<Tobject>;
+
+  // Swap the current list with an empty list to process the objects safely
   TMonitor.Enter(self);
   try
-    fFreeObjectsWorkList := FFreeObjectsCurrList;
+    LFreeObjectsWorkList := FFreeObjectsCurrList;
     fFreeObjectsCurrList := fFreeObjectsEmptyList;
-    fFreeObjectsEmptyList := fFreeObjectsWorkList;
-    fFreeObjectsCounter := fFreeObjectsWorkList.count +
+    fFreeObjectsEmptyList := LFreeObjectsWorkList;
+    fFreeObjectsCounter := LFreeObjectsWorkList.count +
                            fFreeObjectsCurrList.count +
                            fFreeObjectsEmptyList.count;
   finally
     TMonitor.Exit(self);
   end;
 
-  //free all the object
-  for var I := fFreeObjectsWorkList.Count - 1 downto 0 do begin
+  // Iterate through the objects in reverse order and free them
+  for var I := LFreeObjectsWorkList.Count - 1 downto 0 do begin
 
-    //break the loop if terminated
+    // Exit if the thread has been terminated
     if terminated then exit;
     try
 
-      var LObj := fFreeObjectsWorkList[I];
-      fFreeObjectsWorkList.delete(I);
+      var LObj := LFreeObjectsWorkList[I];
+      LFreeObjectsWorkList.delete(I);
       if LObj is TComponent then begin
         tthread.Queue(nil,
           procedure

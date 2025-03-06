@@ -180,6 +180,85 @@ type
 
 type
 
+  TALBitSet32 = record
+  private
+    FBits: Cardinal;
+  public
+    procedure Clear;
+    procedure MarkBit(const Index: Integer);
+    procedure ClearBit(const Index: Integer);
+    function HasBit(const Index: Integer): Boolean;
+    function IsEmpty: Boolean;
+    function FirstMarkedBit: Integer;
+  end;
+
+type
+
+  // A fixed-size ring buffer that supports pushing/popping at both the front and back.
+  // When full, pushBack overwrites the oldest element, and pushFront overwrites the element
+  // at the opposite end. Random access is available via the default Items property.
+  TALRingBuffer<T> = class
+  private
+    FBuffer: TArray<T>;
+    FCapacity: Integer;  // Total capacity of the buffer.
+    FBegin: Integer;     // Index of the first (oldest) element.
+    FCount: Integer;     // Number of initialized elements.
+    function BufferIndex(Index: Integer): Integer;
+    function GetItem(Index: Integer): T;
+    procedure SetItem(Index: Integer; const Value: T);
+  public
+    /// <summary>
+    /// Creates an empty ring buffer with the given capacity.
+    /// </summary>
+    constructor Create(const ACapacity: Integer); overload;
+    /// <summary>
+    /// Removes all elements from the buffer.
+    /// </summary>
+    procedure Clear;
+    /// <summary>
+    /// Returns True if the buffer is empty.
+    /// </summary>
+    function Empty: Boolean;
+    /// <summary>
+    /// Returns the total capacity of the buffer.
+    /// </summary>
+    function Capacity: Integer;
+    /// <summary>
+    /// Returns the current number of elements in the buffer.
+    /// </summary>
+    function Count: Integer;
+    /// <summary>
+    /// Returns the oldest element.
+    /// </summary>
+    function Front: T;
+    /// <summary>
+    /// Returns the newest element.
+    /// </summary>
+    function Back: T;
+    /// <summary>
+    /// Removes and returns the front element.
+    /// </summary>
+    function PopFront: T;
+    /// <summary>
+    /// Removes and returns the back element.
+    /// </summary>
+    function PopBack: T;
+    /// <summary>
+    /// Inserts an element at the front. When full, the element at the back is overwritten.
+    /// </summary>
+    procedure PushFront(const AItem: T);
+    /// <summary>
+    /// Inserts an element at the back. When full, the element at the front is overwritten.
+    /// </summary>
+    procedure PushBack(const AItem: T);
+    /// <summary>
+    /// Random access (0 = oldest element).
+    /// </summary>
+    property Items[Index: Integer]: T read GetItem write SetItem; default;
+  end;
+
+type
+
   TALPointFHelper = record helper for TPointF
     function RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
   end;
@@ -518,14 +597,22 @@ procedure ALLog(Const Tag: String; Const msg: String; const &Type: TalLogType = 
 procedure ALLog(Const Tag: String; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
 procedure ALLog(Const Tag: String; const TagArgs: array of const; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: String; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
 
+var ALDisableLog: Boolean = False;
+
+// LogHistory is useful for error reporting, allowing the last printed logs
+// to be included in the report. To enable it, set ALMaxLogHistory > 0.
 var ALMaxLogHistory: integer = 0;
 function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
 
-Var ALEnqueueLog: Boolean = False; // We can use this flag to enqueue the log when the device just started and when we didn't yet
-procedure ALPrintLogQueue;         // pluged the device to the monitoring tool, so that we can print the log a little later
+// This flag allows us to enqueue logs when the device has just started
+// and hasn't yet been connected to the monitoring tool, enabling us
+// to print the logs later.
+Var ALEnqueueLog: Boolean = False;
+procedure ALPrintLogQueue;
 
 {~~}
 type
@@ -569,6 +656,7 @@ const
   ALMsPerSec = 1000;
   ALNanosPerMs = 1000000;
   ALNanosPerSec = 1000000000;
+  ALSecondsPerNano = 1E-9;
 
 {********************************}
 function ALElapsedTimeNano: int64;
@@ -1131,6 +1219,164 @@ procedure TALWorkerThreadPool.ExecuteProc(
             Const AAsync: Boolean = True);
 begin
   ExecuteProc(AProc, nil{AContext}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
+end;
+
+{**************************}
+procedure TALBitSet32.Clear;
+begin
+  FBits := 0;
+end;
+
+{**************************************************}
+procedure TALBitSet32.MarkBit(const Index: Integer);
+begin
+  FBits := FBits or (1 shl Index);
+end;
+
+{***************************************************}
+procedure TALBitSet32.ClearBit(const Index: Integer);
+begin
+  FBits := FBits and not (1 shl Index);
+end;
+
+{*********************************************************}
+function TALBitSet32.HasBit(const Index: Integer): Boolean;
+begin
+  Result := (FBits and (1 shl Index)) <> 0;
+end;
+
+{************************************}
+function TALBitSet32.IsEmpty: Boolean;
+begin
+  Result := FBits = 0;
+end;
+
+{*******************************************}
+function TALBitSet32.FirstMarkedBit: Integer;
+begin
+  for var I := 0 to 31 do
+    if (FBits and (1 shl I)) <> 0 then
+      Exit(I);
+  Result := -1;
+end;
+
+{*************************************************}
+constructor TALRingBuffer<T>.Create(const ACapacity: Integer);
+begin
+  if ACapacity <= 0 then
+    raise Exception.Create('Capacity must be greater than zero');
+  FCapacity := ACapacity;
+  SetLength(FBuffer, FCapacity);
+  FBegin := 0;
+  FCount := 0;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.BufferIndex(Index: Integer): Integer;
+begin
+  if (Index < 0) or (Index >= FCount) then
+    raise Exception.CreateFmt('Index out of bounds: %d', [Index]);
+  Result := (FBegin + Index) mod FCapacity;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.GetItem(Index: Integer): T;
+begin
+  Result := FBuffer[BufferIndex(Index)];
+end;
+
+{*************************************************}
+procedure TALRingBuffer<T>.SetItem(Index: Integer; const Value: T);
+begin
+  FBuffer[BufferIndex(Index)] := Value;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.Empty: Boolean;
+begin
+  Result := FCount = 0;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.Capacity: Integer;
+begin
+  Result := FCapacity;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.Count: Integer;
+begin
+  Result := FCount;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.Front: T;
+begin
+  if Empty then
+    raise Exception.Create('Buffer is empty');
+  Result := FBuffer[FBegin];
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.Back: T;
+begin
+  if Empty then
+    raise Exception.Create('Buffer is empty');
+  var Index := (FBegin + FCount - 1) mod FCapacity;
+  Result := FBuffer[Index];
+end;
+
+{*************************************************}
+procedure TALRingBuffer<T>.Clear;
+begin
+  FCount := 0;
+  FBegin := 0;
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.PopFront: T;
+begin
+  if Empty then
+    raise Exception.Create('Buffer is empty');
+  Result := FBuffer[FBegin];
+  FBegin := (FBegin + 1) mod FCapacity;
+  Dec(FCount);
+end;
+
+{*************************************************}
+function TALRingBuffer<T>.PopBack: T;
+begin
+  if Empty then
+    raise Exception.Create('Buffer is empty');
+  var Index := (FBegin + FCount - 1) mod FCapacity;
+  Result := FBuffer[Index];
+  Dec(FCount);
+end;
+
+{*************************************************}
+procedure TALRingBuffer<T>.PushFront(const AItem: T);
+begin
+  // Move mBegin one step backward (wrap-around if needed)
+  FBegin := (FBegin - 1 + FCapacity) mod FCapacity;
+  FBuffer[FBegin] := AItem;
+  if FCount < FCapacity then
+    Inc(FCount);
+  // Else when full, pushing to front overwrites the last element.
+end;
+
+{*************************************************}
+procedure TALRingBuffer<T>.PushBack(const AItem: T);
+begin
+  if FCount < FCapacity then begin
+    var Index := (FBegin + FCount) mod FCapacity;
+    FBuffer[Index] := AItem;
+    Inc(FCount);
+  end
+  else begin
+    // When full, pushing back overwrites the front element.
+    FBuffer[FBegin] := AItem;
+    FBegin := (FBegin + 1) mod FCapacity;
+  end;
 end;
 
 {***********************************************}
@@ -2545,6 +2791,7 @@ procedure _ALLog(
             Const ThreadID: TThreadID;
             Const CanPreserve: boolean);
 begin
+  if ALDisableLog then exit;
   {$IF defined(ALCodeProfiler)}
   // Logging can consume time, so to ensure accurate performance statistics,
   // ignore all verbose logs.
@@ -2593,11 +2840,11 @@ begin
       LMilliseconds := LMilliseconds - (LMinutes * 1000 * 60);
       var LSeconds: integer := Trunc(LMilliseconds) div 1000;
       LMilliseconds := LMilliseconds - (LSeconds * 1000);
-      var LMicroSec: integer := Round(Frac(LMilliseconds) * 100000);
+      var LHundredNanoseconds: integer := Round(Frac(LMilliseconds) * 10000);
       if Msg <> '' then
-        LMsg := Msg + ALFormatW(' | StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LMicroSec])
+        LMsg := Msg + ALFormatW(' | StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds])
       else
-        LMsg := ALFormatW('StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LMicroSec]);
+        LMsg := ALFormatW('StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds]);
     end;
     {$ELSE}
     LMsg := msg;
@@ -2680,6 +2927,12 @@ end;
 procedure ALLog(Const Tag: String; const TagArgs: array of const; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
 begin
   ALLog(ALFormatW(Tag, TagArgs), ALFormatW(msg, msgArgs), &Type);
+end;
+
+{*********************************************************************************************************************************}
+procedure ALLog(Const Tag: String; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(Tag, ALFormatW(msg, msgArgs), &Type);
 end;
 
 {***********************************************************************************************************}

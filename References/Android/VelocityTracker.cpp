@@ -16,16 +16,20 @@
 
 #define LOG_TAG "VelocityTracker"
 
-#include <array>
+#include <android-base/logging.h>
+#include <ftl/enum.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <math.h>
+#include <array>
 #include <optional>
 
-#include <android-base/stringprintf.h>
+#include <input/PrintTools.h>
 #include <input/VelocityTracker.h>
 #include <utils/BitSet.h>
 #include <utils/Timers.h>
+
+using std::literals::chrono_literals::operator""ms;
 
 namespace android {
 
@@ -53,12 +57,37 @@ const bool DEBUG_IMPULSE =
 // Nanoseconds per milliseconds.
 static const nsecs_t NANOS_PER_MS = 1000000;
 
+// Seconds per nanosecond.
+static const float SECONDS_PER_NANO = 1E-9;
+
+// All axes supported for velocity tracking, mapped to their default strategies.
+// Although other strategies are available for testing and comparison purposes,
+// the default strategy is the one that applications will actually use.  Be very careful
+// when adjusting the default strategy because it can dramatically affect
+// (often in a bad way) the user experience.
+static const std::map<int32_t, VelocityTracker::Strategy> DEFAULT_STRATEGY_BY_AXIS =
+        {{AMOTION_EVENT_AXIS_X, VelocityTracker::Strategy::LSQ2},
+         {AMOTION_EVENT_AXIS_Y, VelocityTracker::Strategy::LSQ2},
+         {AMOTION_EVENT_AXIS_SCROLL, VelocityTracker::Strategy::IMPULSE}};
+
+// Axes specifying location on a 2D plane (i.e. X and Y).
+static const std::set<int32_t> PLANAR_AXES = {AMOTION_EVENT_AXIS_X, AMOTION_EVENT_AXIS_Y};
+
+// Axes whose motion values are differential values (i.e. deltas).
+static const std::set<int32_t> DIFFERENTIAL_AXES = {AMOTION_EVENT_AXIS_SCROLL};
+
 // Threshold for determining that a pointer has stopped moving.
 // Some input devices do not send ACTION_MOVE events in the case where a pointer has
 // stopped.  We need to detect this case so that we can accurately predict the
 // velocity after the pointer starts moving again.
-static const nsecs_t ASSUME_POINTER_STOPPED_TIME = 40 * NANOS_PER_MS;
+static const std::chrono::duration ASSUME_POINTER_STOPPED_TIME = 40ms;
 
+static std::string toString(std::chrono::nanoseconds t) {
+    std::stringstream stream;
+    stream.precision(1);
+    stream << std::fixed << std::chrono::duration<float, std::milli>(t).count() << " ms";
+    return stream.str();
+}
 
 static float vectorDot(const float* a, const float* b, uint32_t m) {
     float r = 0;
@@ -118,46 +147,35 @@ static std::string matrixToString(const float* a, uint32_t m, uint32_t n, bool r
 // --- VelocityTracker ---
 
 VelocityTracker::VelocityTracker(const Strategy strategy)
-      : mLastEventTime(0), mCurrentPointerIdBits(0), mActivePointerId(-1) {
-    // Configure the strategy.
-    if (!configureStrategy(strategy)) {
-        ALOGE("Unrecognized velocity tracker strategy %" PRId32 ".", strategy);
-        if (!configureStrategy(VelocityTracker::DEFAULT_STRATEGY)) {
-            LOG_ALWAYS_FATAL("Could not create the default velocity tracker strategy '%" PRId32
-                             "'!",
-                             strategy);
-        }
-    }
+      : mLastEventTime(0), mCurrentPointerIdBits(0), mOverrideStrategy(strategy) {}
+
+bool VelocityTracker::isAxisSupported(int32_t axis) {
+    return DEFAULT_STRATEGY_BY_AXIS.find(axis) != DEFAULT_STRATEGY_BY_AXIS.end();
 }
 
-VelocityTracker::~VelocityTracker() {
-}
-
-bool VelocityTracker::configureStrategy(Strategy strategy) {
-    if (strategy == VelocityTracker::Strategy::DEFAULT) {
-        mStrategy = createStrategy(VelocityTracker::DEFAULT_STRATEGY);
+void VelocityTracker::configureStrategy(int32_t axis) {
+    const bool isDifferentialAxis = DIFFERENTIAL_AXES.find(axis) != DIFFERENTIAL_AXES.end();
+    if (isDifferentialAxis || mOverrideStrategy == VelocityTracker::Strategy::DEFAULT) {
+        // Do not allow overrides of strategies for differential axes, for now.
+        mConfiguredStrategies[axis] = createStrategy(DEFAULT_STRATEGY_BY_AXIS.at(axis),
+                                                     /*deltaValues=*/isDifferentialAxis);
     } else {
-        mStrategy = createStrategy(strategy);
+        mConfiguredStrategies[axis] = createStrategy(mOverrideStrategy, /*deltaValues=*/false);
     }
-    return mStrategy != nullptr;
 }
 
 std::unique_ptr<VelocityTrackerStrategy> VelocityTracker::createStrategy(
-        VelocityTracker::Strategy strategy) {
+        VelocityTracker::Strategy strategy, bool deltaValues) {
     switch (strategy) {
         case VelocityTracker::Strategy::IMPULSE:
-            if (DEBUG_STRATEGY) {
-                ALOGI("Initializing impulse strategy");
-            }
-            return std::make_unique<ImpulseVelocityTrackerStrategy>();
+            ALOGI_IF(DEBUG_STRATEGY, "Initializing impulse strategy");
+            return std::make_unique<ImpulseVelocityTrackerStrategy>(deltaValues);
 
         case VelocityTracker::Strategy::LSQ1:
             return std::make_unique<LeastSquaresVelocityTrackerStrategy>(1);
 
         case VelocityTracker::Strategy::LSQ2:
-            if (DEBUG_STRATEGY && !DEBUG_IMPULSE) {
-                ALOGI("Initializing lsq2 strategy");
-            }
+            ALOGI_IF(DEBUG_STRATEGY && !DEBUG_IMPULSE, "Initializing lsq2 strategy");
             return std::make_unique<LeastSquaresVelocityTrackerStrategy>(2);
 
         case VelocityTracker::Strategy::LSQ3:
@@ -167,17 +185,17 @@ std::unique_ptr<VelocityTrackerStrategy> VelocityTracker::createStrategy(
             return std::make_unique<
                     LeastSquaresVelocityTrackerStrategy>(2,
                                                          LeastSquaresVelocityTrackerStrategy::
-                                                                 WEIGHTING_DELTA);
+                                                                 Weighting::DELTA);
         case VelocityTracker::Strategy::WLSQ2_CENTRAL:
             return std::make_unique<
                     LeastSquaresVelocityTrackerStrategy>(2,
                                                          LeastSquaresVelocityTrackerStrategy::
-                                                                 WEIGHTING_CENTRAL);
+                                                                 Weighting::CENTRAL);
         case VelocityTracker::Strategy::WLSQ2_RECENT:
             return std::make_unique<
                     LeastSquaresVelocityTrackerStrategy>(2,
                                                          LeastSquaresVelocityTrackerStrategy::
-                                                                 WEIGHTING_RECENT);
+                                                                 Weighting::RECENT);
 
         case VelocityTracker::Strategy::INT1:
             return std::make_unique<IntegratingVelocityTrackerStrategy>(1);
@@ -191,200 +209,226 @@ std::unique_ptr<VelocityTrackerStrategy> VelocityTracker::createStrategy(
         default:
             break;
     }
+    LOG(FATAL) << "Invalid strategy: " << ftl::enum_string(strategy)
+               << ", deltaValues = " << deltaValues;
+
     return nullptr;
 }
 
 void VelocityTracker::clear() {
     mCurrentPointerIdBits.clear();
-    mActivePointerId = -1;
-
-    mStrategy->clear();
+    mActivePointerId = std::nullopt;
+    mConfiguredStrategies.clear();
 }
 
-void VelocityTracker::clearPointers(BitSet32 idBits) {
-    BitSet32 remainingIdBits(mCurrentPointerIdBits.value & ~idBits.value);
-    mCurrentPointerIdBits = remainingIdBits;
+void VelocityTracker::clearPointer(int32_t pointerId) {
+    mCurrentPointerIdBits.clearBit(pointerId);
 
-    if (mActivePointerId >= 0 && idBits.hasBit(mActivePointerId)) {
-        mActivePointerId = !remainingIdBits.isEmpty() ? remainingIdBits.firstMarkedBit() : -1;
-    }
-
-    mStrategy->clearPointers(idBits);
-}
-
-void VelocityTracker::addMovement(nsecs_t eventTime, BitSet32 idBits,
-                                  const std::vector<VelocityTracker::Position>& positions) {
-    LOG_ALWAYS_FATAL_IF(idBits.count() != positions.size(),
-                        "Mismatching number of pointers, idBits=%" PRIu32 ", positions=%zu",
-                        idBits.count(), positions.size());
-    while (idBits.count() > MAX_POINTERS) {
-        idBits.clearLastMarkedBit();
-    }
-
-    if ((mCurrentPointerIdBits.value & idBits.value)
-            && eventTime >= mLastEventTime + ASSUME_POINTER_STOPPED_TIME) {
-        if (DEBUG_VELOCITY) {
-            ALOGD("VelocityTracker: stopped for %0.3f ms, clearing state.",
-                  (eventTime - mLastEventTime) * 0.000001f);
+    if (mActivePointerId && *mActivePointerId == pointerId) {
+        // The active pointer id is being removed. Mark it invalid and try to find a new one
+        // from the remaining pointers.
+        mActivePointerId = std::nullopt;
+        if (!mCurrentPointerIdBits.isEmpty()) {
+            mActivePointerId = mCurrentPointerIdBits.firstMarkedBit();
         }
+    }
+
+    for (const auto& [_, strategy] : mConfiguredStrategies) {
+        strategy->clearPointer(pointerId);
+    }
+}
+
+void VelocityTracker::addMovement(nsecs_t eventTime, int32_t pointerId, int32_t axis,
+                                  float position) {
+    if (pointerId < 0 || pointerId > MAX_POINTER_ID) {
+        LOG(FATAL) << "Invalid pointer ID " << pointerId << " for axis "
+                   << MotionEvent::getLabel(axis);
+    }
+
+    if (mCurrentPointerIdBits.hasBit(pointerId) &&
+        std::chrono::nanoseconds(eventTime - mLastEventTime) > ASSUME_POINTER_STOPPED_TIME) {
+        ALOGD_IF(DEBUG_VELOCITY, "VelocityTracker: stopped for %s, clearing state.",
+                 toString(std::chrono::nanoseconds(eventTime - mLastEventTime)).c_str());
+
         // We have not received any movements for too long.  Assume that all pointers
         // have stopped.
-        mStrategy->clear();
+        mConfiguredStrategies.clear();
     }
     mLastEventTime = eventTime;
 
-    mCurrentPointerIdBits = idBits;
-    if (mActivePointerId < 0 || !idBits.hasBit(mActivePointerId)) {
-        mActivePointerId = idBits.isEmpty() ? -1 : idBits.firstMarkedBit();
+    mCurrentPointerIdBits.markBit(pointerId);
+    if (!mActivePointerId) {
+        // Let this be the new active pointer if no active pointer is currently set
+        mActivePointerId = pointerId;
     }
 
-    mStrategy->addMovement(eventTime, idBits, positions);
+    if (mConfiguredStrategies.find(axis) == mConfiguredStrategies.end()) {
+        configureStrategy(axis);
+    }
+    mConfiguredStrategies[axis]->addMovement(eventTime, pointerId, position);
 
     if (DEBUG_VELOCITY) {
-        ALOGD("VelocityTracker: addMovement eventTime=%" PRId64
-              ", idBits=0x%08x, activePointerId=%d",
-              eventTime, idBits.value, mActivePointerId);
-        for (BitSet32 iterBits(idBits); !iterBits.isEmpty();) {
-            uint32_t id = iterBits.firstMarkedBit();
-            uint32_t index = idBits.getIndexOfBit(id);
-            iterBits.clearBit(id);
-            Estimator estimator;
-            getEstimator(id, &estimator);
-            ALOGD("  %d: position (%0.3f, %0.3f), "
-                  "estimator (degree=%d, xCoeff=%s, yCoeff=%s, confidence=%f)",
-                  id, positions[index].x, positions[index].y, int(estimator.degree),
-                  vectorToString(estimator.xCoeff, estimator.degree + 1).c_str(),
-                  vectorToString(estimator.yCoeff, estimator.degree + 1).c_str(),
-                  estimator.confidence);
-        }
+        LOG(INFO) << "VelocityTracker: addMovement axis=" << MotionEvent::getLabel(axis)
+                  << ", eventTime=" << eventTime << ", pointerId=" << pointerId
+                  << ", activePointerId=" << toString(mActivePointerId) << ", position=" << position
+                  << ", velocity=" << toString(getVelocity(axis, pointerId));
     }
 }
 
-void VelocityTracker::addMovement(const MotionEvent* event) {
-    int32_t actionMasked = event->getActionMasked();
+void VelocityTracker::addMovement(const MotionEvent& event) {
+    // Stores data about which axes to process based on the incoming motion event.
+    std::set<int32_t> axesToProcess;
+    int32_t actionMasked = event.getActionMasked();
 
     switch (actionMasked) {
-    case AMOTION_EVENT_ACTION_DOWN:
-    case AMOTION_EVENT_ACTION_HOVER_ENTER:
-        // Clear all pointers on down before adding the new movement.
-        clear();
-        break;
-    case AMOTION_EVENT_ACTION_POINTER_DOWN: {
-        // Start a new movement trace for a pointer that just went down.
-        // We do this on down instead of on up because the client may want to query the
-        // final velocity for a pointer that just went up.
-        BitSet32 downIdBits;
-        downIdBits.markBit(event->getPointerId(event->getActionIndex()));
-        clearPointers(downIdBits);
-        break;
-    }
-    case AMOTION_EVENT_ACTION_MOVE:
-    case AMOTION_EVENT_ACTION_HOVER_MOVE:
-        break;
-    default:
-        // Ignore all other actions because they do not convey any new information about
-        // pointer movement.  We also want to preserve the last known velocity of the pointers.
-        // Note that ACTION_UP and ACTION_POINTER_UP always report the last known position
-        // of the pointers that went up.  ACTION_POINTER_UP does include the new position of
-        // pointers that remained down but we will also receive an ACTION_MOVE with this
-        // information if any of them actually moved.  Since we don't know how many pointers
-        // will be going up at once it makes sense to just wait for the following ACTION_MOVE
-        // before adding the movement.
-        return;
-    }
-
-    size_t pointerCount = event->getPointerCount();
-    if (pointerCount > MAX_POINTERS) {
-        pointerCount = MAX_POINTERS;
-    }
-
-    BitSet32 idBits;
-    for (size_t i = 0; i < pointerCount; i++) {
-        idBits.markBit(event->getPointerId(i));
-    }
-
-    uint32_t pointerIndex[MAX_POINTERS];
-    for (size_t i = 0; i < pointerCount; i++) {
-        pointerIndex[i] = idBits.getIndexOfBit(event->getPointerId(i));
-    }
-
-    std::vector<Position> positions;
-    positions.resize(pointerCount);
-
-    size_t historySize = event->getHistorySize();
-    for (size_t h = 0; h <= historySize; h++) {
-        nsecs_t eventTime = event->getHistoricalEventTime(h);
-        for (size_t i = 0; i < pointerCount; i++) {
-            uint32_t index = pointerIndex[i];
-            positions[index].x = event->getHistoricalX(i, h);
-            positions[index].y = event->getHistoricalY(i, h);
+        case AMOTION_EVENT_ACTION_DOWN:
+        case AMOTION_EVENT_ACTION_HOVER_ENTER:
+            // Clear all pointers on down before adding the new movement.
+            clear();
+            axesToProcess.insert(PLANAR_AXES.begin(), PLANAR_AXES.end());
+            break;
+        case AMOTION_EVENT_ACTION_POINTER_DOWN: {
+            // Start a new movement trace for a pointer that just went down.
+            // We do this on down instead of on up because the client may want to query the
+            // final velocity for a pointer that just went up.
+            clearPointer(event.getPointerId(event.getActionIndex()));
+            axesToProcess.insert(PLANAR_AXES.begin(), PLANAR_AXES.end());
+            break;
         }
-        addMovement(eventTime, idBits, positions);
+        case AMOTION_EVENT_ACTION_MOVE:
+        case AMOTION_EVENT_ACTION_HOVER_MOVE:
+            axesToProcess.insert(PLANAR_AXES.begin(), PLANAR_AXES.end());
+            break;
+        case AMOTION_EVENT_ACTION_POINTER_UP:
+            if (event.getFlags() & AMOTION_EVENT_FLAG_CANCELED) {
+                clearPointer(event.getPointerId(event.getActionIndex()));
+                return;
+            }
+            // Continue to ACTION_UP to ensure that the POINTER_STOPPED logic is triggered.
+            [[fallthrough]];
+        case AMOTION_EVENT_ACTION_UP: {
+            std::chrono::nanoseconds delaySinceLastEvent(event.getEventTime() - mLastEventTime);
+            if (delaySinceLastEvent > ASSUME_POINTER_STOPPED_TIME) {
+                ALOGD_IF(DEBUG_VELOCITY,
+                         "VelocityTracker: stopped for %s, clearing state upon pointer liftoff.",
+                         toString(delaySinceLastEvent).c_str());
+                // We have not received any movements for too long.  Assume that all pointers
+                // have stopped.
+                for (int32_t axis : PLANAR_AXES) {
+                    mConfiguredStrategies.erase(axis);
+                }
+            }
+            // These actions because they do not convey any new information about
+            // pointer movement.  We also want to preserve the last known velocity of the pointers.
+            // Note that ACTION_UP and ACTION_POINTER_UP always report the last known position
+            // of the pointers that went up.  ACTION_POINTER_UP does include the new position of
+            // pointers that remained down but we will also receive an ACTION_MOVE with this
+            // information if any of them actually moved.  Since we don't know how many pointers
+            // will be going up at once it makes sense to just wait for the following ACTION_MOVE
+            // before adding the movement.
+            return;
+        }
+        case AMOTION_EVENT_ACTION_SCROLL:
+            axesToProcess.insert(AMOTION_EVENT_AXIS_SCROLL);
+            break;
+        case AMOTION_EVENT_ACTION_CANCEL: {
+            clear();
+            return;
+        }
+
+        default:
+            // Ignore all other actions.
+            return;
+    }
+
+    const size_t historySize = event.getHistorySize();
+    for (size_t h = 0; h <= historySize; h++) {
+        const nsecs_t eventTime = event.getHistoricalEventTime(h);
+        for (size_t i = 0; i < event.getPointerCount(); i++) {
+            if (event.isResampled(i, h)) {
+                continue; // skip resampled samples
+            }
+            const int32_t pointerId = event.getPointerId(i);
+            for (int32_t axis : axesToProcess) {
+                const float position = event.getHistoricalAxisValue(axis, i, h);
+                addMovement(eventTime, pointerId, axis, position);
+            }
+        }
     }
 }
 
-bool VelocityTracker::getVelocity(uint32_t id, float* outVx, float* outVy) const {
-    Estimator estimator;
-    if (getEstimator(id, &estimator) && estimator.degree >= 1) {
-        *outVx = estimator.xCoeff[1];
-        *outVy = estimator.yCoeff[1];
-        return true;
+std::optional<float> VelocityTracker::getVelocity(int32_t axis, int32_t pointerId) const {
+    const auto& it = mConfiguredStrategies.find(axis);
+    if (it != mConfiguredStrategies.end()) {
+        return it->second->getVelocity(pointerId);
     }
-    *outVx = 0;
-    *outVy = 0;
-    return false;
+    return {};
 }
 
-bool VelocityTracker::getEstimator(uint32_t id, Estimator* outEstimator) const {
-    return mStrategy->getEstimator(id, outEstimator);
+VelocityTracker::ComputedVelocity VelocityTracker::getComputedVelocity(int32_t units,
+                                                                       float maxVelocity) {
+    ComputedVelocity computedVelocity;
+    for (const auto& [axis, _] : mConfiguredStrategies) {
+        BitSet32 copyIdBits = BitSet32(mCurrentPointerIdBits);
+        while (!copyIdBits.isEmpty()) {
+            uint32_t id = copyIdBits.clearFirstMarkedBit();
+            std::optional<float> velocity = getVelocity(axis, id);
+            if (velocity) {
+                float adjustedVelocity =
+                        std::clamp(*velocity * units / 1000, -maxVelocity, maxVelocity);
+                computedVelocity.addVelocity(axis, id, adjustedVelocity);
+            }
+        }
+    }
+    return computedVelocity;
 }
 
+AccumulatingVelocityTrackerStrategy::AccumulatingVelocityTrackerStrategy(
+        nsecs_t horizonNanos, bool maintainHorizonDuringAdd)
+      : mHorizonNanos(horizonNanos), mMaintainHorizonDuringAdd(maintainHorizonDuringAdd) {}
 
-// --- LeastSquaresVelocityTrackerStrategy ---
-
-LeastSquaresVelocityTrackerStrategy::LeastSquaresVelocityTrackerStrategy(
-        uint32_t degree, Weighting weighting) :
-        mDegree(degree), mWeighting(weighting) {
-    clear();
+void AccumulatingVelocityTrackerStrategy::clearPointer(int32_t pointerId) {
+    mMovements.erase(pointerId);
 }
 
-LeastSquaresVelocityTrackerStrategy::~LeastSquaresVelocityTrackerStrategy() {
-}
+void AccumulatingVelocityTrackerStrategy::addMovement(nsecs_t eventTime, int32_t pointerId,
+                                                      float position) {
+    auto [ringBufferIt, _] = mMovements.try_emplace(pointerId, HISTORY_SIZE);
+    RingBuffer<Movement>& movements = ringBufferIt->second;
+    const size_t size = movements.size();
 
-void LeastSquaresVelocityTrackerStrategy::clear() {
-    mIndex = 0;
-    mMovements[0].idBits.clear();
-}
-
-void LeastSquaresVelocityTrackerStrategy::clearPointers(BitSet32 idBits) {
-    BitSet32 remainingIdBits(mMovements[mIndex].idBits.value & ~idBits.value);
-    mMovements[mIndex].idBits = remainingIdBits;
-}
-
-void LeastSquaresVelocityTrackerStrategy::addMovement(
-        nsecs_t eventTime, BitSet32 idBits,
-        const std::vector<VelocityTracker::Position>& positions) {
-    if (mMovements[mIndex].eventTime != eventTime) {
+    if (size != 0 && movements[size - 1].eventTime == eventTime) {
         // When ACTION_POINTER_DOWN happens, we will first receive ACTION_MOVE with the coordinates
         // of the existing pointers, and then ACTION_POINTER_DOWN with the coordinates that include
         // the new pointer. If the eventtimes for both events are identical, just update the data
-        // for this time.
+        // for this time (i.e. pop out the last element, and insert the updated movement).
         // We only compare against the last value, as it is likely that addMovement is called
         // in chronological order as events occur.
-        mIndex++;
-    }
-    if (mIndex == HISTORY_SIZE) {
-        mIndex = 0;
+        movements.popBack();
     }
 
-    Movement& movement = mMovements[mIndex];
-    movement.eventTime = eventTime;
-    movement.idBits = idBits;
-    uint32_t count = idBits.count();
-    for (uint32_t i = 0; i < count; i++) {
-        movement.positions[i] = positions[i];
+    movements.pushBack({eventTime, position});
+
+    // Clear movements that do not fall within `mHorizonNanos` of the latest movement.
+    // Note that, if in the future we decide to use more movements (i.e. increase HISTORY_SIZE),
+    // we can consider making this step binary-search based, which will give us some improvement.
+    if (mMaintainHorizonDuringAdd) {
+        while (eventTime - movements[0].eventTime > mHorizonNanos) {
+            movements.popFront();
+        }
     }
 }
+
+// --- LeastSquaresVelocityTrackerStrategy ---
+
+LeastSquaresVelocityTrackerStrategy::LeastSquaresVelocityTrackerStrategy(uint32_t degree,
+                                                                         Weighting weighting)
+      : AccumulatingVelocityTrackerStrategy(HORIZON /*horizonNanos*/,
+                                            true /*maintainHorizonDuringAdd*/),
+        mDegree(degree),
+        mWeighting(weighting) {}
+
+LeastSquaresVelocityTrackerStrategy::~LeastSquaresVelocityTrackerStrategy() {}
 
 /**
  * Solves a linear least squares problem to obtain a N degree polynomial that fits
@@ -435,13 +479,14 @@ void LeastSquaresVelocityTrackerStrategy::addMovement(
  * http://en.wikipedia.org/wiki/Numerical_methods_for_linear_least_squares
  * http://en.wikipedia.org/wiki/Gram-Schmidt
  */
-static bool solveLeastSquares(const std::vector<float>& x, const std::vector<float>& y,
-                              const std::vector<float>& w, uint32_t n, float* outB, float* outDet) {
+static std::optional<float> solveLeastSquares(const std::vector<float>& x,
+                                              const std::vector<float>& y,
+                                              const std::vector<float>& w, uint32_t n) {
     const size_t m = x.size();
-    if (DEBUG_STRATEGY) {
-        ALOGD("solveLeastSquares: m=%d, n=%d, x=%s, y=%s, w=%s", int(m), int(n),
-              vectorToString(x).c_str(), vectorToString(y).c_str(), vectorToString(w).c_str());
-    }
+
+    ALOGD_IF(DEBUG_STRATEGY, "solveLeastSquares: m=%d, n=%d, x=%s, y=%s, w=%s", int(m), int(n),
+             vectorToString(x).c_str(), vectorToString(y).c_str(), vectorToString(w).c_str());
+
     LOG_ALWAYS_FATAL_IF(m != y.size() || m != w.size(), "Mismatched vector sizes");
 
     // Expand the X vector to a matrix A, pre-multiplied by the weights.
@@ -452,9 +497,9 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
             a[i][h] = a[i - 1][h] * x[h];
         }
     }
-    if (DEBUG_STRATEGY) {
-        ALOGD("  - a=%s", matrixToString(&a[0][0], m, n, false /*rowMajor*/).c_str());
-    }
+
+    ALOGD_IF(DEBUG_STRATEGY, "  - a=%s",
+             matrixToString(&a[0][0], m, n, /*rowMajor=*/false).c_str());
 
     // Apply the Gram-Schmidt process to A to obtain its QR decomposition.
     float q[n][m]; // orthonormal basis, column-major order
@@ -473,10 +518,8 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
         float norm = vectorNorm(&q[j][0], m);
         if (norm < 0.000001f) {
             // vectors are linearly dependent or zero so no solution
-            if (DEBUG_STRATEGY) {
-                ALOGD("  - no solution, norm=%f", norm);
-            }
-            return false;
+            ALOGD_IF(DEBUG_STRATEGY, "  - no solution, norm=%f", norm);
+            return {};
         }
 
         float invNorm = 1.0f / norm;
@@ -488,8 +531,8 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
         }
     }
     if (DEBUG_STRATEGY) {
-        ALOGD("  - q=%s", matrixToString(&q[0][0], m, n, false /*rowMajor*/).c_str());
-        ALOGD("  - r=%s", matrixToString(&r[0][0], n, n, true /*rowMajor*/).c_str());
+        ALOGD("  - q=%s", matrixToString(&q[0][0], m, n, /*rowMajor=*/false).c_str());
+        ALOGD("  - r=%s", matrixToString(&r[0][0], n, n, /*rowMajor=*/true).c_str());
 
         // calculate QR, if we factored A correctly then QR should equal A
         float qr[n][m];
@@ -501,7 +544,7 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
                 }
             }
         }
-        ALOGD("  - qr=%s", matrixToString(&qr[0][0], m, n, false /*rowMajor*/).c_str());
+        ALOGD("  - qr=%s", matrixToString(&qr[0][0], m, n, /*rowMajor=*/false).c_str());
     }
 
     // Solve R B = Qt W Y to find B.  This is easy because R is upper triangular.
@@ -510,6 +553,7 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
     for (uint32_t h = 0; h < m; h++) {
         wy[h] = y[h] * w[h];
     }
+    std::array<float, VelocityTracker::MAX_DEGREE + 1> outB;
     for (uint32_t i = n; i != 0; ) {
         i--;
         outB[i] = vectorDot(&q[i][0], wy, m);
@@ -518,9 +562,8 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
         }
         outB[i] /= r[i][i];
     }
-    if (DEBUG_STRATEGY) {
-        ALOGD("  - b=%s", vectorToString(outB, n).c_str());
-    }
+
+    ALOGD_IF(DEBUG_STRATEGY, "  - b=%s", vectorToString(outB.data(), n).c_str());
 
     // Calculate the coefficient of determination as 1 - (SSerr / SStot) where
     // SSerr is the residual sum of squares (variance of the error),
@@ -532,42 +575,46 @@ static bool solveLeastSquares(const std::vector<float>& x, const std::vector<flo
     }
     ymean /= m;
 
-    float sserr = 0;
-    float sstot = 0;
-    for (uint32_t h = 0; h < m; h++) {
-        float err = y[h] - outB[0];
-        float term = 1;
-        for (uint32_t i = 1; i < n; i++) {
-            term *= x[h];
-            err -= term * outB[i];
-        }
-        sserr += w[h] * w[h] * err * err;
-        float var = y[h] - ymean;
-        sstot += w[h] * w[h] * var * var;
-    }
-    *outDet = sstot > 0.000001f ? 1.0f - (sserr / sstot) : 1;
     if (DEBUG_STRATEGY) {
+        float sserr = 0;
+        float sstot = 0;
+        for (uint32_t h = 0; h < m; h++) {
+            float err = y[h] - outB[0];
+            float term = 1;
+            for (uint32_t i = 1; i < n; i++) {
+                term *= x[h];
+                err -= term * outB[i];
+            }
+            sserr += w[h] * w[h] * err * err;
+            float var = y[h] - ymean;
+            sstot += w[h] * w[h] * var * var;
+        }
         ALOGD("  - sserr=%f", sserr);
         ALOGD("  - sstot=%f", sstot);
-        ALOGD("  - det=%f", *outDet);
     }
-    return true;
+
+    return outB[1];
 }
 
 /*
  * Optimized unweighted second-order least squares fit. About 2x speed improvement compared to
  * the default implementation
  */
-static std::optional<std::array<float, 3>> solveUnweightedLeastSquaresDeg2(
-        const std::vector<float>& x, const std::vector<float>& y) {
-    const size_t count = x.size();
-    LOG_ALWAYS_FATAL_IF(count != y.size(), "Mismatching array sizes");
-    // Solving y = a*x^2 + b*x + c
+std::optional<float> LeastSquaresVelocityTrackerStrategy::solveUnweightedLeastSquaresDeg2(
+        const RingBuffer<Movement>& movements) const {
+    // Solving y = a*x^2 + b*x + c, where
+    //      - "x" is age (i.e. duration since latest movement) of the movemnets
+    //      - "y" is positions of the movements.
     float sxi = 0, sxiyi = 0, syi = 0, sxi2 = 0, sxi3 = 0, sxi2yi = 0, sxi4 = 0;
 
+    const size_t count = movements.size();
+    const Movement& newestMovement = movements[count - 1];
     for (size_t i = 0; i < count; i++) {
-        float xi = x[i];
-        float yi = y[i];
+        const Movement& movement = movements[i];
+        nsecs_t age = newestMovement.eventTime - movement.eventTime;
+        float xi = -age * SECONDS_PER_NANO;
+        float yi = movement.position;
+
         float xi2 = xi*xi;
         float xi3 = xi2*xi;
         float xi4 = xi3*xi;
@@ -594,170 +641,120 @@ static std::optional<std::array<float, 3>> solveUnweightedLeastSquaresDeg2(
         ALOGW("division by 0 when computing velocity, Sxx=%f, Sx2x2=%f, Sxx2=%f", Sxx, Sx2x2, Sxx2);
         return std::nullopt;
     }
-    // Compute a
-    float numerator = Sx2y*Sxx - Sxy*Sxx2;
-    float a = numerator / denominator;
 
-    // Compute b
-    numerator = Sxy*Sx2x2 - Sx2y*Sxx2;
-    float b = numerator / denominator;
-
-    // Compute c
-    float c = syi/count - b * sxi/count - a * sxi2/count;
-
-    return std::make_optional(std::array<float, 3>({c, b, a}));
+    return (Sxy * Sx2x2 - Sx2y * Sxx2) / denominator;
 }
 
-bool LeastSquaresVelocityTrackerStrategy::getEstimator(uint32_t id,
-        VelocityTracker::Estimator* outEstimator) const {
-    outEstimator->clear();
+std::optional<float> LeastSquaresVelocityTrackerStrategy::getVelocity(int32_t pointerId) const {
+    const auto movementIt = mMovements.find(pointerId);
+    if (movementIt == mMovements.end()) {
+        return std::nullopt; // no data
+    }
+
+    const RingBuffer<Movement>& movements = movementIt->second;
+    const size_t size = movements.size();
+    if (size == 0) {
+        return std::nullopt; // no data
+    }
+
+    uint32_t degree = mDegree;
+    if (degree > size - 1) {
+        degree = size - 1;
+    }
+
+    if (degree <= 0) {
+        return std::nullopt;
+    }
+
+    if (degree == 2 && mWeighting == Weighting::NONE) {
+        // Optimize unweighted, quadratic polynomial fit
+        return solveUnweightedLeastSquaresDeg2(movements);
+    }
 
     // Iterate over movement samples in reverse time order and collect samples.
-    std::vector<float> x;
-    std::vector<float> y;
+    std::vector<float> positions;
     std::vector<float> w;
     std::vector<float> time;
 
-    uint32_t index = mIndex;
-    const Movement& newestMovement = mMovements[mIndex];
-    do {
-        const Movement& movement = mMovements[index];
-        if (!movement.idBits.hasBit(id)) {
-            break;
-        }
-
+    const Movement& newestMovement = movements[size - 1];
+    for (ssize_t i = size - 1; i >= 0; i--) {
+        const Movement& movement = movements[i];
         nsecs_t age = newestMovement.eventTime - movement.eventTime;
-        if (age > HORIZON) {
-            break;
-        }
-
-        const VelocityTracker::Position& position = movement.getPosition(id);
-        x.push_back(position.x);
-        y.push_back(position.y);
-        w.push_back(chooseWeight(index));
+        positions.push_back(movement.position);
+        w.push_back(chooseWeight(pointerId, i));
         time.push_back(-age * 0.000000001f);
-        index = (index == 0 ? HISTORY_SIZE : index) - 1;
-    } while (x.size() < HISTORY_SIZE);
-
-    const size_t m = x.size();
-    if (m == 0) {
-        return false; // no data
     }
 
-    // Calculate a least squares polynomial fit.
-    uint32_t degree = mDegree;
-    if (degree > m - 1) {
-        degree = m - 1;
-    }
-
-    if (degree == 2 && mWeighting == WEIGHTING_NONE) {
-        // Optimize unweighted, quadratic polynomial fit
-        std::optional<std::array<float, 3>> xCoeff = solveUnweightedLeastSquaresDeg2(time, x);
-        std::optional<std::array<float, 3>> yCoeff = solveUnweightedLeastSquaresDeg2(time, y);
-        if (xCoeff && yCoeff) {
-            outEstimator->time = newestMovement.eventTime;
-            outEstimator->degree = 2;
-            outEstimator->confidence = 1;
-            for (size_t i = 0; i <= outEstimator->degree; i++) {
-                outEstimator->xCoeff[i] = (*xCoeff)[i];
-                outEstimator->yCoeff[i] = (*yCoeff)[i];
-            }
-            return true;
-        }
-    } else if (degree >= 1) {
-        // General case for an Nth degree polynomial fit
-        float xdet, ydet;
-        uint32_t n = degree + 1;
-        if (solveLeastSquares(time, x, w, n, outEstimator->xCoeff, &xdet) &&
-            solveLeastSquares(time, y, w, n, outEstimator->yCoeff, &ydet)) {
-            outEstimator->time = newestMovement.eventTime;
-            outEstimator->degree = degree;
-            outEstimator->confidence = xdet * ydet;
-            if (DEBUG_STRATEGY) {
-                ALOGD("estimate: degree=%d, xCoeff=%s, yCoeff=%s, confidence=%f",
-                      int(outEstimator->degree), vectorToString(outEstimator->xCoeff, n).c_str(),
-                      vectorToString(outEstimator->yCoeff, n).c_str(), outEstimator->confidence);
-            }
-            return true;
-        }
-    }
-
-    // No velocity data available for this pointer, but we do have its current position.
-    outEstimator->xCoeff[0] = x[0];
-    outEstimator->yCoeff[0] = y[0];
-    outEstimator->time = newestMovement.eventTime;
-    outEstimator->degree = 0;
-    outEstimator->confidence = 1;
-    return true;
+    // General case for an Nth degree polynomial fit
+    return solveLeastSquares(time, positions, w, degree + 1);
 }
 
-float LeastSquaresVelocityTrackerStrategy::chooseWeight(uint32_t index) const {
+float LeastSquaresVelocityTrackerStrategy::chooseWeight(int32_t pointerId, uint32_t index) const {
+    const RingBuffer<Movement>& movements = mMovements.at(pointerId);
+    const size_t size = movements.size();
     switch (mWeighting) {
-    case WEIGHTING_DELTA: {
-        // Weight points based on how much time elapsed between them and the next
-        // point so that points that "cover" a shorter time span are weighed less.
-        //   delta  0ms: 0.5
-        //   delta 10ms: 1.0
-        if (index == mIndex) {
+        case Weighting::DELTA: {
+            // Weight points based on how much time elapsed between them and the next
+            // point so that points that "cover" a shorter time span are weighed less.
+            //   delta  0ms: 0.5
+            //   delta 10ms: 1.0
+            if (index == size - 1) {
+                return 1.0f;
+            }
+            float deltaMillis =
+                    (movements[index + 1].eventTime - movements[index].eventTime) * 0.000001f;
+            if (deltaMillis < 0) {
+                return 0.5f;
+            }
+            if (deltaMillis < 10) {
+                return 0.5f + deltaMillis * 0.05;
+            }
             return 1.0f;
         }
-        uint32_t nextIndex = (index + 1) % HISTORY_SIZE;
-        float deltaMillis = (mMovements[nextIndex].eventTime- mMovements[index].eventTime)
-                * 0.000001f;
-        if (deltaMillis < 0) {
+
+        case Weighting::CENTRAL: {
+            // Weight points based on their age, weighing very recent and very old points less.
+            //   age  0ms: 0.5
+            //   age 10ms: 1.0
+            //   age 50ms: 1.0
+            //   age 60ms: 0.5
+            float ageMillis =
+                    (movements[size - 1].eventTime - movements[index].eventTime) * 0.000001f;
+            if (ageMillis < 0) {
+                return 0.5f;
+            }
+            if (ageMillis < 10) {
+                return 0.5f + ageMillis * 0.05;
+            }
+            if (ageMillis < 50) {
+                return 1.0f;
+            }
+            if (ageMillis < 60) {
+                return 0.5f + (60 - ageMillis) * 0.05;
+            }
             return 0.5f;
         }
-        if (deltaMillis < 10) {
-            return 0.5f + deltaMillis * 0.05;
-        }
-        return 1.0f;
-    }
 
-    case WEIGHTING_CENTRAL: {
-        // Weight points based on their age, weighing very recent and very old points less.
-        //   age  0ms: 0.5
-        //   age 10ms: 1.0
-        //   age 50ms: 1.0
-        //   age 60ms: 0.5
-        float ageMillis = (mMovements[mIndex].eventTime - mMovements[index].eventTime)
-                * 0.000001f;
-        if (ageMillis < 0) {
+        case Weighting::RECENT: {
+            // Weight points based on their age, weighing older points less.
+            //   age   0ms: 1.0
+            //   age  50ms: 1.0
+            //   age 100ms: 0.5
+            float ageMillis =
+                    (movements[size - 1].eventTime - movements[index].eventTime) * 0.000001f;
+            if (ageMillis < 50) {
+                return 1.0f;
+            }
+            if (ageMillis < 100) {
+                return 0.5f + (100 - ageMillis) * 0.01f;
+            }
             return 0.5f;
         }
-        if (ageMillis < 10) {
-            return 0.5f + ageMillis * 0.05;
-        }
-        if (ageMillis < 50) {
-            return 1.0f;
-        }
-        if (ageMillis < 60) {
-            return 0.5f + (60 - ageMillis) * 0.05;
-        }
-        return 0.5f;
-    }
 
-    case WEIGHTING_RECENT: {
-        // Weight points based on their age, weighing older points less.
-        //   age   0ms: 1.0
-        //   age  50ms: 1.0
-        //   age 100ms: 0.5
-        float ageMillis = (mMovements[mIndex].eventTime - mMovements[index].eventTime)
-                * 0.000001f;
-        if (ageMillis < 50) {
+        case Weighting::NONE:
             return 1.0f;
-        }
-        if (ageMillis < 100) {
-            return 0.5f + (100 - ageMillis) * 0.01f;
-        }
-        return 0.5f;
-    }
-
-    case WEIGHTING_NONE:
-    default:
-        return 1.0f;
     }
 }
-
 
 // --- IntegratingVelocityTrackerStrategy ---
 
@@ -768,60 +765,42 @@ IntegratingVelocityTrackerStrategy::IntegratingVelocityTrackerStrategy(uint32_t 
 IntegratingVelocityTrackerStrategy::~IntegratingVelocityTrackerStrategy() {
 }
 
-void IntegratingVelocityTrackerStrategy::clear() {
-    mPointerIdBits.clear();
+void IntegratingVelocityTrackerStrategy::clearPointer(int32_t pointerId) {
+    mPointerIdBits.clearBit(pointerId);
 }
 
-void IntegratingVelocityTrackerStrategy::clearPointers(BitSet32 idBits) {
-    mPointerIdBits.value &= ~idBits.value;
-}
-
-void IntegratingVelocityTrackerStrategy::addMovement(
-        nsecs_t eventTime, BitSet32 idBits,
-        const std::vector<VelocityTracker::Position>& positions) {
-    uint32_t index = 0;
-    for (BitSet32 iterIdBits(idBits); !iterIdBits.isEmpty();) {
-        uint32_t id = iterIdBits.clearFirstMarkedBit();
-        State& state = mPointerState[id];
-        const VelocityTracker::Position& position = positions[index++];
-        if (mPointerIdBits.hasBit(id)) {
-            updateState(state, eventTime, position.x, position.y);
-        } else {
-            initState(state, eventTime, position.x, position.y);
-        }
+void IntegratingVelocityTrackerStrategy::addMovement(nsecs_t eventTime, int32_t pointerId,
+                                                     float position) {
+    State& state = mPointerState[pointerId];
+    if (mPointerIdBits.hasBit(pointerId)) {
+        updateState(state, eventTime, position);
+    } else {
+        initState(state, eventTime, position);
     }
 
-    mPointerIdBits = idBits;
+    mPointerIdBits.markBit(pointerId);
 }
 
-bool IntegratingVelocityTrackerStrategy::getEstimator(uint32_t id,
-        VelocityTracker::Estimator* outEstimator) const {
-    outEstimator->clear();
-
-    if (mPointerIdBits.hasBit(id)) {
-        const State& state = mPointerState[id];
-        populateEstimator(state, outEstimator);
-        return true;
+std::optional<float> IntegratingVelocityTrackerStrategy::getVelocity(int32_t pointerId) const {
+    if (mPointerIdBits.hasBit(pointerId)) {
+        return mPointerState[pointerId].vel;
     }
 
-    return false;
+    return std::nullopt;
 }
 
-void IntegratingVelocityTrackerStrategy::initState(State& state,
-        nsecs_t eventTime, float xpos, float ypos) const {
+void IntegratingVelocityTrackerStrategy::initState(State& state, nsecs_t eventTime,
+                                                   float pos) const {
     state.updateTime = eventTime;
     state.degree = 0;
 
-    state.xpos = xpos;
-    state.xvel = 0;
-    state.xaccel = 0;
-    state.ypos = ypos;
-    state.yvel = 0;
-    state.yaccel = 0;
+    state.pos = pos;
+    state.accel = 0;
+    state.vel = 0;
 }
 
-void IntegratingVelocityTrackerStrategy::updateState(State& state,
-        nsecs_t eventTime, float xpos, float ypos) const {
+void IntegratingVelocityTrackerStrategy::updateState(State& state, nsecs_t eventTime,
+                                                     float pos) const {
     const nsecs_t MIN_TIME_DELTA = 2 * NANOS_PER_MS;
     const float FILTER_TIME_CONSTANT = 0.010f; // 10 milliseconds
 
@@ -832,107 +811,61 @@ void IntegratingVelocityTrackerStrategy::updateState(State& state,
     float dt = (eventTime - state.updateTime) * 0.000000001f;
     state.updateTime = eventTime;
 
-    float xvel = (xpos - state.xpos) / dt;
-    float yvel = (ypos - state.ypos) / dt;
+    float vel = (pos - state.pos) / dt;
     if (state.degree == 0) {
-        state.xvel = xvel;
-        state.yvel = yvel;
+        state.vel = vel;
         state.degree = 1;
     } else {
         float alpha = dt / (FILTER_TIME_CONSTANT + dt);
         if (mDegree == 1) {
-            state.xvel += (xvel - state.xvel) * alpha;
-            state.yvel += (yvel - state.yvel) * alpha;
+            state.vel += (vel - state.vel) * alpha;
         } else {
-            float xaccel = (xvel - state.xvel) / dt;
-            float yaccel = (yvel - state.yvel) / dt;
+            float accel = (vel - state.vel) / dt;
             if (state.degree == 1) {
-                state.xaccel = xaccel;
-                state.yaccel = yaccel;
+                state.accel = accel;
                 state.degree = 2;
             } else {
-                state.xaccel += (xaccel - state.xaccel) * alpha;
-                state.yaccel += (yaccel - state.yaccel) * alpha;
+                state.accel += (accel - state.accel) * alpha;
             }
-            state.xvel += (state.xaccel * dt) * alpha;
-            state.yvel += (state.yaccel * dt) * alpha;
+            state.vel += (state.accel * dt) * alpha;
         }
     }
-    state.xpos = xpos;
-    state.ypos = ypos;
+    state.pos = pos;
 }
-
-void IntegratingVelocityTrackerStrategy::populateEstimator(const State& state,
-        VelocityTracker::Estimator* outEstimator) const {
-    outEstimator->time = state.updateTime;
-    outEstimator->confidence = 1.0f;
-    outEstimator->degree = state.degree;
-    outEstimator->xCoeff[0] = state.xpos;
-    outEstimator->xCoeff[1] = state.xvel;
-    outEstimator->xCoeff[2] = state.xaccel / 2;
-    outEstimator->yCoeff[0] = state.ypos;
-    outEstimator->yCoeff[1] = state.yvel;
-    outEstimator->yCoeff[2] = state.yaccel / 2;
-}
-
 
 // --- LegacyVelocityTrackerStrategy ---
 
-LegacyVelocityTrackerStrategy::LegacyVelocityTrackerStrategy() {
-    clear();
-}
+LegacyVelocityTrackerStrategy::LegacyVelocityTrackerStrategy()
+      : AccumulatingVelocityTrackerStrategy(HORIZON /*horizonNanos*/,
+                                            false /*maintainHorizonDuringAdd*/) {}
 
 LegacyVelocityTrackerStrategy::~LegacyVelocityTrackerStrategy() {
 }
 
-void LegacyVelocityTrackerStrategy::clear() {
-    mIndex = 0;
-    mMovements[0].idBits.clear();
-}
-
-void LegacyVelocityTrackerStrategy::clearPointers(BitSet32 idBits) {
-    BitSet32 remainingIdBits(mMovements[mIndex].idBits.value & ~idBits.value);
-    mMovements[mIndex].idBits = remainingIdBits;
-}
-
-void LegacyVelocityTrackerStrategy::addMovement(
-        nsecs_t eventTime, BitSet32 idBits,
-        const std::vector<VelocityTracker::Position>& positions) {
-    if (++mIndex == HISTORY_SIZE) {
-        mIndex = 0;
+std::optional<float> LegacyVelocityTrackerStrategy::getVelocity(int32_t pointerId) const {
+    const auto movementIt = mMovements.find(pointerId);
+    if (movementIt == mMovements.end()) {
+        return std::nullopt; // no data
     }
 
-    Movement& movement = mMovements[mIndex];
-    movement.eventTime = eventTime;
-    movement.idBits = idBits;
-    uint32_t count = idBits.count();
-    for (uint32_t i = 0; i < count; i++) {
-        movement.positions[i] = positions[i];
+    const RingBuffer<Movement>& movements = movementIt->second;
+    const size_t size = movements.size();
+    if (size == 0) {
+        return std::nullopt; // no data
     }
-}
 
-bool LegacyVelocityTrackerStrategy::getEstimator(uint32_t id,
-        VelocityTracker::Estimator* outEstimator) const {
-    outEstimator->clear();
-
-    const Movement& newestMovement = mMovements[mIndex];
-    if (!newestMovement.idBits.hasBit(id)) {
-        return false; // no data
-    }
+    const Movement& newestMovement = movements[size - 1];
 
     // Find the oldest sample that contains the pointer and that is not older than HORIZON.
     nsecs_t minTime = newestMovement.eventTime - HORIZON;
-    uint32_t oldestIndex = mIndex;
-    uint32_t numTouches = 1;
-    do {
-        uint32_t nextOldestIndex = (oldestIndex == 0 ? HISTORY_SIZE : oldestIndex) - 1;
-        const Movement& nextOldestMovement = mMovements[nextOldestIndex];
-        if (!nextOldestMovement.idBits.hasBit(id)
-                || nextOldestMovement.eventTime < minTime) {
+    uint32_t oldestIndex = size - 1;
+    for (ssize_t i = size - 1; i >= 0; i--) {
+        const Movement& nextOldestMovement = movements[i];
+        if (nextOldestMovement.eventTime < minTime) {
             break;
         }
-        oldestIndex = nextOldestIndex;
-    } while (++numTouches < HISTORY_SIZE);
+        oldestIndex = i;
+    }
 
     // Calculate an exponentially weighted moving average of the velocity estimate
     // at different points in time measured relative to the oldest sample.
@@ -945,94 +878,43 @@ bool LegacyVelocityTrackerStrategy::getEstimator(uint32_t id,
     // overestimate the velocity at that time point.  Most samples might be measured
     // 16ms apart but some consecutive samples could be only 0.5sm apart because
     // the hardware or driver reports them irregularly or in bursts.
-    float accumVx = 0;
-    float accumVy = 0;
-    uint32_t index = oldestIndex;
+    float accumV = 0;
     uint32_t samplesUsed = 0;
-    const Movement& oldestMovement = mMovements[oldestIndex];
-    const VelocityTracker::Position& oldestPosition = oldestMovement.getPosition(id);
+    const Movement& oldestMovement = movements[oldestIndex];
+    float oldestPosition = oldestMovement.position;
     nsecs_t lastDuration = 0;
 
-    while (numTouches-- > 1) {
-        if (++index == HISTORY_SIZE) {
-            index = 0;
-        }
-        const Movement& movement = mMovements[index];
+    for (size_t i = oldestIndex; i < size; i++) {
+        const Movement& movement = movements[i];
         nsecs_t duration = movement.eventTime - oldestMovement.eventTime;
 
         // If the duration between samples is small, we may significantly overestimate
         // the velocity.  Consequently, we impose a minimum duration constraint on the
         // samples that we include in the calculation.
         if (duration >= MIN_DURATION) {
-            const VelocityTracker::Position& position = movement.getPosition(id);
+            float position = movement.position;
             float scale = 1000000000.0f / duration; // one over time delta in seconds
-            float vx = (position.x - oldestPosition.x) * scale;
-            float vy = (position.y - oldestPosition.y) * scale;
-            accumVx = (accumVx * lastDuration + vx * duration) / (duration + lastDuration);
-            accumVy = (accumVy * lastDuration + vy * duration) / (duration + lastDuration);
+            float v = (position - oldestPosition) * scale;
+            accumV = (accumV * lastDuration + v * duration) / (duration + lastDuration);
             lastDuration = duration;
             samplesUsed += 1;
         }
     }
 
-    // Report velocity.
-    const VelocityTracker::Position& newestPosition = newestMovement.getPosition(id);
-    outEstimator->time = newestMovement.eventTime;
-    outEstimator->confidence = 1;
-    outEstimator->xCoeff[0] = newestPosition.x;
-    outEstimator->yCoeff[0] = newestPosition.y;
     if (samplesUsed) {
-        outEstimator->xCoeff[1] = accumVx;
-        outEstimator->yCoeff[1] = accumVy;
-        outEstimator->degree = 1;
-    } else {
-        outEstimator->degree = 0;
+        return accumV;
     }
-    return true;
+    return std::nullopt;
 }
 
 // --- ImpulseVelocityTrackerStrategy ---
 
-ImpulseVelocityTrackerStrategy::ImpulseVelocityTrackerStrategy() {
-    clear();
-}
+ImpulseVelocityTrackerStrategy::ImpulseVelocityTrackerStrategy(bool deltaValues)
+      : AccumulatingVelocityTrackerStrategy(HORIZON /*horizonNanos*/,
+                                            true /*maintainHorizonDuringAdd*/),
+        mDeltaValues(deltaValues) {}
 
 ImpulseVelocityTrackerStrategy::~ImpulseVelocityTrackerStrategy() {
-}
-
-void ImpulseVelocityTrackerStrategy::clear() {
-    mIndex = 0;
-    mMovements[0].idBits.clear();
-}
-
-void ImpulseVelocityTrackerStrategy::clearPointers(BitSet32 idBits) {
-    BitSet32 remainingIdBits(mMovements[mIndex].idBits.value & ~idBits.value);
-    mMovements[mIndex].idBits = remainingIdBits;
-}
-
-void ImpulseVelocityTrackerStrategy::addMovement(
-        nsecs_t eventTime, BitSet32 idBits,
-        const std::vector<VelocityTracker::Position>& positions) {
-    if (mMovements[mIndex].eventTime != eventTime) {
-        // When ACTION_POINTER_DOWN happens, we will first receive ACTION_MOVE with the coordinates
-        // of the existing pointers, and then ACTION_POINTER_DOWN with the coordinates that include
-        // the new pointer. If the eventtimes for both events are identical, just update the data
-        // for this time.
-        // We only compare against the last value, as it is likely that addMovement is called
-        // in chronological order as events occur.
-        mIndex++;
-    }
-    if (mIndex == HISTORY_SIZE) {
-        mIndex = 0;
-    }
-
-    Movement& movement = mMovements[mIndex];
-    movement.eventTime = eventTime;
-    movement.idBits = idBits;
-    uint32_t count = idBits.count();
-    for (uint32_t i = 0; i < count; i++) {
-        movement.positions[i] = positions[i];
-    }
 }
 
 /**
@@ -1109,104 +991,53 @@ static float kineticEnergyToVelocity(float work) {
     return (work < 0 ? -1.0 : 1.0) * sqrtf(fabsf(work)) * sqrt2;
 }
 
-static float calculateImpulseVelocity(const nsecs_t* t, const float* x, size_t count) {
-    // The input should be in reversed time order (most recent sample at index i=0)
-    // t[i] is in nanoseconds, but due to FP arithmetic, convert to seconds inside this function
-    static constexpr float SECONDS_PER_NANO = 1E-9;
+std::optional<float> ImpulseVelocityTrackerStrategy::getVelocity(int32_t pointerId) const {
+    const auto movementIt = mMovements.find(pointerId);
+    if (movementIt == mMovements.end()) {
+        return std::nullopt; // no data
+    }
 
-    if (count < 2) {
-        return 0; // if 0 or 1 points, velocity is zero
+    const RingBuffer<Movement>& movements = movementIt->second;
+    const size_t size = movements.size();
+    if (size == 0) {
+        return std::nullopt; // no data
     }
-    if (t[1] > t[0]) { // Algorithm will still work, but not perfectly
-        ALOGE("Samples provided to calculateImpulseVelocity in the wrong order");
-    }
-    if (count == 2) { // if 2 points, basic linear calculation
-        if (t[1] == t[0]) {
-            ALOGE("Events have identical time stamps t=%" PRId64 ", setting velocity = 0", t[0]);
-            return 0;
-        }
-        return (x[1] - x[0]) / (SECONDS_PER_NANO * (t[1] - t[0]));
-    }
-    // Guaranteed to have at least 3 points here
+
     float work = 0;
-    for (size_t i = count - 1; i > 0 ; i--) { // start with the oldest sample and go forward in time
-        if (t[i] == t[i-1]) {
-            ALOGE("Events have identical time stamps t=%" PRId64 ", skipping sample", t[i]);
-            continue;
-        }
-        float vprev = kineticEnergyToVelocity(work); // v[i-1]
-        float vcurr = (x[i] - x[i-1]) / (SECONDS_PER_NANO * (t[i] - t[i-1])); // v[i]
+    for (size_t i = 0; i < size - 1; i++) {
+        const Movement& mvt = movements[i];
+        const Movement& nextMvt = movements[i + 1];
+
+        float vprev = kineticEnergyToVelocity(work);
+        float delta = mDeltaValues ? nextMvt.position : nextMvt.position - mvt.position;
+        float vcurr = delta / (SECONDS_PER_NANO * (nextMvt.eventTime - mvt.eventTime));
         work += (vcurr - vprev) * fabsf(vcurr);
-        if (i == count - 1) {
+
+        if (i == 0) {
             work *= 0.5; // initial condition, case 2) above
         }
     }
-    return kineticEnergyToVelocity(work);
-}
 
-bool ImpulseVelocityTrackerStrategy::getEstimator(uint32_t id,
-        VelocityTracker::Estimator* outEstimator) const {
-    outEstimator->clear();
+    const float velocity = kineticEnergyToVelocity(work);
+    ALOGD_IF(DEBUG_STRATEGY, "velocity: %.1f", velocity);
 
-    // Iterate over movement samples in reverse time order and collect samples.
-    float x[HISTORY_SIZE];
-    float y[HISTORY_SIZE];
-    nsecs_t time[HISTORY_SIZE];
-    size_t m = 0; // number of points that will be used for fitting
-    size_t index = mIndex;
-    const Movement& newestMovement = mMovements[mIndex];
-    do {
-        const Movement& movement = mMovements[index];
-        if (!movement.idBits.hasBit(id)) {
-            break;
-        }
-
-        nsecs_t age = newestMovement.eventTime - movement.eventTime;
-        if (age > HORIZON) {
-            break;
-        }
-
-        const VelocityTracker::Position& position = movement.getPosition(id);
-        x[m] = position.x;
-        y[m] = position.y;
-        time[m] = movement.eventTime;
-        index = (index == 0 ? HISTORY_SIZE : index) - 1;
-    } while (++m < HISTORY_SIZE);
-
-    if (m == 0) {
-        return false; // no data
-    }
-    outEstimator->xCoeff[0] = 0;
-    outEstimator->yCoeff[0] = 0;
-    outEstimator->xCoeff[1] = calculateImpulseVelocity(time, x, m);
-    outEstimator->yCoeff[1] = calculateImpulseVelocity(time, y, m);
-    outEstimator->xCoeff[2] = 0;
-    outEstimator->yCoeff[2] = 0;
-    outEstimator->time = newestMovement.eventTime;
-    outEstimator->degree = 2; // similar results to 2nd degree fit
-    outEstimator->confidence = 1;
-    if (DEBUG_STRATEGY) {
-        ALOGD("velocity: (%.1f, %.1f)", outEstimator->xCoeff[1], outEstimator->yCoeff[1]);
-    }
     if (DEBUG_IMPULSE) {
         // TODO(b/134179997): delete this block once the switch to 'impulse' is complete.
-        // Calculate the lsq2 velocity for the same inputs to allow runtime comparisons
+        // Calculate the lsq2 velocity for the same inputs to allow runtime comparisons.
+        // X axis chosen arbitrarily for velocity comparisons.
         VelocityTracker lsq2(VelocityTracker::Strategy::LSQ2);
-        BitSet32 idBits;
-        const uint32_t pointerId = 0;
-        idBits.markBit(pointerId);
-        for (ssize_t i = m - 1; i >= 0; i--) {
-            lsq2.addMovement(time[i], idBits, {{x[i], y[i]}});
+        for (size_t i = 0; i < size; i++) {
+            const Movement& mvt = movements[i];
+            lsq2.addMovement(mvt.eventTime, pointerId, AMOTION_EVENT_AXIS_X, mvt.position);
         }
-        float outVx = 0, outVy = 0;
-        const bool computed = lsq2.getVelocity(pointerId, &outVx, &outVy);
-        if (computed) {
-            ALOGD("lsq2 velocity: (%.1f, %.1f)", outVx, outVy);
+        std::optional<float> v = lsq2.getVelocity(AMOTION_EVENT_AXIS_X, pointerId);
+        if (v) {
+            ALOGD("lsq2 velocity: %.1f", *v);
         } else {
             ALOGD("lsq2 velocity: could not compute velocity");
         }
     }
-    return true;
+    return velocity;
 }
 
 } // namespace android

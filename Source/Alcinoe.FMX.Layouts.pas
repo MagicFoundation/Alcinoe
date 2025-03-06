@@ -1006,7 +1006,12 @@ begin
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
     fMouseDownPos := TpointF.Create(X,Y);
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseDown(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseDown(X, Y);
+    {$ENDIF}
   end;
 end;
 
@@ -1034,7 +1039,12 @@ begin
       fScrollCapturedByMe := True;
       TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(True));
     end;
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseMove(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseMove(X, Y);
+    {$ENDIF}
   end;
 end;
 
@@ -1048,7 +1058,12 @@ begin
   {$ENDIF}
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     FScrollCapturedByMe := False;
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseUp(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseUp(X, Y);
+    {$ENDIF}
     FHandleMouseEvents := False;
   end;
 end;

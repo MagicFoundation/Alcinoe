@@ -55,10 +55,6 @@ uses
   iOSapi.Foundation,
   iOSapi.QuartzCore,
   {$ENDIF}
-  {$IFDEF ANDROID}
-  Androidapi.JNIBridge,
-  Androidapi.JNI.GraphicsContentViewText,
-  {$ENDIF}
   FMX.Types,
   Alcinoe.Common;
 
@@ -81,20 +77,11 @@ type
   {~~~~~~~~~~~~~~}
   {$IFDEF ANDROID}
   TALChoreographerThread = class(TObject)
-  private type
-    TChoreographerFrameCallback = class(TJavaLocal, JChoreographer_FrameCallback)
-    private
-      fChoreographerThread: TALChoreographerThread;
-    public
-      constructor Create(const AChoreographerThread: TALChoreographerThread);
-      procedure doFrame(frameTimeNanos: Int64); cdecl;
-    end;
-  private
-    FChoreographerFrameCallback: TChoreographerFrameCallback;
   private
     FTimerEvent: TNotifyEvent;
     FInterval: Cardinal;
     FEnabled: Boolean;
+    procedure doFrame(frameTimeNanos: Int64);
   protected
     procedure SetEnabled(Value: Boolean); virtual;
     procedure SetInterval(Value: Cardinal); virtual;
@@ -758,6 +745,9 @@ uses
   System.SysUtils,
   System.math,
   System.Math.Vectors,
+  {$IFDEF ANDROID}
+  FMX.Platform.UI.Android,
+  {$ENDIF}
   {$IFDEF IOS}
   Macapi.Helpers,
   Macapi.ObjCRuntime,
@@ -911,26 +901,19 @@ end;
 
 {$IFDEF ANDROID}
 
-{************************************************************************************************************************}
-constructor TALChoreographerThread.TChoreographerFrameCallback.Create(const AChoreographerThread: TALChoreographerThread);
- begin
-  inherited Create;
-  fChoreographerThread := AChoreographerThread;
-end;
-
-{******************************************************************************************}
-procedure TALChoreographerThread.TChoreographerFrameCallback.doFrame(frameTimeNanos: Int64);
+{**************************************************************}
+procedure TALChoreographerThread.doFrame(frameTimeNanos: Int64);
 begin
 
   {$IFDEF DEBUG}
   //ALLog('TALChoreographerThread.TChoreographerFrameCallback.doFrame');
   {$ENDIF}
 
-  if assigned(fChoreographerThread.FTimerEvent) then
-    fChoreographerThread.FTimerEvent(fChoreographerThread);
+  if assigned(FTimerEvent) then
+    FTimerEvent(Self);
 
-  if fChoreographerThread.Enabled then
-    TJChoreographer.JavaClass.getInstance.postFrameCallback(self);
+  if Enabled then
+    TChoreographer.Instance.PostAniFrameCallback(doFrame);
 
 end;
 
@@ -938,7 +921,6 @@ end;
 constructor TALChoreographerThread.Create(AOwner: TComponent);
 begin
   inherited create;
-  fChoreographerFrameCallback := TChoreographerFrameCallback.create(self);
   FTimerEvent := nil;
   Interval := 1;
   FEnabled := False;
@@ -947,7 +929,7 @@ end;
 {****************************************}
 destructor TALChoreographerThread.Destroy;
 begin
-  alFreeAndNil(fChoreographerFrameCallback);
+  TChoreographer.Instance.RemoveAniFrameCallback(doFrame);
   inherited;
 end;
 
@@ -956,8 +938,8 @@ procedure TALChoreographerThread.SetEnabled(Value: Boolean);
 begin
   if FEnabled <> Value then begin
     FEnabled := Value;
-    if FEnabled then TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback)
-    else TJChoreographer.JavaClass.getInstance.removeFrameCallback(fChoreographerFrameCallback);
+    if FEnabled then TChoreographer.Instance.PostAniFrameCallback(doFrame)
+    else TChoreographer.Instance.RemoveAniFrameCallback(doFrame);
   end;
 end;
 

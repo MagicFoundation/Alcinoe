@@ -59,6 +59,7 @@ Please request the resolution of these quality reports. Due
 to the unresolved issues from Embarcadero, we have been 
 forced to apply patches to the original Delphi source files:
 
+* [Enhance MouseEvent Handling by Providing Access to MotionEvent (Android) and UIEvent (iOS)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002)
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
 * [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
@@ -104,6 +105,9 @@ forced to apply patches to the original Delphi source files:
 * [Update TAlignLayout to Include New Alignment Options for Centering Controls](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342)
 * [Enhance TCustomForm.DoAddObject to Properly Handle FUpdating State for Controls](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388)
 * [Add the CAFrameRateRange record and preferredFramesPerSecond/preferredFrameRateRange to CADisplayLink](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2424)
+* [Add getEventTimeNanos and getHistoricalEventTimeNanos to JMotionEvent](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2992)
+* [Incorrect indentation of end; in TScreen.IndexFormOfObject](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2902)
+
 
 Install Alcinoe
 ---------------

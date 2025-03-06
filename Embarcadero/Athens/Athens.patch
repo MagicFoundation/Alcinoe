@@ -1644,6 +1644,15 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
      if FControls <> nil  then
        FControls.Remove(TControl(AObject));
  
+@@ -7854,7 +7897,7 @@
+         Result := I;
+         Break;
+       end;
+-  end;
++end; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2902
+ 
+ function TScreen.MousePos: TPointF;
+ begin
 Index: Embarcadero/Athens/fmx/FMX.Forms3D.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Forms3D.pas b/Embarcadero/Athens/fmx/FMX.Forms3D.pas
@@ -1759,7 +1768,39 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
  {                                                       }
  {              Delphi FireMonkey Platform               }
  {                                                       }
-@@ -1076,7 +1076,13 @@
+@@ -26,6 +26,7 @@
+     FHandle: TOCLocal;
+     FZOrderManager: TiOSZOrderManager;
+     function GetZOrderManager: TiOSZOrderManager;
++    function GetCurrentTouchEvent: UIEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+   protected
+     function GetView: UIView; virtual;
+     function GetGLView: GLKView; virtual;
+@@ -44,6 +45,7 @@
+     property Handle: TOCLocal read FHandle;
+     /// <summary>Link to Z-Order manager that used as shared manager for platform controls
+     property ZOrderManager: TiOSZOrderManager read GetZOrderManager;
++    property CurrentTouchEvent: UIEvent read GetCurrentTouchEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+   end;
+ 
+   TiOSOpenApplicationContext = class
+@@ -586,6 +588,7 @@
+     FGestureControl: TComponent;
+     FMultiTouchManager: TMultiTouchManagerIOS;
+     FNoOfTouches: NativeUInt;
++    FCurrentTouchEvent: UIEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     [Weak] FTextService: TTextServiceCocoa;
+     function GetView: UIView;
+     function GetTouchCoord(const touches: NSSet; const Window: UIView; var x, y: single): Boolean;
+@@ -636,6 +639,7 @@
+     procedure SingleTap(Sender: id); cdecl;
+     procedure LongTap(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
+     procedure DblTap(X, Y: Single);
++    property CurrentTouchEvent: UIEvent read FCurrentTouchEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     { UIGestureRecognizerDelegate }
+     function gestureRecognizer(gestureRecognizer: UIGestureRecognizer; shouldReceiveTouch: UITouch): Boolean; overload; cdecl;
+     function gestureRecognizer(gestureRecognizer: UIGestureRecognizer; shouldRecognizeSimultaneouslyWithGestureRecognizer: UIGestureRecognizer): Boolean; overload; cdecl;
+@@ -1076,7 +1080,13 @@
      WindowManager.NativeWindow.makeKeyAndVisible;
  
      // Post initialization
@@ -1774,6 +1815,96 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      FMX.Forms.Application.RealCreateForms;
      TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
    finally
+@@ -2461,6 +2471,7 @@
+   FContextMenu := TFMXTextEditActionsMenu.Create(View);
+   FMultiTouchManager := nil;
+   FSavedFocusedControl := TDelegatedFreeNotify<IControl>.Create;
++  FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ end;
+ 
+ procedure TFMXViewBase.cut(Sender: id);
+@@ -3573,6 +3584,8 @@
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
+ 
++    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++
+     // find the control from under the gesture
+     Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
+     SendTouches(withEvent.allTouches, TTouchAction.Down, Obj);
+@@ -3600,6 +3613,7 @@
+       DefineFocusControl;
+     finally
+       FClickedAnotherControl := (Obj <> nil) and (FContextMenu.Control <> Obj.GetObject);
++      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+       View.touchesBegan(touches, withEvent);
+     end;
+   except
+@@ -3629,6 +3643,9 @@
+   try
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
++
++    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++
+     LPoint := TPointF.Create(X, Y);
+     FShouldIgnoreNextClick := False;
+     FAdditionalShift := [];
+@@ -3639,6 +3656,7 @@
+       DoLMouseUp(X, Y, [], False);
+       DefineSelectionStates;
+     finally
++      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+       View.touchesCancelled(touches, withEvent);
+     end;
+   except
+@@ -3670,6 +3688,8 @@
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
+ 
++    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++
+     // find the control from under the gesture
+     Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
+     SendTouches(withEvent.allTouches, TTouchAction.Up, Obj);
+@@ -3683,6 +3703,7 @@
+         NSObject(Self.Super).performSelector(sel_getUid('SingleTap:'), nil, DblTapDelay);
+       DefineSelectionStates;
+     finally
++      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+       if Form <> nil then
+         View.touchesEnded(touches, withEvent);
+     end;
+@@ -3701,6 +3722,8 @@
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
+ 
++    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++
+     LPoint := TPointF.Create(X, Y);
+     Obj := Form.ObjectAtPoint(Form.ClientToScreen(LPoint));
+     SendTouches(withEvent.allTouches, TTouchAction.Move, Obj);
+@@ -3708,6 +3731,7 @@
+     try
+       DoLMouseMove(X, Y, FAdditionalShift);
+     finally
++      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+       View.touchesMoved(touches, withEvent);
+     end;
+   except
+@@ -4406,6 +4430,12 @@
+   Result := FZOrderManager;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++function TiOSWindowHandle.GetCurrentTouchEvent: UIEvent;
++begin
++  Result := TFMXViewBase(FHandle).CurrentTouchEvent;
++end;
++
+ { TiOSOpenApplicationContext }
+ 
+ constructor TiOSOpenApplicationContext.Create(ASourceApp: string; AURL: string; AContext: Pointer);
 Index: Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
@@ -1803,34 +1934,114 @@ Index: Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas
 diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas
 --- a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas	(working copy)
-@@ -26,7 +26,7 @@
+@@ -26,10 +26,61 @@
    TAndroidMotionManager = class;
    TTextServiceAndroid = class;
  
 -  TRender<T: class> = class(TJavaLocal, JRunnable)
-+  TRender<T: class> = class(TJavaLocal, JChoreographer_FrameCallback) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  // We cannot use JChoreographer_FrameCallback everywhere in the code because
++  // there is no practical way to define the callback order. We need the
++  // animation callback to be called first and the render callback to be called last.
++  // Another issue we face is that if we manage to ensure the animation callback
++  // is executed first (before the render callback), then when a new frame starts,
++  // calling "repaint" inside the animation callback will have no effect. This happens
++  // because the render process does not yet understand that we want to redraw
++  // on the next frame rather than the current one. Since the render callback has not
++  // been invoked yet, TRender will simply ignore the repaint instruction.
++  TChoreographer = class
    private
++    type
++      TChoreographerFrameCallback = class(TJavaLocal, JChoreographer_FrameCallback)
++      private
++        fChoreographer: TChoreographer;
++      public
++        constructor Create(const AChoreographer: TChoreographer);
++        procedure doFrame(frameTimeNanos: Int64); cdecl;
++      end;
++  private
++    FChoreographerFrameCallback: TChoreographerFrameCallback;
++    procedure ExecuteFrameCallbacks(frameTimeNanos: Int64);
++  private
++    class var FInstance: TChoreographer;
++    class function GetInstance: TChoreographer; static;
++  public
++    type
++      TFrameCallback = procedure(frameTimeNanos: Int64) of Object;
++  private
++    FIsFrameCallbackScheduled: Boolean;
++    FAniFrameCallbackCurrList: TList<TFrameCallback>;
++    FRenderFrameCallbackCurrList: TList<TFrameCallback>;
++    FAniFrameCallbackEmptyList: TList<TFrameCallback>;
++    FRenderFrameCallbackEmptyList: TList<TFrameCallback>;
++    FPrevframeTimeNanos: Int64;
++    FCurrframeTimeNanos: Int64;
++  public
++    constructor Create;
++    destructor Destroy; override;
++    class procedure DestroyInstance;
++    procedure PostAniFrameCallback(const callback: TFrameCallback);
++    procedure RemoveAniFrameCallback(const callback: TFrameCallback);
++    procedure PostRenderFrameCallback(const callback: TFrameCallback);
++    procedure RemoveRenderFrameCallback(const callback: TFrameCallback);
++    property PrevframeTimeNanos: Int64 read FPrevframeTimeNanos;
++    property CurrframeTimeNanos: Int64 read FCurrframeTimeNanos;
++    class property Instance: TChoreographer read GetInstance;
++  end;
++
++  TRender<T: class> = class // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  private
      [Weak] FContext: T;
-     FIsNeededUpdate: Boolean;
-@@ -41,14 +41,14 @@
+-    FIsNeededUpdate: Boolean;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++    //FIsNeededUpdate: Boolean;
+     { System message handler }
+     procedure ApplicationEventHandler(const Sender: TObject; const AMessage: TMessage);
+   public
+@@ -41,14 +92,14 @@
      /// <summary>Posts event to event bus for future rendering.</summary>
      procedure PostRender;
  
 -    { JRunnable }
 -    procedure run; cdecl;
 +    { JChoreographer_FrameCallback } // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
-+    procedure doFrame(frameTimeNanos: Int64); cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++    procedure doFrame(frameTimeNanos: Int64); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    public
      property Context: T read FContext;
    end;
  
    /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
 -  TFormRender = class(TRender<TAndroidWindowHandle>, JRunnable)
-+  TFormRender = class(TRender<TAndroidWindowHandle>, JChoreographer_FrameCallback) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  TFormRender = class(TRender<TAndroidWindowHandle>) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    public
      /// <summary>Renders form Immediately.</summary>
      procedure Render; override;
-@@ -1171,15 +1171,15 @@
+@@ -269,7 +320,7 @@
+   TAndroidDoubleTapGestureListener = class;
+ 
+   TAndroidMotionManager = class(TInterfacedObject, IFMXGestureRecognizersService)
+-  public const 
++  public const
+     DoubleClickTime = 300; // msec
+   private type
+     TMotionEvent = record
+@@ -282,6 +333,7 @@
+     TMotionEvents = TList<TMotionEvent>;
+   private
+     [Weak] FHandle: TAndroidWindowHandle;
++    FCurrentMotionEvent: JMotionEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     { Gestures }
+     FEnabledInteractiveGestures: TInteractiveGestures;
+     FIsLongTapRecognized: Boolean;
+@@ -309,6 +361,7 @@
+     constructor Create(const AHandle: TAndroidWindowHandle);
+     destructor Destroy; override;
+     function HandleMotionEvent(const AEvent: JMotionEvent): Boolean;
++    property CurrentMotionEvent: JMotionEvent read FCurrentMotionEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     { IFMXGestureRecognizersService }
+     procedure AddRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
+     procedure RemoveRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
+@@ -1171,15 +1224,15 @@
  end;
  
  procedure TAndroidWindowHandle.TFormViewListener.onSizeChanged(w, h, oldw, oldh: Integer);
@@ -1850,7 +2061,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
-@@ -1253,7 +1253,7 @@
+@@ -1253,7 +1306,7 @@
        StatusBarOffset := Ceil(PlatformAndroid.WindowService.StatusBarHeight)
      else
        StatusBarOffset := 0;
@@ -1859,25 +2070,74 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    end;
  
    // Creates Form's view
-@@ -2906,7 +2906,7 @@
- begin
-   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
-   AtomicIncrement(FRefCount);
--  TAndroidHelper.MainHandler.removeCallbacks(Self);
-+  TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
-   AtomicDecrement(FRefCount);
-   inherited;
- end;
-@@ -2916,7 +2916,7 @@
-   if not FIsNeededUpdate then
-   begin
-     FIsNeededUpdate := True;
--    TAndroidHelper.MainHandler.post(Self);
-+    TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
-   end;
+@@ -2091,6 +2144,8 @@
+   FGestureDetector := TJGestureDetector.JavaClass.init(FGestureListener);
+   FGestureDoubleTapListener := TAndroidDoubleTapGestureListener.Create(Self);
+   FGestureDetector.setOnDoubleTapListener(FGestureDoubleTapListener);
++
++  FCurrentMotionEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
  end;
  
-@@ -2924,7 +2924,7 @@
+ function TAndroidMotionManager.CreateGestureEventInfo(const AGesture: TInteractiveGesture;
+@@ -2124,6 +2179,7 @@
+ 
+ begin
+   { Pre initialization }
++  FCurrentMotionEvent := AEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+   ReadMotionEvent(AEvent, FMotionEvents);
+   UpdateMousePosition;
+ 
+@@ -2142,6 +2198,7 @@
+   end;
+ 
+   Result := True;
++  FCurrentMotionEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ end;
+ 
+ procedure TAndroidMotionManager.HandleMultiTouch;
+@@ -2898,7 +2955,8 @@
+ begin
+   inherited Create;
+   FContext := AContext;
+-  FIsNeededUpdate := False;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //FIsNeededUpdate := False;
+   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+ end;
+ 
+@@ -2905,19 +2963,23 @@
+ destructor TRender<T>.Destroy;
+ begin
+   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+-  AtomicIncrement(FRefCount);
+-  TAndroidHelper.MainHandler.removeCallbacks(Self);
+-  AtomicDecrement(FRefCount);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //AtomicIncrement(FRefCount);
++  //TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //AtomicDecrement(FRefCount);
++  TChoreographer.Instance.RemoveRenderFrameCallback(doFrame);
+   inherited;
+ end;
+ 
+ procedure TRender<T>.PostRender;
+ begin
+-  if not FIsNeededUpdate then
+-  begin
+-    FIsNeededUpdate := True;
+-    TAndroidHelper.MainHandler.post(Self);
+-  end;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //if not FIsNeededUpdate then
++  //begin
++  //  FIsNeededUpdate := True;
++  //  TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //end;
++  TChoreographer.Instance.PostRenderFrameCallback(doFrame);
+ end;
+ 
+ procedure TRender<T>.Render;
+@@ -2924,10 +2986,134 @@
  begin
  end;
  
@@ -1885,7 +2145,135 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
 +procedure TRender<T>.doFrame(frameTimeNanos: Int64); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
  begin
    Render;
-   FIsNeededUpdate := False;
+-  FIsNeededUpdate := False;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //FIsNeededUpdate := False;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++constructor TChoreographer.TChoreographerFrameCallback.Create(const AChoreographer: TChoreographer);
++begin
++  inherited Create;
++  FChoreographer := AChoreographer;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.TChoreographerFrameCallback.doFrame(frameTimeNanos: Int64); cdecl;
++begin
++  FChoreographer.ExecuteFrameCallbacks(frameTimeNanos);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++constructor TChoreographer.Create;
++begin
++  inherited Create;
++  FIsFrameCallbackScheduled := False;
++  FAniFrameCallbackCurrList := TList<TFrameCallback>.Create;
++  FRenderFrameCallbackCurrList := TList<TFrameCallback>.Create;
++  FAniFrameCallbackEmptyList := TList<TFrameCallback>.Create;
++  FRenderFrameCallbackEmptyList := TList<TFrameCallback>.Create;
++  FPrevframeTimeNanos := 0;
++  FCurrframeTimeNanos := 0;
++  fChoreographerFrameCallback := TChoreographerFrameCallback.create(self);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++destructor TChoreographer.Destroy;
++begin
++  TJChoreographer.JavaClass.getInstance.removeFrameCallback(fChoreographerFrameCallback);
++  fChoreographerFrameCallback.Free;
++  FAniFrameCallbackCurrList.free;
++  FRenderFrameCallbackCurrList.free;
++  FAniFrameCallbackEmptyList.free;
++  FRenderFrameCallbackEmptyList.free;
++  inherited Destroy;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++class procedure TChoreographer.DestroyInstance;
++begin
++  FreeAndNil(FInstance);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++class function TChoreographer.GetInstance: TChoreographer;
++begin
++  if FInstance = nil then
++    FInstance := TChoreographer.Create;
++  Result := FInstance;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.ExecuteFrameCallbacks(frameTimeNanos: Int64);
++begin
++  FIsFrameCallbackScheduled := False;
++
++  FPrevframeTimeNanos := FCurrframeTimeNanos;
++  FCurrframeTimeNanos := frameTimeNanos;
++
++  var LAniFrameCallbackWorkList := FAniFrameCallbackCurrList;
++  var LRenderFrameCallbackWorkList := FRenderFrameCallbackCurrList;
++  //--
++  FAniFrameCallbackCurrList := FAniFrameCallbackEmptyList;
++  FRenderFrameCallbackCurrList := FRenderFrameCallbackEmptyList;
++  //--
++  FAniFrameCallbackEmptyList := LAniFrameCallbackWorkList;
++  FRenderFrameCallbackEmptyList := LRenderFrameCallbackWorkList;
++
++  for var I := 0 to LAniFrameCallbackWorkList.Count - 1 do
++    LAniFrameCallbackWorkList[i](frameTimeNanos);
++  for var I := 0 to LRenderFrameCallbackWorkList.Count - 1 do
++    LRenderFrameCallbackWorkList[i](frameTimeNanos);
++
++  LAniFrameCallbackWorkList.Count := 0;
++  LRenderFrameCallbackWorkList.Count := 0;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.PostAniFrameCallback(const callback: TFrameCallback);
++begin
++  if not FAniFrameCallbackCurrList.Contains(callback) then
++  begin
++    FAniFrameCallbackCurrList.Add(callback);
++    if not FIsFrameCallbackScheduled then
++    begin
++      FIsFrameCallbackScheduled := true;
++      TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback);
++    end;
++  end;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.RemoveAniFrameCallback(const callback: TFrameCallback);
++begin
++  FAniFrameCallbackCurrList.Remove(callback);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.PostRenderFrameCallback(const callback: TFrameCallback);
++begin
++  if not FRenderFrameCallbackCurrList.Contains(callback) then
++  begin
++    FRenderFrameCallbackCurrList.Add(callback);
++    if not FIsFrameCallbackScheduled then
++    begin
++      FIsFrameCallbackScheduled := true;
++      TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback);
++    end;
++  end;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.RemoveRenderFrameCallback(const callback: TFrameCallback);
++begin
++  FRenderFrameCallbackCurrList.Remove(callback);
++end;
++
++initialization
++finalization
++  TChoreographer.DestroyInstance;
++
+ end.
 Index: Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
@@ -1896,7 +2284,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarca
  
    /// <summary>Render of native view.</summary>
 -  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JRunnable)
-+  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JChoreographer_FrameCallback) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
    public
      procedure Render; override;
    end;

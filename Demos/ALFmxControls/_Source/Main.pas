@@ -503,7 +503,9 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   ALLog('TMainForm.FormCreate', 'begin');
   TALErrorReporting.Instance;
-  //ALVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
+  {$IF defined(MSWindows)}
+  ALVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
+  {$ENDIF}
   //special case for windows
   if not ALVertScrollBox1.HasTouchScreen then begin
     ALVertScrollBox1.VScrollBar.Width := 8;
@@ -1007,6 +1009,9 @@ begin
   var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
   var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxDemoForm);
   LVertScrollBox.Parent := LScrollBoxDemoForm;
+  {$IF defined(MSWindows)}
+  LVertScrollBox.ScrollEngine.TouchTracking := [ttVertical];
+  {$ENDIF}
   LVertScrollBox.BeginUpdate;
   LVertScrollBox.Align := TALalignLayout.Client;
   LVertScrollBox.ScrollEngine.MinEdgeSpringbackEnabled := False;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.dynamicanimation.animation;
+package com.android.internal.dynamicanimation.animation;
 
-import androidx.annotation.FloatRange;
-import androidx.annotation.RestrictTo;
+import android.annotation.FloatRange;
 
 /**
  * Spring Force defines the characteristics of the spring being used in the animation.
@@ -208,9 +207,6 @@ public final class SpringForce implements Force {
 
     /*********************** Below are private APIs *********************/
 
-    /**
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Override
     public float getAcceleration(float lastDisplacement, float lastVelocity) {
 
@@ -222,9 +218,6 @@ public final class SpringForce implements Force {
         return (float) (-k * lastDisplacement - c * lastVelocity);
     }
 
-    /**
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Override
     public boolean isAtEquilibrium(float value, float velocity) {
         if (Math.abs(velocity) < mVelocityThreshold

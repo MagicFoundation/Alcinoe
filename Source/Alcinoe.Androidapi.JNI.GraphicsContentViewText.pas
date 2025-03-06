@@ -42,6 +42,21 @@ type
   end;
   TJALRecordingCanvas = class(TJavaGenericImport<JALRecordingCanvasClass, JALRecordingCanvas>) end;
 
+
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2992 has been resolved. If resolved, remove the class definition below.'}
+  {$ENDIF}
+  JALMotionEventClass = interface(JMotionEventClass)
+    ['{6002774D-239C-4679-8B78-647D04075ADB}']
+  end;
+  [JavaSignature('android/view/MotionEvent')]
+  JALMotionEvent = interface(JMotionEvent)
+    ['{B29E8CD6-C05B-4A72-B377-8D51A70813CF}']
+    function getEventTimeNanos: Int64; cdecl;
+    function getHistoricalEventTimeNanos(pos: Integer): Int64; cdecl;
+  end;
+  TJALMotionEvent = class(TJavaGenericImport<JALMotionEventClass, JALMotionEvent>) end;
+
 implementation
 
 end.

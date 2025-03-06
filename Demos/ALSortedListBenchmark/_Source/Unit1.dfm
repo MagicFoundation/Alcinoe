@@ -51,25 +51,13 @@ object Form1: TForm1
       15
       24)
     ColorPaletteIndex = 7
-    object Series1: TBarSeries
-      HoverElement = []
-      Legend.Text = 'TALAVLStringList'
-      LegendTitle = 'TALAVLStringList'
-      Marks.Visible = False
-      Marks.Angle = 90
-      Emboss.Color = 8618883
-      Shadow.Color = 8618883
-      XValues.Name = 'X'
-      XValues.Order = loAscending
-      YValues.Name = 'Bar'
-      YValues.Order = loNone
-    end
     object Series2: TBarSeries
       HoverElement = []
       Legend.Text = 'TALHashedStringList'
       LegendTitle = 'TALHashedStringList'
       Marks.Visible = False
       Marks.Angle = 90
+      Title = 'TALHashedStringList'
       Emboss.Color = 8684676
       Shadow.Color = 8684676
       XValues.Name = 'X'
@@ -83,8 +71,22 @@ object Form1: TForm1
       LegendTitle = 'TALStringList'
       Marks.Visible = False
       Marks.Angle = 90
+      Title = 'TALStringList'
       Emboss.Color = 8750469
       Shadow.Color = 8750469
+      XValues.Name = 'X'
+      XValues.Order = loAscending
+      YValues.Name = 'Bar'
+      YValues.Order = loNone
+    end
+    object Series6: TBarSeries
+      HoverElement = []
+      Legend.Text = 'TALNvStringList'
+      LegendTitle = 'TALNvStringList'
+      Marks.Visible = False
+      Title = 'TALNVStringList'
+      Emboss.Color = 8487297
+      Shadow.Color = 8487297
       XValues.Name = 'X'
       XValues.Order = loAscending
       YValues.Name = 'Bar'
@@ -96,33 +98,9 @@ object Form1: TForm1
       LegendTitle = 'TStringList'
       Marks.Visible = False
       Marks.Angle = 90
+      Title = 'TStringList'
       Emboss.Color = 8750469
       Shadow.Color = 8750469
-      XValues.Name = 'X'
-      XValues.Order = loAscending
-      YValues.Name = 'Bar'
-      YValues.Order = loNone
-    end
-    object Series5: TBarSeries
-      HoverElement = []
-      Legend.Text = 'TALIntegerList'
-      LegendTitle = 'TALIntegerList'
-      Marks.Visible = False
-      Marks.Angle = 65
-      Emboss.Color = 8684676
-      Shadow.Color = 8684676
-      XValues.Name = 'X'
-      XValues.Order = loAscending
-      YValues.Name = 'Bar'
-      YValues.Order = loNone
-    end
-    object Series6: TBarSeries
-      HoverElement = []
-      Legend.Text = 'TALNvStringList'
-      LegendTitle = 'TALNvStringList'
-      Marks.Visible = False
-      Emboss.Color = 8487297
-      Shadow.Color = 8487297
       XValues.Name = 'X'
       XValues.Order = loAscending
       YValues.Name = 'Bar'
@@ -148,64 +126,44 @@ object Form1: TForm1
     TabOrder = 2
     Value = 1000
   end
-  object CheckBoxALAVLStringList: TCheckBox
-    Left = 24
-    Top = 20
-    Width = 145
-    Height = 17
-    Caption = 'TALAVLStringList'
-    Checked = True
-    State = cbChecked
-    TabOrder = 3
-  end
   object CheckBoxALHashedStringList: TCheckBox
-    Left = 160
+    Left = 24
     Top = 20
     Width = 137
     Height = 17
     Caption = 'TALHashedStringList'
     Checked = True
     State = cbChecked
-    TabOrder = 4
+    TabOrder = 3
   end
   object CheckBoxALStringList: TCheckBox
-    Left = 303
+    Left = 167
     Top = 20
     Width = 97
     Height = 17
     Caption = 'TALStringList'
     Checked = True
     State = cbChecked
-    TabOrder = 5
+    TabOrder = 4
   end
   object CheckBoxStringList: TCheckBox
-    Left = 416
+    Left = 403
     Top = 20
     Width = 97
     Height = 17
     Caption = 'TStringList'
     Checked = True
     State = cbChecked
-    TabOrder = 6
-  end
-  object CheckBoxALIntegerList: TCheckBox
-    Left = 504
-    Top = 20
-    Width = 97
-    Height = 17
-    Caption = 'TALintegerList'
-    Checked = True
-    State = cbChecked
-    TabOrder = 7
+    TabOrder = 5
   end
   object CheckBoxALNvStringList: TCheckBox
-    Left = 616
+    Left = 279
     Top = 20
     Width = 97
     Height = 17
     Caption = 'TALNVStringList'
     Checked = True
     State = cbChecked
-    TabOrder = 8
+    TabOrder = 6
   end
 end

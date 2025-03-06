@@ -122,7 +122,6 @@ uses
   Alcinoe.Macapi.QuartzCore,
   Alcinoe.FMX.NativeView.Mac,
   {$ENDIF}
-  Alcinoe.AVLBinaryTree,
   Alcinoe.ExprEval,
   Alcinoe.InternetMessages,
   Alcinoe.Mime,

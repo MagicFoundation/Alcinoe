@@ -48,7 +48,6 @@ contains
   Alcinoe.StringList in 'Alcinoe.StringList.pas',
   Alcinoe.StringUtils in 'Alcinoe.StringUtils.pas',
   Alcinoe.QuickSortList in 'Alcinoe.QuickSortList.pas',
-  Alcinoe.AVLBinaryTree in 'Alcinoe.AVLBinaryTree.pas',
   Alcinoe.FMX.VideoPlayer in 'Alcinoe.FMX.VideoPlayer.pas',
   Alcinoe.FMX.Memo in 'Alcinoe.FMX.Memo.pas',
   Alcinoe.FMX.Graphics in 'Alcinoe.FMX.Graphics.pas',

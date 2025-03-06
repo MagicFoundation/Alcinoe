@@ -392,7 +392,6 @@ uses
   Alcinoe.WinApi.Common,
   Alcinoe.MySql.Wrapper,
   Alcinoe.Sqlite3.Wrapper,
-  Alcinoe.AVLBinaryTree,
   Alcinoe.Common,
   Alcinoe.XMLDoc,
   Alcinoe.StringList,

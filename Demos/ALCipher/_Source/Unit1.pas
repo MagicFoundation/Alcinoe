@@ -95,7 +95,6 @@ uses
   system.hash,
   system.netencoding,
   system.uitypes,
-  Alcinoe.AVLBinaryTree,
   Alcinoe.StringUtils,
   Alcinoe.Files,
   Alcinoe.Cipher,

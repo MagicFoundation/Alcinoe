@@ -721,7 +721,7 @@ const DIFFERENTIAL_AXES: set of Byte = [TALVelocityTracker.AXIS_SCROLL];
 // velocity after the pointer starts moving again.
 const ASSUME_POINTER_STOPPED_TIME = 40 * ALNanosPerMs;
 
-{***********************************************************}
+{*********************************************************************}
 function vectorDot(a: PSingle; b: PSingle; m: Int32{uint32_t}): Single;
 begin
   var r: Single := 0;
@@ -733,7 +733,7 @@ begin
   result := r;
 end;
 
-{*************************************************}
+{**********************************************************}
 function vectorNorm(a: PSingle; m: Int32{uint32_t}): Single;
 begin
   var r: Single := 0;
@@ -745,7 +745,7 @@ begin
   result := sqrt(r);
 end;
 
-{*******************************************************}
+{********************************************************}
 function vectorToString(const a: Array of Single): String;
 begin
   var str: String := '';
@@ -759,7 +759,7 @@ begin
   Result := str;
 end;
 
-{*******************************************************************************}
+{**********************************************************************************}
 function matrixToString(const a: TArray<TArray<Single>>; rowMajor: Boolean): String;
 begin
   var str: string := '';
@@ -816,13 +816,13 @@ begin
   inherited;
 end;
 
-{*********************************************************************}
+{**********************************************************************}
 class function TALVelocityTracker.isAxisSupported(axis: Int32): Boolean;
 begin
   result := axis in [low(DEFAULT_STRATEGY_BY_AXIS)..high(DEFAULT_STRATEGY_BY_AXIS)];
 end;
 
-{************************************************************}
+{**********************************************************}
 procedure TALVelocityTracker.configureStrategy(axis: Int32);
 begin
   const isDifferentialAxis: Boolean = axis in DIFFERENTIAL_AXES;
@@ -833,7 +833,7 @@ begin
     FConfiguredStrategies[axis] := createStrategy(FOverrideStrategy, {deltaValues=}false);
 end;
 
-{*************************************************************************************************************************}
+{****************************************************************************************************************************}
 class function TALVelocityTracker.createStrategy(const strategy: TStrategy; deltaValues: Boolean): TALVelocityTrackerStrategy;
 begin
   case strategy of
@@ -892,7 +892,7 @@ begin
       FConfiguredStrategies[I].clear;
 end;
 
-{************************************************************}
+{**********************************************************}
 procedure TALVelocityTracker.clearPointer(pointerId: Int32);
 begin
   FCurrentPointerIdBits.clearBit(pointerId);
@@ -910,7 +910,7 @@ begin
       FConfiguredStrategies[I].clearPointer(pointerId);
 end;
 
-{***************************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALVelocityTracker.addMovement(eventTime: Int64; pointerId: Int32; axis: Int32; position: Single);
 begin
   if ((pointerId < 0) or (pointerId > MAX_POINTER_ID)) then
@@ -951,7 +951,7 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************}
+{*****************************************************************************}
 function TALVelocityTracker.getVelocity(axis: Int32; pointerId: Int32): Single;
 begin
   if FConfiguredStrategies[axis] <> nil then
@@ -960,13 +960,13 @@ begin
     result := 0;
 end;
 
-{******************************************************}
+{****************************************************}
 function TALVelocityTracker.getActivePointerId: Int32;
 begin
   Result := FActivePointerId;
 end;
 
-{***************************************************************************************************************}
+{****************************************************************************************************************}
 constructor TALAccumulatingVelocityTrackerStrategy.Create(horizonNanos: Int64; maintainHorizonDuringAdd: Boolean);
 begin
   inherited Create;
@@ -992,14 +992,14 @@ begin
       FMovements[I].Clear;
 end;
 
-{********************************************************************************}
+{******************************************************************************}
 procedure TALAccumulatingVelocityTrackerStrategy.clearPointer(pointerId: Int32);
 begin
   if FMovements[pointerId] <> nil then
     FMovements[pointerId].Clear;
 end;
 
-{********************************************************************************************************************}
+{*****************************************************************************************************************}
 procedure TALAccumulatingVelocityTrackerStrategy.addMovement(eventTime: Int64; pointerId: Int32; position: Single);
 begin
   If FMovements[pointerId] = nil then
@@ -1029,7 +1029,7 @@ begin
       movements.popFront();
 end;
 
-{*******************************************************************************************************************}
+{**************************************************************************************************************************}
 constructor TALLeastSquaresVelocityTrackerStrategy.Create(degree: Int32{uint32_t}; weighting: TWeighting = TWeighting.NONE);
 begin
   inherited create(HORIZON{horizonNanos}, true{maintainHorizonDuringAdd});
@@ -1085,10 +1085,11 @@ end;
 //
 // http://en.wikipedia.org/wiki/Numerical_methods_for_linear_least_squares
 // http://en.wikipedia.org/wiki/Gram-Schmidt
-function solveLeastSquares(const x: TArray<Single>;
-                           const y: TArray<Single>;
-                           const w: TArray<Single>;
-                           n: Int32{uint32_t}): Single;
+function solveLeastSquares(
+           const x: TArray<Single>;
+           const y: TArray<Single>;
+           const w: TArray<Single>;
+           n: Int32{uint32_t}): Single;
 begin
   const m{: size_t} = length(x);
 
@@ -1271,7 +1272,7 @@ begin
   Result := (Sxy * Sx2x2 - Sx2y * Sxx2) / denominator;
 end;
 
-{*************************************************************************************}
+{************************************************************************************}
 function TALLeastSquaresVelocityTrackerStrategy.getVelocity(pointerId: Int32): Single;
 begin
   if (FMovements[pointerId] = nil) then
@@ -1314,7 +1315,7 @@ begin
   Result := solveLeastSquares(time, positions, w, degree + 1);
 end;
 
-{*******************************************************************************************************}
+{*************************************************************************************************************}
 function TALLeastSquaresVelocityTrackerStrategy.chooseWeight(pointerId: Int32; index: Int32{uint32_t}): Single;
 begin
   const movements = FMovements[pointerId];
@@ -1374,26 +1375,26 @@ begin
   end;
 end;
 
-{*************************************************************************}
+{********************************************************************************}
 constructor TALIntegratingVelocityTrackerStrategy.Create(degree: Int32{uint32_t});
 begin
   Inherited Create;
   FDegree := degree;
 end;
 
-{********************************************************}
+{****************************************************}
 procedure TALIntegratingVelocityTrackerStrategy.clear;
 begin
   FPointerIdBits.Clear;
 end;
 
-{*******************************************************************************}
+{*****************************************************************************}
 procedure TALIntegratingVelocityTrackerStrategy.clearPointer(pointerId: Int32);
 begin
   FPointerIdBits.clearBit(pointerId);
 end;
 
-{*******************************************************************************************************************}
+{****************************************************************************************************************}
 procedure TALIntegratingVelocityTrackerStrategy.addMovement(eventTime: Int64; pointerId: Int32; position: Single);
 begin
   if (FPointerIdBits.hasBit(pointerId)) then
@@ -1404,7 +1405,7 @@ begin
   FPointerIdBits.markBit(pointerId);
 end;
 
-{************************************************************************************}
+{***********************************************************************************}
 function TALIntegratingVelocityTrackerStrategy.getVelocity(pointerId: Int32): Single;
 begin
   if (FPointerIdBits.hasBit(pointerId)) then
@@ -1413,7 +1414,7 @@ begin
   Result := 0;
 end;
 
-{***********************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALIntegratingVelocityTrackerStrategy.initState(var state: TState; eventTime: Int64; pos: Single);
 begin
   state.updateTime := eventTime;
@@ -1424,7 +1425,7 @@ begin
   state.vel := 0;
 end;
 
-{*************************************************************************************************************}
+{************************************************************************************************************}
 procedure TALIntegratingVelocityTrackerStrategy.updateState(var state: TState; eventTime: Int64; pos: Single);
 begin
   const MIN_TIME_DELTA: Int64 = 2 * ALNanosPerMs;
@@ -1465,7 +1466,7 @@ begin
   inherited Create(HORIZON{horizonNanos}, false{maintainHorizonDuringAdd});
 end;
 
-{*******************************************************************************}
+{******************************************************************************}
 function TALLegacyVelocityTrackerStrategy.getVelocity(pointerId: Int32): Single;
 begin
   if (FMovements[pointerId] = nil) then
@@ -1527,7 +1528,7 @@ begin
   Result := 0;
 end;
 
-{**********************************************************************}
+{*************************************************************************}
 constructor TALImpulseVelocityTrackerStrategy.Create(deltaValues: Boolean);
 begin
   inherited Create(HORIZON{horizonNanos}, true{maintainHorizonDuringAdd});
@@ -1608,7 +1609,7 @@ begin
   Result := ALIfThen(work < 0, -1.0, 1.0) * sqrt(abs(work)) * sqrt2;
 end;
 
-{********************************************************************************}
+{*******************************************************************************}
 function TALImpulseVelocityTrackerStrategy.getVelocity(pointerId: Int32): Single;
 begin
   if (FMovements[pointerId] = nil) then

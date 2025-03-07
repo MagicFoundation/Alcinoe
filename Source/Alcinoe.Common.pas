@@ -1260,7 +1260,7 @@ begin
   Result := -1;
 end;
 
-{*************************************************}
+{************************************************************}
 constructor TALRingBuffer<T>.Create(const ACapacity: Integer);
 begin
   if ACapacity <= 0 then
@@ -1271,7 +1271,7 @@ begin
   FCount := 0;
 end;
 
-{*************************************************}
+{*************************************************************}
 function TALRingBuffer<T>.BufferIndex(Index: Integer): Integer;
 begin
   if (Index < 0) or (Index >= FCount) then
@@ -1279,37 +1279,37 @@ begin
   Result := (FBegin + Index) mod FCapacity;
 end;
 
-{*************************************************}
+{***************************************************}
 function TALRingBuffer<T>.GetItem(Index: Integer): T;
 begin
   Result := FBuffer[BufferIndex(Index)];
 end;
 
-{*************************************************}
+{*****************************************************************}
 procedure TALRingBuffer<T>.SetItem(Index: Integer; const Value: T);
 begin
   FBuffer[BufferIndex(Index)] := Value;
 end;
 
-{*************************************************}
+{***************************************}
 function TALRingBuffer<T>.Empty: Boolean;
 begin
   Result := FCount = 0;
 end;
 
-{*************************************************}
+{******************************************}
 function TALRingBuffer<T>.Capacity: Integer;
 begin
   Result := FCapacity;
 end;
 
-{*************************************************}
+{***************************************}
 function TALRingBuffer<T>.Count: Integer;
 begin
   Result := FCount;
 end;
 
-{*************************************************}
+{*********************************}
 function TALRingBuffer<T>.Front: T;
 begin
   if Empty then
@@ -1317,7 +1317,7 @@ begin
   Result := FBuffer[FBegin];
 end;
 
-{*************************************************}
+{********************************}
 function TALRingBuffer<T>.Back: T;
 begin
   if Empty then
@@ -1326,14 +1326,14 @@ begin
   Result := FBuffer[Index];
 end;
 
-{*************************************************}
+{*******************************}
 procedure TALRingBuffer<T>.Clear;
 begin
   FCount := 0;
   FBegin := 0;
 end;
 
-{*************************************************}
+{************************************}
 function TALRingBuffer<T>.PopFront: T;
 begin
   if Empty then
@@ -1343,7 +1343,7 @@ begin
   Dec(FCount);
 end;
 
-{*************************************************}
+{***********************************}
 function TALRingBuffer<T>.PopBack: T;
 begin
   if Empty then
@@ -1353,7 +1353,7 @@ begin
   Dec(FCount);
 end;
 
-{*************************************************}
+{***************************************************}
 procedure TALRingBuffer<T>.PushFront(const AItem: T);
 begin
   // Move mBegin one step backward (wrap-around if needed)
@@ -1364,7 +1364,7 @@ begin
   // Else when full, pushing to front overwrites the last element.
 end;
 
-{*************************************************}
+{**************************************************}
 procedure TALRingBuffer<T>.PushBack(const AItem: T);
 begin
   if FCount < FCapacity then begin

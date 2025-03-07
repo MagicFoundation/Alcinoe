@@ -7,6 +7,7 @@ interface
 uses
   iOSapi.Foundation,
   Macapi.ObjectiveC,
+  iOSapi.CocoaTypes,
   iOSapi.UIKit;
 
 {$M+}
@@ -59,6 +60,19 @@ type
     function coalescedTouchesForTouch(touch: UITouch): NSArray; cdecl;
   end;
   TALUIEvent = class(TOCGenericImport<ALUIEventClass, ALUIEvent>)  end;
+
+  {*************************************}
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-43458 has been resolved. If resolved, remove the class definition below.'}
+  {$ENDIF}
+  ALUIScreenClass = interface(UIScreenClass)
+    ['{9FF3822D-E17B-4F79-B097-26BB1B7182C1}']
+  end;
+  ALUIScreen = interface(UIScreen)
+    ['{A9F1AF20-25FE-4437-9E1B-746A04A94DE2}']
+    function maximumFramesPerSecond: NSInteger; cdecl;
+  end;
+  TALUIScreen = class(TOCGenericImport<ALUIScreenClass, ALUIScreen>)  end;
 
 implementation
 

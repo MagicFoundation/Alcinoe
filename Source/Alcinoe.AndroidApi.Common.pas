@@ -29,7 +29,6 @@ type
   JALDatePickerDialog = interface;
   JALKeyPreImeListener = interface;
   JALEditText = interface;
-  JLog = interface;
   JStatFs = interface;
   JAsyncTask_Status = interface;
   JAsyncTask = interface;
@@ -52,8 +51,6 @@ type
     ['{3448C3D0-1FAD-489B-88F5-329E09FE2CCF}']
     {class} function createFileFromURI(context: JContext; uri: Jnet_Uri; fileName: Jstring): boolean; cdecl;
   end;
-
-  {***********************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/util/ALFileUtil')]
   JALFileUtil = interface(JObject)
     ['{5F130085-03D3-4436-87BB-84A3BB9F22E0}']
@@ -64,8 +61,6 @@ type
   JALDatePickerDialogListenerClass = interface(IJavaClass)
     ['{3EDC638B-74FD-40D8-A09C-B92919C9D85B}']
   end;
-
-  {*********************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialogListener')]
   JALDatePickerDialogListener = interface(IJavaInstance)
     ['{9A145783-462B-4E51-AAFC-48F68C79C3EA}']
@@ -83,8 +78,6 @@ type
                        button_neutral_text: JCharSequence;
                        title: JCharSequence): JALDatePickerDialog; cdecl;
   end;
-
-  {*************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialog')]
   JALDatePickerDialog = interface(JObject)
     ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
@@ -100,8 +93,6 @@ type
   JALKeyPreImeListenerClass = interface(IJavaClass)
     ['{E01C70E2-4BBF-47CB-8713-5A73344E9EA9}']
   end;
-
-  {************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/edittext/ALKeyPreImeListener')]
   JALKeyPreImeListener = interface(IJavaInstance)
     ['{343578E2-962A-461E-ADD7-47A1E4BAA1D9}']
@@ -117,8 +108,6 @@ type
     {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer): JALEditText; cdecl; overload;
     {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer; defStyleRes: Integer): JALEditText; cdecl; overload;
   end;
-
-  {***************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/edittext/ALEditText')]
   JALEditText = interface(JEditText)
     ['{A3E765A1-44EB-45C0-9AA5-19A38C029CE5}']
@@ -127,55 +116,11 @@ type
   end;
   TJALEditText = class(TJavaGenericImport<JALEditTextClass, JALEditText>) end;
 
-  {*********************************}
-  JLogClass = interface(JObjectClass)
-    ['{E4B8D3E7-409F-41E4-A7A6-9E011CD9B87E}']
-    {class} function _GetVERBOSE: Integer; cdecl;
-    {class} function _GetDEBUG: Integer; cdecl;
-    {class} function _GetINFO: Integer; cdecl;
-    {class} function _GetWARN: Integer; cdecl;
-    {class} function _GetERROR: Integer; cdecl;
-    {class} function _GetASSERT: Integer; cdecl;
-    {class} function init: JLog; cdecl;
-    {class} function v(tag: JString; msg: JString): integer; cdecl; overload;
-    {class} function v(tag: JString; msg: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function d(tag: JString; msg: JString): integer; cdecl; overload;
-    {class} function d(tag: JString; msg: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function i(tag: JString; msg: JString): integer; cdecl; overload;
-    {class} function i(tag: JString; msg: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function w(tag: JString; msg: JString): integer; cdecl; overload;
-    {class} function w(tag: JString; msg: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function w(tag: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function e(tag: JString; msg: JString): integer; cdecl; overload;
-    {class} function e(tag: JString; msg: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function wtf(tag: JString; msg: JString): integer; cdecl; overload;
-    {class} function wtf(tag: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function wtf(tag: JString; msg: JString; tr: JThrowable): integer; cdecl; overload;
-    {class} function isLoggable(tag: JString; level: integer): boolean; cdecl;
-    {class} function getStackTraceString(tr: JThrowable): JString; cdecl;
-    {class} function println(priority: integer; tag: JString; msg: JString): integer; cdecl;
-    {class} property VERBOSE: Integer read _GetVERBOSE;
-    {class} property DEBUG: Integer read _GetDEBUG;
-    {class} property INFO: Integer read _GetINFO;
-    {class} property WARN: Integer read _GetWARN;
-    {class} property ERROR: Integer read _GetERROR;
-    {class} property ASSERT: Integer read _GetASSERT;
-  end;
-
-  {*********************************}
-  [JavaSignature('android/util/Log')]
-  JLog = interface(JObject)
-    ['{AED82B19-8B1E-4F35-85D9-851D6F1B4F54}']
-  end;
-  TJLog = class(TJavaGenericImport<JLogClass, JLog>) end;
-
   {************************************}
   JStatFsClass = interface(JObjectClass)
     ['{E5587205-C324-4FAF-A101-E31BCD83BD4D}']
     {class} function init(path: JString): JStatFs; cdecl; // public StatFs(String path)
   end;
-
-  {**********************************}
   [JavaSignature('android/os/StatFs')]
   JStatFs = interface(JObject)
     ['{121A2CDF-6B8A-4C8F-BE9A-B2DEDF861CFB}']
@@ -206,8 +151,6 @@ type
     {class} property PENDING: JAsyncTask_Status read _GetPENDING;
     {class} property RUNNING: JAsyncTask_Status read _GetRUNNING;
   end;
-
-  {********************************************}
   [JavaSignature('android/os/AsyncTask$Status')]
   JAsyncTask_Status = interface(JEnum)
     ['{96B0BCE7-1312-49B9-9F33-43541680B0E7}']
@@ -223,8 +166,6 @@ type
     {class} property SERIAL_EXECUTOR: JExecutor read _GetSERIAL_EXECUTOR;
     {class} property THREAD_POOL_EXECUTOR: JExecutor read _GetTHREAD_POOL_EXECUTOR;
   end;
-
-  {*************************************}
   [JavaSignature('android/os/AsyncTask')]
   JAsyncTask = interface(JObject)
     ['{8BC49850-F199-4620-BCFF-ACDA1D69417A}']
@@ -241,8 +182,6 @@ type
   JALBroadcastReceiverListenerClass = interface(IJavaClass)
     ['{64D38904-11AB-4B0E-B9C1-D5038273BC0D}']
   end;
-
-  {*******************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiverListener')]
   JALBroadcastReceiverListener = interface(IJavaInstance)
     ['{8AD95D78-A7FC-4613-8D94-55CC19EB1565}']
@@ -255,8 +194,6 @@ type
     ['{23BF821F-A433-4564-AD56-7704A58D66C9}']
     {class} function init: JALBroadcastReceiver; cdecl;
   end;
-
-  {***********************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiver')]
   JALBroadcastReceiver = interface(JBroadcastReceiver)
     ['{42427B26-C270-4832-8645-F788FCB549CB}']
@@ -269,8 +206,6 @@ type
     ['{B466FF95-339F-4060-965B-44350FDC2686}']
     {class} function getRuntime: JRuntime; cdecl;
   end;
-
-  {**********************************}
   [JavaSignature('java/lang/Runtime')]
   JRuntime = interface(JObject)
     ['{AB57684A-3434-4C09-ACD4-5EC5F220D02D}']
@@ -316,8 +251,6 @@ type
     {class} property CREATE_FLAG_LOW_POWER: Integer read _GetCREATE_FLAG_LOW_POWER;
     {class} property CREATE_FLAG_NONE: Integer read _GetCREATE_FLAG_NONE;
   end;
-
-  {**************************************************}
   [JavaSignature('android/renderscript/RenderScript')]
   JRenderScript = interface(JObject)
     ['{1375A3CE-12EA-4DB9-B20F-128B944A172B}']
@@ -338,8 +271,6 @@ type
   JBaseObjClass = interface(JObjectClass)
     ['{F1A3D5D0-1151-47D2-A690-B3B562F350CC}']
   end;
-
-  {*********************************************}
   [JavaSignature('android/renderscript/BaseObj')]
   JBaseObj = interface(JObject)
     ['{20615312-245C-4906-B481-80FDCA85B4B7}']
@@ -383,8 +314,6 @@ type
     {class} property USAGE_SCRIPT: Integer read _GetUSAGE_SCRIPT;
     {class} property USAGE_SHARED: Integer read _GetUSAGE_SHARED;
   end;
-
-  {************************************************}
   [JavaSignature('android/renderscript/Allocation')]
   JAllocation = interface(JBaseObj)
     ['{1A259581-F9C8-4808-99C1-63859107FE15}']
@@ -475,8 +404,6 @@ type
     {class} property MIPMAP_NONE: JAllocation_MipmapControl read _GetMIPMAP_NONE;
     {class} property MIPMAP_ON_SYNC_TO_TEXTURE: JAllocation_MipmapControl read _GetMIPMAP_ON_SYNC_TO_TEXTURE;
   end;
-
-  {**************************************************************}
   [JavaSignature('android/renderscript/Allocation$MipmapControl')]
   JAllocation_MipmapControl = interface(JEnum)
     ['{2381D33F-176C-4B5F-A896-F00D69E2B8A5}']
@@ -490,8 +417,6 @@ type
     {class} //function createXY(rs: JRenderScript; e: JElement; dimX: Integer; dimY: Integer): JType; cdecl;
     {class} //function createXYZ(rs: JRenderScript; e: JElement; dimX: Integer; dimY: Integer; dimZ: Integer): JType; cdecl;
   end;
-
-  {******************************************}
   [JavaSignature('android/renderscript/Type')]
   JType = interface(JBaseObj)
     ['{1EC7E148-3497-4D42-AF8C-67FF257EECFD}']
@@ -510,8 +435,6 @@ type
   JScriptClass = interface(JBaseObjClass)
     ['{3C4B94DB-AA9D-4EAE-BE4C-22FB4E0E6EAE}']
   end;
-
-  {********************************************}
   [JavaSignature('android/renderscript/Script')]
   JScript = interface(JBaseObj)
     ['{25CE110C-9510-469A-A5C5-957A802D881A}']
@@ -538,8 +461,6 @@ type
   JScriptIntrinsicClass = interface(JScriptClass)
     ['{EFFAD6DF-A3D4-461C-B594-851D221474ED}']
   end;
-
-  {*****************************************************}
   [JavaSignature('android/renderscript/ScriptIntrinsic')]
   JScriptIntrinsic = interface(JScript)
     ['{584A2682-B1D5-4DD4-A5DD-CBCF599E52E8}']
@@ -551,8 +472,6 @@ type
     ['{38491E8D-407C-4BA3-86D4-FE5A6419C4CB}']
     {class} function create(rs: JRenderScript; e: JElement): JScriptIntrinsicBlur; cdecl;
   end;
-
-  {*********************************************************}
   [JavaSignature('android/renderscript/ScriptIntrinsicBlur')]
   JScriptIntrinsicBlur = interface(JScriptIntrinsic)
     ['{63EE931E-7DE6-468A-B5A8-6ACC301BCAF7}']
@@ -638,8 +557,6 @@ type
     {class} //function createPixel(rs: JRenderScript; dt: JElement_DataType; dk: JElement_DataKind): JElement; cdecl;
     {class} //function createVector(rs: JRenderScript; dt: JElement_DataType; size: Integer): JElement; cdecl;
   end;
-
-  {*********************************************}
   [JavaSignature('android/renderscript/Element')]
   JElement = interface(JBaseObj)
     ['{47E2A1DE-1101-43E3-BF42-9F8128EDD03E}']
@@ -736,8 +653,6 @@ type
     //{class} property SHOW_INITIALIZED: Integer read _GetSHOW_INITIALIZED;
     //{class} property TRACE_COUNT_ALLOCS: Integer read _GetTRACE_COUNT_ALLOCS;
   end;
-
-  {*********************************}
   [JavaSignature('android/os/Debug')]
   JDebug = interface(JObject)
     ['{624F38B4-6EAE-4326-B01D-6E8498D5C321}']
@@ -760,7 +675,6 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialog', TypeInfo(Alcinoe.AndroidApi.Common.JALDatePickerDialog));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALKeyPreImeListener', TypeInfo(Alcinoe.AndroidApi.Common.JALKeyPreImeListener));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALEditText', TypeInfo(Alcinoe.AndroidApi.Common.JALEditText));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLog', TypeInfo(Alcinoe.AndroidApi.Common.JLog));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JStatFs', TypeInfo(Alcinoe.AndroidApi.Common.JStatFs));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask_Status', TypeInfo(Alcinoe.AndroidApi.Common.JAsyncTask_Status));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask', TypeInfo(Alcinoe.AndroidApi.Common.JAsyncTask));

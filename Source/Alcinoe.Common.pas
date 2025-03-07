@@ -768,7 +768,7 @@ uses
   Posix.Sched,
   Androidapi.JNI.JavaTypes,
   Androidapi.Helpers,
-  Alcinoe.AndroidApi.Common,
+  Androidapi.JNI.Util,
   Posix.Time,
   {$ENDIF}
   {$IF defined(IOS)}
@@ -2853,12 +2853,12 @@ begin
     if LMsg = '' then LMsg := '<empty>';
     if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
     case &Type of
-      TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.WARN: TJLog.JavaClass.w(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.ERROR: TJLog.JavaClass.e(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
+      TalLogType.VERBOSE: TJutil_Log.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.DEBUG: TJutil_Log.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.INFO: TJutil_Log.JavaClass.i(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.WARN: TJutil_Log.JavaClass.w(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.ERROR: TJutil_Log.JavaClass.e(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.ASSERT: TJutil_Log.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
     end;
     {$ELSEIF defined(IOS)}
     if LMsg <> '' then LMsg := Tag + ' | ' + LMsg

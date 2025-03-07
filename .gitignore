@@ -63,3 +63,4 @@ Dcu
 /Tools/NativeBridgeFileGenerator/OutputAndroid
 /Tools/NativeBridgeFileGenerator/OutputIOS
 /Tools/AppIconGenerator/Output
+/Tools/CodeProfiler/Data

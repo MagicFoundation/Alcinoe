@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 377
   Top = 296
   Caption = 'Alcinoe CodeProfiler'
-  ClientHeight = 800
+  ClientHeight = 900
   ClientWidth = 1080
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,12 +18,13 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 1080
-    Height = 800
+    Height = 868
     Align = alClient
     TabOrder = 0
     Properties.ActivePage = InstrumentationTabSheet
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 795
+    ExplicitHeight = 768
+    ClientRectBottom = 863
     ClientRectLeft = 5
     ClientRectRight = 1075
     ClientRectTop = 37
@@ -31,11 +32,12 @@ object MainForm: TMainForm
       Caption = 'Source Code Instrumentation'
       ImageIndex = 0
       OnResize = InstrumentationTabSheetResize
+      ExplicitHeight = 726
       object InstructionPanel: TdxPanel
         Left = 0
         Top = 0
         Width = 1070
-        Height = 385
+        Height = 424
         Align = alTop
         Color = 16448250
         TabOrder = 0
@@ -81,10 +83,10 @@ object MainForm: TMainForm
         object cxLabel3: TcxLabel
           AlignWithMargins = True
           Left = 16
-          Top = 74
+          Top = 107
           Margins.Left = 16
           Align = alTop
-          Caption = '1) Add Alcinoe profiler markers to your code.'
+          Caption = '2. Add Alcinoe profiler markers to your code.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -95,15 +97,16 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 2
           Transparent = True
+          ExplicitTop = 74
           Width = 1049
         end
         object cxLabel4: TcxLabel
           AlignWithMargins = True
           Left = 16
-          Top = 107
+          Top = 140
           Margins.Left = 16
           Align = alTop
-          Caption = '2) Recompile and run the app.'
+          Caption = '3. Recompile and run the application.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -114,17 +117,19 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 3
           Transparent = True
+          ExplicitTop = 107
           Width = 1049
         end
         object cxLabel5: TcxLabel
           AlignWithMargins = True
           Left = 16
-          Top = 140
+          Top = 173
           Margins.Left = 16
           Align = alTop
           Caption = 
-            '3) Place the generated performance file in CodeProfiler'#8217's data f' +
-            'older.'
+            '4. If you are using Android or iOS, send the app to the backgrou' +
+            'nd and then bring it back to the foreground to generate the perf' +
+            'ormance file.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -140,10 +145,10 @@ object MainForm: TMainForm
         object cxLabel6: TcxLabel
           AlignWithMargins = True
           Left = 16
-          Top = 173
+          Top = 285
           Margins.Left = 16
           Align = alTop
-          Caption = '4) Run the performance analysis.'
+          Caption = '6. Perform the performance analysis.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -159,7 +164,7 @@ object MainForm: TMainForm
         object cxLabel8: TcxLabel
           AlignWithMargins = True
           Left = 3
-          Top = 206
+          Top = 318
           Align = alTop
           Caption = 'Note:'
           ParentFont = False
@@ -172,19 +177,20 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 6
           Transparent = True
+          ExplicitTop = 206
           Width = 1062
         end
-        object cxLabel7: TcxLabel
+        object LastInstructionLabel: TcxLabel
           AlignWithMargins = True
           Left = 3
-          Top = 239
+          Top = 351
           Margins.Bottom = 8
           Align = alTop
           Caption = 
             'On Windows, the performance file is stored in the CodeProfiler d' +
             'ata folder if the app is running locally; otherwise, it is saved' +
-            ' in the user'#39's Downloads folder. On macOS, iOS, and Android, it ' +
-            'is always stored in the user'#39's Downloads folder.'
+            ' in the user'#39's document folder. On macOS, iOS, and Android, it i' +
+            's always stored in the user'#39's document folder.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -195,22 +201,16 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 7
           Transparent = True
+          ExplicitTop = 239
           Width = 1062
         end
-        object LastInstructionLabel: TcxLabel
+        object cxLabel13: TcxLabel
           AlignWithMargins = True
-          Left = 3
-          Top = 297
-          Margins.Top = 0
-          Margins.Bottom = 8
+          Left = 16
+          Top = 74
+          Margins.Left = 16
           Align = alTop
-          Caption = 
-            'On Windows and macOS, the performance file is saved when the app' +
-            ' is closed, whereas on Android and iOS, it is saved when the app' +
-            ' goes into the background. You can use a batch file, such as Dow' +
-            'nloadCodeProfilerProcMetricsDebug.bat, located in the ALFmxDynam' +
-            'icListBox demo, to automatically download the performance file f' +
-            'rom a connected Android device.'
+          Caption = '1. Specify the server IP and port for the listening process.'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWindowText
@@ -221,37 +221,64 @@ object MainForm: TMainForm
           Properties.WordWrap = True
           TabOrder = 8
           Transparent = True
-          Width = 1062
+          Width = 1049
+        end
+        object cxLabel14: TcxLabel
+          AlignWithMargins = True
+          Left = 16
+          Top = 229
+          Margins.Left = 16
+          Align = alTop
+          Caption = 
+            '5. If you specified the server IP and port in step 1, the perfor' +
+            'mance file will be received automatically. After receiving it, s' +
+            'imply reload the data; otherwise, download the data from the use' +
+            'r'#39's document folder and place it in the CodeProfiler data folder' +
+            '.'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -17
+          Style.Font.Name = 'Segoe UI'
+          Style.Font.Style = []
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          TabOrder = 9
+          Transparent = True
+          Width = 1049
         end
       end
       object dxPanel2: TdxPanel
         AlignWithMargins = True
         Left = 0
-        Top = 393
+        Top = 432
         Width = 1070
-        Height = 357
+        Height = 386
         Margins.Left = 0
         Margins.Top = 8
         Margins.Right = 0
         Margins.Bottom = 8
         Align = alClient
         TabOrder = 1
+        ExplicitTop = 393
+        ExplicitHeight = 325
         object SourcesPathMemo: TcxMemo
           AlignWithMargins = True
           Left = 8
-          Top = 90
+          Top = 164
           Margins.Left = 8
           Margins.Right = 8
           Margins.Bottom = 12
           Align = alClient
           TabOrder = 0
-          Height = 253
+          ExplicitHeight = 147
+          Height = 208
           Width = 1052
         end
         object cxLabel9: TcxLabel
           AlignWithMargins = True
           Left = 8
-          Top = 60
+          Top = 134
           Margins.Left = 8
           Margins.Top = 8
           Margins.Right = 8
@@ -266,6 +293,87 @@ object MainForm: TMainForm
         end
         object dxPanel3: TdxPanel
           Left = 0
+          Top = 95
+          Width = 1068
+          Height = 31
+          Align = alTop
+          Frame.Borders = []
+          LookAndFeel.NativeStyle = False
+          LookAndFeel.SkinName = 'Foggy'
+          TabOrder = 2
+          object HttpServerPortEdit: TcxMaskEdit
+            AlignWithMargins = True
+            Left = 504
+            Top = 0
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alLeft
+            Properties.MaskKind = emkRegExpr
+            Properties.EditMask = '[0-9]+'
+            Properties.OnChange = HttpServerPortEditPropertiesChange
+            TabOrder = 0
+            Width = 106
+          end
+          object cxLabel11: TcxLabel
+            Left = 461
+            Top = 0
+            Margins.Left = 8
+            Margins.Top = 8
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alLeft
+            Caption = 'Port'
+            Properties.WordWrap = True
+            TabOrder = 1
+            Width = 35
+          end
+          object HttpServerNameEdit: TcxMaskEdit
+            AlignWithMargins = True
+            Left = 95
+            Top = 0
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alLeft
+            TabOrder = 2
+            Width = 358
+          end
+          object cxLabel12: TcxLabel
+            AlignWithMargins = True
+            Left = 8
+            Top = 0
+            Margins.Left = 8
+            Margins.Top = 0
+            Margins.Right = 8
+            Margins.Bottom = 0
+            Align = alLeft
+            Caption = 'Server IP'
+            Properties.WordWrap = True
+            TabOrder = 3
+            Width = 71
+          end
+        end
+        object cxLabel10: TcxLabel
+          AlignWithMargins = True
+          Left = 8
+          Top = 60
+          Margins.Left = 8
+          Margins.Top = 8
+          Margins.Right = 8
+          Margins.Bottom = 8
+          Align = alTop
+          Caption = 
+            'Specify the IP address and port to automatically receive the per' +
+            'formance file, then update the markers in your code.'
+          Properties.WordWrap = True
+          TabOrder = 3
+          Width = 1052
+        end
+        object dxPanel1: TdxPanel
+          Left = 0
           Top = 0
           Width = 1068
           Height = 52
@@ -273,7 +381,7 @@ object MainForm: TMainForm
           Frame.Borders = []
           LookAndFeel.NativeStyle = False
           LookAndFeel.SkinName = 'Foggy'
-          TabOrder = 2
+          TabOrder = 4
           object InsertProfilerMarkersBtn: TcxButton
             Left = 8
             Top = 12
@@ -298,10 +406,7 @@ object MainForm: TMainForm
     object PerformanceAnalysisTabSheet: TcxTabSheet
       Caption = 'Performance Analysis'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 726
       object Panelfilter: TPanel
         Left = 0
         Top = 0
@@ -360,18 +465,18 @@ object MainForm: TMainForm
           Left = 326
           Top = 8
           Properties.MaskKind = emkRegExpr
-          Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,5})'
+          Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,4})'
           TabOrder = 3
-          TextHint = 'mm:ss:zzz.zzzzz'
+          TextHint = 'mm:ss:zzz.zzzz'
           Width = 177
         end
         object StartTimeStampMaxEdit: TcxMaskEdit
           Left = 698
           Top = 8
           Properties.MaskKind = emkRegExpr
-          Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,5})'
+          Properties.EditMask = '([0-5][0-9]):([0-5][0-9]):([0-9]{3})\.([0-9]{1,4})'
           TabOrder = 4
-          TextHint = 'mm:ss:zzz.zzzzz'
+          TextHint = 'mm:ss:zzz.zzzz'
           Width = 177
         end
       end
@@ -467,7 +572,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 241
         Width = 1070
-        Height = 517
+        Height = 585
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -476,6 +581,7 @@ object MainForm: TMainForm
         Font.Style = []
         ParentFont = False
         TabOrder = 2
+        ExplicitHeight = 485
         object GridTableViewProcMetrics: TcxGridTableView
           Navigator.Buttons.CustomButtons = <>
           ScrollbarAnnotations.CustomAnnotations = <>
@@ -510,6 +616,7 @@ object MainForm: TMainForm
           OptionsView.CellEndEllipsis = True
           OptionsView.ColumnAutoWidth = True
           OptionsView.Footer = True
+          OptionsView.GroupByBox = False
           OptionsView.HeaderEndEllipsis = True
           object GridTableViewProcMetricsColumnExecutionID: TcxGridColumn
             Caption = '_ExecutionID'
@@ -558,19 +665,43 @@ object MainForm: TMainForm
       end
     end
   end
+  object MainStatusBar: TdxStatusBar
+    Left = 0
+    Top = 868
+    Width = 1080
+    Height = 32
+    Panels = <
+      item
+        PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
+        Width = 400
+      end
+      item
+        PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
+      end>
+    ExplicitTop = 768
+  end
   object dxSkinController: TdxSkinController
     NativeStyle = False
     SkinName = 'Foggy'
-    Left = 552
-    Top = 632
+    Left = 768
+    Top = 120
   end
   object cxStyleRepository: TcxStyleRepository
-    Left = 672
-    Top = 632
+    Left = 888
+    Top = 120
     PixelsPerInch = 96
     object cxStyleTreeListProcMetricsBackground: TcxStyle
       AssignedValues = [svColor]
       Color = clWhite
     end
+  end
+  object IdHTTPServer: TIdHTTPServer
+    Bindings = <>
+    OnConnect = IdHTTPServerConnect
+    OnException = IdHTTPServerException
+    OnListenException = IdHTTPServerListenException
+    OnCommandGet = IdHTTPServerCommandGet
+    Left = 661
+    Top = 118
   end
 end

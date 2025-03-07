@@ -29,7 +29,9 @@ uses
   dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
   dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint, dxSkinWXI,
   dxSkinXmas2008Blue, cxTL, cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTreeView,
-  cxTLData, cxSplitter;
+  cxTLData, cxSplitter, IdBaseComponent, IdComponent, IdCustomTCPServer,
+  IdCustomHTTPServer, IdHTTPServer, IdContext, dxStatusBar, System.SysUtils,
+  System.SyncObjs;
 
 type
 
@@ -67,18 +69,27 @@ type
     SourcesPathMemo: TcxMemo;
     cxLabel9: TcxLabel;
     dxPanel3: TdxPanel;
-    InsertProfilerMarkersBtn: TcxButton;
-    RemoveProfilerMarkersBtn: TcxButton;
     cxSplitter1: TcxSplitter;
     cxStyleTreeListProcMetricsBackground: TcxStyle;
     TreeListProcMetricsColumnStartTimeStamp: TcxTreeListColumn;
     GridTableViewProcMetricsColumnStartTimestamp: TcxGridColumn;
-    cxLabel7: TcxLabel;
     LastInstructionLabel: TcxLabel;
     StartTimeStampMinEdit: TcxMaskEdit;
     Label1: TLabel;
     StartTimeStampMaxEdit: TcxMaskEdit;
     Label2: TLabel;
+    IdHTTPServer: TIdHTTPServer;
+    cxLabel10: TcxLabel;
+    dxPanel1: TdxPanel;
+    InsertProfilerMarkersBtn: TcxButton;
+    RemoveProfilerMarkersBtn: TcxButton;
+    HttpServerPortEdit: TcxMaskEdit;
+    cxLabel11: TcxLabel;
+    HttpServerNameEdit: TcxMaskEdit;
+    cxLabel12: TcxLabel;
+    MainStatusBar: TdxStatusBar;
+    cxLabel13: TcxLabel;
+    cxLabel14: TcxLabel;
     procedure InsertProfilerMarkersBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -96,20 +107,35 @@ type
     procedure GridTableViewProcMetricsColumnStartTimestampGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
     procedure TreeListProcMetricsColumnStartTimeStampGetDisplayText(Sender: TcxTreeListColumn; ANode: TcxTreeListNode; var Value: string);
     procedure PanelfilterResize(Sender: TObject);
+    procedure HttpServerPortEditPropertiesChange(Sender: TObject);
+    procedure IdHTTPServerCommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+    procedure IdHTTPServerException(AContext: TIdContext; AException: Exception);
+    procedure IdHTTPServerListenException(AThread: TIdListenerThread; AException: Exception);
+    procedure IdHTTPServerConnect(AContext: TIdContext);
   private
     const ConfigFilename = 'Config.ini';
   private
+    Type
+      TGoBackStackItem = record
+        TopRowIndex: Int64;
+        FocusedRowIndex: Int64;
+        SortColumnIndex: Integer;
+        SortOrder: TcxGridSortOrder;
+      end;
+  private
     FDataDir: String;
     FProcIDSequence: Integer;
-    FTreeListProcMetricsTailNode: TcxTreeListNode;
     FProcMetrics: TArray<TALProcMetrics>;
     FProcIDMap: TALHashedStringListA;
+    FTreeListProcMetricsTailNode: TcxTreeListNode;
     FFilterProcIDs: THashSet<Cardinal>;
     FFilterExecutionIDs: THashSet<Cardinal>;
     FFilterParentExecutionIDs: THashSet<Cardinal>;
     FFilterStartTimeStampMin: Int64;
     FFilterStartTimeStampMax: Int64;
     FOverrideFilterParentExecutionID: Cardinal;
+    FGoBackStack: TDictionary<Int64{ExecutionID}, TGoBackStackItem>;
+    FHttpServerCriticalSection: TCriticalSection;
     procedure ResetFilters;
     Procedure RemoveMarkers(const AFileName: String);
     Procedure InsertMarkers(const AFileName: String; Const AProcIDMap: TALStringListA);
@@ -126,7 +152,6 @@ uses
   System.Variants,
   System.UITypes,
   System.AnsiStrings,
-  System.SysUtils,
   System.IOUtils,
   System.Win.Registry,
   system.IniFiles,
@@ -233,6 +258,107 @@ begin
   end;
 end;
 
+{*************************************************************************************************************************************}
+procedure TMainForm.IdHTTPServerCommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+begin
+  FHttpServerCriticalSection.Acquire;
+  try
+    // We're only handling POST requests here.
+    if ARequestInfo.CommandType = hcPOST then
+    begin
+      // Define the file path where the POST content will be saved.
+      var LProcMetricsTmpFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename + '~tmp');
+      If TFile.Exists(LProcMetricsTmpFilename) then
+        TFile.Delete(LProcMetricsTmpFilename);
+      if Assigned(ARequestInfo.PostStream) then
+      begin
+        TThread.Synchronize(nil,
+          procedure
+          begin
+            MainStatusBar.Panels[1].Text := 'Receiving new performance file...';
+          end);
+        ARequestInfo.PostStream.Position := 0;
+        var LFileStream := TFileStream.Create(LProcMetricsTmpFilename, fmCreate);
+        try
+          // Save the raw POST content to the file.
+          LFileStream.CopyFrom(ARequestInfo.PostStream, ARequestInfo.PostStream.Size);
+        finally
+          LFileStream.Free;
+        end;
+        AResponseInfo.ResponseNo := 200;
+        AResponseInfo.ContentText := '';
+        TThread.Synchronize(nil,
+          procedure
+          begin
+            Try
+              var LProcMetricsFilename := TPath.Combine(FDataDir, ALCodeProfilerProcMetricsFilename);
+              If TFile.Exists(LProcMetricsFilename) then
+                TFile.Delete(LProcMetricsFilename);
+              TFile.Move(LProcMetricsTmpFilename, LProcMetricsFilename);
+              MainStatusBar.Panels[1].Text := 'New performance file received successfully. Please reload the data.';
+            except
+              on E: Exception do begin
+                MainStatusBar.Panels[1].Text := 'Error: '+E.Message;
+              end;
+            End;
+          end);
+      end
+      else
+      begin
+        AResponseInfo.ResponseNo := 400;
+        AResponseInfo.ContentText := 'No POST content received.';
+        TThread.Synchronize(nil,
+          procedure
+          begin
+            MainStatusBar.Panels[1].Text := 'Error: No POST content received.';
+          end);
+      end;
+    end
+    else
+    begin
+      AResponseInfo.ResponseNo := 405;
+      AResponseInfo.ContentText := 'Method not allowed.';
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          MainStatusBar.Panels[1].Text := 'Error: Method not allowed.';
+        end);
+    end;
+  finally
+    FHttpServerCriticalSection.Release;
+  end;
+end;
+
+{************************************************************}
+procedure TMainForm.IdHTTPServerConnect(AContext: TIdContext);
+begin
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      MainStatusBar.Panels[1].Text := 'Receiving new performance file...';
+    end);
+end;
+
+{*************************************************************************************}
+procedure TMainForm.IdHTTPServerException(AContext: TIdContext; AException: Exception);
+begin
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      MainStatusBar.Panels[1].Text := 'Error: '+AException.Message;
+    end);
+end;
+
+{*************************************************************************************************}
+procedure TMainForm.IdHTTPServerListenException(AThread: TIdListenerThread; AException: Exception);
+begin
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      MainStatusBar.Panels[1].Text := 'Error: '+AException.Message;
+    end);
+end;
+
 {*******************************************************************************************}
 procedure TMainForm.InsertMarkers(const AFileName: String; Const AProcIDMap: TALStringListA);
 
@@ -246,6 +372,8 @@ type
 
 begin
   RemoveMarkers(AFileName);
+  var LIsDPR := ALSameTextW(ALExtractFileExt(AFileName), '.dpr');
+  var LHttpServerNameAdded := False;
   var LUnitName := ALExtractFileName(AnsiString(AFileName), true{RemoveFileExt});
   var LUseAdded := False;
   var LAnonymousMethodSequence := 0;
@@ -269,6 +397,20 @@ begin
         Insert('{ALCodeProfiler>>}{$DEFINE ALCodeProfiler}Alcinoe.CodeProfiler,{<<ALCodeProfiler}', LNewLine, length(LCurrentProcIndent + 'uses')+1);
         LSourceCode[i] := LNewLine;
         LUseAdded := True;
+        Continue;
+      end;
+
+      // Handle "begin" in DPR
+      if (LIsDPR) and
+         (not LHttpServerNameAdded) and
+         (ALPosIgnoreCaseA('begin', LLine) = 1) then begin
+        if (ALTrim(HttpServerNameEdit.Text) <> '') and
+           (ALTrim(HttpServerPortEdit.Text) <> '') then begin
+          var LNewLine := LLine;
+          Insert('{ALCodeProfiler>>}ALCodeProfilerServerName := ''http://'+ALTrim(AnsiString(HttpServerNameEdit.Text))+':'+ALTrim(AnsiString(HttpServerPortEdit.Text))+''';{<<ALCodeProfiler}', LNewLine, length('begin')+1);
+          LSourceCode[i] := LNewLine;
+        end;
+        LHttpServerNameAdded := True;
         Continue;
       end;
 
@@ -434,6 +576,8 @@ procedure TMainForm.InsertProfilerMarkersBtnClick(Sender: TObject);
 begin
   var LIniFile := TIniFile.Create(TPath.Combine(FDataDir, ConfigFilename));
   try
+    LIniFile.WriteString('General','ServerName',HttpServerNameEdit.Text);
+    LIniFile.WriteString('General','ServerPort',HttpServerPortEdit.Text);
     LIniFile.WriteString('General','SourcesPath',ALStringReplaceW(ALTrim(SourcesPathMemo.Text), #13#10, ';', [RfReplaceALL]));
   finally
     ALFreeAndNil(LIniFile);
@@ -471,15 +615,7 @@ begin
         'project and run it. After you close the application (or move it '+
         'between background and foreground on Android/iOS), a performance '+
         'file (ALCodeProfilerProcMetrics.dat) will be generated in the user''s '+
-        'download folder.'#13#10+
-        #13#10+
-        'You need to copy this file into the data subfolder where Alcinoe '+
-        'Code Profiler is located. Once copied, you can perform a performance '+
-        'analysis.'#13#10+
-        #13#10+
-        'Note: On Windows, the ALCodeProfilerProcMetrics.dat file is '+
-        'directly saved in the data subfolder of Alcinoe Code Profiler, '+
-        'so no manual copying is required.',
+        'document folder.',
         mtInformation,
         [mbOK], 0);
   Finally
@@ -584,10 +720,15 @@ begin
     FFilterParentExecutionIDs.Add(0);
 
     // Reset TreeListProcMetrics
+    FTreeListProcMetricsTailNode := nil;
     TreeListProcMetrics.Clear;
+    FGoBackStack.Clear;
 
     // Reset the grid
     Refresh;
+
+    // Clear the StatusBar
+    MainStatusBar.Panels[1].Text := '';
 
   Finally
     LoadDataBtn.Cursor := crDefault;
@@ -611,16 +752,21 @@ end;
 {**********************************************}
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  Setlength(FProcMetrics, 0);
-  FProcIDSequence := 0;
-  FProcIDMap := TALHashedStringListA.Create;
   FDataDir := ALGetModulePathW + 'data\';
+  FProcIDSequence := 0;
+  Setlength(FProcMetrics, 0);
+  FProcIDMap := TALHashedStringListA.Create;
+  FTreeListProcMetricsTailNode := nil;
   FFilterProcIDs := THashSet<Cardinal>.Create;
   FFilterExecutionIDs := THashSet<Cardinal>.Create;
   FFilterParentExecutionIDs := THashSet<Cardinal>.Create;
-  ResetFilters;
   FFilterParentExecutionIDs.Add(0);
-  FTreeListProcMetricsTailNode := nil;
+  FFilterStartTimeStampMin := 0;
+  FFilterStartTimeStampMax := 0;
+  FOverrideFilterParentExecutionID := 0;
+  FGoBackStack := TDictionary<Int64{ExecutionID}, TGoBackStackItem>.Create;
+  FHttpServerCriticalSection := TCriticalSection.Create;
+  //--
   TreeListProcMetricsColumnExecutionID.Visible := False;
   GridTableViewProcMetricsColumnExecutionID.Visible := False;
   If not TDirectory.Exists(FDataDir) then TDirectory.CreateDirectory(FDataDir);
@@ -638,7 +784,9 @@ begin
   end;
   var LIniFile := TIniFile.Create(TPath.Combine(FDataDir, ConfigFilename));
   try
-    SourcesPathMemo.Text := ALStringReplaceW(LIniFile.ReadString('General','SourcesPath', ''), ';', #13#10, [RfReplaceALL]);
+    HttpServerNameEdit.Text := LIniFile.ReadString('General','ServerName', '');
+    HttpServerPortEdit.Text := LIniFile.ReadString('General','ServerPort', '8080');
+    SourcesPathMemo.Text := ALStringReplaceW(LIniFile.ReadString('General','SourcesPath', '..\..\Source\;..\..\Embarcadero\Athens\fmx\;..\..\Demos\ALFmxDynamicListBox\_Source\'), ';', #13#10, [RfReplaceALL]);
   finally
     ALFreeAndNil(LIniFile);
   end;
@@ -654,6 +802,8 @@ begin
   ALFreeAndNil(FFilterProcIDs);
   ALFreeAndNil(FFilterExecutionIDs);
   ALFreeAndNil(FFilterParentExecutionIDs);
+  ALFreeAndNil(FGoBackStack);
+  ALFreeAndNil(FHttpServerCriticalSection);
 end;
 
 {*******************************************************}
@@ -665,6 +815,22 @@ procedure TMainForm.GridTableViewProcMetricsCellDblClick(
             var AHandled: Boolean);
 begin
   if ACellViewInfo.GridRecord <> nil then begin
+    var LGoBackStackItem: TGoBackStackItem;
+    LGoBackStackItem.TopRowIndex := GridTableViewProcMetrics.Controller.TopRowIndex;
+    LGoBackStackItem.FocusedRowIndex := GridTableViewProcMetrics.Controller.FocusedRowIndex;
+    LGoBackStackItem.SortColumnIndex := -1;
+    LGoBackStackItem.SortOrder := TcxGridSortOrder.soNone;
+    for var i := 0 to GridTableViewProcMetrics.ColumnCount - 1 do begin
+      var LColumn := GridTableViewProcMetrics.Columns[i];
+      if LColumn.SortIndex <> -1 then begin
+        LGoBackStackItem.SortColumnIndex := i;
+        LGoBackStackItem.SortOrder := LColumn.SortOrder;
+        break;
+      end;
+    end;
+    FGoBackStack.Remove(FOverrideFilterParentExecutionID);
+    FGoBackStack.add(FOverrideFilterParentExecutionID, LGoBackStackItem);
+    //--
     FOverrideFilterParentExecutionID := ACellViewInfo.GridRecord.Values[GridTableViewProcMetricsColumnExecutionID.Index];
     if FTreeListProcMetricsTailNode = nil then FTreeListProcMetricsTailNode := TreeListProcMetrics.Add
     else FTreeListProcMetricsTailNode := TreeListProcMetrics.AddChild(FTreeListProcMetricsTailNode);
@@ -679,10 +845,8 @@ begin
   end;
 end;
 
-{*****************************************************************************}
-procedure TMainForm.GridTableViewProcMetricsColumnStartTimestampGetDisplayText(
-            Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord;
-            var AText: string);
+{**************************************************************************************************************************************************************}
+procedure TMainForm.GridTableViewProcMetricsColumnStartTimestampGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
 begin
   var LVariant := ARecord.Values[Sender.Index];
   If VarIsNull(LVariant) then exit;
@@ -693,8 +857,21 @@ begin
   LMilliseconds := LMilliseconds - (LMinutes * 1000 * 60);
   var LSeconds: integer := Trunc(LMilliseconds) div 1000;
   LMilliseconds := LMilliseconds - (LSeconds * 1000);
-  var LMicroSec: integer := Round(Frac(LMilliseconds) * 100000);
-  AText := ALFormatW({'%.2d:'+}'%.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LMicroSec])
+  var LHundredNanoseconds: integer := Round(Frac(LMilliseconds) * 10000);
+  AText := ALFormatW({'%.2d:'+}'%.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds])
+end;
+
+{**********************************************************************}
+procedure TMainForm.HttpServerPortEditPropertiesChange(Sender: TObject);
+begin
+  IdHTTPServer.Active := False;
+  if ALTrim(HttpServerPortEdit.Text) <> '' then begin
+    IdHTTPServer.DefaultPort := ALStrToInt(ALTrim(HttpServerPortEdit.Text));
+    IdHTTPServer.Active := True;
+    MainStatusBar.Panels[0].Text := 'Listening on port ' + HttpServerPortEdit.Text;
+  end
+  else MainStatusBar.Panels[0].Text := 'Not listening';
+  MainStatusBar.Panels[1].Text := '';
 end;
 
 {**********************************************************************************************************************************************}
@@ -709,8 +886,8 @@ begin
   LMilliseconds := LMilliseconds - (LMinutes * 1000 * 60);
   var LSeconds: integer := Trunc(LMilliseconds) div 1000;
   LMilliseconds := LMilliseconds - (LSeconds * 1000);
-  var LMicroSec: integer := Round(Frac(LMilliseconds) * 100000);
-  Value := ALFormatW({'%.2d:'+}'%.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LMicroSec])
+  var LHundredNanoseconds: integer := Round(Frac(LMilliseconds) * 10000);
+  Value := ALFormatW({'%.2d:'+}'%.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds])
 end;
 
 {***************************************************************}
@@ -724,11 +901,34 @@ begin
     FTreeListProcMetricsTailNode.DeleteChildren;
   end
   else begin
+    if FTreeListProcMetricsTailNode = nil then exit;
     FOverrideFilterParentExecutionID := 0;
     FTreeListProcMetricsTailNode := nil;
     TreeListProcMetrics.Clear;
   end;
-  Refresh;
+
+  var LGoBackStackItem: TGoBackStackItem;
+  if FGoBackStack.TryGetValue(FOverrideFilterParentExecutionID, LGoBackStackItem) then begin
+    for var i := 0 to GridTableViewProcMetrics.ColumnCount - 1 do begin
+      if i = LGoBackStackItem.SortColumnIndex then begin
+        GridTableViewProcMetrics.Columns[i].SortIndex := 0;
+        GridTableViewProcMetrics.Columns[i].SortOrder := LGoBackStackItem.SortOrder;
+      end
+      else begin
+        GridTableViewProcMetrics.Columns[i].SortIndex := -1;
+        GridTableViewProcMetrics.Columns[i].SortOrder := TcxGridSortOrder.soNone;
+      end;
+    end;
+    Refresh;
+    GridTableViewProcMetrics.Controller.TopRowIndex := LGoBackStackItem.TopRowIndex;
+    GridTableViewProcMetrics.Controller.FocusedRowIndex := LGoBackStackItem.FocusedRowIndex;
+  end
+  else
+    Refresh;
+
+  if FOverrideFilterParentExecutionID = 0 then
+    FGoBackStack.Clear;
+  GridProcMetrics.SetFocus;
 end;
 
 {*******************************************************}
@@ -741,12 +941,12 @@ procedure TMainForm.ApplyFilterBtnClick(Sender: TObject);
     var LParts: TArray<string>;
     LParts := ALTrim(ATimeStr).Split([':', '.']);
     if Length(LParts) <> 4 then
-      raise Exception.Create('Invalid time format. Expected "mm:ss:zzz.zzzzz"');
+      raise Exception.Create('Invalid time format. Expected "mm:ss:zzz.zzzz"');
     var LMinutes := StrToInt(LParts[0]);
     var LSeconds := StrToInt(LParts[1]);
     var LMilliseconds := StrToInt(LParts[2]);
-    var LMicroseconds := StrToInt(LParts[3]);
-    Result := (LMinutes * 60 * 1000 * 10000) + (LSeconds * 1000 * 10000) + LMilliseconds * 10000 + LMicroseconds;
+    var LHundredNanoseconds := StrToInt(LParts[3]);
+    Result := (LMinutes * 60 * 1000 * 10000) + (LSeconds * 1000 * 10000) + LMilliseconds * 10000 + LHundredNanoseconds;
   end;
 
 begin
@@ -771,6 +971,8 @@ begin
       Finally
         ALFreeAndNil(LProcNames);
       End;
+      if FFilterProcIDs.Count = 0 then
+        FFilterProcIDs.Add(ALMaxUInt);
     end;
 
     if (FFilterStartTimeStampMin > 0) or
@@ -802,6 +1004,8 @@ begin
       Finally
         ALFreeAndNil(LExecutionDict);
       End;
+      if FFilterExecutionIDs.Count = 0 then
+        FFilterExecutionIDs.Add(ALMaxUInt);
     end;
 
     if (FFilterProcIDs.Count = 0) and
@@ -810,6 +1014,8 @@ begin
 
     FTreeListProcMetricsTailNode := nil;
     TreeListProcMetrics.Clear;
+    FGoBackStack.Clear;
+
     Refresh;
 
   Finally

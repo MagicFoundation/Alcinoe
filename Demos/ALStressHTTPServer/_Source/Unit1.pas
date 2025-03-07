@@ -176,7 +176,7 @@ type
     StopOnError: Boolean;
     DoLikeaSpider: Boolean;
     DelayBetweenEachCall: integer;
-    LstUrl: TALAVLStringListA;
+    LstUrl: TALHashedStringListA;
     MaxHttpRequest: Integer;
     Rank: integer;
     procedure Execute; override;
@@ -472,7 +472,7 @@ begin
   doLikeASpider := False;
   StopOnError := False;
   DelayBetweenEachCall := 0;
-  LstUrl := TALAVLStringListA.Create;
+  LstUrl := TALHashedStringListA.Create;
   LstUrl.Duplicates := DupIgnore;
   lstUrl.NameValueSeparator := #1;
   MaxHttpRequest := 0;

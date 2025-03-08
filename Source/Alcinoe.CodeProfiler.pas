@@ -104,12 +104,12 @@ Type
 threadvar
   ALProcMetricsStack: TALProcMetricsStack;
   ALProcMetricsHistory: TALProcMetricsHistory;
+  ALIsInCodeProfiler: Boolean;
 
 {*}
 var
   ALProcMetricsHistories: TList<TALProcMetricsHistory>;
   ALCodeProfilerEnabled: Boolean;
-  ALIsInCodeProfiler: Boolean;
   ALProcMetricsLock: TLightweightMREW;
   ALProcMetricsFilename: String;
   {$IF defined(IOS) or defined(ANDROID)}
@@ -288,7 +288,7 @@ begin
       LGuid.D4[4], LGuid.D4[5], LGuid.D4[6], LGuid.D4[7]]);
     var LTmpProcMetricsFilename := ALProcMetricsFilename + '~' + LGuidStr;
     TFile.Move(ALProcMetricsFilename, LTmpProcMetricsFilename);
-    {$IF (not defined(IOS)) and (not defined(ANDROID))}
+    {$IF defined(IOS) or defined(ANDROID)}
     TThread.CreateAnonymousThread(
       procedure
       begin
@@ -314,7 +314,7 @@ begin
           TFile.Delete(LTmpProcMetricsFilename);
           LHTTPClient.Free;
         end;
-      {$IF (not defined(IOS)) and (not defined(ANDROID))}
+      {$IF defined(IOS) or defined(ANDROID)}
       end).Start;
     {$ENDIF}
   end;
@@ -493,9 +493,6 @@ end;
 
 initialization
   ALIsInCodeProfiler := False;
-  {$IF defined(IOS) or defined(ANDROID)}
-  ALCodeProfilerAppActivatedBefore := False;
-  {$ENDIF}
   ALCodeProfilerAppStartTimeStamp := TStopWatch.GetTimeStamp;
   TALStopWatchProcMetrics.ExecutionIDSequence := 0;
   //ALProcMetricsLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
@@ -510,6 +507,7 @@ initialization
   ALProcMetricsHistories.Add(ALProcMetricsHistory);
   //--
   {$IF defined(IOS) or defined(ANDROID)}
+  ALCodeProfilerAppActivatedBefore := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALCodeProfilerApplicationEventHandler);
   {$ENDIF}
 

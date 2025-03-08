@@ -4398,7 +4398,7 @@ type
   private
     class var DisplayDefaultRefreshRate: single;
   private
-    fDebugFpsStarted: integer;
+    fDebugFpsStarted: Boolean;
     fDebugFpsCount: integer;
     fDebugFpsStopWatch: TstopWatch;
     fDebugFpsRenderTimeStopWatch: TstopWatch;
@@ -4661,7 +4661,12 @@ uses
   Androidapi.JNIBridge,
   {$ENDIF}
   {$IF defined(IOS)}
+  Macapi.Helpers,
+  Macapi.ObjectiveC,
+  iOSApi.Foundation,
+  iOSapi.Helpers,
   iOSapi.CoreGraphics,
+  Alcinoe.iOSapi.UIKit,
   Alcinoe.iOSApi.AudioToolbox,
   {$ENDIF}
   {$IF DEFINED(ALMacOS)}
@@ -21204,8 +21209,8 @@ begin
               LMainContent := nil;
             end;
           finally
-            ALfreeAndNil(LMainContent);
-            ALFreeAndNil(LContext);
+            ALfreeAndNil(LMainContent, true{ADelayed});
+            ALFreeAndNil(LContext, true{ADelayed});
           End;
         end);
       AContext := nil; // AContext will be free by TThread.queue
@@ -21525,7 +21530,7 @@ begin
   inherited create(AOwner);
   AutoSize := False;
   {$IFDEF DEBUG}
-  fDebugFpsStarted := 0;
+  fDebugFpsStarted := False;
   fDebugFpsCount := 0;
   //fDebugFpsStopWatch
   //fDebugFpsRenderTimeStopWatch
@@ -21749,7 +21754,12 @@ begin
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
     fMouseDownPos := TpointF.Create(X,Y);
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseDown(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseDown(X, Y);
+    {$ENDIF}
   end;
 end;
 
@@ -21777,7 +21787,12 @@ begin
       fScrollCapturedByMe := True;
       TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(True));
     end;
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseMove(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseMove(X, Y);
+    {$ENDIF}
   end;
 end;
 
@@ -21791,7 +21806,12 @@ begin
   {$ENDIF}
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     FScrollCapturedByMe := False;
+    {$IF defined(ANDROID) or defined(IOS)}
+    if form <> nil then
+      ScrollEngine.MouseUp(form.Handle);
+    {$ELSE}
     ScrollEngine.MouseUp(X, Y);
+    {$ENDIF}
     FHandleMouseEvents := False;
   end;
 end;
@@ -22106,10 +22126,10 @@ begin
   if ScrollEngine.TouchTracking = [] then exit;
 
   fDebugFpsRenderTimeStopWatch.stop;
-  if (fDebugFpsStarted = 2) and
+  if (fDebugFpsStarted) and
      (not ScrollEngine.down) and
      (abs(ScrollEngine.CurrentVelocity.y) > 100) and
-     (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds > 1500{1000*1.5} / DisplayDefaultRefreshRate) then begin
+     (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds > 1200{1000*1.2} / DisplayDefaultRefreshRate) then begin
     ALLog(
       classname + '.fps',
       'Drop frame detected | '  +
@@ -22119,18 +22139,8 @@ begin
   end;
 
   if (abs(ScrollEngine.CurrentVelocity.y) > 100) and (not ScrollEngine.down) then begin
-    // When the user moves the mouse, the repaint is triggered by the mousemove event.
-    // However, when the user stops touching the screen, the repaint is triggered by
-    // the ScrollEngine Choreographer. The issue is that these two events do not occur
-    // at the same time. As a result, when the user stops touching the screen and the
-    // ScrollEngine Choreographer takes over to request a repaint, there may be a delay
-    // of up to one frame. This is why we need to ignore the very first frame after
-    // the user stops touching the screen.
-    if fDebugFpsStarted = 0 then begin
-      fDebugFpsStarted := 1;
-    end
-    else if fDebugFpsStarted = 1 then begin
-      fDebugFpsStarted := 2;
+    If not fDebugFpsStarted then begin
+      fDebugFpsStarted := true;
       fDebugFpsCount := 0;
       fDebugFpsStopWatch := TstopWatch.StartNew;
     end
@@ -22138,10 +22148,7 @@ begin
       inc(fDebugFpsCount);
     end;
   end
-  else if fDebugFpsStarted = 1 then begin
-    fDebugFpsStarted := 0;
-  end
-  else if fDebugFpsStarted = 2 then begin
+  else if fDebugFpsStarted then begin
     fDebugFpsStopWatch.stop;
     inc(fDebugFpsCount);
     if fDebugFpsStopWatch.Elapsed.totalMilliseconds > 0 then begin
@@ -22154,7 +22161,7 @@ begin
         'System default: ' + ALFormatFloatW('0.##', DisplayDefaultRefreshRate, ALDefaultFormatSettingsW) + ' fps',
         TalLogType.verbose);
     end;
-    fDebugFpsStarted := 0;
+    fDebugFpsStarted := False;
   end;
   fDebugFpsRenderTimeStopWatch := TstopWatch.StartNew;
 
@@ -22967,7 +22974,7 @@ initialization
   //https://developer.android.com/media/optimize/performance/frame-rate
   TALDynamicListBoxView.DisplayDefaultRefreshRate := TAndroidHelper.Display.getRefreshRate;
   {$ELSEIf defined(IOS)}
-  TALDynamicListBoxView.DisplayDefaultRefreshRate := TiOSHelper.MainScreen.maximumFramesPerSecond;
+  TALDynamicListBoxView.DisplayDefaultRefreshRate := TALUIScreen.Wrap(NSObjectToID(TiOSHelper.MainScreen)).maximumFramesPerSecond;
   {$ELSE}
   TALDynamicListBoxView.DisplayDefaultRefreshRate := 60
   {$ENDIF}

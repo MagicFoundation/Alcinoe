@@ -45,6 +45,7 @@ uses
   System.Math,
   System.Classes,
   System.sysutils,
+  System.Character,
   System.AnsiStrings,
   {$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
   System.Win.Comobj,
@@ -1157,125 +1158,158 @@ end;
 {*************************************************}
 procedure ALJavascriptDecodeV(Var Str: AnsiString);
 
-var CurrPos : Integer;
-    pResTail: PansiChar;
-    pResHead: pansiChar;
-    Ch1, Ch2, Ch3, Ch4, Ch5: ansiChar;
-    IsUniqueString: boolean;
+var
+  CurrPos : Integer;
+  pResTail: PAnsiChar;
+  pResHead: PAnsiChar;
+  Ch1, Ch2, Ch3, Ch4, Ch5: ansiChar;
+  IsUniqueString: boolean;
+  Ln: integer;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _GenerateUniqueString;
-    var Padding: integer;
-    begin
-      Padding := PResTail - PResHead;
-      UniqueString(Str);
-      PResHead := PAnsiChar(Str);
-      PResTail := PResHead + Padding;
-      IsUniqueString := true;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _GenerateUniqueString;
+  var Padding: integer;
+  begin
+    Padding := PResTail - PResHead;
+    UniqueString(Str);
+    PResHead := PAnsiChar(Str);
+    PResTail := PResHead + Padding;
+    IsUniqueString := true;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _OctToInt(I: integer; Ch: ansiChar): integer;
+  begin
+    Result := I * 8 + Ord(Ch) - Ord('0');
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _HexToInt(I: integer; Ch: ansiChar): integer;
+  begin
+    case Ch of
+      '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+      'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+      'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+      else raise EALException.Create('Wrong HEX-character found');
     end;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    function _OctToInt(I: integer; Ch: ansiChar): integer;
-    begin
-      Result := I * 8 + Ord(Ch) - Ord('0');
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyCurrPosCharToResult;
+  Begin
+    if IsUniqueString then pResTail^ := Str[CurrPos];
+    inc(pResTail);
+    inc(CurrPos);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    function _HexToInt(I: integer; Ch: ansiChar): integer;
-    begin
-      case Ch of
-        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
-        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
-        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
-        else raise EALException.Create('Wrong HEX-character found');
-      end;
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyAnsiCharToResult(aCharInt: Integer; aNewCurrPos: integer);
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    pResTail^ := AnsiChar(aCharInt);
+    inc(pResTail);
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyCurrPosCharToResult;
-    Begin
-      if IsUniqueString then pResTail^ := Str[CurrPos];
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
+  var LString: AnsiString;
+      K: integer;
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    LString := AnsiString(Char(aCharInt));
+    For k := low(LString) to high(LString) do begin
+      pResTail^ := LString[k];
       inc(pResTail);
-      inc(CurrPos);
     end;
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyAnsiCharToResult(aCharInt: Integer; aNewCurrPos: integer);
-    begin
-      if not IsUniqueString then _GenerateUniqueString;
-      pResTail^ := AnsiChar(aCharInt);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyUnicodeCharToResult(aHighSurrogateInt, aLowSurrogateInt: Integer; aNewCurrPos: integer); overload;
+  var LString: AnsiString;
+      K: integer;
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    LString := AnsiString(Char.ConvertFromUtf32(Char.ConvertToUtf32(char(aHighSurrogateInt), char(aLowSurrogateInt))));
+    For k := low(LString) to high(LString) do begin
+      pResTail^ := LString[k];
       inc(pResTail);
-      CurrPos := aNewCurrPos;
     end;
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
-    var LString: AnsiString;
-        K: integer;
-    begin
-      if not IsUniqueString then _GenerateUniqueString;
-      LString := AnsiString(Char(aCharInt));
-      For k := low(LString) to high(LString) do begin
-        pResTail^ := LString[k];
-        inc(pResTail);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyUnicodeCharToResult; overload;
+  var I,J: integer;
+  Begin
+    I := _HexToInt(0, ch2);
+    I := _HexToInt(I, ch3);
+    I := _HexToInt(I, ch4);
+    I := _HexToInt(I, ch5);
+    // Special case I is a high surrogate.
+    if (I >= $D800{MinHighSurrogate}) and (I <= $DBFF{MaxHighSurrogate}) and
+       (CurrPos + 6 <= Ln - 5) and
+       (Str[CurrPos + 6]='\') and
+       (Str[CurrPos + 7]='u') then begin
+      Ch2 := Str[CurrPos + 8];
+      Ch3 := Str[CurrPos + 9];
+      Ch4 := Str[CurrPos + 10];
+      Ch5 := Str[CurrPos + 11];
+      J := _HexToInt(0, ch2);
+      J := _HexToInt(J, ch3);
+      J := _HexToInt(J, ch4);
+      J := _HexToInt(J, ch5);
+      // Verify that the low surrogate is valid.
+      if (J >= $DC00{MinLowSurrogate}) and (J <= $DFFF{MaxLowSurrogate}) then begin
+        _CopyUnicodeCharToResult(I, j, CurrPos+12);
+        exit;
       end;
-      CurrPos := aNewCurrPos;
     end;
+    _CopyUnicodeCharToResult(I, CurrPos+6);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyUnicodeCharToResult; overload;
-    var I: integer;
-    Begin
-      I := _HexToInt(0, ch2);
-      I := _HexToInt(I, ch3);
-      I := _HexToInt(I, ch4);
-      I := _HexToInt(I, ch5);
-      _CopyUnicodeCharToResult(I, CurrPos+6);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
+  var LChar: WideChar;
+      LString: AnsiString;
+      K: integer;
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    if UnicodeFromLocaleChars(
+         28591, //CodePage,
+         0, // Flags
+         @aCharInt,// LocaleStr
+         1, // LocaleStrLen
+         @LChar, // UnicodeStr
+         1)<> 1 then RaiseLastOSError; // UnicodeStrLen
+    LString := AnsiString(LChar);
+    for k := low(LString) to high(LString) do begin
+      pResTail^ := LString[k];
+      inc(pResTail);
     end;
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
-    var LChar: WideChar;
-        LString: AnsiString;
-        K: integer;
-    begin
-      if not IsUniqueString then _GenerateUniqueString;
-      if UnicodeFromLocaleChars(
-           28591, //CodePage,
-           0, // Flags
-           @aCharInt,// LocaleStr
-           1, // LocaleStrLen
-           @LChar, // UnicodeStr
-           1)<> 1 then RaiseLastOSError; // UnicodeStrLen
-      LString := AnsiString(LChar);
-      for k := low(LString) to high(LString) do begin
-        pResTail^ := LString[k];
-        inc(pResTail);
-      end;
-      CurrPos := aNewCurrPos;
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyHexIso88591CharToResult;
+  var I: integer;
+  Begin
+    I := _HexToInt(0, ch2);
+    I := _HexToInt(I, ch3);
+    _CopyIso88591CharToResult(I, CurrPos+4);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyHexIso88591CharToResult;
-    var I: integer;
-    Begin
-      I := _HexToInt(0, ch2);
-      I := _HexToInt(I, ch3);
-      _CopyIso88591CharToResult(I, CurrPos+4);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyOctIso88591CharToResult;
-    var I: integer;
-    Begin
-      I := _OctToInt(0, ch1);
-      I := _OctToInt(I, ch2);
-      I := _OctToInt(I, ch3);
-      if I in [0..255] then _CopyIso88591CharToResult(I, CurrPos+4)
-      else inc(CurrPos); // delete the \
-    end;
-
-var Ln: integer;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyOctIso88591CharToResult;
+  var I: integer;
+  Begin
+    I := _OctToInt(0, ch1);
+    I := _OctToInt(I, ch2);
+    I := _OctToInt(I, ch3);
+    if I in [0..255] then _CopyIso88591CharToResult(I, CurrPos+4)
+    else inc(CurrPos); // delete the \
+  end;
 
 begin
 
@@ -1283,7 +1317,7 @@ begin
   CurrPos := low(Str);
   Ln := high(Str);
   IsUniqueString := false;
-  pResHead := PansiChar(Str);
+  pResHead := PAnsiChar(Str);
   pResTail := pResHead;
 
   {start loop}
@@ -1382,115 +1416,115 @@ end;
 {$WARN WIDECHAR_REDUCED OFF}
 procedure ALJavascriptDecodeV(Var Str: String);
 
-var CurrPos : Integer;
-    pResTail: PChar;
-    pResHead: pChar;
-    Ch1, Ch2, Ch3, Ch4, Ch5: Char;
-    IsUniqueString: boolean;
+var
+  CurrPos : Integer;
+  pResTail: PChar;
+  pResHead: pChar;
+  Ch1, Ch2, Ch3, Ch4, Ch5: Char;
+  IsUniqueString: boolean;
+  Ln: integer;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _GenerateUniqueString;
-    var Padding: integer;
-    begin
-      Padding := PResTail - PResHead;
-      UniqueString(Str);
-      PResHead := PChar(Str);
-      PResTail := PResHead + Padding;
-      IsUniqueString := true;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _GenerateUniqueString;
+  var Padding: integer;
+  begin
+    Padding := PResTail - PResHead;
+    UniqueString(Str);
+    PResHead := PChar(Str);
+    PResTail := PResHead + Padding;
+    IsUniqueString := true;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _OctToInt(I: integer; Ch: Char): integer;
+  begin
+    Result := I * 8 + Ord(Ch) - Ord('0');
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _HexToInt(I: integer; Ch: Char): integer;
+  begin
+    case Ch of
+      '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+      'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+      'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+      else raise EALException.Create('Wrong HEX-character found');
     end;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    function _OctToInt(I: integer; Ch: Char): integer;
-    begin
-      Result := I * 8 + Ord(Ch) - Ord('0');
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyCurrPosCharToResult;
+  Begin
+    if IsUniqueString then pResTail^ := Str[CurrPos];
+    inc(pResTail);
+    inc(CurrPos);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    function _HexToInt(I: integer; Ch: Char): integer;
-    begin
-      case Ch of
-        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
-        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
-        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
-        else raise EALException.Create('Wrong HEX-character found');
-      end;
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyCharToResult(aCharInt: Integer; aNewCurrPos: integer);
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    pResTail^ := Char(aCharInt);
+    inc(pResTail);
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyCurrPosCharToResult;
-    Begin
-      if IsUniqueString then pResTail^ := Str[CurrPos];
-      inc(pResTail);
-      inc(CurrPos);
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    pResTail^ := Char(aCharInt);
+    inc(pResTail);
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyCharToResult(aCharInt: Integer; aNewCurrPos: integer);
-    begin
-      if not IsUniqueString then _GenerateUniqueString;
-      pResTail^ := Char(aCharInt);
-      inc(pResTail);
-      CurrPos := aNewCurrPos;
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyUnicodeCharToResult; overload;
+  var I: integer;
+  Begin
+    I := _HexToInt(0, ch2);
+    I := _HexToInt(I, ch3);
+    I := _HexToInt(I, ch4);
+    I := _HexToInt(I, ch5);
+    _CopyUnicodeCharToResult(I, CurrPos+6);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
-    begin
-      if not IsUniqueString then _GenerateUniqueString;
-      pResTail^ := Char(aCharInt);
-      inc(pResTail);
-      CurrPos := aNewCurrPos;
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
+  var LChar: WideChar;
+  begin
+    if not IsUniqueString then _GenerateUniqueString;
+    if UnicodeFromLocaleChars(
+         28591, //CodePage,
+         0, // Flags
+         @aCharInt,// LocaleStr
+         1, // LocaleStrLen
+         @LChar, // UnicodeStr
+         1) <> 1 then RaiseLastOSError; // UnicodeStrLen
+    pResTail^ := LChar;
+    inc(pResTail);
+    CurrPos := aNewCurrPos;
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyUnicodeCharToResult; overload;
-    var I: integer;
-    Begin
-      I := _HexToInt(0, ch2);
-      I := _HexToInt(I, ch3);
-      I := _HexToInt(I, ch4);
-      I := _HexToInt(I, ch5);
-      _CopyUnicodeCharToResult(I, CurrPos+6);
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyHexIso88591CharToResult;
+  var I: integer;
+  Begin
+    I := _HexToInt(0, ch2);
+    I := _HexToInt(I, ch3);
+    _CopyIso88591CharToResult(I, CurrPos+4);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
-    var LChar: WideChar;
-    begin
-      if not IsUniqueString then _GenerateUniqueString;
-      if UnicodeFromLocaleChars(
-           28591, //CodePage,
-           0, // Flags
-           @aCharInt,// LocaleStr
-           1, // LocaleStrLen
-           @LChar, // UnicodeStr
-           1) <> 1 then RaiseLastOSError; // UnicodeStrLen
-      pResTail^ := LChar;
-      inc(pResTail);
-      CurrPos := aNewCurrPos;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyHexIso88591CharToResult;
-    var I: integer;
-    Begin
-      I := _HexToInt(0, ch2);
-      I := _HexToInt(I, ch3);
-      _CopyIso88591CharToResult(I, CurrPos+4);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _CopyOctIso88591CharToResult;
-    var I: integer;
-    Begin
-      I := _OctToInt(0, ch1);
-      I := _OctToInt(I, ch2);
-      I := _OctToInt(I, ch3);
-      if I in [0..255] then _CopyIso88591CharToResult(I, CurrPos+4)
-      else inc(CurrPos); // delete the \
-    end;
-
-var Ln: integer;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _CopyOctIso88591CharToResult;
+  var I: integer;
+  Begin
+    I := _OctToInt(0, ch1);
+    I := _OctToInt(I, ch2);
+    I := _OctToInt(I, ch3);
+    if I in [0..255] then _CopyIso88591CharToResult(I, CurrPos+4)
+    else inc(CurrPos); // delete the \
+  end;
 
 begin
 

@@ -2725,6 +2725,10 @@ begin
   end;
   fDisplayLink.setPaused(False);
   {$ELSEIF defined(ANDROID)}
+  {$IF defined(DEBUG)}
+  if TThread.Current.ThreadID <> MainThreadID then
+    raise Exception.Create('TALScrollEngine.StartTimer must only be called from the main thread.');
+  {$ENDIF}
   TChoreographer.Instance.PostAniFrameCallback(DoFrame);
   {$ELSE}
   if FTimerHandle = TFmxHandle(-1) then begin
@@ -2749,6 +2753,10 @@ begin
   if fDisplayLink <> nil then
     fDisplayLink.setPaused(True);
   {$ELSEIF defined(ANDROID)}
+  {$IF defined(DEBUG)}
+  if TThread.Current.ThreadID <> MainThreadID then
+    raise Exception.Create('TALScrollEngine.StopTimer must only be called from the main thread.');
+  {$ENDIF}
   TChoreographer.Instance.RemoveAniFrameCallback(DoFrame);
   {$ELSE}
   if FTimerHandle <> TFmxHandle(-1) then begin

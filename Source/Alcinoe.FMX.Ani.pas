@@ -929,6 +929,10 @@ end;
 {****************************************}
 destructor TALChoreographerThread.Destroy;
 begin
+  {$IF defined(DEBUG)}
+  if TThread.Current.ThreadID <> MainThreadID then
+    raise Exception.Create('TALChoreographerThread.Destroy must only be called from the main thread.');
+  {$ENDIF}
   TChoreographer.Instance.RemoveAniFrameCallback(doFrame);
   inherited;
 end;
@@ -938,6 +942,10 @@ procedure TALChoreographerThread.SetEnabled(Value: Boolean);
 begin
   if FEnabled <> Value then begin
     FEnabled := Value;
+    {$IF defined(DEBUG)}
+    if TThread.Current.ThreadID <> MainThreadID then
+      raise Exception.Create('TALChoreographerThread.SetEnabled must only be called from the main thread.');
+    {$ENDIF}
     if FEnabled then TChoreographer.Instance.PostAniFrameCallback(doFrame)
     else TChoreographer.Instance.RemoveAniFrameCallback(doFrame);
   end;

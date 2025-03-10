@@ -1,21 +1,9 @@
 (*******************************************************************************
-ALVideoPlayer renders a video on a texture, which is crucial because it allows
-full integration of the video into the Delphi form. This means you can place any
-controls you want on top of the video, as it supports Z-ordering. In contrast,
-the official Delphi video players are just native video player windows that sit
-on top of the form, and therefore do not support Z-ordering.
-
-On Android, I use ExoPlayer. ExoPlayer is an open-source project that is not
-part of the Android framework and is distributed separately from the Android SDK.
-ExoPlayer’s standard audio and video components are built on Android’s
-MediaCodec API, which was introduced in Android 4.1 (API level 16). Since
-ExoPlayer is a library, you can easily benefit from new features as they become
-available by updating your app. ExoPlayer supports advanced features like
-Dynamic Adaptive Streaming over HTTP (DASH), HLS, SmoothStreaming, and Common
-Encryption, which are not supported by MediaPlayer. It is designed to be easy
-to customize and extend.
-
-On iOS, I use AVPlayer, which also supports HLS, similar to ExoPlayer.
+ALVideoPlayer displays video on a texture, enabling seamless integration into a
+Delphi form. This approach allows you to overlay any controls on top of the
+video with proper Z-ordering. In contrast, the official Delphi video players
+use native video windows that simply float above the form, lacking support for
+Z-order layering.
 *******************************************************************************)
 unit Alcinoe.FMX.VideoPlayer;
 
@@ -35,7 +23,7 @@ uses
   Androidapi.JNIBridge,
   Androidapi.JNI.JavaTypes,
   Androidapi.Gles2ext,
-  Alcinoe.AndroidApi.ExoPlayer,
+  Alcinoe.AndroidApi.AndroidX.Media3,
   {$endIF}
   {$IF defined(IOS)}
   Macapi.ObjectiveC,
@@ -82,10 +70,6 @@ type
       {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TFrameAvailableListener = class(TJavaLocal, JSurfaceTexture_OnFrameAvailableListener)
       private
-        {$IF defined(DEBUG)}
-        fTotalFramesProcessed: integer;
-        fFpsStopWatch: TstopWatch;
-        {$ENDIF}
         FVideoPlayerEngine: TALAndroidVideoPlayer;
         procedure DoOnFrameAvailable(surfaceTexture: JSurfaceTexture);
       public
@@ -141,7 +125,6 @@ type
   private
     fHandler: JHandler;
     fExoPlayer: JExoPlayer;
-    fDataSourceFactory: JDataSource_Factory;
     fSurface: JSurface;
     fSurfaceTexture: JSurfaceTexture;
     {$IF defined(ALSkiaCanvas)}
@@ -237,17 +220,6 @@ type
         procedure ItemNewErrorLogEntry; cdecl;
       end;
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TPrepareThread = class(TThread)
-      private
-        FVideoPlayerEngine: TALIOSVideoPlayer;
-        FDataSource: String;
-      protected
-        procedure Execute; override;
-      public
-        constructor Create(const AVideoPlayerEngine: TALIOSVideoPlayer; const aDataSource: String);
-      end;
-
   private
     class var appAudioSessionActivated: Boolean;
   private
@@ -258,9 +230,6 @@ type
     fNotificationsDelegate: TNotificationsDelegate;
     FFrameRefreshAnimation: TALDisplayAnimation;
     fhasNONewPixelBufferForItemTimeCounter: integer;
-    {$IFDEF DEBUG}
-    fFrameRefreshCounter: integer;
-    {$ENDIF}
     {$IF defined(ALSkiaCanvas)}
     fGrBackEndTexture: gr_backendtexture_t;
     {$ENDIF}
@@ -272,7 +241,6 @@ type
     fState: Integer;
     fLooping: boolean;
     fVolume: single;
-    fPrepareThread: TPrepareThread;
     fOnFrameAvailableEvent: TNotifyEvent;
     fOnCompletionEvent: TNotifyEvent;
     fOnErrorEvent: TNotifyEvent;
@@ -591,10 +559,6 @@ uses
 constructor TALAndroidVideoPlayer.TFrameAvailableListener.Create(const AVideoPlayerEngine: TALAndroidVideoPlayer);
 begin
   inherited Create;
-  {$IF defined(DEBUG)}
-  fTotalFramesProcessed := 0;
-  fFpsStopWatch := TStopWatch.StartNew;
-  {$ENDIF}
   fVideoPlayerEngine := AVideoPlayerEngine;
 end;
 
@@ -604,16 +568,6 @@ begin
 
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
   if fVideoPlayerEngine = nil then exit;
-
-  {$IF defined(DEBUG)}
-  if (fTotalFramesProcessed mod 1000 = 0) then begin
-    fFpsStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable', 'fps: ' + ALFormatFloatW('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), ALDefaultFormatSettingsW));
-    fTotalFramesProcessed := 0;
-    fFpsStopWatch := TStopWatch.StartNew;
-  end;
-  inc(fTotalFramesProcessed);
-  {$ENDIF}
 
   fVideoPlayerEngine.fSurfaceTexture.updateTexImage;
 
@@ -670,18 +624,6 @@ begin
     // so i don't need to finalize the texture !!
     TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FWidth := fVideoPlayerEngine.fVideoWidth;
     TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FHeight := fVideoPlayerEngine.fVideoHeight;
-  end;
-  {$ENDIF}
-
-  {$IF defined(DEBUG)}
-  var LStopWatch: TStopWatch;
-  if (fTotalFramesProcessed mod 1000 = 0) then LStopWatch := TStopWatch.StartNew;
-  {$ENDIF}
-
-  {$IFDEF DEBUG}
-  if (fTotalFramesProcessed mod 1000 = 0) then begin
-    LStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
   end;
   {$ENDIF}
 
@@ -1075,8 +1017,6 @@ begin
   fExoPlayer := TJExoPlayer_Builder.JavaClass.init(TAndroidHelper.Context).Build;
   //-----
   fonVideoSizeChangedEvent := nil;
-  //----
-  fDataSourceFactory := TJDefaultDataSource_Factory.javaclass.init(TAndroidHelper.Context);
   //-----
   fOnErrorEvent := nil;
   fOnPreparedEvent := nil;
@@ -1133,7 +1073,6 @@ begin
   fExoPlayer.clearVideoSurface;
   fExoPlayer.release;
   fExoPlayer := nil;
-  fDataSourceFactory := nil;
 
   //----
   fSurface.release;
@@ -1218,28 +1157,11 @@ begin
   var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
-  //----
   if not SetState(vpsPreparing, vpsIdle) then raise Exception.Create('prepare can be call only in the idle state');
   var LMediaItem := TJMediaItem.JavaClass.fromUri(StringToJString(aDataSource));
-  var LMediaSource: JMediaSource;
-
-  //HLS datasource
-  if ALSameTextW(ExtractFileExt(aDataSource), '.m3u8') then begin
-    var LHlsMediaSourceFactory := TJHlsMediaSource_Factory.JavaClass.init(fDataSourceFactory);
-    LMediaSource := LHlsMediaSourceFactory.createMediaSource(LMediaItem);
-  end
-
-  //Other datasource
-  else begin
-    var LProgressiveMediaSourceFactory := TJProgressiveMediaSource_Factory.JavaClass.init(fDataSourceFactory);
-    LMediaSource := LProgressiveMediaSourceFactory.createMediaSource(LMediaItem);
-  end;
-
-  //-----
-  fExoPlayer.setMediaSource(LMediaSource);
+  fExoPlayer.setMediaItem(LMediaItem);
   fExoPlayer.prepare;
 
-  //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
   ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
@@ -1484,86 +1406,6 @@ begin
   {$ENDIF}
 end;
 
-{**************************************************************************************************************************}
-constructor TALIOSVideoPlayer.TPrepareThread.Create(const AVideoPlayerEngine: TALIOSVideoPlayer; const aDataSource: String);
-begin
-  inherited Create(True);
-  fVideoPlayerEngine := AVideoPlayerEngine;
-  FDataSource := aDataSource;
-  FreeOnTerminate := False;
-end;
-
-{*************************************************}
-procedure TALIOSVideoPlayer.TPrepareThread.Execute;
-begin
-  try
-
-    {$IFDEF DEBUG}
-    var LStopWatch := TstopWatch.StartNew;
-    {$ENDIF}
-
-    var P: Pointer;
-    if AlIsHttpOrHttpsUrl(FDataSource) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(FDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
-    else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(FDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
-    if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
-    var LURL := TNSUrl.Wrap(P);
-    // return A new player item, prepared to use URL.
-    // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
-    // Associating the player item with an AVPlayer immediately begins enqueuing its media
-    // and preparing it for playback. If the URL contains valid data that can be used by
-    // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
-    // URL contains no valid data or otherwise can't be used by the player item, its status
-    // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
-    // by querying the player item’s error property.
-    fVideoPlayerEngine.FPlayerItem := TALAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
-    fVideoPlayerEngine.FPlayerItem.retain;
-    //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
-    //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
-
-    //-----
-    fVideoPlayerEngine.FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(fVideoPlayerEngine.FPlayerItem)); // Returns a new player initialized to play the specified player item.
-    fVideoPlayerEngine.FPlayer.retain;
-
-    //-----
-    fVideoPlayerEngine.fNotificationsDelegate := TNotificationsDelegate.Create(fVideoPlayerEngine);
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fVideoPlayerEngine.fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(fVideoPlayerEngine.FPlayerItem));
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fVideoPlayerEngine.fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(fVideoPlayerEngine.FPlayerItem));
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fVideoPlayerEngine.fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), NSObjectToID(fVideoPlayerEngine.FPlayerItem));
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fVideoPlayerEngine.fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(fVideoPlayerEngine.FPlayerItem));
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fVideoPlayerEngine.fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(fVideoPlayerEngine.FPlayerItem));
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fVideoPlayerEngine.fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(fVideoPlayerEngine.FPlayerItem));
-
-    //-----
-    fVideoPlayerEngine.FKVODelegate := TKVODelegate.Create(fVideoPlayerEngine);
-    fVideoPlayerEngine.FPlayer.addObserver(
-      TNSObject.Wrap(fVideoPlayerEngine.FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
-      StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
-      NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
-      nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
-    fVideoPlayerEngine.FPlayerItem.addObserver(
-      TNSObject.Wrap(fVideoPlayerEngine.FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
-      StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
-      NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
-      nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
-
-    //-----
-    {$IFDEF DEBUG}
-    LStopWatch.Stop;
-    ALLog(
-      'TALIOSVideoPlayer.prepare',
-      'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
-      'FPlayer.status: ' + ALIntToStrW(fVideoPlayerEngine.FPlayer.status) + ' | ' +
-      'FPlayerItem.status: ' + ALIntToStrW(fVideoPlayerEngine.FPlayerItem.status));
-    {$ENDIF}
-
-  except
-    // We cannot call 'synchronize' from here (this might cause issues when freeing the object),
-    // so we also cannot call 'onErrorEvent'.
-    On E: Exception do
-      ALLog('TALIOSVideoPlayer.prepare', E);
-  end;
-end;
-
 {***********************************}
 constructor TALIOSVideoPlayer.Create;
 begin
@@ -1625,16 +1467,12 @@ begin
   FFrameRefreshAnimation.Enabled := False;
 
   //--
-  fPrepareThread := nil;
   FPlayer := nil;
   FPlayerItem := nil;
   FPlayerItemVideoOutput := nil;
   FKVODelegate := nil;
   FNotificationsDelegate := nil;
   fhasNONewPixelBufferForItemTimeCounter := 0;
-  {$IFDEF DEBUG}
-  fFrameRefreshCounter := 0;
-  {$ENDIF}
 
   //--
   fOnFrameAvailableEvent := nil;
@@ -1656,8 +1494,6 @@ begin
   {$IFDEF DEBUG}
   var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
-  //--
-  ALFreeAndNil(fPrepareThread);
   //--
   FFrameRefreshAnimation.Enabled := False;
   alFreeAndNil(FFrameRefreshAnimation);
@@ -1775,9 +1611,65 @@ end;
 procedure TALIOSVideoPlayer.prepare(Const aDataSource: String);
 begin
   if not SetState(vpsPreparing, vpsIdle) then raise Exception.Create('prepare can be call only in the idle state');
-  //https://stackoverflow.com/questions/30363502/maintaining-good-scroll-performance-when-using-avplayer
-  fPrepareThread := TPrepareThread.Create(self, aDataSource);
-  fPrepareThread.Start;
+
+  {$IFDEF DEBUG}
+  var LStopWatch := TstopWatch.StartNew;
+  {$ENDIF}
+
+  var P: Pointer;
+  if AlIsHttpOrHttpsUrl(aDataSource) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+  else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
+  if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
+  var LURL := TNSUrl.Wrap(P);
+  // return A new player item, prepared to use URL.
+  // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
+  // Associating the player item with an AVPlayer immediately begins enqueuing its media
+  // and preparing it for playback. If the URL contains valid data that can be used by
+  // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
+  // URL contains no valid data or otherwise can't be used by the player item, its status
+  // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
+  // by querying the player item’s error property.
+  FPlayerItem := TALAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
+  FPlayerItem.retain;
+  //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
+  //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
+
+  //-----
+  FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
+  FPlayer.retain;
+
+  //-----
+  fNotificationsDelegate := TNotificationsDelegate.Create(Self);
+  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(FPlayerItem));
+
+  //-----
+  FKVODelegate := TKVODelegate.Create(Self);
+  FPlayer.addObserver(
+    TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
+    StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
+    NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
+    nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
+  FPlayerItem.addObserver(
+    TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
+    StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
+    NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
+    nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
+
+  //-----
+  {$IFDEF DEBUG}
+  LStopWatch.Stop;
+  ALLog(
+    'TALIOSVideoPlayer.prepare',
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
+    'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
+    'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status));
+  {$ENDIF}
+
 end;
 
 {********************************}
@@ -1888,10 +1780,6 @@ begin
 
   // In case
   if FPlayerItemVideoOutput = nil then exit;
-
-  {$IFDEF DEBUG}
-  var LStopWatch := TstopWatch.StartNew;
-  {$ENDIF}
 
   // Returns the current time of the current player item
   var T: CMTime := fPlayer.currentTime;
@@ -2099,15 +1987,6 @@ begin
 
     //--
     fhasNONewPixelBufferForItemTimeCounter := 0;
-
-    {$IFDEF DEBUG}
-    inc(fFrameRefreshCounter);
-    if fFrameRefreshCounter mod 1000 = 0 then begin
-      LStopWatch.Stop;
-      fFrameRefreshCounter := 0;
-      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
-    end;
-    {$ENDIF}
 
   end
   else begin

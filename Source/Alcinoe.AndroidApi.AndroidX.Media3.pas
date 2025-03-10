@@ -46,16 +46,6 @@ type
   JDeviceInfo = interface;
   JCueGroup = interface;
   JTracks = interface;
-  JMediaSource = interface;
-  JBaseMediaSource = interface;
-  JProgressiveMediaSource = interface;
-  JHlsMediaSource = interface;
-  JMediaSource_Factory = interface;
-  JMediaSourceFactory = interface;
-  JProgressiveMediaSource_Factory = interface;
-  JHlsMediaSource_Factory = interface;
-  JDataSource_Factory = interface;
-  JDefaultDataSource_Factory = interface;
   JMediaMetadata = interface;
   JMetadata = interface;
   JMediaItem = interface;
@@ -113,7 +103,6 @@ type
   [JavaSignature('androidx/media3/exoplayer/ExoPlayer')]
   JExoPlayer = interface(JPlayer)
     ['{23F139A5-FEA3-450F-8FDC-039312AE95FF}']
-    procedure setMediaSource(mediaSource: JMediaSource); cdecl;
   end;
   TJExoPlayer = class(TJavaGenericImport<JExoPlayerClass, JExoPlayer>) end;
 
@@ -326,121 +315,6 @@ type
   end;
   TJTracks = class(TJavaGenericImport<JTracksClass, JTracks>) end;
 
-  {**********************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/source/MediaSource.java
-  JMediaSourceClass = interface(IJavaClass)
-    ['{3E592CEC-43F4-4657-BA6D-9FD9D64923D6}']
-  end;
-  [JavaSignature('androidx/media3/exoplayer/source/MediaSource')]
-  JMediaSource = interface(IJavaInstance)
-    ['{C2318719-6D42-4448-98C6-F2BD1A7615A8}']
-  end;
-  TJMediaSource = class(TJavaGenericImport<JMediaSourceClass, JMediaSource>) end;
-
-  {**************************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/source/BaseMediaSource.java
-  JBaseMediaSourceClass = interface(JMediaSourceClass)
-    ['{3CBB53CB-835B-48A1-92C9-771C00FC19F9}']
-  end;
-  [JavaSignature('androidx/media3/exoplayer/source/BaseMediaSource')]
-  JBaseMediaSource = interface(JMediaSource)
-    ['{D4306711-F75A-4E78-9C14-5ED31C96591F}']
-  end;
-  TJBaseMediaSource = class(TJavaGenericImport<JBaseMediaSourceClass, JBaseMediaSource>) end;
-
-  {*********************************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/source/ProgressiveMediaSource.java
-  JProgressiveMediaSourceClass = interface(JBaseMediaSourceClass)
-    ['{549D61C7-B8CD-4604-931E-406C6E29FC4D}']
-  end;
-  [JavaSignature('androidx/media3/exoplayer/source/ProgressiveMediaSource')]
-  JProgressiveMediaSource = interface(JBaseMediaSource)
-    ['{7D591E12-649B-4E91-8494-E23B5B64D99B}']
-  end;
-  TJProgressiveMediaSource = class(TJavaGenericImport<JProgressiveMediaSourceClass, JProgressiveMediaSource>) end;
-
-  {**************************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer_hls/src/main/java/androidx/media3/exoplayer/hls/HlsMediaSource.java
-  JHlsMediaSourceClass = interface(JBaseMediaSourceClass)
-    ['{9CB1E5D7-8111-401A-916B-AED6B81FFAD6}']
-  end;
-  [JavaSignature('androidx/media3/exoplayer/hls/HlsMediaSource')]
-  JHlsMediaSource = interface(JBaseMediaSource)
-    ['{4A68FCD9-06A1-4C28-A518-8079DDBCA395}']
-  end;
-  TJHlsMediaSource = class(TJavaGenericImport<JHlsMediaSourceClass, JHlsMediaSource>) end;
-
-  {**********************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/source/MediaSource.java
-  JMediaSource_FactoryClass = interface(IJavaClass)
-    ['{57AF7F71-FFC0-4CB6-B401-65DFC1F9253F}']
-  end;
-  [JavaSignature('androidx/media3/exoplayer/source/MediaSource$Factory')]
-  JMediaSource_Factory = interface(IJavaInstance)
-    ['{1EDC2493-E0FE-4FB4-98E3-C8430BEF56D9}']
-  end;
-  TJMediaSource_Factory = class(TJavaGenericImport<JMediaSource_FactoryClass, JMediaSource_Factory>) end;
-
-  {*****************************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/source/MediaSourceFactory.java
-  JMediaSourceFactoryClass = interface(JMediaSource_FactoryClass)
-    ['{B84352AF-4537-4173-BE96-441C97B4E798}']
-  end;
-  [JavaSignature('androidx/media3/exoplayer/source/MediaSourceFactory')]
-  JMediaSourceFactory = interface(JMediaSource_Factory)
-    ['{13E30EC4-5E63-4EA1-99F4-CABCACE46FEC}']
-  end;
-  TJMediaSourceFactory = class(TJavaGenericImport<JMediaSourceFactoryClass, JMediaSourceFactory>) end;
-
-  {*********************************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/source/ProgressiveMediaSource.java
-  JProgressiveMediaSource_FactoryClass = interface(JMediaSourceFactoryClass)
-    ['{B61AB190-CADC-47B0-9650-EB3CADFB24ED}']
-    {class} function init(dataSourceFactory: JDataSource_Factory): JProgressiveMediaSource_Factory; cdecl;
-  end;
-  [JavaSignature('androidx/media3/exoplayer/source/ProgressiveMediaSource$Factory')]
-  JProgressiveMediaSource_Factory = interface(JMediaSourceFactory)
-    ['{C01468D3-F52F-4486-BCB5-0187F99C0428}']
-    function createMediaSource(mediaItem: JMediaItem): JProgressiveMediaSource; cdecl;
-  end;
-  TJProgressiveMediaSource_Factory = class(TJavaGenericImport<JProgressiveMediaSource_FactoryClass, JProgressiveMediaSource_Factory>) end;
-
-  {**************************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/exoplayer_hls/src/main/java/androidx/media3/exoplayer/hls/HlsMediaSource.java
-  JHlsMediaSource_FactoryClass = interface(JMediaSourceFactoryClass)
-    ['{6CF34ADE-D3E9-4EE2-8B27-60C4838066BF}']
-    {class} function init(dataSourceFactory: JDataSource_Factory): JHlsMediaSource_Factory; cdecl;
-  end;
-  [JavaSignature('androidx/media3/exoplayer/hls/HlsMediaSource$Factory')]
-  JHlsMediaSource_Factory = interface(JMediaSourceFactory)
-    ['{84A92CAC-3429-44EB-BBE6-8A04AAFD7DEC}']
-    function createMediaSource(mediaItem: JMediaItem): JHlsMediaSource; cdecl;
-  end;
-  TJHlsMediaSource_Factory = class(TJavaGenericImport<JHlsMediaSource_FactoryClass, JHlsMediaSource_Factory>) end;
-
-  {****************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/datasource/src/main/java/androidx/media3/datasource/DataSource.java
-  JDataSource_FactoryClass = interface(IJavaClass)
-    ['{CF670334-A97D-48F1-918D-5BABB74532B0}']
-  end;
-  [JavaSignature('androidx/media3/datasource/DataSource$Factory')]
-  JDataSource_Factory = interface(IJavaInstance)
-    ['{2FF40D20-A1B1-461D-8CF9-4F1F3E27519C}']
-  end;
-  TJDataSource_Factory = class(TJavaGenericImport<JDataSource_FactoryClass, JDataSource_Factory>) end;
-
-  {***********************************************************************************************************************************}
-  //https://github.com/androidx/media/blob/release/libraries/datasource/src/main/java/androidx/media3/datasource/DefaultDataSource.java
-  JDefaultDataSource_FactoryClass = interface(JDataSource_FactoryClass)
-    ['{F4CE7183-BCCA-4231-8492-F79B8ABE023D}']
-    {class} function init(context: JContext): JDefaultDataSource_Factory; cdecl;
-  end;
-  [JavaSignature('androidx/media3/datasource/DefaultDataSource$Factory')]
-  JDefaultDataSource_Factory = interface(JDataSource_Factory)
-    ['{DAA8568E-C6A9-4F80-BD38-1EF8D6DB4A56}']
-  end;
-  TJDefaultDataSource_Factory = class(TJavaGenericImport<JDefaultDataSource_FactoryClass, JDefaultDataSource_Factory>) end;
-
   {***********************************************************************************************************************}
   //https://github.com/androidx/media/blob/release/libraries/common/src/main/java/androidx/media3/common/MediaMetadata.java
   JMediaMetadataClass = interface(JObjectClass)
@@ -497,16 +371,6 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JDeviceInfo', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JDeviceInfo));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JCueGroup', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JCueGroup));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JTracks', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JTracks));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JMediaSource', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JMediaSource));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JBaseMediaSource', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JBaseMediaSource));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JProgressiveMediaSource', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JProgressiveMediaSource));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JHlsMediaSource', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JHlsMediaSource));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JMediaSource_Factory', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JMediaSource_Factory));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JMediaSourceFactory', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JMediaSourceFactory));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JProgressiveMediaSource_Factory', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JProgressiveMediaSource_Factory));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JHlsMediaSource_Factory', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JHlsMediaSource_Factory));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JDataSource_Factory', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JDataSource_Factory));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JDefaultDataSource_Factory', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JDefaultDataSource_Factory));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JMediaMetadata', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JMediaMetadata));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JMetadata', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JMetadata));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Media3.JMediaItem', TypeInfo(Alcinoe.AndroidApi.AndroidX.Media3.JMediaItem));

@@ -5294,7 +5294,7 @@ begin
   Result := TALRectD.Create(LocalToAbsolute(LocalRect));
 end;
 
-{*********************************************************}
+{*****************************************************************}
 function TALDynamicListBoxControl.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (FIsDestroying) or (not AbsoluteVisible) or (OwnerListBox = nil) then Exit(TRectF.Empty);
@@ -21332,8 +21332,6 @@ end;
 procedure TALDynamicListBoxVideoPlayerSurface.Paint;
 begin
 
-  inherited paint;
-
   If (FAutoStartMode = TAutoStartMode.WhenDisplayed) and (FInternalState <> VPSStarted) then begin
     var LAbsoluteDisplayedRect := GetAbsoluteDisplayedRect;
     // If 80% of the surface is visible and another video is currently playing,
@@ -22289,7 +22287,7 @@ begin
 
 end;
 
-{******************************************************}
+{**************************************************************}
 function TALDynamicListBoxItem.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (OwnerView <> nil) and

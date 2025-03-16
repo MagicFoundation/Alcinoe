@@ -1067,13 +1067,13 @@ begin
   FIsPixelAlignmentEnabled := AValue;
 end;
 
-{*****************************************************}
+{***************************************}
 function TALControl.IsDisplayed: Boolean;
 begin
   Result := not GetAbsoluteDisplayedRect.IsEmpty;
 end;
 
-{*******************************************}
+{***************************************************}
 function TALControl.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (not Visible) or (form = nil) then Exit(TRectF.Empty);

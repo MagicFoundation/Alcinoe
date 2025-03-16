@@ -107,7 +107,7 @@ type
   end;
   TJExoPlayer = class(TJavaGenericImport<JExoPlayerClass, JExoPlayer>) end;
 
-  {***********************************************************************************************************************}
+  {*************************************************************************************************************************}
   //https://github.com/androidx/media/blob/release/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/ExoPlayer.java
   JExoPlayer_BuilderClass = interface(JObjectClass)
     ['{AE382CD9-C438-41A6-A83B-3650BA28F850}']
@@ -204,7 +204,7 @@ type
   end;
   TJPlayer_PositionInfo = class(TJavaGenericImport<JPlayer_PositionInfoClass, JPlayer_PositionInfo>) end;
 
-  {***********************************************************************************************************************************}
+  {**********************************************************************************************************************************}
   //https://github.com/androidx/media/blob/release/libraries/datasource/src/main/java/androidx/media3/datasource/TransferListener.java
   JTransferListenerClass = interface(IJavaClass)
     ['{9B26DEB2-564E-400A-B57D-71A56BAC7197}']

@@ -832,7 +832,7 @@ begin
   {$ENDIF}
 end;
 
-{***********************************}
+{*************************************}
 constructor TALDummyVideoPlayer.Create;
 begin
   inherited;
@@ -847,31 +847,31 @@ begin
   fOnVideoSizeChangedEvent := nil;
 end;
 
-{*******************************************}
+{*********************************************}
 function TALDummyVideoPlayer.GetState: Integer;
 begin
   result := vpsIdle;
 end;
 
-{*******************************************}
+{*************************************************************}
 function TALDummyVideoPlayer.GetAutoStartWhenPrepared: Boolean;
 begin
   Result := FAutoStartWhenPrepared;
 end;
 
-{*******************************************}
+{***************************************************************************}
 procedure TALDummyVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
 begin
   FAutoStartWhenPrepared := Value;
 end;
 
-{***********************************************}
+{*************************************************}
 function TALDummyVideoPlayer.GetIsPlaying: boolean;
 begin
   result := False;
 end;
 
-{*********************************************}
+{***********************************************}
 function TALDummyVideoPlayer.GetLooping: Boolean;
 begin
   Result := FLooping;
@@ -883,81 +883,81 @@ begin
   FLooping := Value;
 end;
 
-{********************************************}
+{*********************************************}
 function TALDummyVideoPlayer.GetVolume: Single;
 begin
   Result := FVolume;
 end;
 
-{*********************************************************}
+{***********************************************************}
 procedure TALDummyVideoPlayer.SetVolume(const Value: Single);
 begin
   FVolume := Value;
 end;
 
-{***************************************************}
+{****************************************************}
 function TALDummyVideoPlayer.GetPlaybackSpeed: Single;
 begin
   Result := FPlayBackSpeed;
 end;
 
-{****************************************************************}
+{******************************************************************}
 procedure TALDummyVideoPlayer.SetPlaybackSpeed(const Value: single);
 begin
   FPlayBackSpeed := Value;
 end;
 
-{******************************************************}
+{****************************************************}
 function TALDummyVideoPlayer.GetDrawable: TALDrawable;
 begin
   Result := ALNullDrawable;
 end;
 
-{***************************************************}
+{*****************************************************}
 function TALDummyVideoPlayer.GetCurrentPosition: Int64;
 begin
   result := 0;
 end;
 
-{********************************************}
+{**********************************************}
 function TALDummyVideoPlayer.GetDuration: Int64;
 begin
   result := 0;
 end;
 
-{*************************************************}
+{***************************************************}
 function TALDummyVideoPlayer.GetVideoHeight: Integer;
 begin
   result := 0;
 end;
 
-{************************************************}
+{**************************************************}
 function TALDummyVideoPlayer.GetVideoWidth: Integer;
 begin
   result := 0;
 end;
 
-{*************************************************************}
+{***************************************************************}
 procedure TALDummyVideoPlayer.Prepare(Const ADataSource: String);
 begin
 end;
 
-{********************************}
+{**********************************}
 procedure TALDummyVideoPlayer.Start;
 begin
 end;
 
-{********************************}
+{**********************************}
 procedure TALDummyVideoPlayer.Pause;
 begin
 end;
 
-{*******************************}
+{*********************************}
 procedure TALDummyVideoPlayer.Stop;
 begin
 end;
 
-{****************************************************}
+{******************************************************}
 procedure TALDummyVideoPlayer.SeekTo(const msec: Int64);
 begin
 end;
@@ -1527,13 +1527,13 @@ begin
   result := AtomicCmpExchange(fState, -1, -1);
 end;
 
-{***********************************************}
+{***************************************************************}
 function TALAndroidVideoPlayer.GetAutoStartWhenPrepared: Boolean;
 begin
   Result := FAutoStartWhenPrepared;
 end;
 
-{***********************************************}
+{*****************************************************************************}
 procedure TALAndroidVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
 begin
   FAutoStartWhenPrepared := Value;
@@ -1551,7 +1551,7 @@ begin
   result := fExoPlayer.GetRepeatMode = TJPlayer.JavaClass.REPEAT_MODE_ALL;
 end;
 
-{*****************************************************************}
+{***************************************************************}
 procedure TALAndroidVideoPlayer.SetLooping(const Value: Boolean);
 begin
   //int REPEAT_MODE_OFF = 0; => Normal playback without repetition.
@@ -1708,14 +1708,14 @@ end;
 {$REGION ' IOS'}
 {$IF defined(IOS)}
 
-{********************************************************************************************}
+{*****************************************************************************************************}
 constructor TALIOSVideoPlayer.TDisplayLinkListener.Create(const AVideoPlayerEngine: TALIOSVideoPlayer);
 begin
   inherited Create;
   fVideoPlayerEngine := AVideoPlayerEngine;
 end;
 
-{****************************************************************}
+{******************************************************************}
 procedure TALIOSVideoPlayer.TDisplayLinkListener.displayLinkUpdated;
 begin
   {$IFDEF DEBUG}
@@ -1724,7 +1724,7 @@ begin
   fVideoPlayerEngine.DoOnFrameRefresh;
 end;
 
-{**************************************************************************}
+{****************************************************************************}
 function TALIOSVideoPlayer.TDisplayLinkListener.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IDisplayLinkListener);
@@ -2371,13 +2371,13 @@ begin
   result := AtomicCmpExchange(fState, -1, -1);
 end;
 
-{***********************************************}
+{***********************************************************}
 function TALIOSVideoPlayer.GetAutoStartWhenPrepared: Boolean;
 begin
   Result := FAutoStartWhenPrepared;
 end;
 
-{***********************************************}
+{*************************************************************************}
 procedure TALIOSVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
 begin
   FAutoStartWhenPrepared := Value;
@@ -2395,7 +2395,7 @@ begin
   Result := fLooping;
 end;
 
-{*************************************************************}
+{***********************************************************}
 procedure TALIOSVideoPlayer.SetLooping(const Value: Boolean);
 begin
   fLooping := Value;
@@ -2590,7 +2590,7 @@ end;
 {$ENDIF}
 {$ENDREGION}
 
-{*********************************************}
+{*************************************}
 constructor TALAsyncVideoPlayer.Create;
 begin
   inherited;
@@ -2598,7 +2598,7 @@ begin
   FCoreVideoPlayer := nil;
 end;
 
-{*********************************************}
+{*************************************}
 destructor TALAsyncVideoPlayer.Destroy;
 begin
   TALVideoPlayerControllerThread.Instance.ReleaseEngine(FEngineIndex);
@@ -2611,31 +2611,31 @@ begin
   Result := TALVideoPlayerControllerThread.Instance.GetState(FEngineIndex);
 end;
 
-{*********************************************}
+{*************************************************************}
 function TALAsyncVideoPlayer.GetAutoStartWhenPrepared: Boolean;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetAutoStartWhenPrepared(FEngineIndex);
 end;
 
-{*********************************************}
+{***************************************************************************}
 procedure TALAsyncVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
 begin
   TALVideoPlayerControllerThread.Instance.SetAutoStartWhenPrepared(FEngineIndex, Value);
 end;
 
-{*********************************************}
+{*************************************************}
 function TALAsyncVideoPlayer.GetIsPlaying: boolean;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetIsPlaying(FEngineIndex);
 end;
 
-{*********************************************}
+{***********************************************}
 function TALAsyncVideoPlayer.GetLooping: Boolean;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetLooping(FEngineIndex);
 end;
 
-{*********************************************}
+{*************************************************************}
 procedure TALAsyncVideoPlayer.SetLooping(const Value: Boolean);
 begin
   TALVideoPlayerControllerThread.Instance.SetLooping(FEngineIndex, Value);
@@ -2647,25 +2647,25 @@ begin
   Result := TALVideoPlayerControllerThread.Instance.GetVolume(FEngineIndex);
 end;
 
-{*********************************************}
+{***********************************************************}
 procedure TALAsyncVideoPlayer.SetVolume(const Value: Single);
 begin
   TALVideoPlayerControllerThread.Instance.SetVolume(FEngineIndex, Value);
 end;
 
-{*********************************************}
+{****************************************************}
 function TALAsyncVideoPlayer.GetPlaybackSpeed: single;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetPlaybackSpeed(FEngineIndex);
 end;
 
-{*********************************************}
+{******************************************************************}
 procedure TALAsyncVideoPlayer.SetPlaybackSpeed(const Value: single);
 begin
   TALVideoPlayerControllerThread.Instance.SetPlaybackSpeed(FEngineIndex, Value);
 end;
 
-{*********************************************}
+{****************************************************}
 function TALAsyncVideoPlayer.GetDrawable: TALDrawable;
 begin
   if FCoreVideoPlayer = nil then
@@ -2674,55 +2674,55 @@ begin
   else result := ALNullDrawable;
 end;
 
-{*********************************************}
+{*****************************************************}
 function TALAsyncVideoPlayer.GetCurrentPosition: Int64;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetCurrentPosition(FEngineIndex);
 end;
 
-{*********************************************}
+{**********************************************}
 function TALAsyncVideoPlayer.GetDuration: Int64;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetDuration(FEngineIndex);
 end;
 
-{*********************************************}
+{***************************************************}
 function TALAsyncVideoPlayer.GetVideoHeight: Integer;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetVideoHeight(FEngineIndex);
 end;
 
-{*********************************************}
+{**************************************************}
 function TALAsyncVideoPlayer.GetVideoWidth: Integer;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetVideoWidth(FEngineIndex);
 end;
 
-{*********************************************}
+{***************************************************************}
 procedure TALAsyncVideoPlayer.Prepare(Const ADataSource: String);
 begin
   TALVideoPlayerControllerThread.Instance.Prepare(FEngineIndex, ADataSource);
 end;
 
-{*********************************************}
+{**********************************}
 procedure TALAsyncVideoPlayer.Start;
 begin
   TALVideoPlayerControllerThread.Instance.Start(FEngineIndex);
 end;
 
-{*********************************************}
+{**********************************}
 procedure TALAsyncVideoPlayer.Pause;
 begin
   TALVideoPlayerControllerThread.Instance.Pause(FEngineIndex);
 end;
 
-{*********************************************}
+{*********************************}
 procedure TALAsyncVideoPlayer.Stop;
 begin
   TALVideoPlayerControllerThread.Instance.Stop(FEngineIndex);
 end;
 
-{*********************************************}
+{******************************************************}
 procedure TALAsyncVideoPlayer.SeekTo(const msec: Int64);
 begin
   TALVideoPlayerControllerThread.Instance.SeekTo(FEngineIndex, msec);
@@ -2746,7 +2746,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************************}
+{********************************************************}
 constructor TALVideoPlayerControllerThread.TEngine.Create;
 begin
   inherited Create;
@@ -2756,7 +2756,7 @@ begin
   ProxyVideoPlayer := nil;
 end;
 
-{*************************************}
+{********************************************************}
 destructor TALVideoPlayerControllerThread.TEngine.Destroy;
 begin
   ALFreeAndNil(Signal);
@@ -2764,7 +2764,7 @@ begin
   Inherited Destroy;
 end;
 
-{*************************************}
+{************************************************}
 constructor TALVideoPlayerControllerThread.Create;
 begin
   inherited Create(True{CreateSuspended});
@@ -2783,7 +2783,7 @@ begin
   FCommandQueue := TQueue<TCommand>.Create;
 end;
 
-{*************************************}
+{************************************************}
 destructor TALVideoPlayerControllerThread.Destroy;
 begin
   Terminate;
@@ -2833,7 +2833,7 @@ begin
   result := FInstance <> nil;
 end;
 
-{*************************************}
+{***********************************************}
 procedure TALVideoPlayerControllerThread.Execute;
 begin
   {$IF defined(android)}
@@ -2853,7 +2853,7 @@ begin
   {$ENDIF}
 end;
 
-{************************************************}
+{***********************************************************}
 procedure TALVideoPlayerControllerThread.ProcessCommandQueue;
 begin
   While true do begin
@@ -2969,15 +2969,15 @@ begin
   end;
 end;
 
-{********************************************}
+{*****************************************************}
 function TALVideoPlayerControllerThread.EnqueueCommand(
-            const AEngineIndex: Integer;
-            const AOperation: TOperation;
-            const AWaitResponse: Boolean;
-            const AParamInt64: Int64;
-            const AParamSingle: Single;
-            const AParamBoolean: Boolean;
-            const AParamString: String): TResponse;
+           const AEngineIndex: Integer;
+           const AOperation: TOperation;
+           const AWaitResponse: Boolean;
+           const AParamInt64: Int64;
+           const AParamSingle: Single;
+           const AParamBoolean: Boolean;
+           const AParamString: String): TResponse;
 begin
   var LCommand: TCommand;
   LCommand.EngineIndex := AEngineIndex;
@@ -3006,7 +3006,7 @@ begin
     GetEngine(AEngineIndex).Signal.WaitFor(INFINITE);
 end;
 
-{********************************************}
+{*********************************************************************************************************************************************************}
 function TALVideoPlayerControllerThread.EnqueueCommand(const AEngineIndex: Integer; const AOperation: TOperation; const AWaitResponse: Boolean): TResponse;
 begin
   Result := EnqueueCommand(
@@ -3019,7 +3019,7 @@ begin
               ''); // AParamString: String);
 end;
 
-{********************************************}
+{***********************************************************************************************************************************************************************************}
 function TALVideoPlayerControllerThread.EnqueueCommand(const AEngineIndex: Integer; const AOperation: TOperation; const AWaitResponse: Boolean; const AParamInt64: Int64): TResponse;
 begin
   Result := EnqueueCommand(
@@ -3032,7 +3032,7 @@ begin
               ''); // AParamString: String);
 end;
 
-{********************************************}
+{*************************************************************************************************************************************************************************************}
 function TALVideoPlayerControllerThread.EnqueueCommand(const AEngineIndex: Integer; const AOperation: TOperation; const AWaitResponse: Boolean; const AParamSingle: Single): TResponse;
 begin
   Result := EnqueueCommand(
@@ -3045,7 +3045,7 @@ begin
               ''); // AParamString: String);
 end;
 
-{********************************************}
+{***************************************************************************************************************************************************************************************}
 function TALVideoPlayerControllerThread.EnqueueCommand(const AEngineIndex: Integer; const AOperation: TOperation; const AWaitResponse: Boolean; const AParamBoolean: Boolean): TResponse;
 begin
   Result := EnqueueCommand(
@@ -3058,7 +3058,7 @@ begin
               ''); // AParamString: String);
 end;
 
-{********************************************}
+{*************************************************************************************************************************************************************************************}
 function TALVideoPlayerControllerThread.EnqueueCommand(const AEngineIndex: Integer; const AOperation: TOperation; const AWaitResponse: Boolean; const AParamString: String): TResponse;
 begin
   Result := EnqueueCommand(
@@ -3071,7 +3071,7 @@ begin
               AParamString); // AParamString: String);
 end;
 
-{***********************}
+{******************************************************************}
 procedure TALVideoPlayerControllerThread.DoOnError(Sender: TObject);
 begin
   {$IF defined(DEBUG)}
@@ -3108,7 +3108,7 @@ begin
   end;
 end;
 
-{***********************}
+{*********************************************************************}
 procedure TALVideoPlayerControllerThread.DoOnPrepared(Sender: TObject);
 begin
   {$IF defined(DEBUG)}
@@ -3145,7 +3145,7 @@ begin
   end;
 end;
 
-{***********************}
+{***************************************************************************}
 procedure TALVideoPlayerControllerThread.DoOnFrameAvailable(Sender: TObject);
 begin
   {$IF defined(DEBUG)}
@@ -3164,7 +3164,7 @@ begin
   end;
 end;
 
-{***********************}
+{***********************************************************************}
 procedure TALVideoPlayerControllerThread.DoOnCompletion(Sender: TObject);
 begin
   {$IF defined(DEBUG)}
@@ -3201,7 +3201,7 @@ begin
   end;
 end;
 
-{***********************}
+{********************************************************************************************************************************}
 procedure TALVideoPlayerControllerThread.DoOnVideoSizeChanged(const Sender: TObject; const width: Integer; const height: Integer);
 begin
   {$IF defined(DEBUG)}
@@ -3238,7 +3238,7 @@ begin
   end;
 end;
 
-{***********************}
+{**************************************************************************************}
 Function TALVideoPlayerControllerThread.GetEngine(const AEngineIndex: Integer): TEngine;
 begin
   FLock.BeginRead;
@@ -3251,7 +3251,7 @@ begin
   End;
 end;
 
-{***********************}
+{**********************************************************************************************************}
 function TALVideoPlayerControllerThread.AcquireEngine(const AProxyVideoPlayer: TALBaseVideoPlayer): Integer;
 begin
   FLock.BeginWrite;
@@ -3286,7 +3286,7 @@ begin
   EnqueueCommand(Result, TOperation.CreateEngine, False{AWaitResponse});
 end;
 
-{***********************}
+{**********************************************************************************}
 procedure TALVideoPlayerControllerThread.ReleaseEngine(const AEngineIndex: Integer);
 begin
   var LEngine := GetEngine(AEngineIndex);
@@ -3304,7 +3304,7 @@ begin
   EnqueueCommand(AEngineIndex, TOperation.ReleaseEngine, False{AWaitResponse});
 end;
 
-{***********************}
+{**********************************************************************************************************}
 function TALVideoPlayerControllerThread.GetCoreVideoPlayer(const AEngineIndex: Integer): TALBaseVideoPlayer;
 begin
   var LEngine := GetEngine(AEngineIndex);
@@ -3316,121 +3316,121 @@ begin
   end;
 end;
 
-{***********************}
+{*************************************************************************************}
 function TALVideoPlayerControllerThread.GetState(const AEngineIndex: Integer): Integer;
 begin
   Result := Integer(EnqueueCommand(AEngineIndex, TOperation.GetState, True{AWaitResponse}).ResultInt64);
 end;
 
-{***********************}
+{*****************************************************************************************************}
 function TALVideoPlayerControllerThread.GetAutoStartWhenPrepared(const AEngineIndex: Integer): Boolean;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetAutoStartWhenPrepared, True{AWaitResponse}).ResultBoolean;
 end;
 
-{***********************}
+{*******************************************************************************************************************}
 procedure TALVideoPlayerControllerThread.SetAutoStartWhenPrepared(const AEngineIndex: Integer; const Value: Boolean);
 begin
   EnqueueCommand(AEngineIndex, TOperation.SetAutoStartWhenPrepared, False{AWaitResponse}, Value);
 end;
 
-{***********************}
+{*****************************************************************************************}
 function TALVideoPlayerControllerThread.GetIsPlaying(const AEngineIndex: Integer): boolean;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetIsPlaying, True{AWaitResponse}).Resultboolean;
 end;
 
-{***********************}
+{***************************************************************************************}
 function TALVideoPlayerControllerThread.GetLooping(const AEngineIndex: Integer): Boolean;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetLooping, True{AWaitResponse}).ResultBoolean;
 end;
 
-{***********************}
+{*****************************************************************************************************}
 procedure TALVideoPlayerControllerThread.SetLooping(const AEngineIndex: Integer; const Value: Boolean);
 begin
   EnqueueCommand(AEngineIndex, TOperation.SetLooping, False{AWaitResponse}, Value);
 end;
 
-{***********************}
+{*************************************************************************************}
 function TALVideoPlayerControllerThread.GetVolume(const AEngineIndex: Integer): Single;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetVolume, True{AWaitResponse}).ResultSingle;
 end;
 
-{***********************}
+{***************************************************************************************************}
 procedure TALVideoPlayerControllerThread.SetVolume(const AEngineIndex: Integer; const Value: Single);
 begin
   EnqueueCommand(AEngineIndex, TOperation.SetVolume, False{AWaitResponse}, Value);
 end;
 
-{***********************}
+{********************************************************************************************}
 function TALVideoPlayerControllerThread.GetPlaybackSpeed(const AEngineIndex: Integer): single;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetPlaybackSpeed, True{AWaitResponse}).Resultsingle;
 end;
 
-{***********************}
+{**********************************************************************************************************}
 procedure TALVideoPlayerControllerThread.SetPlaybackSpeed(const AEngineIndex: Integer; const Value: single);
 begin
   EnqueueCommand(AEngineIndex, TOperation.SetPlaybackSpeed, False{AWaitResponse}, Value);
 end;
 
-{***********************}
+{*********************************************************************************************}
 function TALVideoPlayerControllerThread.GetCurrentPosition(const AEngineIndex: Integer): Int64;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetCurrentPosition, True{AWaitResponse}).ResultInt64;
 end;
 
-{***********************}
+{**************************************************************************************}
 function TALVideoPlayerControllerThread.GetDuration(const AEngineIndex: Integer): Int64;
 begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetDuration, True{AWaitResponse}).ResultInt64;
 end;
 
-{***********************}
+{*******************************************************************************************}
 function TALVideoPlayerControllerThread.GetVideoHeight(const AEngineIndex: Integer): Integer;
 begin
   Result := Integer(EnqueueCommand(AEngineIndex, TOperation.GetVideoHeight, True{AWaitResponse}).ResultInt64);
 end;
 
-{***********************}
+{******************************************************************************************}
 function TALVideoPlayerControllerThread.GetVideoWidth(const AEngineIndex: Integer): Integer;
 begin
   Result := Integer(EnqueueCommand(AEngineIndex, TOperation.GetVideoWidth, True{AWaitResponse}).ResultInt64)
 end;
 
-{***********************}
+{*******************************************************************************************************}
 procedure TALVideoPlayerControllerThread.Prepare(const AEngineIndex: Integer; Const ADataSource: String);
 begin
   EnqueueCommand(AEngineIndex, TOperation.Prepare, False{AWaitResponse}, ADataSource);
 end;
 
-{***********************}
+{**************************************************************************}
 procedure TALVideoPlayerControllerThread.Start(const AEngineIndex: Integer);
 begin
   EnqueueCommand(AEngineIndex, TOperation.Start, False{AWaitResponse});
 end;
 
-{***********************}
+{**************************************************************************}
 procedure TALVideoPlayerControllerThread.Pause(const AEngineIndex: Integer);
 begin
   EnqueueCommand(AEngineIndex, TOperation.Pause, False{AWaitResponse});
 end;
 
-{***********************}
+{*************************************************************************}
 procedure TALVideoPlayerControllerThread.Stop(const AEngineIndex: Integer);
 begin
   EnqueueCommand(AEngineIndex, TOperation.Stop, False{AWaitResponse});
 end;
 
-{***********************}
+{**********************************************************************************************}
 procedure TALVideoPlayerControllerThread.SeekTo(const AEngineIndex: Integer; const msec: Int64);
 begin
   EnqueueCommand(AEngineIndex, TOperation.SeekTo, False{AWaitResponse}, msec);
 end;
 
-{***************************************************************************}
+{****************************************************************************************************}
 constructor TALVideoPlayerSurface.TPreviewDownloadContext.Create(const AOwner: TALVideoPlayerSurface);
 begin
   inherited Create;
@@ -3445,7 +3445,7 @@ begin
   WrapMode := Owner.WrapMode;
 end;
 
-{***************************************************}
+{***************************************************************}
 destructor TALVideoPlayerSurface.TPreviewDownloadContext.Destroy;
 begin
   ALFreeAndNil(Lock);
@@ -3499,13 +3499,13 @@ begin
     FVideoPlayerEngine.Prepare(FDataSource)
 end;
 
-{******************************************}
+{*******************************************************}
 function TALVideoPlayerSurface.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-{*******************************************}
+{********************************************************}
 function TALVideoPlayerSurface.GetDoubleBuffered: boolean;
 begin
   result := True;
@@ -3527,7 +3527,7 @@ begin
   end;
 end;
 
-{**********************************************************}
+{*****************************************************************}
 procedure TALVideoPlayerSurface.SetDataSource(const Value: String);
 begin
   if Value <> FDataSource then begin
@@ -3543,7 +3543,7 @@ begin
   end;
 end;
 
-{**********************************************************}
+{*************************************************************************}
 procedure TALVideoPlayerSurface.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if FWrapMode <> Value then begin
@@ -3553,13 +3553,13 @@ begin
   end;
 end;
 
-{**********************************************************}
+{***********************************************}
 function TALVideoPlayerSurface.GetState: Integer;
 begin
   Result := fVideoPlayerEngine.State;
 end;
 
-{**********************************************************}
+{****************************************************************************}
 procedure TALVideoPlayerSurface.SetAutoStartMode(const Value: TAutoStartMode);
 begin
   if value <> FAutoStartMode then begin
@@ -3568,73 +3568,73 @@ begin
   end;
 end;
 
-{**********************************************************}
+{***************************************************}
 function TALVideoPlayerSurface.GetIsPlaying: boolean;
 begin
   Result := fVideoPlayerEngine.IsPlaying;
 end;
 
-{**********************************************************}
+{*************************************************}
 function TALVideoPlayerSurface.GetLooping: Boolean;
 begin
   Result := fVideoPlayerEngine.Looping;
 end;
 
-{**********************************************************}
+{***************************************************************}
 procedure TALVideoPlayerSurface.SetLooping(const Value: Boolean);
 begin
   fVideoPlayerEngine.Looping := Value;
 end;
 
-{**********************************************************}
+{***********************************************}
 function TALVideoPlayerSurface.GetVolume: Single;
 begin
   Result := fVideoPlayerEngine.Volume;
 end;
 
-{**********************************************************}
+{*************************************************************}
 procedure TALVideoPlayerSurface.SetVolume(const Value: Single);
 begin
   fVideoPlayerEngine.Volume := Value;
 end;
 
-{**********************************************************}
+{******************************************************}
 function TALVideoPlayerSurface.GetPlaybackSpeed: single;
 begin
   Result := fVideoPlayerEngine.PlaybackSpeed;
 end;
 
-{**********************************************************}
+{********************************************************************}
 procedure TALVideoPlayerSurface.SetPlaybackSpeed(const Value: single);
 begin
   fVideoPlayerEngine.PlaybackSpeed := Value;
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALVideoPlayerSurface.GetCurrentPosition: Int64;
 begin
   Result := fVideoPlayerEngine.GetCurrentPosition;
 end;
 
-{**********************************************************}
+{************************************************}
 function TALVideoPlayerSurface.GetDuration: Int64;
 begin
   Result := fVideoPlayerEngine.GetDuration;
 end;
 
-{**********************************************************}
+{*****************************************************}
 function TALVideoPlayerSurface.GetVideoHeight: Integer;
 begin
   Result := fVideoPlayerEngine.GetVideoHeight;
 end;
 
-{**********************************************************}
+{****************************************************}
 function TALVideoPlayerSurface.GetVideoWidth: Integer;
 begin
   Result := fVideoPlayerEngine.GetVideoWidth;
 end;
 
-{**********************************************************}
+{************************************}
 procedure TALVideoPlayerSurface.Start;
 begin
   if FInternalState = VPSStarted then exit;
@@ -3642,7 +3642,7 @@ begin
   fVideoPlayerEngine.Start;
 end;
 
-{**********************************************************}
+{************************************}
 procedure TALVideoPlayerSurface.Pause;
 begin
   if FInternalState = VPSPaused then exit;
@@ -3651,7 +3651,7 @@ begin
   fVideoPlayerEngine.Pause;
 end;
 
-{**********************************************************}
+{***********************************}
 procedure TALVideoPlayerSurface.Stop;
 begin
   if FInternalState = VPSStopped then exit;
@@ -3660,67 +3660,67 @@ begin
   fVideoPlayerEngine.Stop;
 end;
 
-{**********************************************************}
+{********************************************************}
 procedure TALVideoPlayerSurface.SeekTo(const msec: Int64);
 begin
   fVideoPlayerEngine.SeekTo(msec);
 end;
 
-{**********************************************************}
+{***********************************************************}
 function TALVideoPlayerSurface.GetOnErrorEvent: TNotifyEvent;
 begin
   result := fVideoPlayerEngine.OnError;
 end;
 
-{**********************************************************}
+{*************************************************************************}
 procedure TALVideoPlayerSurface.SetOnErrorEvent(const Value: TNotifyEvent);
 begin
   fVideoPlayerEngine.OnError := Value;
 end;
 
-{**********************************************************}
+{**************************************************************}
 function TALVideoPlayerSurface.GetOnPreparedEvent: TNotifyEvent;
 begin
   result := fVideoPlayerEngine.OnPrepared;
 end;
 
-{**********************************************************}
+{****************************************************************************}
 procedure TALVideoPlayerSurface.SetOnPreparedEvent(const Value: TNotifyEvent);
 begin
   fVideoPlayerEngine.OnPrepared := Value;
 end;
 
-{**********************************************************}
+{****************************************************************}
 function TALVideoPlayerSurface.GetOnCompletionEvent: TNotifyEvent;
 begin
   result := fVideoPlayerEngine.OnCompletion;
 end;
 
-{**********************************************************}
+{******************************************************************************}
 procedure TALVideoPlayerSurface.SetOnCompletionEvent(const Value: TNotifyEvent);
 begin
   fVideoPlayerEngine.OnCompletion := Value;
 end;
 
-{****************************************************************************************}
+{**********************************************************************************}
 function TALVideoPlayerSurface.GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
 begin
   result := fVideoPlayerEngine.OnVideoSizeChanged;
 end;
 
-{******************************************************************************************************}
+{************************************************************************************************}
 procedure TALVideoPlayerSurface.SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
 begin
   fVideoPlayerEngine.OnVideoSizeChanged := Value;
 end;
 
-{***************************************************************}
+{**************************************************************}
 function TALVideoPlayerSurface.IsBackgroundColorStored: Boolean;
 begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
-{**********************************************************}
+{*********************************************************}
 function TALVideoPlayerSurface.IsDataSourceStored: Boolean;
 begin
   result := FDataSource <> '';
@@ -3738,14 +3738,14 @@ begin
   Result := not SameValue(Volume, 1);
 end;
 
-{***************************}
+{****************************************}
 procedure TALVideoPlayerSurface.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-{**********************************}
+{***********************************************}
 procedure TALVideoPlayerSurface.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -3757,7 +3757,7 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-{****************************************}
+{****************************************************}
 procedure TALVideoPlayerSurface.CancelPreviewDownload;
 begin
   // The FPreviewDownloadContext pointer can only be
@@ -3958,7 +3958,7 @@ begin
 
 end;
 
-{*********************************}
+{**********************************************}
 procedure TALVideoPlayerSurface.MakeBufDrawable;
 begin
 

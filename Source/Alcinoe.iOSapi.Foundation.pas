@@ -50,6 +50,21 @@ type
     function phoneticRepresentation : NSPersonNameComponents; cdecl;
   end;
 
+function NSKeyValueChangeNewKey: NSString;
+function NSKeyValueChangeOldKey: NSString;
+
 implementation
+
+{****************************************}
+function NSKeyValueChangeNewKey: NSString;
+begin
+  result := CocoaNSStringConst(libFoundation, 'NSKeyValueChangeNewKey');
+end;
+
+{****************************************}
+function NSKeyValueChangeOldKey: NSString;
+begin
+  result := CocoaNSStringConst(libFoundation, 'NSKeyValueChangeOldKey');
+end;
 
 end.

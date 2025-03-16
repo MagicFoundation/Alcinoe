@@ -138,12 +138,14 @@ type
     procedure BeginTextUpdate; virtual;
     procedure EndTextUpdate; virtual;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
+    function GetAbsoluteDisplayedRect: TRectF; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
-    function IsVisibleWithinFormBounds: Boolean;
+    function IsDisplayed: Boolean; virtual;
+    property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
     property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
     {$IFNDEF ALCompilerVersionSupported122}
@@ -1066,12 +1068,28 @@ begin
 end;
 
 {*****************************************************}
-function TALControl.IsVisibleWithinFormBounds: Boolean;
+function TALControl.IsDisplayed: Boolean;
 begin
-  Result := GetParentedVisible;
-  if not result then exit;
-  if Form <> nil then
-    Result := Form.ClientRect.IntersectsWith(LocalToAbsolute(LocalRect));
+  Result := not GetAbsoluteDisplayedRect.IsEmpty;
+end;
+
+{*******************************************}
+function TALControl.GetAbsoluteDisplayedRect: TRectF;
+begin
+  if (not Visible) or (form = nil) then Exit(TRectF.Empty);
+  var LAbsoluteIntersectionRect := AbsoluteRect;
+  var LControlTmp := Tcontrol(Self);
+  while LControlTmp.ParentControl <> nil do begin
+    if not LControlTmp.Visible then Exit(TRectF.Empty);
+    if LControlTmp.ClipChildren then begin
+      var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
+      LAbsoluteIntersectionRect.Intersect(AbsoluteClipRect);
+      if LAbsoluteIntersectionRect.IsEmpty then
+        Exit(TRectF.Empty);
+    end;
+    LControlTmp := LControlTmp.ParentControl;
+  end;
+  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
 end;
 
 {***********************************************}

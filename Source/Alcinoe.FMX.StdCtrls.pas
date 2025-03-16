@@ -3147,7 +3147,7 @@ end;
 {********************************************************}
 procedure TALAniIndicator.DoTimerProcess(sender: Tobject);
 begin
-  if not IsVisibleWithinFormBounds then begin
+  if not IsDisplayed then begin
     FTimer.Enabled := False;
     exit;
   end;

@@ -43,10 +43,10 @@ type
     destructor Destroy; override;
     property Signal: TEvent read FSignal;
     property HasObjectsToFree: Boolean read getHasObjectsToFree;
-    // CanExecute is a flag used to freeze the loop for 3 seconds.
+    // CanExecute is a flag used to freeze the loop for 100 ms.
     // To prevent the loop from executing during UI animations,
     // simply set CanExecute to False in the form's repaint event.
-    // CanExecute will automatically reset to True after 3 seconds.
+    // CanExecute will automatically reset to True after 100 ms.
     property CanExecute: boolean read FCanExecute write FCanExecute;
     property ForceExecute: Boolean read FForceExecute write SetForceExecute;
   end;
@@ -138,14 +138,7 @@ begin
           (not Terminated) and
           (TThread.GetTickCount64 < LMaxTickCount64) do begin // Wait max 2 minutes before forcing loop execution
       CanExecute := True;
-      FSignal.WaitFor(3000);
-      TMonitor.Enter(self);
-      try
-        if fFreeObjectsCurrList.count > 1000 then
-          FForceExecute := True;
-      finally
-        TMonitor.Exit(self);
-      end;
+      FSignal.WaitFor(100);
     end;
     FForceExecute := False;
     FSignal.ResetEvent;

@@ -2721,7 +2721,7 @@ begin
       else
         TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
     end;
-    fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.currentRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+    fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.mainRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
   end;
   fDisplayLink.setPaused(False);
   {$ELSEIF defined(ANDROID)}

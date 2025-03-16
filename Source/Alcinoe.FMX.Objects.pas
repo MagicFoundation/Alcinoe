@@ -2214,16 +2214,9 @@ begin
   if (not ALIsDrawableNull(FBufDrawable)) or
      (FResourceDownloadContext <> nil) then exit;
 
-  If FResourceDownloadContext <> nil then begin
-    if (LoadingCacheIndex > 0) and
-       (CacheEngine <> nil) and
-       (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex})) then Exit;
-  end
-  else begin
-    if (CacheIndex > 0) and
-       (CacheEngine <> nil) and
-       (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
-  end;
+  if (CacheIndex > 0) and
+     (CacheEngine <> nil) and
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   if (FResourceDownloadContext = nil) and
      (ALIsHttpOrHttpsUrl(ResourceName)) then begin
@@ -2511,7 +2504,7 @@ end;
 {********************************************}
 procedure TALAnimatedImage.TAnimation.repaint;
 begin
-  if Fowner.IsVisibleWithinFormBounds then
+  if Fowner.IsDisplayed then
     Fowner.Repaint;
 end;
 

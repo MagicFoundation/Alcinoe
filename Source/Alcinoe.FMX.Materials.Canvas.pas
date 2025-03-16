@@ -105,7 +105,6 @@ var
 function ALGetDefExternalOESMaterial: TALCanvasExternalOESTextureMaterial;
 begin
   if ALDefExternalOESMaterial = nil then begin
-    if TThread.Current.ThreadID <> MainThreadID then raise Exception.Create('TALTexture.DefExternalOESMaterial can only be created on the main UI thread');
     var LMaterial := TALCanvasExternalOESTextureMaterial.Create;
     if AtomicCmpExchange(Pointer(ALDefExternalOESMaterial), Pointer(LMaterial), nil) <> nil then AlfreeAndNil(LMaterial)
     {$IFDEF AUTOREFCOUNT}
@@ -119,7 +118,6 @@ end;
 function ALGetDef420YpCbCr8BiPlanarVideoRangeMaterial: TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial;
 begin
   if ALDef420YpCbCr8BiPlanarVideoRangeMaterial = nil then begin
-    if TThread.Current.ThreadID <> MainThreadID then raise Exception.Create('TALTexture.Def420YpCbCr8BiPlanarVideoRangeMaterial can only be created on the main UI thread');
     var LMaterial := TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.Create;
     if AtomicCmpExchange(Pointer(ALDef420YpCbCr8BiPlanarVideoRangeMaterial), Pointer(LMaterial), nil) <> nil then AlfreeAndNil(LMaterial)
     {$IFDEF AUTOREFCOUNT}
@@ -133,7 +131,6 @@ end;
 function ALGetDef420YpCbCr8PlanarMaterial: TALCanvas420YpCbCr8PlanarTextureMaterial;
 begin
   if ALDef420YpCbCr8PlanarMaterial = nil then begin
-    if TThread.Current.ThreadID <> MainThreadID then raise Exception.Create('TALTexture.Def420YpCbCr8PlanarMaterial can only be created on the main UI thread');
     var LMaterial := TALCanvas420YpCbCr8PlanarTextureMaterial.Create;
     if AtomicCmpExchange(Pointer(ALDef420YpCbCr8PlanarMaterial), Pointer(LMaterial), nil) <> nil then AlfreeAndNil(LMaterial)
     {$IFDEF AUTOREFCOUNT}

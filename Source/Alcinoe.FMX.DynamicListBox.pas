@@ -24,6 +24,7 @@ uses
   FMX.types,
   FMX.StdActns,
   Fmx.Forms,
+  Alcinoe.FMX.VideoPlayer,
   Alcinoe.JSONDoc,
   Alcinoe.FMX.Ani,
   Alcinoe.Common,
@@ -127,6 +128,7 @@ type
     function GetLocalRect: TALRectD; virtual; // [TControl] function GetLocalRect: TRectF; virtual;
     function GetExpandedLocalRect: TALRectD;
     function GetAbsoluteRect: TALRectD; virtual; // [TControl] function GetAbsoluteRect: TRectF; virtual;
+    function GetAbsoluteDisplayedRect: TRectF; virtual;
     function GetExpandedBoundsRect: TALRectD;
     procedure SetPosition(const AValue: TALPointD); overload;
     procedure SetPosition(const AValue: TPointf); overload;
@@ -144,7 +146,6 @@ type
     procedure SetVisible(const Value: Boolean); virtual; // [TControl] procedure SetVisible(const Value: Boolean); virtual;
     function GetFirstVisibleObjectIndex: Integer; virtual; // [TControl] function GetFirstVisibleObjectIndex: Integer; virtual;
     function GetLastVisibleObjectIndex: Integer; virtual; // [TControl] function GetLastVisibleObjectIndex: Integer; virtual;
-    function IsVisibleWithinListboxBounds: Boolean; virtual;
     procedure RefreshAbsoluteVisible;
     procedure SetAlign(const Value: TALAlignLayout); virtual; // [TControl] procedure SetAlign(const Value: TAlignLayout); virtual;
     function GetPriority(const AContext: Tobject): Int64; virtual;
@@ -223,6 +224,7 @@ type
     function LocalToAbsolute(const APoint: TPointF): TALPointD; overload; // [TControl] function LocalToAbsolute(const APoint: TPointF): TPointF; overload; virtual;
     function LocalToAbsolute(const ARect: TRectF): TALRectD; overload; // [TControl] function LocalToAbsolute(const ARect: TRectF): TRectF; overload;
     function PointInObjectLocal(X, Y: Double): Boolean; virtual; // [TControl] function PointInObject(X, Y: Single): Boolean; virtual;
+    function IsDisplayed: Boolean; virtual; abstract;
     property Name: String read FName write FName; // [TControl:published] property Name: TComponentName read FName write SetName stored False;
     property Enabled: Boolean read FEnabled write SetEnabled; // [TControl] property Enabled: Boolean read FEnabled write SetEnabled stored EnabledStored default True;
     property AbsoluteEnabled: Boolean read FAbsoluteEnabled; // [TControl] property AbsoluteEnabled: Boolean read GetAbsoluteEnabled;
@@ -351,12 +353,14 @@ type
     procedure BeginTextUpdate; override;
     procedure EndTextUpdate; override;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
+    //function GetAbsoluteDisplayedRect: TRectF; virtual;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure EndUpdate; override;
     //procedure SetNewScene(AScene: IScene); override;
-    function IsVisibleWithinFormBounds: Boolean;
+    function IsDisplayed: Boolean; override;
+    property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     //property Form: TCommonCustomForm read FForm;
     //property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
     {$IFNDEF ALCompilerVersionSupported122}
@@ -4097,6 +4101,192 @@ type
     //property OnResized;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicListBoxVideoPlayerSurface = class(TALDynamicListBoxExtendedControl)
+  public
+    type
+      TAutoStartMode = (None, WhenPrepared, WhenDisplayed);
+  protected
+    type
+      TPreviewDownloadContext = Class(TObject)
+      private
+        Lock: TObject;
+        FreeByThread: Boolean;
+      public
+        Owner: TALDynamicListBoxVideoPlayerSurface;
+        Rect: TRectF;
+        Scale: Single;
+        AlignToPixel: Boolean;
+        ResourceName: String;
+        ResourceStream: TStream;
+        WrapMode: TALImageWrapMode;
+        constructor Create(const AOwner: TALDynamicListBoxVideoPlayerSurface); virtual;
+        destructor Destroy; override;
+      End;
+  private
+    class var AutoStartedVideoPlayerSurface: TALDynamicListBoxVideoPlayerSurface;
+  private
+    fVideoPlayerEngine: TALBaseVideoPlayer; // 8 bytes
+    FDataSource: String; // 8 bytes
+    fPreviewResourceName: String; // 8 bytes
+    FBackgroundColor: TAlphaColor; // 4 bytes
+    FInternalState: Integer; // 4 Bytes
+    FAutoStartMode: TAutoStartMode; // 1 Byte
+    FWrapMode: TALImageWrapMode; // 1 bytes
+    FCacheIndex: Integer; // 4 bytes
+    FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
+    FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
+    procedure DoOnFrameAvailable(Sender: Tobject);
+    procedure setPreviewResourceName(const Value: String);
+    procedure SetDataSource(const Value: String);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    function GetState: Integer;
+    procedure SetAutoStartMode(const Value: TAutoStartMode);
+    function GetIsPlaying: boolean;
+    function GetLooping: Boolean;
+    procedure SetLooping(const Value: Boolean);
+    function GetVolume: Single;
+    procedure SetVolume(const Value: Single);
+    function GetPlaybackSpeed: single;
+    procedure SetPlaybackSpeed(const Value: single);
+    function GetOnErrorEvent: TNotifyEvent;
+    procedure SetOnErrorEvent(const Value: TNotifyEvent);
+    function GetOnPreparedEvent: TNotifyEvent;
+    procedure SetOnPreparedEvent(const Value: TNotifyEvent);
+    function GetOnCompletionEvent: TNotifyEvent;
+    procedure SetOnCompletionEvent(const Value: TNotifyEvent);
+    function GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
+    procedure SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
+    function IsBackgroundColorStored: Boolean;
+    function IsDataSourceStored: Boolean;
+    function IsPlaybackSpeedStored: Boolean;
+    function IsVolumeStored: Boolean;
+  protected
+    fBufDrawable: TALDrawable; // 8 bytes
+    fBufDrawableRect: TRectF; // 16 bytes
+    function GetCacheSubIndex: Integer; virtual;
+    function GetDoubleBuffered: boolean; override;
+    function GetDefaultBackgroundColor: TalphaColor; virtual;
+    procedure CancelPreviewDownload;
+    class function CanStartPreviewDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
+    class procedure HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject); virtual; // [MultiThread]
+    class procedure HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
+    class function GetPreviewDownloadPriority(const AContext: Tobject): Int64; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(var AContext: TObject); overload; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(
+                      var ABufDrawable: TALDrawable;
+                      out ABufDrawableRect: TRectF;
+                      const ARect: TRectF;
+                      const AScale: Single;
+                      const AAlignToPixel: Boolean;
+                      const AResourceName: String;
+                      const AResourceStream: TStream;
+                      const AWrapMode: TALImageWrapMode); overload; virtual; // [MultiThread]
+    procedure Paint; override;
+    //procedure Loaded; override;
+    procedure DoResized; override;
+    property VideoPlayerEngine: TALBaseVideoPlayer read fVideoPlayerEngine;
+  public
+    constructor Create(const AOwner: TObject); override;
+    destructor Destroy; override;
+    procedure BeforeDestruction; override;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
+    property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    function GetCurrentPosition: Int64;
+    function GetDuration: Int64;
+    function GetVideoHeight: Integer;
+    function GetVideoWidth: Integer;
+    procedure Start;
+    procedure Pause;
+    procedure Stop;
+    procedure SeekTo(const msec: Int64);
+    property State: Integer read GetState;
+    property IsPlaying: boolean read GetIsPlaying;
+    // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
+    // prevent duplicate drawables across multiple identical controls.
+    // CacheIndex specifies the slot in the cache engine where an existing
+    // drawable can be retrieved.
+    property CacheIndex: Integer read FCacheIndex write FCacheIndex;
+    // CacheEngine is not owned by the current control.
+    property CacheEngine: TALBufDrawableCacheEngine read FCacheEngine write FCacheEngine;
+  public
+    //property Action;
+    property Align;
+    //property Anchors;
+    //property AutoSize;
+    property AutoStartMode: TAutoStartMode read FAutoStartMode write SetAutoStartMode default TAutoStartMode.None;
+    property BackgroundColor: TAlphaColor read fBackgroundColor write fBackgroundColor Stored IsBackgroundColorStored;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DataSource: String read FDataSource Write SetDataSource stored IsDataSourceStored nodefault;
+    //property DoubleBuffered;
+    //property DragMode;
+    //property EnableDragHighlight;
+    property Enabled;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    //property Locked;
+    Property Looping: Boolean read GetLooping Write SetLooping default false;
+    property Margins;
+    property Opacity;
+    property Padding;
+    Property PlaybackSpeed: Single read GetPlaybackSpeed Write SetPlaybackSpeed stored IsPlaybackSpeedStored nodefault;
+    //property PopupMenu;
+    //property Position;
+    // If a file extension (e.g., .png) is detected in ResourceName, the image is loaded from the
+    // specified file (With the full path of the file obtained using ALGetResourceFilename).
+    // If ResourceName is a URL, the image is downloaded in the background from the internet.
+    // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
+    // project directory (with the extensions .png or .jpg).
+    property PreviewResourceName: String read fPreviewResourceName write setPreviewResourceName;
+    //property RotationAngle;
+    //property RotationCenter;
+    property Pivot;
+    property Scale;
+    //property Size;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    Property Volume: Single read GetVolume Write SetVolume stored IsVolumeStored nodefault;
+    property Width;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
+    //property OnCanFocus;
+    //property OnDragEnter;
+    //property OnDragLeave;
+    //property OnDragOver;
+    //property OnDragDrop;
+    //property OnDragEnd;
+    //property OnEnter;
+    //property OnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    //property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    //property OnResized;
+    property OnError: TNotifyEvent read GetOnErrorEvent write SetOnErrorEvent;
+    property OnPrepared: TNotifyEvent read GetOnPreparedEvent write SetOnPreparedEvent;
+    property OnCompletion: TNotifyEvent read GetOnCompletionEvent write SetOnCompletionEvent;
+    property OnVideoSizeChanged: TALVideoSizeChangedEvent read GetOnVideoSizeChangedEvent write SetOnVideoSizeChangedEvent;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxLayout = class(TALDynamicListBoxExtendedControl)
   protected
@@ -4309,8 +4499,8 @@ type
     function CreateErrorContent(const AContext: TCreateContentContext): TALDynamicListBoxItemErrorContent; virtual;
     procedure ShiftErrorContent(const AContent: TALDynamicListBoxItemErrorContent); virtual;
     //--
-    function IsVisibleWithinListboxBounds: Boolean; override;
     procedure PaintInternal(const ACanvas: TCanvas); override;
+    function GetAbsoluteDisplayedRect: TRectF; override;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
@@ -4479,7 +4669,6 @@ type
     function FindFirstVisibleItemIndex: integer; virtual;
     function FindLastVisibleItemIndex: integer; virtual;
     function FindLastActiveItem: TALDynamicListBoxItem; virtual;
-    function IsVisibleWithinListboxBounds: Boolean; override;
     property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
     property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
     property FirstPreloadedItemIndex: integer read FFirstPreloadedItemIndex;
@@ -5105,6 +5294,15 @@ begin
   Result := TALRectD.Create(LocalToAbsolute(LocalRect));
 end;
 
+{*********************************************************}
+function TALDynamicListBoxControl.GetAbsoluteDisplayedRect: TRectF;
+begin
+  if (FIsDestroying) or (not AbsoluteVisible) or (OwnerListBox = nil) then Exit(TRectF.Empty);
+  // This function assumes that ClipChildren is not implemented.
+  // If this changes, use the implementation found in TALControl.GetAbsoluteDisplayedRect.
+  Result := TRectF.Intersect(OwnerListbox.LocalToAbsolute(OwnerListbox.DisplayedRect), AbsoluteRect.ReducePrecision);
+end;
+
 {****************************************************************}
 function TALDynamicListBoxControl.GetExpandedBoundsRect: TALRectD;
 begin
@@ -5313,15 +5511,6 @@ end;
 function TALDynamicListBoxControl.GetLastVisibleObjectIndex: Integer;
 begin
   Result := high(Fcontrols);
-end;
-
-{**********************************************************************}
-function TALDynamicListBoxControl.IsVisibleWithinListboxBounds: Boolean;
-begin
-  Result := AbsoluteVisible;
-  if not result then exit;
-  if OwnerListbox <> nil then
-    Result := OwnerListbox.AbsoluteRect.IntersectsWith(LocalToAbsolute(LocalRect).ReducePrecision);
 end;
 
 {********************************************************}
@@ -7365,11 +7554,30 @@ begin
   FIsPixelAlignmentEnabled := AValue;
 end;
 
-{***************************************************************************}
-function TALDynamicListBoxExtendedControl.IsVisibleWithinFormBounds: Boolean;
+{*************************************************************}
+function TALDynamicListBoxExtendedControl.IsDisplayed: Boolean;
 begin
-  Result := IsVisibleWithinListBoxBounds and (OwnerListBox <> nil) and (OwnerListBox.IsVisibleWithinFormBounds);
+  Result := not GetAbsoluteDisplayedRect.IsEmpty;
 end;
+
+{***************************************************************************}
+//function TALDynamicListBoxExtendedControl.GetAbsoluteDisplayedRect: TRectF;
+//begin
+//  if (not Visible) or (form = nil) then Exit(TRectF.Empty);
+//  var LAbsoluteIntersectionRect := AbsoluteRect;
+//  var LControlTmp := Tcontrol(Self);
+//  while LControlTmp.OwnerControl <> nil do begin
+//    if not LControlTmp.Visible then Exit(TRectF.Empty);
+//    if LControlTmp.ClipChildren then begin
+//      var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
+//      LAbsoluteIntersectionRect.Intersect(AbsoluteClipRect);
+//      if LAbsoluteIntersectionRect.IsEmpty then
+//        Exit(TRectF.Empty);
+//    end;
+//    LControlTmp := LControlTmp.OwnerControl;
+//  end;
+//  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
+//end;
 
 {***********************************************************************}
 //procedure TALDynamicListBoxExtendedControl.SetNewScene(AScene: IScene);
@@ -8599,16 +8807,9 @@ begin
   if (not ALIsDrawableNull(FBufDrawable)) or
      (FResourceDownloadContext <> nil) then exit;
 
-  If FResourceDownloadContext <> nil then begin
-    if (LoadingCacheIndex > 0) and
-       (CacheEngine <> nil) and
-       (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex})) then Exit;
-  end
-  else begin
-    if (CacheIndex > 0) and
-       (CacheEngine <> nil) and
-       (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
-  end;
+  if (CacheIndex > 0) and
+     (CacheEngine <> nil) and
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   if (FResourceDownloadContext = nil) and
      (ALIsHttpOrHttpsUrl(ResourceName)) then begin
@@ -20523,6 +20724,770 @@ begin
   Result := Nil;
 end;
 
+{********************************************************************************************************************************}
+constructor TALDynamicListBoxVideoPlayerSurface.TPreviewDownloadContext.Create(const AOwner: TALDynamicListBoxVideoPlayerSurface);
+begin
+  inherited Create;
+  Lock := TObject.Create;
+  FreeByThread := True;
+  Owner := AOwner;
+  Rect := Owner.LocalRect.ReducePrecision;
+  Scale := ALGetScreenScale;
+  AlignToPixel := Owner.IsPixelAlignmentEnabled;
+  ResourceName := Owner.PreviewResourceName;
+  ResourceStream := nil;
+  WrapMode := Owner.WrapMode;
+end;
+
+{*****************************************************************************}
+destructor TALDynamicListBoxVideoPlayerSurface.TPreviewDownloadContext.Destroy;
+begin
+  ALFreeAndNil(Lock);
+  ALFreeAndNil(ResourceStream);
+  inherited
+end;
+
+{****************************************************************************}
+constructor TALDynamicListBoxVideoPlayerSurface.Create(const AOwner: TObject);
+begin
+  inherited Create(AOwner);
+  {$IF defined(ALDPK)}
+  fVideoPlayerEngine := TALDummyVideoPlayer.create;
+  {$ELSE}
+  fVideoPlayerEngine := TALAsyncVideoPlayer.create;
+  {$ENDIF}
+  fVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
+  FDataSource := '';
+  fPreviewResourceName := '';
+  FBackgroundColor := DefaultBackgroundColor;
+  FInternalState := VPSIdle;
+  FAutoStartMode := TAutoStartMode.None;
+  FWrapMode := TALImageWrapMode.Fit;
+  FCacheIndex := 0;
+  FCacheEngine := nil;
+  FPreviewDownloadContext := nil;
+  fBufDrawable := ALNullDrawable;
+end;
+
+{*****************************************************}
+destructor TALDynamicListBoxVideoPlayerSurface.Destroy;
+begin
+  ALFreeAndNil(fVideoPlayerEngine);
+  inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{**************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.BeforeDestruction;
+begin
+  // Required for DynamicListBox or when
+  // using ALFreeAndNil with delayed set to True.
+  Stop;
+  inherited;
+end;
+
+{*****************************************************}
+//procedure TALDynamicListBoxVideoPlayerSurface.Loaded;
+//begin
+//  inherited;
+//  If FDataSource <> '' then
+//    FVideoPlayerEngine.Prepare(FDataSource)
+//end;
+
+{*********************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
+end;
+
+{**********************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDoubleBuffered: boolean;
+begin
+  result := True;
+end;
+
+{**********************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDefaultBackgroundColor: TalphaColor;
+begin
+  Result := TalphaColors.Black;
+end;
+
+{****************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.setPreviewResourceName(const Value: String);
+begin
+  if FPreviewResourceName <> Value then begin
+    ClearBufDrawable;
+    FPreviewResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{*******************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetDataSource(const Value: String);
+begin
+  if Value <> FDataSource then begin
+    FDataSource := Value;
+    {$IF not defined(ALDPK)}
+    //if not (csLoading in ComponentState) then begin
+      if FInternalState = vpsIdle then
+        FVideoPlayerEngine.Prepare(FDataSource)
+      else
+        Raise Exception.Create('The data source cannot be changed once it has been set.');
+    //end;
+    {$ENDIF}
+  end;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if FWrapMode <> Value then begin
+    ClearBufDrawable;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{*************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetState: Integer;
+begin
+  Result := fVideoPlayerEngine.State;
+end;
+
+{******************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetAutoStartMode(const Value: TAutoStartMode);
+begin
+  if value <> FAutoStartMode then begin
+    FAutoStartMode := Value;
+    fVideoPlayerEngine.AutoStartWhenPrepared := FAutoStartMode = TautoStartMode.WhenPrepared;
+  end;
+end;
+
+{*****************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetIsPlaying: boolean;
+begin
+  Result := fVideoPlayerEngine.IsPlaying;
+end;
+
+{***************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetLooping: Boolean;
+begin
+  Result := fVideoPlayerEngine.Looping;
+end;
+
+{*****************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetLooping(const Value: Boolean);
+begin
+  fVideoPlayerEngine.Looping := Value;
+end;
+
+{*************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetVolume: Single;
+begin
+  Result := fVideoPlayerEngine.Volume;
+end;
+
+{***************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetVolume(const Value: Single);
+begin
+  fVideoPlayerEngine.Volume := Value;
+end;
+
+{********************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetPlaybackSpeed: single;
+begin
+  Result := fVideoPlayerEngine.PlaybackSpeed;
+end;
+
+{**********************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetPlaybackSpeed(const Value: single);
+begin
+  fVideoPlayerEngine.PlaybackSpeed := Value;
+end;
+
+{*********************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetCurrentPosition: Int64;
+begin
+  Result := fVideoPlayerEngine.GetCurrentPosition;
+end;
+
+{**************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDuration: Int64;
+begin
+  Result := fVideoPlayerEngine.GetDuration;
+end;
+
+{*******************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetVideoHeight: Integer;
+begin
+  Result := fVideoPlayerEngine.GetVideoHeight;
+end;
+
+{******************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetVideoWidth: Integer;
+begin
+  Result := fVideoPlayerEngine.GetVideoWidth;
+end;
+
+{**************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.Start;
+begin
+  if FInternalState = VPSStarted then exit;
+  FInternalState := VPSStarted;
+  fVideoPlayerEngine.Start;
+end;
+
+{**************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.Pause;
+begin
+  if FInternalState = VPSPaused then exit;
+  FInternalState := VPSPaused;
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  fVideoPlayerEngine.Pause;
+end;
+
+{*************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.Stop;
+begin
+  if FInternalState = VPSStopped then exit;
+  FInternalState := VPSStopped;
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  fVideoPlayerEngine.Stop;
+end;
+
+{**********************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SeekTo(const msec: Int64);
+begin
+  fVideoPlayerEngine.SeekTo(msec);
+end;
+
+{*************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetOnErrorEvent: TNotifyEvent;
+begin
+  result := fVideoPlayerEngine.OnError;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetOnErrorEvent(const Value: TNotifyEvent);
+begin
+  fVideoPlayerEngine.OnError := Value;
+end;
+
+{****************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetOnPreparedEvent: TNotifyEvent;
+begin
+  result := fVideoPlayerEngine.OnPrepared;
+end;
+
+{******************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetOnPreparedEvent(const Value: TNotifyEvent);
+begin
+  fVideoPlayerEngine.OnPrepared := Value;
+end;
+
+{******************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetOnCompletionEvent: TNotifyEvent;
+begin
+  result := fVideoPlayerEngine.OnCompletion;
+end;
+
+{********************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetOnCompletionEvent(const Value: TNotifyEvent);
+begin
+  fVideoPlayerEngine.OnCompletion := Value;
+end;
+
+{************************************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
+begin
+  result := fVideoPlayerEngine.OnVideoSizeChanged;
+end;
+
+{**************************************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
+begin
+  fVideoPlayerEngine.OnVideoSizeChanged := Value;
+end;
+
+{****************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsBackgroundColorStored: Boolean;
+begin
+  Result := FBackgroundColor <> DefaultBackgroundColor;
+end;
+
+{***********************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsDataSourceStored: Boolean;
+begin
+  result := FDataSource <> '';
+end;
+
+{**************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsPlaybackSpeedStored: Boolean;
+begin
+  Result := not SameValue(PlaybackSpeed, 1);
+end;
+
+{*******************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsVolumeStored: Boolean;
+begin
+  Result := not SameValue(Volume, 1);
+end;
+
+{******************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.DoResized;
+begin
+  ClearBufDrawable;
+  inherited;
+end;
+
+{*************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.ClearBufDrawable;
+begin
+  {$IFDEF debug}
+  if (not IsDestroying) and
+     (not ALIsDrawableNull(fBufDrawable)) then
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+  {$endif}
+  CancelPreviewDownload;
+  ALFreeAndNilDrawable(fBufDrawable);
+end;
+
+{******************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.CancelPreviewDownload;
+begin
+  // The FPreviewDownloadContext pointer can only be
+  // updated in the main thread, so there is no need
+  // to lock its access for reading or updating.
+  if FPreviewDownloadContext <> nil then begin
+    var LContextToFree: TPreviewDownloadContext;
+    var LLock := FPreviewDownloadContext.lock;
+    TMonitor.Enter(LLock);
+    try
+      if not FPreviewDownloadContext.FreeByThread then LContextToFree := FPreviewDownloadContext
+      else LContextToFree := nil;
+      FPreviewDownloadContext.Owner := nil;
+      FPreviewDownloadContext := nil;
+    Finally
+      TMonitor.Exit(LLock);
+    End;
+    ALFreeAndNil(LContextToFree);
+  end;
+end;
+
+{*************}
+//[MultiThread]
+class function TALDynamicListBoxVideoPlayerSurface.CanStartPreviewDownload(var AContext: Tobject): boolean;
+begin
+  result := TPreviewDownloadContext(AContext).owner <> nil;
+end;
+
+{*************}
+//[MultiThread]
+class procedure TALDynamicListBoxVideoPlayerSurface.HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
+begin
+  var LContext := TPreviewDownloadContext(AContext);
+  if LContext.owner = nil then exit;
+  LContext.ResourceStream := AContentStream;
+  TALGraphicThreadPool.Instance.ExecuteProc(
+    CreateBufDrawable, // const AProc: TALWorkerThreadProc;
+    LContext, // const AContext: Tobject; TALGraphicThreadPool.Instance will own and release the Context object
+    GetPreviewDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+  AContentStream := nil; // AContentStream Will be free by AContext
+  AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
+end;
+
+{*************}
+//[MultiThread]
+class procedure TALDynamicListBoxVideoPlayerSurface.HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject);
+begin
+  var LContext := TPreviewDownloadContext(AContext);
+  if LContext.owner = nil then exit;
+  {$IFDEF ALDPK}
+  TMonitor.Enter(LContext.Lock);
+  try
+    if LContext.Owner <> nil then begin
+      LContext.FreeByThread := False;
+      AContext := nil; // AContext will be free by CancelResourceDownload
+    end;
+  finally
+    TMonitor.Exit(LContext.Lock);
+  end;
+  exit;
+  {$ENDIF}
+  if LContext.ResourceName = ALBrokenImageResourceName then begin
+    ALLog(
+      'TALDynamicListBoxVideoPlayerSurface.HandlePreviewDownloadError',
+      'BrokenImage resource is missing or incorrect | ' +
+      AErrMessage,
+      TalLogType.error);
+    TMonitor.Enter(LContext.Lock);
+    try
+      if LContext.Owner <> nil then begin
+        LContext.FreeByThread := False;
+        AContext := nil; // AContext will be free by CancelResourceDownload
+      end;
+    finally
+      TMonitor.Exit(LContext.Lock);
+    end;
+    exit;
+  end;
+  ALLog(
+    'TALDynamicListBoxVideoPlayerSurface.HandlePreviewDownloadError',
+    'Url: ' + LContext.ResourceName + ' | ' +
+    AErrMessage,
+    TalLogType.warn);
+  LContext.Rect := TRectF.Create(
+                     LContext.Rect.TopLeft,
+                     ALBrokenImageWidth,
+                     ALBrokenImageHeight);
+  //LContext.Scale: Single;
+  //LContext.AlignToPixel: Boolean;
+  LContext.ResourceName := ALBrokenImageResourceName;
+  ALFreeAndNil(LContext.ResourceStream);
+  LContext.WrapMode := TALImageWrapMode.Fit;
+  TALGraphicThreadPool.Instance.ExecuteProc(
+    CreateBufDrawable, // const AProc: TALWorkerThreadProc;
+    LContext, // const AContext: Tobject; TALGraphicThreadPool.Instance will own and release the Context object
+    GetPreviewDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+  AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
+end;
+
+{*************}
+//[MultiThread]
+class function TALDynamicListBoxVideoPlayerSurface.GetPreviewDownloadPriority(const AContext: Tobject): Int64;
+begin
+  result := TALNetHttpClientPool.Instance.PriorityStartingPoint;
+end;
+
+{*************}
+//[MultiThread]
+class Procedure TALDynamicListBoxVideoPlayerSurface.CreateBufDrawable(var AContext: TObject);
+begin
+  var LContext := TPreviewDownloadContext(AContext);
+  if LContext.owner = nil then exit;
+  var LBufDrawable: TALDrawable := ALNullDrawable;
+  var LBufDrawableRect: TRectF;
+  Try
+    CreateBufDrawable(
+      LBufDrawable, // var ABufDrawable: TALDrawable;
+      LBufDrawableRect, // out ABufDrawableRect: TRectF;
+      LContext.Rect, // const ARect: TRectF;
+      LContext.Scale, // const AScale: Single;
+      LContext.AlignToPixel, // const AAlignToPixel: Boolean;
+      LContext.ResourceName, // const AResourceName: String;
+      LContext.ResourceStream, // const AResourceStream: TStream;
+      LContext.WrapMode); // const AWrapMode: TALImageWrapMode;
+  except
+    On E: Exception do begin
+      HandlePreviewDownloadError(E.Message, AContext);
+      exit;
+    end;
+  End;
+  TThread.queue(nil,
+    procedure
+    begin
+      if LContext.Owner <> nil then begin
+        ALFreeAndNilDrawable(LContext.Owner.fBufDrawable);
+        LContext.Owner.fBufDrawable := LBufDrawable;
+        LContext.Owner.FBufDrawableRect := LBufDrawableRect;
+        LContext.Owner.FPreviewDownloadContext := nil;
+        LContext.Owner.Repaint;
+      end;
+      ALFreeAndNil(LContext);
+    end);
+  AContext := nil; // AContext will be free by TThread.queue
+end;
+
+{*************}
+//[MultiThread]
+class Procedure TALDynamicListBoxVideoPlayerSurface.CreateBufDrawable(
+                  var ABufDrawable: TALDrawable;
+                  out ABufDrawableRect: TRectF;
+                  const ARect: TRectF;
+                  const AScale: Single;
+                  const AAlignToPixel: Boolean;
+                  const AResourceName: String;
+                  const AResourceStream: TStream;
+                  const AWrapMode: TALImageWrapMode);
+begin
+
+  if (not ALIsDrawableNull(ABufDrawable)) then exit;
+
+  var lResourceName: String;
+  if ALIsHttpOrHttpsUrl(AResourceName) then lResourceName := ''
+  else lResourceName := AResourceName;
+  var LFileName := ALGetResourceFilename(lResourceName);
+
+  ABufDrawableRect := ARect;
+
+  if (AResourceStream <> nil) or (LFileName <> '') or (LResourceName <> '') then begin
+
+    {$IFDEF ALDPK}
+    try
+    {$ENDIF}
+
+      ABufDrawable := ALCreateDrawableFromResource(
+                        AResourceName, // const AResourceName: String;
+                        AResourceStream, // const AResourceStream: TStream;
+                        '', // AMaskResourceName, // const AMaskResourceName: String;
+                        ALNullBitmap, // AMaskBitmap, // const AMaskBitmap: TALBitmap;
+                        AScale, // const AScale: Single;
+                        ARect.Width, ARect.Height, // const W, H: single;
+                        AWrapMode, // const AWrapMode: TALImageWrapMode;
+                        TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                        0, // const ABlurRadius: single;
+                        0, // const AXRadius: Single;
+                        0); // const AYRadius: Single);
+
+    {$IFDEF ALDPK}
+    except
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      Exit;
+    end;
+    {$ENDIF}
+
+  end;
+
+  if not ALIsDrawableNull(ABufDrawable) then
+    ABufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(ABufDrawable)/AScale, ALGetDrawableHeight(ABufDrawable)/AScale).CenterAt(ARect);
+
+end;
+
+{************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.MakeBufDrawable;
+begin
+
+  if //--- Do not create BufDrawable if the size is 0
+     (BoundsRect.IsEmpty) or
+     //--- Do not create BufDrawable if fResourceName is empty
+     (fPreviewResourceName = '')
+  then begin
+    ClearBufDrawable;
+    exit;
+  end;
+
+  if (not ALIsDrawableNull(FBufDrawable)) or
+     (FPreviewDownloadContext <> nil) then exit;
+
+  if (CacheIndex > 0) and
+     (CacheEngine <> nil) and
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
+
+  if (FPreviewDownloadContext = nil) and
+     (ALIsHttpOrHttpsUrl(PreviewResourceName)) then begin
+
+    {$IFDEF debug}
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    {$endif}
+
+    FPreviewDownloadContext := TPreviewDownloadContext.Create(Self);
+    Try
+      TALNetHttpClientPool.Instance.Get(
+        PreviewResourceName, // const AUrl: String;
+        CanStartPreviewDownload, // const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
+        HandlePreviewDownloadSuccess, // const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
+        HandlePreviewDownloadError, // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+        FPreviewDownloadContext, // const AContext: Tobject; // Context will be free by the worker thread
+        true, // const AUseCache: Boolean = True;
+        GetPreviewDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+    except
+      ALFreeAndNil(FPreviewDownloadContext);
+      Raise;
+    End;
+
+    exit;
+
+  end;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
+
+  CreateBufDrawable(
+    FBufDrawable, // var ABufDrawable: TALDrawable;
+    FBufDrawableRect, // out ABufDrawableRect: TRectF;
+    LocalRect.ReducePrecision, // const ARect: TRectF;
+    ALGetScreenScale, // const AScale: Single;
+    IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+    PreviewResourceName, // const AResourceName: String;
+    nil, // const AResourceStream: TStream;
+    WrapMode); // const AWrapMode: TALImageWrapMode;
+
+end;
+
+{********************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.DoOnFrameAvailable(Sender: Tobject);
+begin
+  var LAbsoluteDisplayedRect := GetAbsoluteDisplayedRect;
+  If FAutoStartMode = TAutoStartMode.WhenDisplayed then begin
+    // If less than 20% of the surface is visible, then pause this video.
+    If (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.2, TEpsilon.position) <= 0) then
+      Pause;
+  end;
+
+  if not LAbsoluteDisplayedRect.IsEmpty then
+    repaint;
+end;
+
+{**************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.Paint;
+begin
+
+  inherited paint;
+
+  If (FAutoStartMode = TAutoStartMode.WhenDisplayed) and (FInternalState <> VPSStarted) then begin
+    var LAbsoluteDisplayedRect := GetAbsoluteDisplayedRect;
+    // If 80% of the surface is visible and another video is currently playing,
+    // pause the other video and start this one.
+    If (AutoStartedVideoPlayerSurface <> nil) and
+       (AutoStartedVideoPlayerSurface <> self) and
+       (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.8, TEpsilon.position) > 0) then begin
+      AutoStartedVideoPlayerSurface.Pause;
+      Start;
+      AutoStartedVideoPlayerSurface := Self;
+    end
+    // If 20% of the surface is visible and no other video is currently playing,
+    // then start this video.
+    else if (AutoStartedVideoPlayerSurface = nil) and
+            (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.2, TEpsilon.position) > 0) then begin
+      Start;
+      AutoStartedVideoPlayerSurface := Self;
+    end
+  end;
+
+  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  //begin
+  //  var R := LocalRect.ReducePrecision;
+  //  InflateRect(R, -0.5, -0.5);
+  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  //end;
+
+  if ALIsDrawableNull(fVideoPlayerEngine.Drawable) then begin
+
+    var LCacheIndex: integer;
+    var LCacheSubIndex: Integer;
+    if FPreviewDownloadContext <> nil then begin
+      LCacheIndex := 0;
+      LCacheSubIndex := 0;
+    end
+    else begin
+      LCacheIndex := CacheIndex;
+      LCacheSubIndex := GetCacheSubIndex;
+    end;
+    var LDrawable: TALDrawable;
+    var LDrawableRect: TRectF;
+    if (LCacheIndex <= 0) or
+       (CacheEngine = nil) or
+       (not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+      MakeBufDrawable;
+      if FPreviewDownloadContext <> nil then LCacheIndex := 0
+      else LCacheIndex := CacheIndex;
+      if (LCacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
+        if not CacheEngine.TrySetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+        else fBufDrawable := ALNullDrawable;
+        if not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+          raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
+      end
+      else begin
+        LDrawable := FBufDrawable;
+        LDrawableRect := FBufDrawableRect;
+      end;
+    end;
+
+    if ALIsDrawableNull(LDrawable) then begin
+      if BackgroundColor <> TAlphaColors.Null then begin
+        {$IF DEFINED(ALSkiaCanvas)}
+        TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LocalRect.ReducePrecision)
+          .SetOpacity(AbsoluteOpacity)
+          .SetFillColor(FBackgroundColor)
+          .Draw;
+        {$ELSE}
+        Canvas.Fill.kind := TBrushKind.solid;
+        Canvas.Fill.color := BackGroundColor;
+        Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, AbsoluteOpacity, TCornerType.Round);
+        {$ENDIF}
+      end;
+      exit;
+    end;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LDrawable, // const ADrawable: TALDrawable;
+      LDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single);
+
+  end
+
+  else begin
+
+    if BackgroundColor <> TAlphaColors.Null then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFillColor(FBackgroundColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := BackGroundColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, AbsoluteOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    var LSrcRect: TrectF;
+    var LDstRect: TrectF;
+    case WrapMode of
+
+      TALImageWrapMode.Fit: begin
+        LSrcRect := Trectf.Create(
+                      0, 0,
+                      ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
+                      ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
+        LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
+                      FitInto(LocalRect.ReducePrecision);
+      end;
+
+      TALImageWrapMode.Stretch: begin
+        LSrcRect := Trectf.Create(
+                      0, 0,
+                      ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
+                      ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
+        LDstRect := LocalRect.ReducePrecision;
+      end;
+
+      TALImageWrapMode.Place: begin
+        LSrcRect := Trectf.Create(
+                      0, 0,
+                      ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
+                      ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
+        LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
+                      PlaceInto(LocalRect.ReducePrecision);
+      end;
+
+      TALImageWrapMode.FitAndCrop: begin
+        LDstRect := TRectF.Create(0, 0, Width, Height);
+        LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
+        LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)));
+      end;
+
+      else
+        Raise Exception.Create('Error B0DE069F-2CFD-4719-9130-0D69A647EE2D')
+
+    end;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      fVideoPlayerEngine.Drawable, // const ADrawable: TALDrawable;
+      LSrcRect, // const ASrcRect: TrectF; // IN REAL PIXEL !
+      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single);
+
+  end;
+
+end;
+
 {****************************************************************}
 constructor TALDynamicListBoxLayout.Create(const AOwner: TObject);
 begin
@@ -20888,7 +21853,7 @@ end;
 {************************************************************************}
 function TALDynamicListBoxItem.FetchContent: TALDynamicListBoxItemContent;
 begin
-  Result := FetchContent(not IsVisibleWithinListboxBounds{APreload});
+  Result := FetchContent(not IsDisplayed{APreload});
 end;
 
 {*****************************************************************************************}
@@ -21324,13 +22289,13 @@ begin
 
 end;
 
-{*******************************************************************}
-function TALDynamicListBoxItem.IsVisibleWithinListboxBounds: Boolean;
+{******************************************************}
+function TALDynamicListBoxItem.GetAbsoluteDisplayedRect: TRectF;
 begin
-  if (not AbsoluteVisible) or (OwnerView = nil) then exit(False)
-  else Result := ((index >= OwnerView.FirstVisibleItemIndex) and
-                  (index <= OwnerView.LastVisibleItemIndex)) and
-                 (OwnerView.IsVisibleWithinListboxBounds);
+  if (OwnerView <> nil) and
+     ((index < OwnerView.FirstVisibleItemIndex) or
+      (index > OwnerView.LastVisibleItemIndex)) then exit(TRectF.Empty);
+  Result := Inherited GetAbsoluteDisplayedRect;
 end;
 
 {********************************************************************}
@@ -21754,7 +22719,7 @@ begin
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
     fMouseDownPos := TpointF.Create(X,Y);
-    {$IF defined(ANDROID) or defined(IOS)}
+    {$IF (not defined(ALUIAutomationEnabled)) and (defined(ANDROID) or defined(IOS))}
     if form <> nil then
       ScrollEngine.MouseDown(form.Handle);
     {$ELSE}
@@ -21787,7 +22752,7 @@ begin
       fScrollCapturedByMe := True;
       TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(True));
     end;
-    {$IF defined(ANDROID) or defined(IOS)}
+    {$IF (not defined(ALUIAutomationEnabled)) and (defined(ANDROID) or defined(IOS))}
     if form <> nil then
       ScrollEngine.MouseMove(form.Handle);
     {$ELSE}
@@ -21806,7 +22771,7 @@ begin
   {$ENDIF}
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     FScrollCapturedByMe := False;
-    {$IF defined(ANDROID) or defined(IOS)}
+    {$IF (not defined(ALUIAutomationEnabled)) and (defined(ANDROID) or defined(IOS))}
     if form <> nil then
       ScrollEngine.MouseUp(form.Handle);
     {$ELSE}
@@ -22095,20 +23060,6 @@ begin
       end;
 end;
 
-{*******************************************************************}
-function TALDynamicListBoxView.IsVisibleWithinListboxBounds: Boolean;
-begin
-  if not AbsoluteVisible then
-    exit(false)
-  else if OwnerView = nil then
-    result := (OwnerListBox <> nil) and
-              (OwnerListBox.MainView = Self)
-  else
-    Result := ((index >= OwnerView.FirstVisibleItemIndex) and
-               (index <= OwnerView.LastVisibleItemIndex)) and
-              (OwnerView.IsVisibleWithinListboxBounds);
-end;
-
 {********************************************************************}
 procedure TALDynamicListBoxView.PaintInternal(const ACanvas: TCanvas);
 begin
@@ -22193,7 +23144,7 @@ begin
   var LOldFirstPreloadedItemIndex := FFirstPreloadedItemIndex;
   var LOldLastPreloadedItemIndex := FLastPreloadedItemIndex;
   FFirstPreloadedItemIndex := Max(Low(FItems^){0 if empty}, FFirstVisibleItemIndex - PreloadItemCount);
-  FLastPreloadedItemIndex := Min(High(FItems^){-1 if empty}, FLastVisibleItemIndex + PreloadItemCount);
+  FLastPreloadedItemIndex := Min(High(FItems^){-1 if empty}, FFirstVisibleItemIndex + PreloadItemCount);
 
   // Consistency check only in debug
   {$IF defined(DEBUG)}
@@ -22926,7 +23877,7 @@ end;
 {********************************}
 procedure TALDynamicListBox.Paint;
 begin
-  if TALGuardianThread.HasInstance then
+  if (TALGuardianThread.HasInstance) and (HasActiveScrollEngines) then
     TALGuardianThread.Instance.CanExecute := False;
   //--
   inherited;
@@ -22968,6 +23919,7 @@ end;
 
 initialization
   RegisterFmxClasses([TALDynamicListBox]);
+  TALDynamicListBoxVideoPlayerSurface.AutoStartedVideoPlayerSurface := Nil;
   _ALDummyComponent := TComponent.create(nil);
   {$IFDEF DEBUG}
   {$If defined(Android)}

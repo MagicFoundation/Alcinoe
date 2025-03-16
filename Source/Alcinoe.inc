@@ -69,3 +69,5 @@
 {$IF Defined(ALDPK)}
   {$DEFINE ALBackwardCompatible}
 {$ENDIF}
+
+{.$Define ALUIAutomationEnabled}

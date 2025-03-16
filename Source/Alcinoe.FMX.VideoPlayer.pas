@@ -1468,13 +1468,14 @@ end;
 {***************************************}
 destructor TALAndroidVideoPlayer.Destroy;
 begin
+  Stop;
+  //--
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
   fOnFrameAvailableListener.FVideoPlayerEngine := nil;
   FPlayerListener.FVideoPlayerEngine := nil;
   fSurfaceTexture.setOnFrameAvailableListener(nil);
   fExoPlayer.removeListener(FPlayerListener);
   //--
-  fExoPlayer.stop;
   fExoPlayer.clearVideoSurface;
   fExoPlayer.release;
   fExoPlayer := nil;
@@ -1924,6 +1925,8 @@ end;
 {***********************************}
 destructor TALIOSVideoPlayer.Destroy;
 begin
+  Stop;
+  //--
   // Removes the display link from all run loop modes.
   // Removing the display link from all run loop modes causes it to be released by the run loop. The display link also releases the target.
   // invalidate is thread safe meaning that it can be called from a thread separate to the one in which the display link is running.
@@ -3299,7 +3302,6 @@ begin
   finally
     TMonitor.Exit(LEngine);
   end;
-  LEngine.CoreVideoPlayer.Stop;
   EnqueueCommand(AEngineIndex, TOperation.ReleaseEngine, False{AWaitResponse});
 end;
 

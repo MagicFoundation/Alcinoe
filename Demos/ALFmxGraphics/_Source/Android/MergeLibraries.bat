@@ -9,8 +9,6 @@ if "%ALBaseDir%"=="" (
 )
 
 set Libraries=%ALBaseDir%\Demos\ALFmxGraphics\_Source\Android\App\
-set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-core:2.19.1
-set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-hls:2.19.1
 
 REM Required by fmx.jar, else the app crash at startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Landroidx/activity/result/contract/ActivityResultContracts$OpenDocument;

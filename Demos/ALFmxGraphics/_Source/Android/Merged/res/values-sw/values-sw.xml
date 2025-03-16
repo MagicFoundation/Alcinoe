@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <string name="exo_download_completed">Imepakuliwa</string>
-    <string name="exo_download_description">Pakua</string>
-    <string name="exo_download_downloading">Inapakua</string>
-    <string name="exo_download_failed">Imeshindwa kupakua</string>
-    <string name="exo_download_notification_channel_name">Vipakuliwa</string>
-    <string name="exo_download_paused">Imesimamisha shughuli ya kupakua</string>
-    <string name="exo_download_paused_for_network">Upakuaji unasubiri mtandao</string>
-    <string name="exo_download_paused_for_wifi">Upakuaji unasubiri Wi-Fi</string>
-    <string name="exo_download_removing">Inaondoa vipakuliwa</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

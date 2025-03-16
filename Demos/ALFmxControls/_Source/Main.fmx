@@ -34,7 +34,6 @@ object MainForm: TMainForm
     TabOrder = 0
     OnClick = ALVertScrollBox1Click
     OnResized = ALVertScrollBox1Resized
-    OnViewportPositionChange = ALVertScrollBox1ViewportPositionChange
     object ButtonLaunchScrollBoxDemoDelphi: TALButton
       Align = Top
       Fill.Color = claNull
@@ -531,7 +530,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = xFF79747E
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 225
+      TabOrder = 232
       Text = 'Bench TCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -580,7 +579,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 250
+      TabOrder = 257
       Text = 'Bench TALCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -815,7 +814,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 274
+      TabOrder = 281
       Value = 25.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.ShowOnInteraction = True
@@ -885,14 +884,17 @@ object MainForm: TMainForm
     object ALVideoPlayerSurface1: TALVideoPlayerSurface
       Touch.InteractiveGestures = [DoubleTap]
       Align = Top
-      Fill.Color = xFF141218
+      AutoStartMode = WhenDisplayed
+      DataSource = 
+        'https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflowe' +
+        'r_1080p_30fps_normal.mp4'
+      Looping = True
       Margins.Top = 8.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.Y = 16108.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
-      OnVideoSizeChanged = ALVideoPlayerSurface1VideoSizeChanged
       object MonochromeEffect1: TMonochromeEffect
         Enabled = False
       end
@@ -1069,7 +1071,7 @@ object MainForm: TMainForm
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 159
+      TabOrder = 165
       object ALText53: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1126,7 +1128,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 155
+      TabOrder = 161
       object ALText49: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1313,7 +1315,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 360
+      TabOrder = 367
       Text = 'Show dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1362,7 +1364,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 365
+      TabOrder = 372
       Text = 'Apply Effect to the Video'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1379,7 +1381,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 370
+      TabOrder = 377
       object ALButton6: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -1480,7 +1482,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 376
+      TabOrder = 383
       object ALButton10: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1581,7 +1583,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 379
+      TabOrder = 386
       object ALButton11: TALButton
         Align = LeftCenter
         Fill.Color = xFFF7F2FA
@@ -1690,7 +1692,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 383
+      TabOrder = 390
       object ALButton14: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1779,7 +1781,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 387
+      TabOrder = 394
       object ALButton17: TALButton
         Align = LeftCenter
         Fill.Color = claNull
@@ -2979,7 +2981,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 43.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 452
+      TabOrder = 462
       object ALLayout33: TALLayout
         Align = Left
         AutoSize = True
@@ -3200,7 +3202,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 66.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 475
+      TabOrder = 485
       object ALLayout36: TALLayout
         Align = Left
         AutoSize = True
@@ -3411,7 +3413,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 490
+      TabOrder = 503
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3438,7 +3440,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 493
+      TabOrder = 506
       object ALButton21: TALButton
         Align = LeftCenter
         Fill.Color = xFFE8DEF8
@@ -3597,7 +3599,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 496
+      TabOrder = 509
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3612,7 +3614,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 93.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 499
+      TabOrder = 512
       object ALLayout47: TALLayout
         Align = Left
         AutoSize = True
@@ -3838,7 +3840,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 502
+      TabOrder = 515
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3865,7 +3867,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 83.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 503
+      TabOrder = 516
       object ALLayout49: TALLayout
         Align = Left
         AutoSize = True
@@ -4077,7 +4079,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 505
+      TabOrder = 518
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4885,7 +4887,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 508
+      TabOrder = 521
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4965,7 +4967,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 237
+      TabOrder = 244
       object ALAutoSizeLayoutImage: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -5172,7 +5174,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 374
+      TabOrder = 381
       object ALAnimatedImage1: TALAnimatedImage
         Align = Left
         Animation.Enabled = True
@@ -5369,7 +5371,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 132
+      TabOrder = 138
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = True
@@ -7894,7 +7896,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 124
+      TabOrder = 130
       object ALImage14: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -8034,7 +8036,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 268
+      TabOrder = 269
       object ALButton25: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4

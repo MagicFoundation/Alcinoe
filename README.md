@@ -377,13 +377,13 @@ In contrast, Delphi’s official video players are native
 video player windows overlaid on the form, which do not 
 support Z-ORDER.
 
-On Android, **Alcinoe** uses **ExoPlayer**, which provides 
+On Android, **Alcinoe** uses **Media3 ExoPlayer**, which provides 
 advanced features such as dynamic adaptive streaming over 
 HTTP (DASH), HLS, SmoothStreaming, and common encryption—capabilities 
-not available in MediaPlayer. **ExoPlayer** is also designed 
+not available in MediaPlayer. **Media3 ExoPlayer** is also designed 
 to be easily customizable and extendable. On iOS, 
 **AVPlayer** is used, offering similar HLS support to 
-**ExoPlayer**.
+**Media3 ExoPlayer**.
 
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>

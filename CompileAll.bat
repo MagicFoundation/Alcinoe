@@ -135,7 +135,7 @@ if "%ALDownloadLibraries%"=="" set ALDownloadLibraries=Y
 if "%ALDownloadLibraries%"=="y" set ALDownloadLibraries=Y
 if "%ALDownloadLibraries%"=="n" set ALDownloadLibraries=N
 if "%ALDownloadLibraries%"=="Y" goto DO_DOWNLOAD_LIBRARIES
-if "%ALDownloadLibraries%"=="N" goto BUILD_DPROJNORMALIZER
+if "%ALDownloadLibraries%"=="N" goto BUILD_CORETOOLS
 goto DOWNLOAD_LIBRARIES
 
 :DO_DOWNLOAD_LIBRARIES
@@ -149,15 +149,15 @@ IF ERRORLEVEL 1 goto ERROR
 echo.
 
 
-REM ----------------------------------------
-REM Build DProjNormalizer and UnitNormalizer
-REM ----------------------------------------
+REM -----------------------------------------------------
+REM Build DProjNormalizer, UnitNormalizer and CodeBuilder
+REM -----------------------------------------------------
 
-:BUILD_DPROJNORMALIZER
+:BUILD_CORETOOLS
 
-echo ----------------------------------------
-echo Build DProjNormalizer and UnitNormalizer
-echo ----------------------------------------
+echo -----------------------------------------------------
+echo Build DProjNormalizer, UnitNormalizer and CodeBuilder
+echo -----------------------------------------------------
 echo.
 
 echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:Platform=Win64[0m
@@ -167,6 +167,11 @@ echo.
 
 echo [36mMSBuild UnitNormalizer.dproj /p:config=Release /p:Platform=Win64[0m
 MSBuild "%ALBaseDir%\Tools\UnitNormalizer\_Source\UnitNormalizer.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+echo [36mMSBuild CodeBuilder.dproj /p:config=Release /p:Platform=Win64[0m
+MSBuild "%ALBaseDir%\Tools\CodeBuilder\_Source\CodeBuilder.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -187,6 +192,20 @@ IF ERRORLEVEL 1 goto ERROR
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tools\" -CreateBackup="false" -NoInteraction=true
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+
+REM -------------------------
+REM Auto-Generate Source Code
+REM -------------------------
+
+echo -------------------------
+echo Auto-Generate Source Code
+echo -------------------------
+echo.
+
+call "%ALBaseDir%\Tools\CodeBuilder\CodeBuilder.exe" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -309,13 +328,14 @@ goto BUILD_TOOLS
 
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Source" "AndroidMerger.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\AppIconGenerator" "_Source" "AppIconGenerator.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeBuilder" "_Source" "CodeBuilder.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeRenaming" "_Source" "CodeRenaming.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64" || GOTO ERROR
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeRenaming" "_Source" "CodeRenaming.dproj" "Win64" || GOTO ERROR
 if "%DXVCL%"=="" goto BUILD_DEMOS
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeProfiler" "_Source" "CodeProfiler.dproj" "Win64" || GOTO ERROR
 
@@ -337,6 +357,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALBuildDemos=
   set /P ALBuildDemos="Build demos (Y/N, default=Y)?:" %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
 )
 
 if "%ALBuildDemos%"=="" set ALBuildDemos=Y
@@ -349,6 +370,7 @@ goto BUILD_DEMOS
 :DO_BUILD_DEMOS
 
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxControls" "_Source" "ALFmxControlsDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxDynamicListBox" "_Source" "ALFmxDynamicListBoxDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALAnimation" "_Source" "ALAnimationDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE
@@ -400,13 +422,17 @@ SET FileName=%ALBaseDir%\Demos\AllDemos.groupproj.local
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
-echo Copy %ALBaseDir%\Demos to %ALBaseDir%\Compiled\Demos
-xcopy "%ALBaseDir%\Demos" "%ALBaseDir%\Compiled\Demos\" /s >nul
-IF ERRORLEVEL 1 goto ERROR
+if "%ALBuildDemos%"=="Y" (
+  echo Copy %ALBaseDir%\Demos to %ALBaseDir%\Compiled\Demos
+  xcopy "%ALBaseDir%\Demos" "%ALBaseDir%\Compiled\Demos\" /s >nul
+  IF ERRORLEVEL 1 goto ERROR
+)
 
-echo Copy %ALBaseDir%\Tools to %ALBaseDir%\Compiled\Tools
-xcopy "%ALBaseDir%\Tools" "%ALBaseDir%\Compiled\Tools\" /s >nul
-IF ERRORLEVEL 1 goto ERROR
+if "%ALBuildTools%"=="Y" (
+  echo Copy %ALBaseDir%\Tools to %ALBaseDir%\Compiled\Tools
+  xcopy "%ALBaseDir%\Tools" "%ALBaseDir%\Compiled\Tools\" /s >nul
+  IF ERRORLEVEL 1 goto ERROR
+)
 
 echo Clean %ALBaseDir%\Compiled
 
@@ -470,21 +496,25 @@ SET FileName=%ALBaseDir%\Compiled\Demos\ALLiveVideoChat\ALLiveVideoChat.grouppro
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
-echo Pack %ALBaseDir%\Compiled\Demos
-PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Demos\*' -DestinationPath '%ALBaseDir%\Compiled\Demos-Compiled.zip' -Force"
-IF ERRORLEVEL 1 goto ERROR
+if "%ALBuildDemos%"=="Y" (
+  echo Pack %ALBaseDir%\Compiled\Demos
+  PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Demos\*' -DestinationPath '%ALBaseDir%\Compiled\Demos-Compiled.zip' -Force"
+  IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=%ALBaseDir%\Compiled\Demos\
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+  SET FileName=%ALBaseDir%\Compiled\Demos\
+  IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+  if exist "%FileName%" goto ERROR
+)
 
-echo Pack %ALBaseDir%\Compiled\Tools
-PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Tools\*' -DestinationPath '%ALBaseDir%\Compiled\Tools-Compiled.zip' -Force"
-IF ERRORLEVEL 1 goto ERROR
+if "%ALBuildTools%"=="Y" (
+  echo Pack %ALBaseDir%\Compiled\Tools
+  PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Tools\*' -DestinationPath '%ALBaseDir%\Compiled\Tools-Compiled.zip' -Force"
+  IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=%ALBaseDir%\Compiled\Tools\
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
+  SET FileName=%ALBaseDir%\Compiled\Tools\
+  IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+  if exist "%FileName%" goto ERROR
+)
 
 goto FINISHED
 
@@ -617,16 +647,16 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" EXIT /B 1
 mkdir "%FileName%"
 
-if "%~4"=="Android" (
+if "%~4"=="Android64" (
   echo [36mMerge Android Libraries for %~3[0m
   call "%~1\%~2\Android\MergeLibraries.bat"
   IF ERRORLEVEL 1 EXIT /B 1
+  echo.
 )
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
 IF ERRORLEVEL 1 EXIT /B 1
 
-echo.
 echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4[0m
 MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 EXIT /B 1

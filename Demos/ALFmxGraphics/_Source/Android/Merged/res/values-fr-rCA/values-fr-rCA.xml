@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <string name="exo_download_completed">Téléchargement terminé</string>
-    <string name="exo_download_description">Télécharger</string>
-    <string name="exo_download_downloading">Téléchargement en cours…</string>
-    <string name="exo_download_failed">Échec du téléchargement</string>
-    <string name="exo_download_notification_channel_name">Téléchargements</string>
-    <string name="exo_download_paused">Téléchargements interrompus</string>
-    <string name="exo_download_paused_for_network">Téléchargements en attente du réseau</string>
-    <string name="exo_download_paused_for_wifi">Téléchargements en attente du Wi-Fi</string>
-    <string name="exo_download_removing">Suppression des téléchargements en cours…</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

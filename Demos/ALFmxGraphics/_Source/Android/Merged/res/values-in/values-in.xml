@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <string name="exo_download_completed">Download selesai</string>
-    <string name="exo_download_description">Download</string>
-    <string name="exo_download_downloading">Mendownload</string>
-    <string name="exo_download_failed">Download gagal</string>
-    <string name="exo_download_notification_channel_name">Download</string>
-    <string name="exo_download_paused">Download dijeda</string>
-    <string name="exo_download_paused_for_network">Download menunggu konektivitas jaringan</string>
-    <string name="exo_download_paused_for_wifi">Download menunggu konektivitas Wi-Fi</string>
-    <string name="exo_download_removing">Menghapus download</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

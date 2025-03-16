@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <string name="exo_download_completed">Татаж дууссан</string>
-    <string name="exo_download_description">Татах</string>
-    <string name="exo_download_downloading">Татаж байна</string>
-    <string name="exo_download_failed">Татаж чадсангүй</string>
-    <string name="exo_download_notification_channel_name">Татaлт</string>
-    <string name="exo_download_paused">Таталтуудыг түр зогсоосон</string>
-    <string name="exo_download_paused_for_network">Таталтууд сүлжээг хүлээж байна</string>
-    <string name="exo_download_paused_for_wifi">Таталтууд Wi-Fi-г хүлээж байна</string>
-    <string name="exo_download_removing">Татаж авсан файлыг хасаж байна</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

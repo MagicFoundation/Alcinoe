@@ -12,8 +12,8 @@ set Libraries=%ALBaseDir%\Demos\ALFmxControls\_Source\Android\App\
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-edittext:1.0.0
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-datepicker:1.0.0
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-common:1.0.1
-set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-core:2.19.1
-set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-hls:2.19.1
+set Libraries=%Libraries%;androidx.media3:media3-exoplayer:1.5.1
+set Libraries=%Libraries%;androidx.media3:media3-exoplayer-hls:1.5.1
 
 REM Required by fmx.jar, else the app crash at startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Landroidx/activity/result/contract/ActivityResultContracts$OpenDocument;
@@ -25,7 +25,7 @@ REM To resolve this, we are enforcing the use of org.jetbrains.kotlin:kotlin-std
 set Libraries=%Libraries%;org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22
 REM Required else the app crash few seconds after startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Lcom/google/common/util/concurrent/ListenableFuture;
-set Libraries=%Libraries%;com.google.guava:guava:32.1.3-android
+set Libraries=%Libraries%;androidx.concurrent:concurrent-futures:1.2.0
 
 call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^

@@ -23,7 +23,7 @@
   <!-- AndroidMerger auto-generated section (BEGIN) -->
   <!-- ============================================ -->
   
-  <!-- ===== com.google.android.exoplayer2.core ===== -->
+  <!-- ===== androidx.media3.exoplayer ===== -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   
   <!-- ========================================== -->

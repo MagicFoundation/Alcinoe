@@ -430,11 +430,7 @@ type
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure ALVertScrollBox1Click(Sender: TObject);
     procedure ButtonApplyEffectToVideoClick(Sender: TObject);
-    procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure FormResize(Sender: TObject);
-    procedure ALVideoPlayerSurface1VideoSizeChanged(
-                const Sender: TObject;
-                const width, height: Integer);
     procedure ButtonShowTALDatePickerDialogClick(Sender: TObject);
     procedure ALTextDemoElementClick(Sender: TObject; const Element: TALTextElement);
     procedure ALTextDemoElementMouseEnter(Sender: TObject; const Element: TALTextElement);
@@ -875,89 +871,6 @@ begin
   end;
 end;
 
-{**********************************************************************************************************************************}
-procedure TMainForm.ALVertScrollBox1ViewportPositionChange(Sender: TObject;const OldViewportPosition, NewViewportPosition: TPointF);
-begin
-
-  if (ALVideoPlayerSurface1.Position.y + ALVideoPlayerSurface1.Height >= NewViewportPosition.Y) and
-     (ALVideoPlayerSurface1.Position.y < NewViewportPosition.Y + height) then begin
-    if ALVideoPlayerSurface1.VideoPlayer.state in [vpsIdle] then begin
-      ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
-
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8', True{AutoStartWhenPrepared});
-      (*
-      #EXTM3U
-      #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="stereo",LANGUAGE="en",NAME="English",DEFAULT=YES,AUTOSELECT=YES,URI="audio/stereo/en/128kbit.m3u8"
-      #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="stereo",LANGUAGE="dubbing",NAME="Dubbing",DEFAULT=NO,AUTOSELECT=YES,URI="audio/stereo/none/128kbit.m3u8"
-      #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="surround",LANGUAGE="en",NAME="English",DEFAULT=YES,AUTOSELECT=YES,URI="audio/surround/en/320kbit.m3u8"
-      #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="surround",LANGUAGE="dubbing",NAME="Dubbing",DEFAULT=NO,AUTOSELECT=YES,URI="audio/stereo/none/128kbit.m3u8"
-      #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="Deutsch",DEFAULT=NO,AUTOSELECT=YES,FORCED=NO,LANGUAGE="de",URI="subtitles_de.m3u8"
-      #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitles_en.m3u8"
-      #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="Espanol",DEFAULT=NO,AUTOSELECT=YES,FORCED=NO,LANGUAGE="es",URI="subtitles_es.m3u8"
-      #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="Français",DEFAULT=NO,AUTOSELECT=YES,FORCED=NO,LANGUAGE="fr",URI="subtitles_fr.m3u8"
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=258157,CODECS="avc1.4d400d,mp4a.40.2",AUDIO="stereo",RESOLUTION=422x180,SUBTITLES="subs"
-      video/250kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=520929,CODECS="avc1.4d4015,mp4a.40.2",AUDIO="stereo",RESOLUTION=638x272,SUBTITLES="subs"
-      video/500kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=831270,CODECS="avc1.4d4015,mp4a.40.2",AUDIO="stereo",RESOLUTION=638x272,SUBTITLES="subs"
-      video/800kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1144430,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="surround",RESOLUTION=958x408,SUBTITLES="subs"
-      video/1100kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1558322,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="surround",RESOLUTION=1277x554,SUBTITLES="subs"
-      video/1500kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=4149264,CODECS="avc1.4d4028,mp4a.40.2",AUDIO="surround",RESOLUTION=1921x818,SUBTITLES="subs"
-      video/4000kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=6214307,CODECS="avc1.4d4028,mp4a.40.2",AUDIO="surround",RESOLUTION=1921x818,SUBTITLES="subs"
-      video/6000kbit.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=10285391,CODECS="avc1.4d4033,mp4a.40.2",AUDIO="surround",RESOLUTION=4096x1744,SUBTITLES="subs"
-      video/10000kbit.m3u8
-      *)
-
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('http://cdn-fms.rbs.com.br/vod/hls_sample1_manifest.m3u8', True{AutoStartWhenPrepared});
-      (*
-      #EXTM3U
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=150000
-      /hls-vod/sample1_150kbps.f4v.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=500000
-      /hls-vod/sample1_500kbps.f4v.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=700000
-      /hls-vod/sample1_700kbps.f4v.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1000000
-      /hls-vod/sample1_1000kbps.f4v.m3u8
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1500000
-      /hls-vod/sample1_1500kbps.f4v.m3u8
-      *)
-
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('http://content.jwplatform.com/manifests/vM7nH0Kl.m3u8', True{AutoStartWhenPrepared});
-      (*
-      #EXTM3U
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=670000,RESOLUTION=640x286,CODECS="mp4a.40.2,avc1.77.30",CLOSED-CAPTIONS=NONE
-      http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-1753142.mp4.m3u8?token=0_5a709f9d_0xf5b3d43b44268c58a2712ac88abc3d45e032eb4a
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3400000,RESOLUTION=1920x858,CODECS="mp4a.40.2,avc1.77.30",CLOSED-CAPTIONS=NONE
-      http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-1703854.mp4.m3u8?token=0_5a709f9d_0xa8762db0a663f6b81a81b5033ce89bc4578e4a33
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1710000,RESOLUTION=1280x572,CODECS="mp4a.40.2,avc1.77.30",CLOSED-CAPTIONS=NONE
-      http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-364768.mp4.m3u8?token=0_5a709f9d_0xd4799dbb4504aac710409af0598840625a5415dd
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=380000,RESOLUTION=320x142,CODECS="mp4a.40.2,avc1.77.30",CLOSED-CAPTIONS=NONE
-      http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-364765.mp4.m3u8?token=0_5a709f9d_0x32cc62bc74320eee50114bc88f70d5f307033c44
-      #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=120000,CODECS="mp4a.40.2"
-      http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-588477.m4a.m3u8?token=0_5a709f9d_0x160466a864635c5481a5f70c20b15d4bfa2ada9b
-      *)
-
-      ALVideoPlayerSurface1.VideoPlayer.prepare('https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflower_1080p_30fps_normal.mp4', True{AutoStartWhenPrepared});
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflower_1080p_60fps_normal.mp4', True{AutoStartWhenPrepared});
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflower_2160p_60fps_normal.mp4', True{AutoStartWhenPrepared});
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('http://techslides.com/demos/samples/sample.mp4', True{AutoStartWhenPrepared}); // << this have sound on ios
-
-    end
-    else if ALVideoPlayerSurface1.VideoPlayer.state in [vpsPrepared, vpsPaused] then ALVideoPlayerSurface1.VideoPlayer.Start
-    else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := true;
-  end
-  else begin
-    if ALVideoPlayerSurface1.VideoPlayer.state in [vpsStarted] then ALVideoPlayerSurface1.VideoPlayer.Pause
-    else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := False;
-  end;
-end;
-
 {*****************************************************************}
 procedure TMainForm.ButtonApplyEffectToVideoClick(Sender: TObject);
 begin
@@ -995,12 +908,6 @@ begin
     13: EmbossEffect1.Enabled := true;
     14: PinchEffect1.Enabled := true;
   end;
-end;
-
-{*************************************************************************************************************}
-procedure TMainForm.ALVideoPlayerSurface1VideoSizeChanged(const Sender: TObject; const width, height: Integer);
-begin
-  ALVideoPlayerSurface1.Height := height * (ClientWidth/Width)
 end;
 
 {*************************************************************************}

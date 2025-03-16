@@ -64,7 +64,7 @@ uses
   Alcinoe.AndroidApi.AndroidX,
   Alcinoe.AndroidApi.BillingClient,
   Alcinoe.AndroidApi.Common,
-  Alcinoe.AndroidApi.ExoPlayer,
+  Alcinoe.AndroidApi.AndroidX.Media3,
   Alcinoe.AndroidApi.Facebook,
   Alcinoe.AndroidApi.Firebase,
   Alcinoe.AndroidApi.Google,

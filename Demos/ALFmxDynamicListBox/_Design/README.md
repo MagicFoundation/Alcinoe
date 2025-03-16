@@ -12,3 +12,8 @@ You can use [Instaloader](https://instaloader.github.io) to download sample post
    ```
 
 This will download posts from the **saved collection** in your Instagram account.
+
+
+# Extract the first frame of a video
+
+ffmpeg -i input.mp4 -vf "select=eq(n\,0)" -q:v 2 -frames:v 1 first_frame.jpg

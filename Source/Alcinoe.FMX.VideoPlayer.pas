@@ -791,7 +791,6 @@ uses
   FMX.Context.Metal,
   Alcinoe.iOSApi.Foundation,
   Alcinoe.iOSapi.QuartzCore,
-  Alcinoe.HTTP.Client,
   {$ENDIF}
   {$IF defined(ALSkiaCanvas)}
   FMX.Skia.Canvas,

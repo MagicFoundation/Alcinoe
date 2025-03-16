@@ -275,6 +275,10 @@ begin
         {$ENDREGION}
 
         {$REGION 'normalize LOutputSrc'}
+        {class} //UNSUPPORTED is defined in parent interface
+        // =>
+        //
+        LOutputSrc := ALStringReplaceA(LOutputSrc, #13#10'    {class} //UNSUPPORTED is defined in parent interface'#13#10, #13#10, [RfReplaceALL]);
         //JAccessibilityServiceInfo = interface;//android.accessibilityservice.AccessibilityServiceInfo
         // =>
         //JAccessibilityServiceInfo = interface;

@@ -78,8 +78,6 @@ type
     fOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
     FTag: NativeInt;
     function GetState: Integer; virtual; abstract;
-    function GetAutoStartWhenPrepared: Boolean; virtual; abstract;
-    procedure SetAutoStartWhenPrepared(const Value: Boolean); virtual; abstract;
     function GetIsPlaying: boolean; virtual; abstract;
     function GetLooping: Boolean; virtual; abstract;
     procedure SetLooping(const Value: Boolean); virtual; abstract;
@@ -101,7 +99,6 @@ type
     procedure Stop; virtual; abstract;
     procedure SeekTo(const msec: Int64); virtual; abstract;
     property State: Integer read GetState;
-    property AutoStartWhenPrepared: Boolean read GetAutoStartWhenPrepared write SetAutoStartWhenPrepared;
     property IsPlaying: boolean read GetIsPlaying;
     property Looping: Boolean read GetLooping write SetLooping;
     property Volume: Single read GetVolume write SetVolume;
@@ -117,14 +114,11 @@ type
 
   TALDummyVideoPlayer = class(TALBaseVideoPlayer)
   private
-    FAutoStartWhenPrepared: Boolean;
     FLooping: Boolean;
     FVolume: Single;
     FPlaybackSpeed: single;
   protected
     function GetState: Integer; override;
-    function GetAutoStartWhenPrepared: Boolean; override;
-    procedure SetAutoStartWhenPrepared(const Value: Boolean); override;
     function GetIsPlaying: boolean; override;
     function GetLooping: Boolean; override;
     procedure SetLooping(const Value: Boolean); override;
@@ -229,8 +223,6 @@ type
     function SetState(const aValue: Integer; const aCompareAnd: array of Integer): boolean; overload;
   protected
     function GetState: Integer; override;
-    function GetAutoStartWhenPrepared: Boolean; override;
-    procedure SetAutoStartWhenPrepared(const Value: Boolean); override;
     function GetIsPlaying: boolean; override;
     function GetLooping: Boolean; override;
     procedure SetLooping(const Value: Boolean); override;
@@ -352,8 +344,6 @@ type
     function SetState(const aValue: Integer; const aCompareAnd: array of Integer): boolean; overload;
   protected
     function GetState: Integer; override;
-    function GetAutoStartWhenPrepared: Boolean; override;
-    procedure SetAutoStartWhenPrepared(const Value: Boolean); override;
     function GetIsPlaying: boolean; override;
     function GetLooping: Boolean; override;
     procedure SetLooping(const Value: Boolean); override;
@@ -410,8 +400,6 @@ type
     FCoreVideoPlayer: TALBaseVideoPlayer;
   protected
     function GetState: Integer; override;
-    function GetAutoStartWhenPrepared: Boolean; override;
-    procedure SetAutoStartWhenPrepared(const Value: Boolean); override;
     function GetIsPlaying: boolean; override;
     function GetLooping: Boolean; override;
     procedure SetLooping(const Value: Boolean); override;
@@ -471,8 +459,6 @@ type
         CreateEngine,
         ReleaseEngine,
         GetState,
-        GetAutoStartWhenPrepared,
-        SetAutoStartWhenPrepared,
         GetIsPlaying,
         GetLooping,
         SetLooping,
@@ -507,7 +493,7 @@ type
       end;
       // --------
       // TCommand
-      TCommand = record
+      TCommand = Class(TObject)
       public
         EngineIndex: Integer;
         WaitResponse: Boolean;
@@ -562,8 +548,6 @@ type
     procedure ReleaseEngine(const AEngineIndex: Integer);
     function GetCoreVideoPlayer(const AEngineIndex: Integer): TALBaseVideoPlayer;
     function GetState(const AEngineIndex: Integer): Integer;
-    function GetAutoStartWhenPrepared(const AEngineIndex: Integer): Boolean;
-    procedure SetAutoStartWhenPrepared(const AEngineIndex: Integer; const Value: Boolean);
     function GetIsPlaying(const AEngineIndex: Integer): boolean;
     function GetLooping(const AEngineIndex: Integer): Boolean;
     procedure SetLooping(const AEngineIndex: Integer; const Value: Boolean);
@@ -835,7 +819,6 @@ end;
 constructor TALDummyVideoPlayer.Create;
 begin
   inherited;
-  FAutoStartWhenPrepared := False;
   FLooping := False;
   FVolume := 1;
   FPlaybackSpeed := 1;
@@ -850,18 +833,6 @@ end;
 function TALDummyVideoPlayer.GetState: Integer;
 begin
   result := vpsIdle;
-end;
-
-{*************************************************************}
-function TALDummyVideoPlayer.GetAutoStartWhenPrepared: Boolean;
-begin
-  Result := FAutoStartWhenPrepared;
-end;
-
-{***************************************************************************}
-procedure TALDummyVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
-begin
-  FAutoStartWhenPrepared := Value;
 end;
 
 {*************************************************}
@@ -1035,7 +1006,8 @@ begin
                                       LImageInfo.color_space, // color_space: sk_colorspace_t): sk_image_t; cdecl;
                                       nil, // proc: sk_image_texture_release_proc;
                                       nil); // proc_context: Pointer
-    fVideoPlayerEngine.FDrawableReady := true;
+    fVideoPlayerEngine.FDrawableReady := (fVideoPlayerEngine.fVideoWidth > 0) and
+                                         (fVideoPlayerEngine.fVideoHeight > 0);
   end;
   {$ELSE}
   if (fVideoPlayerEngine.fDrawable.Width <> fVideoPlayerEngine.fVideoWidth) or
@@ -1057,7 +1029,8 @@ begin
     TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FWidth := fVideoPlayerEngine.fVideoWidth;
     TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FHeight := fVideoPlayerEngine.fVideoHeight;
   end;
-  fVideoPlayerEngine.FDrawableReady := true;
+  fVideoPlayerEngine.FDrawableReady := (fVideoPlayerEngine.fVideoWidth > 0) and
+                                       (fVideoPlayerEngine.fVideoHeight > 0);
   {$ENDIF}
 
   if assigned(fVideoPlayerEngine.fOnFrameAvailableEvent) then
@@ -1527,18 +1500,6 @@ begin
   result := AtomicCmpExchange(fState, -1, -1);
 end;
 
-{***************************************************************}
-function TALAndroidVideoPlayer.GetAutoStartWhenPrepared: Boolean;
-begin
-  Result := FAutoStartWhenPrepared;
-end;
-
-{*****************************************************************************}
-procedure TALAndroidVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
-begin
-  FAutoStartWhenPrepared := Value;
-end;
-
 {***************************************************}
 function TALAndroidVideoPlayer.GetIsPlaying: boolean;
 begin
@@ -1656,7 +1617,10 @@ end;
 {************************************}
 procedure TALAndroidVideoPlayer.start;
 begin
-  if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then exit;
+  if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then begin
+    if GetState = vpsPreparing then FAutoStartWhenPrepared := True;
+    exit;
+  end;
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.start');
   {$ENDIF}
@@ -1669,6 +1633,7 @@ end;
 {************************************}
 procedure TALAndroidVideoPlayer.Pause;
 begin
+  FAutoStartWhenPrepared := False;
   if not SetState(vpsPaused, vpsStarted) then exit;
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.Pause');
@@ -1682,6 +1647,7 @@ end;
 {***********************************}
 procedure TALAndroidVideoPlayer.stop;
 begin
+  FAutoStartWhenPrepared := False;
   if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.stop');
@@ -2373,18 +2339,6 @@ begin
   result := AtomicCmpExchange(fState, -1, -1);
 end;
 
-{***********************************************************}
-function TALIOSVideoPlayer.GetAutoStartWhenPrepared: Boolean;
-begin
-  Result := FAutoStartWhenPrepared;
-end;
-
-{*************************************************************************}
-procedure TALIOSVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
-begin
-  FAutoStartWhenPrepared := Value;
-end;
-
 {***********************************************}
 function TALIOSVideoPlayer.GetIsPlaying: boolean;
 begin
@@ -2545,7 +2499,10 @@ end;
 {********************************}
 procedure TALIOSVideoPlayer.Start;
 begin
-  if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then exit;
+  if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then begin
+    if GetState = vpsPreparing then FAutoStartWhenPrepared := True;
+    exit;
+  end;
   {$IF defined(DEBUG)}
   ALLog('TALIOSVideoPlayer.Start');
   {$ENDIF}
@@ -2559,6 +2516,7 @@ end;
 {********************************}
 procedure TALIOSVideoPlayer.Pause;
 begin
+  FAutoStartWhenPrepared := False;
   if not SetState(vpsPaused, vpsStarted) then exit;
   {$IF defined(DEBUG)}
   ALLog('TALIOSVideoPlayer.Pause');
@@ -2572,6 +2530,7 @@ end;
 {*******************************}
 procedure TALIOSVideoPlayer.Stop;
 begin
+  FAutoStartWhenPrepared := False;
   if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
   {$IF defined(DEBUG)}
   ALLog('TALIOSVideoPlayer.Stop');
@@ -2611,18 +2570,6 @@ end;
 function TALAsyncVideoPlayer.GetState: Integer;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetState(FEngineIndex);
-end;
-
-{*************************************************************}
-function TALAsyncVideoPlayer.GetAutoStartWhenPrepared: Boolean;
-begin
-  Result := TALVideoPlayerControllerThread.Instance.GetAutoStartWhenPrepared(FEngineIndex);
-end;
-
-{***************************************************************************}
-procedure TALAsyncVideoPlayer.SetAutoStartWhenPrepared(const Value: Boolean);
-begin
-  TALVideoPlayerControllerThread.Instance.SetAutoStartWhenPrepared(FEngineIndex, Value);
 end;
 
 {*************************************************}
@@ -2805,6 +2752,8 @@ begin
   // (destroying TALVideoPlayerControllerThread), this constraint no longer matters.
   for var I := Low(FEngines) to High(FEngines) do
     ALFreeAndNil(FEngines[I]);
+  While FCommandQueue.Count > 0 do
+    FCommandQueue.Dequeue.Free;
   ALFreeAndNil(FCommandQueue);
   inherited Destroy;
 end;
@@ -2902,12 +2851,6 @@ begin
         TOperation.GetState:
           LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetState;
 
-        TOperation.GetAutoStartWhenPrepared:
-          LCommand.Response.ResultBoolean := LEngine.CoreVideoPlayer.GetAutoStartWhenPrepared;
-
-        TOperation.SetAutoStartWhenPrepared:
-          LEngine.CoreVideoPlayer.SetAutoStartWhenPrepared(LCommand.Request.Param1Boolean);
-
         TOperation.GetIsPlaying:
           LCommand.Response.Resultboolean := LEngine.CoreVideoPlayer.GetIsPlaying;
 
@@ -2966,7 +2909,9 @@ begin
     End;
 
     if LCommand.WaitResponse then
-      LEngine.Signal.setEvent;
+      LEngine.Signal.setEvent
+    else
+      ALFreeAndNil(LCommand);
 
   end;
 end;
@@ -2981,31 +2926,43 @@ function TALVideoPlayerControllerThread.EnqueueCommand(
            const AParamBoolean: Boolean;
            const AParamString: String): TResponse;
 begin
-  var LCommand: TCommand;
-  LCommand.EngineIndex := AEngineIndex;
-  LCommand.WaitResponse := AWaitResponse;
-  LCommand.Request.Operation := AOperation;
-  LCommand.Request.Param1Int64 := AParamInt64;
-  LCommand.Request.Param1Single := AParamSingle;
-  LCommand.Request.Param1Boolean := AParamBoolean;
-  LCommand.Request.Param1String := AParamString;
+  var LCommand := TCommand.Create;
+  Try
 
-  Tmonitor.Enter(FCommandQueue);
-  try
-    FCommandQueue.Enqueue(LCommand);
+    LCommand.EngineIndex := AEngineIndex;
+    LCommand.WaitResponse := AWaitResponse;
+    LCommand.Request.Operation := AOperation;
+    LCommand.Request.Param1Int64 := AParamInt64;
+    LCommand.Request.Param1Single := AParamSingle;
+    LCommand.Request.Param1Boolean := AParamBoolean;
+    LCommand.Request.Param1String := AParamString;
+
+    Tmonitor.Enter(FCommandQueue);
+    try
+      FCommandQueue.Enqueue(LCommand);
+    finally
+      Tmonitor.Exit(FCommandQueue);
+    end;
+
+    {$IF defined(android)}
+    if FReady then
+      FHandler.sendEmptyMessage(0{what});
+    {$ELSE}
+    FSignal.SetEvent;
+    {$ENDIF}
+
+    if AWaitResponse then begin
+      GetEngine(AEngineIndex).Signal.WaitFor(INFINITE);
+      Result := LCommand.Response;
+    end
+    else
+      // When not waiting for a response, ProcessCommandQueue
+      // is responsible for releasing LCommand.
+      LCommand := nil;
+
   finally
-    Tmonitor.Exit(FCommandQueue);
-  end;
-
-  {$IF defined(android)}
-  if FReady then
-    FHandler.sendEmptyMessage(0{what});
-  {$ELSE}
-  FSignal.SetEvent;
-  {$ENDIF}
-
-  if AWaitResponse then
-    GetEngine(AEngineIndex).Signal.WaitFor(INFINITE);
+    ALFreeAndNil(LCommand);
+  End;
 end;
 
 {*********************************************************************************************************************************************************}
@@ -3323,18 +3280,6 @@ begin
   Result := Integer(EnqueueCommand(AEngineIndex, TOperation.GetState, True{AWaitResponse}).ResultInt64);
 end;
 
-{*****************************************************************************************************}
-function TALVideoPlayerControllerThread.GetAutoStartWhenPrepared(const AEngineIndex: Integer): Boolean;
-begin
-  Result := EnqueueCommand(AEngineIndex, TOperation.GetAutoStartWhenPrepared, True{AWaitResponse}).ResultBoolean;
-end;
-
-{*******************************************************************************************************************}
-procedure TALVideoPlayerControllerThread.SetAutoStartWhenPrepared(const AEngineIndex: Integer; const Value: Boolean);
-begin
-  EnqueueCommand(AEngineIndex, TOperation.SetAutoStartWhenPrepared, False{AWaitResponse}, Value);
-end;
-
 {*****************************************************************************************}
 function TALVideoPlayerControllerThread.GetIsPlaying(const AEngineIndex: Integer): boolean;
 begin
@@ -3496,8 +3441,10 @@ end;
 procedure TALVideoPlayerSurface.Loaded;
 begin
   inherited;
-  If FDataSource <> '' then
-    FVideoPlayerEngine.Prepare(FDataSource)
+  If FDataSource <> '' then begin
+    FVideoPlayerEngine.Prepare(FDataSource);
+    if FAutoStartMode = TAutoStartMode.WhenPrepared then start;
+  end;
 end;
 
 {*******************************************************}
@@ -3535,8 +3482,11 @@ begin
     FDataSource := Value;
     {$IF not defined(ALDPK)}
     if not (csLoading in ComponentState) then begin
-      if FInternalState = vpsIdle then
-        FVideoPlayerEngine.Prepare(FDataSource)
+      if FInternalState = vpsIdle then begin
+        FVideoPlayerEngine.Prepare(FDataSource);
+        if AutoStartMode = TAutoStartMode.WhenPrepared then
+          FVideoPlayerEngine.Start;
+      end
       else
         Raise Exception.Create('The data source cannot be changed once it has been set.');
     end;
@@ -3565,7 +3515,12 @@ procedure TALVideoPlayerSurface.SetAutoStartMode(const Value: TAutoStartMode);
 begin
   if value <> FAutoStartMode then begin
     FAutoStartMode := Value;
-    fVideoPlayerEngine.AutoStartWhenPrepared := FAutoStartMode = TautoStartMode.WhenPrepared;
+    {$IF not defined(ALDPK)}
+    If (not (csLoading in ComponentState)) and
+       (FAutoStartMode = TAutoStartMode.WhenPrepared) and
+       (DataSource <> '') and
+       (FInternalState = VPSIdle) then Start;
+    {$ENDIF}
   end;
 end;
 

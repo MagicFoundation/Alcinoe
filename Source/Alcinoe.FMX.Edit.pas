@@ -230,7 +230,6 @@ type
   private
     FFillColor: TAlphaColor;
     fMaxLength: integer;
-    fApplicationEventMessageID: integer;
     fReturnKeyType: TReturnKeyType;
     fKeyboardType: TVirtualKeyboardType;
     fAutoCapitalizationType: TALAutoCapitalizationType;
@@ -1731,7 +1730,7 @@ begin
   inherited create(AOwner);
   FFillColor := $ffffffff;
   fMaxLength := 0;
-  fApplicationEventMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   fReturnKeyType := tReturnKeyType.Default;
   fKeyboardType := TVirtualKeyboardType.default;
   fAutoCapitalizationType := TALAutoCapitalizationType.acNone;
@@ -1745,7 +1744,7 @@ end;
 {***************************************}
 destructor TALAndroidEditControl.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
   inherited Destroy;
 end;
 

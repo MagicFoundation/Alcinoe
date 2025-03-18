@@ -473,6 +473,8 @@ type
     FStroke: TALStrokeBrush; // 8 bytes
     fShadow: TALShadow; // 8 bytes
     FResourceDownloadContext: TResourceDownloadContext; // [MultiThread] | 8 bytes
+    FFadeInDuration: Single;
+    FFadeInStartTimeNano: Int64;
     function GetCropCenter: TALPosition;
     procedure SetCropCenter(const Value: TALPosition);
     function GetStroke: TALStrokeBrush;
@@ -488,6 +490,7 @@ type
     procedure setLoadingColor(const Value: TAlphaColor);
     function IsBackgroundColorStored: Boolean;
     function IsLoadingColorStored: Boolean;
+    function IsFadeInDurationStored: Boolean;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
     function IsXRadiusStored: Boolean;
@@ -496,6 +499,8 @@ type
   protected
     fBufDrawable: TALDrawable; // 8 bytes
     fBufDrawableRect: TRectF; // 16 bytes
+    fBufLoadingDrawable: TALDrawable; // 8 bytes
+    fBufLoadingDrawableRect: TRectF; // 16 bytes
     function CreateCropCenter: TALPosition; virtual;
     function CreateStroke: TALStrokeBrush; virtual;
     function CreateShadow: TALShadow; virtual;
@@ -504,6 +509,7 @@ type
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultFadeInDuration: Single; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
     function GetDefaultBlurRadius: Single; virtual;
@@ -557,6 +563,7 @@ type
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
     property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
     property DefaultBlurRadius: Single read GetDefaultBlurRadius;
@@ -594,6 +601,7 @@ type
     //property DragMode;
     //property EnableDragHighlight;
     property Enabled;
+    property FadeInDuration: Single read FFadeInDuration write FFadeInDuration stored IsFadeInDurationStored nodefault;
     property Height;
     //property Hint;
     //property ParentShowHint;
@@ -4130,12 +4138,17 @@ type
     FDataSource: String; // 8 bytes
     fPreviewResourceName: String; // 8 bytes
     FBackgroundColor: TAlphaColor; // 4 bytes
+    FLoadingColor: TAlphaColor; // 4 bytes
     FInternalState: Integer; // 4 Bytes
+    FIsFirstFrame: Boolean; // 4 Bytes
     FAutoStartMode: TAutoStartMode; // 1 Byte
     FWrapMode: TALImageWrapMode; // 1 bytes
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
+    FFadeInDuration: Single; // 4 bytes
+    FFadeInStartTimeNano: Int64; // 8 bytes
+    procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
     procedure DoOnFrameAvailable(Sender: Tobject);
     procedure setPreviewResourceName(const Value: String);
     procedure SetDataSource(const Value: String);
@@ -4158,6 +4171,8 @@ type
     function GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
     procedure SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
     function IsBackgroundColorStored: Boolean;
+    function IsLoadingColorStored: Boolean;
+    function IsFadeInDurationStored: Boolean;
     function IsDataSourceStored: Boolean;
     function IsPlaybackSpeedStored: Boolean;
     function IsVolumeStored: Boolean;
@@ -4167,6 +4182,8 @@ type
     function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultFadeInDuration: Single; virtual;
     procedure CancelPreviewDownload;
     class function CanStartPreviewDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
     class procedure HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject); virtual; // [MultiThread]
@@ -4193,6 +4210,8 @@ type
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     function GetCurrentPosition: Int64;
     function GetDuration: Int64;
     function GetVideoHeight: Integer;
@@ -4217,6 +4236,7 @@ type
     //property AutoSize;
     property AutoStartMode: TAutoStartMode read FAutoStartMode write SetAutoStartMode default TAutoStartMode.None;
     property BackgroundColor: TAlphaColor read fBackgroundColor write fBackgroundColor Stored IsBackgroundColorStored;
+    property LoadingColor: TAlphaColor read FLoadingColor write FLoadingColor Stored IsLoadingColorStored;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -4228,6 +4248,7 @@ type
     //property DragMode;
     //property EnableDragHighlight;
     property Enabled;
+    property FadeInDuration: Single read FFadeInDuration write FFadeInDuration stored IsFadeInDurationStored nodefault;
     property Height;
     //property Hint;
     //property ParentShowHint;
@@ -4860,6 +4881,10 @@ uses
   {$ENDIF}
   {$IF DEFINED(ALMacOS)}
   Macapi.CoreGraphics,
+  {$ENDIF}
+  {$IF defined(MSWindows)}
+  Winapi.Windows,
+  FMX.Platform.Win,
   {$ENDIF}
   {$IF defined(ALSkiaEngine)}
   System.Skia.API,
@@ -8093,7 +8118,10 @@ begin
   fShadow := CreateShadow;
   fShadow.OnChanged := ShadowChanged;
   FResourceDownloadContext := nil;
+  FFadeInDuration := DefaultFadeInDuration;
+  FFadeInStartTimeNano := 0;
   fBufDrawable := ALNullDrawable;
+  fBufLoadingDrawable := ALNullDrawable;
 end;
 
 {****************************************}
@@ -8164,6 +8192,12 @@ end;
 function TALDynamicListBoxImage.GetDefaultLoadingColor: TalphaColor;
 begin
   Result := $FFe0e4e9;
+end;
+
+{***************************************************************}
+function TALDynamicListBoxImage.GetDefaultFadeInDuration: Single;
+begin
+  Result := 0.250;
 end;
 
 {********************************************************}
@@ -8354,6 +8388,12 @@ begin
   Result := FLoadingColor <> DefaultLoadingColor;
 end;
 
+{**************************************************************}
+function TALDynamicListBoxImage.IsFadeInDurationStored: Boolean;
+begin
+  Result := not SameValue(FFadeInDuration, DefaultFadeInDuration, TEpsilon.Vector);
+end;
+
 {*******************************************************}
 function TALDynamicListBoxImage.IsCornersStored: Boolean;
 begin
@@ -8417,11 +8457,14 @@ procedure TALDynamicListBoxImage.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not IsDestroying) and
-     (not ALIsDrawableNull(fBufDrawable)) then
+     ((not ALIsDrawableNull(fBufDrawable)) or
+      (not ALIsDrawableNull(fBufLoadingDrawable))) then
     ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   CancelResourceDownload;
+  FFadeInStartTimeNano := 0;
   ALFreeAndNilDrawable(fBufDrawable);
+  ALFreeAndNilDrawable(fBufLoadingDrawable);
 end;
 
 {******************************************************}
@@ -8593,6 +8636,15 @@ begin
     procedure
     begin
       if LContext.Owner <> nil then begin
+        if (LContext.Owner.FFadeInDuration > 0) and
+           (LContext.ResourceName <> ALBrokenImageResourceName) and
+           (not ALIsDrawableNull(LBufDrawable)) then begin
+          LContext.Owner.FFadeInStartTimeNano := ALElapsedTimeNano;
+        end
+        else begin
+          ALFreeAndNilDrawable(LContext.Owner.fBufLoadingDrawable);
+          LContext.Owner.FFadeInStartTimeNano := 0;
+        end;
         ALFreeAndNilDrawable(LContext.Owner.fBufDrawable);
         LContext.Owner.fBufDrawable := LBufDrawable;
         LContext.Owner.FBufDrawableRect := LBufDrawableRect;
@@ -8848,8 +8900,8 @@ begin
       {$endif}
 
       CreateBufDrawable(
-        FBufDrawable, // var ABufDrawable: TALDrawable;
-        FBufDrawableRect, // out ABufDrawableRect: TRectF;
+        FBufLoadingDrawable, // var ABufDrawable: TALDrawable;
+        FBufLoadingDrawableRect, // out ABufDrawableRect: TRectF;
         FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
         LocalRect.ReducePrecision, // const ARect: TRectF;
         ALGetScreenScale, // const AScale: Single;
@@ -8916,35 +8968,61 @@ end;
 procedure TALDynamicListBoxImage.Paint;
 begin
 
+  // Draw a dashed rectangle in design mode
   //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
   //begin
   //  var R := LocalRect.ReducePrecision;
-  //  InflateRect(R, -0.5, -0.5);
+  //  system.types.InflateRect(R, -0.5, -0.5);
   //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
   //end;
 
-  var LCacheIndex: integer;
-  var LCacheSubIndex: Integer;
-  if FResourceDownloadContext <> nil then begin
-    LCacheIndex := LoadingCacheIndex;
-    LCacheSubIndex := GetLoadingCacheSubIndex;
-  end
-  else begin
-    LCacheIndex := CacheIndex;
-    LCacheSubIndex := GetCacheSubIndex;
+  // Calculate the opacity based on FFadeInStartTimeNano.
+  var LOpacity: Single := AbsoluteOpacity;
+  if FFadeInStartTimeNano > 0 then begin
+    {$IF defined(DEBUG)}
+    // Not possible; we are initiating a FadeIn
+    // effect while still downloading the image.
+    if (FResourceDownloadContext <> nil) then
+      Raise Exception.Create('Error 821554A1-5E7D-4920-BA1A-CECA32A9D967');
+    {$ENDIF}
+    var LElapsedTime := (ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec;
+    if LElapsedTime > FFadeInDuration then FFadeInStartTimeNano := 0
+    else begin
+      LOpacity := LOpacity * (LElapsedTime / FFadeInDuration);
+      // We cannot call Repaint from within a paint method,
+      // but we can call Form.Invalidate. We use Form.Invalidate
+      // to avoid using any TALFloatAnimation object
+      {$IF defined(MSWindows)}
+      If Form <> nil then begin
+        var LWnd := FormToHWND(Form);
+        TThread.ForceQueue(nil,
+          procedure
+          begin
+            Winapi.Windows.InvalidateRect(LWnd, nil, False);
+          end);
+      end;
+      {$ELSE}
+      If Form <> nil then
+        Form.Invalidate;
+      {$ENDIF}
+    end;
   end;
+
+  // Retrieve the image drawable in LDrawable.
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
-  if (LCacheIndex <= 0) or
+  if (CacheIndex <= 0) or
      (CacheEngine = nil) or
-     (not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+     (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
     MakeBufDrawable;
-    if FResourceDownloadContext <> nil then LCacheIndex := LoadingCacheIndex
-    else LCacheIndex := CacheIndex;
-    if (LCacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-      if not CacheEngine.TrySetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+    if (LoadingCacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufLoadingDrawable)) then begin
+      if not CacheEngine.TrySetEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex}, fBufLoadingDrawable{ADrawable}, fBufLoadingDrawableRect{ARect}) then ALFreeAndNiLDrawable(fBufLoadingDrawable)
+      else fBufLoadingDrawable := ALNullDrawable;
+    end;
+    if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
+      if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
       else fBufDrawable := ALNullDrawable;
-      if not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+      if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
         raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
     end
     else begin
@@ -8953,27 +9031,57 @@ begin
     end;
   end;
 
-  if ALIsDrawableNull(LDrawable) then begin
-    if LoadingColor <> TAlphaColors.Null then begin
-      {$IF DEFINED(ALSkiaCanvas)}
-      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
-        .SetDstRect(LocalRect.ReducePrecision)
-        .SetOpacity(AbsoluteOpacity)
-        .SetFillColor(FloadingColor)
-        .SetCorners(FCorners)
-        .SetXRadius(FXRadius)
-        .SetYRadius(FYRadius)
-        .Draw;
-      {$ELSE}
-      Canvas.Fill.kind := TBrushKind.solid;
-      Canvas.Fill.color := FloadingColor;
-      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
-      {$ENDIF}
-    end;
-    exit;
+  // Retrieve the loading drawable in LLoadingDrawable.
+  var LLoadingDrawable: TALDrawable := ALNullDrawable;
+  var LLoadingDrawableRect: TRectF;
+  if (((ALIsDrawableNull(LDrawable)) and (FResourceDownloadContext <> nil)) or
+      (FFadeInStartTimeNano > 0)) and
+     ((LoadingCacheIndex <= 0) or
+      (CacheEngine = nil) or
+      (not CacheEngine.TryGetEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex}, LLoadingDrawable{ADrawable}, LLoadingDrawableRect{ARect}))) then begin
+    LLoadingDrawable := fBufLoadingDrawable;
+    LLoadingDrawableRect := fBufLoadingDrawableRect;
   end;
 
+  // Draw LLoadingDrawable if there is one.
+  If not ALIsDrawableNull(LLoadingDrawable) then begin
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LLoadingDrawable, // const ADrawable: TALDrawable;
+      LLoadingDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single);
+  end
+
+  // Otherwise, draw a loading background if necessary.
+  else if ((ALIsDrawableNull(LDrawable) and (FResourceDownloadContext <> nil)) or
+           (FFadeInStartTimeNano > 0)) and
+          (LoadingColor <> TAlphaColors.Null) then begin
+    {$IF DEFINED(ALSkiaCanvas)}
+    TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(LocalRect.ReducePrecision)
+      .SetOpacity(AbsoluteOpacity)
+      .SetFillColor(FloadingColor)
+      .SetCorners(FCorners)
+      .SetXRadius(FXRadius)
+      .SetYRadius(FYRadius)
+      .Draw;
+    {$ELSE}
+    Canvas.Fill.kind := TBrushKind.solid;
+    Canvas.Fill.color := FloadingColor;
+    Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
+    {$ENDIF}
+  end;
+
+  // Exit if LDrawable is null
+  If ALIsDrawableNull(LDrawable) then
+    Exit;
+
+  // Clear fBufLoadingDrawable
+  if FFadeInStartTimeNano <= 0 then
+    ALFreeAndNilDrawable(fBufLoadingDrawable);
+
+  // Handle the fExifOrientationInfo
   case fExifOrientationInfo of
     TalExifOrientationInfo.FLIP_HORIZONTAL: begin
       var LMatrixRotationCenter: TpointF;
@@ -9054,11 +9162,12 @@ begin
       Raise Exception.Create('Error 015D39FD-8A61-4F7F-A8AA-639A91FCBC37');
   end;
 
+  // Draw the LDrawable
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
     LDrawable, // const ADrawable: TALDrawable;
     LDrawableRect.TopLeft, // const ATopLeft: TpointF;
-    AbsoluteOpacity); // const AOpacity: Single);
+    LOpacity); // const AOpacity: Single);
 
 end;
 
@@ -20760,18 +20869,24 @@ begin
   FDataSource := '';
   fPreviewResourceName := '';
   FBackgroundColor := DefaultBackgroundColor;
+  FLoadingColor := DefaultLoadingColor;
   FInternalState := VPSIdle;
+  FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
   FWrapMode := TALImageWrapMode.Fit;
   FCacheIndex := 0;
   FCacheEngine := nil;
   FPreviewDownloadContext := nil;
+  FFadeInDuration := DefaultFadeInDuration;
+  FFadeInStartTimeNano := 0;
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   fBufDrawable := ALNullDrawable;
 end;
 
 {*****************************************************}
 destructor TALDynamicListBoxVideoPlayerSurface.Destroy;
 begin
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
   ALFreeAndNil(fVideoPlayerEngine);
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
@@ -20789,8 +20904,10 @@ end;
 //procedure TALDynamicListBoxVideoPlayerSurface.Loaded;
 //begin
 //  inherited;
-//  If FDataSource <> '' then
-//    FVideoPlayerEngine.Prepare(FDataSource)
+//  If FDataSource <> '' then begin
+//    FVideoPlayerEngine.Prepare(FDataSource);
+//    if FAutoStartMode = TAutoStartMode.WhenPrepared then start;
+//  end;
 //end;
 
 {*********************************************************************}
@@ -20808,7 +20925,19 @@ end;
 {**********************************************************************************}
 function TALDynamicListBoxVideoPlayerSurface.GetDefaultBackgroundColor: TalphaColor;
 begin
-  Result := TalphaColors.Black;
+  Result := TalphaColors.Null;
+end;
+
+{*******************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDefaultLoadingColor: TalphaColor;
+begin
+  Result := $FFe0e4e9;
+end;
+
+{****************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDefaultFadeInDuration: Single;
+begin
+  Result := 0.250;
 end;
 
 {****************************************************************************************}
@@ -20828,8 +20957,11 @@ begin
     FDataSource := Value;
     {$IF not defined(ALDPK)}
     //if not (csLoading in ComponentState) then begin
-      if FInternalState = vpsIdle then
-        FVideoPlayerEngine.Prepare(FDataSource)
+      if FInternalState = vpsIdle then begin
+        FVideoPlayerEngine.Prepare(FDataSource);
+        if AutoStartMode = TAutoStartMode.WhenPrepared then
+          FVideoPlayerEngine.Start;
+      end
       else
         Raise Exception.Create('The data source cannot be changed once it has been set.');
     //end;
@@ -20858,7 +20990,12 @@ procedure TALDynamicListBoxVideoPlayerSurface.SetAutoStartMode(const Value: TAut
 begin
   if value <> FAutoStartMode then begin
     FAutoStartMode := Value;
-    fVideoPlayerEngine.AutoStartWhenPrepared := FAutoStartMode = TautoStartMode.WhenPrepared;
+    {$IF not defined(ALDPK)}
+    If //(not (csLoading in ComponentState)) and
+       (FAutoStartMode = TAutoStartMode.WhenPrepared) and
+       (DataSource <> '') and
+       (FInternalState = VPSIdle) then Start;
+    {$ENDIF}
   end;
 end;
 
@@ -21014,6 +21151,18 @@ begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
+{*************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsLoadingColorStored: Boolean;
+begin
+  Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{***************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsFadeInDurationStored: Boolean;
+begin
+  Result := not SameValue(FFadeInDuration, DefaultFadeInDuration, TEpsilon.Vector);
+end;
+
 {***********************************************************************}
 function TALDynamicListBoxVideoPlayerSurface.IsDataSourceStored: Boolean;
 begin
@@ -21048,6 +21197,7 @@ begin
     ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   CancelPreviewDownload;
+  FFadeInStartTimeNano := 0;
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
@@ -21186,6 +21336,13 @@ begin
     procedure
     begin
       if LContext.Owner <> nil then begin
+        if (LContext.Owner.FFadeInDuration > 0) and
+           (LContext.ResourceName <> ALBrokenImageResourceName) and
+           (not ALIsDrawableNull(LBufDrawable)) and
+           (ALIsDrawableNull(LContext.Owner.fVideoPlayerEngine.Drawable)) then
+          LContext.Owner.FFadeInStartTimeNano := ALElapsedTimeNano
+        else
+          LContext.Owner.FFadeInStartTimeNano := 0;
         ALFreeAndNilDrawable(LContext.Owner.fBufDrawable);
         LContext.Owner.fBufDrawable := LBufDrawable;
         LContext.Owner.FBufDrawableRect := LBufDrawableRect;
@@ -21314,6 +21471,19 @@ begin
 
 end;
 
+{***************************************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.ApplicationEventHandler(const Sender: TObject; const M : TMessage);
+begin
+  if FAutoStartMode = TAutoStartMode.WhenDisplayed then begin
+    if (M is TApplicationEventMessage) then begin
+      case (M as TApplicationEventMessage).Value.Event of
+        TApplicationEvent.EnteredBackground,
+        TApplicationEvent.WillTerminate: Pause;
+      end;
+    end;
+  end;
+end;
+
 {********************************************************************************}
 procedure TALDynamicListBoxVideoPlayerSurface.DoOnFrameAvailable(Sender: Tobject);
 begin
@@ -21355,35 +21525,55 @@ begin
   //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
   //begin
   //  var R := LocalRect.ReducePrecision;
-  //  InflateRect(R, -0.5, -0.5);
+  //  system.types.InflateRect(R, -0.5, -0.5);
   //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
   //end;
 
+  // Calculate the opacity based on FFadeInStartTimeNano.
+  var LOpacity: Single := AbsoluteOpacity;
+  if FFadeInStartTimeNano > 0 then begin
+    {$IF defined(DEBUG)}
+    // Not possible; we are initiating a FadeIn
+    // effect while still downloading the image.
+    if (FPreviewDownloadContext <> nil) then
+      Raise Exception.Create('Error 821554A1-5E7D-4920-BA1A-CECA32A9D967');
+    {$ENDIF}
+    var LElapsedTime := (ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec;
+    if LElapsedTime > FFadeInDuration then FFadeInStartTimeNano := 0
+    else begin
+      LOpacity := LOpacity * (LElapsedTime / FFadeInDuration);
+      // We cannot call Repaint from within a paint method,
+      // but we can call Form.Invalidate. We use Form.Invalidate
+      // to avoid using any TALFloatAnimation object
+      {$IF defined(MSWindows)}
+      If Form <> nil then begin
+        var LWnd := FormToHWND(Form);
+        TThread.ForceQueue(nil,
+          procedure
+          begin
+            Winapi.Windows.InvalidateRect(LWnd, nil, False);
+          end);
+      end;
+      {$ELSE}
+      If Form <> nil then
+        Form.Invalidate;
+      {$ENDIF}
+    end;
+  end;
+
   if ALIsDrawableNull(fVideoPlayerEngine.Drawable) then begin
 
-    var LCacheIndex: integer;
-    var LCacheSubIndex: Integer;
-    if FPreviewDownloadContext <> nil then begin
-      LCacheIndex := 0;
-      LCacheSubIndex := 0;
-    end
-    else begin
-      LCacheIndex := CacheIndex;
-      LCacheSubIndex := GetCacheSubIndex;
-    end;
     var LDrawable: TALDrawable;
     var LDrawableRect: TRectF;
-    if (LCacheIndex <= 0) or
+    if (CacheIndex <= 0) or
        (CacheEngine = nil) or
-       (not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+       (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
       MakeBufDrawable;
-      if FPreviewDownloadContext <> nil then LCacheIndex := 0
-      else LCacheIndex := CacheIndex;
-      if (LCacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-        if not CacheEngine.TrySetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+      if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
+        if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
         else fBufDrawable := ALNullDrawable;
-        if not CacheEngine.TryGetEntry(LCacheIndex{AIndex}, LCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
-          raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
+        if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+          raise Exception.Create('Error 6FFD96FE-A985-4F3B-AF0A-2A5C03615E27');
       end
       else begin
         LDrawable := FBufDrawable;
@@ -21391,46 +21581,105 @@ begin
       end;
     end;
 
-    if ALIsDrawableNull(LDrawable) then begin
-      if BackgroundColor <> TAlphaColors.Null then begin
-        {$IF DEFINED(ALSkiaCanvas)}
-        TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
-          .SetDstRect(LocalRect.ReducePrecision)
-          .SetOpacity(AbsoluteOpacity)
-          .SetFillColor(FBackgroundColor)
-          .Draw;
-        {$ELSE}
-        Canvas.Fill.kind := TBrushKind.solid;
-        Canvas.Fill.color := BackGroundColor;
-        Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, AbsoluteOpacity, TCornerType.Round);
-        {$ENDIF}
-      end;
-      exit;
+    if ((ALIsDrawableNull(LDrawable) and (FPreviewDownloadContext <> nil)) or
+        (FFadeInStartTimeNano > 0)) and
+       (LoadingColor <> TAlphaColors.Null) then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFillColor(FloadingColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := FloadingColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, AllCorners, AbsoluteOpacity, TCornerType.Round);
+      {$ENDIF}
     end;
-
-    ALDrawDrawable(
-      Canvas, // const ACanvas: Tcanvas;
-      LDrawable, // const ADrawable: TALDrawable;
-      LDrawableRect.TopLeft, // const ATopLeft: TpointF;
-      AbsoluteOpacity); // const AOpacity: Single);
-
-  end
-
-  else begin
 
     if BackgroundColor <> TAlphaColors.Null then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
         .SetAlignToPixel(IsPixelAlignmentEnabled)
         .SetDstRect(LocalRect.ReducePrecision)
-        .SetOpacity(AbsoluteOpacity)
+        .SetOpacity(LOpacity)
         .SetFillColor(FBackgroundColor)
         .Draw;
       {$ELSE}
       Canvas.Fill.kind := TBrushKind.solid;
       Canvas.Fill.color := BackGroundColor;
-      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, AbsoluteOpacity, TCornerType.Round);
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, LOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LDrawable, // const ADrawable: TALDrawable;
+      LDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      LOpacity); // const AOpacity: Single);
+
+    if FIsFirstFrame then
+      FIsFirstFrame := ALIsDrawableNull(LDrawable);
+
+  end
+
+  else begin
+
+    if FIsFirstFrame then begin
+      CancelPreviewDownload;
+      ALFreeAndNilDrawable(fBufDrawable);
+      if (FFadeInDuration > 0) and (FFadeInStartTimeNano <= 0) then begin
+        FFadeInStartTimeNano := ALElapsedTimeNano;
+        LOpacity := 0;
+        // We cannot call Repaint from within a paint method,
+        // but we can call Form.Invalidate. We use Form.Invalidate
+        // to avoid using any TALFloatAnimation object
+        {$IF defined(MSWindows)}
+        If Form <> nil then begin
+          var LWnd := FormToHWND(Form);
+          TThread.ForceQueue(nil,
+            procedure
+            begin
+              Winapi.Windows.InvalidateRect(LWnd, nil, False);
+            end);
+        end;
+        {$ELSE}
+        If Form <> nil then
+          Form.Invalidate;
+        {$ENDIF}
+      end;
+      FIsFirstFrame := false;
+    end;
+
+    if (FFadeInStartTimeNano > 0) and
+       (LoadingColor <> TAlphaColors.Null) then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFillColor(FloadingColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := FloadingColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, AllCorners, AbsoluteOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    if BackgroundColor <> TAlphaColors.Null then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(LOpacity)
+        .SetFillColor(FBackgroundColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := BackGroundColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, LOpacity, TCornerType.Round);
       {$ENDIF}
     end;
 
@@ -21480,7 +21729,7 @@ begin
       fVideoPlayerEngine.Drawable, // const ADrawable: TALDrawable;
       LSrcRect, // const ASrcRect: TrectF; // IN REAL PIXEL !
       LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
-      AbsoluteOpacity); // const AOpacity: Single);
+      LOpacity); // const AOpacity: Single);
 
   end;
 

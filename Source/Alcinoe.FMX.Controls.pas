@@ -339,7 +339,7 @@ procedure TALControl.BeginTextUpdate;
       if AControl.Controls[i] is TALControl then
         TALControl(AControl.Controls[i]).BeginTextUpdate
       else
-        DoBeginTextUpdate(AControl);
+        DoBeginTextUpdate(AControl.Controls[i]);
   end;
 
 begin
@@ -357,7 +357,7 @@ procedure TALControl.EndTextUpdate;
       if AControl.Controls[i] is TALControl then
         TALControl(AControl.Controls[i]).EndTextUpdate
       else
-        DoEndTextUpdate(AControl);
+        DoEndTextUpdate(AControl.Controls[i]);
   end;
 
 begin
@@ -1095,7 +1095,7 @@ function TALControl.IsReadyToDisplay: Boolean;
     Result := True;
     for var I := 0 to AControl.ControlsCount - 1 do begin
       if AControl.Controls[i] is TALControl then Result := TALControl(AControl.Controls[i]).IsReadyToDisplay
-      else Result := CheckAllChildrenAreReadyToDisplay(AControl);
+      else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);
       if not Result then exit;
     end;
   end;

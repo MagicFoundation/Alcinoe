@@ -3467,7 +3467,7 @@ begin
   inherited;
 end;
 
-{************************************************}
+{*******************************************************}
 function TALVideoPlayerSurface.IsReadyToDisplay: Boolean;
 begin
   Result := Inherited and
@@ -3510,7 +3510,7 @@ begin
   Result := $FFe0e4e9;
 end;
 
-{*************************************************}
+{**************************************************************}
 function TALVideoPlayerSurface.GetDefaultFadeInDuration: Single;
 begin
   Result := 0.250;
@@ -3733,7 +3733,7 @@ begin
   Result := FLoadingColor <> DefaultLoadingColor;
 end;
 
-{**********************************************}
+{*************************************************************}
 function TALVideoPlayerSurface.IsFadeInDurationStored: Boolean;
 begin
   Result := not SameValue(FFadeInDuration, DefaultFadeInDuration, TEpsilon.Vector);

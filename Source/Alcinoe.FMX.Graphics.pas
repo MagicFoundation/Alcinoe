@@ -7681,7 +7681,7 @@ end;
 {***********************************************************************}
 class function TALGraphicThreadPool.CreateInstance: TALGraphicThreadPool;
 begin
-  result := TALGraphicThreadPool.Create(TThread.ProcessorCount);
+  result := TALGraphicThreadPool.Create(max(1, TThread.ProcessorCount-1));
 end;
 
 {********************************************************************}

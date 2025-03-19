@@ -6857,6 +6857,7 @@ end;
 //   EndTextUpdate;
 procedure TALDynamicListBoxExtendedControl.BeginTextUpdate;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure DoBeginTextUpdate(const AControl: TALDynamicListBoxControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do
@@ -6875,6 +6876,7 @@ end;
 {*******************************************************}
 procedure TALDynamicListBoxExtendedControl.EndTextUpdate;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure DoEndTextUpdate(const AControl: TALDynamicListBoxControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do
@@ -7615,14 +7617,22 @@ end;
 
 {******************************************************************}
 function TALDynamicListBoxExtendedControl.IsReadyToDisplay: Boolean;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function CheckAllChildrenAreReadyToDisplay(const AControl: TALDynamicListBoxControl): boolean;
+  begin
+    Result := True;
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      //if AControl.Controls[i] is TALDynamicListBoxControl then Result := TALDynamicListBoxControl(AControl.Controls[i]).IsReadyToDisplay
+      //else Result := CheckAllChildrenAreReadyToDisplay(AControl);
+      Result := AControl.Controls[i].IsReadyToDisplay;
+      if not Result then exit;
+    end;
+  end;
+
 begin
   MakeBufDrawable;
-  For var I := 0 to ControlsCount - 1 do
-    //if (Controls[i] is TALDynamicListBoxControl) and
-    //   (not TALDynamicListBoxControl(Controls[i]).IsReadyToDisplay) then
-    if not Controls[i].IsReadyToDisplay then
-      exit(False);
-  Result := True;
+  Result := CheckAllChildrenAreReadyToDisplay(Self);
 end;
 
 {*************************************************************}

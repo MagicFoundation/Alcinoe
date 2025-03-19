@@ -9,6 +9,9 @@ interface
 {$ENDIF}
 
 uses
+  {$IF defined(MSWindows)}
+  Winapi.Windows,
+  {$ENDIF}
   System.Classes,
   System.Types,
   System.UITypes,
@@ -1316,7 +1319,6 @@ uses
   FMX.Surfaces,
   {$ENDIF}
   {$IF defined(MSWindows)}
-  Winapi.Windows,
   FMX.Platform.Win,
   {$ENDIF}
   {$IFDEF ALDPK}
@@ -1792,7 +1794,7 @@ begin
   Result := FLoadingColor <> DefaultLoadingColor;
 end;
 
-{**********************************************}
+{************************************************}
 function TALImage.IsFadeInDurationStored: Boolean;
 begin
   Result := not SameValue(FFadeInDuration, DefaultFadeInDuration, TEpsilon.Vector);

@@ -92,6 +92,7 @@ implementation
 uses
   {$IF defined(Android)}
   Androidapi.Helpers,
+  Androidapi.JNI.App,
   {$ENDIF}
   system.Diagnostics,
   system.threading,
@@ -127,7 +128,7 @@ begin
     TALDynamicListBoxText(Sender).Cursor := crDefault;
 end;
 
-{**************************************************************************************************}
+{****************************************************}
 procedure TMainForm.BottomBarResized(Sender: TObject);
 begin
   var LMargin: Single := (BottomBar.Width - button1.Width - button2.Width - button3.Width - button4.Width - button5.Width) / 10;

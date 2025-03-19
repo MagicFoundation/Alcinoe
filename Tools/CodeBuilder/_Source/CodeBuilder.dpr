@@ -517,15 +517,25 @@ Procedure BuildAlcinoeFMXDynamicControls;
     //--
     aSrc := FindAndReplace(
               aSrc,
-              '  For var I := 0 to ControlsCount - 1 do'+#13#10+
-              '    if (Controls[i] is TALDynamicListBoxControl) and'+#13#10+
-              '       (not TALDynamicListBoxControl(Controls[i]).IsReadyToDisplay) then'+#13#10+
-              '      exit(False);',
-              '  For var I := 0 to ControlsCount - 1 do'+#13#10+
-              '    //if (Controls[i] is TALDynamicListBoxControl) and'+#13#10+
-              '    //   (not TALDynamicListBoxControl(Controls[i]).IsReadyToDisplay) then'+#13#10+
-              '    if not Controls[i].IsReadyToDisplay then'+#13#10+
-              '      exit(False);');
+              '  function CheckAllChildrenAreReadyToDisplay(const AControl: TControl): boolean;'+#13#10+
+              '  begin'+#13#10+
+              '    Result := True;'+#13#10+
+              '    for var I := 0 to AControl.ControlsCount - 1 do begin'+#13#10+
+              '      if AControl.Controls[i] is TALDynamicListBoxControl then Result := TALDynamicListBoxControl(AControl.Controls[i]).IsReadyToDisplay'+#13#10+
+              '      else Result := CheckAllChildrenAreReadyToDisplay(AControl);'+#13#10+
+              '      if not Result then exit;'+#13#10+
+              '    end;'+#13#10+
+              '  end;',
+              '  function CheckAllChildrenAreReadyToDisplay(const AControl: TALDynamicListBoxControl): boolean;'+#13#10+
+              '  begin'+#13#10+
+              '    Result := True;'+#13#10+
+              '    for var I := 0 to AControl.ControlsCount - 1 do begin'+#13#10+
+              '      //if AControl.Controls[i] is TALDynamicListBoxControl then Result := TALDynamicListBoxControl(AControl.Controls[i]).IsReadyToDisplay'+#13#10+
+              '      //else Result := CheckAllChildrenAreReadyToDisplay(AControl);'+#13#10+
+              '      Result := AControl.Controls[i].IsReadyToDisplay;'+#13#10+
+              '      if not Result then exit;'+#13#10+
+              '    end;'+#13#10+
+              '  end;');
     //--
     aSrc := FindAndReplace(
               aSrc,

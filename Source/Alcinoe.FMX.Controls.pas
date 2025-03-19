@@ -332,6 +332,7 @@ end;
 //   EndTextUpdate;
 procedure TALControl.BeginTextUpdate;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure DoBeginTextUpdate(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do
@@ -349,6 +350,7 @@ end;
 {*********************************}
 procedure TALControl.EndTextUpdate;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure DoEndTextUpdate(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do
@@ -1084,9 +1086,10 @@ begin
   FIsPixelAlignmentEnabled := AValue;
 end;
 
-{***************************************}
+{********************************************}
 function TALControl.IsReadyToDisplay: Boolean;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function CheckAllChildrenAreReadyToDisplay(const AControl: TControl): boolean;
   begin
     Result := True;

@@ -262,12 +262,11 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, '_TControlAccessProtected(ParentControl)','OwnerControl');
     aSrc := FindAndReplace(aSrc, '_TControlAccessProtected(FParent).click;','FParent.click;');
     //--
-    aSrc := FindAndReplace(aSrc, 'ParenTALDynamicListBoxControl', 'ParentALControl');
-    aSrc := FindAndReplace(aSrc, 'FParentALControl := nil;','//FParentALControl := nil;');
-    aSrc := FindAndReplace(aSrc, 'FParentALControl: TALDynamicListBoxControl;', '//FParentALControl: TALDynamicListBoxControl;');
-    aSrc := FindAndReplace(aSrc, 'property ParentALControl: TALDynamicListBoxControl read FParentALControl;', '//property ParentALControl: TALDynamicListBoxControl read FParentALControl;');
+    aSrc := FindAndReplace(aSrc, 'FALParentControl := nil;','//FALParentControl := nil;');
+    aSrc := FindAndReplace(aSrc, 'FALParentControl: TALDynamicListBoxControl;', '//FALParentControl: TALDynamicListBoxControl;');
+    aSrc := FindAndReplace(aSrc, 'property ALParentControl: TALDynamicListBoxControl read FALParentControl;', '//property ALParentControl: TALDynamicListBoxControl read FALParentControl;');
+    aSrc := FindAndReplace(aSrc, 'ALParentControl', 'OwnerControl');
     aSrc := FindAndReplace(aSrc, 'ParentControl', 'OwnerControl');
-    aSrc := FindAndReplace(aSrc, 'ParentALControl', 'OwnerControl');
     aSrc := FindAndReplace(aSrc, 'var P: TControl := Self;','var P: TALDynamicListBoxControl := Self;');
     //--
     aSrc := FindAndReplace(aSrc, 'Size.SetPlatformDefaultWithoutNotification(False);','//Size.SetPlatformDefaultWithoutNotification(False);');
@@ -382,6 +381,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'procedure EndTextUpdate; virtual;','procedure EndTextUpdate; override;');
     aSrc := FindAndReplace(aSrc, 'function IsDisplayed: Boolean; virtual;','function IsDisplayed: Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'function GetAbsoluteDisplayedRect: TRectF; virtual;','//function GetAbsoluteDisplayedRect: TRectF; virtual;');
+    aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay: Boolean; virtual;','function IsReadyToDisplay: Boolean; override;');
     //--
     aSrc := FindAndReplace(aSrc, 'FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;','//FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;');
     aSrc := FindAndReplace(aSrc, 'FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;','//FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;');
@@ -452,6 +452,83 @@ Procedure BuildAlcinoeFMXDynamicControls;
     //--
     aSrc := FindAndReplace(
               aSrc,
+              '  Procedure DoBeginTextUpdate(const AControl: TControl);'+#13#10+
+              '  begin'+#13#10+
+              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
+              '      if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
+              '        TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate'+#13#10+
+              '      else'+#13#10+
+              '        DoBeginTextUpdate(AControl);'+#13#10+
+              '  end;',
+              '  Procedure DoBeginTextUpdate(const AControl: TALDynamicListBoxControl);'+#13#10+
+              '  begin'+#13#10+
+              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
+              '      //if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
+              '      //  TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate'+#13#10+
+              '      //else'+#13#10+
+              '      //  DoBeginTextUpdate(AControl);'+#13#10+
+              '      AControl.Controls[i].BeginTextUpdate;'+#13#10+
+              '  end;');
+    //--
+    aSrc := FindAndReplace(
+              aSrc,
+              '  Procedure DoEndTextUpdate(const AControl: TControl);'+#13#10+
+              '  begin'+#13#10+
+              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
+              '      if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
+              '        TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate'+#13#10+
+              '      else'+#13#10+
+              '        DoEndTextUpdate(AControl);'+#13#10+
+              '  end;',
+              '  Procedure DoEndTextUpdate(const AControl: TALDynamicListBoxControl);'+#13#10+
+              '  begin'+#13#10+
+              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
+              '      //if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
+              '      //  TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate'+#13#10+
+              '      //else'+#13#10+
+              '      //  DoEndTextUpdate(AControl);'+#13#10+
+              '      AControl.Controls[i].EndTextUpdate;'+#13#10+
+              '  end;');
+    //--
+    aSrc := FindAndReplace(
+              aSrc,
+              '        var LALChildControl: TALDynamicListBoxControl;'+#13#10+
+              '        var LALChildControlAlign: TALAlignLayout;'+#13#10+
+              '        If (LChildControl is TALDynamicListBoxControl) then begin'+#13#10+
+              '          LALChildControl := TALDynamicListBoxControl(LChildControl);'+#13#10+
+              '          LALChildControlAlign := LALChildControl.Align'+#13#10+
+              '        end'+#13#10+
+              '        else begin'+#13#10+
+              '          LALChildControl := nil;'+#13#10+
+              '          LALChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
+              '        end;',
+              '        //var LALChildControl: TALDynamicListBoxControl;'+#13#10+
+              '        //var LALChildControlAlign: TALAlignLayout;'+#13#10+
+              '        //If (LChildControl is TALDynamicListBoxControl) then begin'+#13#10+
+              '        //  LALChildControl := TALDynamicListBoxControl(LChildControl);'+#13#10+
+              '        //  LALChildControlAlign := LALChildControl.Align'+#13#10+
+              '        //end'+#13#10+
+              '        //else begin'+#13#10+
+              '        //  LALChildControl := nil;'+#13#10+
+              '        //  LALChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
+              '        //end;'+#13#10+
+              '        var LALChildControl := LChildControl;'+#13#10+
+              '        var LALChildControlAlign := LALChildControl.Align;');
+    //--
+    aSrc := FindAndReplace(
+              aSrc,
+              '  For var I := 0 to ControlsCount - 1 do'+#13#10+
+              '    if (Controls[i] is TALDynamicListBoxControl) and'+#13#10+
+              '       (not TALDynamicListBoxControl(Controls[i]).IsReadyToDisplay) then'+#13#10+
+              '      exit(False);',
+              '  For var I := 0 to ControlsCount - 1 do'+#13#10+
+              '    //if (Controls[i] is TALDynamicListBoxControl) and'+#13#10+
+              '    //   (not TALDynamicListBoxControl(Controls[i]).IsReadyToDisplay) then'+#13#10+
+              '    if not Controls[i].IsReadyToDisplay then'+#13#10+
+              '      exit(False);');
+    //--
+    aSrc := FindAndReplace(
+              aSrc,
               '    if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode'+#13#10+
               '    else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
@@ -475,13 +552,13 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then'+#13#10+
               '  begin'+#13#10+
               '    var R := LocalRect;'+#13#10+
-              '    InflateRect(R, -0.5, -0.5);'+#13#10+
+              '    system.types.InflateRect(R, -0.5, -0.5);'+#13#10+
               '    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);'+#13#10+
               '  end;',
               '  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then'+#13#10+
               '  //begin'+#13#10+
               '  //  var R := LocalRect;'+#13#10+
-              '  //  InflateRect(R, -0.5, -0.5);'+#13#10+
+              '  //  system.types.InflateRect(R, -0.5, -0.5);'+#13#10+
               '  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);'+#13#10+
               '  //end;');
     aSrc := FindAndReplace(
@@ -680,14 +757,20 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(
               aSrc,
               '    if not (csLoading in ComponentState) then begin'+#13#10+
-              '      if FInternalState = vpsIdle then'+#13#10+
-              '        FVideoPlayerEngine.Prepare(FDataSource)'+#13#10+
+              '      if FInternalState = vpsIdle then begin'+#13#10+
+              '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
+              '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
+              '          FVideoPlayerEngine.Start;'+#13#10+
+              '      end'+#13#10+
               '      else'+#13#10+
               '        Raise Exception.Create(''The data source cannot be changed once it has been set.'');'+#13#10+
               '    end;',
               '    //if not (csLoading in ComponentState) then begin'+#13#10+
-              '      if FInternalState = vpsIdle then'+#13#10+
-              '        FVideoPlayerEngine.Prepare(FDataSource)'+#13#10+
+              '      if FInternalState = vpsIdle then begin'+#13#10+
+              '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
+              '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
+              '          FVideoPlayerEngine.Start;'+#13#10+
+              '      end'+#13#10+
               '      else'+#13#10+
               '        Raise Exception.Create(''The data source cannot be changed once it has been set.'');'+#13#10+
               '    //end;');

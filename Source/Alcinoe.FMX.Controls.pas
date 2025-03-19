@@ -72,7 +72,7 @@ type
   TALControl = class(TControl)
   private
     FForm: TCommonCustomForm; // 8 bytes
-    FParentALControl: TALControl; // 8 bytes
+    FALParentControl: TALControl; // 8 bytes
     FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
     FScale: Single; // 4 bytes
@@ -144,6 +144,7 @@ type
     destructor Destroy; override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
+    function IsReadyToDisplay: Boolean; virtual;
     function IsDisplayed: Boolean; virtual;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
@@ -161,7 +162,7 @@ type
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
     property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
     property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
-    property ParentALControl: TALControl read FParentALControl;
+    property ALParentControl: TALControl read FALParentControl;
   end;
 
   {*************************************}
@@ -265,7 +266,7 @@ begin
   Margins.OnChange := MarginsChangedHandler;
   Size.SetPlatformDefaultWithoutNotification(False);
   FForm := nil;
-  FParentALControl := nil;
+  FALParentControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
   FScale := 1;
   FFocusOnMouseDown := False;
@@ -330,20 +331,36 @@ end;
 //   EndUpdate;
 //   EndTextUpdate;
 procedure TALControl.BeginTextUpdate;
+
+  Procedure DoBeginTextUpdate(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do
+      if AControl.Controls[i] is TALControl then
+        TALControl(AControl.Controls[i]).BeginTextUpdate
+      else
+        DoBeginTextUpdate(AControl);
+  end;
+
 begin
   FTextUpdating := True;
-  for var I := 0 to ControlsCount - 1 do
-    if Controls[i] is TALControl then
-      TALControl(Controls[i]).BeginTextUpdate;
+  DoBeginTextUpdate(Self);
 end;
 
 {*********************************}
 procedure TALControl.EndTextUpdate;
+
+  Procedure DoEndTextUpdate(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do
+      if AControl.Controls[i] is TALControl then
+        TALControl(AControl.Controls[i]).EndTextUpdate
+      else
+        DoEndTextUpdate(AControl);
+  end;
+
 begin
   FTextUpdating := False;
-  for var I := 0 to ControlsCount - 1 do
-    if Controls[i] is TALControl then
-      TALControl(Controls[i]).EndTextUpdate;
+  DoEndTextUpdate(Self);
 end;
 
 {**************************}
@@ -1020,8 +1037,8 @@ begin
                              TALAlignLayout.MostBottom,
                              TALAlignLayout.Horizontal,
                              TALAlignLayout.VertCenter]);
-    if (not result) and (ParentALControl <> nil) then
-      Result := ParentALControl.HasUnconstrainedAutosizeX;
+    if (not result) and (ALParentControl <> nil) then
+      Result := ALParentControl.HasUnconstrainedAutosizeX;
   end;
 end;
 
@@ -1038,8 +1055,8 @@ begin
                              TALAlignLayout.MostRight,
                              TALAlignLayout.Vertical,
                              TALAlignLayout.HorzCenter]);
-    if (not result) and (ParentALControl <> nil) then
-      Result := ParentALControl.HasUnconstrainedAutosizeY;
+    if (not result) and (ALParentControl <> nil) then
+      Result := ALParentControl.HasUnconstrainedAutosizeY;
   end;
 end;
 
@@ -1065,6 +1082,24 @@ end;
 procedure TALControl.SetIsPixelAlignmentEnabled(const AValue: Boolean);
 begin
   FIsPixelAlignmentEnabled := AValue;
+end;
+
+{***************************************}
+function TALControl.IsReadyToDisplay: Boolean;
+
+  function CheckAllChildrenAreReadyToDisplay(const AControl: TControl): boolean;
+  begin
+    Result := True;
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      if AControl.Controls[i] is TALControl then Result := TALControl(AControl.Controls[i]).IsReadyToDisplay
+      else Result := CheckAllChildrenAreReadyToDisplay(AControl);
+      if not Result then exit;
+    end;
+  end;
+
+begin
+  MakeBufDrawable;
+  Result := CheckAllChildrenAreReadyToDisplay(Self);
 end;
 
 {***************************************}
@@ -1400,11 +1435,11 @@ begin
   // Note: The procedure TControl.PaintTo(const ACanvas: TCanvas; const ARect: TRectF; const AParent: TFmxObject = nil)
   // temporarily updates the ParentControl. Unfortunately, ParentControl is not a virtual property,
   // and TControl.UpdateParentProperties is strictly private. As a result, within TControl.PaintTo,
-  // the value of FParentALControl will be incorrect.
+  // the value of FALParentControl will be incorrect.
   if (ParentControl <> nil) and (ParentControl is TALControl) then
-    FParentALControl := TALControl(ParentControl)
+    FALParentControl := TALControl(ParentControl)
   else
-    FParentALControl := nil;
+    FALParentControl := nil;
 end;
 
 {**********************************************************}

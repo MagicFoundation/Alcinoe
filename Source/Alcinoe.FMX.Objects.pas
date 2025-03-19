@@ -244,6 +244,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function IsReadyToDisplay: Boolean; override;
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -1525,6 +1526,15 @@ begin
   ALFreeAndNil(FStroke);
   ALFreeAndNil(fShadow);
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{******************************************}
+function TALImage.IsReadyToDisplay: Boolean;
+begin
+  Result := Inherited and
+            (FResourceDownloadContext = nil) and
+            ((FFadeInStartTimeNano <= 0) or
+             ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
 
 {**********************************************}

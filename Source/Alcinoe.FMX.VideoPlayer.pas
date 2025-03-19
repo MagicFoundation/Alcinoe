@@ -667,6 +667,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    function IsReadyToDisplay: Boolean; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
@@ -3466,6 +3467,15 @@ begin
   inherited;
 end;
 
+{************************************************}
+function TALVideoPlayerSurface.IsReadyToDisplay: Boolean;
+begin
+  Result := Inherited and
+            (FPreviewDownloadContext = nil) and
+            ((FFadeInStartTimeNano <= 0) or
+             ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
+end;
+
 {*************************************}
 procedure TALVideoPlayerSurface.Loaded;
 begin
@@ -3989,7 +3999,8 @@ begin
   end;
 
   if (not ALIsDrawableNull(FBufDrawable)) or
-     (FPreviewDownloadContext <> nil) then exit;
+     (FPreviewDownloadContext <> nil) or
+     (not ALIsDrawableNull(fVideoPlayerEngine.Drawable)) then exit;
 
   if (CacheIndex > 0) and
      (CacheEngine <> nil) and

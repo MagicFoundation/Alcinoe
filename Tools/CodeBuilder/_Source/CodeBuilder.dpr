@@ -458,7 +458,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '      if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
               '        TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate'+#13#10+
               '      else'+#13#10+
-              '        DoBeginTextUpdate(AControl);'+#13#10+
+              '        DoBeginTextUpdate(AControl.Controls[i]);'+#13#10+
               '  end;',
               '  Procedure DoBeginTextUpdate(const AControl: TALDynamicListBoxControl);'+#13#10+
               '  begin'+#13#10+
@@ -466,7 +466,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '      //if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
               '      //  TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate'+#13#10+
               '      //else'+#13#10+
-              '      //  DoBeginTextUpdate(AControl);'+#13#10+
+              '      //  DoBeginTextUpdate(AControl.Controls[i]);'+#13#10+
               '      AControl.Controls[i].BeginTextUpdate;'+#13#10+
               '  end;');
     //--
@@ -478,7 +478,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '      if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
               '        TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate'+#13#10+
               '      else'+#13#10+
-              '        DoEndTextUpdate(AControl);'+#13#10+
+              '        DoEndTextUpdate(AControl.Controls[i]);'+#13#10+
               '  end;',
               '  Procedure DoEndTextUpdate(const AControl: TALDynamicListBoxControl);'+#13#10+
               '  begin'+#13#10+
@@ -486,7 +486,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '      //if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
               '      //  TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate'+#13#10+
               '      //else'+#13#10+
-              '      //  DoEndTextUpdate(AControl);'+#13#10+
+              '      //  DoEndTextUpdate(AControl.Controls[i]);'+#13#10+
               '      AControl.Controls[i].EndTextUpdate;'+#13#10+
               '  end;');
     //--
@@ -522,7 +522,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    Result := True;'+#13#10+
               '    for var I := 0 to AControl.ControlsCount - 1 do begin'+#13#10+
               '      if AControl.Controls[i] is TALDynamicListBoxControl then Result := TALDynamicListBoxControl(AControl.Controls[i]).IsReadyToDisplay'+#13#10+
-              '      else Result := CheckAllChildrenAreReadyToDisplay(AControl);'+#13#10+
+              '      else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);'+#13#10+
               '      if not Result then exit;'+#13#10+
               '    end;'+#13#10+
               '  end;',
@@ -531,7 +531,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    Result := True;'+#13#10+
               '    for var I := 0 to AControl.ControlsCount - 1 do begin'+#13#10+
               '      //if AControl.Controls[i] is TALDynamicListBoxControl then Result := TALDynamicListBoxControl(AControl.Controls[i]).IsReadyToDisplay'+#13#10+
-              '      //else Result := CheckAllChildrenAreReadyToDisplay(AControl);'+#13#10+
+              '      //else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);'+#13#10+
               '      Result := AControl.Controls[i].IsReadyToDisplay;'+#13#10+
               '      if not Result then exit;'+#13#10+
               '    end;'+#13#10+

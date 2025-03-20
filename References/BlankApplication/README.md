@@ -37,6 +37,7 @@ Check DProjNormalizer/DeployProjNormalizer
   in configuration of the missing nodes and compare again.
   You can ignore the node:
     <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Linux64&#39;"/>
+    <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64x&#39;"/>
     <PropertyGroup>
       <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">2B011FDH200DHE</DeviceId>
       <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">2B011FDH200DHE</DeviceId>
@@ -47,6 +48,7 @@ Check DProjNormalizer/DeployProjNormalizer
 * Run Project1.dproj.normalize.bat
 * Study the diffs between Project1.dproj and the previous commited version
 * Study the diffs between Project1.dproj.bak and the previous commited version
+* Run Project1.deployproj.normalize.bat
 * Study the diffs between Project1.deployproj and the previous commited version
 * Study the diffs between Project1.deployproj.bak and the previous commited version
 * rename Project1.deployproj.bak.tmp in Project1.deployproj.bak

@@ -1,1 +1,1 @@
-PlatformFile=c:\Dev\MagicFoundation\PlatformSDKs\Android\platforms\android-34\android.jar
+PlatformFile=c:\Dev\MagicFoundation\PlatformSDKs\Android\platforms\android-35\android.jar

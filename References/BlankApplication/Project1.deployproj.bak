@@ -326,6 +326,15 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\styles-v35.xml">
+      <DeployClass>AndroidSplashStylesV35</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
@@ -658,6 +667,15 @@
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\styles-v35.xml">
+      <DeployClass>AndroidSplashStylesV35</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\styles.xml">
@@ -1005,6 +1023,15 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\styles-v35.xml">
+      <DeployClass>AndroidSplashStylesV35</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
@@ -1348,6 +1375,15 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\styles-v35.xml">
+      <DeployClass>AndroidSplashStylesV35</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
@@ -1378,6 +1414,15 @@
       <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
@@ -1454,6 +1499,15 @@
       <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
@@ -1796,6 +1850,15 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
@@ -2233,6 +2296,15 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>Project1</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
@@ -2482,8 +2554,8 @@
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
   <PropertyGroup>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;"/>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;"/>
+    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">2B011FDH200DHE</DeviceId>
+    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">2B011FDH200DHE</DeviceId>
     <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;"/>
     <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">BABDA219-1CEE-43B2-8F32-B7242E9705B5</DeviceId>
   </PropertyGroup>

@@ -1,6 +1,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="AppTheme" parent="@android:style/Theme.NoTitleBar">
+    <style name="AppTheme.Base" parent="@android:style/Theme.NoTitleBar">
         <item name="android:windowBackground">@drawable/splash_image_def</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+    <style name="AppTheme" parent="AppTheme.Base"/>
 </resources>

@@ -67,7 +67,7 @@ resourcestring
 
 type
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings is still the same and adjust the IFDEF'}
   {$ENDIF}
 
@@ -160,7 +160,7 @@ type
   TALStringStreamW = class(TStringStream);
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
   {$ENDIF}
 
@@ -819,7 +819,7 @@ begin
   end;
 end;
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings.GetEraYearOffset is still the same and adjust the IFDEF'}
 {$ENDIF}
 function TALFormatSettingsA.GetEraYearOffset(const Name: ansistring): Integer;
@@ -990,7 +990,7 @@ Begin
   Result := ALGUIDToStringW(LGUID, WithoutBracket, WithoutHyphen);
 End;
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
 {$ENDIF}
 
@@ -1282,7 +1282,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.SysUtils.ConvertErrorFmt is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALConvertErrorFmt(ResString: PResStringRec; const Args: array of const);
@@ -1291,7 +1291,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.SysUtils.ConvertError is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALConvertError(ResString: PResStringRec);
@@ -1300,7 +1300,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.SysUtils.FormatError is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALFormatError(ErrorCode: Integer; Format: PChar; FmtLen: Cardinal);
@@ -1319,7 +1319,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.SysUtils.AnsiFormatError is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALAnsiFormatError(ErrorCode: Integer; Format: PAnsiChar; FmtLen: Cardinal);
@@ -1331,7 +1331,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.SysUtils.InternalFloatToText is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$R-} {Range-Checking}
@@ -1732,7 +1732,7 @@ end;
 {$ENDIF}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.AnsiStrings.FormatBuf is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALFormatBuf(
@@ -2044,7 +2044,6 @@ begin
         vtInterface: ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
         vtInteger:
           begin
-            //https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2001
             if Precision = -1 then
               Precision := 0;
             case FormatChar of
@@ -2130,7 +2129,6 @@ begin
             ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
         vtInt64:
           begin
-            //https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2001
             if Precision = -1 then
               Precision := 0;
             case FormatChar of
@@ -2165,7 +2163,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.AnsiStrings.FmtStr is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALFmtStr(
@@ -2336,7 +2334,7 @@ begin
   else s := falseStr;
 end;
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TCFString is still the same and adjust the IFDEF'}
 {$ENDIF}
 
@@ -2421,7 +2419,7 @@ end;
 {$ENDIF MACOS}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.DateTimeToString is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALDateTimeToString(
@@ -3035,7 +3033,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TDatePart/TDateItem/TDateSeq are still the same and adjust the IFDEF'}
 {$ENDIF}
 type
@@ -3051,7 +3049,7 @@ type
   TALDateSeq = array [1 .. 64] of TALDateItem;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ParseDateTimeFormat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALParseDateTimeFormat(const Format: AnsiString; WithTime: Boolean): TALDateSeq;
@@ -3184,7 +3182,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanBlanks is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanBlanks(const S: AnsiString; var Pos: Integer): Boolean;
@@ -3198,7 +3196,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanNumber is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanNumber(const S: AnsiString; var Pos: Integer; var Number: Word; MaxChars: Integer): Integer;
@@ -3213,7 +3211,7 @@ begin
   if (MaxChars >= 0) and (E - I + 1 > MaxChars) then
     E := I + MaxChars - 1;
   N := 0;
-  while (I <= E) and (S[I] in ['0'..'9']) and (N < 1000) do
+  while (I <= E) and (S[I] in ['0'..'9']) and (N < 6552) do
   begin
     N := N * 10 + (Ord(S[I]) - Ord('0'));
     Inc(I);
@@ -3227,7 +3225,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanFractional is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanFractional(const S: AnsiString; var Pos: Integer; var Number: Word; BaseDigits, MaxChars: Integer): Integer;
@@ -3262,7 +3260,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanString is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanString(const S: AnsiString; var Pos: Integer; const Symbol: AnsiString{; AUseAnsi: Boolean}): Boolean;
@@ -3285,7 +3283,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanChar is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanChar(const S: AnsiString; var Pos: Integer; Ch: AnsiChar): Boolean;
@@ -3311,7 +3309,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanToNumber is still the same and adjust the IFDEF'}
 {$ENDIF}
 procedure ALScanToNumber(const S: AnsiString; var Pos: Integer);
@@ -3326,7 +3324,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanName is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanName(const S: AnsiString; var Pos: Integer; var Name: AnsiString; AnAbbr: Boolean): Boolean;
@@ -3367,7 +3365,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanDate is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanDate(
@@ -3644,7 +3642,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTimeRegular is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanTimeRegular(
@@ -3694,7 +3692,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTimeUsingShortTimeFormat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanTimeUsingShortTimeFormat(
@@ -3807,7 +3805,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTime is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALScanTime(
@@ -3828,7 +3826,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDate is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALTryStrToDate(
@@ -3852,7 +3850,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToDate is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALStrToDate(
@@ -3872,7 +3870,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToTime is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALTryStrToTime(
@@ -3896,7 +3894,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToTime is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALStrToTime(
@@ -3916,7 +3914,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$R-} {Range-Checking}
@@ -3943,7 +3941,7 @@ begin
     ALScanToNumber(S, NumberPos);
 
     // the first number of the time data was found
-    if NumberPos < High(S) then
+    if NumberPos <= High(S) then
     begin
       // search between the end of date and the start of time for AM and PM
       // strings; if found, then ScanTime from this position where it is found
@@ -3972,7 +3970,7 @@ begin
         // search of the next blank if no AM/PM string has been found
         if not Stop then
         begin
-          while (S[BlankPos] <> ' ') and (BlankPos <= High(S)) do
+          while (BlankPos <= High(S)) and (S[BlankPos] <> ' ') do
             Inc(BlankPos);
           if BlankPos > High(S) then
             BlankPos := 0;
@@ -4025,7 +4023,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToDateTime is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALStrToDateTime(
@@ -4045,7 +4043,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system._ValLong is still the same and adjust the IFDEF'}
 {$ENDIF}
 // Hex : ( '$' | 'X' | 'x' | '0X' | '0x' ) [0-9A-Fa-f]*
@@ -4141,7 +4139,7 @@ end;
 {$ENDIF}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system._ValInt64 is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$R-} {Range-Checking}
@@ -4235,7 +4233,7 @@ end;
 {$ENDIF}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system._ValUInt64 is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$R-} {Range-Checking}
@@ -4511,7 +4509,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TwoDigitLookup is still the same and adjust the IFDEF'}
 {$ENDIF}
 const
@@ -4528,7 +4526,7 @@ const
      '90','91','92','93','94','95','96','97','98','99');
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils._IntToStr32 is still the same and adjust the IFDEF'}
 {$ENDIF}
 function _ALIntToStr32(Value: Cardinal; Negative: Boolean): AnsiString;
@@ -4568,7 +4566,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils._IntToStr64 is still the same and adjust the IFDEF'}
 {$ENDIF}
 function _ALIntToStr64(Value: UInt64; Negative: Boolean): AnsiString;
@@ -4665,7 +4663,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.IntToStr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALIntToStrA(Value: Integer): AnsiString;
@@ -4680,7 +4678,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.IntToStr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALIntToStrA(Value: Int64): AnsiString;
@@ -4719,7 +4717,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.UIntToStr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALUIntToStrA(Value: Cardinal): AnsiString;
@@ -4728,7 +4726,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.UIntToStr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALUIntToStrA(Value: UInt64): AnsiString;
@@ -5117,7 +5115,7 @@ begin
   Result := _Base64Encoding;
 end;
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$ENDIF}
 
@@ -5676,7 +5674,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if declaration below in system.Sysutils is still the same and adjust the IFDEF'}
 {$ENDIF}
 const
@@ -5712,7 +5710,7 @@ const
 {$ENDIF CPUX64}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearFPUExceptions is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$IFDEF CPUX86}
@@ -5736,7 +5734,7 @@ end;
 {$ENDIF CPUX86}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearSSEExceptions is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$WARN SYMBOL_PLATFORM OFF}
@@ -5754,7 +5752,7 @@ end;
 
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.GetSpecialValueAC is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALGetSpecialValueAC(Buffer: PAnsiChar; var Value; ValueType: TFloatValue): Boolean;
@@ -5781,7 +5779,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToExtended is still the same and adjust the IFDEF'}
 {$ENDIF}
 {$WARN SYMBOL_PLATFORM OFF}
@@ -6033,7 +6031,7 @@ end;
 {$WARN SYMBOL_PLATFORM ON}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToCurrency is still the same and adjust the IFDEF'}
 {$ENDIF}
 //this function is not threadsafe because of Set8087CW / SetMXCSR
@@ -6402,7 +6400,7 @@ end;
 {$ENDIF !EXTENDEDHAS10BYTES}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.TextToFloat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALTextToFloat(
@@ -6416,7 +6414,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalFloatToTextFmt is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALInternalFloatToTextFmt(
@@ -6909,7 +6907,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatFloat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALFormatFloatA(
@@ -6950,7 +6948,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatCurr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function ALFormatCurrA(
@@ -6991,7 +6989,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToFloat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALStrToFloat(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): Extended;
@@ -7007,7 +7005,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToFloatDef is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALStrToFloatDef(const S: AnsiString; const Default: Extended; const AFormatSettings: TALFormatSettingsA): Extended;
@@ -7023,7 +7021,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToFloat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALTryStrToFloat(const S: AnsiString; out Value: Extended; const AFormatSettings: TALFormatSettingsA): Boolean;
@@ -7038,7 +7036,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToFloat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALTryStrToFloat(const S: AnsiString; out Value: Double; const AFormatSettings: TALFormatSettingsA): Boolean;
@@ -7061,7 +7059,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToFloat is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALTryStrToFloat(const S: AnsiString; out Value: Single; const AFormatSettings: TALFormatSettingsA): Boolean;
@@ -7084,7 +7082,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToCurr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALStrToCurr(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): Currency;
@@ -7100,7 +7098,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToCurrDef is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALStrToCurrDef(const S: AnsiString; const Default: Currency; const AFormatSettings: TALFormatSettingsA): Currency;
@@ -7116,7 +7114,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToCurr is still the same and adjust the IFDEF'}
 {$ENDIF}
 function  ALTryStrToCurr(const S: AnsiString; out Value: Currency; const AFormatSettings: TALFormatSettingsA): Boolean;
@@ -10557,7 +10555,7 @@ begin
 
   _Base64Encoding := nil;
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$ENDIF}
 

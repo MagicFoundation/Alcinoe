@@ -13,7 +13,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1935 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALNSAttributedStringClass = interface(NSAttributedStringClass)

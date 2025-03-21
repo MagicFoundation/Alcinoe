@@ -59,6 +59,7 @@ uses
 //       AndroidSplashStyles
 //       AndroidSplashStylesV21
 //       AndroidSplashStylesV31
+//       AndroidSplashStylesV35
 //       Android_AdaptiveIcon
 //       Android_AdaptiveIconV33
 //       Android_VectorizedNotificationIcon
@@ -104,7 +105,7 @@ uses
 //   * Do NOT add any Win64 files
 //
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if the structure of the *.deployproj didn''t changed by following the instructions in References\BlankApplication\README.md'}
 {$ENDIF}
 
@@ -1043,6 +1044,7 @@ begin
           //AndroidSplashStyles: use if "include splash images" is set in icons > splash images
           //AndroidSplashStylesV21: use if "include splash images" is set in icons > splash images
           //AndroidSplashStylesV31: (added in 20.1{Athens})
+          //AndroidSplashStylesV35: (added in 20.3{Athens})
           //Android_AdaptiveIcon: (added in 20.1{Athens})
           //Android_AdaptiveIconV33: (added in 20.1{Athens})
           //Android_VectorizedNotificationIcon: (added in 20.1{Athens})

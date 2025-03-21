@@ -94,7 +94,7 @@ type
   end;
 
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if Winapi.WinHTTP.pas was not updated with the lines below and adjust the IFDEF'}
 {$ENDIF}
 

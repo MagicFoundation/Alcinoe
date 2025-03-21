@@ -47,8 +47,9 @@
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
                android:icon="@mipmap/ic_launcher"
-               android:theme="@android:style/Theme.NoTitleBar"
+               android:theme="@style/AppTheme"
                android:hardwareAccelerated="%hardwareAccelerated%"
+               android:usesCleartextTraffic="true"
                android:resizeableActivity="true"
                android:requestLegacyExternalStorage="true"
                android:appComponentFactory="androidx.core.app.CoreComponentFactory">
@@ -81,12 +82,16 @@
               android:label="%activityLabel%"
               android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout|uiMode"
               android:launchMode="singleTask">
+
+        <!-- Tell NativeActivity the name of our .so -->
         <meta-data android:name="android.app.lib_name"
                    android:value="%libNameValue%"/>
+
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent-filter>
+
     </activity>
 
     <%activity%>

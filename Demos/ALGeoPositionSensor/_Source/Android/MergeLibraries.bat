@@ -31,7 +31,6 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -DProj="%ALBaseDir%\Demos\ALGeoPositionSensor\_Source\ALGeoPositionSensorDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALGeoPositionSensor\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -UseGradle=true^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 
 

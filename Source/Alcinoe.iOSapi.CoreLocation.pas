@@ -14,14 +14,14 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
-    {$MESSAGE WARN 'Check if // https://quality.embarcadero.com/browse/RSP-18621 has been resolved. If resolved, remove the definitions below.'}
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-18621 has been resolved. If resolved, remove the definitions below.'}
   {$ENDIF}
   CLBeaconIdentityConstraint = interface; // https://quality.embarcadero.com/browse/RSP-18621
   CLVisit = interface; // https://quality.embarcadero.com/browse/RSP-18621
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-18621 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   CLLocationManagerDelegate = interface(IObjectiveC)
@@ -60,7 +60,7 @@ type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-18621 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   CLBeaconIdentityConstraintClass = interface(NSObjectClass)
@@ -81,7 +81,7 @@ type
   TCLBeaconIdentityConstraint = class(TOCGenericImport<CLBeaconIdentityConstraintClass, CLBeaconIdentityConstraint>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-18621 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   CLVisitClass = interface(NSObjectClass)

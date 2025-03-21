@@ -15,7 +15,7 @@ uses
 Type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   NSControlTextEditingDelegate = interface(IObjectiveC)
@@ -32,7 +32,7 @@ Type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   NSTextDelegate = interface(IObjectiveC)
@@ -45,7 +45,7 @@ Type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   //NSTextFieldDelegate = interface(NSControlTextEditingDelegate) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933
@@ -53,7 +53,7 @@ Type
   //end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   NSTextViewDelegate = interface(NSTextDelegate) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933
@@ -63,7 +63,7 @@ Type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALNSTextClass = interface(NSTextClass)
@@ -76,7 +76,7 @@ Type
   TALNSText = class(TOCGenericImport<ALNSTextClass, ALNSText>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALNSControlClass = interface(NSControlClass)
@@ -90,7 +90,7 @@ Type
   TALNSControl = class(TOCGenericImport<ALNSControlClass, ALNSControl>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALNSTextViewClass = interface(NSTextViewClass)
@@ -103,7 +103,7 @@ Type
   TALNSTextView = class(TOCGenericImport<ALNSTextViewClass, ALNSTextView>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALNSTextFieldClass = interface(NSTextFieldClass)

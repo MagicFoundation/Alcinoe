@@ -13,7 +13,7 @@
   <%uses-permission%>
  
   <uses-feature android:glEsVersion="0x00020000"
-                android:required="True"/>
+                android:required="true"/>
   
   <queries>
     <%queries-child-elements%>

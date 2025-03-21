@@ -270,7 +270,7 @@ type
   TALPointDType = array [0..1] of Double;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALPointD = ^TALPointD;
@@ -346,7 +346,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALSizeD = ^TALSizeD;
@@ -386,7 +386,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALRectD = ^TALRectD;
@@ -536,7 +536,7 @@ type
   end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
 {$ENDIF}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
@@ -666,7 +666,7 @@ function ALElapsedTimeSecondsAsDouble: Double;
 function ALElapsedTimeSecondsAsInt64: int64;
 
 {$IFDEF MSWINDOWS}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
 {$ENDIF}
 {$WARNINGS OFF}
@@ -1429,10 +1429,11 @@ end;
 
 {***********************************************************************}
 function ALRectCenter(var R: TALRectD; const Bounds: TALRectD): TALRectD;
+var
+  Offset: TALPointD;
 begin
-  ALOffsetRect(R, -R.Left, -R.Top);
-  ALOffsetRect(R, (ALRectWidth(Bounds)/2 - ALRectWidth(R)/2), (ALRectHeight(Bounds)/2 - ALRectHeight(R)/2));
-  ALOffsetRect(R, Bounds.Left, Bounds.Top);
+  Offset := Bounds.CenterPoint - R.CenterPoint;
+  ALOffsetRect(R, Offset.X, Offset.Y);
   Result := R;
 end;
 

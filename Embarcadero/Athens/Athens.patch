@@ -1302,7 +1302,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          Continue;
  
        NewObj := Control.ObjectAtPoint(AScreenPoint);
-@@ -3699,6 +3705,12 @@
+@@ -3708,6 +3714,12 @@
      Result := 0;
  end;
  
@@ -1315,7 +1315,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  function TControl.GetLeft: Single;
  begin
    Result := Position.X;
-@@ -4158,6 +4170,7 @@
+@@ -4167,6 +4179,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseEnter) then
      FOnMouseEnter(Self);
@@ -1323,7 +1323,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.DoMouseLeave;
-@@ -4167,6 +4180,7 @@
+@@ -4176,6 +4189,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseLeave) then
      FOnMouseLeave(Self);
@@ -1331,7 +1331,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  function TControl.GetCanFocus: Boolean;
-@@ -4227,34 +4241,34 @@
+@@ -4236,34 +4250,34 @@
    if not Assigned(AConsumer) or (FScene = nil) or (ControlsCount = 0)then
      Exit;
  
@@ -1392,7 +1392,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
        end;
  
        if AllowPaint then
-@@ -4643,6 +4657,7 @@
+@@ -4652,6 +4666,7 @@
  
    if Assigned(FOnMouseDown) then
      FOnMouseDown(Self, Button, Shift, X, Y);
@@ -1400,7 +1400,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
    if FAutoCapture then
      Capture;
    if Button = TMouseButton.mbLeft then
-@@ -4665,6 +4680,7 @@
+@@ -4674,6 +4689,7 @@
  begin
    if Assigned(FOnMouseMove) then
      FOnMouseMove(Self, Shift, X, Y);
@@ -1408,7 +1408,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-@@ -4673,6 +4689,7 @@
+@@ -4682,6 +4698,7 @@
  
    if Assigned(FOnMouseUp) then
      FOnMouseUp(Self, Button, Shift, X, Y);
@@ -1416,7 +1416,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
    if FPressed then
    begin
      FPressed := False;
-@@ -4687,6 +4704,41 @@
+@@ -4696,6 +4713,41 @@
      FOnMouseWheel(Self, Shift, WheelDelta, Handled)
  end;
  
@@ -1488,7 +1488,7 @@ Index: Embarcadero/Athens/fmx/FMX.Filter.pas
 diff --git a/Embarcadero/Athens/fmx/FMX.Filter.pas b/Embarcadero/Athens/fmx/FMX.Filter.pas
 --- a/Embarcadero/Athens/fmx/FMX.Filter.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Filter.pas	(working copy)
-@@ -1611,9 +1611,10 @@
+@@ -1612,9 +1612,10 @@
  
  function TFilterContext3D.InputTexture: TTexture;
  begin
@@ -1502,7 +1502,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Filter.pas b/Embarcadero/Athens/fmx/FMX.
      Result := FInput;
  end;
  
-@@ -1943,9 +1944,10 @@
+@@ -1944,9 +1945,10 @@
  
  function TFilterContext3D.TargetTexture: TTexture;
  begin
@@ -1587,7 +1587,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    end;
  end;
  
-@@ -6523,7 +6535,24 @@
+@@ -6529,7 +6541,24 @@
    end;
  end;
  
@@ -1612,7 +1612,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
  begin
    inherited;
    if AObject = nil then
-@@ -6530,6 +6559,8 @@
+@@ -6536,6 +6565,8 @@
      Exit;
    if AObject is TControl then
    begin
@@ -1621,7 +1621,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
      TControl(AObject).SetNewScene(Self);
  
      TOpenControl(AObject).RecalcOpacity;
-@@ -6557,10 +6588,22 @@
+@@ -6563,10 +6594,22 @@
  end;
  
  procedure TCustomForm.DoRemoveObject(const AObject: TFmxObject);
@@ -1644,7 +1644,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
      if FControls <> nil  then
        FControls.Remove(TControl(AObject));
  
-@@ -7854,7 +7897,7 @@
+@@ -7860,7 +7903,7 @@
          Result := I;
          Break;
        end;
@@ -1823,7 +1823,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
  end;
  
  procedure TFMXViewBase.cut(Sender: id);
-@@ -3573,6 +3584,8 @@
+@@ -3582,6 +3593,8 @@
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
@@ -1832,7 +1832,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      // find the control from under the gesture
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
      SendTouches(withEvent.allTouches, TTouchAction.Down, Obj);
-@@ -3600,6 +3613,7 @@
+@@ -3609,6 +3622,7 @@
        DefineFocusControl;
      finally
        FClickedAnotherControl := (Obj <> nil) and (FContextMenu.Control <> Obj.GetObject);
@@ -1840,7 +1840,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
        View.touchesBegan(touches, withEvent);
      end;
    except
-@@ -3629,6 +3643,9 @@
+@@ -3638,6 +3652,9 @@
    try
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
@@ -1850,7 +1850,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      LPoint := TPointF.Create(X, Y);
      FShouldIgnoreNextClick := False;
      FAdditionalShift := [];
-@@ -3639,6 +3656,7 @@
+@@ -3648,6 +3665,7 @@
        DoLMouseUp(X, Y, [], False);
        DefineSelectionStates;
      finally
@@ -1858,7 +1858,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
        View.touchesCancelled(touches, withEvent);
      end;
    except
-@@ -3670,6 +3688,8 @@
+@@ -3679,6 +3697,8 @@
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
@@ -1867,7 +1867,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      // find the control from under the gesture
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
      SendTouches(withEvent.allTouches, TTouchAction.Up, Obj);
-@@ -3683,6 +3703,7 @@
+@@ -3692,6 +3712,7 @@
          NSObject(Self.Super).performSelector(sel_getUid('SingleTap:'), nil, DblTapDelay);
        DefineSelectionStates;
      finally
@@ -1875,7 +1875,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
        if Form <> nil then
          View.touchesEnded(touches, withEvent);
      end;
-@@ -3701,6 +3722,8 @@
+@@ -3710,6 +3731,8 @@
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
@@ -1884,7 +1884,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      LPoint := TPointF.Create(X, Y);
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(LPoint));
      SendTouches(withEvent.allTouches, TTouchAction.Move, Obj);
-@@ -3708,6 +3731,7 @@
+@@ -3717,6 +3740,7 @@
      try
        DoLMouseMove(X, Y, FAdditionalShift);
      finally
@@ -1892,7 +1892,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
        View.touchesMoved(touches, withEvent);
      end;
    except
-@@ -4406,6 +4430,12 @@
+@@ -4415,6 +4439,12 @@
    Result := FZOrderManager;
  end;
  
@@ -2041,7 +2041,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
      { IFMXGestureRecognizersService }
      procedure AddRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
      procedure RemoveRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
-@@ -1171,15 +1224,15 @@
+@@ -1185,15 +1238,15 @@
  end;
  
  procedure TAndroidWindowHandle.TFormViewListener.onSizeChanged(w, h, oldw, oldh: Integer);
@@ -2061,7 +2061,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
-@@ -1253,7 +1306,7 @@
+@@ -1267,7 +1320,7 @@
        StatusBarOffset := Ceil(PlatformAndroid.WindowService.StatusBarHeight)
      else
        StatusBarOffset := 0;
@@ -2070,7 +2070,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    end;
  
    // Creates Form's view
-@@ -2091,6 +2144,8 @@
+@@ -2125,6 +2178,8 @@
    FGestureDetector := TJGestureDetector.JavaClass.init(FGestureListener);
    FGestureDoubleTapListener := TAndroidDoubleTapGestureListener.Create(Self);
    FGestureDetector.setOnDoubleTapListener(FGestureDoubleTapListener);
@@ -2079,7 +2079,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  function TAndroidMotionManager.CreateGestureEventInfo(const AGesture: TInteractiveGesture;
-@@ -2124,6 +2179,7 @@
+@@ -2158,6 +2213,7 @@
  
  begin
    { Pre initialization }
@@ -2087,7 +2087,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    ReadMotionEvent(AEvent, FMotionEvents);
    UpdateMousePosition;
  
-@@ -2142,6 +2198,7 @@
+@@ -2176,6 +2232,7 @@
    end;
  
    Result := True;
@@ -2095,7 +2095,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  procedure TAndroidMotionManager.HandleMultiTouch;
-@@ -2898,7 +2955,8 @@
+@@ -2932,7 +2989,8 @@
  begin
    inherited Create;
    FContext := AContext;
@@ -2105,7 +2105,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
  end;
  
-@@ -2905,19 +2963,23 @@
+@@ -2939,19 +2997,23 @@
  destructor TRender<T>.Destroy;
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
@@ -2137,7 +2137,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  procedure TRender<T>.Render;
-@@ -2924,10 +2986,134 @@
+@@ -2958,10 +3020,134 @@
  begin
  end;
  
@@ -3512,17 +3512,17 @@ Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas
 diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas
 --- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas	(working copy)
-@@ -68,7 +68,7 @@
-     FBackBufferSurface: ISkSurface;
-     FCurrentDrawable: CAMetalDrawable;
+@@ -71,7 +71,7 @@
+     FHasCreatedAnySurface: Boolean;
+     procedure BeforeCreateFirstSurface;
    protected
 -    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
 +    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
      function CreateSharedContext: IGrSharedContext; override;
      function GetSurfaceFromWindow(const AContextHandle: THandle): TSkSurface; override;
      procedure SwapBuffers(const AContextHandle: THandle); override;
-@@ -138,7 +138,7 @@
- { TMtlCanvas }
+@@ -153,7 +153,7 @@
+ end;
  
  constructor TMtlCanvas.CreateFromWindow(const AParent: TWindowHandle;
 -  const AWidth, AHeight: Integer; const AQuality: TCanvasQuality);
@@ -3562,7 +3562,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx
      function BeginCanvas(const AContextHandle: THandle): ISkCanvas; override;
      function CreateSharedContext: IGrSharedContext; virtual; abstract;
      procedure EndCanvas(const AContextHandle: THandle); override;
-@@ -2154,9 +2154,10 @@
+@@ -2342,9 +2342,10 @@
  
  {$ENDIF}
  
@@ -3575,16 +3575,16 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx
    begin
      inherited;
      Resized;
-@@ -2247,7 +2248,7 @@
+@@ -2435,7 +2436,7 @@
  {$IFDEF MSWINDOWS}
  
  constructor TSkCanvasBase.CreateFromWindow(const AParent: TWindowHandle;
 -  const AWidth, AHeight: Integer; const AQuality: TCanvasQuality);
 +  const AWidth, AHeight: Single; const AQuality: TCanvasQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ var
+   LParentHandle: TWinWindowHandle;
  begin
-   inherited;
-   if WindowHandleToPlatform(Parent){$IF CompilerVersion < 30}.Form{$ENDIF}.Transparency then
-@@ -2425,7 +2426,7 @@
+@@ -2627,7 +2628,7 @@
  end;
  
  constructor TGrCanvas.CreateFromWindow(const AParent: TWindowHandle;
@@ -4972,31 +4972,3 @@ diff --git a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcader
      try
        FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
        FPreviousVKRect := VKRect;
-Index: Embarcadero/Athens/rtl/common/System.Skia.API.pas
-===================================================================
-diff --git a/Embarcadero/Athens/rtl/common/System.Skia.API.pas b/Embarcadero/Athens/rtl/common/System.Skia.API.pas
---- a/Embarcadero/Athens/rtl/common/System.Skia.API.pas	(revision 1)
-+++ b/Embarcadero/Athens/rtl/common/System.Skia.API.pas	(working copy)
-@@ -2428,11 +2428,17 @@
-       procedure LINKLIB_cxx;                         external '/usr/lib/libc++.dylib';
-       procedure LINKLIB_cxxabi;                      external '/usr/lib/libc++abi.dylib';
-     {$ELSEIF DEFINED(ANDROID)}
--      procedure LINKLIB_EGL;                         external 'libEGL.so';
--      procedure LINKLIB_GLESv2;                      external 'libGLESv2.so';
--      procedure LINKLIB_log;                         external 'liblog.so';
--      procedure LINKLIB_cxxstatic;                   external 'libc++_static.a';
--      procedure LINKLIB_cxxabi;                      external 'libc++abi.a';
-+      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997
-+      //procedure LINKLIB_EGL;                         external 'libEGL.so';
-+      //procedure LINKLIB_GLESv2;                      external 'libGLESv2.so';
-+      //procedure LINKLIB_log;                         external 'liblog.so';
-+      //procedure LINKLIB_cxxstatic;                   external 'libc++_static.a';
-+      //procedure LINKLIB_cxxabi;                      external 'libc++abi.a';
-+      procedure eglInitialize;                         external 'libEGL.so';
-+      procedure glCreateShader;                        external 'libGLESv2.so';
-+      procedure __android_log_write;                   external 'liblog.so';
-+      procedure _ZTSSt12bad_any_cast;                  external 'libc++_static.a';
-+      procedure __cxa_guard_acquire;                   external 'libc++abi.a';
-     {$ENDIF}
-   {$ENDIF}
- {$ELSE}

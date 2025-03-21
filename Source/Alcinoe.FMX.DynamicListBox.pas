@@ -365,7 +365,7 @@ type
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     //property Form: TCommonCustomForm read FForm;
     //property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
-    {$IFNDEF ALCompilerVersionSupported122}
+    {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
@@ -5487,7 +5487,7 @@ end;
 {**************************************************************************}
 function TALDynamicListBoxControl.PointInObjectLocal(X, Y: Double): Boolean;
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.PointInObjectLocal was not updated and adjust the IFDEF'}
   {$ENDIF}
   Result := (X >= (0 - TouchTargetExpansion.Left)) and
@@ -5569,13 +5569,11 @@ end;
 {*****************************************************************}
 procedure TALDynamicListBoxControl.SetOpacity(const Value: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.SetOpacity was not updated and adjust the IFDEF'}
   {$ENDIF}
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
-    FOpacity := Value;
-    if FOpacity < 0 then FOpacity := 0;
-    if FOpacity > 1 then FOpacity := 1;
+    FOpacity := EnsureRange(Value, 0, 1);
     RefreshAbsoluteOpacity;
   end;
 end;
@@ -5695,7 +5693,7 @@ end;
 {**************************************************************}
 function TALDynamicListBoxControl.FillTextFlags: TFillTextFlags;
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.FillTextFlags was not updated and adjust the IFDEF'}
   {$ENDIF}
   if (Form <> nil) and (Form.BiDiMode = bdRightToLeft) then
@@ -5816,7 +5814,7 @@ end;
 {*****************************************}
 procedure TALDynamicListBoxControl.Realign;
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.Realign was not updated and adjust the IFDEF'}
   {$ENDIF}
   if IsDestroying then
@@ -6567,8 +6565,8 @@ end;
 {********************************************}
 procedure TALDynamicListBoxControl.MouseEnter;
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
-    {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseEnter was not updated and adjust the IFDEF'}
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMouseEnter was not updated and adjust the IFDEF'}
   {$ENDIF}
   FIsMouseOver := True;
   if Assigned(FOnMouseEnter) then
@@ -6579,8 +6577,8 @@ end;
 {********************************************}
 procedure TALDynamicListBoxControl.MouseLeave;
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
-    {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseLeave was not updated and adjust the IFDEF'}
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMouseLeave was not updated and adjust the IFDEF'}
   {$ENDIF}
   FIsMouseOver := False;
   if Assigned(FOnMouseLeave) then
@@ -6591,7 +6589,7 @@ end;
 {***************************************************************************************************}
 procedure TALDynamicListBoxControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseDown was not updated and adjust the IFDEF'}
   {$ENDIF}
   if Assigned(FOnMouseDown) then
@@ -6608,7 +6606,7 @@ end;
 {*****************************************************************************}
 procedure TALDynamicListBoxControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseMove was not updated and adjust the IFDEF'}
   {$ENDIF}
   if Assigned(FOnMouseMove) then
@@ -6619,7 +6617,7 @@ end;
 {*************************************************************************************************}
 procedure TALDynamicListBoxControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseUp was not updated and adjust the IFDEF'}
   {$ENDIF}
   ReleaseCapture;
@@ -6632,7 +6630,7 @@ end;
 {****************************************************************************************************}
 procedure TALDynamicListBoxControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.MouseClick was not updated and adjust the IFDEF'}
   {$ENDIF}
   if AbsoluteEnabled and FPressed and PointInObjectLocal(X, Y) then begin
@@ -6784,7 +6782,7 @@ end;
 constructor TALDynamicListBoxExtendedControl.Create(const AOwner: TObject);
 begin
   inherited;
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if MarginsChanged is not implemented in FMX.Controls.TControl and adjust the IFDEF'}
   {$ENDIF}
   //FFormerMarginsChangedHandler := Margins.OnChange;
@@ -6864,7 +6862,7 @@ procedure TALDynamicListBoxExtendedControl.BeginTextUpdate;
       //if AControl.Controls[i] is TALDynamicListBoxControl then
       //  TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate
       //else
-      //  DoBeginTextUpdate(AControl);
+      //  DoBeginTextUpdate(AControl.Controls[i]);
       AControl.Controls[i].BeginTextUpdate;
   end;
 
@@ -6883,7 +6881,7 @@ procedure TALDynamicListBoxExtendedControl.EndTextUpdate;
       //if AControl.Controls[i] is TALDynamicListBoxControl then
       //  TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate
       //else
-      //  DoEndTextUpdate(AControl);
+      //  DoEndTextUpdate(AControl.Controls[i]);
       AControl.Controls[i].EndTextUpdate;
   end;
 
@@ -7006,7 +7004,7 @@ begin
   //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
   {$ENDIF}
   // I decided to remove this workaround because it doesn't
@@ -7031,7 +7029,7 @@ begin
   if TNonReentrantHelper.EnterSection(FIsSetBoundsLocked) then begin
     try
 
-      {$IFNDEF ALCompilerVersionSupported122}
+      {$IFNDEF ALCompilerVersionSupported123}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
       {$ENDIF}
       //TALAlignLayout.TopCenter
@@ -7131,7 +7129,7 @@ begin
     AHeight := Height;
   end;
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
   //TALAlignLayout.TopCenter
@@ -7624,7 +7622,7 @@ function TALDynamicListBoxExtendedControl.IsReadyToDisplay: Boolean;
     Result := True;
     for var I := 0 to AControl.ControlsCount - 1 do begin
       //if AControl.Controls[i] is TALDynamicListBoxControl then Result := TALDynamicListBoxControl(AControl.Controls[i]).IsReadyToDisplay
-      //else Result := CheckAllChildrenAreReadyToDisplay(AControl);
+      //else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);
       Result := AControl.Controls[i].IsReadyToDisplay;
       if not Result then exit;
     end;
@@ -7663,7 +7661,7 @@ end;
 {***********************************************************************}
 //procedure TALDynamicListBoxExtendedControl.SetNewScene(AScene: IScene);
 //begin
-//  {$IFNDEF ALCompilerVersionSupported122}
+//  {$IFNDEF ALCompilerVersionSupported123}
 //    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
 //    {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseLeave/MouseDown/MouseUp/MouseClick'}
 //    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
@@ -7756,7 +7754,7 @@ end;
 {***********************************************************************************************************}
 procedure TALDynamicListBoxExtendedControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -7797,7 +7795,7 @@ end;
 {*********************************************************************************************************}
 procedure TALDynamicListBoxExtendedControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -7832,7 +7830,7 @@ begin
     {$ENDIF}
     exit;
   end;
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -7864,7 +7862,7 @@ end;
 {****************************************************************************}
 //procedure TALDynamicListBoxExtendedControl.DoMatrixChanged(Sender: TObject);
 //begin
-//  {$IFNDEF ALCompilerVersionSupported122}
+//  {$IFNDEF ALCompilerVersionSupported123}
 //    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
 //    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
 //  {$ENDIF}

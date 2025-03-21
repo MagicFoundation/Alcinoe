@@ -589,7 +589,7 @@ Type
     property Gamma: Single read fGamma write fGamma;
   end;
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Filter.Effects.TFilterBaseFilter still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALFilterBaseFilterAccessPrivate = class(TFmxObject)

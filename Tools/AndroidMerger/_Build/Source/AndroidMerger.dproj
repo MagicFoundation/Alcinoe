@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{4ED631FC-C70A-4154-8401-66B0F3C1BCEB}</ProjectGuid>
-    <ProjectVersion>20.2</ProjectVersion>
+    <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>AndroidMerger.dpr</MainSource>
     <Base>True</Base>

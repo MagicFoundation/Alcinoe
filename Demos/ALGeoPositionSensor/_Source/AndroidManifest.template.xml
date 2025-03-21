@@ -20,9 +20,7 @@
                 android:required="true"/>
 
   <queries>
-   
     <%queries-child-elements%>
-    
   </queries>
   
   <!-- ============================================ -->
@@ -42,8 +40,9 @@
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
                android:icon="@mipmap/ic_launcher"
-               android:theme="@android:style/Theme.NoTitleBar"
+               android:theme="@style/AppTheme"
                android:hardwareAccelerated="%hardwareAccelerated%"
+               android:usesCleartextTraffic="true"
                android:resizeableActivity="true"
                android:requestLegacyExternalStorage="true">
 

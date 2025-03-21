@@ -31,7 +31,6 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -AndroidManifest="%ALBaseDir%\Demos\ALNotificationService\_Source\AndroidManifest.template.xml"^
  -GoogleServicesJson="%ALBaseDir%\Demos\ALNotificationService\_Source\Android\GoogleServices\google-services.json"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -UseGradle=true^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 
 

@@ -15,7 +15,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939 has been resolved. If resolved, remove the definitions below.'}
   {$ENDIF}
   CVMetalTextureRef = CVImageBufferRef; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
@@ -24,7 +24,7 @@ type
   PCVMetalTextureCacheRef = ^CVMetalTextureCacheRef; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939 has been resolved. If resolved, remove the functions below.'}
 {$ENDIF}
 function CVMetalTextureGetTexture(image: CVMetalTextureRef): pointer; cdecl; external libCoreVideo name _PU + 'CVMetalTextureGetTexture'; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939

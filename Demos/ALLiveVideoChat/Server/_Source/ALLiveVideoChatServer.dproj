@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{BA02E708-0CCE-47B0-8778-B03D4B7B7FA8}</ProjectGuid>
-    <ProjectVersion>20.2</ProjectVersion>
+    <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>ALLiveVideoChatServer.dpr</MainSource>
     <Base>True</Base>

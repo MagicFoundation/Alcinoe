@@ -15,7 +15,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1937 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALCIContextClass = interface(CIContextClass)
@@ -28,7 +28,7 @@ type
   TALCIContext = class(TOCGenericImport<ALCIContextClass, ALCIContext>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1937 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALCIFilterClass = interface(CIFilterClass)
@@ -41,7 +41,7 @@ type
   TALCIFilter = class(TOCGenericImport<ALCIFilterClass, ALCIFilter>)  end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1937 has been resolved. If resolved, remove the functions below.'}
 {$ENDIF}
 function kCIInputImageKey: NSString; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1937

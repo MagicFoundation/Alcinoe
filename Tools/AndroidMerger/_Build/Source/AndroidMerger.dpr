@@ -297,7 +297,6 @@ begin
                 aNode);
 end;
 
-
 {*****************************}
 procedure MergeAndroidManifest(
             const APackageName: AnsiString;
@@ -1031,226 +1030,6 @@ begin
   ExecuteCmdLine(LCmdLine);
 end;
 
-{*****************************************************************************************************************************************}
-Function CompareVersion(const AVersionA, AVersionB: AnsiString; out ARelationship: integer; const ACanWriteError: boolean = True): Boolean;
-begin
-  if AVersionA = AVersionB then begin
-    ARelationship := 0;
-    Result := True;
-    exit;
-  end;
-  if AVersionA = '0.0.0.0' then begin
-    ARelationship := -1;
-    result := True;
-    exit;
-  end;
-  if AVersionB = '0.0.0.0' then begin
-    ARelationship := 1;
-    result := True;
-    exit;
-  end;
-  if AVersionA = ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64) then begin
-    ARelationship := 1;
-    result := True;
-    exit;
-  end;
-  if AVersionB = ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64) then begin
-    ARelationship := -1;
-    result := True;
-    exit;
-  end;
-  //---
-  var LVersionA := AVersionA;
-  var LVersionB := AVersionB;
-  //---
-  //https://gist.github.com/caseykulm/8f229ef3d89dec02780ea880129bc75d - Guava ListenableFuture Hell
-  //  9999.0-empty-to-avoid-conflict-with-guava => 9999.0.0
-  if LVersionA = '9999.0-empty-to-avoid-conflict-with-guava' then LVersionA := '9999.0';
-  if LVersionB = '9999.0-empty-to-avoid-conflict-with-guava' then LVersionB := '9999.0';
-  //---
-  //if flavor is the same then remove it
-  //  31.1-jre => 31.1
-  //  27.2-jre => 27.2
-  var LFlavorA: AnsiString := '';
-  var LFlavorB: AnsiString := '';
-  Var P := ALPosA('-',LVersionA);
-  if P > 0 then LFlavorA := ALCopyStr(LVersionA, P, Maxint); // -jre
-  P := ALPosA('-',LVersionB);
-  if P > 0 then LFlavorB := ALCopyStr(LVersionB, P, Maxint); // -jre
-  if (LFlavorA <> '') and (LFlavorB <> '') and (LFlavorA = LFlavorB) then begin
-    LVersionA := ALStringReplaceA(LVersionA, LFlavorA, '', []); //  31.1
-    LVersionB := ALStringReplaceA(LVersionB, LFlavorB, '', []); //  27.2
-  end;
-  //---
-  //their is version like
-  //  31.1-jre
-  //  31.1-android
-  //so I take the rule to ignore the comparaison if their is
-  //alpha char inside the version number even for version like
-  //  1.4.0-alpha02
-  //  1.4.0-alpha03
-  var LIsWithAlpha: Boolean := False;
-  for var Lch in LVersionA do
-    if not (Lch in ['0'..'9', '.']) then begin
-      LIsWithAlpha := True;
-      Break;
-    end;
-  for var Lch in LVersionB do
-    if not (Lch in ['0'..'9', '.']) then begin
-      LIsWithAlpha := True;
-      Break;
-    end;
-  if LIsWithAlpha then begin
-    if ACanWriteError then
-      Writeln(
-        ALStringReplaceW(
-          'Can not compare version ' + string(AVersionA) + ' vs ' + String(AVersionB),
-          ALIntToStrW(ALMaxint64),
-          '<maxint>',
-          [rfReplaceALL]),
-        TALConsoleColor.ccAqua,
-        true{ASkipDuplicates});
-    ARelationship := 0;
-    Result := False;
-    exit;
-  end;
-  //---
-  ARelationship := 0;
-  Result := True;
-  //---
-  var LVersionALst := TALStringListA.Create;
-  var LVersionBLst := TALStringListA.Create;
-  try
-    LVersionALst.LineBreak := '.';
-    LVersionBLst.LineBreak := '.';
-    LVersionALst.Text := LVersionA;
-    LVersionBLst.Text := LVersionB;
-    //---
-    while LVersionALst.count < LVersionBLst.Count do
-      LVersionALst.Add('0'); // 1.2.0.0
-    while LVersionBLst.count < LVersionALst.Count do
-      LVersionBLst.Add('0'); // 1.4.0.0
-    //---
-    for var I := 0 to LVersionALst.Count - 1 do begin
-      var LVersionANumber: int64;
-      var LVersionBNumber: int64;
-      if not ALTryStrToInt64(LVersionALst[I], LVersionANumber) then raise Exception.Create('Error A5262D46-2E67-4CF1-A28A-924D445E330F');
-      if not ALTryStrToInt64(LVersionBLst[I], LVersionBNumber) then raise Exception.Create('Error 99B4CDDE-0B43-41DE-A1AE-FEB4D9BE21A2');
-      if LVersionANumber < LVersionBNumber then begin
-        ARelationship := -1;
-        Result := True;
-        exit;
-      end
-      else if LVersionANumber > LVersionBNumber then begin
-        ARelationship := 1;
-        Result := True;
-        exit;
-      end;
-    end;
-  finally
-    ALFreeAndNil(LVersionALst);
-    ALFreeAndNil(LVersionBLst);
-  end;
-end;
-
-{**********************************************************}
-function incVersion(const aVersion: ansiString): ansiString;
-begin
-  // 1.0.0 => 1.0.0.1
-  result := aVersion + '.1';
-end;
-
-{**********************************************************}
-function decVersion(const aVersion: ansiString): ansiString;
-begin
-  // 1.0.0 => 0.<maxint>.<maxint>
-  Var LLst := TALStringListA.Create;
-  try
-    LLst.LineBreak := '.';
-    LLst.Text := aVersion;
-    for var I := LLst.Count - 1 downto 0 do begin
-      Var LNumber := ALStrToint64(LLst[i]);
-      if LNumber = 0 then begin
-        LLst[i] := ALIntToStrA(ALMaxint64);
-        continue;
-      end
-      else begin
-        LLst[i] := ALIntToStrA(LNumber-1);
-        break;
-      end;
-    end;
-    Result := ALExcludeTrailingPathDelimiterA(LLst.Text, '.');
-  finally
-    ALFreeAndNil(LLst);
-  end;
-end;
-
-{**************************************************}
-function DownloadMetadataFromCentralMavenRepository(
-           const ARemoteRepositoryBaseUrl: AnsiString;
-           const AGroupID: AnsiString;
-           const AArtifactID: AnsiString;
-           out AMavenMetadataSrc: AnsiString): Boolean; overload;
-begin
-
-  //init result
-  result := False;
-  AMavenMetadataSrc := '';
-
-  //create LHttpClient
-  var LHttpClient := TALWinHttpClient.Create;
-  Try
-
-    //try to download from the ARemoteRepositoryBaseUrl
-    Var LUrl := ARemoteRepositoryBaseUrl +
-                ALStringReplaceA(AGroupID,'.','/',[RfReplaceALL])+'/'+
-                AArtifactID+'/'+
-                'maven-metadata.xml'; // https://repo1.maven.org/maven2/androidx/camera/camera-core/maven-metadata.xml
-    OverWrite(String(LUrl+'.pom'));
-    var LResponseContent := TALStringStreamA.Create('');
-    var LResponseHeader := TALHTTPResponseHeader.Create;
-    try
-      Try
-        LHttpClient.Get(
-          LUrl, // const aUrl:AnsiString;
-          LResponseContent, // const aResponseContent: TStream;
-          LResponseHeader); // const aResponseHeader: TALHTTPResponseHeader;
-      except
-        on E: Exception do begin
-          if LResponseHeader.StatusCode = '404' then exit
-          else raise;
-        end;
-      End;
-      AMavenMetadataSrc := LResponseContent.DataString;
-      Result := True;
-    finally
-      ALFreeAndNil(LResponseContent);
-      ALFreeAndNil(LResponseHeader);
-    end;
-  Finally
-    ALFreeAndNil(LHttpClient);
-  End;
-
-end;
-
-{**************************************************}
-function DownloadMetadataFromCentralMavenRepository(
-           const AGroupID: AnsiString;
-           const AArtifactID: AnsiString;
-           out AMavenMetadataSrc: AnsiString): Boolean; overload;
-begin
-  result := DownloadMetadataFromCentralMavenRepository(
-              'https://dl.google.com/android/maven2/', // const ARemoteRepositoryBaseUrl: AnsiString;
-              AGroupID, // const AGroupID: AnsiString;
-              AArtifactID, // const AArtifactID: AnsiString;
-              AMavenMetadataSrc) or // out AMavenMetadataSrc: AnsiString
-            DownloadMetadataFromCentralMavenRepository(
-              'https://repo1.maven.org/maven2/', // const ARemoteRepositoryBaseUrl: AnsiString;
-              AGroupID, // const AGroupID: AnsiString;
-              AArtifactID, // const AArtifactID: AnsiString;
-              AMavenMetadataSrc); // out AMavenMetadataSrc: AnsiString
-end;
-
 {*************************************************}
 function DownloadLibraryFromCentralMavenRepository(
            const ARemoteRepositoryBaseUrl: AnsiString;
@@ -1377,178 +1156,6 @@ begin
               ALocalpomfilename); // out ALocalpomfilename: String)
 end;
 
-{*******************************************}
-function ExpandDependencyVersionRequirements(
-           const aDependencyGroupId: AnsiString;
-           const aDependencyArtifactId: AnsiString;
-           const aDependencyVersionRequirements: AnsiString;
-           out APreferredVersion: AnsiString): Tarray<Tpair<AnsiString,AnsiString>>;
-begin
-
-  //Version requirements have the following syntax:
-  //1.0: Soft requirement for 1.0. Use 1.0 if no other version appears earlier in the dependency tree.
-  //[1.0]: Hard requirement for 1.0. Use 1.0 and only 1.0.
-  //(,1.0]: Hard requirement for any version <= 1.0.
-  //[1.2,1.3]: Hard requirement for any version between 1.2 and 1.3 inclusive.
-  //[1.0,2.0): 1.0 <= x < 2.0; Hard requirement for any version between 1.0 inclusive and 2.0 exclusive.
-  //[1.5,): Hard requirement for any version greater than or equal to 1.5.
-  //(,1.0],[1.2,): Hard requirement for any version less than or equal to 1.0 than or greater than or equal to 1.2, but not 1.1. Multiple requirements are separated by commas.
-  //(,1.1),(1.1,): Hard requirement for any version except 1.1; for example because 1.1 has a critical vulnerability.
-
-  //init LWorkDependencyVersionRequirements
-  var LWorkDependencyVersionRequirements := aDependencyVersionRequirements;
-
-  //https://github.com/google/guava/wiki/ReleasePolicy#flavors
-  if (aDependencyGroupId = 'com.google.guava') and (aDependencyArtifactId = 'guava') then
-    LWorkDependencyVersionRequirements := ALStringReplaceA(LWorkDependencyVersionRequirements, '-jre', '-android', []);
-
-  //handle case la 3.+ => [3.0.0,)
-  if ALPosA('+', LWorkDependencyVersionRequirements) > 0 then begin
-    if (ALPosA('[', LWorkDependencyVersionRequirements) > 0) or
-       (ALPosA(']', LWorkDependencyVersionRequirements) > 0) or
-       (ALPosA('(', LWorkDependencyVersionRequirements) > 0) or
-       (ALPosA(')', LWorkDependencyVersionRequirements) > 0) then raise Exception.Create('Error 90368DB2-6633-46E7-B3C0-115FC3857496');
-    var LMavenMetadataSrc: AnsiString;
-    if not DownloadMetadataFromCentralMavenRepository(
-             aDependencyGroupId, // const AGroupID: AnsiString;
-             aDependencyArtifactId, // const AArtifactID: AnsiString;
-             LMavenMetadataSrc) then // out AMavenMetadataSrc: AnsiString): Boolean;
-      raise Exception.Createfmt('Could not download maven-metadata.xml for %s:%s', [aDependencyGroupId, aDependencyArtifactId]);
-    LWorkDependencyVersionRequirements := ALStringReplaceA(LWorkDependencyVersionRequirements, '+', '.0', []); // 3.+ => 3..0
-    LWorkDependencyVersionRequirements := ALStringReplaceA(LWorkDependencyVersionRequirements, '..', '.', []); // 3..0 => 3.0
-    var LMavenMetadataDoc := TalXmlDocument.Create;
-    try
-      LMavenMetadataDoc.LoadFromXML(LMavenMetadataSrc);
-      Var LversioningNode := LMavenMetadataDoc.DocumentElement.ChildNodes['versioning'];
-      Var LversionsNode := LversioningNode.ChildNodes['versions'];
-      var LMostAdequateVersion: AnsiString := '';
-      for var I := 0 to LversionsNode.ChildNodes.Count - 1 do begin
-        var LVersion := LversionsNode.ChildNodes[i].Text;
-        Var LIsGoodVersion: Boolean := True;
-        for var Lch in LVersion do
-          if not (Lch in ['0'..'9','.']) then begin
-            LIsGoodVersion := False;
-            break;
-          end;
-        if not LIsGoodVersion then continue;
-        var LVersionRelationShip: integer;
-        if (CompareVersion(
-              LWorkDependencyVersionRequirements,
-              LVersion,
-              LVersionRelationShip,
-              false{ACanWriteError})) and (LVersionRelationShip <= 0) then begin
-         if LMostAdequateVersion = '' then LMostAdequateVersion := LVersion
-         else if (CompareVersion(
-                    LVersion,
-                    LMostAdequateVersion,
-                    LVersionRelationShip)) and (LVersionRelationShip <= 0) then LMostAdequateVersion := LVersion
-        end;
-      end;
-      if LMostAdequateVersion = '' then raise Exception.Createfmt('Can not Expand %s:%s:%s', [aDependencyGroupId, aDependencyArtifactId, aDependencyVersionRequirements]);
-      LWorkDependencyVersionRequirements := '['+LMostAdequateVersion+',)';
-    finally
-      ALFreeAndNil(LMavenMetadataDoc);
-    end;
-  end;
-
-  Setlength(Result, 0);
-  APreferredVersion := '';
-  var LLst := TALStringListA.Create;
-  try
-
-    // 1.0 | [1.0] | (,1.0]       | [1.2,1.3] | [1.0,2.0) | [1.5,)        | (,1.0],[1.2,)              | (,1.1),(1.1,)
-    LWorkDependencyVersionRequirements := ALStringReplaceA(LWorkDependencyVersionRequirements, ' ', '', [rfReplaceALL]);
-    // 1.0 | [1.0] | 0.0.0.0,1.0] | [1.2,1.3] | [1.0,2.0) | [1.5,)        | 0.0.0.0,1.0],[1.2,)        | 0.0.0.0,1.1),(1.1,)
-    LWorkDependencyVersionRequirements := ALStringReplaceA(LWorkDependencyVersionRequirements, '(,', '0.0.0.0,', [rfReplaceALL]);
-    // 1.0 | [1.0] | 0.0.0.0,1.0] | [1.2,1.3] | [1.0,2.0) | [1.5,<MAXINT> | 0.0.0.0,1.0],[1.2,<MAXINT> | 0.0.0.0,1.1),(1.1,<MAXINT>
-    LWorkDependencyVersionRequirements := ALStringReplaceA(LWorkDependencyVersionRequirements, ',)', ',' + ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64), [rfReplaceALL]);
-
-    LLst.LineBreak := ',';
-    LLst.Text := LWorkDependencyVersionRequirements;
-    if LLst.Count = 0 then raise Exception.Create('Error 57608ECA-8EEE-4C63-B797-39E74CBF7B9D');
-
-    // 1.0 | [1.0]
-    if LLst.Count = 1 then begin
-      Var LStr := LLst[0];
-      // [1.0]
-      if (ALPosA('[', LStr) = 1) and
-         (ALPosA(']', LStr) = length(LStr)) then begin
-        delete(LStr,1,1); // 1.0]
-        delete(LStr,length(LStr),1); // 1.0
-        APreferredVersion := LStr; // 1.0
-        Setlength(Result, 1);
-        Result[0] := Tpair<AnsiString,AnsiString>.create(LStr, LStr); // 1.0 - 1.0
-      end
-      // 1.0
-      else begin
-        APreferredVersion := LStr; // 1.0
-        Setlength(Result, 1);
-        Result[0] := Tpair<AnsiString,AnsiString>.create('0.0.0.0', ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)+'.'+ALIntToStrA(ALMaxInt64)); // 0.0.0.0 - maxint.maxint.maxint.maxint
-      end;
-      if (ALPosA('[', APreferredVersion) > 0) or
-         (ALPosA(']', APreferredVersion) > 0) or
-         (ALPosA('(', APreferredVersion) > 0) or
-         (ALPosA(')', APreferredVersion) > 0) then raise Exception.Create('Error 73BA1C49-4E46-44A8-8A4D-118BC355889C');
-    end
-
-    // 0.0.0.0,1.0] | [1.2,1.3] | [1.0,2.0) | [1.5,<MAXINT> | 0.0.0.0,1.0],[1.2,<MAXINT> | 0.0.0.0,1.1),(1.1,<MAXINT>
-    else begin
-      if LLst.Count mod 2 <> 0 then raise Exception.Create('Error 57608ECA-8EEE-4C63-B797-39E74CBF7B9D');
-      for var I := 0 to LLst.Count - 1 do begin
-        if I mod 2 <> 0 then continue;
-        //----
-        var LstrMin := LLst[i];   // 0.0.0.0 | [1.2 | [1.0 | [1.5 | 0.0.0.0 | [1.2 | 0.0.0.0 | (1.1
-        var LstrMax := LLst[i+1]; // 1.0] | 1.3] | 2.0) | <MAXINT> | 1.0] | <MAXINT> | 1.1) | <MAXINT>
-        //----
-        // [1.2 | [1.0 | [1.5 | [1.2
-        if (ALPosA('[', LstrMin) = 1) then begin
-          // 1.2 | 1.0 | 1.5 | 1.2
-          delete(LstrMin,1,1);
-          APreferredVersion := LstrMin;
-        end
-        // (1.1
-        else if (ALPosA('(', LstrMin) = 1) then begin
-          // 1.1
-          delete(LstrMin,1,1);
-          // 1.1.1
-          LstrMin := incVersion(LstrMin);
-        end;
-        //----
-        // 1.0] | 1.3] | 1.0]
-        if (ALPosA(']', LstrMax) = length(LstrMax)) then begin
-          // 1.0 | 1.3 | 1.0
-          delete(LstrMax,length(LstrMax),1);
-          APreferredVersion := LstrMax;
-        end
-        // 2.0) | 1.1)
-        else if (ALPosA(')', LstrMax) = length(LstrMax)) then begin
-          // 2.0 | 1.1
-          delete(LstrMax,length(LstrMax),1);
-          // 1.<MAXINT> | 1.0
-          LstrMax := decVersion(LstrMax);
-        end;
-        //----
-        if (ALPosA('[', LstrMin) > 0) or
-           (ALPosA(']', LstrMin) > 0) or
-           (ALPosA('(', LstrMin) > 0) or
-           (ALPosA(')', LstrMin) > 0) then raise Exception.Create('Error A8246244-77B7-4B2D-BDBA-12D9CAB5B4A1');
-        //----
-        if (ALPosA('[', LstrMax) > 0) or
-           (ALPosA(']', LstrMax) > 0) or
-           (ALPosA('(', LstrMax) > 0) or
-           (ALPosA(')', LstrMax) > 0) then raise Exception.Create('Error 3BAB20BC-2DA5-458B-839A-08395B523FEE');
-        //----
-        Setlength(Result, length(Result)+1);
-        Result[high(Result)] := Tpair<AnsiString,AnsiString>.create(LstrMin, LstrMax);
-      end;
-      if APreferredVersion = '' then raise Exception.Create('Error 9572ABBD-A0D8-47AD-859C-DD532B6281A3');
-    end;
-  finally
-    ALFreeAndNil(LLst);
-  end;
-
-end;
-
 {***********************}
 Function FindLibraryNode(
            const ALibraries: TALJSONNodeA;
@@ -1565,23 +1172,6 @@ begin
       if result <> nil then raise Exception.Create('Error 1C88C34A-EF22-4CBB-AD85-B1CC130346D8');
       result := LLibrary;
     end;
-  end;
-end;
-
-{*************************}
-Function RemoveLibraryNode(
-           const ALibraries: TALJSONNodeA;
-           const AGroupID: AnsiString;
-           const AArtifactID: AnsiString;
-           const AVersion: AnsiString): TALJSONNodeA;
-begin
-  Result := nil;
-  for var I := ALibraries.ChildNodes.Count - 1 downto 0 do begin
-    var LLibrary := ALibraries.ChildNodes[i];
-    if ((AGroupID = '') or (LLibrary.GetChildNodeValueText('groupid', ''{default}) = AGroupID)) and
-       ((AArtifactID = '') or (LLibrary.GetChildNodeValueText('artifactid', ''{default}) = AArtifactID)) and
-       ((AVersion = '') or (LLibrary.GetChildNodeValueText('version', ''{default}) = AVersion)) then
-      ALibraries.ChildNodes.Delete(i);
   end;
 end;
 
@@ -1984,7 +1574,6 @@ begin
       LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
       LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
       LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
-      LParamLst.add('-UseGradle=true');
       LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
       {$ENDIF}
       {$ENDREGION}
@@ -2082,10 +1671,6 @@ begin
 
       {$REGION 'Init LGoogleServicesJson'}
       var LGoogleServicesJson := ExpandFileName(ALTrim(LParamLst.Values['-GoogleServicesJson']));
-      {$ENDREGION}
-
-      {$REGION 'Init LUseGradle'}
-      var LUseGradle := AlStrToBool(ALTrim(LParamLst.Values['-UseGradle']));
       {$ENDREGION}
 
       {$REGION 'Init libraries'}
@@ -2187,537 +1772,171 @@ begin
       {$ENDREGION}
 
       {$REGION 'Check all dependancies using Gradle'}
-      if LUseGradle then begin
-        Writeln('Check all dependancies using gradle');
-        var LDependenciesWalkerOriginalDir := ALGetModulePathW + 'DependenciesWalker\';
-        if not TDirectory.Exists(LDependenciesWalkerOriginalDir) then raise EALException.CreateFmt('Directory %s does not exist', [LDependenciesWalkerOriginalDir]);
-        var LDependenciesWalkerTmpDir := LtmpDirectory + 'DependenciesWalker\';
-        TDirectory.CreateDirectory(LDependenciesWalkerTmpDir);
-        //---
-        //copy the DependenciesWalker content in TMP dir
-        if not AlCopyDirectoryW(
-                 LDependenciesWalkerOriginalDir, // SrcDirectory,
-                 LDependenciesWalkerTmpDir, // DestDirectory: ansiString;
-                 true) then // SubDirectory: Boolean;
-          raise Exception.Createfmt('Cannot copy %s to %s', [LDependenciesWalkerOriginalDir, LDependenciesWalkerTmpDir]);
-        //---
-        //Update the build.gradle
-        var LBuildGradleFileName := LDependenciesWalkerTmpDir + 'app\build.gradle';
-        if not Tfile.Exists(LBuildGradleFileName) then raise Exception.CreateFmt('%s does not exist', [LBuildGradleFileName]);
-        Var LBuildGradledependencies: AnsiString := '';
-        for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-          var LLibrary := LLibraries.ChildNodes[i];
-          Var LGroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
-          Var Lartifactid := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-          Var LVersion := LLibrary.GetChildNodeValueText('version', ''{default});
-          var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
-          var LPomFileName := string(LLibrary.GetChildNodeValueText('pomfilename', ''{default}));
-          if (LGroupID <> '') and (Lartifactid <> '') and (LVersion <> '') then begin
-            LBuildGradledependencies := LBuildGradledependencies + '    implementation "'+LGroupID+':'+Lartifactid+':'+LVersion+'"'#13#10;
-            if ((LLibraryArchiveFileName <> '') and
-                (ALPosW(LLocalMavenRepositoryDir, LLibraryArchiveFileName) <> 1))  or
-               ((LPomFileName <> '') and
-                (ALPosW(LLocalMavenRepositoryDir, LPomFileName) <> 1)) then begin
-              Var LRepositoryDirectory := LDependenciesWalkerTmpDir +
-                                          'localrepository\' +
-                                          ALStringReplaceW(string(LGroupId),'.','\',[RfReplaceALL]) + '\' +
-                                          String(LArtifactId) + '\' +
-                                          string(LVersion) + '\';
-              TDirectory.CreateDirectory(LRepositoryDirectory);
-              if LLibraryArchiveFileName <> '' then
-                Tfile.Copy(LLibraryArchiveFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExt(LLibraryArchiveFileName));
-              if LPomFileName <> '' then
-                Tfile.Copy(LPomFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExt(LPomFileName));
-            end;
-          end
-          else begin
-            if LLibraryArchiveFileName = '' then raise Exception.Create('Error 6AF219E0-8FDC-4C2A-A112-BBFDB91B9580');
-            if LPomFileName <> '' then raise Exception.Create('Error 6F7C2A3E-76E2-44A6-A2D5-D0BCA4C2F1EA');
-            Writeln('Skip '+string(LLibraryArchiveFileName) + ' (no pom file found)', TALConsoleColor.ccAqua);
-            continue;
+      Writeln('Check all dependancies using gradle');
+      var LDependenciesWalkerOriginalDir := ALGetModulePathW + 'DependenciesWalker\';
+      if not TDirectory.Exists(LDependenciesWalkerOriginalDir) then raise EALException.CreateFmt('Directory %s does not exist', [LDependenciesWalkerOriginalDir]);
+      var LDependenciesWalkerTmpDir := LtmpDirectory + 'DependenciesWalker\';
+      TDirectory.CreateDirectory(LDependenciesWalkerTmpDir);
+      //---
+      //copy the DependenciesWalker content in TMP dir
+      if not AlCopyDirectoryW(
+               LDependenciesWalkerOriginalDir, // SrcDirectory,
+               LDependenciesWalkerTmpDir, // DestDirectory: ansiString;
+               true) then // SubDirectory: Boolean;
+        raise Exception.Createfmt('Cannot copy %s to %s', [LDependenciesWalkerOriginalDir, LDependenciesWalkerTmpDir]);
+      //---
+      //Update the build.gradle
+      var LBuildGradleFileName := LDependenciesWalkerTmpDir + 'app\build.gradle';
+      if not Tfile.Exists(LBuildGradleFileName) then raise Exception.CreateFmt('%s does not exist', [LBuildGradleFileName]);
+      Var LBuildGradledependencies: AnsiString := '';
+      for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+        var LLibrary := LLibraries.ChildNodes[i];
+        Var LGroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
+        Var Lartifactid := LLibrary.GetChildNodeValueText('artifactid', ''{default});
+        Var LVersion := LLibrary.GetChildNodeValueText('version', ''{default});
+        var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
+        var LPomFileName := string(LLibrary.GetChildNodeValueText('pomfilename', ''{default}));
+        if (LGroupID <> '') and (Lartifactid <> '') and (LVersion <> '') then begin
+          LBuildGradledependencies := LBuildGradledependencies + '    implementation "'+LGroupID+':'+Lartifactid+':'+LVersion+'"'#13#10;
+          if ((LLibraryArchiveFileName <> '') and
+              (ALPosW(LLocalMavenRepositoryDir, LLibraryArchiveFileName) <> 1))  or
+             ((LPomFileName <> '') and
+              (ALPosW(LLocalMavenRepositoryDir, LPomFileName) <> 1)) then begin
+            Var LRepositoryDirectory := LDependenciesWalkerTmpDir +
+                                        'localrepository\' +
+                                        ALStringReplaceW(string(LGroupId),'.','\',[RfReplaceALL]) + '\' +
+                                        String(LArtifactId) + '\' +
+                                        string(LVersion) + '\';
+            TDirectory.CreateDirectory(LRepositoryDirectory);
+            if LLibraryArchiveFileName <> '' then
+              Tfile.Copy(LLibraryArchiveFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExt(LLibraryArchiveFileName));
+            if LPomFileName <> '' then
+              Tfile.Copy(LPomFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExt(LPomFileName));
           end;
-        end;
-        var LBuildGradleSrc := ALGetStringFromFile(LBuildGradleFileName, TEncoding.UTF8);
-        LBuildGradleSrc := ALStringReplaceW(LBuildGradleSrc, '%dependencies%', ALTrimRight(String(LBuildGradledependencies)), [RfIgnoreCase]);
-        ALSaveStringtoFile(LBuildGradleSrc, LBuildGradleFileName, Tencoding.UTF8, false{WriteBOM});
-        //---
-        var LSettingGradleFileName := LDependenciesWalkerTmpDir + 'settings.gradle';
-        var LLocalMavenRepositoryStr := '';
-        if LLocalMavenRepositoryDir <> '' then begin
-          LLocalMavenRepositoryStr := ALStringReplaceW(LLocalMavenRepositoryDir,'\','/',[RfReplaceALL]);
-          LLocalMavenRepositoryStr := 'maven {url uri("file://'+LLocalMavenRepositoryStr+'")}';
-        end;
-        var LSettingGradleSrc := ALGetStringFromFile(LSettingGradleFileName, TEncoding.UTF8);
-        LSettingGradleSrc := ALStringReplaceW(LSettingGradleSrc, '%LocalMavenRepository%', LLocalMavenRepositoryStr, [RfIgnoreCase]);
-        ALSaveStringtoFile(LSettingGradleSrc, LSettingGradleFileName, Tencoding.UTF8, false{WriteBOM});
-        //---
-        //run graddle
-        Var LGradleResultSrc: AnsiString;
-        Var LInputStream := TMemorystream.Create;
-        Var LOutputStream := TStringStream.Create;
-        try
-          var LcmdLine := LDependenciesWalkerTmpDir + 'gradlew.bat app:dependencies --configuration releaseRuntimeClasspath --project-dir '+LDependenciesWalkerTmpDir;
-          OverWrite(LcmdLine);
-          Var LCmdLineResult := ALWinExecW(
-                                  LcmdLine, // const aCommandLine: String;
-                                  LDependenciesWalkerTmpDir, // const aCurrentDirectory: AnsiString;
-                                  GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
-                                  LInputStream, // const aInputStream: Tstream;
-                                  LOutputStream); //const aOutputStream: TStream;
-          if LCmdLineResult <> 0 then
-            raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
-          LGradleResultSrc := AnsiString(LOutputStream.DataString);
-        finally
-          ALFreeandNil(LInputStream);
-          ALFreeandNil(LOutputStream);
-        end;
-        //analyze LGradleResultSrc
-        var LInDependanciesTree: Boolean := False;
-        Var LGradleResultLst := TALStringListA.Create;
-        try
-          LGradleResultLst.Text := LGradleResultSrc;
-          for Var I := 0 to LGradleResultLst.Count - 1 do begin
-            Var LLine := ALTrim(LGradleResultLst[i]); // |    |    |    \--- androidx.annotation:annotation:1.1.0 -> 1.3.0
-            If ALSameTextA(LLine, 'releaseRuntimeClasspath - Resolved configuration for runtime for variant: release') then begin
-              LInDependanciesTree := True;
-              Continue;
-            end;
-            if not LInDependanciesTree then continue;
-            if LLine = '' then break;
-            if ALSameTextA(LLine, 'No dependencies') then break;
-            while (LLine <> '') and (LLine[low(LLine)] in ['+','|','\','-', ' ']) do
-              delete(LLine, 1, 1); // androidx.annotation:annotation:1.1.0 -> 1.3.0
-            Var LLst := TALStringListA.Create;
-            Try
-              LLst.LineBreak := ':';
-              LLst.Text := LLine;
-              if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE ('+String(LLine)+')');
-              var LDependencyGroupID := LLst[0]; // androidx.annotation
-              var LDependencyArtifactID := LLst[1]; // annotation
-              var LDependencyVersion := LLst[2]; // 1.1.0 -> 1.3.0 (*)
-              Var P := ALPosA('->', LDependencyVersion);
-              if P > 0 then begin
-                delete(LDependencyVersion, 1, P+1); //  1.3.0 (*)
-              end;
-              //(*) - dependencies omitted (listed previously)
-              LDependencyVersion := ALStringReplaceA(LDependencyVersion, '(*)', '', []); //  1.3.0
-              //(c) - dependency constraint
-              LDependencyVersion := ALStringReplaceA(LDependencyVersion, '(c)', '', []);
-              LDependencyVersion := ALTrim(LDependencyVersion); // 1.3.0
-              if ALPosIgnoreCaseA('FAILED', LDependencyVersion) > 0 then begin
-                LDependencyVersion := ALTrim(ALStringReplaceA(LDependencyVersion, 'FAILED', '', [RfIgnoreCase]));
-                Writeln(
-                  'Cannot resolve '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
-                  TALConsoleColor.ccPurple,
-                  true{ASkipDuplicates});
-              end
-              else begin
-                if ALPosA(' ', LDependencyVersion) > 0 then raise Exception.Create('Error CD3F7D9C-874C-4089-B674-9CCCE4AFA50E'#13#10+string(LGradleResultSrc));
-                if FindLibraryNode(
-                     LLibraries, // const ALibraries: TALJSONNodeA;
-                     LDependencyGroupID, // const AGroupID: AnsiString;
-                     LDependencyArtifactID, // const AArtifactID: AnsiString;
-                     LDependencyVersion) <> nil then continue; // const AVersion: AnsiString): TALJSONNodeA; then
-                var LLocalArchivefilename: String;
-                var LLocalpomfilename: String;
-                if LDownloadDependencies and
-                   DownloadLibraryFromCentralMavenRepository(
-                     LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                     LDependencyGroupID, // const AGroupID: AnsiString;
-                     LDependencyArtifactID, // const AArtifactID: AnsiString;
-                     LDependencyVersion, // const AVersion: AnsiString;
-                     LLocalArchivefilename, // out ALocalArchivefilename: String;
-                     LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
-                  With LLibraries.AddChild('library', ntObject) do begin
-                    Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
-                    Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
-                    Addchild('version').Text := LDependencyVersion; // 23.1.0
-                    Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-                    Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-                    Addchild('dependencyrequirements', ntarray);
-                  end;
-                end
-                else begin
-                  Writeln(
-                    'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
-                    TALConsoleColor.ccPurple,
-                    true{ASkipDuplicates});
-                end;
-              end;
-            Finally
-              ALFreeAndNil(LLst);
-            End;
-          end;
-        finally
-          ALFreeAndNil(LGradleResultLst);
-        end;
-        if LInDependanciesTree = False then
-          raise Exception.Create('Error FD57344C-9716-421F-B210-6E5E7B367418');
-      end
-      {$ENDREGION}
-
-      {$REGION 'Check all dependancies using internal algorithm'}
-      //https://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-project-dependencies.html#pom-relationships-sect-version-ranges
-      else begin
-        Writeln('Check all dependancies using internal algorithm');
-        var LLibrariesIdx: integer := 0;
-        while LLibrariesIdx <= LLibraries.ChildNodes.Count - 1 do begin
-
-          {$REGION 'init LLibrary'}
-          var LLibrary := LLibraries.ChildNodes[LLibrariesIdx];
-          inc(LLibrariesIdx);
-          {$ENDREGION}
-
-          {$REGION 'Their is a pom'}
-          var LPomFilename := LLibrary.GetChildNodeValueText('pomfilename', '');
-          if LPomFilename <> '' then begin
-            Try
-              Var LPomXmlDoc := TalXmlDocument.Create('root');
-              try
-
-                {$REGION 'load the pom'}
-                LPomXmlDoc.LoadFromFile(LPomFilename);
-                ExpandPom(LPomXmlDoc, LLocalMavenRepositoryDir);
-                {$ENDREGION}
-
-                {$REGION 'init LdependenciesNode'}
-                Var LdependenciesNode := LPomXmlDoc.DocumentElement.ChildNodes.FindNode('dependencies');
-                {$ENDREGION}
-
-                {$REGION 'no dependency in the pom'}
-                if (LdependenciesNode = nil) or
-                   (LdependenciesNode.ChildNodes.Count = 0) then continue;
-                {$ENDREGION}
-
-                {$REGION 'loop on all dependancies in the pom'}
-                For var J := 0 to LdependenciesNode.ChildNodes.Count - 1 do begin
-
-                  {$REGION 'get infos from the dependency'}
-                  var LdependencyNode := LdependenciesNode.ChildNodes[J];
-                  if LdependencyNode.NodeType <> ntElement then continue;
-                  if LdependencyNode.NodeName <> 'dependency' then raise Exception.Create('Error 15D1E7CC-A4D2-49B0-8755-4EFC06296AA2');
-                  //---
-                  //https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
-                  //When optional=true then they are included only if they are a direct dependancy
-                  //in our case direct dependancy are only the one we included in the command line (ie -libraries params)
-                  //all other are transitive to our project and can be ignored
-                  var LdependancyOptionalNode := LdependencyNode.ChildNodes.FindNode('optional');
-                  if (LdependancyOptionalNode <> nil) then begin
-                    if not ALSameTextA(LdependancyOptionalNode.Text, 'true') then
-                      raise Exception.Create('Error 711FF857-5288-4013-9A2C-861D5C16E007');
-                    continue;
-                  end;
-                  //---
-                  //scope: This element refers to the classpath of the task at hand (compiling and runtime, testing, etc.) as well as how
-                  //to limit the transitivity of a dependency. There are five scopes available:
-                  //compile - this is the default scope, used if none is specified. Compile dependencies are available in all classpaths.
-                  //          Furthermore, those dependencies are propagated to dependent projects.
-                  //provided - this is much like compile, but indicates you expect the JDK or a container to provide it at runtime.
-                  //           It is only available on the compilation and test classpath, and is not transitive.
-                  //runtime - this scope indicates that the dependency is not required for compilation, but is for execution.
-                  //          It is in the runtime and test classpaths, but not the compile classpath.
-                  //test - this scope indicates that the dependency is not required for normal use of the application,
-                  //       and is only available for the test compilation and execution phases. It is not transitive.
-                  //system - this scope is similar to provided except that you have to provide the JAR which contains it
-                  //         explicitly. The artifact is always available and is not looked up in a repository.
-                  var LDependencyScopeNode := LdependencyNode.ChildNodes.FindNode('scope');
-                  var LDependencyScope: AnsiString;
-                  if LDependencyScopeNode = nil then LDependencyScope := 'compile'
-                  else LDependencyScope := LDependencyScopeNode.Text;
-                  if ALSameTextA(LDependencyScope, 'test') then continue
-                  else if ALSameTextA(LDependencyScope, 'provided') then continue // I found stuff like com.google.android:android:4.0.0 (in com.squareup.okhttp3:parent:3.12.1 for exemple)
-                  else if ALSameTextA(LDependencyScope, 'system') then continue // same as provided, I found also stuff like com.google.android:android:4.0.0 in com.google.zxing:zxing-parent:3.3.3
-                  else if (not ALSameTextA(LDependencyScope, 'compile')) and
-                          (not ALSameTextA(LDependencyScope, 'runtime')) then raise Exception.Createfmt('Unknown dependency.scope value "%s"', [LDependencyScope]);
-                  //---
-                  var LDependencyGroupId := LdependencyNode.ChildNodes['groupId'].text;  // com.android.support
-                  var LDependencyArtifactId := LdependencyNode.ChildNodes['artifactId'].text; // support-v4
-                  var LDependencyPreferredVersion: AnsiString;
-                  var LDependencyVersionRequirements := ExpandDependencyVersionRequirements(
-                                                          LDependencyGroupId,
-                                                          LDependencyArtifactId,
-                                                          LdependencyNode.ChildNodes['version'].Text, // [1.0]
-                                                          LDependencyPreferredVersion);
-                  if (LDependencyGroupId = '') or (LDependencyArtifactId = '') or (LDependencyPreferredVersion = '') then
-                    raise Exception.Create('Error E911B0CA-007B-4DAD-A90C-5F7117A8407C');
-                  if length(LDependencyVersionRequirements) = 0 then raise Exception.Create('Error 5B1E62D3-527A-4050-BA8D-ADC727E02304');
-                  if length(LDependencyVersionRequirements) > 1 then raise Exception.Create('Error A1F6B447-9276-4247-BE0D-D82E54C23DF0');
-                  //---
-                  //https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
-                  //I do not handle Dependency Exclusions for now
-                  var LdependancyExclusionsNode := LdependencyNode.ChildNodes.FindNode('exclusions');
-                  if (LdependancyOptionalNode <> nil) and (LdependancyOptionalNode.ChildNodes.Count > 0) then begin
-                    Writeln(
-                      string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion) + ' use dependency exclusions. AndroidMerger do not yet support dependency exclusions',
-                      TALConsoleColor.ccaQua,
-                      true{ASkipDuplicates});
-                  end;
-                  {$ENDREGION}
-
-                  {$REGION 'init LAlreadyIncludedDependencyLibrary'}
-                  var LAlreadyIncludedDependencyLibrary := FindLibraryNode(
-                                                             LLibraries, // const ALibraries: TALJSONNodeA;
-                                                             LDependencyGroupID, // const AGroupID: AnsiString;
-                                                             LDependencyArtifactID, // const AArtifactID: AnsiString;
-                                                             ''); // const AVersion: AnsiString): TALJSONNodeA;
-                  {$ENDREGION}
-
-                  {$REGION 'We do not yet have any version of the dependency already included'}
-                  if (LAlreadyIncludedDependencyLibrary = nil) then begin
-                    var LLocalArchivefilename: String;
-                    var LLocalpomfilename: String;
-                    if LDownloadDependencies and
-                       DownloadLibraryFromCentralMavenRepository(
-                         LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                         LDependencyGroupID, // const AGroupID: AnsiString;
-                         LDependencyArtifactID, // const AArtifactID: AnsiString;
-                         LDependencyPreferredVersion, // const AVersion: AnsiString;
-                         LLocalArchivefilename, // out ALocalArchivefilename: String;
-                         LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
-                      With LLibraries.AddChild('library', ntObject) do begin
-                        Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
-                        Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
-                        Addchild('version').Text := LDependencyPreferredVersion; // 23.1.0
-                        Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-                        Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-                        With Addchild('dependencyrequirements', ntarray) do begin
-                          for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
-                            With addchild(ntobject) do begin
-                              with Addchild('version', ntobject) do begin
-                                Addchild('min').text := LDependencyVersionRequirements[k].Key;
-                                Addchild('max').text := LDependencyVersionRequirements[k].value;
-                              end;
-                              with Addchild('by', ntobject) do begin
-                                Addchild('groupid').Text := LLibrary.GetChildNodeValueText('groupid', ''{default});
-                                Addchild('artifactid').Text := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-                                Addchild('version').Text := LLibrary.GetChildNodeValueText('version', ''{default});
-                              end;
-                            end;
-                          end;
-                        end;
-                      end;
-                    end
-                    else begin
-                      Writeln(
-                        'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion),
-                        TALConsoleColor.ccPurple,
-                        true{ASkipDuplicates});
-                    end;
-                  end
-                  {$ENDREGION}
-
-                  {$REGION 'We do have a version of the dependency already included'}
-                  else begin
-
-                    {$REGION 'Check that the range of DependencyVersionRequirements cross the range of AlreadyIncludedDependencyRequirements'}
-                    //this will not work perfectly with a dependency that have 2 ranges
-                    //for exemple the version xx need the dependency Y with a version between 0 .. 1.1 or 1.2 .. maxint
-                    //I do not complicate my life for now as I think this will never happen
-                    for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
-                      var LDependencyVersionRequirementMin := LDependencyVersionRequirements[k].Key;
-                      var LDependencyVersionRequirementMax := LDependencyVersionRequirements[k].value;
-                      var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
-                      for var L := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
-                        var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[L];
-                        var LVersionRelationShip1: integer;
-                        var LVersionRelationShip2: integer;
-                        if ((CompareVersion(LDependencyVersionRequirementMax, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
-                           ((CompareVersion(LDependencyVersionRequirementMin, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
-                          Var LProjectName := LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'groupid'], ''{default});
-                          if LProjectName <> '' then
-                            LProjectName := LProjectName + ':' +
-                                            LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'artifactid'], ''{default}) + ':' +
-                                            LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'version'], ''{default})
-                          else
-                            LProjectName := 'The project';
-                          var LErrorMessage:= 'Dependency version conflicts. ' +
-                                              LProjectName + ' ' +
-                                              'need a version of '+
-                                              LDependencyGroupId + ':' +
-                                              LDependencyGroupID + ' ' +
-                                              'between ' +
-                                              LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}) + '..' +
-                                              LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}) + ' ' +
-                                              'and ' +
-                                              LLibrary.GetChildNodeValueText('groupid', '') +':'+
-                                              LLibrary.GetChildNodeValueText('artifactid', '') +':'+
-                                              LLibrary.GetChildNodeValueText('version', '') + ' ' +
-                                              'need a version between ' +
-                                              LDependencyVersionRequirementMin + '..' +
-                                              LDependencyVersionRequirementMax;
-                          LErrorMessage := ALStringReplaceA(LErrorMessage, ALIntToStrA(ALMaxint64), '<maxint>', [rfReplaceALL]);
-                          LPomFilename := '';
-                          raise EALException.Create(LErrorMessage);
-                        end;
-                      end;
-                    end;
-                    {$ENDREGION}
-
-                    {$REGION 'Update the AlreadyIncludedDependencyRequirements'}
-                    With LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'] do begin
-                      for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
-                        With addchild(ntobject) do begin
-                          with Addchild('version', ntobject) do begin
-                            Addchild('min').text := LDependencyVersionRequirements[k].Key;
-                            Addchild('max').text := LDependencyVersionRequirements[k].value;
-                          end;
-                          with Addchild('by', ntobject) do begin
-                            Addchild('groupid').Text := LLibrary.GetChildNodeValueText('groupid', ''{default});
-                            Addchild('artifactid').Text := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-                            Addchild('version').Text := LLibrary.GetChildNodeValueText('version', ''{default});
-                          end;
-                        end;
-                      end;
-                    end;
-                    {$ENDREGION}
-
-                    {$REGION 'check if the current preferred version is the most adequate'}
-                    var LVersionRelationShip: integer;
-                    if CompareVersion(
-                         LDependencyPreferredVersion,
-                         LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default}),
-                         LVersionRelationShip) and (LVersionRelationShip > 0) then begin
-
-                      //check that LDependencyPreferredVersion fulfill all the requierement
-                      var LDependencyPreferredVersionFulFillRequierements: Boolean := True;
-                      var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
-                      for var K := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
-                        var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[K];
-                        var LVersionRelationShip1: integer;
-                        var LVersionRelationShip2: integer;
-                        if ((CompareVersion(LDependencyPreferredVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
-                           ((CompareVersion(LDependencyPreferredVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
-                          LDependencyPreferredVersionFulFillRequierements := False;
-                          break;
-                        end;
-                      end;
-
-                      //The LDependencyPreferredVersion fulfill all requierements
-                      if LDependencyPreferredVersionFulFillRequierements then begin
-
-                        //download the new dependency
-                        var LLocalArchivefilename: String;
-                        var LLocalpomfilename: String;
-                        if LDownloadDependencies and
-                           DownloadLibraryFromCentralMavenRepository(
-                             LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                             LDependencyGroupID, // const AGroupID: AnsiString;
-                             LDependencyArtifactID, // const AArtifactID: AnsiString;
-                             LDependencyPreferredVersion, // const AVersion: AnsiString;
-                             LLocalArchivefilename, // out ALocalArchivefilename: String;
-                             LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
-
-                          //add the new node
-                          var LTmpNode := LLibraries.AddChild('library', ntObject);
-                          With LTmpNode do begin
-                            Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
-                            Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
-                            Addchild('version').Text := LDependencyPreferredVersion; // 23.1.0
-                            Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-                            Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-                            With Addchild('dependencyrequirements', ntarray) do begin
-                              While LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count > 0 do
-                                Childnodes.Add(LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Extract(0));
-                            end;
-                          end;
-
-                          //delete the old dependency
-                          var LTodeleteGroupID := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('groupid', ''{default});
-                          var LTodeleteArtifactid := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('artifactid', ''{default});
-                          var LTodeleteVersion := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default});
-                          if (LTodeleteGroupID = '') or (LTodeleteArtifactid = '') or (LTodeleteVersion = '') then
-                            raise Exception.Create('Error 47607420-D49C-4D38-9185-A2B597EF7551');
-                          RemoveLibraryNode(
-                            LLibraries, // const ALibraries: TALJSONNodeA;
-                            LTodeleteGroupID, // const AGroupID: AnsiString;
-                            LTodeleteArtifactid, // const AArtifactID: AnsiString;
-                            LTodeleteVersion); // const AVersion: AnsiString): TALJSONNodeA;
-
-                          //update all dependencyrequirements
-                          for var K := LLibraries.ChildNodes.Count - 1 downto 0 do begin
-                            if LLibraries.ChildNodes[K] = LTmpNode then continue;
-                            Var LdependencyrequirementsNode := LLibraries.ChildNodes[K].ChildNodes['dependencyrequirements'];
-                            for var L := LdependencyrequirementsNode.ChildNodes.Count - 1 downto 0 do begin
-                              var LdependencyrequirementNode := LdependencyrequirementsNode.ChildNodes[L];
-                              if (LdependencyrequirementNode.GetChildNodeValueText(['by', 'groupid'], ''{default}) = LTodeleteGroupID) and
-                                 (LdependencyrequirementNode.GetChildNodeValueText(['by', 'artifactid'], ''{default}) = LTodeleteArtifactid) and
-                                 (LdependencyrequirementNode.GetChildNodeValueText(['by', 'version'], ''{default}) = LTodeleteVersion) then
-                                LdependencyrequirementsNode.ChildNodes.Delete(L);
-                            end;
-                            if LdependencyrequirementsNode.ChildNodes.Count = 0 then
-                              LLibraries.ChildNodes.Delete(K);
-                          end;
-
-                          //update LAlreadyIncludedDependencyLibrary
-                          LAlreadyIncludedDependencyLibrary := LTmpNode;
-
-                          //instruct to restart the main loop from 0 because we don't know
-                          //how many libraries we deleted so LLibrariesIdx is not anymore accurate
-                          //I m a little lazzy I know
-                          LLibrariesIdx := 0;
-
-                        end
-
-                        //could not download the new dependency, just add a warning
-                        else begin
-                          Writeln(
-                            'Dependency out-of-date. '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion) + ' seam more adequate than the included version ' + string(LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default})),
-                            TALConsoleColor.ccPurple,
-                            true{ASkipDuplicates});
-                        end;
-
-                      end;
-
-                    end;
-                    {$ENDREGION}
-
-                    {$REGION 'check if the dependency version is still inside version requierements'}
-                    var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
-                    var LAlreadyIncludedDependencyVersion := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default});
-                    for var K := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
-                      var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[K];
-                      var LVersionRelationShip1: integer;
-                      var LVersionRelationShip2: integer;
-                      if ((CompareVersion(LAlreadyIncludedDependencyVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
-                         ((CompareVersion(LAlreadyIncludedDependencyVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
-                        raise EALException.Create('Dependency version conflicts.');
-                      end;
-                    end;
-                    {$ENDREGION}
-
-                  end;
-                  {$ENDREGION}
-
-                end;
-                {$ENDREGION}
-
-              finally
-                ALFreeAndNil(LPomXmlDoc);
-              end;
-            Except
-              On E: Exception do begin
-                if LPomFilename <> '' then
-                  raise Exception.CreateFmt('%s - %s', [E.Message, LPomFilename])
-                else
-                  raise;
-              end;
-            End;
-          end
-          {$ENDREGION}
-
-          {$REGION 'their is no pom'}
-          //If it's a directory and not an archive (jar/aar) then do no show any warning
-          //because no pom could be associated with a directory
-          else begin
-            Writeln(
-              'Skip ' + String(LLibrary.GetChildNodeValueText('archivefilename', '') + ' (no pom file found)'),
-              TALConsoleColor.ccAqua,
-              true{ASkipDuplicates});
-          end;
-          {$ENDREGION}
-
+        end
+        else begin
+          if LLibraryArchiveFileName = '' then raise Exception.Create('Error 6AF219E0-8FDC-4C2A-A112-BBFDB91B9580');
+          if LPomFileName <> '' then raise Exception.Create('Error 6F7C2A3E-76E2-44A6-A2D5-D0BCA4C2F1EA');
+          Writeln('Skip '+string(LLibraryArchiveFileName) + ' (no pom file found)', TALConsoleColor.ccAqua);
+          continue;
         end;
       end;
+      var LBuildGradleSrc := ALGetStringFromFile(LBuildGradleFileName, TEncoding.UTF8);
+      LBuildGradleSrc := ALStringReplaceW(LBuildGradleSrc, '%dependencies%', ALTrimRight(String(LBuildGradledependencies)), [RfIgnoreCase]);
+      ALSaveStringtoFile(LBuildGradleSrc, LBuildGradleFileName, Tencoding.UTF8, false{WriteBOM});
+      //---
+      var LSettingGradleFileName := LDependenciesWalkerTmpDir + 'settings.gradle';
+      var LLocalMavenRepositoryStr := '';
+      if LLocalMavenRepositoryDir <> '' then begin
+        LLocalMavenRepositoryStr := ALStringReplaceW(LLocalMavenRepositoryDir,'\','/',[RfReplaceALL]);
+        LLocalMavenRepositoryStr := 'maven {url uri("file://'+LLocalMavenRepositoryStr+'")}';
+      end;
+      var LSettingGradleSrc := ALGetStringFromFile(LSettingGradleFileName, TEncoding.UTF8);
+      LSettingGradleSrc := ALStringReplaceW(LSettingGradleSrc, '%LocalMavenRepository%', LLocalMavenRepositoryStr, [RfIgnoreCase]);
+      ALSaveStringtoFile(LSettingGradleSrc, LSettingGradleFileName, Tencoding.UTF8, false{WriteBOM});
+      //---
+      //run gradle
+      Var LGradleResultSrc: AnsiString;
+      Var LInputStream := TMemorystream.Create;
+      Var LOutputStream := TStringStream.Create;
+      try
+        var LcmdLine := LDependenciesWalkerTmpDir + 'gradlew.bat app:dependencies --configuration releaseRuntimeClasspath --project-dir '+LDependenciesWalkerTmpDir;
+        OverWrite(LcmdLine);
+        Var LCmdLineResult := ALWinExecW(
+                                LcmdLine, // const aCommandLine: String;
+                                LDependenciesWalkerTmpDir, // const aCurrentDirectory: AnsiString;
+                                GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
+                                LInputStream, // const aInputStream: Tstream;
+                                LOutputStream); //const aOutputStream: TStream;
+        if LCmdLineResult <> 0 then
+          raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
+        LGradleResultSrc := AnsiString(LOutputStream.DataString);
+      finally
+        ALFreeandNil(LInputStream);
+        ALFreeandNil(LOutputStream);
+      end;
+      //analyze LGradleResultSrc
+      var LInDependanciesTree: Boolean := False;
+      Var LGradleResultLst := TALStringListA.Create;
+      try
+        LGradleResultLst.Text := LGradleResultSrc;
+        for Var I := 0 to LGradleResultLst.Count - 1 do begin
+          Var LLine := ALTrim(LGradleResultLst[i]); // |    |    |    \--- androidx.annotation:annotation:1.1.0 -> 1.3.0
+          If ALSameTextA(LLine, 'releaseRuntimeClasspath - Resolved configuration for runtime for variant: release') then begin
+            LInDependanciesTree := True;
+            Continue;
+          end;
+          if not LInDependanciesTree then continue;
+          if LLine = '' then break;
+          if ALSameTextA(LLine, 'No dependencies') then break;
+          while (LLine <> '') and (LLine[low(LLine)] in ['+','|','\','-', ' ']) do
+            delete(LLine, 1, 1); // androidx.annotation:annotation:1.1.0 -> 1.3.0
+          Var LLst := TALStringListA.Create;
+          Try
+            LLst.LineBreak := ':';
+            LLst.Text := LLine;
+            if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE ('+String(LLine)+')');
+            var LDependencyGroupID := LLst[0]; // androidx.annotation
+            var LDependencyArtifactID := LLst[1]; // annotation
+            var LDependencyVersion := LLst[2]; // 1.1.0 -> 1.3.0 (*)
+            Var P := ALPosA('->', LDependencyVersion);
+            if P > 0 then begin
+              delete(LDependencyVersion, 1, P+1); //  1.3.0 (*)
+            end;
+            //(*) - dependencies omitted (listed previously)
+            LDependencyVersion := ALStringReplaceA(LDependencyVersion, '(*)', '', []); //  1.3.0
+            //(c) - dependency constraint
+            LDependencyVersion := ALStringReplaceA(LDependencyVersion, '(c)', '', []);
+            LDependencyVersion := ALTrim(LDependencyVersion); // 1.3.0
+            if ALPosIgnoreCaseA('FAILED', LDependencyVersion) > 0 then begin
+              LDependencyVersion := ALTrim(ALStringReplaceA(LDependencyVersion, 'FAILED', '', [RfIgnoreCase]));
+              Writeln(
+                'Cannot resolve '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
+                TALConsoleColor.ccPurple,
+                true{ASkipDuplicates});
+            end
+            else begin
+              if ALPosA(' ', LDependencyVersion) > 0 then raise Exception.Create('Error CD3F7D9C-874C-4089-B674-9CCCE4AFA50E'#13#10+string(LGradleResultSrc));
+              if FindLibraryNode(
+                   LLibraries, // const ALibraries: TALJSONNodeA;
+                   LDependencyGroupID, // const AGroupID: AnsiString;
+                   LDependencyArtifactID, // const AArtifactID: AnsiString;
+                   LDependencyVersion) <> nil then continue; // const AVersion: AnsiString): TALJSONNodeA; then
+              var LLocalArchivefilename: String;
+              var LLocalpomfilename: String;
+              if LDownloadDependencies and
+                 DownloadLibraryFromCentralMavenRepository(
+                   LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
+                   LDependencyGroupID, // const AGroupID: AnsiString;
+                   LDependencyArtifactID, // const AArtifactID: AnsiString;
+                   LDependencyVersion, // const AVersion: AnsiString;
+                   LLocalArchivefilename, // out ALocalArchivefilename: String;
+                   LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
+                With LLibraries.AddChild('library', ntObject) do begin
+                  Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
+                  Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
+                  Addchild('version').Text := LDependencyVersion; // 23.1.0
+                  Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
+                  Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
+                  Addchild('dependencyrequirements', ntarray);
+                end;
+              end
+              else begin
+                Writeln(
+                  'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
+                  TALConsoleColor.ccPurple,
+                  true{ASkipDuplicates});
+              end;
+            end;
+          Finally
+            ALFreeAndNil(LLst);
+          End;
+        end;
+      finally
+        ALFreeAndNil(LGradleResultLst);
+      end;
+      if LInDependanciesTree = False then
+        raise Exception.Create('Error FD57344C-9716-421F-B210-6E5E7B367418');
       {$ENDREGION}
 
       {$REGION 'init LSupportLibraryToAndroidx'}
@@ -3036,8 +2255,8 @@ begin
         var LcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar';
         var LJarFiles := TDirectory.GetFiles(LLibsOutputDir, '*.jar', TSearchOption.soTopDirectoryOnly);
         for var LJarFile in LJarFiles do begin
-          Var LInputStream := TMemorystream.Create;
-          Var LOutputStream := TStringStream.Create;
+          LInputStream := TMemorystream.Create;
+          LOutputStream := TStringStream.Create;
           try
             var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LOutputDir+'\JavaInterfaces_'+ALExtractFileName(LJarFile, true{RemoveFileExt})+'_'+ALIntToStrW(ALDateTimeToUnixMs(Now))+'"';
             OverWrite(LTmpCmdLine);
@@ -3245,7 +2464,7 @@ begin
           if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
           //init LDeployFilesToDeactivate
-          {$IFNDEF ALCompilerVersionSupported122}
+          {$IFNDEF ALCompilerVersionSupported123}
             {$MESSAGE WARN 'Check if no new Android resource files were added in DeployProjNormalizer'}
           {$ENDIF}
           LDeployFilesToDeactivate.Add('Android_Strings=<PlatForm>\<Config>\strings.xml');
@@ -3256,6 +2475,7 @@ begin
           LDeployFilesToDeactivate.Add('AndroidSplashStyles=<PlatForm>\<Config>\styles.xml');
           LDeployFilesToDeactivate.Add('AndroidSplashStylesV21=<PlatForm>\<Config>\styles-v21.xml|styles.xml');
           LDeployFilesToDeactivate.Add('AndroidSplashStylesV31=<PlatForm>\<Config>\styles-v31.xml|styles.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashStylesV35=<PlatForm>\<Config>\styles-v35.xml|styles.xml');
           LDeployFilesToDeactivate.Add('Android_AdaptiveIcon=<PlatForm>\<Config>\ic_launcher.xml');
           LDeployFilesToDeactivate.Add('Android_AdaptiveIconV33=<PlatForm>\<Config>\ic_launcher-v33.xml|ic_launcher.xml');
           LDeployFilesToDeactivate.Add('Android_VectorizedNotificationIcon=$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml|ic_notification.xml');
@@ -3554,7 +2774,6 @@ begin
       Writeln('    -Platforms=Default Android;Android64. Separate Platforms with '';''.');
       Writeln('    -GoogleServicesJson=Path to the google-services.json');
       Writeln('    -DProjNormalizer=Path to the Alcinoe DProjNormalizer tool.');
-      Writeln('    -UseGradle=Use Gradle build tool to retrieve the dependencies. default false');
       Writeln('    -GenerateNativeBridgeFile=Generate in OutputDir the Delphi native bridge file from the Java libraries.');
       Writeln('    -NoInteraction=Non-interactive mode.');
       Writeln('');
@@ -3565,8 +2784,7 @@ begin
       Writeln('    -OutputDir=c:\MyProject\Android\Merged^');
       Writeln('    -DProj=c:\MyProject\MyProject.dproj^');
       Writeln('    -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^');
-      Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^');
-      Writeln('    -UseGradle=true');
+      Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe');
       Writeln('');
       Writeln('');
       Writeln('Merge failed!');

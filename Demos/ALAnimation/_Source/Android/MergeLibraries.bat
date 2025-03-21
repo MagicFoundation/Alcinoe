@@ -29,7 +29,6 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -DProj="%ALBaseDir%\Demos\ALAnimation\_Source\ALAnimationDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALAnimation\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -UseGradle=true^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 
 

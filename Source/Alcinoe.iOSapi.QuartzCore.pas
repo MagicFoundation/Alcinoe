@@ -12,7 +12,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2424 has been resolved. If resolved, remove the definitions below.'}
   {$ENDIF}
   CAFrameRateRange = record
@@ -22,7 +22,7 @@ type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2424 has been resolved. If resolved, remove the definitions below.'}
   {$ENDIF}
   ALCADisplayLinkClass = interface(CADisplayLinkClass)

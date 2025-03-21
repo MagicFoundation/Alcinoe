@@ -13,7 +13,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-16853 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALAVPlayerItemClass = interface(AVPlayerItemClass)

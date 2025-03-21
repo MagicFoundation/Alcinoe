@@ -11,7 +11,7 @@ uses
 
 type
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-44100 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALBitmapClass = interface(JBitmapClass)
@@ -26,7 +26,7 @@ type
   TJALBitmap = class(TJavaGenericImport<JALBitmapClass, JALBitmap>) end; //https://quality.embarcadero.com/browse/RSP-44100
 
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-44102 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALRecordingCanvasClass = interface(JRecordingCanvasClass)
@@ -43,7 +43,7 @@ type
   TJALRecordingCanvas = class(TJavaGenericImport<JALRecordingCanvasClass, JALRecordingCanvas>) end;
 
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2992 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALMotionEventClass = interface(JMotionEventClass)

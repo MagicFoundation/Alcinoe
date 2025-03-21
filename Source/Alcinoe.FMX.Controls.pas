@@ -15,7 +15,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
@@ -66,7 +66,7 @@ type
     MostBottomRight); // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the right.
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALControl = class(TControl)
@@ -149,7 +149,7 @@ type
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
     property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
-    {$IFNDEF ALCompilerVersionSupported122}
+    {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
@@ -166,7 +166,7 @@ type
   end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALContent = class(TALControl, IContent)
@@ -259,7 +259,7 @@ Type
 constructor TALControl.Create(AOwner: TComponent);
 begin
   inherited;
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if MarginsChanged is not implemented in FMX.Controls.TControl and adjust the IFDEF'}
   {$ENDIF}
   FFormerMarginsChangedHandler := Margins.OnChange;
@@ -479,7 +479,7 @@ begin
   //ALLog(ClassName+'.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
   {$ENDIF}
   // I decided to remove this workaround because it doesn't
@@ -504,7 +504,7 @@ begin
   if TNonReentrantHelper.EnterSection(FIsSetBoundsLocked) then begin
     try
 
-      {$IFNDEF ALCompilerVersionSupported122}
+      {$IFNDEF ALCompilerVersionSupported123}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
       {$ENDIF}
       //TALAlignLayout.TopCenter
@@ -604,7 +604,7 @@ begin
     AHeight := Height;
   end;
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
   //TALAlignLayout.TopCenter
@@ -1133,7 +1133,7 @@ end;
 {***********************************************}
 procedure TALControl.SetNewScene(AScene: IScene);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/DoMouseLeave/MouseDown/MouseUp/MouseClick'}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
@@ -1226,7 +1226,7 @@ end;
 {*************************************************************************************}
 procedure TALControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -1267,7 +1267,7 @@ end;
 {***********************************************************************************}
 procedure TALControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -1302,7 +1302,7 @@ begin
     {$ENDIF}
     exit;
   end;
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -1334,7 +1334,7 @@ end;
 {****************************************************}
 procedure TALControl.DoMatrixChanged(Sender: TObject);
 begin
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
   {$ENDIF}
@@ -1460,7 +1460,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if FMX.Controls.TContentTabList was not updated and adjust the IFDEF'}
 {$ENDIF}
 type

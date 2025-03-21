@@ -12,8 +12,8 @@ uses
 
 type
 
-  {$IFNDEF ALCompilerVersionSupported122}
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-39511 has been resolved. If resolved, remove the class definition below.'}
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationClass = interface(JNotificationClass)
     ['{D0C93C68-19D5-4CB6-997B-19EC96149450}']
@@ -26,8 +26,8 @@ type
   end;
   TJALNotification = class(TJavaGenericImport<JALNotificationClass, JALNotification>) end;
 
-  {$IFNDEF ALCompilerVersionSupported122}
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-39511 has been resolved. If resolved, remove the class definition below.'}
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationChannelClass = interface(JNotificationChannelClass)
     ['{118B9745-6C2E-466E-B0FC-CF86F896259B}']

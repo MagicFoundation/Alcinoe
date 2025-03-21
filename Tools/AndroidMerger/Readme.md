@@ -76,7 +76,6 @@ Usage
     -Platforms: Default Android;Android64. Separate Platforms with ';'.
     -GoogleServicesJson: Path to the google-services.json
     -DProjNormalizer: Path to the Alcinoe DProjNormalizer tool.
-    -UseGradle: Use Gradle build tool to retrieve the dependencies. default false
     -GenerateNativeBridgeFile: Generate in OutputDir the Delphi native bridge file from the Java libraries.
     -NoInteraction: Non-interactive mode.
 ```
@@ -91,8 +90,7 @@ Example
     -OutputDir=c:\MyProject\Android\Merged^
     -DProj=c:\MyProject\MyProject.dproj^
     -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^
-    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^
-    -UseGradle=true
+    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe
 ```
  
 You can also check the ALFacebookLogin Demo and in particular the script:

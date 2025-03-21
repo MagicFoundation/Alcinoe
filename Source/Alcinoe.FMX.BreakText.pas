@@ -2188,7 +2188,7 @@ begin
                   // Set decoration kinds
                   // https://api.flutter.dev/flutter/painting/TextStyle/decoration.html
                   // The decorations to paint near the text (e.g., an underline).
-                  {$IFNDEF ALCompilerVersionSupported122}
+                  {$IFNDEF ALCompilerVersionSupported123}
                     {$MESSAGE WARN 'Check if declaration of System.Skia.TSkTextDecoration didn''t changed'}
                   {$ENDIF}
                   sk4d_textstyle_set_decorations(LTextStyle, Byte(LDecorationKind));
@@ -2269,7 +2269,7 @@ begin
 
                   // Add the text or PlaceHolder
                   if LCurrImgSrc <> '' then begin
-                    {$IFNDEF ALCompilerVersionSupported122}
+                    {$IFNDEF ALCompilerVersionSupported123}
                       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
                     {$ENDIF}
                     var LPlaceholderStyle: sk_placeholderstyle_t;

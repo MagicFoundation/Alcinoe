@@ -21,8 +21,6 @@ mkdir "%FileName%"
 SET FileName=%ALBaseDir%\Embarcadero\Athens\rtl
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
-mkdir "%FileName%"
-mkdir "%FileName%\common"
 
 SET FileName=%ALBaseDir%\Embarcadero\Athens\data
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
@@ -33,12 +31,6 @@ mkdir "%FileName%\firedac"
 echo Copy "%EmbSourceDir%\fmx"
 xcopy /Q "%EmbSourceDir%\fmx" "%ALBaseDir%\Embarcadero\Athens\fmx"
 IF ERRORLEVEL 1 goto ERROR
-
-IF EXIST "%EmbSourceDir%\rtl\common\System.Skia.API.pas" (
-  echo Copy "%EmbSourceDir%\rtl\common\System.Skia.API.pas"
-  copy /Y "%EmbSourceDir%\rtl\common\System.Skia.API.pas" "%ALBaseDir%\Embarcadero\Athens\rtl\common\System.Skia.API.pas"
-  IF ERRORLEVEL 1 goto ERROR
-)
 
 echo Copy "%EmbSourceDir%\data\firedac"
 xcopy /Q "%EmbSourceDir%\data\firedac" "%ALBaseDir%\Embarcadero\Athens\data\firedac"

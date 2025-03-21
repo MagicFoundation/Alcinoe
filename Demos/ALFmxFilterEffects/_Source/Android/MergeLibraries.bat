@@ -29,7 +29,6 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -DProj="%ALBaseDir%\Demos\ALFmxFilterEffects\_Source\ALFmxFilterEffectsDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALFmxFilterEffects\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -UseGradle=true^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 
 

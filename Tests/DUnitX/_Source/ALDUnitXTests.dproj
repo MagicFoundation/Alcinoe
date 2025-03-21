@@ -452,7 +452,7 @@
     <UsingDelphiRTL>true</UsingDelphiRTL>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-    <DCC_UnitSearchPath>$(DUnitX);..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;..\..\..\Embarcadero\Athens\rtl\common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>$(DUnitX);..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <SanitizedProjectName>ALDUnitXTests</SanitizedProjectName>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>

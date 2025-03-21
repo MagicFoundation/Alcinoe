@@ -10,17 +10,10 @@
   <uses-sdk android:minSdkVersion="%minSdkVersion%"
             android:targetSdkVersion="%targetSdkVersion%"/>
             
-      <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <%uses-permission%>
     
   <uses-feature android:glEsVersion="0x00020000"
-                android:required="True"/>
+                android:required="true"/>
 
   <queries>
     <%queries-child-elements%>
@@ -43,8 +36,9 @@
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
                android:icon="@mipmap/ic_launcher"
-               android:theme="@android:style/Theme.NoTitleBar"
+               android:theme="@style/AppTheme"
                android:hardwareAccelerated="%hardwareAccelerated%"
+               android:usesCleartextTraffic="true"
                android:resizeableActivity="true"
                android:requestLegacyExternalStorage="true">
 
@@ -76,13 +70,16 @@
               android:label="%activityLabel%"
               android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout|uiMode"
               android:launchMode="singleTask">
+
         <!-- Tell NativeActivity the name of our .so -->
         <meta-data android:name="android.app.lib_name"
                    android:value="%libNameValue%"/>
+
         <intent-filter>  
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent-filter> 
+
     </activity>
     
     <%activity%>

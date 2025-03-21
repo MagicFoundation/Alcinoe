@@ -4,7 +4,7 @@ SETLOCAL
 Set NoInteraction=true
 if "%ALBaseDir%"=="" (
   Set NoInteraction=false
-  call "%~dp0\..\..\..\..\InitEnvironment.bat" >nul
+  call "%~dp0\..\..\..\..\..\InitEnvironment.bat" >nul
   IF ERRORLEVEL 1 goto ERROR  
 )
 
@@ -30,7 +30,6 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -DProj="%ALBaseDir%\Demos\ALLiveVideoChat\Client\_Source\ALLiveVideoChatClient.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALLiveVideoChat\Client\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -UseGradle=true^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 
 

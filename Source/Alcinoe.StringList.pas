@@ -33,15 +33,15 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported122}
-  {$MESSAGE WARN 'Check if System.classes.TStringsEnumerator didn''t change and adjust the IFDEF'}
+{$IFNDEF ALCompilerVersionSupported123}
+  {$  MESSAGE WARN 'Check if System.classes.TStringsEnumerator didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
@@ -4126,7 +4126,7 @@ end;
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<K,V> was not updated and adjust the IFDEF'}
   {$ENDIF}
   _TObjectDictionaryAccessPrivate<K,V> = class(TObjectDictionary<K,V>)

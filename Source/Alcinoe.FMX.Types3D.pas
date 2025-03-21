@@ -16,7 +16,7 @@ uses
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextureAccessPrivate = class(TInterfacedPersistent)
@@ -129,7 +129,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 //
@@ -207,7 +207,7 @@ begin
   if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign and FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture are still the same as below and adjust the IFDEF'}
   {$ENDIF}
   if (Handle <> 0) and

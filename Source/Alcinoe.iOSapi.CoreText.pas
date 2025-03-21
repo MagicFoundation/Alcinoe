@@ -10,7 +10,7 @@ uses
 {$M+}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1938 has been resolved. If resolved, remove the functions below.'}
 {$ENDIF}
 function kCTFontSymbolicTrait: CFStringRef; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1938

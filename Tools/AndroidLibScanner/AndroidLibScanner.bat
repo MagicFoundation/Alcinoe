@@ -10,7 +10,6 @@ set /p Libraries="Enter Libraries: "
  -LocalMavenRepositoryDir="%ALBaseDir%\..\Libraries\jar\"^
  -Libraries="%Libraries%"^
  -OutputDir="%ALBaseDir%\Output"^
- -UseGradle=true^
  -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
  

@@ -11,14 +11,14 @@ uses
 {$M+}
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19878 has been resolved. If resolved, remove the functions below.'}
 {$ENDIF}
 function kCIInputImageKey: NSString; // https://quality.embarcadero.com/browse/RSP-19878
 function kCIInputRadiusKey: NSString; // https://quality.embarcadero.com/browse/RSP-19878
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported122}
+{$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-44130 has been resolved. If resolved, remove the functions below.'}
 {$ENDIF}
 function kCIFormatRGBA8: CIFormat; // https://quality.embarcadero.com/browse/RSP-44130

@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{5148A347-83D2-463A-8E4D-3015A05EBFAB}</ProjectGuid>
-    <ProjectVersion>20.2</ProjectVersion>
+    <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>VCL</FrameworkType>
     <MainSource>ALLibPhoneNumberDemo.dpr</MainSource>
     <Base>True</Base>

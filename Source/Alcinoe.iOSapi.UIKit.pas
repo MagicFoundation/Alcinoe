@@ -20,7 +20,7 @@ type
   end;
   ALUITextView = interface(UITextView)
     ['{1B6B1339-95D5-466E-9214-C57C2AE58B4D}']
-    {$IFNDEF ALCompilerVersionSupported122}
+    {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-860 has been resolved. If resolved, remove the class definition below.'}
     {$ENDIF}
     function textContainer: NSTextContainer; cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-860
@@ -28,7 +28,7 @@ type
     function typingAttributes: NSDictionary; cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-860
     procedure setSelectable(selectable: Boolean); cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-860
     function isSelectable: Boolean; cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-860
-    {$IFNDEF ALCompilerVersionSupported122}
+    {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941 has been resolved. If resolved, remove the class definition below.'}
     {$ENDIF}
     function layoutManager : NSLayoutManager; cdecl; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941
@@ -36,7 +36,7 @@ type
   TALUITextView = class(TOCGenericImport<ALUITextViewClass, ALUITextView>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALUITextFieldClass = interface(UITextFieldClass)
@@ -49,7 +49,7 @@ type
   TUITextField = class(TOCGenericImport<ALUITextFieldClass, ALUITextField>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2993 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALUIEventClass = interface(UIEventClass)
@@ -62,7 +62,7 @@ type
   TALUIEvent = class(TOCGenericImport<ALUIEventClass, ALUIEvent>)  end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-43458 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   ALUIScreenClass = interface(UIScreenClass)

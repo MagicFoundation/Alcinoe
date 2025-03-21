@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar"> 
+    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    <item name="android:forceDarkAllowed">false</item>
+    <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
+    <item name="android:colorAccent">#ff0288d1</item>
+    <item name="android:windowSplashScreenBackground">@color/splashscreen_background</item>
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/splashscreen_icon</item>
+    <item name="Material3LightFilledEditTextStyle">@style/Material3LightFilledEditTextStyle</item>
+    <item name="Material3LightOutlinedEditTextStyle">@style/Material3LightOutlinedEditTextStyle</item>
+    <item name="Material3DarkFilledEditTextStyle">@style/Material3DarkFilledEditTextStyle</item>
+    <item name="Material3DarkOutlinedEditTextStyle">@style/Material3DarkOutlinedEditTextStyle</item>
+    <item name="Material3LightFilledErrorEditTextStyle">@style/Material3LightFilledErrorEditTextStyle</item>
+    <item name="Material3LightOutlinedErrorEditTextStyle">@style/Material3LightOutlinedErrorEditTextStyle</item>
+    <item name="Material3DarkFilledErrorEditTextStyle">@style/Material3DarkFilledErrorEditTextStyle</item>
+    <item name="Material3DarkOutlinedErrorEditTextStyle">@style/Material3DarkOutlinedErrorEditTextStyle</item>
+    <item name="android:datePickerDialogTheme">@style/AppThemeDatePickerDialogTheme</item>
+  </style>
+</resources>

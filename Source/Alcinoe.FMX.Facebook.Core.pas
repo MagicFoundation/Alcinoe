@@ -241,7 +241,7 @@ begin
         'Url: ' + Lcontext.URL);
       {$ENDIF}
       if not _ALFacebookInitialised then exit;
-      {$IFNDEF ALCompilerVersionSupported122}
+      {$IFNDEF ALCompilerVersionSupported123}
         //Ios doc say iOS 13 moved opening URL functionality to the SceneDelegate. If you are
         //using iOS 13, add the following method to your SceneDelegate so that operations like
         //logging in or sharing function as intended (https://developers.facebook.com/docs/ios/getting-started)
@@ -265,7 +265,7 @@ begin
         'ALFmxFacebookCoreApplicationEventHandler',
         'Event: FinishedLaunching');
       {$ENDIF}
-      {$IFNDEF ALCompilerVersionSupported122}
+      {$IFNDEF ALCompilerVersionSupported123}
         {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40351 is implemented like expected (With TiOSOpenApplicationContext)'}
       {$ENDIF}
       var LdidFinishLaunchingWithOptions: NSDictionary;

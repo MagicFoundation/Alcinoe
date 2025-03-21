@@ -155,6 +155,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-hdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -253,6 +262,15 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-mdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-v21\notification_action_background.xml">
       <DeployClass>File</DeployClass>
@@ -371,6 +389,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxhdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -424,6 +451,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable\common_google_signin_btn_icon_dark.xml">
       <DeployClass>File</DeployClass>
@@ -587,6 +632,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
       <RemoteName>notification_tile_bg.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable\splashscreen.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
+      <RemoteName>splashscreen.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\layout-v16\notification_template_custom_big.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -695,6 +749,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
       <RemoteName>notification_template_part_time.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-anydpi-v26\ic_launcher.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-anydpi-v26\</RemoteDir>
+      <RemoteName>ic_launcher.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -703,6 +766,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -713,6 +794,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -721,6 +820,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -731,6 +848,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -739,6 +874,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -2153,6 +2306,33 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v29\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v29\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v31\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v31\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v35\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2242,6 +2422,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values\colors.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>colors.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values\values.xml">
       <DeployClass>File</DeployClass>
@@ -2406,6 +2604,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-hdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2504,6 +2711,15 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-mdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-v21\notification_action_background.xml">
       <DeployClass>File</DeployClass>
@@ -2622,6 +2838,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxhdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2675,6 +2900,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable\common_google_signin_btn_icon_dark.xml">
       <DeployClass>File</DeployClass>
@@ -2838,6 +3081,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
       <RemoteName>notification_tile_bg.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable\splashscreen.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
+      <RemoteName>splashscreen.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\layout-v16\notification_template_custom_big.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2946,6 +3198,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
       <RemoteName>notification_template_part_time.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-anydpi-v26\ic_launcher.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-anydpi-v26\</RemoteDir>
+      <RemoteName>ic_launcher.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2954,6 +3215,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -2964,6 +3243,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2972,6 +3269,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -2982,6 +3297,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2990,6 +3323,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -4404,6 +4755,33 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v29\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v29\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v31\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v31\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v35\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -4493,6 +4871,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values\colors.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>colors.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values\values.xml">
       <DeployClass>File</DeployClass>
@@ -4659,6 +5055,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-hdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -4757,6 +5162,15 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-mdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-v21\notification_action_background.xml">
       <DeployClass>File</DeployClass>
@@ -4875,6 +5289,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxhdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -4928,6 +5351,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable\common_google_signin_btn_icon_dark.xml">
       <DeployClass>File</DeployClass>
@@ -5091,6 +5532,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
       <RemoteName>notification_tile_bg.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable\splashscreen.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
+      <RemoteName>splashscreen.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\layout-v16\notification_template_custom_big.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -5199,6 +5649,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
       <RemoteName>notification_template_part_time.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-anydpi-v26\ic_launcher.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-anydpi-v26\</RemoteDir>
+      <RemoteName>ic_launcher.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -5207,6 +5666,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -5217,6 +5694,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -5225,6 +5720,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -5235,6 +5748,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -5243,6 +5774,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -6657,6 +7206,33 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v29\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v29\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v31\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v31\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v35\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -6746,6 +7322,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values\colors.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>colors.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values\values.xml">
       <DeployClass>File</DeployClass>
@@ -6910,6 +7504,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-hdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7008,6 +7611,15 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-mdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-v21\notification_action_background.xml">
       <DeployClass>File</DeployClass>
@@ -7126,6 +7738,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxhdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7179,6 +7800,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable\common_google_signin_btn_icon_dark.xml">
       <DeployClass>File</DeployClass>
@@ -7342,6 +7981,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
       <RemoteName>notification_tile_bg.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable\splashscreen.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\drawable\</RemoteDir>
+      <RemoteName>splashscreen.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\layout-v16\notification_template_custom_big.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7450,6 +8098,15 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
       <RemoteName>notification_template_part_time.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-anydpi-v26\ic_launcher.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-anydpi-v26\</RemoteDir>
+      <RemoteName>ic_launcher.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7458,6 +8115,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -7468,6 +8143,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7476,6 +8169,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -7486,6 +8197,24 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7494,6 +8223,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_background.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_background.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_foreground.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher_foreground.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -8908,6 +9655,33 @@
       <RemoteDir>ALGeoPositionSensorDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v29\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v29\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v31\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v31\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v35\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values-v35\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-vi\values-vi.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -8997,6 +9771,24 @@
       <RemoteCommand/>
       <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values\colors.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>colors.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALGeoPositionSensorDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values\values.xml">
       <DeployClass>File</DeployClass>

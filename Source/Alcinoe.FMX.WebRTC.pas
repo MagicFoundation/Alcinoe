@@ -528,7 +528,7 @@ var LJListIceServers: JList;
 {$IF defined(ios)}
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported122}
+  {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
   {$ENDIF}
   procedure _InitTexture(const aTexture: TTexture);
@@ -2503,7 +2503,7 @@ begin
       glBindTexture(GL_TEXTURE_2D, 0);
 
       //-----
-      {$IFNDEF ALCompilerVersionSupported122}
+      {$IFNDEF ALCompilerVersionSupported123}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := LLumaWidth;

@@ -39,6 +39,12 @@ git mv xxx2 XXX
 Git LFS
 -------
 
+Every account using Git Large File Storage receives 
+1 GiB of free storage and 1 GiB a month of free bandwidth. 
+If the bandwidth and storage quotas are not enough, you can 
+choose to purchase an additional quota for Git LFS. 
+Unused bandwidth doesn't roll over month-to-month.
+
 To associate a file type in your repository with Git LFS
 git lfs track "*.psd"
 
@@ -49,3 +55,11 @@ fatal: detected dubious ownership in repository
 https://medium.com/@thecodinganalyst/git-detect-dubious-ownership-in-repository-e7f33037a8f
 In my case the owner was built-in Administrators group and
 my solution was just to change it to me
+
+------------------------------------------------------------------------------------
+Undo the Act of Committing and Also Unstage Your Changes, But Keep Your Files Intact
+------------------------------------------------------------------------------------
+
+https://kodekloud.com/blog/git-uncommit-last-commit/
+
+git reset HEAD~1

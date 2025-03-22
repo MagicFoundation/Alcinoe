@@ -416,6 +416,7 @@ uses
   Macapi.CoreFoundation,
   iOSapi.CocoaTypes,
   Macapi.Helpers,
+  FMX.Platform.iOS,
   FMX.Helpers.iOS,
   FMX.Consts,
   {$ELSEIF defined(ALMacOS)}
@@ -503,10 +504,24 @@ begin
      (not view.isFirstResponder) and
      (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
     Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
     Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 
@@ -517,9 +532,23 @@ begin
      (not view.isFirstResponder) and
      (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
     Form.MouseLeave;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 
@@ -530,9 +559,23 @@ begin
      (not view.isFirstResponder) and
      (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
     Form.MouseLeave;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 
@@ -543,8 +586,22 @@ begin
      (not view.isFirstResponder) and
      (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 

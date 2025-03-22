@@ -1181,11 +1181,13 @@ uses
   Androidapi.JNI.Os,
   FMX.Platform,
   FMX.Platform.Android,
+  FMX.Platform.UI.Android,
   {$ELSEIF defined(IOS)}
   Macapi.CoreFoundation,
   iOSapi.CocoaTypes,
   Macapi.Helpers,
   iOSapi.CoreText,
+  FMX.Platform.iOS,
   FMX.Helpers.iOS,
   FMX.Consts,
   Alcinoe.iOSapi.Foundation,
@@ -1505,6 +1507,16 @@ begin
      (not FeditText.view.hasFocus) and
      ((not FeditText.fIsMultiline) or
       (FeditText.FEditControl.getLineCount < FeditText.FeditControl.Height / FeditText.FeditControl.getLineHeight)) then begin
+
+    var LHandle: TAndroidWindowHandle;
+    if FEditText.Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(FEditText.Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentMotionEvent := event;
+
     var LTouchPoint := TPointF.Create(event.getRawX / ALGetScreenScale, event.getRawY / ALGetScreenScale);
     LTouchPoint := FEditText.Form.ScreenToClient(LTouchPoint);
     var LEventAction := event.getAction;
@@ -1526,6 +1538,10 @@ begin
       FEditText.Form.MouseLeave;
     end;
     Result := True;
+
+    if LHandle <> nil then
+      LHandle.CurrentMotionEvent := nil;
+
   end
   else begin
     // In Android, within a single-line EditText, it's possible for the text line to shift slightly vertically
@@ -2188,10 +2204,24 @@ begin
   if (Form <> nil) and
      (not view.isFirstResponder) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
     Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
     Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 
@@ -2201,9 +2231,23 @@ begin
   if (Form <> nil) and
      (not view.isFirstResponder) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
     Form.MouseLeave;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 
@@ -2213,9 +2257,23 @@ begin
   if (Form <> nil) and
      (not view.isFirstResponder) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
     Form.MouseLeave;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 
@@ -2225,8 +2283,22 @@ begin
   if (Form <> nil) and
      (not view.isFirstResponder) and
      (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
     var LTouchPoint := ExtractFirstTouchPoint(touches);
     Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
   end;
 end;
 

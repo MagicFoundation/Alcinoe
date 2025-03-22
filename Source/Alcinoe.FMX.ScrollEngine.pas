@@ -3072,12 +3072,18 @@ end;
 {****************************************************************}
 procedure TALScrollEngine.MouseDown(const AHandle: TWindowHandle);
 begin
-  if FTouchTracking = [] then exit;
+  if (AHandle = nil) or (FTouchTracking = []) then exit;
 
   {$IF defined(ANDROID)}
-  var LCurrentMotionEvent := TJALMotionEvent.wrap(WindowHandleToPlatform(AHandle).MotionManager.CurrentMotionEvent);
-  if (LCurrentMotionEvent = nil) or
-     (LCurrentMotionEvent.getPointerCount = 0) or
+  var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
+  if LTmpCurrentMotionEvent = nil then begin
+    {$IF defined(DEBUG)}
+    ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseDown', 'CurrentMotionEvent is nil', TALLogType.ERROR);
+    {$ENDIF}
+    exit;
+  end;
+  var LCurrentMotionEvent := TJALMotionEvent.wrap(LTmpCurrentMotionEvent);
+  if (LCurrentMotionEvent.getPointerCount = 0) or
      (LCurrentMotionEvent.getActionMasked <> AMOTION_EVENT_ACTION_DOWN) then exit;
   //--
   var LMovement: TMovement;
@@ -3093,9 +3099,15 @@ begin
   {$ENDIF}
 
   {$IF defined(IOS)}
-  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(WindowHandleToPlatform(AHandle).CurrentTouchEvent));
-  if (LCurrentTouchEvent = nil) or
-     (LCurrentTouchEvent.AllTouches = nil) or
+  var LTmpCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
+  if LTmpCurrentTouchEvent = nil then begin
+    {$IF defined(DEBUG)}
+    ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseDown', 'CurrentTouchEvent is nil', TALLogType.ERROR);
+    {$ENDIF}
+    exit;
+  end;
+  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(LTmpCurrentTouchEvent));
+  if (LCurrentTouchEvent.AllTouches = nil) or
      (LCurrentTouchEvent.AllTouches.count = 0) then exit;
   var LTouch := TUITouch.Wrap(LCurrentTouchEvent.alltouches.anyObject);
   if LTouch.phase <> UITouchPhaseBegan then exit;
@@ -3204,12 +3216,18 @@ end;
 {****************************************************************}
 procedure TALScrollEngine.MouseMove(const AHandle: TWindowHandle);
 begin
-  if not fDown then exit;
+  if (AHandle = nil) or (not fDown) then exit;
 
   {$IF defined(ANDROID)}
-  var LCurrentMotionEvent := TJALMotionEvent.wrap(WindowHandleToPlatform(AHandle).MotionManager.CurrentMotionEvent);
-  if (LCurrentMotionEvent = nil) or
-     (LCurrentMotionEvent.getPointerCount = 0) or
+  var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
+  if LTmpCurrentMotionEvent = nil then begin
+    {$IF defined(DEBUG)}
+    ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseMove', 'CurrentMotionEvent is nil', TALLogType.ERROR);
+    {$ENDIF}
+    exit;
+  end;
+  var LCurrentMotionEvent := TJALMotionEvent.wrap(LTmpCurrentMotionEvent);
+  if (LCurrentMotionEvent.getPointerCount = 0) or
      (LCurrentMotionEvent.getActionMasked <> AMOTION_EVENT_ACTION_MOVE) then exit;
   //--
   for var I := 0 to LCurrentMotionEvent.getHistorySize - 1 do begin
@@ -3238,9 +3256,15 @@ begin
   {$ENDIF}
 
   {$IF defined(IOS)}
-  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(WindowHandleToPlatform(AHandle).CurrentTouchEvent));
-  if (LCurrentTouchEvent = nil) or
-     (LCurrentTouchEvent.AllTouches = nil) or
+  var LTmpCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
+  if LTmpCurrentTouchEvent = nil then begin
+    {$IF defined(DEBUG)}
+    ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseMove', 'CurrentTouchEvent is nil', TALLogType.ERROR);
+    {$ENDIF}
+    exit;
+  end;
+  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(LTmpCurrentTouchEvent));
+  if (LCurrentTouchEvent.AllTouches = nil) or
      (LCurrentTouchEvent.AllTouches.count = 0) then exit;
   var LTouch := TUITouch.Wrap(LCurrentTouchEvent.alltouches.anyObject);
   if LTouch.phase <> UITouchPhaseMoved then exit;
@@ -3370,12 +3394,18 @@ end;
 {**************************************************************}
 procedure TALScrollEngine.MouseUp(const AHandle: TWindowHandle);
 begin
-  if not Fdown then exit;
+  if (AHandle = nil) or (not Fdown) then exit;
 
   {$IF defined(ANDROID)}
-  var LCurrentMotionEvent := TJALMotionEvent.wrap(WindowHandleToPlatform(AHandle).MotionManager.CurrentMotionEvent);
-  if (LCurrentMotionEvent = nil) or
-     (LCurrentMotionEvent.getPointerCount = 0) or
+  var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
+  if LTmpCurrentMotionEvent = nil then begin
+    {$IF defined(DEBUG)}
+    ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseUp', 'CurrentMotionEvent is nil', TALLogType.ERROR);
+    {$ENDIF}
+    exit;
+  end;
+  var LCurrentMotionEvent := TJALMotionEvent.wrap(LTmpCurrentMotionEvent);
+  if (LCurrentMotionEvent.getPointerCount = 0) or
      (LCurrentMotionEvent.getActionMasked <> AMOTION_EVENT_ACTION_UP) then exit;
   //--
   var LMovement: TMovement;
@@ -3389,11 +3419,16 @@ begin
                             LCurrentMotionEvent.getY(0)));
   FMovements.Add(LMovement);
   {$ENDIF}
-
   {$IF defined(IOS)}
-  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(WindowHandleToPlatform(AHandle).CurrentTouchEvent));
-  if (LCurrentTouchEvent = nil) or
-     (LCurrentTouchEvent.AllTouches = nil) or
+  var LTmpCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
+  if LTmpCurrentTouchEvent = nil then begin
+    {$IF defined(DEBUG)}
+    ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseUp', 'CurrentTouchEvent is nil', TALLogType.ERROR);
+    {$ENDIF}
+    exit;
+  end;
+  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(LTmpCurrentTouchEvent));
+  if (LCurrentTouchEvent.AllTouches = nil) or
      (LCurrentTouchEvent.AllTouches.count = 0) then exit;
   var LTouch := TUITouch.Wrap(LCurrentTouchEvent.alltouches.anyObject);
   if not LTouch.phase in [UITouchPhaseEnded, UITouchPhaseCancelled] then exit;

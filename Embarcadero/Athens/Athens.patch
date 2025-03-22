@@ -1768,38 +1768,24 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
  {                                                       }
  {              Delphi FireMonkey Platform               }
  {                                                       }
-@@ -26,6 +26,7 @@
+@@ -25,6 +25,7 @@
+   private
      FHandle: TOCLocal;
      FZOrderManager: TiOSZOrderManager;
++    FCurrentTouchEvent: UIEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
      function GetZOrderManager: TiOSZOrderManager;
-+    function GetCurrentTouchEvent: UIEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
    protected
      function GetView: UIView; virtual;
-     function GetGLView: GLKView; virtual;
-@@ -44,6 +45,7 @@
+@@ -44,6 +45,9 @@
      property Handle: TOCLocal read FHandle;
      /// <summary>Link to Z-Order manager that used as shared manager for platform controls
      property ZOrderManager: TiOSZOrderManager read GetZOrderManager;
-+    property CurrentTouchEvent: UIEvent read GetCurrentTouchEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    /// <summary>Gets or sets the current touch event associated with the form.</summary>
++    property CurrentTouchEvent: UIEvent read FCurrentTouchEvent write FCurrentTouchEvent;
    end;
  
    TiOSOpenApplicationContext = class
-@@ -586,6 +588,7 @@
-     FGestureControl: TComponent;
-     FMultiTouchManager: TMultiTouchManagerIOS;
-     FNoOfTouches: NativeUInt;
-+    FCurrentTouchEvent: UIEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
-     [Weak] FTextService: TTextServiceCocoa;
-     function GetView: UIView;
-     function GetTouchCoord(const touches: NSSet; const Window: UIView; var x, y: single): Boolean;
-@@ -636,6 +639,7 @@
-     procedure SingleTap(Sender: id); cdecl;
-     procedure LongTap(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
-     procedure DblTap(X, Y: Single);
-+    property CurrentTouchEvent: UIEvent read FCurrentTouchEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
-     { UIGestureRecognizerDelegate }
-     function gestureRecognizer(gestureRecognizer: UIGestureRecognizer; shouldReceiveTouch: UITouch): Boolean; overload; cdecl;
-     function gestureRecognizer(gestureRecognizer: UIGestureRecognizer; shouldRecognizeSimultaneouslyWithGestureRecognizer: UIGestureRecognizer): Boolean; overload; cdecl;
 @@ -1076,7 +1080,13 @@
      WindowManager.NativeWindow.makeKeyAndVisible;
  
@@ -1815,96 +1801,151 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      FMX.Forms.Application.RealCreateForms;
      TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
    finally
-@@ -2461,6 +2471,7 @@
-   FContextMenu := TFMXTextEditActionsMenu.Create(View);
-   FMultiTouchManager := nil;
-   FSavedFocusedControl := TDelegatedFreeNotify<IControl>.Create;
-+  FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
- end;
- 
- procedure TFMXViewBase.cut(Sender: id);
-@@ -3582,6 +3593,8 @@
+@@ -3577,11 +3587,22 @@
+   TextInput: ITextInput;
+   Obj: IControl;
+   Touch: UITouch;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ begin
+   try
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
-+    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
 +
      // find the control from under the gesture
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
      SendTouches(withEvent.allTouches, TTouchAction.Down, Obj);
-@@ -3609,6 +3622,7 @@
-       DefineFocusControl;
-     finally
+@@ -3611,6 +3632,11 @@
        FClickedAnotherControl := (Obj <> nil) and (FContextMenu.Control <> Obj.GetObject);
-+      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
        View.touchesBegan(touches, withEvent);
      end;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
    except
-@@ -3638,6 +3652,9 @@
+     Application.HandleException(Form);
+   end;
+@@ -3632,6 +3658,7 @@
+   X, Y : single;
+   Obj: IControl;
+   LPoint: TPointF;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ const
+   LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
+ begin
+@@ -3638,6 +3665,17 @@
    try
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
 +
-+    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
 +
      LPoint := TPointF.Create(X, Y);
      FShouldIgnoreNextClick := False;
      FAdditionalShift := [];
-@@ -3648,6 +3665,7 @@
-       DoLMouseUp(X, Y, [], False);
-       DefineSelectionStates;
+@@ -3650,6 +3688,11 @@
      finally
-+      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
        View.touchesCancelled(touches, withEvent);
      end;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
    except
-@@ -3679,6 +3697,8 @@
+     Application.HandleException(Form);
+   end;
+@@ -3672,6 +3715,7 @@
+   X, Y : single;
+   Touch: UITouch;
+   Obj: IControl;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ const
+   LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
+ begin
+@@ -3679,6 +3723,16 @@
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
-+    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
 +
      // find the control from under the gesture
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
      SendTouches(withEvent.allTouches, TTouchAction.Up, Obj);
-@@ -3692,6 +3712,7 @@
-         NSObject(Self.Super).performSelector(sel_getUid('SingleTap:'), nil, DblTapDelay);
-       DefineSelectionStates;
-     finally
-+      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+@@ -3695,6 +3749,11 @@
        if Form <> nil then
          View.touchesEnded(touches, withEvent);
      end;
-@@ -3710,6 +3731,8 @@
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
+   except
+     Application.HandleException(Form);
+   end;
+@@ -3705,11 +3764,22 @@
+   X, Y : single;
+   Obj: IControl;
+   LPoint: TPointF;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ begin
+   try
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
-+    FCurrentTouchEvent := withEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
 +
      LPoint := TPointF.Create(X, Y);
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(LPoint));
      SendTouches(withEvent.allTouches, TTouchAction.Move, Obj);
-@@ -3717,6 +3740,7 @@
-     try
-       DoLMouseMove(X, Y, FAdditionalShift);
+@@ -3719,6 +3789,11 @@
      finally
-+      FCurrentTouchEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
        View.touchesMoved(touches, withEvent);
      end;
-   except
-@@ -4415,6 +4439,12 @@
-   Result := FZOrderManager;
- end;
- 
-+// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
-+function TiOSWindowHandle.GetCurrentTouchEvent: UIEvent;
-+begin
-+  Result := TFMXViewBase(FHandle).CurrentTouchEvent;
-+end;
 +
- { TiOSOpenApplicationContext }
- 
- constructor TiOSOpenApplicationContext.Create(ASourceApp: string; AURL: string; AContext: Pointer);
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
+   except
+     Application.HandleException(Form);
+   end;
 Index: Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
@@ -2016,7 +2057,25 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    public
      /// <summary>Renders form Immediately.</summary>
      procedure Render; override;
-@@ -269,7 +320,7 @@
+@@ -125,6 +176,7 @@
+     FZOrderManager: TAndroidZOrderManager;
+     FMultiTouchManager: TMultiTouchManagerAndroid;
+     FMotionManager: TAndroidMotionManager;
++    FCurrentMotionEvent: JMotionEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     FRender: TFormRender;
+     FFormBounds: TRectF;
+     procedure SetBounds(const AValue: TRectF);
+@@ -168,6 +220,9 @@
+     property MultiTouchManager: TMultiTouchManagerAndroid read GetMultiTouchManager;
+     /// <summary>MotionManager of form.</summary>
+     property MotionManager: TAndroidMotionManager read GetMotionManager;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    /// <summary>Gets or sets the current Android motion event associated with the form.</summary>
++    property CurrentMotionEvent: JMotionEvent read FCurrentMotionEvent write FCurrentMotionEvent;
+     property Render: TFormRender read FRender;
+   end;
+ 
+@@ -269,7 +324,7 @@
    TAndroidDoubleTapGestureListener = class;
  
    TAndroidMotionManager = class(TInterfacedObject, IFMXGestureRecognizersService)
@@ -2025,23 +2084,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
      DoubleClickTime = 300; // msec
    private type
      TMotionEvent = record
-@@ -282,6 +333,7 @@
-     TMotionEvents = TList<TMotionEvent>;
-   private
-     [Weak] FHandle: TAndroidWindowHandle;
-+    FCurrentMotionEvent: JMotionEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
-     { Gestures }
-     FEnabledInteractiveGestures: TInteractiveGestures;
-     FIsLongTapRecognized: Boolean;
-@@ -309,6 +361,7 @@
-     constructor Create(const AHandle: TAndroidWindowHandle);
-     destructor Destroy; override;
-     function HandleMotionEvent(const AEvent: JMotionEvent): Boolean;
-+    property CurrentMotionEvent: JMotionEvent read FCurrentMotionEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
-     { IFMXGestureRecognizersService }
-     procedure AddRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
-     procedure RemoveRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
-@@ -1185,15 +1238,15 @@
+@@ -1185,15 +1240,15 @@
  end;
  
  procedure TAndroidWindowHandle.TFormViewListener.onSizeChanged(w, h, oldw, oldh: Integer);
@@ -2061,7 +2104,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
-@@ -1267,7 +1320,7 @@
+@@ -1267,7 +1322,7 @@
        StatusBarOffset := Ceil(PlatformAndroid.WindowService.StatusBarHeight)
      else
        StatusBarOffset := 0;
@@ -2070,32 +2113,25 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    end;
  
    // Creates Form's view
-@@ -2125,6 +2178,8 @@
-   FGestureDetector := TJGestureDetector.JavaClass.init(FGestureListener);
-   FGestureDoubleTapListener := TAndroidDoubleTapGestureListener.Create(Self);
-   FGestureDetector.setOnDoubleTapListener(FGestureDoubleTapListener);
-+
-+  FCurrentMotionEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
- end;
- 
- function TAndroidMotionManager.CreateGestureEventInfo(const AGesture: TInteractiveGesture;
-@@ -2158,6 +2213,7 @@
+@@ -2158,6 +2213,8 @@
  
  begin
    { Pre initialization }
-+  FCurrentMotionEvent := AEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if IsHandleAlive then
++    FHandle.CurrentMotionEvent := AEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
    ReadMotionEvent(AEvent, FMotionEvents);
    UpdateMousePosition;
  
-@@ -2176,6 +2232,7 @@
+@@ -2176,6 +2233,8 @@
    end;
  
    Result := True;
-+  FCurrentMotionEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if IsHandleAlive then
++    FHandle.CurrentMotionEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
  end;
  
  procedure TAndroidMotionManager.HandleMultiTouch;
-@@ -2932,7 +2989,8 @@
+@@ -2932,7 +2991,8 @@
  begin
    inherited Create;
    FContext := AContext;
@@ -2105,7 +2141,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
  end;
  
-@@ -2939,19 +2997,23 @@
+@@ -2939,19 +2999,23 @@
  destructor TRender<T>.Destroy;
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
@@ -2137,7 +2173,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  procedure TRender<T>.Render;
-@@ -2958,10 +3020,134 @@
+@@ -2958,10 +3022,134 @@
  begin
  end;
  
@@ -2274,6 +2310,50 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
 +  TChoreographer.DestroyInstance;
 +
  end.
+Index: Embarcadero/Athens/fmx/FMX.Presentation.Android.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Android.pas
+--- a/Embarcadero/Athens/fmx/FMX.Presentation.Android.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Presentation.Android.pas	(working copy)
+@@ -239,7 +239,8 @@
+ 
+ uses
+   System.SysUtils, System.UITypes, System.Math, Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.App,
+-  FMX.Platform, FMX.Platform.Android, FMX.Helpers.Android, FMX.Presentation.Factory, FMX.Consts;
++  FMX.Platform, FMX.Platform.Android, FMX.Helpers.Android, FMX.Presentation.Factory, FMX.Consts,
++  FMX.Platform.UI.Android; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ 
+ { TAndroidPresentationProxy<T> }
+ 
+@@ -702,6 +703,17 @@
+   if not PointInside(TouchPoint, event) then
+     Exit(False);
+ 
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TAndroidWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentMotionEvent := event;
++
+   // Transfer touch point into gestures recognizers
+   FGestureDetector.onTouchEvent(event);
+   FScaleGestureDetector.onTouchEvent(event);
+@@ -742,6 +754,10 @@
+   end
+   else
+     Result := False;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentMotionEvent := nil;
+ end;
+ 
+ procedure TAndroidNativeView.RefreshNativeParent;
 Index: Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
@@ -2303,6 +2383,123 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarca
    FreeAndNil(FCanvas);
    FCanvas := TCanvasManager.CreateFromWindow(Handle, Size.Width, Size.Height);
    Result := True;
+Index: Embarcadero/Athens/fmx/FMX.Presentation.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.iOS.pas b/Embarcadero/Athens/fmx/FMX.Presentation.iOS.pas
+--- a/Embarcadero/Athens/fmx/FMX.Presentation.iOS.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Presentation.iOS.pas	(working copy)
+@@ -644,6 +644,17 @@
+ var
+   TouchPoint: TPointF;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+   begin
+@@ -651,6 +662,10 @@
+     Form.MouseMove([], TouchPoint.X, TouchPoint.Y); // Require for correct IsMouseOver handle
+     Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
+   end;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
+@@ -657,6 +672,17 @@
+ var
+   TouchPoint: TPointF;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
+@@ -663,6 +689,10 @@
+   // Don't combine these if statements because in MouseUp the form can unload presentation!
+   if Form <> nil then
+     Form.MouseLeave;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.touchesEnded(touches: NSSet; withEvent: UIEvent);
+@@ -670,6 +700,17 @@
+   TouchPoint: TPointF;
+   Touch: UITouch;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
+@@ -680,6 +721,10 @@
+   Touch := TUITouch.Wrap(touches.anyObject);
+   if Touch.tapCount = 2 then
+     SendDblTapToGestureControl(TouchPoint);
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.touchesMoved(touches: NSSet; withEvent: UIEvent);
+@@ -686,9 +731,24 @@
+ var
+   TouchPoint: TPointF;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+     Form.MouseMove([ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.PMAncestorPresentationLoaded(var AMessage: TDispatchMessageWithValue<Boolean>);
 Index: Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas

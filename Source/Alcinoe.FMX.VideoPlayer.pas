@@ -3533,13 +3533,25 @@ begin
     FDataSource := Value;
     {$IF not defined(ALDPK)}
     if not (csLoading in ComponentState) then begin
-      if FInternalState = vpsIdle then begin
+      if FInternalState <> vpsIdle then begin
+        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;
+        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;
+        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;
+        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;
+        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;
+        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;
+        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
+        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
+        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
+        //--
+        ALFreeAndNil(fVideoPlayerEngine);
+        fVideoPlayerEngine := LVideoPlayerEngine;
+      end;
+      if FDataSource <> '' then begin
         FVideoPlayerEngine.Prepare(FDataSource);
         if AutoStartMode = TAutoStartMode.WhenPrepared then
           FVideoPlayerEngine.Start;
-      end
-      else
-        Raise Exception.Create('The data source cannot be changed once it has been set.');
+      end;
     end;
     {$ENDIF}
   end;

@@ -767,22 +767,46 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(
               aSrc,
               '    if not (csLoading in ComponentState) then begin'+#13#10+
-              '      if FInternalState = vpsIdle then begin'+#13#10+
+              '      if FInternalState <> vpsIdle then begin'+#13#10+
+              '        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;'+#13#10+
+              '        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;'+#13#10+
+              '        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;'+#13#10+
+              '        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;'+#13#10+
+              '        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;'+#13#10+
+              '        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;'+#13#10+
+              '        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;'+#13#10+
+              '        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;'+#13#10+
+              '        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;'+#13#10+
+              '        //--'+#13#10+
+              '        ALFreeAndNil(fVideoPlayerEngine);'+#13#10+
+              '        fVideoPlayerEngine := LVideoPlayerEngine;'+#13#10+
+              '      end;'+#13#10+
+              '      if FDataSource <> '' then begin'+#13#10+
               '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
               '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
               '          FVideoPlayerEngine.Start;'+#13#10+
-              '      end'+#13#10+
-              '      else'+#13#10+
-              '        Raise Exception.Create(''The data source cannot be changed once it has been set.'');'+#13#10+
+              '      end;'+#13#10+
               '    end;',
               '    //if not (csLoading in ComponentState) then begin'+#13#10+
-              '      if FInternalState = vpsIdle then begin'+#13#10+
+              '      if FInternalState <> vpsIdle then begin'+#13#10+
+              '        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;'+#13#10+
+              '        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;'+#13#10+
+              '        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;'+#13#10+
+              '        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;'+#13#10+
+              '        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;'+#13#10+
+              '        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;'+#13#10+
+              '        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;'+#13#10+
+              '        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;'+#13#10+
+              '        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;'+#13#10+
+              '        //--'+#13#10+
+              '        ALFreeAndNil(fVideoPlayerEngine);'+#13#10+
+              '        fVideoPlayerEngine := LVideoPlayerEngine;'+#13#10+
+              '      end;'+#13#10+
+              '      if FDataSource <> '' then begin'+#13#10+
               '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
               '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
               '          FVideoPlayerEngine.Start;'+#13#10+
-              '      end'+#13#10+
-              '      else'+#13#10+
-              '        Raise Exception.Create(''The data source cannot be changed once it has been set.'');'+#13#10+
+              '      end;'+#13#10+
               '    //end;');
     //--
     aSrc := FindAndReplace(aSrc, '(LocalRect)','(LocalRect.ReducePrecision)');

@@ -781,7 +781,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '        ALFreeAndNil(fVideoPlayerEngine);'+#13#10+
               '        fVideoPlayerEngine := LVideoPlayerEngine;'+#13#10+
               '      end;'+#13#10+
-              '      if FDataSource <> '' then begin'+#13#10+
+              '      if FDataSource <> '''' then begin'+#13#10+
               '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
               '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
               '          FVideoPlayerEngine.Start;'+#13#10+
@@ -802,7 +802,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '        ALFreeAndNil(fVideoPlayerEngine);'+#13#10+
               '        fVideoPlayerEngine := LVideoPlayerEngine;'+#13#10+
               '      end;'+#13#10+
-              '      if FDataSource <> '' then begin'+#13#10+
+              '      if FDataSource <> '''' then begin'+#13#10+
               '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
               '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
               '          FVideoPlayerEngine.Start;'+#13#10+

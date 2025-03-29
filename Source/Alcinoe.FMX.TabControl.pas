@@ -192,6 +192,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     function SetActiveTabWithTransition(
                const ATab: TALTabItem;
                const ATransition: TALTabTransition;
@@ -528,9 +529,23 @@ end;
 {*******************************}
 destructor TALTabControl.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   ALFreeAndNil(FScrollEngine);
   ALFreeAndNil(FAniTransition);
+  inherited;
+end;
+
+{************************************}
+procedure TALTabControl.BeforeDestruction;
+begin
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  if not (csDestroying in ComponentState) then begin
+    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+    FAniTransition.Enabled := False;
+    FScrollEngine.Stop(True{AAbruptly});
+  end;
   inherited;
 end;
 

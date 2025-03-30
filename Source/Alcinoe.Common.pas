@@ -3686,7 +3686,7 @@ begin
   if Temp = nil then exit;
   TObject(Obj) := nil;
   {$ENDIF}
-  if adelayed and assigned(ALCustomDelayedFreeObjectProc) then ALCustomDelayedFreeObjectProc(Temp)
+  if ADelayed and assigned(ALCustomDelayedFreeObjectProc) then ALCustomDelayedFreeObjectProc(Temp)
   else begin
     {$IF defined(AUTOREFCOUNT)}
     //AUTOREFCOUNT was removed in 10.4 (sydney) so the

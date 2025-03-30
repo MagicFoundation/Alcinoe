@@ -272,6 +272,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     property ScrollEngine: TALScrollEngine read GetScrollEngine;
     procedure Sort(Compare: TFmxObjectSortCompare); override;
     procedure ScrollBy(const Dx, Dy: Single);
@@ -784,9 +785,22 @@ begin
   If FVScrollBar <> nil then LTabList.Remove(FVScrollBar);
   If FHScrollBar <> nil then LTabList.Remove(FHScrollBar);
   LTabList := nil;
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   ALFreeAndNil(FScrollEngine);
   inherited Destroy;
+end;
+
+{**********************************************}
+procedure TALCustomScrollBox.BeforeDestruction;
+begin
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  if not (csDestroying in ComponentState) then begin
+    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+    FScrollEngine.Stop(true{AAbruptly});
+  end;
+  inherited;
 end;
 
 {************************************************************}

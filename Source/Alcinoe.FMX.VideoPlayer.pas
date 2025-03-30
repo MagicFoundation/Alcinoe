@@ -3453,7 +3453,6 @@ end;
 {***************************************}
 destructor TALVideoPlayerSurface.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
   ALFreeAndNil(fVideoPlayerEngine);
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
@@ -3461,9 +3460,14 @@ end;
 {************************************************}
 procedure TALVideoPlayerSurface.BeforeDestruction;
 begin
-  // Required for DynamicListBox or when
-  // using ALFreeAndNil with delayed set to True.
-  Stop;
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  if not (csDestroying in ComponentState) then begin
+    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+    Stop;
+  end;
   inherited;
 end;
 

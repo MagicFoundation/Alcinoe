@@ -866,7 +866,7 @@ type
                 const ACheckMark: TALBaseCheckBox.TCheckMarkBrush); override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
+    procedure BeforeDestruction; override;
   published
     property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
     property Mandatory: Boolean read fMandatory write fMandatory default false;
@@ -1413,6 +1413,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure AfterConstruction; override;
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
@@ -2242,6 +2243,7 @@ type
       public
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
+        procedure BeforeDestruction; override;
         procedure AlignToPixel; override;
         function GetValue: Double;
         procedure MakeBufDrawable; override;
@@ -3555,8 +3557,19 @@ begin
   ALFreeAndNil(FPrevStateStyles);
   {$ENDIF}
   ALFreeAndNil(FStateStyles);
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   ALFreeAndNil(FValueRange);
+  inherited;
+end;
+
+{************************************}
+procedure TALCustomTrack.TThumb.BeforeDestruction;
+begin
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  if not (csDestroying in ComponentState) then
+    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 
@@ -8828,10 +8841,15 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
-{********************************}
-destructor TALRadioButton.Destroy;
+{************************************}
+procedure TALRadioButton.BeforeDestruction;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  if not (csDestroying in ComponentState) then
+    TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
   inherited;
 end;
 
@@ -10398,8 +10416,19 @@ end;
 {***************************}
 destructor TALSwitch.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   ALFreeAndNil(FTransition);
+  inherited;
+end;
+
+{************************************}
+procedure TALSwitch.BeforeDestruction;
+begin
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  if not (csDestroying in ComponentState) then
+    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 

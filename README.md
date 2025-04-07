@@ -106,6 +106,10 @@ forced to apply patches to the original Delphi source files:
 * [Add the CAFrameRateRange record and preferredFramesPerSecond/preferredFrameRateRange to CADisplayLink](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2424)
 * [Add getEventTimeNanos and getHistoricalEventTimeNanos to JMotionEvent](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2992)
 * [Incorrect indentation of end; in TScreen.IndexFormOfObject](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2902)
+* [ForceQueue with Delay Does Not Work on Android](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206)
+* [FullScreenManager.showSystemUI Resets SystemUiVisibility](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207)
+* [Component Type Name Cannot Contain a "."](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3213)
+* [TControl.SetBounds: Missing ParentContentChanged Call on Size-Only Updates](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264)
 
 
 Install Alcinoe
@@ -364,6 +368,20 @@ responsive text behavior. Learn more at
 [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/htmltext.png?raw=true" />
+<br/>
+  
+TALPageController – The Page Transition Maestro
+===============================================
+
+**TALPageController** is a component that manages 
+and controls page transitions within your application, 
+similar to Flutter's PageController. It allows you to smoothly 
+navigate between different pages, track the current page index, 
+and customize the behavior of scrolling animations and 
+transitions. Learn more at 
+[Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pagecontroller.gif?raw=true" />
 <br/>
   
 Video Player for FireMonkey

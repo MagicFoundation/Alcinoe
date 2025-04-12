@@ -384,6 +384,32 @@ transitions. Learn more at
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pagecontroller.gif?raw=true" />
 <br/>
   
+TALPageIndicator: Animated Navigation for Multiple Pages
+========================================================
+
+Page indicators are a key element in multi-page applications, 
+offering users a clear sense of their current location and 
+the overall number of pages. **TALPageIndicator** is a lightweight 
+component that delivers animated, customizable page indicators 
+with a variety of effects, making it easy to integrate and 
+ensuring smooth, visually appealing transitions throughout your 
+interface. It comes with a set of built-in effects to animate 
+the active dot, each of which can be customized to suit your 
+design preferences.
+
+| Effect             |                                                         Preview                                                                         |  
+|:-------------------|:---------------------------------------------------------------------------------------------------------------------------------------:|  
+| Worm               |              ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_worm.gif?raw=true)           |
+| ThinWorm           |            ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_thinworm.gif?raw=true)         |
+| JumpingDotTopView  |           ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_jumpingdottopview.gif?raw=true) | 
+| jumpingDotSideView | ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_jumpingdotsideview.gif?raw=true)          | 
+| Slide              |              ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_slide.gif?raw=true)          |
+| Scale              |              ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_scale.gif?raw=true)          | 
+| LinearSwap         |              ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_linearswap.gif?raw=true)     | 
+| SpinSwap           |         ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_spinswap.gif?raw=true)            |
+| Color              |        ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_color.gif?raw=true)                | 
+
+  
 Video Player for FireMonkey
 ===========================
 

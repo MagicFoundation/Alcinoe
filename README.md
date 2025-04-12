@@ -384,8 +384,8 @@ transitions. Learn more at
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pagecontroller.gif?raw=true" />
 <br/>
   
-TALPageIndicator: Animated Navigation for Multiple Pages
-========================================================
+TALPageIndicator: Animated Multi-Page Navigator
+===============================================
 
 Page indicators are a key element in multi-page applications, 
 offering users a clear sense of their current location and 

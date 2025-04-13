@@ -420,6 +420,7 @@ type
     procedure onEdgeReached;
   public
     constructor Create; virtual;
+    function getFriction: Single;
     procedure setFriction(friction: Single);
     procedure updateScroll(q: Single; q2: Single);
     procedure startScroll(start: integer; distance: integer; duration: integer);
@@ -462,6 +463,7 @@ type
   public
     constructor Create(const interpolateFunc: TInterpolateFunc = nil; const flywheel: Boolean = true); virtual;
     destructor Destroy; override;
+    function getFriction: Single;
     procedure setFriction(friction: Single);
     function isFinished: Boolean;
     procedure forceFinished(finished: boolean);
@@ -493,8 +495,8 @@ type
     function getSplineFlingDistance(velocity: integer): double;
   end;
 
-  {******************************}
-  TALScrollEngine = class(TObject)
+  {**********************************}
+  TALScrollEngine = class(TPersistent)
 
   {$IFDEF IOS}
 
@@ -539,6 +541,9 @@ type
         eventTime: Int64;
         position: TPointF;
       end;
+  public
+    type
+      TTouchMode = (Disabled, Enabled, Auto);
   private
     FTimerActive: Boolean;
     FTimerInterval: Integer;
@@ -549,6 +554,7 @@ type
     FDragResistanceFactor: Single;
     FMinEdgeSpringbackEnabled: Boolean;
     FMaxEdgeSpringbackEnabled: Boolean;
+    FTouchMode: TTouchMode;
     FTouchTracking: TTouchTracking;
     FMinScrollLimit: TALPointD;
     FMaxScrollLimit: TALPointD;
@@ -563,10 +569,6 @@ type
     FUpPosition: TPointF;
     FUpVelocity: TPointF;
     FMoved: Boolean;
-    FAutoShowing: Boolean;
-    FOpacity: Single;
-    FOpacityTransitionStarted: Boolean;
-    FOpacityTransitionStartTime: int64;
     FTag: NativeInt;
     procedure StartTimer;
     procedure StopTimer(const AAbruptly: Boolean = False);
@@ -575,9 +577,15 @@ type
     {$ENDIF}
     procedure SetTimerInterval(const Value: Integer);
     procedure SetDown(const Value: Boolean);
-    procedure SetAutoShowing(const Value: Boolean);
+    function IsTouchSlopStored: Boolean;
+    function IsOverflingDistanceStored: Boolean;
+    function IsDragResistanceFactorStored: Boolean;
+    function IsFrictionStored: Boolean;
+    function GetFriction: Single;
+    procedure SetFriction(const Value: Single);
     function GetCurrentVelocity: TPointF;
     function GetIsVelocityLow: Boolean;
+    function GetTouchEnabled: Boolean;
     procedure SetMinScrollLimit(const Value: TalPointD);
     procedure SetMaxScrollLimit(const Value: TalPointD);
     procedure SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean; const SynchOverScroller: Boolean); overload;
@@ -603,18 +611,18 @@ type
       DefaultTimerInterval = 10; // 100 fps
       // The default multiplier that dampens a drag movement at boundaries.
       DefaultDragResistanceFactor = 0.4;
-      // A constant value of 0.3, representing the default duration (in seconds)
-      // for opacity transitions, such as fade-in and fade-out effects.
-      DefaultOpacityTransitionDuration = 0.3;
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
     function Calculate: boolean;
-    // Specifies the duration between offset recalculations. We don't use
-    // TimerInterval for Android/iOS since we utilize DisplayLink and JChoreographer
+    /// <summary>
+    ///   Specifies the duration between offset recalculations. We don't use
+    ///   TimerInterval for Android/iOS since we utilize DisplayLink and JChoreographer
+    /// </summary>
     property TimerInterval: Integer read FTimerInterval write SetTimerInterval;
     property TimerActive: boolean read FTimerActive;
-    procedure setFriction(friction: Single);
+    procedure startScroll(startX: Double; startY: Double; dx: Double; dy: Double; const duration: integer = TALOverScroller.DEFAULT_DURATION);
     procedure MouseDown(X, Y: Single); overload;
     procedure MouseDown(const AHandle: TWindowHandle); overload;
     procedure MouseMove(X, Y: Single); overload;
@@ -623,26 +631,16 @@ type
     procedure MouseUp(const AHandle: TWindowHandle); overload;
     procedure MouseLeave;
     procedure MouseWheel(X, Y: Double); virtual;
-    // Distance a touch can wander before we think the user is scrolling
-    property TouchSlop: Single read FTouchSlop write FTouchSlop;
-    // Max distance to overfling for edge effects
-    property OverflingDistance: Single read FOverflingDistance write FOverflingDistance;
-    // A multiplier applied during drag operations to simulate resistance. A value
-    // of 1 implies normal drag behavior, while values below 1 introduce increased
-    // resistance, making the drag feel heavier.
-    property DragResistanceFactor: Single read FDragResistanceFactor write FDragResistanceFactor;
-    // Halts the ongoing animation, freezing the scroller at its current position
-    // without completing the remaining motion.
+    /// <summary>
+    ///   Halts the ongoing animation, freezing the scroller at its current position
+    ///   without completing the remaining motion.
+    /// </summary>
     procedure Stop(const AAbruptly: Boolean = False);
-    property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write FMinEdgeSpringbackEnabled;
-    property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write FMaxEdgeSpringbackEnabled;
     property TouchTracking: TTouchTracking read FTouchTracking write FTouchTracking;
-    // Controls the opacity behavior typically used by elements like scrollbars.
-    // When enabled, the opacity increases, making the element visible during
-    // scrolling activity and fades out, hiding the element when the scrolling stops
-    property AutoShowing: Boolean read FAutoShowing write SetAutoShowing;
-    property Opacity: Single read FOpacity;
-    // In virtual pixels per second.
+    property TouchEnabled: Boolean read GetTouchEnabled;
+    /// <summary>
+    ///   In virtual pixels per second.
+    /// </summary>
     property CurrentVelocity: TPointF read GetCurrentVelocity;
     property IsVelocityLow: Boolean read GetIsVelocityLow;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
@@ -652,13 +650,37 @@ type
     property DownPosition: TPointF read fDownPosition;
     property UpPosition: TPointF read FUpPosition;
     property UpVelocity: TPointF read FUpVelocity;
-    // The Moved flag is activated when the mouse is dragged beyond the
-    // TouchSlop distance following a mousedown event.
+    /// <summary>
+    ///   The Moved flag is activated when the mouse is dragged beyond the
+    ///   TouchSlop distance following a mousedown event.
+    /// </summary>
     property Moved: Boolean read FMoved;
     property OnStart: TNotifyEvent read FOnStart write FOnStart;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnStop: TNotifyEvent read FOnStop write FOnStop;
     property Tag: NativeInt read FTag write FTag;
+  published
+    property TouchMode: TTouchMode read FTouchMode write FTouchMode default TTouchMode.Auto;
+    /// <summary>
+    ///   Distance a touch can wander before we think the user is scrolling
+    /// </summary>
+    property TouchSlop: Single read FTouchSlop write FTouchSlop stored IsTouchSlopStored nodefault;
+    /// <summary>
+    ///   Max distance to overfling for edge effects
+    /// </summary>
+    property OverflingDistance: Single read FOverflingDistance write FOverflingDistance stored IsOverflingDistanceStored nodefault;
+    /// <summary>
+    ///   A multiplier applied during drag operations to simulate resistance. A value
+    ///   of 1 implies normal drag behavior, while values below 1 introduce increased
+    ///   resistance, making the drag feel heavier.
+    /// </summary>
+    property DragResistanceFactor: Single read FDragResistanceFactor write FDragResistanceFactor stored IsDragResistanceFactorStored nodefault;
+    property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write FMinEdgeSpringbackEnabled default true;
+    property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write FMaxEdgeSpringbackEnabled default true;
+    /// <summary>
+    ///   The amount of friction applied to flings.
+    /// </summary>
+    property Friction: Single read GetFriction write SetFriction stored IsFrictionStored nodefault;
   end;
 
 implementation
@@ -1735,6 +1757,12 @@ begin
   {$ENDIF}
 end;
 
+{*************************************************}
+function TALSplineOverScroller.getFriction: Single;
+begin
+  Result := FFlingFriction;
+end;
+
 {************************************************************}
 procedure TALSplineOverScroller.setFriction(friction: Single);
 begin
@@ -2137,6 +2165,12 @@ procedure TALOverScroller.setInterpolateFunc(interpolateFunc: TInterpolateFunc);
 begin
   if not assigned(interpolateFunc) then FInterpolateFunc := ALInterpolateViscousFluid
   else FInterpolateFunc := interpolateFunc;
+end;
+
+{*******************************************}
+function TALOverScroller.getFriction: Single;
+begin
+  Result := FScrollerX.getFriction;
 end;
 
 {******************************************}
@@ -2551,6 +2585,7 @@ end;
 constructor TALScrollEngine.Create;
 begin
   inherited Create;
+  ALInitScreenScale;
   {$IFDEF IOS}
   fDisplayLinkListener := nil;
   fDisplayLink := nil;
@@ -2566,6 +2601,7 @@ begin
   FDragResistanceFactor := DefaultDragResistanceFactor;
   FMinEdgeSpringbackEnabled := True;
   FMaxEdgeSpringbackEnabled := True;
+  FTouchMode := TTouchMode.Auto;
   FTouchTracking := [ttVertical, ttHorizontal];
   FMinScrollLimit := TALPointD.Zero;
   FMaxScrollLimit := TALPointD.Zero;
@@ -2580,10 +2616,6 @@ begin
   FUpPosition := TPointF.Zero;
   FUpVelocity := TPointF.Zero;
   FMoved := false;
-  FAutoShowing := False;
-  FOpacity := 1;
-  FOpacityTransitionStarted := False;
-  FOpacityTransitionStartTime := 0;
   FTag := 0;
 end;
 
@@ -2622,12 +2654,42 @@ begin
 end;
 {$ENDIF}
 
-{******************************************}
-// The amount of friction applied to flings.
-// @param friction A scalar dimension-less value representing the coefficient of friction.
-procedure TALScrollEngine.setFriction(friction: Single);
+{****************************************************}
+procedure TALScrollEngine.Assign(Source: TPersistent);
 begin
-  FoverScroller.setFriction(friction);
+  if Source is TALScrollEngine then begin
+    TouchMode := TALScrollEngine(Source).TouchMode;
+    TouchSlop := TALScrollEngine(Source).TouchSlop;
+    OverflingDistance := TALScrollEngine(Source).OverflingDistance;
+    DragResistanceFactor := TALScrollEngine(Source).DragResistanceFactor;
+    MinEdgeSpringbackEnabled := TALScrollEngine(Source).MinEdgeSpringbackEnabled;
+    MaxEdgeSpringbackEnabled := TALScrollEngine(Source).MaxEdgeSpringbackEnabled;
+    Friction := TALScrollEngine(Source).Friction;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{**************************************************************************}
+// Start scrolling by providing a starting point and the distance to travel.
+// @param startX Starting horizontal scroll offset in pixels. Positive numbers will scroll the content to the left.
+// @param startY Starting vertical scroll offset in pixels. Positive numbers will scroll the content up.
+// @param dx Horizontal distance to travel. Positive numbers will scroll the content to the left.
+// @param dy Vertical distance to travel. Positive numbers will scroll the content up.
+// @param duration Duration of the scroll in milliseconds.
+procedure TALScrollEngine.startScroll(startX: Double; startY: Double; dx: Double; dy: Double; const duration: integer = TALOverScroller.DEFAULT_DURATION);
+begin
+  if not FOverScroller.isFinished then
+    FoverScroller.abortAnimation;
+
+  FOverScroller.startScroll(
+    trunc(startX * ALScreenScale), // startX: integer;
+    trunc(startY * ALScreenScale), // startY: integer;
+    trunc(dx * ALScreenScale), // dx: integer;
+    trunc(dy * ALScreenScale), // dy: integer;
+    duration); // const duration: integer = DEFAULT_DURATION);
+
+  StartTimer;
 end;
 
 {***********************************************************************************************************************************}
@@ -2691,6 +2753,19 @@ begin
   // virtual pixels per second
   result := (abs(LCurrentVelocity.X) < 10) and
             (abs(LCurrentVelocity.Y) < 10);
+end;
+
+{************************************************}
+function TALScrollEngine.GetTouchEnabled: Boolean;
+begin
+  Result := FTouchTracking <> [];
+  If result then
+    case FTouchMode of
+      TTouchMode.Disabled: Result := False;
+      TTouchMode.Enabled: Result := True;
+      TTouchMode.Auto: Result := ALGetHasTouchScreen;
+      else Raise Exception.Create('Error 400A0C7F-EE78-464B-8FE9-BEA521225713')
+    end;
 end;
 
 {***********************************}
@@ -2772,7 +2847,7 @@ end;
 procedure TALScrollEngine.DoStart;
 begin
   {$IFDEF DEBUG}
-  ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.DoStart');
+  //ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.DoStart');
   {$ENDIF}
   if Assigned(FOnStart) then
     FOnStart(self);
@@ -2794,7 +2869,7 @@ end;
 procedure TALScrollEngine.DoStop;
 begin
   {$IFDEF DEBUG}
-  ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.DoStop');
+  //ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.DoStop');
   {$ENDIF}
   if Assigned(FOnStop) then
     FOnStop(self);
@@ -2824,14 +2899,42 @@ begin
   end;
 end;
 
-{*************************************************************}
-procedure TALScrollEngine.SetAutoShowing(const Value: Boolean);
+{**************************************************}
+function TALScrollEngine.IsTouchSlopStored: Boolean;
 begin
-  if FAutoShowing <> Value then begin
-    FAutoShowing := Value;
-    if AutoShowing then FOpacity := 0
-    else FOpacity := 1;
-  end;
+  Result := Not sameValue(FTouchSlop, DefaultTouchSlop, TEpsilon.Position);
+end;
+
+{**********************************************************}
+function TALScrollEngine.IsOverflingDistanceStored: Boolean;
+begin
+  Result := Not sameValue(FOverflingDistance, DefaultOverflingDistance, TEpsilon.Position);
+end;
+
+{*************************************************************}
+function TALScrollEngine.IsDragResistanceFactorStored: Boolean;
+begin
+  Result := Not sameValue(FDragResistanceFactor, DefaultDragResistanceFactor, TEpsilon.Scale);
+end;
+
+{*************************************************}
+function TALScrollEngine.IsFrictionStored: Boolean;
+begin
+  Result := Not sameValue(GetFriction, 0.015{ViewConfiguration.getScrollFriction}, TEpsilon.Scale);
+end;
+
+{*******************************************}
+function TALScrollEngine.GetFriction: Single;
+begin
+  Result := FOverScroller.getFriction;
+end;
+
+{******************************************}
+// The amount of friction applied to flings.
+// @param friction A scalar dimension-less value representing the coefficient of friction.
+procedure TALScrollEngine.SetFriction(const Value: Single);
+begin
+  FOverScroller.setFriction(Value);
 end;
 
 {************************************************************************************************************************************}
@@ -2984,34 +3087,6 @@ begin
 
   end;
 
-  Var LOpacityChanged := False;
-  if AutoShowing then begin
-    if Result or FDown then begin
-      if CompareValue(opacity, 1, Tepsilon.Scale) < 0 then begin
-        if not FOpacityTransitionStarted then begin
-          FOpacityTransitionStarted := True;
-          FOpacityTransitionStartTime := ALElapsedTimeMillisAsInt64;
-        end;
-        FOpacity := Min(1, (ALElapsedTimeMillisAsInt64 - FOpacityTransitionStartTime) / (DefaultOpacityTransitionDuration * ALMsPerSec));
-        if CompareValue(opacity, 1, Tepsilon.Scale) >= 0 then
-          FOpacityTransitionStarted := False;
-        LOpacityChanged := True;
-      end;
-    end
-    else begin
-      if CompareValue(opacity, 0, Tepsilon.Scale) > 0 then begin
-        if not FOpacityTransitionStarted then begin
-          FOpacityTransitionStarted := True;
-          FOpacityTransitionStartTime := ALElapsedTimeMillisAsInt64;
-        end;
-        FOpacity := max(0, 1 - ((ALElapsedTimeMillisAsInt64 - FOpacityTransitionStartTime) / (DefaultOpacityTransitionDuration * ALMsPerSec)));
-        if CompareValue(opacity, 0, Tepsilon.Scale) <= 0 then
-          FOpacityTransitionStarted := False;
-        LOpacityChanged := True;
-      end;
-    end;
-  end;
-
   if result then begin
     SetViewportPosition(
       TALPointD.Create(
@@ -3019,10 +3094,6 @@ begin
         FOverScroller.getCurrY/ALScreenScale),
       False{EnforceLimits},
       False{SynchOverScroller});
-  end
-  else if LOpacityChanged then begin
-    Result := True;
-    Dochanged;
   end
   else if Fdown then
     result := True;
@@ -3041,7 +3112,7 @@ end;
 {************************************}
 procedure TALScrollEngine.DoMouseDown;
 begin
-  if FTouchTracking = [] then FMovements.Count := 0;
+  if not TouchEnabled then FMovements.Count := 0;
   if FMovements.Count = 0 then exit;
   var LNewestMovement := FMovements.Last;
   FDown := True;
@@ -3061,7 +3132,7 @@ end;
 {************************************************}
 procedure TALScrollEngine.MouseDown(X, Y: Single);
 begin
-  if FTouchTracking = [] then exit;
+  if not TouchEnabled then exit;
   var LMovement: TMovement;
   LMovement.eventTime := ALElapsedTimeNano;
   LMovement.position := TPointF.Create(X, Y);
@@ -3072,7 +3143,7 @@ end;
 {****************************************************************}
 procedure TALScrollEngine.MouseDown(const AHandle: TWindowHandle);
 begin
-  if (AHandle = nil) or (FTouchTracking = []) then exit;
+  if (AHandle = nil) or (not TouchEnabled) then exit;
 
   {$IF defined(ANDROID)}
   var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;

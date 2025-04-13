@@ -63,9 +63,7 @@ type
   //
   // TALVideoPlayer = class(TObject)
   //
-  // TALVideoPlayerHost = class(TALBaseRectangle)
-  //   TFill = class(TALBrush) // TAlphacolors.Black
-  //   TStroke = class(TALStrokeBrush) // TalphaColors.null
+  // TALVideoPlayerSurface = class(TALControl)
   //
   // TALAniIndicator = class(TALControl)
   //
@@ -3228,7 +3226,7 @@ end;
 {*************************************************}
 function TALAniIndicator.IsIntervalStored: Boolean;
 begin
-  result := Not SameValue(Finterval, 0.05);
+  result := Not SameValue(Finterval, 0.05, 1E-5);
 end;
 
 {*************************************************************}
@@ -3564,12 +3562,12 @@ end;
 {************************************}
 procedure TALCustomTrack.TThumb.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not (csDestroying in ComponentState) then
-    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 
@@ -6909,7 +6907,7 @@ begin
   FThickness := DefaultThickness;
   //--
   FMargins := CreateMargins;
-  FMargins.OnChange := MarginsChanged;
+  FMargins.OnChanged := MarginsChanged;
 end;
 
 {*************************************************}
@@ -8844,12 +8842,12 @@ end;
 {************************************}
 procedure TALRadioButton.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not (csDestroying in ComponentState) then
-    TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
+  TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
   inherited;
 end;
 
@@ -10423,12 +10421,12 @@ end;
 {************************************}
 procedure TALSwitch.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not (csDestroying in ComponentState) then
-    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 

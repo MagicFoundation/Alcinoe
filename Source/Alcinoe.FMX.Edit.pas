@@ -3690,7 +3690,7 @@ constructor TALBaseEdit.TLabelTextSettings.Create;
 begin
   inherited create;
   FMargins := CreateMargins;
-  FMargins.OnChange := MarginsChanged;
+  FMargins.OnChanged := MarginsChanged;
   FLayout := TLabelTextLayout.Floating;
   FAnimation := TLabelTextAnimation.Translation;
 end;
@@ -3805,7 +3805,7 @@ constructor TALBaseEdit.TSupportingTextSettings.Create;
 begin
   inherited create;
   FMargins := CreateMargins;
-  FMargins.OnChange := MarginsChanged;
+  FMargins.OnChanged := MarginsChanged;
   FLayout := TSupportingTextLayout.Floating;
 end;
 

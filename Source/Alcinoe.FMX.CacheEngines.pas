@@ -7,10 +7,11 @@ interface
 uses
   System.Types,
   system.SyncObjs,
+  Alcinoe.GuardianThread,
   Alcinoe.FMX.Graphics;
 
 type
-  TALBufDrawableCacheEngine = class(Tobject)
+  TALBufDrawableCacheEngine = class(TALRefCountObject)
   public
     type
       TEntry = Record
@@ -20,10 +21,9 @@ type
       end;
   private
     FLock: TLightweightMREW;
-    FRefCount: Integer;
     FEntries: TArray<Tarray<TEntry>>; // [Index][SubIndex]
   public
-    constructor Create; virtual;
+    constructor Create; override;
     destructor Destroy; override;
     function HasEntry(const AIndex, ASubIndex: Integer): Boolean;
     function TryGetEntry(const AIndex, ASubIndex: Integer; out ADrawable: TALDrawable; out ARect: TRectF): Boolean; overload;
@@ -31,8 +31,7 @@ type
     function TryGetEntry(const AIndex, ASubIndex: Integer; out ARect: TRectF): Boolean; overload;
     function TrySetEntry(const AIndex, ASubIndex: Integer; Const ADrawable: TALDrawable; const ARect: TRectF): Boolean;
     procedure CLearEntries;
-    function IncreaseRefCount: TALBufDrawableCacheEngine;
-    procedure DecreaseRefCount;
+    function IncreaseRefCount: TALBufDrawableCacheEngine; reintroduce; virtual;
   end;
 
 
@@ -51,7 +50,6 @@ constructor TALBufDrawableCacheEngine.Create;
 begin
   inherited;
   //FLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
-  FRefCount := 1;
   FEntries := nil;
 end;
 
@@ -162,18 +160,10 @@ begin
   end;
 end;
 
-{***************************************************}
-procedure TALBufDrawableCacheEngine.DecreaseRefCount;
-begin
-  If AtomicDecrement(FRefCount) = 0 then
-    Free;
-end;
-
-{*****************************************************************************}
+{***********************************************}
 function TALBufDrawableCacheEngine.IncreaseRefCount: TALBufDrawableCacheEngine;
 begin
-  AtomicIncrement(FrefCount);
-  Result := Self;
+  result := TALBufDrawableCacheEngine(inherited IncreaseRefCount);
 end;
 
 end.

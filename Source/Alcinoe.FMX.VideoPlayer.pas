@@ -3460,14 +3460,13 @@ end;
 {************************************************}
 procedure TALVideoPlayerSurface.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not (csDestroying in ComponentState) then begin
-    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
-    Stop;
-  end;
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  Stop;
   inherited;
 end;
 

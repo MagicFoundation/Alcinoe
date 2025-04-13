@@ -36,6 +36,7 @@ uses
   FMX.types,
   fmx.types3D,
   FMX.graphics,
+  Alcinoe.GuardianThread,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
@@ -46,18 +47,39 @@ Type
   TALBitmap =   {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
   TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
 
+type
+  TALRefCountBitmap = Class(TALRefCountObject)
+  private
+    FBitmap: TALBitmap;
+  public
+    constructor Create(const ABitmap: TALBitmap); reintroduce; virtual;
+    destructor Destroy; override;
+    function IncreaseRefCount: TALRefCountBitmap; reintroduce; virtual;
+    property Bitmap: TALBitmap read FBitmap;
+  End;
+
 const
   ALNullSurface = {$IF defined(ALSkiaEngine)}0{$ELSE}Nil{$ENDIF};
   ALNullCanvas = {$IF defined(ALSkiaEngine)}0{$ELSE}Nil{$ENDIF};
   ALNullDrawable = {$IF defined(ALSkiaCanvas)}0{$ELSE}Nil{$ENDIF};
   ALNullBitmap = {$IF defined(ALSkiaEngine)}0{$ELSE}Nil{$ENDIF};
 
+{~~}
+type
+  TALCustomDelayedFreeDrawableProc = procedure(var aDrawable: TALDrawable) of object;
+  TALCustomDelayedFreeBitmapProc = procedure(var aBitmap: TALBitmap) of object;
+
+var
+  ALCustomDelayedFreeDrawableProc: TALCustomDelayedFreeDrawableProc = nil;
+  ALCustomDelayedFreeBitmapProc: TALCustomDelayedFreeBitmapProc = nil;
+
+
 function  ALIsSurfaceNull(const aSurface: TALSurface): Boolean; inline;
 function  ALIsCanvasNull(const aCanvas: TALCanvas): Boolean; inline;
 function  ALIsDrawableNull(const aDrawable: TALDrawable): Boolean; inline;
 function  ALIsBitmapNull(const aBitmap: TALBitmap): Boolean; inline;
-procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable); inline;
-procedure ALFreeAndNilBitmap(var aBitmap: TALBitmap); inline;
+procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable; const ADelayed: boolean = false); inline;
+procedure ALFreeAndNilBitmap(var aBitmap: TALBitmap; const ADelayed: boolean = false); inline;
 function  ALGetDrawableWidth(const aDrawable: TALDrawable): integer; inline;
 function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
 function  ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean; inline;
@@ -636,6 +658,27 @@ uses
   System.UIConsts,
   Alcinoe.http.client,
   Alcinoe.FMX.Types3D;
+
+{********************}
+constructor TALRefCountBitmap.Create(const ABitmap: TALBitmap);
+begin
+  inherited create;
+  FBitmap := ABitmap;
+end;
+
+{********************}
+destructor TALRefCountBitmap.Destroy;
+begin
+  ALFreeAndNilBitmap(FBitmap);
+  Inherited Destroy;
+end;
+
+{********************}
+function TALRefCountBitmap.IncreaseRefCount: TALRefCountBitmap;
+begin
+  result := TALRefCountBitmap(inherited IncreaseRefCount);
+end;
+
 
 {********************}
 {$IF defined(ANDROID)}
@@ -6405,34 +6448,37 @@ begin
 end;
 
 {*********************************************************}
-procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable);
+procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable; const ADelayed: boolean = false);
 begin
-  {$IF defined(ALSkiaCanvas)}
-  if aDrawable <> 0 then begin
+  IF ALIsDrawableNull(aDrawable) then exit;
+  if ADelayed and assigned(ALCustomDelayedFreeDrawableProc) then ALCustomDelayedFreeDrawableProc(aDrawable)
+  else begin
+    {$IF defined(ALSkiaCanvas)}
     sk4d_refcnt_unref(aDrawable);
-    aDrawable := 0;
+    {$ELSE}
+    aDrawable.free;
+    {$ENDIF}
+    aDrawable := ALNullDrawable;
   end;
-  {$ELSE}
-  ALFreeAndNil(aDrawable);
-  {$ENDIF}
 end;
 
 {***************************************************}
-procedure ALFreeAndNilBitmap(var aBitmap: TALBitmap);
+procedure ALFreeAndNilBitmap(var aBitmap: TALBitmap; const ADelayed: boolean = false);
 begin
-  {$IF defined(ALSkiaEngine)}
-  if aBitmap <> 0 then begin
+  IF ALIsBitmapNull(aBitmap) then exit;
+  if ADelayed and assigned(ALCustomDelayedFreeBitmapProc) then ALCustomDelayedFreeBitmapProc(aBitmap)
+  else begin
+    {$IF defined(ALSkiaEngine)}
     sk4d_refcnt_unref(aBitmap);
-    aBitmap := 0;
+    {$ELSEIF defined(ANDROID)}
+    aBitmap.recycle;
+    {$ELSEIF defined(ALAppleOS)}
+    CGImageRelease(aBitmap);
+    {$ELSE}
+    aBitmap.free;
+    {$ENDIF};
+    aBitmap := ALNullBitmap;
   end;
-  {$ELSEIF defined(ANDROID)}
-  aBitmap.recycle;
-  aBitmap := nil;
-  {$ELSEIF defined(ALAppleOS)}
-  CGImageRelease(aBitmap);
-  {$ELSE}
-  ALFreeAndNil(aBitmap);
-  {$ENDIF};
 end;
 
 {******************************************************************}

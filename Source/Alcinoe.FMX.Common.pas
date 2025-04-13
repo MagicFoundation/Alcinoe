@@ -193,7 +193,7 @@ type
     FTop: Single; // 4 Bytes
     FRight: Single; // 4 Bytes
     FBottom: Single; // 4 Bytes
-    FOnChange: TNotifyEvent; // 16 Bytes
+    FOnChanged: TNotifyEvent; // 16 Bytes
     function GetRect: TRectF;
     procedure SetRect(const Value: TRectF);
     procedure SetBottom(const Value: Single);
@@ -206,9 +206,11 @@ type
     function IsTopStored: Boolean;
   protected
     function GetDefaultValue: TRectF; virtual;
-    procedure DoChange; virtual;
+    procedure DoChanged; virtual;
   public
     constructor Create; virtual;
+    procedure Reset; virtual;
+    procedure AlignToPixel; virtual;
     procedure Assign(Source: TPersistent); override;
     function Equals(Obj: TObject): Boolean; override;
     function PaddingRect(const R: TRectF): TRectF;
@@ -217,7 +219,7 @@ type
     function Height: Single;
     property Rect: TRectF read GetRect write SetRect;
     property DefaultValue: TRectF read GetDefaultValue;
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     function Empty: Boolean;
     function MarginEmpty: Boolean;
     function ToString: string; override;
@@ -236,7 +238,7 @@ type
   private
     FY: Single; // 4 Bytes
     FX: Single; // 4 Bytes
-    FOnChange: TNotifyEvent; // 16 Bytes
+    FOnChanged: TNotifyEvent; // 16 Bytes
     procedure SetPoint(const Value: TPointF);
     procedure SetX(const Value: Single);
     procedure SetY(const Value: Single);
@@ -245,16 +247,17 @@ type
     function IsYStored: Boolean;
   protected
     function GetDefaultValue: TPointF; virtual;
-    procedure DoChange; virtual;
+    procedure DoChanged; virtual;
   public
     constructor Create; virtual;
+    procedure Reset; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure SetPointNoChange(const P: TPointF);
     function Empty: Boolean;
     procedure Reflect(const Normal: TPointF);
     property Point: TPointF read GetPoint write SetPoint;
     property DefaultValue: TPointF read GetDefaultValue;
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
   published
     property X: Single read FX write SetX stored IsXStored nodefault;
     property Y: Single read FY write SetY stored IsYStored nodefault;
@@ -1294,6 +1297,12 @@ var
 procedure ALInitScreenScale;
 function ALGetScreenScale: Single; Inline;
 
+var
+  ALHasTouchScreen: Boolean;
+  ALHasTouchScreenInitialized: Boolean;
+procedure ALInitHasTouchScreen;
+function ALGetHasTouchScreen: Boolean; Inline;
+
 implementation
 
 uses
@@ -1480,6 +1489,18 @@ begin
   FBottom := LDefaultValue.Bottom;
 end;
 
+{************************}
+procedure TALBounds.Reset;
+begin
+  SetRect(DefaultValue);
+end;
+
+{************************}
+procedure TALBounds.AlignToPixel;
+begin
+  SetRect(ALAlignEdgesToPixelRound(Rect, ALGetScreenScale, TEpsilon.Position));
+end;
+
 {**********************************************}
 procedure TALBounds.Assign(Source: TPersistent);
 begin
@@ -1514,7 +1535,7 @@ begin
     FTop := Value.Top;
     FRight := Value.Right;
     FBottom := Value.Bottom;
-    DoChange;
+    DoChanged;
   end;
 end;
 
@@ -1598,7 +1619,7 @@ begin
   if not SameValue(FBottom, Value, Epsilon) then
   begin
     FBottom := Value;
-    DoChange;
+    DoChanged;
   end;
 end;
 
@@ -1608,7 +1629,7 @@ begin
   if not SameValue(FLeft, Value, Epsilon) then
   begin
     FLeft := Value;
-    DoChange;
+    DoChanged;
   end;
 end;
 
@@ -1618,7 +1639,7 @@ begin
   if not SameValue(FRight, Value, Epsilon) then
   begin
     FRight := Value;
-    DoChange;
+    DoChanged;
   end;
 end;
 
@@ -1628,7 +1649,7 @@ begin
   if not SameValue(FTop, Value, Epsilon) then
   begin
     FTop := Value;
-    DoChange;
+    DoChanged;
   end;
 end;
 
@@ -1639,10 +1660,10 @@ begin
 end;
 
 {***************************}
-procedure TALBounds.DoChange;
+procedure TALBounds.DoChanged;
 begin
-  if Assigned(OnChange) then
-    OnChange(Self);
+  if Assigned(OnChanged) then
+    OnChanged(Self);
 end;
 
 {*****************************}
@@ -1652,6 +1673,12 @@ begin
   var LDefaultValue := DefaultValue;
   FX := LDefaultValue.X;
   FY := LDefaultValue.Y;
+end;
+
+{**************************}
+procedure TALPosition.Reset;
+begin
+  SetPoint(DefaultValue);
 end;
 
 {************************************************}
@@ -1679,10 +1706,10 @@ begin
 end;
 
 {*****************************}
-procedure TALPosition.DoChange;
+procedure TALPosition.DoChanged;
 begin
-  if Assigned(OnChange) then
-    OnChange(Self);
+  if Assigned(OnChanged) then
+    OnChanged(Self);
 end;
 
 {**************************************}
@@ -1722,7 +1749,7 @@ begin
   FX := Value.X;
   FY := Value.Y;
   if LChange then
-    DoChange;
+    DoChanged;
 end;
 
 {**********************************************}
@@ -1731,7 +1758,7 @@ begin
   var LChange := not SameValue(FX, Value, Epsilon);
   FX := Value;
   if LChange then
-    DoChange;
+    DoChanged;
 end;
 
 {**********************************************}
@@ -1740,7 +1767,7 @@ begin
   var LChange := not SameValue(FY, Value, Epsilon);
   FY := Value;
   if LChange then
-    DoChange;
+    DoChanged;
 end;
 
 {***************************}
@@ -3692,9 +3719,9 @@ begin
   FGradient.OnChanged := GradientChanged;
   FResourceName := DefaultResourceName;
   FBackgroundMargins := CreateBackgroundMargins;
-  FBackgroundMargins.OnChange := BackgroundMarginsChanged;
+  FBackgroundMargins.OnChanged := BackgroundMarginsChanged;
   FImageMargins := CreateImageMargins;
-  FImageMargins.OnChange := ImageMarginsChanged;
+  FImageMargins.OnChanged := ImageMarginsChanged;
   FImageNoRadius := DefaultImageNoRadius;
   FWrapMode := DefaultWrapMode;
 end;
@@ -4341,7 +4368,7 @@ begin
   FYRadius := DefaultYRadius;
   //--
   FMargins := CreateMargins;
-  FMargins.OnChange := MarginsChanged;
+  FMargins.OnChanged := MarginsChanged;
 end;
 
 {*******************************}
@@ -6255,11 +6282,41 @@ begin
   end;
 end;
 
+{**************************}
+procedure ALInitHasTouchScreen;
+begin
+  if not ALHasTouchScreenInitialized then begin
+    var LDeviceService: IFMXDeviceService;
+    if TPlatformServices.Current.SupportsPlatformService(IFMXDeviceService, LDeviceService) then
+      ALHasTouchScreen := TDeviceFeature.HasTouchScreen in LDeviceService.GetFeatures
+    else
+      ALHasTouchScreen := False;
+    ALHasTouchScreenInitialized := True;
+    {$IF defined(debug)}
+    ALLog('Has Touch Screen', ALBoolToStrW(ALHasTouchScreen, 'true', 'false'));
+    {$ENDIF}
+  end;
+end;
+
+{************************************}
+function ALGetHasTouchScreen: Boolean;
+begin
+  if not ALHasTouchScreenInitialized then
+    ALInitHasTouchScreen;
+  {$IF defined(debug)}
+  Result := True;
+  {$ELSE}
+  result := ALHasTouchScreen;
+  {$ENDIF}
+end;
+
 initialization
   ALBrokenImageResourceName := 'broken_image';
   ALBrokenImageWidth := 16;
   ALBrokenImageHeight := 16;
   ALScreenScale := 0;
+  ALHasTouchScreen := False;
+  ALHasTouchScreenInitialized := False;
   ALCustomConvertFontFamilyProc := nil;
   ALCustomGetResourceFilenameProc := nil;
   {$IFDEF ANDROID}

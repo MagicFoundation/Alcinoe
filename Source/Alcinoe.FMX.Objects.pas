@@ -123,7 +123,7 @@ type
         ResourceName: String;
         ResourceStream: TStream;
         MaskResourceName: String;
-        MaskBitmap: TALBitmap;
+        MaskBitmap: TALRefCountBitmap;
         WrapMode: TALImageWrapMode;
         CropCenter: TpointF;
         RotateAccordingToExifOrientation: Boolean;
@@ -146,7 +146,7 @@ type
     FLoadingColor: TAlphaColor; // 4 bytes
     fResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
-    FMaskBitmap: TALBitmap; // 8 bytes
+    FMaskBitmap: TALRefCountBitmap; // 8 bytes
     FWrapMode: TALImageWrapMode; // 1 bytes
     fExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
     fRotateAccordingToExifOrientation: Boolean; // 1 bytes
@@ -162,8 +162,8 @@ type
     FStroke: TALStrokeBrush; // 8 bytes
     fShadow: TALShadow; // 8 bytes
     FResourceDownloadContext: TResourceDownloadContext; // [MultiThread] | 8 bytes
-    FFadeInDuration: Single;
-    FFadeInStartTimeNano: Int64;
+    FFadeInDuration: Single; // 4 bytes
+    FFadeInStartTimeNano: Int64; // 8 bytes
     function GetCropCenter: TALPosition;
     procedure SetCropCenter(const Value: TALPosition);
     function GetStroke: TALStrokeBrush;
@@ -174,7 +174,7 @@ type
     procedure SetRotateAccordingToExifOrientation(const Value: Boolean);
     procedure setResourceName(const Value: String);
     procedure setMaskResourceName(const Value: String);
-    procedure setMaskBitmap(const Value: TALBitmap);
+    procedure setMaskBitmap(const Value: TALRefCountBitmap);
     procedure setBackgroundColor(const Value: TAlphaColor);
     procedure setLoadingColor(const Value: TAlphaColor);
     function IsBackgroundColorStored: Boolean;
@@ -227,7 +227,7 @@ type
                       const AResourceName: String;
                       const AResourceStream: TStream;
                       const AMaskResourceName: String;
-                      const AMaskBitmap: TALBitmap;
+                      const AMaskBitmap: TALRefCountBitmap;
                       const AWrapMode: TALImageWrapMode;
                       const ACropCenter: TpointF;
                       const ARotateAccordingToExifOrientation: Boolean;
@@ -258,7 +258,7 @@ type
     property DefaultYRadius: Single read GetDefaultYRadius;
     property DefaultBlurRadius: Single read GetDefaultBlurRadius;
     // MaskBitmap will not be owned and will not be freed with the TALImage
-    property MaskBitmap: TALBitmap read fMaskBitmap write setMaskBitmap;
+    property MaskBitmap: TALRefCountBitmap read fMaskBitmap write setMaskBitmap;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
     // prevent duplicate drawables across multiple identical controls.
     // CacheIndex specifies the slot in the cache engine where an existing
@@ -1085,8 +1085,6 @@ type
     procedure Loaded; override;
     procedure DoResized; override;
     procedure AdjustSize; override;
-    procedure BeginTextUpdate; override;
-    procedure EndTextUpdate; override;
     function GetMultiLineTextOptions(
                const AScale: Single;
                const AOpacity: Single;
@@ -1464,6 +1462,7 @@ begin
   ResourceStream := nil;
   MaskResourceName := Owner.MaskResourceName;
   MaskBitmap := Owner.MaskBitmap;
+  if MaskBitmap <> nil then MaskBitmap.IncreaseRefCount;
   WrapMode := Owner.WrapMode;
   CropCenter := Owner.CropCenter.Point;
   RotateAccordingToExifOrientation := Owner.RotateAccordingToExifOrientation;
@@ -1485,6 +1484,10 @@ destructor TALImage.TResourceDownloadContext.Destroy;
 begin
   ALFreeAndNil(Lock);
   ALFreeAndNil(ResourceStream);
+  if MaskBitmap <> nil then begin
+    MaskBitmap.DecreaseRefCount;
+    MaskBitmap := nil;
+  end;
   inherited
 end;
 
@@ -1496,7 +1499,7 @@ begin
   FLoadingColor := DefaultLoadingColor;
   fResourceName := '';
   FMaskResourceName := '';
-  FMaskBitmap := ALNullBitmap;
+  FMaskBitmap := nil;
   FWrapMode := TALImageWrapMode.Fit;
   fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   fRotateAccordingToExifOrientation := False;
@@ -1509,7 +1512,7 @@ begin
   FLoadingCacheIndex := 0;
   FCacheEngine := nil;
   FCropCenter := CreateCropCenter;
-  FCropCenter.OnChange := CropCenterChanged;
+  FCropCenter.OnChanged := CropCenterChanged;
   FStroke := CreateStroke;
   FStroke.OnChanged := StrokeChanged;
   fShadow := CreateShadow;
@@ -1527,6 +1530,10 @@ begin
   ALFreeAndNil(fCropCenter);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(fShadow);
+  if FMaskBitmap <> nil then begin
+    FMaskBitmap.DecreaseRefCount;
+    FMaskBitmap := nil;
+  end;
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
 
@@ -1701,11 +1708,13 @@ begin
 end;
 
 {*******************************************************}
-procedure TALImage.setMaskBitmap(const Value: TALBitmap);
+procedure TALImage.setMaskBitmap(const Value: TALRefCountBitmap);
 begin
   if FMaskBitmap <> Value then begin
     ClearBufDrawable;
+    if FMaskBitmap <> nil then FMaskBitmap.DecreaseRefCount;
     FMaskBitmap := Value;
+    if FMaskBitmap <> nil then FMaskBitmap.IncreaseRefCount;
     Repaint;
   end;
 end;
@@ -1967,7 +1976,7 @@ begin
   LContext.ResourceName := ALBrokenImageResourceName;
   ALFreeAndNil(LContext.ResourceStream);
   LContext.MaskResourceName := '';
-  LContext.MaskBitmap := ALNullBitmap;
+  LContext.MaskBitmap := nil;
   LContext.WrapMode := TALImageWrapMode.Fit;
   //LContext.CropCenter: TpointF;
   //LContext.RotateAccordingToExifOrientation: Boolean;
@@ -2017,7 +2026,7 @@ begin
       LContext.ResourceName, // const AResourceName: String;
       LContext.ResourceStream, // const AResourceStream: TStream;
       LContext.MaskResourceName, // const AMaskResourceName: String;
-      LContext.MaskBitmap, // const AMaskBitmap: TALBitmap;
+      LContext.MaskBitmap, // const AMaskBitmap: TALRefCountBitmap;
       LContext.WrapMode, // const AWrapMode: TALImageWrapMode;
       LContext.CropCenter, // const ACropCenter: TpointF;
       LContext.RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
@@ -2076,7 +2085,7 @@ class Procedure TALImage.CreateBufDrawable(
                   const AResourceName: String;
                   const AResourceStream: TStream;
                   const AMaskResourceName: String;
-                  const AMaskBitmap: TALBitmap;
+                  const AMaskBitmap: TALRefCountBitmap;
                   const AWrapMode: TALImageWrapMode;
                   const ACropCenter: TpointF;
                   const ARotateAccordingToExifOrientation: Boolean;
@@ -2094,6 +2103,10 @@ class Procedure TALImage.CreateBufDrawable(
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
+
+  var LMaskBitmap: TALbitmap;
+  if AMaskBitmap <> nil then LMaskBitmap := AMaskBitmap.Bitmap
+  else LMaskBitmap := ALNullBitmap;
 
   var lResourceName: String;
   if ALIsHttpOrHttpsUrl(AResourceName) then lResourceName := ''
@@ -2153,7 +2166,7 @@ begin
                         AResourceName, // const AResourceName: String;
                         AResourceStream, // const AResourceStream: TStream;
                         AMaskResourceName, // const AMaskResourceName: String;
-                        AMaskBitmap, // const AMaskBitmap: TALBitmap;
+                        LMaskBitmap, // const AMaskBitmap: TALBitmap;
                         AScale, // const AScale: Single;
                         ARect.Width, ARect.Height, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -2217,7 +2230,7 @@ begin
         .SetFillResourceName(LResourceName)
         .SetFillResourceStream(AResourceStream)
         .SetFillMaskResourceName(AMaskResourceName)
-        .SetFillMaskBitmap(AMaskBitmap)
+        .SetFillMaskBitmap(LMaskBitmap)
         .SetFillWrapMode(AWrapMode)
         .SetFillCropCenter(ACropCenter)
         .SetFillBlurRadius(ABlurRadius)
@@ -2293,7 +2306,7 @@ begin
 
     if (LoadingColor <> TAlphaColors.Null) and
        ((MaskResourceName <> '') or
-        (not ALIsBitmapNull(MaskBitmap)) or
+        (MaskBitmap <> nil) or
         (not SameValue(xRadius, 0, TEpsilon.Vector)) or
         (not SameValue(yRadius, 0, TEpsilon.Vector))) then begin
 
@@ -2316,7 +2329,7 @@ begin
         '', // const AResourceName: String;
         nil, // const AResourceStream: TStream;
         MaskResourceName, // const AMaskResourceName: String;
-        MaskBitmap, // const AMaskBitmap: TALBitmap;
+        MaskBitmap, // const AMaskBitmap: TALRefCountBitmap;
         TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
         TpointF.Zero, // const ACropCenter: TpointF;
         false, // const ARotateAccordingToExifOrientation: Boolean;
@@ -2352,7 +2365,7 @@ begin
     ResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
     MaskResourceName, // const AMaskResourceName: String;
-    MaskBitmap, // const AMaskBitmap: TALBitmap;
+    MaskBitmap, // const AMaskBitmap: TALRefCountBitmap;
     WrapMode, // const AWrapMode: TALImageWrapMode;
     CropCenter.Point, // const ACropCenter: TpointF;
     RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
@@ -4847,20 +4860,6 @@ begin
       TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
     end;
   end;
-end;
-
-{************************************}
-procedure TALBaseText.BeginTextUpdate;
-begin
-  BeginUpdate;
-  Inherited;
-end;
-
-{**********************************}
-procedure TALBaseText.EndTextUpdate;
-begin
-  EndUpdate;
-  Inherited;
 end;
 
 {************************************************************************}

@@ -1098,12 +1098,13 @@ Var buffer: AnsiString;
         WorkingNode.ChildNodes.Add(CreateNode(LName, ntProcessingInstr, LContent));
       end;
 
-      //calculate the encoding
-      //note: The XML Declaration at the beginning of an XML document (shown below) is not a processing instruction, however its similar
-      //      syntax has often resulted in it being referred to as a processing instruction
+      // Determine the encoding for the XML document.
+      // Note: Although the XML declaration at the start of an XML document is not a true
+      // processing instruction, its similar syntax has often led to it being treated as one.
+      // When a BOM is present, it takes precedence over the encoding specified in the XML declaration.
       if ((not notSaxMode) or
           (ContainerNode.NodeType=ntDocument)) and
-         (bufferPos in [1,4{UTF8 BOOM}]) then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, LContent, ''));
+         (bufferPos = 1{NO UTF-8 BOM}) then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, LContent, ''));
 
       DoParseProcessingInstruction(GetPathStr(LName), LName, LContent);
 
@@ -1361,7 +1362,12 @@ Begin
     bufferLength := 0;
     bufferPos := 1;
     Expandbuffer;
-    if AlUTF8DetectBOM(PansiChar(buffer),length(buffer)) then bufferPos := 4;
+    if AlUTF8DetectBOM(PansiChar(buffer),length(buffer)) then begin
+      bufferPos := 4;
+      CodePage := 65001; {UTF-8}
+    end
+    else if CodePage = 0 then CodePage := 65001; {UTF-8}
+
 
     While bufferPos <= bufferLength do begin
 

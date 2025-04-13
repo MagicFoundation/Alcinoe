@@ -10,26 +10,20 @@ interface
 
 uses
   System.Classes,
-  System.Generics.Collections,
   FMX.Types,
+  FMX.Editor.Items,
   DesignIntf,
   DesignEditors,
   DesignMenus,
   StrEdit;
 
 resourcestring
-  SNewItem = 'Add Item';
-  SNewLastItem = 'Add %s';
   SItems = 'Items';
-  SNextTab = 'Next Tab';
-  SPrevTab = 'Previous Tab';
-  SUnnamedTab = 'Unnamed %1:s %0:d';
+  SNextPage = 'Next Page';
+  SPrevPage = 'Previous Page';
+  SUnnamedPage = 'Unnamed %1:s %0:d';
   SDeleteItem = 'Delete %s';
   SSetActive = 'Set Active';
-
-const
-  EDITOR_CREATE_ITEM = 0;
-  EDITOR_NEW_ITEM = 1;
 
 const
   EDITOR_SET_ACTIVE = 0;
@@ -116,45 +110,14 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {***********************}
-  TALItemClassDesc = record
-    ItemClass: TFmxObjectClass;
-    CanContainSimilarItem: Boolean; // Can accept ItemClass Items
-    ShowOnlyInMenu: Boolean;
-    constructor Create(
-                  const AItemClass: TFmxObjectClass;
-                  const ACanContaineSimilarItem: Boolean = False;
-                  const AShowOnlyInMenu: Boolean = False);
-  end;
-
-  {**************************************}
-  TALItemsEditor = class(TComponentEditor)
-  private
-    class var FListOfLastItems: TDictionary<string, Integer>;
-  protected
-    FAllowChild: Boolean;
-    FItemsClasses: array of TALItemClassDesc;
-    procedure DoCreateItem(Sender: TObject); virtual;
-    function GetIndexOfItemClass: Integer;
-    procedure SetIndexOfItemClass(const Value: Integer);
-  protected
-    function CanShow: Boolean; virtual;
-    property IndexOfItemClass: Integer read GetIndexOfItemClass write SetIndexOfItemClass;
-  public
-    procedure ExecuteVerb(Index: Integer); override;
-    function GetVerb(Index: Integer): string; override;
-    function GetVerbCount: Integer; override;
-    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
-  end;
-
   {*****************************************}
-  TALTabControlEditor = class(TALItemsEditor)
+  TALPageControllerEditor = class(TItemsEditor)
   private
-    FEditorNextTab: Integer;
-    FEditorPrevTab: Integer;
-    FEditorDeleteTab: Integer;
+    FEditorNextPage: Integer;
+    FEditorPrevPage: Integer;
+    FEditorDeletePage: Integer;
     FVerbCount: Integer;
-    function GetTabIndex: Integer;
+    function GetActivePageIndex: Integer;
   protected
     procedure DoCreateItem(Sender: TObject); override;
   public
@@ -166,7 +129,7 @@ type
   end;
 
   {****************************************}
-  TALTabItemEditor = class(TComponentEditor)
+  TALPageViewEditor = class(TComponentEditor)
   private
   protected
   public
@@ -203,26 +166,23 @@ type
     procedure SetValue(const AValue: string); override;
   end;
 
-
 procedure Register;
 
 implementation
 
 uses
   System.SysUtils,
-  System.UIConsts,
   Vcl.Menus,
-  FMX.Graphics,
+  FMX.Design.Items,
   Alcinoe.Common,
   Alcinoe.StringList,
-  Alcinoe.StringUtils,
   Alcinoe.FMX.Themes,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Memo,
   Alcinoe.fmx.common,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.Objects,
-  Alcinoe.FMX.TabControl;
+  Alcinoe.FMX.PageController;
 
 {*****************************************************}
 function TALEditEditor.GetVerb(Index: Integer): string;
@@ -528,216 +488,86 @@ begin
   end;
 end;
 
-{**********************************}
-constructor TALItemClassDesc.Create(
-              const AItemClass: TFmxObjectClass;
-              const ACanContaineSimilarItem: Boolean;
-              const AShowOnlyInMenu: Boolean);
-begin
-  Self.ItemClass := AItemClass;
-  Self.CanContainSimilarItem := ACanContaineSimilarItem;
-  Self.ShowOnlyInMenu := AShowOnlyInMenu;
-end;
-
-{***************************************}
-function TALItemsEditor.CanShow: Boolean;
-begin
-  Result := True;
-end;
-
-{*****************************************************}
-procedure TALItemsEditor.DoCreateItem(Sender: TObject);
-var
-  MenuItem: Vcl.Menus.TMenuItem;
-begin
-  if Sender is Vcl.Menus.TMenuItem then
-  begin
-    MenuItem := Sender as Vcl.Menus.TMenuItem;
-    if MenuItem.Tag >= 0 then
-      IndexOfItemClass := MenuItem.Tag;
-  end;
-  if (Component is TFmxObject) and (IndexOfItemClass >= 0) and (IndexOfItemClass < Length(FItemsClasses)) then
-    Designer.CreateChild(FItemsClasses[IndexOfItemClass].ItemClass, Component);
-end;
-
-{***************************************************}
-procedure TALItemsEditor.ExecuteVerb(Index: Integer);
-begin
-  case Index of
-    EDITOR_NEW_ITEM:
-      DoCreateItem(nil);
-  end;
-end;
-
-{******************************************************}
-function TALItemsEditor.GetVerb(Index: Integer): string;
-begin
-  case Index of
-    EDITOR_CREATE_ITEM:
-      Result := SNewItem;
-    EDITOR_NEW_ITEM:
-      begin
-        if (IndexOfItemClass >= 0) and (IndexOfItemClass < Length(FItemsClasses)) then
-          Result := Format(SNewLastItem, [FItemsClasses[IndexOfItemClass].ItemClass.ClassName])
-        else
-          Result := Format(SNewLastItem, [IntToStr(IndexOfItemClass)]);
-      end;
-  else
-    Result := Format(SItems + ' %d', [Index]);
-  end;
-end;
-
-{********************************************}
-function TALItemsEditor.GetVerbCount: Integer;
-begin
-  if CanShow then
-    Result := 2
-  else
-    Result := 0;
-end;
-
-{***************************************************}
-function TALItemsEditor.GetIndexOfItemClass: Integer;
-var
-  I: Integer;
-begin
-  Result := 0;
-  if (FListOfLastItems <> nil) and FListOfLastItems.TryGetValue(ClassType.QualifiedClassName, I) then
-    Result := I;
-end;
-
-{*****************************************************************}
-procedure TALItemsEditor.SetIndexOfItemClass(const Value: Integer);
-var
-  I: Integer;
-begin
-  if FListOfLastItems = nil then
-  begin
-    FListOfLastItems := TDictionary<string, Integer>.Create;
-  end;
-  if FListOfLastItems.TryGetValue(ClassType.QualifiedClassName, I) then
-    FListOfLastItems[ClassType.QualifiedClassName] := Value
-  else
-    FListOfLastItems.Add(ClassType.QualifiedClassName, Value);
-end;
-
-{***************************************************************************}
-procedure TALItemsEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
-var
-  I: Integer;
-  MenuItem: IMenuItem;
-begin
-  inherited PrepareItem(Index, AItem);
-  case Index of
-    EDITOR_CREATE_ITEM:
-      begin
-        if Length(FItemsClasses) > 1 then
-        begin
-          AItem.Visible := True;
-          for I := 0 to High(FItemsClasses) do
-          begin
-            MenuItem := AItem.AddItem(FItemsClasses[I].ItemClass.ClassName, 0, False, True, DoCreateItem);
-            MenuItem.Tag := I;
-            MenuItem := nil;
-          end;
-        end
-        else
-          AItem.Visible := False;
-      end;
-    EDITOR_NEW_ITEM:
-      begin
-        AItem.Visible := (IndexOfItemClass >= 0) and (IndexOfItemClass < Length(FItemsClasses));
-        AItem.Tag := -1;
-      end;
-  end;
-end;
-
 {***********************************************************************************}
-constructor TALTabControlEditor.Create(AComponent: TComponent; ADesigner: IDesigner);
+constructor TALPageControllerEditor.Create(AComponent: TComponent; ADesigner: IDesigner);
 begin
   inherited Create(AComponent, ADesigner);
-  FEditorNextTab := inherited GetVerbCount;
-  FEditorPrevTab := FEditorNextTab + 1;
-  FEditorDeleteTab := FEditorNextTab + 2;
-  FVerbCount := FEditorNextTab + 3;
+  FEditorNextPage := inherited GetVerbCount;
+  FEditorPrevPage := FEditorNextPage + 1;
+  FEditorDeletePage := FEditorNextPage + 2;
+  FVerbCount := FEditorNextPage + 3;
   FAllowChild := False;
   SetLength(FItemsClasses, 1);
-  FItemsClasses[0] := TALItemClassDesc.Create(TALTabItem);
+  FItemsClasses[0] := TItemClassDesc.Create(TALPageView);
 end;
 
 {**********************************************************}
-procedure TALTabControlEditor.DoCreateItem(Sender: TObject);
+procedure TALPageControllerEditor.DoCreateItem(Sender: TObject);
 begin
   inherited;
-  if (Component is TALTabControl) then
-    TALTabControl(Component).TabIndex := TALTabControl(Component).TabCount - 1;
+  if (Component is TALPageController) then
+    TALPageController(Component).ActivePageIndex := TALPageController(Component).PageCount - 1;
 end;
 
 {************************************************}
-function TALTabControlEditor.GetTabIndex: Integer;
+function TALPageControllerEditor.GetActivePageIndex: Integer;
 begin
-  if (Component is TALTabControl) and (TALTabControl(Component).TabIndex >= 0) and
-    (TALTabControl(Component).TabIndex < TALTabControl(Component).TabCount) then
-    Result := TALTabControl(Component).TabIndex
+  if (Component is TALPageController) then
+    Result := TALPageController(Component).ActivePageIndex
   else
     Result := -1;
 end;
 
 {********************************************************}
-procedure TALTabControlEditor.ExecuteVerb(Index: Integer);
+procedure TALPageControllerEditor.ExecuteVerb(Index: Integer);
 var
-  Obj: TFmxObject;
-  LTabIndex: Integer;
-  LControl: TALTabControl;
-  procedure SelectTab(I: Integer);
+  LControl: TALPageController;
+
+  procedure SelectPage(I: Integer);
   begin
-    if I >= LControl.TabCount then
-      I := LControl.TabCount - 1;
-    if I < 0 then
-      I := -1;
-    LControl.TabIndex := I;
-    if I >= 0 then
-      Designer.SelectComponent(LControl.Tabs[I])
+    if I >= LControl.PageCount then I := LControl.PageCount - 1;
+    if I < 0 then I := 0;
+    if (I >= 0) and (LControl.PageCount > 0) then begin
+      LControl.ActivePageIndex := I;
+      Designer.SelectComponent(LControl.Pages[I]);
+    end
     else
       Designer.SelectComponent(Component);
   end;
+
 begin
   inherited;
-  if Component is TALTabControl then
+  if Component is TALPageController then
   begin
-    LTabIndex := GetTabIndex;
-    LControl := TALTabControl(Component);
-    if Index = FEditorNextTab then
-      SelectTab(LTabIndex + 1)
-    else if Index = FEditorPrevTab then
-      SelectTab(LTabIndex - 1)
-    else if (Index = FEditorDeleteTab) and (LTabIndex >= 0) then
-    begin
-      Obj := (LControl as IItemsContainer).GetItem(LTabIndex);
-      FreeAndNil(Obj);
-      SelectTab(LTabIndex);
+    var LPageIndex := GetActivePageIndex;
+    LControl := TALPageController(Component);
+    if Index = FEditorNextPage then SelectPage(LPageIndex + 1)
+    else if Index = FEditorPrevPage then SelectPage(LPageIndex - 1)
+    else if (Index = FEditorDeletePage) and (LPageIndex >= 0) then begin
+      LControl.DeletePage(LPageIndex);
+      SelectPage(GetActivePageIndex);
     end;
   end;
 end;
 
 {***********************************************************}
-function TALTabControlEditor.GetVerb(Index: Integer): string;
+function TALPageControllerEditor.GetVerb(Index: Integer): string;
 var
   S: string;
 begin
   Result := Inherited GetVerb(Index);
-  if Component is TALTabControl then
-    if Index = FEditorNextTab then
-      Result := SNextTab
-    else if Index = FEditorPrevTab then
-      Result := SPrevTab
-    else if Index = FEditorDeleteTab then
+  if Component is TALPageController then
+    if Index = FEditorNextPage then
+      Result := SNextPage
+    else if Index = FEditorPrevPage then
+      Result := SPrevPage
+    else if Index = FEditorDeletePage then
     begin
-      if GetTabIndex >= 0 then
+      if GetActivePageIndex >= 0 then
       begin
-        S := TALTabControl(Component).Tabs[GetTabIndex].Name;
+        S := TALPageController(Component).Pages[GetActivePageIndex].Name;
         if S = '' then
-          S := Format(SUnnamedTab, [GetTabIndex, TALTabControl(Component).Tabs[GetTabIndex].ClassName])
+          S := Format(SUnnamedPage, [GetActivePageIndex, TALPageController(Component).Pages[GetActivePageIndex].ClassName])
         else
           S := QuotedStr(S);
         Result := Format(SDeleteItem, [S]);
@@ -748,40 +578,40 @@ begin
 end;
 
 {*************************************************}
-function TALTabControlEditor.GetVerbCount: Integer;
+function TALPageControllerEditor.GetVerbCount: Integer;
 begin
   Result := FVerbCount;
 end;
 
 {********************************************************************************}
-procedure TALTabControlEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+procedure TALPageControllerEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   inherited;
-  if Component is TALTabControl then
+  if Component is TALPageController then
   begin
-    if Index = FEditorNextTab then
-      AItem.Enabled := GetTabIndex < TALTabControl(Component).TabCount - 1
-    else if Index = FEditorPrevTab then
-      AItem.Enabled := GetTabIndex > 0
-    else if Index = FEditorDeleteTab then
-      AItem.Enabled := GetTabIndex >= 0;
+    if Index = FEditorNextPage then
+      AItem.Enabled := GetActivePageIndex < TALPageController(Component).PageCount - 1
+    else if Index = FEditorPrevPage then
+      AItem.Enabled := GetActivePageIndex > 0
+    else if Index = FEditorDeletePage then
+      AItem.Enabled := GetActivePageIndex >= 0;
   end
   else
     AItem.Visible := False;
 end;
 
 {*****************************************************}
-procedure TALTabItemEditor.ExecuteVerb(Index: Integer);
+procedure TALPageViewEditor.ExecuteVerb(Index: Integer);
 begin
   case Index of
     EDITOR_SET_ACTIVE:
-      if (Component is TALTabItem) then
-        TALTabItem(Component).IsSelected := true;
+      if (Component is TALPageView) then
+        TALPageView(Component).Active := true;
   end;
 end;
 
 {********************************************************}
-function TALTabItemEditor.GetVerb(Index: Integer): string;
+function TALPageViewEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     EDITOR_SET_ACTIVE:
@@ -792,22 +622,22 @@ begin
 end;
 
 {**********************************************}
-function TALTabItemEditor.GetVerbCount: Integer;
+function TALPageViewEditor.GetVerbCount: Integer;
 begin
   Result := 1;
 end;
 
 {*****************************************************************************}
-procedure TALTabItemEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+procedure TALPageViewEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   inherited PrepareItem(Index, AItem);
   case Index of
     EDITOR_SET_ACTIVE:
       begin
         AItem.Visible := true;
-        if (Component is TALTabItem) and
-           ((TALTabItem(Component).IsSelected) or
-            (not (TALTabItem(Component).Visible))) then Aitem.Enabled := False
+        if (Component is TALPageView) and
+           ((TALPageView(Component).Active) or
+            (not (TALPageView(Component).Visible))) then Aitem.Enabled := False
         else aItem.Enabled := True;
       end;
   end;
@@ -900,17 +730,10 @@ begin
   RegisterComponentEditor(TALSwitch, TALSwitchEditor);
   RegisterComponentEditor(TALTrackBar, TALTrackBarEditor);
   RegisterComponentEditor(TALRangeTrackBar, TALRangeTrackBarEditor);
-  RegisterComponentEditor(TALTabControl, TALTabControlEditor);
-  RegisterComponentEditor(TALTabItem, TALTabItemEditor);
+  RegisterComponentEditor(TALPageController, TALPageControllerEditor);
+  RegisterComponentEditor(TALPageView, TALPageViewEditor);
   RegisterPropertyEditor(TypeInfo(string), TALText, 'Text', TALTextTextPropertyEditor);
   RegisterPropertyEditor(TypeInfo(TALGradient), TALBrush, 'Gradient', TALGradientPropertyEditor);
 end;
-
-initialization
-  TALItemsEditor.FListOfLastItems := nil;
-
-finalization
-  if TALItemsEditor.FListOfLastItems <> nil then
-    FreeandNil(TALItemsEditor.FListOfLastItems);
 
 end.

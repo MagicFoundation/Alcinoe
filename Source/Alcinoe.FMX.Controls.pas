@@ -1,4 +1,4 @@
-unit Alcinoe.FMX.Controls;
+﻿unit Alcinoe.FMX.Controls;
 
 interface
 
@@ -83,6 +83,7 @@ type
     FIsPixelAlignmentEnabled: Boolean; // 1 byte
     FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
+    FBeforeDestructionExecuted: Boolean; // 1 byte
     function GetPivot: TPosition;
     procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
@@ -96,6 +97,7 @@ type
     FAutoSize: Boolean; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
+    property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
     procedure SetScale(const AValue: Single); virtual;
@@ -135,13 +137,12 @@ type
     procedure DoResized; override;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
-    procedure BeginTextUpdate; virtual;
-    procedure EndTextUpdate; virtual;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
     function GetAbsoluteDisplayedRect: TRectF; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; virtual;
@@ -160,6 +161,13 @@ type
     procedure MakeBufDrawable; virtual;
     procedure ClearBufDrawable; virtual;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
+    /// <summary>
+    ///   When IsPixelAlignmentEnabled is true, all dimensions used to build the buffered drawable
+    ///   are aligned to the pixel grid. Additionally, after the object is loaded, all properties
+    ///   related to the pixel grid (e.g., margins) are automatically aligned. Note that setting these
+    ///   properties at runtime does not change their alignment; alignment is applied only via the
+    ///   loading process.
+    /// </summary>
     property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
     property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     property ALParentControl: TALControl read FALParentControl;
@@ -170,13 +178,15 @@ type
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALContent = class(TALControl, IContent)
-  private
-    FParentAligning: Boolean;
   protected
     function GetTabStopController: ITabStopController; override;
+    procedure DoAddObject(const AObject: TFmxObject); override;
+    procedure DoRemoveObject(const AObject: TFmxObject); override;
+    procedure DoDeleteChildren; override;
     procedure DoRealign; override;
     procedure IContent.Changed = ContentChanged;
-    procedure ContentChanged; virtual;
+    procedure DoContentChanged; Virtual;
+    procedure ContentChanged;
   public
     constructor Create(AOwner: TComponent); override;
     function GetTabListClass: TTabListClass; override;
@@ -283,6 +293,7 @@ begin
   FIsPixelAlignmentEnabled := True;
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
+  FBeforeDestructionExecuted := False;
   FTextUpdating := False;
   FAutoSize := False;
   FIsAdjustingSize := False;
@@ -296,73 +307,57 @@ begin
   inherited;
 end;
 
-{*****************************}
+{*************************************}
+procedure TALControl.BeforeDestruction;
+begin
+  if FBeforeDestructionExecuted then exit;
+  FBeforeDestructionExecuted := True;
+  for var I := 0 to Controls.Count - 1 do
+    Controls[I].BeforeDestruction;
+  inherited;
+end;
+
+{***************************************************************}
+// The current implementation of TControl's BeginUpdate/EndUpdate
+// and Realign methods is inefficient—particularly for TALText,
+// which must rebuild its internal buffer every time its size
+// changes. When EndUpdate is called, the update propagates through
+// the deepest nested children first. For example, consider the
+// following hierarchy:
+//
+// Control1
+//   └─ Control2
+//         └─ AlText1
+//
+// When Control1.EndUpdate is called, the sequence of events is as
+// follows:
+//
+//   * AlText1.EndUpdate is called first, triggering an AdjustSize
+//     and a Realign.
+//   * Next, Control2.EndUpdate executes, which calls Realign and
+//     may trigger AlText1.AdjustSize again.
+//   * Finally, Control1.EndUpdate runs, calling Realign and possibly
+//     causing yet another AlText1.AdjustSize.
+//
+// This series of operations results in the BufDrawable being
+// recalculated multiple times, leading to significant performance
+// overhead.
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if FMX.Controls.TControl.EndUpdate was not updated and adjust the IFDEF'}
+{$ENDIF}
 procedure TALControl.EndUpdate;
 begin
   if IsUpdating then
   begin
-    if not FTextUpdating then begin
-      BeginTextUpdate;
-      Inherited;
-      EndTextUpdate;
-    end
-    else
-      Inherited;
+    Dec(FUpdating);
+    if not IsUpdating then
+    begin
+      DoEndUpdate;
+      //RefreshInheritedCursorForChildren;
+    end;
+    for var I := 0 to ControlsCount - 1 do
+      Controls[I].EndUpdate;
   end;
-end;
-
-{*************************************************}
-// Unfortunately, the way BeginUpdate/EndUpdate and
-// Realign are implemented is not very efficient for TALText.
-// When calling EndUpdate, it first propagates to the most
-// deeply nested children in this hierarchy:
-//   Control1
-//     Control2
-//       AlText1
-// This means when Control1.EndUpdate is called,
-// it executes in the following order:
-//       AlText1.EndUpdate => AdjustSize and Realign
-//     Control2.EndUpdate => Realign and potentially calls AlText1.AdjustSize again
-//   Control1.EndUpdate => Realign and possibly triggers AlText1.AdjustSize once more
-// This poses a problem since the BufDrawable will be
-// recalculated multiple times.
-// To mitigate this, we can use:
-//   BeginTextUpdate;
-//   EndUpdate;
-//   EndTextUpdate;
-procedure TALControl.BeginTextUpdate;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure DoBeginTextUpdate(const AControl: TControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do
-      if AControl.Controls[i] is TALControl then
-        TALControl(AControl.Controls[i]).BeginTextUpdate
-      else
-        DoBeginTextUpdate(AControl.Controls[i]);
-  end;
-
-begin
-  FTextUpdating := True;
-  DoBeginTextUpdate(Self);
-end;
-
-{*********************************}
-procedure TALControl.EndTextUpdate;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure DoEndTextUpdate(const AControl: TControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do
-      if AControl.Controls[i] is TALControl then
-        TALControl(AControl.Controls[i]).EndTextUpdate
-      else
-        DoEndTextUpdate(AControl.Controls[i]);
-  end;
-
-begin
-  FTextUpdating := False;
-  DoEndTextUpdate(Self);
 end;
 
 {**************************}
@@ -717,8 +712,12 @@ begin
       var LSize := TSizeF.Create(0,0);
       for var I := 0 to ControlsCount - 1 do begin
         var LChildControl := Controls[I];
-        if (csDesigning in ComponentState) and (LChildControl.ClassName = 'TGrabHandle.TGrabHandleRectangle') then
-          continue;
+        {$IF defined(ALDPK)}
+        // At design time, the Delphi IDE may add children such as
+        // TGrabHandle.TGrabHandleRectangle
+        if (csDesigning in ComponentState) and Supports(LChildControl, IDesignerControl) then
+          Continue;
+        {$ENDIF}
 
         var LALChildControl: TALControl;
         var LALChildControlAlign: TALAlignLayout;
@@ -1003,7 +1002,6 @@ end;
 procedure TALControl.SetScale(const AValue: Single);
 begin
   if not SameValue(FScale, AValue, TEpsilon.Scale) then begin
-    ClearBufDrawable;
     FScale := AValue;
     DoMatrixChanged(nil);
     Repaint;
@@ -1493,23 +1491,89 @@ begin
   SetAcceptsControls(False);
 end;
 
+{***************************************************************************}
+procedure TALContent.DoAddObject(const AObject: TFmxObject);
+begin
+  inherited;
+  ContentChanged;
+end;
+
+{******************************************************************************}
+procedure TALContent.DoRemoveObject(const AObject: TFmxObject);
+begin
+  inherited;
+  ContentChanged;
+end;
+
+{*****************************************************}
+procedure TALContent.DoDeleteChildren;
+begin
+  inherited;
+  ContentChanged;
+end;
+
 {*****************************}
 procedure TALContent.DoRealign;
-var
-  AlignRoot: IAlignRoot;
+//var
+//  AlignRoot: IAlignRoot;
 begin
-  if (Parent <> nil) and not(csLoading in Parent.ComponentState) then
-    inherited;
-  if (Parent <> nil) and not FParentAligning and not(csLoading in ComponentState) then
-  begin
-    FParentAligning := True;
-    if ParentControl <> nil then
-      _TControlAccessProtected(ParentControl).Realign
-    else
-      if not(csLoading in ComponentState) and Supports(Parent, IAlignRoot, AlignRoot) then
-        AlignRoot.Realign;
-    FParentAligning := False;
-  end;
+//  if (Parent <> nil) and not(csLoading in Parent.ComponentState) then
+//    inherited;
+//  if (Parent <> nil) and not FParentAligning and not(csLoading in ComponentState) then
+//  begin
+//    FParentAligning := True;
+//    if ParentControl <> nil then
+//      _TControlAccessProtected(ParentControl).Realign
+//    else
+//      if not(csLoading in ComponentState) and Supports(Parent, IAlignRoot, AlignRoot) then
+//        AlignRoot.Realign;
+//    FParentAligning := False;
+//  end;
+
+  // There is nothing wrong with the previous implementation.
+  // This code is taken from TContent. We must call ContentChanged every time we realign,
+  // because if one of its child controls changes its position or size during realignment,
+  // ContentChanged would normally be triggered. However, since ContentChanged is deactivated
+  // (i.e., FDisableAlign is checked), DoContentChanged will not be called,
+  // and thus the parent of the content will not be notified.
+
+  inherited;
+  ContentChanged;
+
+end;
+
+{**********************************}
+procedure TALContent.DoContentChanged;
+begin
+  // Virtual
+end;
+
+{**********************************}
+procedure TALContent.ContentChanged;
+begin
+
+  // ContentChanged is called by the TControl.ParentContentChanged function,
+  // which in turn is invoked by:
+  //
+  //  * TControl.DoMatrixChanged (i.e., when the position of a child control changes)
+  //  * TControl.SetAlign (i.e., when the alignment property of a child control changes)
+  //  * TControl.SetVisible (i.e., when the visibility of a child control changes)
+  //  * TControl.InternalSizeChanged (i.e., when the size of a child control changes)
+  //
+  // Monitoring this event is important so that we can update the size of TALContent
+  // to best fit its content—this is especially crucial for components such as TALScrollBox.
+
+  {$IF defined(debug)}
+  //ALLog(ClassName+'.ContentChanged', 'Name: ' + Name);
+  {$ENDIF}
+
+  // * We do not call DoContentChanged if IsUpdating because calling EndUpdate triggers a
+  //   realignment (DoEndUpdate > Realign > DoRealign) that invokes ContentChanged again.
+  // * Likewise, we ignore FDisableAlign since ContentChanged will be called again
+  //   (in DoRealign) once the alignment process is complete.
+  if (not IsUpdating) and (not FDisableAlign) and (not (csDestroying in ComponentState)) then
+    DoContentChanged;
+
 end;
 
 {*************************************************}
@@ -1527,14 +1591,6 @@ begin
     Result := Control.GetTabStopController
   else
     Result := nil;
-end;
-
-{**********************************}
-procedure TALContent.ContentChanged;
-begin
-  {$IF defined(debug)}
-  //ALLog(ClassName+'.ContentChanged', 'Name: ' + Name);
-  {$ENDIF}
 end;
 
 end.

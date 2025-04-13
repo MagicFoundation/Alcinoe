@@ -3639,7 +3639,7 @@ end;
 {$IFDEF MSWINDOWS}
 Procedure ALWriteLN(const AStr: String);
 begin
-  System.Write(AStr);
+  System.WriteLN(AStr);
 end;
 {$ENDIF}
 

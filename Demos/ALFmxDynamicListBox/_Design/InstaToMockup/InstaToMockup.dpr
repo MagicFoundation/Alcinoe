@@ -71,7 +71,9 @@ begin
       If TDirectory.Exists(LDoneDir) then TDirectory.Delete(LDoneDir, true);
       TDirectory.CreateDirectory(LDoneDir);
 
-      var LResourceJsonData := TALJSONArrayNodeA.Create;
+      var LPostsJsonData := TALJSONArrayNodeA.Create;
+      var LStoriesJsonData := TALJSONArrayNodeA.Create;
+      var LuserNames := TDictionary<AnsiString, Boolean>.Create;
       try
         var Lfiles := Tdirectory.GetFiles(ALGetModulePathW + '：saved', '*.json');
         for var Lfile in LFiles do begin
@@ -94,7 +96,7 @@ begin
           //  "comment_count":NumberInt(129),
           //  "reshare_count":NumberInt(81)
           //}
-          With LResourceJsonData.AddChild(ntObject) do begin
+          With LPostsJsonData.AddChild(ntObject) do begin
             SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
             var lUserName := LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','username'], '');
             if lUserName = '' then raise Exception.Create('Error CEE296F2-9E79-4100-9B8F-48B16EF3863E | ' + Lfile);
@@ -391,29 +393,43 @@ begin
               TFile.Copy(ALGetModulePathW + '：saved\'+String(lUserName)+'.jpg', LdoneDir + String(lUserName)+'.jpg');
             SetChildNodeValueText('profile_pic_url', 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ansiString(lUserName)+'.jpg');
           end;
+          //--
+          //--
+          if LuserNames.TryAdd(LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','username'], ''), true) then begin
+            With LStoriesJsonData.AddChild(ntObject) do begin
+              SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+              var lUserName := LPostJsonData.GetChildNodeValueText(['node', 'iphone_struct','user','username'], '');
+              if lUserName = '' then raise Exception.Create('Error CEE296F2-9E79-4100-9B8F-48B16EF3863E | ' + Lfile);
+              SetChildNodeValueText('username', lUserName);
+              SetChildNodeValueText('profile_pic_url', 'https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/' + ansiString(lUserName)+'.jpg');
+            end;
+          end;
         end;
 
         // Make 1 video every 2 posts
         var LVideoJsonNode := TList<TALJsonNodeA>.create;
         try
-          for var I := LResourceJsonData.ChildNodes.Count - 1 downto 0 do begin
-            if LResourceJsonData.ChildNodes[i].ChildNodes['media'].ChildNodes[0].GetChildNodeValueBool('is_video', false) then
-              LVideoJsonNode.Add(LResourceJsonData.ChildNodes.Extract(i));
+          for var I := LPostsJsonData.ChildNodes.Count - 1 downto 0 do begin
+            if LPostsJsonData.ChildNodes[i].ChildNodes['media'].ChildNodes[0].GetChildNodeValueBool('is_video', false) then
+              LVideoJsonNode.Add(LPostsJsonData.ChildNodes.Extract(i));
           end;
           for var i := 0 to LVideoJsonNode.Count - 1 do begin
-            if (I+1) * 3 >= LResourceJsonData.ChildNodes.Count then
-              LResourceJsonData.ChildNodes.add(LVideoJsonNode[i])
+            if (I+1) * 3 >= LPostsJsonData.ChildNodes.Count then
+              LPostsJsonData.ChildNodes.add(LVideoJsonNode[i])
             else
-              LResourceJsonData.ChildNodes.Insert(((I+1) * 3) - 1, LVideoJsonNode[i]);
+              LPostsJsonData.ChildNodes.Insert(((I+1) * 3) - 1, LVideoJsonNode[i]);
           end;
         finally
           ALFreeAndNil(LVideoJsonNode);
         end;
 
-        LResourceJsonData.SaveToJSONFile(ALGetModulePathW + 'data.json', [soNodeAutoIndent]);
+        LPostsJsonData.SaveToJSONFile(ALGetModulePathW + 'data.json', [soNodeAutoIndent]);
+        LStoriesJsonData.SaveToJSONFile(ALGetModulePathW + 'stories.json', [soNodeAutoIndent]);
 
       finally
-        ALFreeAndNil(LResourceJsonData);
+        ALFreeAndNil(LPostsJsonData);
+        ALFreeandNil(LStoriesJsonData);
+        ALFReeAndNil(LuserNames);
       end;
 
     finally

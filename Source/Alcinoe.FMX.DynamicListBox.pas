@@ -73,7 +73,6 @@ type
     FMargins: TALBounds; // 8 bytes | [TControl] FMargins: TBounds;
     FPressedPosition: TPointF; // 8 bytes | [TControl] FPressedPosition: TPointF;
     FCanvas: TCanvas; // 8 bytes;
-    FBeforeDestructionExecuted: Boolean; // 1 byte
     FIsDestroying: boolean; // 1 byte | [TControl] FComponentState: TComponentState; & csDestroying
     FIsEphemeral: boolean; // 1 byte
     FEnabled: Boolean; // 1 byte | [TControl] FEnabled: Boolean;
@@ -121,7 +120,6 @@ type
     function GetControl(Index: Integer): TALDynamicListBoxControl;
     function GetForm: TCommonCustomForm;
   protected
-    property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function CreateMargins: TALBounds; virtual;
     function CreatePadding: TALBounds; virtual;
     procedure SetBounds(X, Y, AWidth, AHeight: Double); virtual; // [TControl] procedure SetBounds(X, Y, AWidth, AHeight: Single); virtual;
@@ -167,8 +165,6 @@ type
     procedure DoRealign; virtual; // [TControl] procedure DoRealign; virtual;
     procedure DoBeginUpdate; virtual; // [TControl] procedure DoBeginUpdate; virtual;
     procedure DoEndUpdate; virtual; // [TControl] procedure DoEndUpdate; virtual;
-    procedure BeginTextUpdate; virtual; abstract;
-    procedure EndTextUpdate; virtual; abstract;
     procedure MouseEnter; virtual; // [TControl] procedure DoMouseEnter; virtual;
     procedure MouseLeave; virtual; // [TControl] procedure DoMouseLeave; virtual;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // [TControl] procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
@@ -204,7 +200,7 @@ type
     Property IsDestroying: boolean read FIsDestroying; // [MultiThread]
     Property IsEphemeral: boolean read FIsEphemeral write FIsEphemeral; // [MultiThread]
     procedure BeginUpdate; virtual; // [TControl] procedure BeginUpdate; virtual;
-    procedure EndUpdate; virtual; // [TControl] procedure EndUpdate; virtual;
+    procedure EndUpdate; virtual; abstract; // [TControl] procedure EndUpdate; virtual;
     function IsUpdating: Boolean; virtual; // [TControl] function IsUpdating: Boolean; virtual;
     function IsReadyToDisplay: Boolean; virtual; abstract;
     procedure AddControl(const AControl: TALDynamicListBoxControl); inline; // [TControl] procedure AddObject(const AObject: TFmxObject);
@@ -301,6 +297,7 @@ type
     FIsPixelAlignmentEnabled: Boolean; // 1 byte
     //FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
+    FBeforeDestructionExecuted: Boolean; // 1 byte
     //function GetPivot: TPosition;
     //procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
@@ -314,6 +311,7 @@ type
     FAutoSize: Boolean; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
+    property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetScale(const AValue: Single); virtual;
@@ -353,13 +351,12 @@ type
     procedure DoResized; override;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
-    procedure BeginTextUpdate; override;
-    procedure EndTextUpdate; override;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
     //function GetAbsoluteDisplayedRect: TRectF; virtual;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure EndUpdate; override;
     //procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; override;
@@ -378,6 +375,13 @@ type
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
+    /// <summary>
+    ///   When IsPixelAlignmentEnabled is true, all dimensions used to build the buffered drawable
+    ///   are aligned to the pixel grid. Additionally, after the object is loaded, all properties
+    ///   related to the pixel grid (e.g., margins) are automatically aligned. Note that setting these
+    ///   properties at runtime does not change their alignment; alignment is applied only via the
+    ///   loading process.
+    /// </summary>
     property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
     //property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     //property OwnerControl: TALDynamicListBoxControl read FOwnerControl;
@@ -477,8 +481,8 @@ type
     FStroke: TALStrokeBrush; // 8 bytes
     fShadow: TALShadow; // 8 bytes
     FResourceDownloadContext: TResourceDownloadContext; // [MultiThread] | 8 bytes
-    FFadeInDuration: Single;
-    FFadeInStartTimeNano: Int64;
+    FFadeInDuration: Single; // 4 bytes
+    FFadeInStartTimeNano: Int64; // 8 bytes
     function GetCropCenter: TALPosition;
     procedure SetCropCenter(const Value: TALPosition);
     function GetStroke: TALStrokeBrush;
@@ -1112,8 +1116,6 @@ type
     //procedure Loaded; override;
     procedure DoResized; override;
     procedure AdjustSize; override;
-    procedure BeginTextUpdate; override;
-    procedure EndTextUpdate; override;
     function GetMultiLineTextOptions(
                const AScale: Single;
                const AOpacity: Single;
@@ -5123,7 +5125,6 @@ begin
   FMargins.OnChanged := MarginsChangedHandler;
   FPressedPosition := TPointF.Zero;
   FCanvas := nil;
-  FBeforeDestructionExecuted := False;
   FIsDestroying := False;
   FIsEphemeral := False;
   FEnabled := True;
@@ -5181,11 +5182,7 @@ end;
 {***************************************************}
 procedure TALDynamicListBoxControl.BeforeDestruction;
 begin
-  if FBeforeDestructionExecuted then exit;
-  FBeforeDestructionExecuted := True;
   fIsDestroying := True;
-  for Var I := 0 to FControlsCount - 1 do
-    FControls[i].BeforeDestruction;
   inherited;
 end;
 
@@ -5222,18 +5219,6 @@ begin
   Inc(FUpdating);
   for var I := 0 to FControlsCount - 1 do
     FControls[I].BeginUpdate;
-end;
-
-{*******************************************}
-procedure TALDynamicListBoxControl.EndUpdate;
-begin
-  if IsUpdating then begin
-    Dec(FUpdating);
-    if not IsUpdating then
-      DoEndUpdate;
-    for var I := 0 to FControlsCount - 1 do
-      FControls[I].EndUpdate;
-  end;
 end;
 
 {****************************************************}
@@ -6886,6 +6871,7 @@ begin
   FIsPixelAlignmentEnabled := True;
   //FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
+  FBeforeDestructionExecuted := False;
   FTextUpdating := False;
   FAutoSize := False;
   FIsAdjustingSize := False;
@@ -6899,75 +6885,57 @@ begin
   inherited;
 end;
 
-{***************************************************}
+{***********************************************************}
+procedure TALDynamicListBoxExtendedControl.BeforeDestruction;
+begin
+  if FBeforeDestructionExecuted then exit;
+  FBeforeDestructionExecuted := True;
+  for var I := 0 to ControlsCount - 1 do
+    Controls[I].BeforeDestruction;
+  inherited;
+end;
+
+{***************************************************************}
+// The current implementation of TControl's BeginUpdate/EndUpdate
+// and Realign methods is inefficient—particularly for TALDynamicListBoxText,
+// which must rebuild its internal buffer every time its size
+// changes. When EndUpdate is called, the update propagates through
+// the deepest nested children first. For example, consider the
+// following hierarchy:
+//
+// Control1
+//   └─ Control2
+//         └─ AlText1
+//
+// When Control1.EndUpdate is called, the sequence of events is as
+// follows:
+//
+//   * AlText1.EndUpdate is called first, triggering an AdjustSize
+//     and a Realign.
+//   * Next, Control2.EndUpdate executes, which calls Realign and
+//     may trigger AlText1.AdjustSize again.
+//   * Finally, Control1.EndUpdate runs, calling Realign and possibly
+//     causing yet another AlText1.AdjustSize.
+//
+// This series of operations results in the BufDrawable being
+// recalculated multiple times, leading to significant performance
+// overhead.
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if FMX.Controls.TControl.EndUpdate was not updated and adjust the IFDEF'}
+{$ENDIF}
 procedure TALDynamicListBoxExtendedControl.EndUpdate;
 begin
   if IsUpdating then
   begin
-    if not FTextUpdating then begin
-      BeginTextUpdate;
-      Inherited;
-      EndTextUpdate;
-    end
-    else
-      Inherited;
+    Dec(FUpdating);
+    if not IsUpdating then
+    begin
+      DoEndUpdate;
+      //RefreshInheritedCursorForChildren;
+    end;
+    for var I := 0 to ControlsCount - 1 do
+      Controls[I].EndUpdate;
   end;
-end;
-
-{*************************************************}
-// Unfortunately, the way BeginUpdate/EndUpdate and
-// Realign are implemented is not very efficient for TALDynamicListBoxText.
-// When calling EndUpdate, it first propagates to the most
-// deeply nested children in this hierarchy:
-//   Control1
-//     Control2
-//       AlText1
-// This means when Control1.EndUpdate is called,
-// it executes in the following order:
-//       AlText1.EndUpdate => AdjustSize and Realign
-//     Control2.EndUpdate => Realign and potentially calls AlText1.AdjustSize again
-//   Control1.EndUpdate => Realign and possibly triggers AlText1.AdjustSize once more
-// This poses a problem since the BufDrawable will be
-// recalculated multiple times.
-// To mitigate this, we can use:
-//   BeginTextUpdate;
-//   EndUpdate;
-//   EndTextUpdate;
-procedure TALDynamicListBoxExtendedControl.BeginTextUpdate;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure DoBeginTextUpdate(const AControl: TALDynamicListBoxControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do
-      //if AControl.Controls[i] is TALDynamicListBoxControl then
-      //  TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate
-      //else
-      //  DoBeginTextUpdate(AControl.Controls[i]);
-      AControl.Controls[i].BeginTextUpdate;
-  end;
-
-begin
-  FTextUpdating := True;
-  DoBeginTextUpdate(Self);
-end;
-
-{*******************************************************}
-procedure TALDynamicListBoxExtendedControl.EndTextUpdate;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure DoEndTextUpdate(const AControl: TALDynamicListBoxControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do
-      //if AControl.Controls[i] is TALDynamicListBoxControl then
-      //  TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate
-      //else
-      //  DoEndTextUpdate(AControl.Controls[i]);
-      AControl.Controls[i].EndTextUpdate;
-  end;
-
-begin
-  FTextUpdating := False;
-  DoEndTextUpdate(Self);
 end;
 
 {**************************************************}
@@ -7322,8 +7290,12 @@ begin
       var LSize := TSizeF.Create(0,0);
       for var I := 0 to ControlsCount - 1 do begin
         var LChildControl := Controls[I];
-        //if (csDesigning in ComponentState) and (LChildControl.ClassName = 'TGrabHandle.TGrabHandleRectangle') then
-        //  continue;
+        {$IF defined(ALDPK)}
+        // At design time, the Delphi IDE may add children such as
+        // TGrabHandle.TGrabHandleRectangle
+        //if (csDesigning in ComponentState) and Supports(LChildControl, IDesignerControl) then
+        //  Continue;
+        {$ENDIF}
 
         //var LALChildControl: TALDynamicListBoxControl;
         //var LALChildControlAlign: TALAlignLayout;
@@ -7610,7 +7582,6 @@ end;
 procedure TALDynamicListBoxExtendedControl.SetScale(const AValue: Single);
 begin
   if not SameValue(FScale, AValue, TEpsilon.Scale) then begin
-    ClearBufDrawable;
     FScale := AValue;
     //DoMatrixChanged(nil);
     Repaint;
@@ -10683,20 +10654,6 @@ begin
       TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
     end;
   end;
-end;
-
-{**************************************************}
-procedure TALDynamicListBoxBaseText.BeginTextUpdate;
-begin
-  BeginUpdate;
-  Inherited;
-end;
-
-{************************************************}
-procedure TALDynamicListBoxBaseText.EndTextUpdate;
-begin
-  EndUpdate;
-  Inherited;
 end;
 
 {**************************************************************************************}
@@ -14255,12 +14212,12 @@ end;
 {*******************************************************}
 procedure TALDynamicListBoxRadioButton.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not IsDestroying then
-    TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
+  TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
   inherited;
 end;
 
@@ -15846,12 +15803,12 @@ end;
 {**************************************************}
 procedure TALDynamicListBoxSwitch.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not IsDestroying then
-    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 
@@ -17653,12 +17610,12 @@ end;
 {**************************************************************}
 procedure TALDynamicListBoxCustomTrack.TThumb.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not IsDestroying then
-    TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 
@@ -21078,14 +21035,13 @@ end;
 {**************************************************************}
 procedure TALDynamicListBoxVideoPlayerSurface.BeforeDestruction;
 begin
+  if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  if not IsDestroying then begin
-    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
-    Stop;
-  end;
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  Stop;
   inherited;
 end;
 

@@ -435,10 +435,6 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="Main.pas">
-      <Form>Form1</Form>
-      <FormType>fmx</FormType>
-    </DCCReference>
     <JavaReference Include="Merged\libs\androidx.annotation-annotation-1.3.0.jar"/>
     <JavaReference Include="Merged\libs\androidx.arch.core-core-common-2.0.0.jar"/>
     <JavaReference Include="Merged\libs\androidx.arch.core-core-runtime-2.0.0.jar"/>
@@ -466,7 +462,6 @@
     <JavaReference Include="Merged\libs\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar"/>
     <JavaReference Include="Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.0.jar"/>
     <JavaReference Include="Merged\libs\androidx.viewpager-viewpager-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\io.magicfoundation.alcinoe-alcinoe-firebase-messaging-1.0.0.jar"/>
     <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-api-3.0.0.jar"/>
     <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-backend-cct-3.1.8.jar"/>
     <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-runtime-3.1.8.jar"/>
@@ -487,6 +482,7 @@
     <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-interop-17.1.0.jar"/>
     <JavaReference Include="Merged\libs\com.google.firebase-firebase-measurement-connector-19.0.0.jar"/>
     <JavaReference Include="Merged\libs\com.google.firebase-firebase-messaging-23.1.0.jar"/>
+    <JavaReference Include="Merged\libs\io.magicfoundation.alcinoe-alcinoe-firebase-messaging-1.0.0.jar"/>
     <JavaReference Include="Merged\libs\javax.inject-javax.inject-1.jar"/>
     <JavaReference Include="Merged\libs\r.jar"/>
     <BuildConfiguration Include="Base">

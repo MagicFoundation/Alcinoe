@@ -2700,7 +2700,7 @@ begin
 
           //normalize the LdprojXmlDoc
           if LDProjNormalizer <> '' then
-            ExecuteCmdLine('"'+LDProjNormalizer+'" "' +LDProjFilename + '" false');
+            ExecuteCmdLine('"'+LDProjNormalizer+'" -DProj="'+LDProjFilename+'" -CreateBackup="false"');
 
         finally
           ALFreeAndNil(LdprojXmlDoc);
@@ -2789,7 +2789,7 @@ begin
       Writeln('    -OutputDir=c:\MyProject\Android\Merged^');
       Writeln('    -DProj=c:\MyProject\MyProject.dproj^');
       Writeln('    -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^');
-      Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe');
+      Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DProjNormalizer\DProjNormalizer.exe');
       Writeln('');
       Writeln('');
       Writeln('Merge failed!');

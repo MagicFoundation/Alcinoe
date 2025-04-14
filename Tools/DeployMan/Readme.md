@@ -27,7 +27,7 @@ Example
   DeployMan.exe^
     -DProj=c:\MyProject\MyProject.dproj^
     -Paths=c:\MyProject\MyDirA|true|./MyDirA;c:\MyProject\MyFileB.json|false|./MyFileB.jsonB^
-    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^
+    -DProjNormalizer=c:\Alcinoe\Tools\DProjNormalizer\DProjNormalizer.exe^
     -Platforms=iOSDevice64
 ```
     

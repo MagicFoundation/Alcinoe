@@ -278,7 +278,7 @@ begin
 
       {$REGION 'Update LDProjNormalizer'}
       if LDProjNormalizer <> '' then
-        ExecuteCmdLine('"'+LDProjNormalizer+'" "' +LDProjFilename + '" false');
+        ExecuteCmdLine('"'+LDProjNormalizer+'" -DProj="'+LDProjFilename+'" -CreateBackup="false"');
       {$ENDREGION}
 
     finally
@@ -316,7 +316,7 @@ begin
       Writeln('  DeployMan.exe^');
       Writeln('    -DProj=c:\MyProject\MyProject.dproj^');
       Writeln('    -Paths=c:\MyProject\MyDirA|true|./MyDirA;c:\MyProject\MyFileB.json|false|./MyFileB.jsonB^');
-      Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^');
+      Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DProjNormalizer\DProjNormalizer.exe^');
       Writeln('    -Platforms=iOSDevice64');
       Writeln('');
       Writeln('');

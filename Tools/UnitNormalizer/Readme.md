@@ -38,7 +38,6 @@ Usage
     -Dir=The directory where all source files are located.
     -FilesToIgnore=The list of filenames to ignore. Separate filename with '';''.
     -CreateBackup=true or false.
-    -NoInteraction=Non-interactive mode.
 ```
 
 Example

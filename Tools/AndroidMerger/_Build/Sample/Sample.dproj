@@ -667,12 +667,6 @@
     <JavaReference Include="Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Merged\libs\io.magicfoundation.alcinoe-alcinoe-firebase-messaging-1.0.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Merged\libs\io.magicfoundation.alcinoe-alcinoe-firebase-messaging-1.0.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
     <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-api-3.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
@@ -791,6 +785,12 @@
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Merged\libs\com.google.firebase-firebase-messaging-23.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\io.magicfoundation.alcinoe-alcinoe-firebase-messaging-1.0.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\io.magicfoundation.alcinoe-alcinoe-firebase-messaging-1.0.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Merged\libs\javax.inject-javax.inject-1.jar">

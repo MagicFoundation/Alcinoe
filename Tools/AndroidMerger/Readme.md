@@ -90,7 +90,7 @@ Example
     -OutputDir=c:\MyProject\Android\Merged^
     -DProj=c:\MyProject\MyProject.dproj^
     -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^
-    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe
+    -DProjNormalizer=c:\Alcinoe\Tools\DProjNormalizer\DProjNormalizer.exe
 ```
  
 You can also check the ALFacebookLogin Demo and in particular the script:

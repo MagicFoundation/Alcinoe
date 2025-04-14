@@ -37,7 +37,7 @@ echo 5) alcinoe-firebase-messaging
 echo 6) alcinoe-installreferrer
 echo 7) alcinoe-webrtc
 
-set /P LibraryToBuild=Enter number to select a library (Empty for all): %=%
+set /P LibraryToBuild=Select a library (Empty for all): %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 echo.
 

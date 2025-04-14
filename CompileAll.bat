@@ -22,7 +22,7 @@ echo 1) Athens
 echo 2) Alexandria (deprecated)
 
 set COMPILER=
-set /P COMPILER="Enter number to select a compiler (Empty to auto select):" %=%
+set /P COMPILER="Select a compiler (Empty to auto select):" %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 
 if "%COMPILER%"=="" (
@@ -334,6 +334,7 @@ Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dpr
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\EnvOptionsProjUpdater" "_Source" "EnvOptionsProjUpdater.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64" || GOTO ERROR
 if "%DXVCL%"=="" goto BUILD_DEMOS
@@ -364,7 +365,7 @@ if "%ALBuildDemos%"=="" set ALBuildDemos=Y
 if "%ALBuildDemos%"=="y" set ALBuildDemos=Y
 if "%ALBuildDemos%"=="n" set ALBuildDemos=N
 if "%ALBuildDemos%"=="Y" goto DO_BUILD_DEMOS
-if "%ALBuildDemos%"=="N" goto BUILD_COMPILED_ZIP_FILES
+if "%ALBuildDemos%"=="N" goto CREATE_COMPILED_ARCHIVES
 goto BUILD_DEMOS
 
 :DO_BUILD_DEMOS
@@ -392,7 +393,7 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSort
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj" || PAUSE
-if "%DXVCL%"=="" goto BUILD_COMPILED_ZIP_FILES
+if "%DXVCL%"=="" goto CREATE_COMPILED_ARCHIVES
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_Source" "ALDatabaseBenchmark.dproj" || PAUSE
 xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s  || PAUSE
 xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s  || PAUSE
@@ -403,13 +404,13 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_Source" "ALWinIne
 
 
 REM ------------------------
-REM Build Compiled ZIP Files
+REM Create Compiled Archives
 REM ------------------------
 
-:BUILD_COMPILED_ZIP_FILES
+:CREATE_COMPILED_ARCHIVES
 
 echo ------------------------
-echo Build Compiled ZIP Files
+echo Create Compiled Archives
 echo ------------------------
 echo.
 
@@ -614,31 +615,31 @@ REM %~2 the source directory relative to the base directory
 REM %~3 the dproj filename without path
 REM %~4 the platform
 
-SET FileName=%~1\%~2\dbgout.log
-if exist "%FileName%" del "%FileName%" /s >nul
-if exist "%FileName%" EXIT /B 1
-
-SET FileName=%~1\*.skincfg
-if exist "%FileName%" del "%FileName%" /s >nul
-if exist "%FileName%" EXIT /B 1
-
 SET FileName=%~1\*.rsm
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
-SET FileName=%~1\*.identcache
+SET FileName=%~1\%~2\dbgout.log
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
-SET FileName=%~1\*.dproj.local
+SET FileName=%~1\%~2\*.skincfg
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
-SET FileName=%~1\*.groupproj.local
+SET FileName=%~1\%~2\*.identcache
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
-SET FileName=%~1\*.deployproj.local
+SET FileName=%~1\%~2\*.dproj.local
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
+SET FileName=%~1\%~2\*.groupproj.local
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
+SET FileName=%~1\%~2\*.deployproj.local
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
 
@@ -647,12 +648,12 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" EXIT /B 1
 mkdir "%FileName%"
 
-if "%~4"=="Android64" (
-  echo [36mMerge Android Libraries for %~3[0m
-  call "%~1\%~2\Android\MergeLibraries.bat"
-  IF ERRORLEVEL 1 EXIT /B 1
-  echo.
-)
+REM if "%~4"=="Android64" (
+REM   echo [36mMerge Android Libraries for %~3[0m
+REM   call "%~1\%~2\Android\MergeLibraries.bat"
+REM   IF ERRORLEVEL 1 EXIT /B 1
+REM   echo.
+REM )
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
 IF ERRORLEVEL 1 EXIT /B 1
@@ -667,8 +668,8 @@ if "%~4"=="Android" Set ALDeploy=Y
 if "%~4"=="Android64" Set ALDeploy=Y
 if "%ALDeploy%"=="Y" (
 
-  if exist *.deployproj del *.deployproj /s >nul
-  if exist *.deployproj EXIT /B 1
+  if exist %~1\%~2\*.deployproj del %~1\%~2\*.deployproj /s >nul
+  if exist %~1\%~2\*.deployproj EXIT /B 1
 
   call "%ALBaseDir%\Tools\DeployProjNormalizer\DeployProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
   IF ERRORLEVEL 1 EXIT /B 1

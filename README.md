@@ -1114,6 +1114,33 @@ undesired conversions.
 History
 =======
 
+#### 13/04/2025 ####
+
+- **TALTabControl** has been replaced by **TALPageController**.
+- **TALPageIndicator** has been added.
+- **TALBufDrawableCacheEngine** now inherits from **TALRefCountObject**.
+- Renamed **TALBounds.OnChange** to **TALBounds.OnChanged**.
+- Renamed **TALPosition.OnChange** to **TALPosition.OnChanged**.
+- Added the function **ALGetHasTouchScreen**.
+- Removed **TALControl.BeginTextUpdate** and **TALControl.EndTextUpdate**.
+- Added Metal support to **TALColorAdjustEffect**, removed Highlights and 
+  Shadows, and changed the Contrast parameter to accept values from -1 to 1 (instead of -2 to 2).
+- Added **TALRefCountBitmap**.
+- Removed *AutoShowing* and *Opacity* from **TALScrollEngine**; these properties 
+  are now directly managed in **TALScrollBox.TScrollBar**.
+- Added **TALScrollEngine.startScroll** and introduced **TALScrollEngine.TouchMode** 
+  (with options: Disabled, Enabled, Auto) as well as **TALScrollEngine.Friction**.
+- Added the fill property and published ScrollEngine to **TALScrollBox**.
+- Removed **HasTouchScreen**, **AutoHide**, and **ShowScrollBars** from **TALScrollEngine**.
+- Changed **TALScrollBox.TViewportPositionChangeEvent** from:
+  ```
+  procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
+  ```
+  to
+  ```
+  procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TALPointD) of object;
+  ```
+  
 #### 02/02/2025 ####
 
 - Replace **RotationCenter** with **Pivot** ([RSS-2824](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2824)).

@@ -377,8 +377,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'FValueRange := TValueRange.create(self);','FValueRange := TValueRange.create(_ALDummyComponent);');
     aSrc := FindAndReplace(aSrc, 'function GetDoubleBuffered: boolean; virtual;','function GetDoubleBuffered: boolean; override;');
     aSrc := FindAndReplace(aSrc, 'procedure SetDoubleBuffered(const AValue: Boolean); virtual;','procedure SetDoubleBuffered(const AValue: Boolean); override;');
-    aSrc := FindAndReplace(aSrc, 'procedure BeginTextUpdate; virtual;','procedure BeginTextUpdate; override;');
-    aSrc := FindAndReplace(aSrc, 'procedure EndTextUpdate; virtual;','procedure EndTextUpdate; override;');
     aSrc := FindAndReplace(aSrc, 'function IsDisplayed: Boolean; virtual;','function IsDisplayed: Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'function GetAbsoluteDisplayedRect: TRectF; virtual;','//function GetAbsoluteDisplayedRect: TRectF; virtual;');
     aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay: Boolean; virtual;','function IsReadyToDisplay: Boolean; override;');
@@ -432,7 +430,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'Result.SetSubComponent(True);','//Result.SetSubComponent(True);');
     //--
     aSrc := FindAndReplace(aSrc, 'SetAcceptsControls(False);', '//SetAcceptsControls(False);');
-    aSrc := FindAndReplace(aSrc, 'for var I := 0 to ControlsCount - 1 do begin','for var I := Low(FControls) to High(FControls) do begin');
     aSrc := FindAndReplace(aSrc, 'function GetParentedVisible: Boolean; override;','//function GetParentedVisible: Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'procedure DoRootChanged; override;','//procedure DoRootChanged; override;');
     aSrc := FindAndReplace(aSrc, 'procedure Loaded; override;', '//procedure Loaded; override;');
@@ -449,46 +446,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'if csLoading in ComponentState then exit;','//if csLoading in ComponentState then exit;');
     aSrc := FindAndReplace(aSrc, 'function IsOwnerLoading: Boolean;','//function IsOwnerLoading: Boolean;');
     aSrc := FindAndReplace(aSrc, 'if not IsOwnerLoading then','//if not IsOwnerLoading then');
-    //--
-    aSrc := FindAndReplace(
-              aSrc,
-              '  Procedure DoBeginTextUpdate(const AControl: TControl);'+#13#10+
-              '  begin'+#13#10+
-              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
-              '      if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
-              '        TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate'+#13#10+
-              '      else'+#13#10+
-              '        DoBeginTextUpdate(AControl.Controls[i]);'+#13#10+
-              '  end;',
-              '  Procedure DoBeginTextUpdate(const AControl: TALDynamicListBoxControl);'+#13#10+
-              '  begin'+#13#10+
-              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
-              '      //if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
-              '      //  TALDynamicListBoxControl(AControl.Controls[i]).BeginTextUpdate'+#13#10+
-              '      //else'+#13#10+
-              '      //  DoBeginTextUpdate(AControl.Controls[i]);'+#13#10+
-              '      AControl.Controls[i].BeginTextUpdate;'+#13#10+
-              '  end;');
-    //--
-    aSrc := FindAndReplace(
-              aSrc,
-              '  Procedure DoEndTextUpdate(const AControl: TControl);'+#13#10+
-              '  begin'+#13#10+
-              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
-              '      if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
-              '        TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate'+#13#10+
-              '      else'+#13#10+
-              '        DoEndTextUpdate(AControl.Controls[i]);'+#13#10+
-              '  end;',
-              '  Procedure DoEndTextUpdate(const AControl: TALDynamicListBoxControl);'+#13#10+
-              '  begin'+#13#10+
-              '    for var I := 0 to AControl.ControlsCount - 1 do'+#13#10+
-              '      //if AControl.Controls[i] is TALDynamicListBoxControl then'+#13#10+
-              '      //  TALDynamicListBoxControl(AControl.Controls[i]).EndTextUpdate'+#13#10+
-              '      //else'+#13#10+
-              '      //  DoEndTextUpdate(AControl.Controls[i]);'+#13#10+
-              '      AControl.Controls[i].EndTextUpdate;'+#13#10+
-              '  end;');
     //--
     aSrc := FindAndReplace(
               aSrc,
@@ -579,10 +536,10 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  //  DrawDesignBorder;');
     aSrc := FindAndReplace(
               aSrc,
-              '        if (csDesigning in ComponentState) and (LChildControl.ClassName = ''TGrabHandle.TGrabHandleRectangle'') then'+#13#10+
-              '          continue;',
-              '        //if (csDesigning in ComponentState) and (LChildControl.ClassName = ''TGrabHandle.TGrabHandleRectangle'') then'+#13#10+
-              '        //  continue;');
+              '        if (csDesigning in ComponentState) and Supports(LChildControl, IDesignerControl) then'+#13#10+
+              '          Continue;',
+              '        //if (csDesigning in ComponentState) and Supports(LChildControl, IDesignerControl) then'+#13#10+
+              '        //  Continue;');
     aSrc := FindAndReplace(
               aSrc,
               '    if not (csLoading in ComponentState) then begin'+#13#10+

@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{5E76BA34-846F-4068-B144-F2A6B009EC2F}</ProjectGuid>
+    <ProjectGuid>{75AD9D04-FB1F-4585-AA4B-90AA3BC92190}</ProjectGuid>
     <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>DProjNormalizer.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
-    <TargetedPlatforms>1</TargetedPlatforms>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
+    <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Console</AppType>
     <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">DProjNormalizer</ProjectName>
   </PropertyGroup>
@@ -181,6 +181,9 @@
     <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+    <BT_BuildType>Debug</BT_BuildType>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -244,7 +247,7 @@
         <Platform value="OSX64">False</Platform>
         <Platform value="OSXARM64">False</Platform>
         <Platform value="Win32">True</Platform>
-        <Platform value="Win64">False</Platform>
+        <Platform value="Win64">True</Platform>
       </Platforms>
     </BorlandProject>
     <ProjectFileVersion>12</ProjectFileVersion>

@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{5E76BA34-846F-4068-B144-F2A6B009EC2F}</ProjectGuid>
-    <ProjectVersion>20.2</ProjectVersion>
+    <ProjectGuid>{4AB64738-C89D-4368-992D-6ECF47AFD57C}</ProjectGuid>
+    <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>NativeBridgeFileGeneratorHelper.dpr</MainSource>
     <Base>True</Base>

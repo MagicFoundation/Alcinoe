@@ -153,6 +153,7 @@ begin
       LOldToNewNames.add('ALNetHttpClientPool=Alcinoe.HTTP.Client.Net.Pool');
       LOldToNewNames.add('ALWebSocketClient=Alcinoe.WebSocket.Client');
       LOldToNewNames.add('ALWinHTTPWebSocketClient=Alcinoe.WebSocket.Client.WinHTTP');
+      LOldToNewNames.add('Alcinoe.FMX.TabControl=Alcinoe.FMX.PageController');
 
       //Function names
       LOldToNewNames.add('ALUTF8ExtractHTMLText=ALExtractHTMLText');
@@ -548,6 +549,8 @@ begin
       LOldToNewNames.add('TALNativeBitmap=TALSurface');
       LOldToNewNames.add('TALRasterImage=TALDrawable');
       LOldToNewNames.add('TALDrawMultiLineTextOptions=TALMultiLineTextOptions');
+      LOldToNewNames.add('TALTabItem=TALPageView');
+      LOldToNewNames.add('TALTabControl=TALPageController');
 
       //var names
       LOldToNewNames.add('ALDefaultFormatSettings=ALDefaultFormatSettingsA');
@@ -563,6 +566,8 @@ begin
 
         var LPasFiles := TDirectory.GetFiles(string(LRootDirectory), '*.pas', TSearchOption.soAllDirectories);
         for var I := Low(LPasFiles) to High(LPasFiles) do LFiles.Add(LPasFiles[i]);
+        var LFmxFiles := TDirectory.GetFiles(string(LRootDirectory), '*.fmx', TSearchOption.soAllDirectories);
+        for var I := Low(LFmxFiles) to High(LFmxFiles) do LFiles.Add(LFmxFiles[i]);
         var LDprFiles := TDirectory.GetFiles(string(LRootDirectory), '*.dpr', TSearchOption.soAllDirectories);
         for var I := Low(LDprFiles) to High(LDprFiles) do LFiles.Add(LDprFiles[i]);
         var LDprojFiles := TDirectory.GetFiles(string(LRootDirectory), '*.dproj', TSearchOption.soAllDirectories);

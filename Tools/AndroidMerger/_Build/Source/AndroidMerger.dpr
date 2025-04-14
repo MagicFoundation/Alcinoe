@@ -1464,30 +1464,30 @@ begin
       var LSubKeyNames := TStringList.Create;
       Try
         LRegistry.GetKeyNames(LSubKeyNames);
-        var LCompilerVersionStr: String := '';
-        var LCompilerVersionFloat: Double := 0;
+        var LBDSVersionStr: String := '';
+        var LBDSVersionFloat: Double := 0;
         for var LName in LSubKeyNames do begin
           var LTmpCompilerVersionFloat := ALStrToFloatDef(LName, 0, ALDefaultFormatSettingsW);
-          if LTmpCompilerVersionFloat > LCompilerVersionFloat then begin
-            LCompilerVersionStr := LName;
-            LCompilerVersionFloat := LTmpCompilerVersionFloat;
+          if LTmpCompilerVersionFloat > LBDSVersionFloat then begin
+            LBDSVersionStr := LName;
+            LBDSVersionFloat := LTmpCompilerVersionFloat;
           end;
         end;
-        if LCompilerVersionStr = '' then raise Exception.Create('Incorrect Embarcadero Delphi Registry');
+        if LBDSVersionStr = '' then raise Exception.Create('Incorrect Embarcadero Delphi Registry');
         LRegistry.CloseKey;
-        if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LCompilerVersionStr) then
+        if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LBDSVersionStr) then
           raise Exception.Create('Incorrect Embarcadero Delphi Registry');
         LDelphiRootDir := LRegistry.ReadString('RootDir');
         if LDelphiRootDir = '' then raise Exception.Create('Their is no RootDir Configured in Embarcadero Delphi Registry');
         if not TDirectory.Exists(LDelphiRootDir) then raise Exception.CreateFmt('Directory %s does not exist', [LDelphiRootDir]);
         LRegistry.CloseKey;
-        if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LCompilerVersionStr+'\PlatformSDKs') then
+        if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LBDSVersionStr+'\PlatformSDKs') then
           raise Exception.Create('Their is no platform SDK Configured');
         Var LPlatformSDKName := LRegistry.ReadString('Default_Android64');
         if LPlatformSDKName = '' then LPlatformSDKName := LRegistry.ReadString('Default_Android');
         if LPlatformSDKName = '' then raise Exception.Create('Their is no default Android platform SDK Configured');
         LRegistry.CloseKey;
-        if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LCompilerVersionStr+'\PlatformSDKs\'+LPlatformSDKName) then
+        if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LBDSVersionStr+'\PlatformSDKs\'+LPlatformSDKName) then
           raise Exception.Create('Incorrect Embarcadero Delphi Registry');
         LAapt2Filename := '';
         var Lfiles := TDirectory.GetFiles(TPath.combine(LDelphiRootDir, 'bin\Android\'));
@@ -2177,11 +2177,14 @@ begin
           if LClientNode.ChildNodes.Count <> 1 then raise Exception.Create('client node must have only 1 child in google-services.json');
           LClientNode := LClientNode.ChildNodes[0];
           //---
-          var LOauthClientNode := LClientNode.ChildNodes.FindNode('oauth_client');
-          if LOauthClientNode = nil then raise Exception.Create('Could not find client.oauth_client node in google-services.json');
-          if LOauthClientNode.ChildNodes.Count <> 1 then raise Exception.Create('client.oauth_client node must have only 1 child in google-services.json');
-          LOauthClientNode := LOauthClientNode.ChildNodes[0];
-          if LOauthClientNode.GetChildNodeValueFloat('client_type',0) <> 3 then raise Exception.Create('client.oauth_client node must have client_type=3 child node in google-services.json');
+          var LOauthClientNodes := LClientNode.ChildNodes.FindNode('oauth_client');
+          if LOauthClientNodes = nil then raise Exception.Create('Could not find client.oauth_client node in google-services.json');
+          var LOauthClientType3Node: TALJsonNodeA := nil;
+          for var I := 0 to LOauthClientNodes.ChildNodes.Count - 1 do
+            if SameValue(LOauthClientNodes.ChildNodes[i].GetChildNodeValueFloat('client_type', 0), 3) then begin
+              LOauthClientType3Node := LOauthClientNodes.ChildNodes[i];
+              break;
+            end;
           //---
           var LApikeyNode := LClientNode.ChildNodes.FindNode('api_key');
           if LApikeyNode = nil then raise Exception.Create('Could not find client.api_key node in google-services.json');
@@ -2199,10 +2202,12 @@ begin
           //  <string name="project_id" translatable="false">alfirebasemessagingapp</string> <!-- project_info/project_id -->
           //</resources>
           //---
-          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-            Attributes['name'] := 'default_web_client_id';
-            Attributes['translatable'] := 'false';
-            text := LOauthClientNode.GetChildNodeValueText('client_id','');
+          if LOauthClientType3Node <> nil then begin
+            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+              Attributes['name'] := 'default_web_client_id';
+              Attributes['translatable'] := 'false';
+              text := LOauthClientType3Node.GetChildNodeValueText('client_id','');
+            end;
           end;
           with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
             Attributes['name'] := 'gcm_defaultSenderId';

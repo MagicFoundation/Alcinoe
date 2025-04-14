@@ -1377,6 +1377,16 @@ begin
               'classes.dex', // const aRemoteName: String;
               ''); // aRequired: AnsiString
 
+          //--------
+          //OSXARM64
+          //OSX64_OutputDir
+          if ALSameTextA(LplatFormName, 'OSXARM64') then begin
+            with LDeployProjXmlDoc.DocumentElement.AddChild('PropertyGroup').AddChild('OSX64_OutputDir') do begin
+              Attributes['Condition'] := '''$(Platform)''==''OSXARM64''';
+              Text := _getExeOutputDir(LProperties,LConfigs,'OSX64',LConfigName);
+            end;
+          end;
+
           //--------------
           //OSX64/OSXARM64
           //The main binary

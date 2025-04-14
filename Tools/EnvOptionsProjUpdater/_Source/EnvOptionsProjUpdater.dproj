@@ -1,15 +1,15 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{A6AFB891-F444-4AD1-9289-11E85AA4DCEA}</ProjectGuid>
+    <ProjectGuid>{AAB7C4EB-0D0A-4CE2-BF89-BE2D77DDFBF4}</ProjectGuid>
     <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>None</FrameworkType>
-    <MainSource>DeployProjNormalizer.dpr</MainSource>
+    <MainSource>EnvOptionsProjUpdater.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>
     <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
     <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Console</AppType>
-    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">DeployProjNormalizer</ProjectName>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">EnvOptionsProjUpdater</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>
@@ -70,6 +70,12 @@
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <Cfg_1_Win64>true</Cfg_1_Win64>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; or &#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <Cfg_2>true</Cfg_2>
     <CfgParent>Base</CfgParent>
@@ -91,12 +97,12 @@
     <DCC_K>false</DCC_K>
     <DCC_UsePackage>RESTComponents;emsclientfiredac;DataSnapFireDAC;FireDACIBDriver;emsclient;FireDACCommon;RESTBackendComponents;soapserver;CloudService;FireDACCommonDriver;inet;FireDAC;FireDACSqliteDriver;soaprtl;soapmidas;$(DCC_UsePackage)</DCC_UsePackage>
     <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-    <SanitizedProjectName>DeployProjNormalizer</SanitizedProjectName>
+    <SanitizedProjectName>EnvOptionsProjUpdater</SanitizedProjectName>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-    <DCC_CodePage>65001</DCC_CodePage>
-    <DCC_Define>DeployProjNormalizer;$(DCC_Define)</DCC_Define>
+    <DCC_Define>EnvOptionsProjUpdater;$(DCC_Define)</DCC_Define>
     <DCC_UnitSearchPath>..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_CodePage>65001</DCC_CodePage>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;DBXInterBaseDriver;tethering;bindcompfmx;FmxTeeUI;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;bindengine;DataSnapClient;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;ibmonitor;FMXTee;DbxCommonDriver;ibxpress;xmlrtl;DataSnapNativeClient;ibxbindings;rtl;FireDACDSDriver;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
@@ -196,7 +202,13 @@
   <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
     <Manifest_File>(None)</Manifest_File>
-    <Debugger_RunParams>-DProj=&#34;Project1.dproj&#34;</Debugger_RunParams>
+    <Debugger_RunParams>sample.dproj false</Debugger_RunParams>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <Debugger_RunParams>-BDSVersion=23.0 -Platform=iOSDevice64 -ENV_PF_DevTeamIdAppStore=é</Debugger_RunParams>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <Manifest_File>(None)</Manifest_File>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -207,7 +219,6 @@
   <PropertyGroup Condition="&#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <Manifest_File>(None)</Manifest_File>
-    <Debugger_RunParams>-DProj=&#34;Project1.dproj&#34;</Debugger_RunParams>
   </PropertyGroup>
   <ItemGroup>
     <DelphiCompile Include="$(MainSource)">
@@ -231,11 +242,11 @@
     <BorlandProject>
       <Delphi.Personality>
         <Source>
-          <Source Name="MainSource">DeployProjNormalizer.dpr</Source>
+          <Source Name="MainSource">EnvOptionsProjUpdater.dpr</Source>
         </Source>
         <Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
       <Deployment Version="5"/>

@@ -1,0 +1,168 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B0ED44AB-306F-4DB7-928B-8DED9E07F95E}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CodeProfiler\_Source\CodeProfiler.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AppIconGenerator\_Source\AppIconGenerator.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="EnvOptionsProjUpdater\_Source\EnvOptionsProjUpdater.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DeployProjNormalizer\_Source\DeployProjNormalizer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DeployMan\_Build\Source\DeployMan.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="AndroidMerger\_Build\Source\AndroidMerger.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CodeRenaming\_Source\CodeRenaming.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CodeBuilder\_Source\CodeBuilder.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="UnitNormalizer\_Source\UnitNormalizer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NativeBridgeFileGenerator\_Build\Source\NativeBridgeFileGeneratorHelper.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DProjVersioning\_Source\DProjVersioning.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DProjNormalizer\_Source\DProjNormalizer.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CodeProfiler">
+        <MSBuild Projects="CodeProfiler\_Source\CodeProfiler.dproj"/>
+    </Target>
+    <Target Name="CodeProfiler:Clean">
+        <MSBuild Projects="CodeProfiler\_Source\CodeProfiler.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeProfiler:Make">
+        <MSBuild Projects="CodeProfiler\_Source\CodeProfiler.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AppIconGenerator">
+        <MSBuild Projects="AppIconGenerator\_Source\AppIconGenerator.dproj"/>
+    </Target>
+    <Target Name="AppIconGenerator:Clean">
+        <MSBuild Projects="AppIconGenerator\_Source\AppIconGenerator.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AppIconGenerator:Make">
+        <MSBuild Projects="AppIconGenerator\_Source\AppIconGenerator.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EnvOptionsProjUpdater">
+        <MSBuild Projects="EnvOptionsProjUpdater\_Source\EnvOptionsProjUpdater.dproj"/>
+    </Target>
+    <Target Name="EnvOptionsProjUpdater:Clean">
+        <MSBuild Projects="EnvOptionsProjUpdater\_Source\EnvOptionsProjUpdater.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EnvOptionsProjUpdater:Make">
+        <MSBuild Projects="EnvOptionsProjUpdater\_Source\EnvOptionsProjUpdater.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DeployProjNormalizer">
+        <MSBuild Projects="DeployProjNormalizer\_Source\DeployProjNormalizer.dproj"/>
+    </Target>
+    <Target Name="DeployProjNormalizer:Clean">
+        <MSBuild Projects="DeployProjNormalizer\_Source\DeployProjNormalizer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DeployProjNormalizer:Make">
+        <MSBuild Projects="DeployProjNormalizer\_Source\DeployProjNormalizer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DeployMan">
+        <MSBuild Projects="DeployMan\_Build\Source\DeployMan.dproj"/>
+    </Target>
+    <Target Name="DeployMan:Clean">
+        <MSBuild Projects="DeployMan\_Build\Source\DeployMan.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DeployMan:Make">
+        <MSBuild Projects="DeployMan\_Build\Source\DeployMan.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AndroidMerger">
+        <MSBuild Projects="AndroidMerger\_Build\Source\AndroidMerger.dproj"/>
+    </Target>
+    <Target Name="AndroidMerger:Clean">
+        <MSBuild Projects="AndroidMerger\_Build\Source\AndroidMerger.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AndroidMerger:Make">
+        <MSBuild Projects="AndroidMerger\_Build\Source\AndroidMerger.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CodeRenaming">
+        <MSBuild Projects="CodeRenaming\_Source\CodeRenaming.dproj"/>
+    </Target>
+    <Target Name="CodeRenaming:Clean">
+        <MSBuild Projects="CodeRenaming\_Source\CodeRenaming.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeRenaming:Make">
+        <MSBuild Projects="CodeRenaming\_Source\CodeRenaming.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CodeBuilder">
+        <MSBuild Projects="CodeBuilder\_Source\CodeBuilder.dproj"/>
+    </Target>
+    <Target Name="CodeBuilder:Clean">
+        <MSBuild Projects="CodeBuilder\_Source\CodeBuilder.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeBuilder:Make">
+        <MSBuild Projects="CodeBuilder\_Source\CodeBuilder.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="UnitNormalizer">
+        <MSBuild Projects="UnitNormalizer\_Source\UnitNormalizer.dproj"/>
+    </Target>
+    <Target Name="UnitNormalizer:Clean">
+        <MSBuild Projects="UnitNormalizer\_Source\UnitNormalizer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="UnitNormalizer:Make">
+        <MSBuild Projects="UnitNormalizer\_Source\UnitNormalizer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NativeBridgeFileGeneratorHelper">
+        <MSBuild Projects="NativeBridgeFileGenerator\_Build\Source\NativeBridgeFileGeneratorHelper.dproj"/>
+    </Target>
+    <Target Name="NativeBridgeFileGeneratorHelper:Clean">
+        <MSBuild Projects="NativeBridgeFileGenerator\_Build\Source\NativeBridgeFileGeneratorHelper.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NativeBridgeFileGeneratorHelper:Make">
+        <MSBuild Projects="NativeBridgeFileGenerator\_Build\Source\NativeBridgeFileGeneratorHelper.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DProjVersioning">
+        <MSBuild Projects="DProjVersioning\_Source\DProjVersioning.dproj"/>
+    </Target>
+    <Target Name="DProjVersioning:Clean">
+        <MSBuild Projects="DProjVersioning\_Source\DProjVersioning.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DProjVersioning:Make">
+        <MSBuild Projects="DProjVersioning\_Source\DProjVersioning.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DProjNormalizer">
+        <MSBuild Projects="DProjNormalizer\_Source\DProjNormalizer.dproj"/>
+    </Target>
+    <Target Name="DProjNormalizer:Clean">
+        <MSBuild Projects="DProjNormalizer\_Source\DProjNormalizer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DProjNormalizer:Make">
+        <MSBuild Projects="DProjNormalizer\_Source\DProjNormalizer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CodeProfiler;AppIconGenerator;EnvOptionsProjUpdater;DeployProjNormalizer;DeployMan;AndroidMerger;CodeRenaming;CodeBuilder;UnitNormalizer;NativeBridgeFileGeneratorHelper;DProjVersioning;DProjNormalizer"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CodeProfiler:Clean;AppIconGenerator:Clean;EnvOptionsProjUpdater:Clean;DeployProjNormalizer:Clean;DeployMan:Clean;AndroidMerger:Clean;CodeRenaming:Clean;CodeBuilder:Clean;UnitNormalizer:Clean;NativeBridgeFileGeneratorHelper:Clean;DProjVersioning:Clean;DProjNormalizer:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CodeProfiler:Make;AppIconGenerator:Make;EnvOptionsProjUpdater:Make;DeployProjNormalizer:Make;DeployMan:Make;AndroidMerger:Make;CodeRenaming:Make;CodeBuilder:Make;UnitNormalizer:Make;NativeBridgeFileGeneratorHelper:Make;DProjVersioning:Make;DProjNormalizer:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

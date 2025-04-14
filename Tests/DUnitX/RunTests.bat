@@ -56,23 +56,23 @@ goto BUILD_TESTS
 :DO_BUILD_TESTS
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\dbgout.log
-del "%FileName%" /s
+del "%FileName%" /s >nul 2>&1
 if exist "%FileName%" goto ERROR
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\*.identcache
-del "%FileName%" /s
+del "%FileName%" /s >nul 2>&1
 if exist "%FileName%" goto ERROR
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\*.dproj.local
-del "%FileName%" /s
+del "%FileName%" /s >nul 2>&1
 if exist "%FileName%" goto ERROR
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\*.groupproj.local
-del "%FileName%" /s
+del "%FileName%" /s >nul 2>&1
 if exist "%FileName%" goto ERROR
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\*.deployproj.local
-del "%FileName%" /s
+del "%FileName%" /s >nul 2>&1
 if exist "%FileName%" goto ERROR
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\_Source\Dcu
@@ -100,7 +100,6 @@ REM -----
 REM Debug
 REM -----
 
-echo.
 echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:Platform=Win32[0m
 msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
@@ -350,7 +349,7 @@ echo 3) Both Win32 and Win64 tests
 :ASK_PLATFORM
 
 set Platform=
-set /P Platform=Enter number to select a platform (Empty to Win64): %=%
+set /P Platform=Select a platform (Empty to Win64): %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 
 if "%Platform%"=="" goto RUN_WIN64_TESTS_WITHOUT_CODE_COVERAGE
@@ -417,7 +416,7 @@ EXIT /B 1
 :FINISHED
 
 SET FileName=%ALBaseDir%\Tests\DUnitX\dbgout.log
-del "%FileName%" /s
+del "%FileName%" /s >nul 2>&1
 if exist "%FileName%" goto ERROR
 
 if "%Standalone%"=="1" (

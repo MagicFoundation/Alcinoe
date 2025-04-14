@@ -2,6 +2,29 @@
 SETLOCAL
 cls
 
+REM To deploy the app to the Apple Store, set the following environment variables:
+REM   * Alcinoe_Mac_Host=IP address of the Mac computer used for deployment.
+REM   * Alcinoe_Mac_Username=Username of the account on the Mac computer.
+REM   * Alcinoe_Mac_Connection_Profile_Name=Name of the PAServer connection profile.
+REM   * Alcinoe_EnvOptions_iOSDevice64_DevAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_ALFmxControlsDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM   * Alcinoe_ALFmxDynamicListBoxDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore=Retrieve this value from: C:\Users\{UserName}\AppData\Roaming\Embarcadero\BDS\xx.0\EnvOptions.proj (after deploying the app from the IDE).
+REM 
+REM You must also generate an app-specific password for ALTool. Follow these steps:
+REM  1. Generate an App-Specific Password:
+REM     * Go to appleid.apple.com and sign in with your Apple ID.
+REM     * In your account settings, navigate to the Security section.
+REM     * Locate the option to generate an app-specific password, then click "Create an app-specific password."
+REM     * Follow the on-screen instructions and provide a label ^(e.g., "altool"^) for your reference.
+REM  2. Store the Username/Password Pair in Windows Credential Manager:
+REM     * Open Credential Manager from the Control Panel.
+REM     * Select the Windows Credentials tab.
+REM     * Click "Add a generic credential."
+REM     * Internet or network address: alcinoe.altool
+REM     * User Name:{UserName} 
+REM     * Password:{Password} 
+
 REM -------------------
 REM Choose the compiler
 REM -------------------
@@ -149,49 +172,48 @@ IF ERRORLEVEL 1 goto ERROR
 echo.
 
 
-REM -----------------------------------------------------
-REM Build DProjNormalizer, UnitNormalizer and CodeBuilder
-REM -----------------------------------------------------
+REM ----------------
+REM Build Core Tools
+REM ----------------
 
 :BUILD_CORETOOLS
 
-echo -----------------------------------------------------
-echo Build DProjNormalizer, UnitNormalizer and CodeBuilder
-echo -----------------------------------------------------
+echo ----------------
+echo Build Core Tools
+echo ----------------
 echo.
 
-echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:Platform=Win64[0m
+echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
 MSBuild "%ALBaseDir%\Tools\DProjNormalizer\_Source\DProjNormalizer.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo [36mMSBuild UnitNormalizer.dproj /p:config=Release /p:Platform=Win64[0m
+echo [36mMSBuild DeployProjNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
+MSBuild "%ALBaseDir%\Tools\DeployProjNormalizer\_Source\DeployProjNormalizer.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+echo [36mMSBuild UnitNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
 MSBuild "%ALBaseDir%\Tools\UnitNormalizer\_Source\UnitNormalizer.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo [36mMSBuild CodeBuilder.dproj /p:config=Release /p:Platform=Win64[0m
+echo [36mMSBuild CodeBuilder.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
 MSBuild "%ALBaseDir%\Tools\CodeBuilder\_Source\CodeBuilder.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
 
-REM -------------------
-REM Normalize all units
-REM -------------------
+REM -----------------------------------------
+REM Normalize all Units, DProj and DeployProj
+REM -----------------------------------------
 
-echo -------------------
-echo Normalize all units
-echo -------------------
+echo -----------------------------------------
+echo Normalize all Units, DProj and DeployProj
+echo -----------------------------------------
 echo.
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas;dwsStrings.pas" -NoInteraction=true
-IF ERRORLEVEL 1 goto ERROR
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.iOSapi.ImageIO.pas" -CreateBackup="false" -NoInteraction=true
-IF ERRORLEVEL 1 goto ERROR
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\" -CreateBackup="false" -NoInteraction=true
-IF ERRORLEVEL 1 goto ERROR
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tools\" -CreateBackup="false" -NoInteraction=true
+call "%ALBaseDir%\NormalizeAll.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -393,14 +415,103 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSort
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj" || PAUSE
-if "%DXVCL%"=="" goto CREATE_COMPILED_ARCHIVES
+if "%DXVCL%"=="" goto DEPLOY_TO_APP_STORE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_Source" "ALDatabaseBenchmark.dproj" || PAUSE
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s  || PAUSE
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s  || PAUSE
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s >nul 2>&1
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s >nul 2>&1
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_Source" "ALWinHTTPClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_Source" "ALWinHTTPWebSocketClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_Source" "ALWinInetHTTPClientDemo.dproj" || PAUSE
+
+
+REM -----------------------
+REM Deploy to the App Store
+REM -----------------------
+
+:DEPLOY_TO_APP_STORE
+
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CREATE_COMPILED_ARCHIVES
+
+SET ALTOOL_USERNAME=
+for /f "usebackq delims=" %%i in (
+  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\GetWindowsCredential\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field UserName`
+) do set ALTOOL_USERNAME=%%i
+
+SET ALTOOL_PASSWORD=
+for /f "usebackq delims=" %%i in (
+  `powershell -NoProfile -ExecutionPolicy Bypass -File "%ALBaseDir%\Tools\GetWindowsCredential\GetWindowsCredential.ps1" -TargetName "alcinoe.altool" -Field Password`
+) do set ALTOOL_PASSWORD=%%i
+
+If "%ALTOOL_PASSWORD%"=="" (
+  Echo You must generate an app-specific password for ALTool. Follow these steps:
+  Echo  1. Generate an App-Specific Password:
+  Echo     * Go to appleid.apple.com and sign in with your Apple ID.
+  Echo     * In your account settings, navigate to the Security section.
+  Echo     * Locate the option to generate an app-specific password, then click "Create an app-specific password."
+  Echo     * Follow the on-screen instructions and provide a label ^(e.g., "altool"^) for your reference.
+  Echo  2. Store the Username/Password Pair in Windows Credential Manager:
+  Echo     * Open Credential Manager from the Control Panel.
+  Echo     * Select the Windows Credentials tab.
+  Echo     * Click "Add a generic credential."
+  Echo     * Internet or network address: alcinoe.altool
+  Echo     * User Name:{UserName} 
+  Echo     * Password:{Password} 
+  GOTO ERROR
+)
+
+echo -----------------------
+echo Deploy to the App Store
+echo -----------------------
+echo.  
+
+if "%ALNoPrompts%"=="Y" (
+  set DEPLOYTOAPPSTORE=Y
+) else (
+  set DEPLOYTOAPPSTORE=
+  set /P DEPLOYTOAPPSTORE="Upload the Binary to the App Store (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
+)
+if "%DEPLOYTOAPPSTORE%"=="n" (SET DEPLOYTOAPPSTORE=N)
+if "%DEPLOYTOAPPSTORE%"=="y" (SET DEPLOYTOAPPSTORE=Y)
+if "%DEPLOYTOAPPSTORE%"=="" (SET DEPLOYTOAPPSTORE=Y)
+
+if "%DEPLOYTOAPPSTORE%"=="N" (
+  echo.
+  goto CREATE_COMPILED_ARCHIVES
+)
+if "%DEPLOYTOAPPSTORE%"=="Y" ( 
+  goto DO_DEPLOY_TO_APP_STORE 
+)
+echo.
+goto DEPLOY_TO_APP_STORE
+
+:DO_DEPLOY_TO_APP_STORE
+
+echo Uploading ALFmxControlsDemo.ipa to the Mac 
+ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /tmp/ALFmxControlsDemo.ipa"
+IF ERRORLEVEL 1 goto ERROR
+scp -q %ALBaseDir%\Demos\ALFmxControls\iOSDevice64\Release\ALFmxControlsDemo.ipa %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host%:/tmp/ALFmxControlsDemo.ipa
+IF ERRORLEVEL 1 goto ERROR
+echo Uploading ALFmxControlsDemo.ipa to the App Store
+ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "xcrun altool --upload-app --type ios --file /tmp/ALFmxControlsDemo.ipa --username %ALTOOL_USERNAME% --password %ALTOOL_PASSWORD%"
+IF ERRORLEVEL 1 goto ERROR
+ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /tmp/ALFmxControlsDemo.ipa"
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+echo Uploading ALFmxDynamicListBoxDemo.ipa to the Mac 
+ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /tmp/ALFmxDynamicListBoxDemo.ipa"
+IF ERRORLEVEL 1 goto ERROR
+scp -q %ALBaseDir%\Demos\ALFmxDynamicListBox\iOSDevice64\Release\ALFmxDynamicListBoxDemo.ipa %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host%:/tmp/ALFmxDynamicListBoxDemo.ipa
+IF ERRORLEVEL 1 goto ERROR
+echo Uploading ALFmxDynamicListBoxDemo.ipa to the App Store
+ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "xcrun altool --upload-app --type ios --file /tmp/ALFmxDynamicListBoxDemo.ipa --username %ALTOOL_USERNAME% --password %ALTOOL_PASSWORD%"
+IF ERRORLEVEL 1 goto ERROR
+ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /tmp/ALFmxDynamicListBoxDemo.ipa"
+IF ERRORLEVEL 1 goto ERROR
+echo.
 
 
 REM ------------------------
@@ -408,6 +519,8 @@ REM Create Compiled Archives
 REM ------------------------
 
 :CREATE_COMPILED_ARCHIVES
+
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO FINISHED
 
 echo ------------------------
 echo Create Compiled Archives
@@ -446,7 +559,14 @@ for /r "%ALBaseDir%\Compiled" %%D in (Android) do (
 )
 
 for /r "%ALBaseDir%\Compiled" %%D in (Android64) do (
-  if exist "%%D" ( rmdir /s /q "%%D" )
+  if exist "%%D" ( 
+    xcopy "%%D\*.aab" "%ALBaseDir%\Compiled\tmp\" /s >nul 2>&1
+    xcopy "%%D\*.apk" "%ALBaseDir%\Compiled\tmp\" /s >nul 2>&1
+    rmdir /s /q "%%D" 
+    xcopy "%ALBaseDir%\Compiled\tmp\*.aab" "%%D\" /s >nul 2>&1
+    xcopy "%ALBaseDir%\Compiled\tmp\*.apk" "%%D\" /s >nul 2>&1
+    rmdir /s /q "%ALBaseDir%\Compiled\tmp\" 
+  )
 )
 
 for /r "%ALBaseDir%\Compiled" %%D in (iOSDevice64) do (
@@ -485,6 +605,14 @@ for /r "%ALBaseDir%\Compiled" %%D in (OutputIOS) do (
   if exist "%%D" ( rmdir /s /q "%%D" )
 )
 
+for /r "%ALBaseDir%\Compiled" %%D in (Data) do (
+  if exist "%%D" ( rmdir /s /q "%%D" )
+)
+
+SET FileName=%ALBaseDir%\Compiled\Tools\AllTools.groupproj
+if exist "%FileName%" del "%FileName%" /s >nul
+if exist "%FileName%" EXIT /B 1
+
 SET FileName=%ALBaseDir%\Compiled\Demos\AllDemos.groupproj
 if exist "%FileName%" del "%FileName%" /s >nul
 if exist "%FileName%" EXIT /B 1
@@ -501,21 +629,21 @@ if "%ALBuildDemos%"=="Y" (
   echo Pack %ALBaseDir%\Compiled\Demos
   PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Demos\*' -DestinationPath '%ALBaseDir%\Compiled\Demos-Compiled.zip' -Force"
   IF ERRORLEVEL 1 goto ERROR
-
-  SET FileName=%ALBaseDir%\Compiled\Demos\
-  IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-  if exist "%FileName%" goto ERROR
 )
 
 if "%ALBuildTools%"=="Y" (
   echo Pack %ALBaseDir%\Compiled\Tools
   PowerShell -Command "Compress-Archive -Path '%ALBaseDir%\Compiled\Tools\*' -DestinationPath '%ALBaseDir%\Compiled\Tools-Compiled.zip' -Force"
   IF ERRORLEVEL 1 goto ERROR
-
-  SET FileName=%ALBaseDir%\Compiled\Tools\
-  IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-  if exist "%FileName%" goto ERROR
 )
+
+SET FileName=%ALBaseDir%\Compiled\Demos\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
+
+SET FileName=%ALBaseDir%\Compiled\Tools\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
 
 goto FINISHED
 
@@ -655,28 +783,92 @@ REM   IF ERRORLEVEL 1 EXIT /B 1
 REM   echo.
 REM )
 
-call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
-IF ERRORLEVEL 1 EXIT /B 1
+set EnvOptions_iOSDevice64_MobileProvisionAppStore=
+set EnvOptions_iOSDevice64_CFBundleIdentifierAppStore=
+if "%~3"=="ALFmxControlsDemo.dproj" (
+  set EnvOptions_iOSDevice64_MobileProvisionAppStore=%Alcinoe_ALFmxControlsDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore%
+  set EnvOptions_iOSDevice64_CFBundleIdentifierAppStore=io.magicfoundation.alcinoe.alfmxcontrolsdemo
+)
+if "%~3"=="ALFmxDynamicListBoxDemo.dproj" (
+  set EnvOptions_iOSDevice64_MobileProvisionAppStore=%Alcinoe_ALFmxDynamicListBoxDemo_EnvOptions_iOSDevice64_MobileProvisionAppStore%
+  set EnvOptions_iOSDevice64_CFBundleIdentifierAppStore=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo
+)
+REM <key>get-task-allow</key>
+REM <false/>
+REM <key>com.apple.developer.team-identifier</key>
+REM <string>%Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore%</string>
+SET "EnvOptions_iOSDevice64_EntitlementExtraKeyValuesAppStore=<key>get-task-allow</key><br/>  <false/><br/>  <key>com.apple.developer.team-identifier</key><br/>  <string>%Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore%</string>"
 
-echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4[0m
-MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Build /verbosity:minimal
-IF ERRORLEVEL 1 EXIT /B 1
-echo.
+SET ALRunEnvOptionsProjUpdater=N
+if "%~4"=="iOSDevice64" (
+  if "%~3"=="ALFmxControlsDemo.dproj" Set ALRunEnvOptionsProjUpdater=Y
+  if "%~3"=="ALFmxDynamicListBoxDemo.dproj" Set ALRunEnvOptionsProjUpdater=Y
+)
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" Set ALRunEnvOptionsProjUpdater=N
+if "%ALRunEnvOptionsProjUpdater%"=="Y" (
+  call "%ALBaseDir%\Tools\EnvOptionsProjUpdater\EnvOptionsProjUpdater.exe"^
+   -BDSVersion="%ALDelphiVersion%"^
+   -Platform="iOSDevice64"^
+   -ENV_PF_DevDebug=^
+   -ENV_PF_MobileProvisionDebug=^
+   -ENV_PF_MobileProvisionPathDebug=^
+   -ENV_PF_DevTeamIdDebug=^
+   -ENV_PF_AppIdentifierDebug=^
+   -ENV_PF_KeyChainAccessDebug=^
+   -ENV_PF_EntitlementExtraKeyValuesDebug=^
+   -ENV_PF_AutoMobileProvisionDebug=^
+   -ENV_PF_AutoCertificateDebug=^
+   -ENV_PF_CFBundleIdentifierDebug=^
+   -ENV_PF_DevAdHoc=^
+   -ENV_PF_MobileProvisionAdHoc=^
+   -ENV_PF_MobileProvisionPathAdHoc=^
+   -ENV_PF_DevTeamIdAdHoc=^
+   -ENV_PF_AppIdentifierAdHoc=^
+   -ENV_PF_KeyChainAccessAdhoc=^
+   -ENV_PF_EntitlementExtraKeyValuesAdhoc=^
+   -ENV_PF_AutoMobileProvisionAdHoc=^
+   -ENV_PF_AutoCertificateAdHoc=^
+   -ENV_PF_CFBundleIdentifierAdHoc=^
+   -ENV_PF_InstallAppOnDeviceAdHoc=^
+   -ENV_PF_DevAppStore="%Alcinoe_EnvOptions_iOSDevice64_DevAppStore%"^
+   -ENV_PF_MobileProvisionAppStore="%EnvOptions_iOSDevice64_MobileProvisionAppStore%"^
+   -ENV_PF_MobileProvisionPathAppStore="/Users/%Alcinoe_Mac_Username%/Library/MobileDevice/Provisioning Profiles/%EnvOptions_iOSDevice64_MobileProvisionAppStore%.mobileprovision"^
+   -ENV_PF_DevTeamIdAppStore="%Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore%"^
+   -ENV_PF_AppIdentifierAppStore="%Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore%.%EnvOptions_iOSDevice64_CFBundleIdentifierAppStore%"^
+   -ENV_PF_KeyChainAccessAppStore="%Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore%.%EnvOptions_iOSDevice64_CFBundleIdentifierAppStore%;com.apple.token;"^
+   -ENV_PF_EntitlementExtraKeyValuesAppStore="%EnvOptions_iOSDevice64_EntitlementExtraKeyValuesAppStore%"^
+   -ENV_PF_AutoMobileProvisionAppStore=^
+   -ENV_PF_AutoCertificateAppStore=^
+   -ENV_PF_CFBundleIdentifierAppStore="%Alcinoe_EnvOptions_iOSDevice64_DevTeamIdAppStore%.%EnvOptions_iOSDevice64_CFBundleIdentifierAppStore%"
+  IF ERRORLEVEL 1 EXIT /B 1 
+)
 
 SET ALDeploy=N
-if "%~4"=="Android" Set ALDeploy=Y
 if "%~4"=="Android64" Set ALDeploy=Y
+if "%~4"=="iOSDevice64" (
+  if "%~3"=="ALFmxControlsDemo.dproj" Set ALDeploy=Y
+  if "%~3"=="ALFmxDynamicListBoxDemo.dproj" Set ALDeploy=Y
+)
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" Set ALDeploy=N
 if "%ALDeploy%"=="Y" (
-
-  if exist %~1\%~2\*.deployproj del %~1\%~2\*.deployproj /s >nul
-  if exist %~1\%~2\*.deployproj EXIT /B 1
-
-  call "%ALBaseDir%\Tools\DeployProjNormalizer\DeployProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
+  echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4 /t:Build;Deploy[0m
+  echo Clean PAServer scratch-dir
+  ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /Users/%Alcinoe_Mac_Username%/PAServer/scratch-dir"
   IF ERRORLEVEL 1 EXIT /B 1
-
-  MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Deploy /verbosity:minimal
+  if "%~4"=="iOSDevice64" ( 
+    MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /p:Profile=%Alcinoe_Mac_Connection_Profile_Name% /t:Build;Deploy /verbosity:minimal
+  )
+  if "%~4" neq "iOSDevice64" ( 
+    MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Build;Deploy /verbosity:minimal
+  )
   IF ERRORLEVEL 1 EXIT /B 1
-
+  echo.
+)
+if "%ALDeploy%"=="N" (
+  echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4 /t:Build[0m
+  MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Build /verbosity:minimal
+  IF ERRORLEVEL 1 EXIT /B 1
+  echo.
 )
 
 SET FileName=%~1\%~2\Dcu\

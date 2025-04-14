@@ -158,7 +158,7 @@ uses
   Alcinoe.FMX.NotificationService,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.TabControl,
+  Alcinoe.FMX.PageController,
   Alcinoe.FMX.Themes,
   Alcinoe.FMX.Types3D,
   Alcinoe.FMX.VideoPlayer,

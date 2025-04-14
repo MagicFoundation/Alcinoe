@@ -10,6 +10,56 @@ object Form2: TForm2
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMasterStyle = 0
+  object ButtonActivateDeactivate: TALButton
+    Align = Top
+    Fill.Color = xFF6750A4
+    Margins.Left = 16.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 16.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Padding.Left = 27.000000000000000000
+    Padding.Top = 14.000000000000000000
+    Padding.Right = 27.000000000000000000
+    Padding.Bottom = 14.000000000000000000
+    Position.X = 16.000000000000000000
+    Position.Y = 209.000000000000000000
+    Size.Width = 328.000000000000000000
+    Size.Height = 49.000000000000000000
+    Size.PlatformDefault = False
+    StateStyles.Disabled.Fill.Color = x1F1D1B20
+    StateStyles.Disabled.Fill.Inherit = False
+    StateStyles.Disabled.TextSettings.Inherit = False
+    StateStyles.Disabled.TextSettings.Font.Size = 16.000000000000000000
+    StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
+    StateStyles.Disabled.Opacity = 1.000000000000000000
+    StateStyles.Hovered.Shadow.blur = 2.289999961853027000
+    StateStyles.Hovered.Shadow.OffsetY = 1.139999985694885000
+    StateStyles.Hovered.Shadow.Color = x80000000
+    StateStyles.Hovered.Shadow.Inherit = False
+    StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
+    StateStyles.Hovered.StateLayer.UseContentColor = True
+    StateStyles.Hovered.StateLayer.XRadius = -50.000000000000000000
+    StateStyles.Hovered.StateLayer.YRadius = -50.000000000000000000
+    StateStyles.Pressed.StateLayer.Opacity = 0.119999997317791000
+    StateStyles.Pressed.StateLayer.UseContentColor = True
+    StateStyles.Pressed.StateLayer.XRadius = -50.000000000000000000
+    StateStyles.Pressed.StateLayer.YRadius = -50.000000000000000000
+    StateStyles.Focused.StateLayer.Opacity = 0.119999997317791000
+    StateStyles.Focused.StateLayer.UseContentColor = True
+    StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
+    StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
+    StateStyles.Transition.Duration = 0.200000002980232200
+    Stroke.Color = claNull
+    Stroke.Thickness = 1.139999985694885000
+    TabOrder = 1
+    Text = 'Deactivate'
+    TextSettings.Font.Size = 16.000000000000000000
+    TextSettings.Font.Color = claWhite
+    TextSettings.LetterSpacing = 0.109999999403953600
+    XRadius = -50.000000000000000000
+    YRadius = -50.000000000000000000
+    OnClick = ButtonActivateDeactivateClick
+  end
   object ALLayout1: TALLayout
     Align = Top
     HitTest = True
@@ -12565,72 +12615,25 @@ object Form2: TForm2
       Size.Width = 360.000000000000000000
       Size.Height = 201.000000000000000000
       Size.PlatformDefault = False
+      object ALColorAdjustEffect1: TALColorAdjustEffect
+        Enabled = False
+      end
     end
-  end
-  object Button1: TALButton
-    Align = Top
-    Fill.Color = xFF6750A4
-    Margins.Left = 16.000000000000000000
-    Margins.Top = 8.000000000000000000
-    Margins.Right = 16.000000000000000000
-    Margins.Bottom = 8.000000000000000000
-    Padding.Left = 27.430000305175780000
-    Padding.Top = 13.710000038146970000
-    Padding.Right = 27.430000305175780000
-    Padding.Bottom = 13.710000038146970000
-    Position.X = 16.000000000000000000
-    Position.Y = 209.000000000000000000
-    Size.Width = 328.000000000000000000
-    Size.Height = 49.000000000000000000
-    Size.PlatformDefault = False
-    StateStyles.Disabled.Fill.Color = x1F1D1B20
-    StateStyles.Disabled.Fill.Inherit = False
-    StateStyles.Disabled.TextSettings.Inherit = False
-    StateStyles.Disabled.TextSettings.Font.Size = 16.000000000000000000
-    StateStyles.Disabled.TextSettings.Font.Weight = Medium
-    StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
-    StateStyles.Disabled.Opacity = 1.000000000000000000
-    StateStyles.Hovered.Shadow.blur = 2.289999961853027000
-    StateStyles.Hovered.Shadow.OffsetY = 1.139999985694885000
-    StateStyles.Hovered.Shadow.Color = x80000000
-    StateStyles.Hovered.Shadow.Inherit = False
-    StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
-    StateStyles.Hovered.StateLayer.UseContentColor = True
-    StateStyles.Hovered.StateLayer.XRadius = -50.000000000000000000
-    StateStyles.Hovered.StateLayer.YRadius = -50.000000000000000000
-    StateStyles.Pressed.StateLayer.Opacity = 0.119999997317791000
-    StateStyles.Pressed.StateLayer.UseContentColor = True
-    StateStyles.Pressed.StateLayer.XRadius = -50.000000000000000000
-    StateStyles.Pressed.StateLayer.YRadius = -50.000000000000000000
-    StateStyles.Focused.StateLayer.Opacity = 0.119999997317791000
-    StateStyles.Focused.StateLayer.UseContentColor = True
-    StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
-    StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
-    StateStyles.Transition.Duration = 0.200000002980232200
-    Stroke.Color = claNull
-    Stroke.Thickness = 1.139999985694885000
-    TabOrder = 1
-    Text = 'Activate / Deactivate'
-    TextSettings.Font.Size = 16.000000000000000000
-    TextSettings.Font.Color = claWhite
-    TextSettings.LetterSpacing = 0.109999999403953600
-    XRadius = -50.000000000000000000
-    YRadius = -50.000000000000000000
-    OnClick = Button1Click
   end
   object ALVertScrollBox1: TALVertScrollBox
     VScrollBar.Size.Width = 4.000000000000000000
     VScrollBar.Size.Height = 553.000000000000000000
     VScrollBar.Size.PlatformDefault = False
+    VScrollBar.TabOrder = 0
     VScrollBar.Thumb.Size.Width = 4.000000000000000000
-    VScrollBar.Thumb.Size.Height = 328.000000000000000000
+    VScrollBar.Thumb.Size.Height = 400.000000000000000000
     VScrollBar.Thumb.Size.PlatformDefault = False
     Align = Client
     Size.Width = 360.000000000000000000
     Size.Height = 553.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
-    object ALTrackBar2: TALTrackBar
+    object ALTrackBarContrast: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -12663,8 +12666,8 @@ object Form2: TForm2
       Margins.Left = 32.000000000000000000
       Margins.Right = 32.000000000000000000
       Margins.Bottom = 8.000000000000000000
-      Min = -2.000000000000000000
-      Max = 2.000000000000000000
+      Min = -1.000000000000000000
+      Max = 1.000000000000000000
       Position.X = 32.000000000000000000
       Position.Y = 40.000000000000000000
       Size.Width = 296.000000000000000000
@@ -12695,9 +12698,9 @@ object Form2: TForm2
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar2Change
+      OnChange = ALTrackBarContrastChange
     end
-    object ALTrackBar3: TALTrackBar
+    object ALTrackBarSaturation: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -12730,6 +12733,74 @@ object Form2: TForm2
       Margins.Left = 32.000000000000000000
       Margins.Right = 32.000000000000000000
       Margins.Bottom = 8.000000000000000000
+      Min = -1.000000000000000000
+      Max = 1.000000000000000000
+      Position.X = 32.000000000000000000
+      Position.Y = 124.000000000000000000
+      Size.Width = 296.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Thumb.Fill.Color = xFF6750A4
+      Thumb.Margins.Left = 6.000000000000000000
+      Thumb.Margins.Right = 6.000000000000000000
+      Thumb.Size.Width = 4.000000000000000000
+      Thumb.Size.Height = 44.000000000000000000
+      Thumb.Size.PlatformDefault = False
+      Thumb.StateStyles.Disabled.Fill.Color = x611D1B20
+      Thumb.StateStyles.Disabled.Fill.Inherit = False
+      Thumb.StateStyles.Disabled.Opacity = 1.000000000000000000
+      Thumb.StateStyles.Pressed.Fill.Color = xFF6750A4
+      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Left = 1.000000000000000000
+      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Right = 1.000000000000000000
+      Thumb.StateStyles.Pressed.Fill.Inherit = False
+      Thumb.Stroke.Color = claNull
+      Thumb.Stroke.Thickness = 1.379999995231628000
+      Thumb.TouchTargetExpansion.Left = 22.000000000000000000
+      Thumb.TouchTargetExpansion.Top = 2.000000000000000000
+      Thumb.TouchTargetExpansion.Right = 22.000000000000000000
+      Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
+      ValueIndicator.Fill.Color = xFF322F35
+      ValueIndicator.Format = '0.00'
+      ValueIndicator.ShowOnInteraction = True
+      ValueIndicator.Stroke.Thickness = 1.379999995231628000
+      ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
+      OnChange = ALTrackBarSaturationChange
+    end
+    object ALTrackBarVibrance: TALTrackBar
+      ActiveTrack.Fill.Color = xFF6750A4
+      ActiveTrack.Margins.Top = 14.000000000000000000
+      ActiveTrack.Margins.Bottom = 14.000000000000000000
+      ActiveTrack.Padding.Left = 6.000000000000000000
+      ActiveTrack.Padding.Right = 6.000000000000000000
+      ActiveTrack.StateStyles.Disabled.Fill.Color = x611D1B20
+      ActiveTrack.StateStyles.Disabled.Fill.Inherit = False
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Color = xA8F5EFF7
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
+      ActiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
+      ActiveTrack.StopIndicator.Color = claWhite
+      ActiveTrack.Stroke.Thickness = 1.379999995231628000
+      ActiveTrack.XRadius = -50.000000000000000000
+      ActiveTrack.YRadius = -50.000000000000000000
+      Align = Top
+      InactiveTrack.Fill.Color = xFFE8DEF8
+      InactiveTrack.Margins.Top = 14.000000000000000000
+      InactiveTrack.Margins.Bottom = 14.000000000000000000
+      InactiveTrack.Padding.Left = 6.000000000000000000
+      InactiveTrack.Padding.Right = 6.000000000000000000
+      InactiveTrack.StateStyles.Disabled.Fill.Color = x1F1D1B20
+      InactiveTrack.StateStyles.Disabled.Fill.Inherit = False
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Color = x611D1B20
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
+      InactiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
+      InactiveTrack.StopIndicator.Color = xFF4A4458
+      InactiveTrack.Stroke.Thickness = 1.379999995231628000
+      InactiveTrack.XRadius = -50.000000000000000000
+      InactiveTrack.YRadius = -50.000000000000000000
+      Margins.Left = 32.000000000000000000
+      Margins.Right = 32.000000000000000000
+      Margins.Bottom = 8.000000000000000000
+      Min = -1.000000000000000000
       Max = 1.000000000000000000
       Position.X = 32.000000000000000000
       Position.Y = 208.000000000000000000
@@ -12756,15 +12827,14 @@ object Form2: TForm2
       Thumb.TouchTargetExpansion.Top = 2.000000000000000000
       Thumb.TouchTargetExpansion.Right = 22.000000000000000000
       Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
-      Value = 1.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.Format = '0.00'
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar3Change
+      OnChange = ALTrackBarVibranceChange
     end
-    object ALTrackBar4: TALTrackBar
+    object ALTrackBarWhites: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -12804,7 +12874,7 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 4
+      TabOrder = 8
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -12829,9 +12899,9 @@ object Form2: TForm2
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar4Change
+      OnChange = ALTrackBarWhitesChange
     end
-    object ALTrackBar5: TALTrackBar
+    object ALTrackBarBlacks: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -12871,7 +12941,7 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 5
+      TabOrder = 9
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -12896,9 +12966,9 @@ object Form2: TForm2
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar5Change
+      OnChange = ALTrackBarBlacksChange
     end
-    object ALTrackBar6: TALTrackBar
+    object ALTrackBarTemperature: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -12938,7 +13008,7 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 10
+      TabOrder = 6
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -12963,9 +13033,9 @@ object Form2: TForm2
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar6Change
+      OnChange = ALTrackBarTemperatureChange
     end
-    object ALTrackBar7: TALTrackBar
+    object ALTrackBarTint: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -13005,7 +13075,7 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 11
+      TabOrder = 7
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -13030,9 +13100,9 @@ object Form2: TForm2
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar7Change
+      OnChange = ALTrackBarTintChange
     end
-    object ALTrackBar8: TALTrackBar
+    object ALTrackBarExposure: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -13072,7 +13142,7 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 8
+      TabOrder = 5
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -13097,9 +13167,9 @@ object Form2: TForm2
       ValueIndicator.ShowOnInteraction = True
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar8Change
+      OnChange = ALTrackBarExposureChange
     end
-    object ALTrackBar9: TALTrackBar
+    object ALTrackBarGamma: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
       ActiveTrack.Margins.Top = 14.000000000000000000
       ActiveTrack.Margins.Bottom = 14.000000000000000000
@@ -13139,141 +13209,7 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 9
-      Thumb.Fill.Color = xFF6750A4
-      Thumb.Margins.Left = 6.000000000000000000
-      Thumb.Margins.Right = 6.000000000000000000
-      Thumb.Size.Width = 4.000000000000000000
-      Thumb.Size.Height = 44.000000000000000000
-      Thumb.Size.PlatformDefault = False
-      Thumb.StateStyles.Disabled.Fill.Color = x611D1B20
-      Thumb.StateStyles.Disabled.Fill.Inherit = False
-      Thumb.StateStyles.Disabled.Opacity = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.Color = xFF6750A4
-      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Left = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Right = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.Inherit = False
-      Thumb.Stroke.Color = claNull
-      Thumb.Stroke.Thickness = 1.379999995231628000
-      Thumb.TouchTargetExpansion.Left = 22.000000000000000000
-      Thumb.TouchTargetExpansion.Top = 2.000000000000000000
-      Thumb.TouchTargetExpansion.Right = 22.000000000000000000
-      Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
-      ValueIndicator.Fill.Color = xFF322F35
-      ValueIndicator.Format = '0.00'
-      ValueIndicator.ShowOnInteraction = True
-      ValueIndicator.Stroke.Thickness = 1.379999995231628000
-      ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar9Change
-    end
-    object ALTrackBar10: TALTrackBar
-      ActiveTrack.Fill.Color = xFF6750A4
-      ActiveTrack.Margins.Top = 14.000000000000000000
-      ActiveTrack.Margins.Bottom = 14.000000000000000000
-      ActiveTrack.Padding.Left = 6.000000000000000000
-      ActiveTrack.Padding.Right = 6.000000000000000000
-      ActiveTrack.StateStyles.Disabled.Fill.Color = x611D1B20
-      ActiveTrack.StateStyles.Disabled.Fill.Inherit = False
-      ActiveTrack.StateStyles.Disabled.StopIndicator.Color = xA8F5EFF7
-      ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
-      ActiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
-      ActiveTrack.StopIndicator.Color = claWhite
-      ActiveTrack.Stroke.Thickness = 1.379999995231628000
-      ActiveTrack.XRadius = -50.000000000000000000
-      ActiveTrack.YRadius = -50.000000000000000000
-      Align = Top
-      InactiveTrack.Fill.Color = xFFE8DEF8
-      InactiveTrack.Margins.Top = 14.000000000000000000
-      InactiveTrack.Margins.Bottom = 14.000000000000000000
-      InactiveTrack.Padding.Left = 6.000000000000000000
-      InactiveTrack.Padding.Right = 6.000000000000000000
-      InactiveTrack.StateStyles.Disabled.Fill.Color = x1F1D1B20
-      InactiveTrack.StateStyles.Disabled.Fill.Inherit = False
-      InactiveTrack.StateStyles.Disabled.StopIndicator.Color = x611D1B20
-      InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
-      InactiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
-      InactiveTrack.StopIndicator.Color = xFF4A4458
-      InactiveTrack.Stroke.Thickness = 1.379999995231628000
-      InactiveTrack.XRadius = -50.000000000000000000
-      InactiveTrack.YRadius = -50.000000000000000000
-      Margins.Left = 32.000000000000000000
-      Margins.Right = 32.000000000000000000
-      Margins.Bottom = 8.000000000000000000
-      Min = -1.000000000000000000
-      Max = 1.000000000000000000
-      Position.X = 32.000000000000000000
-      Position.Y = 796.000000000000000000
-      Size.Width = 296.000000000000000000
-      Size.Height = 44.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 7
-      Thumb.Fill.Color = xFF6750A4
-      Thumb.Margins.Left = 6.000000000000000000
-      Thumb.Margins.Right = 6.000000000000000000
-      Thumb.Size.Width = 4.000000000000000000
-      Thumb.Size.Height = 44.000000000000000000
-      Thumb.Size.PlatformDefault = False
-      Thumb.StateStyles.Disabled.Fill.Color = x611D1B20
-      Thumb.StateStyles.Disabled.Fill.Inherit = False
-      Thumb.StateStyles.Disabled.Opacity = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.Color = xFF6750A4
-      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Left = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Right = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.Inherit = False
-      Thumb.Stroke.Color = claNull
-      Thumb.Stroke.Thickness = 1.379999995231628000
-      Thumb.TouchTargetExpansion.Left = 22.000000000000000000
-      Thumb.TouchTargetExpansion.Top = 2.000000000000000000
-      Thumb.TouchTargetExpansion.Right = 22.000000000000000000
-      Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
-      ValueIndicator.Fill.Color = xFF322F35
-      ValueIndicator.Format = '0.00'
-      ValueIndicator.ShowOnInteraction = True
-      ValueIndicator.Stroke.Thickness = 1.379999995231628000
-      ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar10Change
-    end
-    object ALTrackBar11: TALTrackBar
-      ActiveTrack.Fill.Color = xFF6750A4
-      ActiveTrack.Margins.Top = 14.000000000000000000
-      ActiveTrack.Margins.Bottom = 14.000000000000000000
-      ActiveTrack.Padding.Left = 6.000000000000000000
-      ActiveTrack.Padding.Right = 6.000000000000000000
-      ActiveTrack.StateStyles.Disabled.Fill.Color = x611D1B20
-      ActiveTrack.StateStyles.Disabled.Fill.Inherit = False
-      ActiveTrack.StateStyles.Disabled.StopIndicator.Color = xA8F5EFF7
-      ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
-      ActiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
-      ActiveTrack.StopIndicator.Color = claWhite
-      ActiveTrack.Stroke.Thickness = 1.379999995231628000
-      ActiveTrack.XRadius = -50.000000000000000000
-      ActiveTrack.YRadius = -50.000000000000000000
-      Align = Top
-      InactiveTrack.Fill.Color = xFFE8DEF8
-      InactiveTrack.Margins.Top = 14.000000000000000000
-      InactiveTrack.Margins.Bottom = 14.000000000000000000
-      InactiveTrack.Padding.Left = 6.000000000000000000
-      InactiveTrack.Padding.Right = 6.000000000000000000
-      InactiveTrack.StateStyles.Disabled.Fill.Color = x1F1D1B20
-      InactiveTrack.StateStyles.Disabled.Fill.Inherit = False
-      InactiveTrack.StateStyles.Disabled.StopIndicator.Color = x611D1B20
-      InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
-      InactiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
-      InactiveTrack.StopIndicator.Color = xFF4A4458
-      InactiveTrack.Stroke.Thickness = 1.379999995231628000
-      InactiveTrack.XRadius = -50.000000000000000000
-      InactiveTrack.YRadius = -50.000000000000000000
-      Margins.Left = 32.000000000000000000
-      Margins.Right = 32.000000000000000000
-      Margins.Bottom = 8.000000000000000000
-      Min = -1.000000000000000000
-      Max = 1.000000000000000000
-      Position.X = 32.000000000000000000
-      Position.Y = 880.000000000000000000
-      Size.Width = 296.000000000000000000
-      Size.Height = 44.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 6
+      TabOrder = 4
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -13297,73 +13233,7 @@ object Form2: TForm2
       ValueIndicator.Format = '0.00'
       ValueIndicator.Stroke.Thickness = 1.379999995231628000
       ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar11Change
-    end
-    object ALTrackBar12: TALTrackBar
-      ActiveTrack.Fill.Color = xFF6750A4
-      ActiveTrack.Margins.Top = 14.000000000000000000
-      ActiveTrack.Margins.Bottom = 14.000000000000000000
-      ActiveTrack.Padding.Left = 6.000000000000000000
-      ActiveTrack.Padding.Right = 6.000000000000000000
-      ActiveTrack.StateStyles.Disabled.Fill.Color = x611D1B20
-      ActiveTrack.StateStyles.Disabled.Fill.Inherit = False
-      ActiveTrack.StateStyles.Disabled.StopIndicator.Color = xA8F5EFF7
-      ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
-      ActiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
-      ActiveTrack.StopIndicator.Color = claWhite
-      ActiveTrack.Stroke.Thickness = 1.379999995231628000
-      ActiveTrack.XRadius = -50.000000000000000000
-      ActiveTrack.YRadius = -50.000000000000000000
-      Align = Top
-      InactiveTrack.Fill.Color = xFFE8DEF8
-      InactiveTrack.Margins.Top = 14.000000000000000000
-      InactiveTrack.Margins.Bottom = 14.000000000000000000
-      InactiveTrack.Padding.Left = 6.000000000000000000
-      InactiveTrack.Padding.Right = 6.000000000000000000
-      InactiveTrack.StateStyles.Disabled.Fill.Color = x1F1D1B20
-      InactiveTrack.StateStyles.Disabled.Fill.Inherit = False
-      InactiveTrack.StateStyles.Disabled.StopIndicator.Color = x611D1B20
-      InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit = False
-      InactiveTrack.StateStyles.Disabled.Opacity = 1.000000000000000000
-      InactiveTrack.StopIndicator.Color = xFF4A4458
-      InactiveTrack.Stroke.Thickness = 1.379999995231628000
-      InactiveTrack.XRadius = -50.000000000000000000
-      InactiveTrack.YRadius = -50.000000000000000000
-      Margins.Left = 32.000000000000000000
-      Margins.Right = 32.000000000000000000
-      Margins.Bottom = 8.000000000000000000
-      Max = 1.000000000000000000
-      Position.X = 32.000000000000000000
-      Position.Y = 124.000000000000000000
-      Size.Width = 296.000000000000000000
-      Size.Height = 44.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 2
-      Thumb.Fill.Color = xFF6750A4
-      Thumb.Margins.Left = 6.000000000000000000
-      Thumb.Margins.Right = 6.000000000000000000
-      Thumb.Size.Width = 4.000000000000000000
-      Thumb.Size.Height = 44.000000000000000000
-      Thumb.Size.PlatformDefault = False
-      Thumb.StateStyles.Disabled.Fill.Color = x611D1B20
-      Thumb.StateStyles.Disabled.Fill.Inherit = False
-      Thumb.StateStyles.Disabled.Opacity = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.Color = xFF6750A4
-      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Left = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.BackgroundMargins.Right = 1.000000000000000000
-      Thumb.StateStyles.Pressed.Fill.Inherit = False
-      Thumb.Stroke.Color = claNull
-      Thumb.Stroke.Thickness = 1.379999995231628000
-      Thumb.TouchTargetExpansion.Left = 22.000000000000000000
-      Thumb.TouchTargetExpansion.Top = 2.000000000000000000
-      Thumb.TouchTargetExpansion.Right = 22.000000000000000000
-      Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
-      ValueIndicator.Fill.Color = xFF322F35
-      ValueIndicator.Format = '0.00'
-      ValueIndicator.ShowOnInteraction = True
-      ValueIndicator.Stroke.Thickness = 1.379999995231628000
-      ValueIndicator.TextSettings.Font.Color = xFFF5EFF7
-      OnChange = ALTrackBar12Change
+      OnChange = ALTrackBarGammaChange
     end
     object Label3: TALText
       Align = Top
@@ -13377,9 +13247,9 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'contrast'
+      Text = 'Contrast'
     end
-    object Label4: TALText
+    object Label6: TALText
       Align = Top
       AutoSize = True
       Margins.Left = 32.000000000000000000
@@ -13391,9 +13261,9 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'Shadows'
+      Text = 'Saturation'
     end
-    object Label5: TALText
+    object Label7: TALText
       Align = Top
       AutoSize = True
       Margins.Left = 32.000000000000000000
@@ -13405,9 +13275,9 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'Highlights'
+      Text = 'Vibrance'
     end
-    object Label6: TALText
+    object Label8: TALText
       Align = Top
       AutoSize = True
       Margins.Left = 32.000000000000000000
@@ -13419,46 +13289,18 @@ object Form2: TForm2
       Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'Saturation'
-    end
-    object Label7: TALText
-      Align = Top
-      AutoSize = True
-      Margins.Left = 16.000000000000000000
-      Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
-      Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 352.000000000000000000
-      Size.Width = 328.000000000000000000
-      Size.Height = 19.000000000000000000
-      Size.PlatformDefault = False
-      Text = 'Vibrance'
-    end
-    object Label8: TALText
-      Align = Top
-      AutoSize = True
-      Margins.Left = 16.000000000000000000
-      Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
-      Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 436.000000000000000000
-      Size.Width = 328.000000000000000000
-      Size.Height = 19.000000000000000000
-      Size.PlatformDefault = False
       Text = 'Whites'
     end
     object Label9: TALText
       Align = Top
       AutoSize = True
-      Margins.Left = 16.000000000000000000
+      Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
+      Margins.Right = 32.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 520.000000000000000000
-      Size.Width = 328.000000000000000000
+      Position.X = 32.000000000000000000
+      Position.Y = 352.000000000000000000
+      Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
       Text = 'Blacks'
@@ -13466,41 +13308,41 @@ object Form2: TForm2
     object Label10: TALText
       Align = Top
       AutoSize = True
-      Margins.Left = 16.000000000000000000
+      Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
+      Margins.Right = 32.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 604.000000000000000000
-      Size.Width = 328.000000000000000000
+      Position.X = 32.000000000000000000
+      Position.Y = 436.000000000000000000
+      Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'temperature'
+      Text = 'Temperature'
     end
-    object tint: TALText
+    object Label13: TALText
       Align = Top
       AutoSize = True
-      Margins.Left = 16.000000000000000000
+      Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
+      Margins.Right = 32.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 688.000000000000000000
-      Size.Width = 328.000000000000000000
+      Position.X = 32.000000000000000000
+      Position.Y = 520.000000000000000000
+      Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'tint'
+      Text = 'Tint'
     end
     object Label11: TALText
       Align = Top
       AutoSize = True
-      Margins.Left = 16.000000000000000000
+      Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
+      Margins.Right = 32.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 772.000000000000000000
-      Size.Width = 328.000000000000000000
+      Position.X = 32.000000000000000000
+      Position.Y = 604.000000000000000000
+      Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
       Text = 'Exposure'
@@ -13508,16 +13350,16 @@ object Form2: TForm2
     object Label12: TALText
       Align = Top
       AutoSize = True
-      Margins.Left = 16.000000000000000000
+      Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
-      Margins.Right = 16.000000000000000000
+      Margins.Right = 32.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Position.X = 16.000000000000000000
-      Position.Y = 856.000000000000000000
-      Size.Width = 328.000000000000000000
+      Position.X = 32.000000000000000000
+      Position.Y = 688.000000000000000000
+      Size.Width = 296.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      Text = 'gamma'
+      Text = 'Gamma'
     end
   end
 end

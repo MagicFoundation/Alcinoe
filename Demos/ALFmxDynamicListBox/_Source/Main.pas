@@ -13,6 +13,7 @@ uses
   System.Classes,
   System.Variants,
   System.ImageList,
+  FMX.Platform,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -34,7 +35,7 @@ uses
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.TabControl,
+  Alcinoe.FMX.PageController,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.FMX.DatePickerDialog,
@@ -56,30 +57,42 @@ type
   {**********************}
   TMainForm = class(TForm)
     MainDynamicListBox: TALDynamicListBox;
-    BottomBar: TALRectangle;
-    Button1: TALButton;
-    Button2: TALButton;
-    Button3: TALButton;
-    Button4: TALButton;
-    Button5: TALButton;
+    procedure FormCreate(Sender: TObject);
     procedure MainDynamicListBoxDownloadItems(
                 const AContext: TALDynamicListBoxView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
                 var AErrorCode: Integer);
-    function MainDynamicListBoxCreateMainViewLoadingContent(const AContext: TALDynamicListBoxItem.TCreateContentContext): TALDynamicListBoxItemLoadingContent;
-    function MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBoxItem.TCreateContentContext): TALDynamicListBoxItemMainContent;
-    procedure FormCreate(Sender: TObject);
-    procedure BottomBarResized(Sender: TObject);
+    function MainDynamicListBoxCreateLoadingContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemLoadingContent;
+    function MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
+    function MainDynamicListBoxCreateTopBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBarContent;
+    function MainDynamicListBoxCreateBottomBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBarContent;
+    function MainDynamicListBoxCreateItem(const AContext: TALDynamicListBoxView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBoxItem;
   private
     {$IF defined(ALUIAutomationEnabled)}
     FSimulateInfiniteScrollCurrentPoint: TPointF;
     procedure SimulateInfiniteScroll;
     {$ENDIF}
+    {$IF defined(android)}
+    function ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
+    {$ENDIF}
   protected
     procedure ALTextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
     procedure ALTextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
     procedure ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+    procedure BottomBarResized(Sender: TObject);
+    procedure StoriesCarouselDownloadItems(
+                const AContext: TALDynamicListBoxView.TDownloadItemsContext;
+                out AData: TALJSONNodeW;
+                var APaginationToken: string;
+                var AErrorCode: Integer);
+    function StoriesCarouselCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
+    procedure SuggestedCarouselDownloadItems(
+                const AContext: TALDynamicListBoxView.TDownloadItemsContext;
+                out AData: TALJSONNodeW;
+                var APaginationToken: string;
+                var AErrorCode: Integer);
+    function SuggestedCarouselCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
   end;
 
 var
@@ -91,8 +104,13 @@ implementation
 
 uses
   {$IF defined(Android)}
+  Androidapi.JNI.GraphicsContentViewText,
   Androidapi.Helpers,
   Androidapi.JNI.App,
+  {$ENDIF}
+  {$IF defined(ios)}
+  iOSapi.UIKit,
+  iOSapi.CocoaTypes,
   {$ENDIF}
   system.Diagnostics,
   system.threading,
@@ -105,13 +123,83 @@ uses
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Common;
 
+{**********************************************}
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  TALErrorReporting.Instance;
+  TALGuardianThread.Instance;
+  {$IF defined(ALUIAutomationEnabled)}
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      SimulateInfiniteScroll;
+    end, 5000);
+  {$ENDIF}
+
+  {$IF defined(android)}
+
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+  {$ENDIF}
+
+  if TOSVersion.Check(11{API level 30}) then begin
+    var LWindow := TAndroidHelper.Activity.getWindow;
+    LWindow.setNavigationBarColor(integer(TAlphaColors.White));
+    LWindow.setStatusBarColor(integer(TAlphaColors.White));
+    var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
+    if LInsetsController <> nil then
+      LInsetsController.setSystemBarsAppearance(
+        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
+        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS,
+        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
+        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);
+  end;
+
+  var LApplicationEventService: IFMXApplicationEventService;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXApplicationEventService, IInterface(LApplicationEventService)) then
+    LApplicationEventService.SetApplicationEventHandler(ApplicationEventHandler);
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      var LWindow := TAndroidHelper.Activity.getWindow;
+      LWindow.setNavigationBarColor(integer(TAlphaColors.White));
+      LWindow.setStatusBarColor(integer(TAlphaColors.White));
+      LWindow.getDecorView.setSystemUiVisibility(
+        TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+        TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+    end, 500);
+
+  {$ENDIF}
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+{$ENDIF}
+{$IF defined(android)}
+function TMainForm.ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
+begin
+  if AAppEvent = TApplicationEvent.BecameActive then begin
+    TThread.ForceQueue(nil,
+      procedure
+      begin
+        var LWindow := TAndroidHelper.Activity.getWindow;
+        LWindow.setNavigationBarColor(integer(TAlphaColors.White));
+        LWindow.setStatusBarColor(integer(TAlphaColors.White));
+        LWindow.getDecorView.setSystemUiVisibility(
+          TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+          TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+      end, 500);
+  end;
+  Result := True;
+end;
+{$ENDIF}
+
 {*********************************************************************************************}
 procedure TMainForm.ALTextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
 begin
-  If Element.Id = 'ellipsis' then begin
+  If Element.Id = 'ellipsis' then
     TALDynamicListBoxText(Sender).TextSettings.MaxLines := 65535;
-    TALDynamicListBoxText(Sender).MaxHeight := 65535;
-  end;
 end;
 
 {**************************************************************************************************}
@@ -131,15 +219,52 @@ end;
 {****************************************************}
 procedure TMainForm.BottomBarResized(Sender: TObject);
 begin
-  var LMargin: Single := (BottomBar.Width - button1.Width - button2.Width - button3.Width - button4.Width - button5.Width) / 10;
-  button1.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
-  button2.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
-  button3.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
-  button4.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
+  with TALDynamicListBoxViewBottomBarContent(Sender) do begin
+    var Lbutton1 := Controls[0];
+    var Lbutton2 := Controls[1];
+    var Lbutton3 := Controls[2];
+    var Lbutton4 := Controls[3];
+    var Lbutton5 := Controls[4];
+    var LMargin: Single := (Width - Lbutton1.Width - Lbutton2.Width - Lbutton3.Width - Lbutton4.Width - Lbutton5.Width) / 10;
+    Lbutton1.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
+    Lbutton2.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
+    Lbutton3.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
+    Lbutton4.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
+    Lbutton5.Margins.Rect := TRectF.Create(LMargin, 0, LMargin, 0);
+  end;
 end;
 
-{******************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateMainViewLoadingContent(const AContext: TALDynamicListBoxItem.TCreateContentContext): TALDynamicListBoxItemLoadingContent;
+{***********************************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateItem(const AContext: TALDynamicListBoxView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBoxItem;
+begin
+  if AData.GetChildNodeValueText('type', '') = 'stories' then begin
+    var Lview := TALDynamicListBoxView.Create(nil);
+    Lview.Orientation := TOrientation.Horizontal;
+    Lview.Height := 132;
+    Lview.OnDownloadItems := StoriesCarouselDownloadItems;
+    Lview.OnCreateItemMainContent := StoriesCarouselCreateItemMainContent;
+    Lview.PreloadItemCount := 50;
+    Result := LView;
+  end
+  else if AData.GetChildNodeValueText('type', '') = 'suggested' then begin
+    var Lview := TALDynamicListBoxView.Create(nil);
+    Lview.Orientation := TOrientation.Horizontal;
+    Lview.Height := 255;
+    Lview.OnDownloadItems := SuggestedCarouselDownloadItems;
+    Lview.OnCreateItemMainContent := SuggestedCarouselCreateItemMainContent;
+    Lview.PreloadItemCount := 50;
+    LView.Margins.bottom := 23;
+    LView.ScrollEngine.Friction := 0.04;
+    Result := LView;
+  end
+  else begin
+    Result := TALDynamicListBoxItem.Create(nil);
+    Result.OnCreateMainContent := MainDynamicListBoxCreateItemMainContent;
+  end;
+end;
+
+{***********************************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateLoadingContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemLoadingContent;
 begin
   Result := TALDynamicListBoxItemLoadingContent.Create(nil);
   Try
@@ -236,26 +361,119 @@ begin
   End;
 end;
 
-{**********************************************}
-procedure TMainForm.FormCreate(Sender: TObject);
+{*********************************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateTopBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBarContent;
 begin
-  TALErrorReporting.Instance;
-  TALGuardianThread.Instance;
-  {$IF defined(ALUIAutomationEnabled)}
-  TThread.ForceQueue(nil,
-    procedure
-    begin
-      SimulateInfiniteScroll;
-    end, 5000);
-  {$ENDIF}
-  BottomBarResized(nil);
-  {$IF defined(android)}
-  TAndroidHelper.Activity.getWindow.setNavigationBarColor(integer(TAlphaColors.White));
-  {$ENDIF}
+  Result := TALDynamicListBoxViewTopBarContent.Create(nil);
+  try
+    Result.BoundsRect := AContext.TargetRect;
+    Result.Height := 56;
+    Result.Fill.Color := TalphaColors.White;
+
+    var LTitle := TALDynamicListBoxText.Create(Result);
+    LTitle.Align := TALAlignLayout.LeftCenter;
+    LTitle.TextSettings.Font.Size := 22;
+    LTitle.TextSettings.Font.weight := TFontWeight.Bold;
+    LTitle.TextSettings.Font.Color := $FF0d1014;
+    LTitle.AutoSize := True;
+    LTitle.Margins.left := 18;
+    LTitle.Text := 'For you';
+
+    var LMessageBtn := TALDynamicListBoxButton.Create(Result);
+    LMessageBtn.Fill.Color := TalphaColors.Null;
+    LMessageBtn.Fill.ResourceName := 'message';
+    LMessageBtn.Stroke.Color := TalphaColors.Null;
+    LMessageBtn.Align := TALAlignLayout.RightCenter;
+    LMessageBtn.Margins.right := 24;
+    LMessageBtn.Height := 20;
+    LMessageBtn.Width := 23;
+
+    var LActivityBtn := TALDynamicListBoxButton.Create(Result);
+    LActivityBtn.Fill.Color := TalphaColors.Null;
+    LActivityBtn.Fill.ResourceName := 'activity';
+    LActivityBtn.Stroke.Color := TalphaColors.Null;
+    LActivityBtn.Align := TALAlignLayout.RightCenter;
+    LActivityBtn.Margins.right := 21;
+    LActivityBtn.Height := 22;
+    LActivityBtn.Width := 24;
+
+  Except
+    ALFreeAndNil(Result);
+    Raise;
+  End;
 end;
 
-{********************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBoxItem.TCreateContentContext): TALDynamicListBoxItemMainContent;
+{***************************************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateBottomBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBarContent;
+begin
+  Result := TALDynamicListBoxViewBottomBarContent.Create(nil);
+  try
+    Result.BoundsRect := AContext.TargetRect;
+    {$IF defined(IOS)}
+    var LhomeIndicatorBottom: CGFloat := 0;
+    var LWindow := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication).keyWindow;
+    if LWindow <> nil then begin
+      var LInsets := LWindow.safeAreaInsets;
+      LhomeIndicatorBottom := LInsets.Bottom;
+    end;
+    Result.height := 48 + LhomeIndicatorBottom - 8;
+    Result.padding.bottom := LhomeIndicatorBottom - 8;
+    {$ELSE}
+    Result.Height := 48;
+    {$ENDIF}
+    Result.Fill.Color := TalphaColors.white;
+
+    var LButton1 := TALDynamicListBoxButton.Create(Result);
+    LButton1.Align := TALAlignLayout.LeftCenter;
+    LButton1.Fill.Color := TalphaColors.Null;
+    LButton1.Fill.ResourceName := 'home';
+    LButton1.Width := 22;
+    LButton1.Height := 22;
+    LButton1.Stroke.Color := TalphaColors.Null;
+
+    var LButton2 := TALDynamicListBoxButton.Create(Result);
+    LButton2.Align := TALAlignLayout.LeftCenter;
+    LButton2.Fill.Color := TalphaColors.Null;
+    LButton2.Fill.ResourceName := 'search';
+    LButton2.Width := 22;
+    LButton2.Height := 22;
+    LButton2.Stroke.Color := TalphaColors.Null;
+
+    var LButton3 := TALDynamicListBoxButton.Create(Result);
+    LButton3.Align := TALAlignLayout.LeftCenter;
+    LButton3.Fill.Color := TalphaColors.Null;
+    LButton3.Fill.ResourceName := 'add';
+    LButton3.Width := 22;
+    LButton3.Height := 22;
+    LButton3.Stroke.Color := TalphaColors.Null;
+
+    var LButton4 := TALDynamicListBoxButton.Create(Result);
+    LButton4.Align := TALAlignLayout.LeftCenter;
+    LButton4.Fill.Color := TalphaColors.Null;
+    LButton4.Fill.ResourceName := 'video';
+    LButton4.Width := 22;
+    LButton4.Height := 22;
+    LButton4.Stroke.Color := TalphaColors.Null;
+
+    var LButton5 := TALDynamicListBoxButton.Create(Result);
+    LButton5.Align := TALAlignLayout.LeftCenter;
+    LButton5.Fill.Color := TalphaColors.Null;
+    LButton5.Fill.ResourceName := 'profile';
+    LButton5.Width := 26;
+    LButton5.Height := 26;
+    LButton5.Stroke.Color := TalphaColors.Null;
+
+    Result.OnResized := BottomBarResized;
+    BottomBarResized(Result);
+
+  Except
+    ALFreeAndNil(Result);
+    Raise;
+  End;
+end;
+
+{*********************************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
 begin
   Result := TALDynamicListBoxItemMainContent.Create(nil);
   Try
@@ -275,6 +493,8 @@ begin
     LRainbowCircle.Margins.Left := 15;
     LRainbowCircle.Height := 38;
     LRainbowCircle.Width := 38;
+    LRainbowCircle.CacheIndex := 1;
+    LRainbowCircle.CacheEngine := AContext.CacheEngine;
 
     var LAvatar := TALDynamicListBoxImage.Create(LRainbowCircle);
     LAvatar.Name := 'ProfilePicture';
@@ -291,12 +511,12 @@ begin
     LMenuBtn.Fill.Color := TalphaColors.Null;
     LMenuBtn.Fill.ResourceName := 'menu';
     LMenuBtn.Stroke.Color := TalphaColors.Null;
-    LMenuBtn.CacheIndex := 1;
-    LMenuBtn.CacheEngine := AContext.CacheEngine;
     LMenuBtn.Align := TALAlignLayout.RightCenter;
     LMenuBtn.Margins.right := 14;
     LMenuBtn.Height := 16;
     LMenuBtn.Width := 4;
+    LMenuBtn.CacheIndex := 2;
+    LMenuBtn.CacheEngine := AContext.CacheEngine;
 
     Var LLayout2 := TALDynamicListBoxLayout.Create(LLayout1);
     LLayout2.Name := 'Layout2';
@@ -368,6 +588,14 @@ begin
         LMedia1.Margins.Top := 11;
         LMedia1.Align := TALAlignLayout.top;
         LMedia1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
+        if AContext.Owner.Index = 1 then begin
+          LLayout1.Margins.top := 12;
+          LMedia1.AddControl(LLayout1);
+          LUsername.TextSettings.Font.Color := $FFffffff;
+          LGeotag.TextSettings.Font.Color := $FFffffff;
+          LMenuBtn.Fill.ResourceName := 'menu_dark';
+          LMenuBtn.CacheIndex := 3
+        end;
       end;
     end;
 
@@ -383,12 +611,12 @@ begin
     LLikeCountBtn.Fill.Color := TalphaColors.Null;
     LLikeCountBtn.Fill.ResourceName := 'like';
     LLikeCountBtn.Stroke.Color := TalphaColors.Null;
-    LLikeCountBtn.CacheIndex := 2;
-    LLikeCountBtn.CacheEngine := AContext.CacheEngine;
     LLikeCountBtn.Align := TALAlignLayout.LeftCenter;
     LLikeCountBtn.Margins.Left := 17;
     LLikeCountBtn.Height := 20;
     LLikeCountBtn.Width := 23;
+    LLikeCountBtn.CacheIndex := 4;
+    LLikeCountBtn.CacheEngine := AContext.CacheEngine;
 
     var LLikeCountText := TALDynamicListBoxText.Create(LLayout3);
     LLikeCountText.Name := 'LikeCountText';
@@ -405,12 +633,12 @@ begin
     LCommentCountBtn.Fill.Color := TalphaColors.Null;
     LCommentCountBtn.Fill.ResourceName := 'comments';
     LCommentCountBtn.Stroke.Color := TalphaColors.Null;
-    LCommentCountBtn.CacheIndex := 3;
-    LCommentCountBtn.CacheEngine := AContext.CacheEngine;
     LCommentCountBtn.Align := TALAlignLayout.LeftCenter;
     LCommentCountBtn.Margins.Left := 14;
     LCommentCountBtn.Height := 22;
     LCommentCountBtn.Width := 22;
+    LCommentCountBtn.CacheIndex := 5;
+    LCommentCountBtn.CacheEngine := AContext.CacheEngine;
 
     var LCommentCountText := TALDynamicListBoxText.Create(LLayout3);
     LCommentCountText.Name := 'CommentCountText';
@@ -427,12 +655,12 @@ begin
     LReshareCountsBtn.Fill.Color := TalphaColors.Null;
     LReshareCountsBtn.Fill.ResourceName := 'message';
     LReshareCountsBtn.Stroke.Color := TalphaColors.Null;
-    LReshareCountsBtn.CacheIndex := 4;
-    LReshareCountsBtn.CacheEngine := AContext.CacheEngine;
     LReshareCountsBtn.Align := TALAlignLayout.LeftCenter;
     LReshareCountsBtn.Margins.Left := 14;
     LReshareCountsBtn.Height := 19;
     LReshareCountsBtn.Width := 22;
+    LReshareCountsBtn.CacheIndex := 6;
+    LReshareCountsBtn.CacheEngine := AContext.CacheEngine;
 
     var LReshareCountText := TALDynamicListBoxText.Create(LLayout3);
     LReshareCountText.Name := 'ReshareCountText';
@@ -449,12 +677,12 @@ begin
     LBookmarkBtn.Fill.Color := TalphaColors.Null;
     LBookmarkBtn.Fill.ResourceName := 'bookmark';
     LBookmarkBtn.Stroke.Color := TalphaColors.Null;
-    LBookmarkBtn.CacheIndex := 5;
-    LBookmarkBtn.CacheEngine := AContext.CacheEngine;
     LBookmarkBtn.Align := TALAlignLayout.rightCenter;
     LBookmarkBtn.Margins.right := 19;
     LBookmarkBtn.Height := 20;
     LBookmarkBtn.Width := 18;
+    LBookmarkBtn.CacheIndex := 7;
+    LBookmarkBtn.CacheEngine := AContext.CacheEngine;
 
     var LCaption := TALDynamicListBoxText.Create(Result);
     LCaption.Name := 'Caption';
@@ -517,6 +745,132 @@ begin
 
 end;
 
+{******************************************************************************************************************************************************}
+function TMainForm.StoriesCarouselCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
+begin
+  Result := TALDynamicListBoxItemMainContent.Create(nil);
+  Try
+
+    Result.BoundsRect := AContext.TargetRect;
+
+    Var LLayout1 := TALDynamicListBoxLayout.Create(Result);
+    LLayout1.Align := TALAlignLayout.left;
+    LLayout1.width := 100;
+    LLayout1.Margins.Left := 6;
+    LLayout1.Margins.Left := 6;
+
+    var LRainbowCircle := TALDynamicListBoxImage.Create(LLayout1);
+    LRainbowCircle.WrapMode := TALImageWrapMode.Fit;
+    LRainbowCircle.ResourceName := 'bigrainbowcircle';
+    LRainbowCircle.Align := TALAlignLayout.TopCenter;
+    LRainbowCircle.Margins.Top := 6;
+    LRainbowCircle.Margins.bottom := 6;
+    LRainbowCircle.Height := 100;
+    LRainbowCircle.Width := 100;
+    LRainbowCircle.CacheIndex := 20;
+    LRainbowCircle.CacheEngine := AContext.CacheEngine;
+
+    var LAvatar := TALDynamicListBoxImage.Create(LRainbowCircle);
+    LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
+    LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    LAvatar.Align := TALAlignLayout.Center;
+    LAvatar.Height := 84;
+    LAvatar.Width := 84;
+    LAvatar.XRadius := -50;
+    LAvatar.yRadius := -50;
+
+    var LUsername := TALDynamicListBoxText.Create(LLayout1);
+    LUsername.Align := TALAlignLayout.topcenter;
+    LUsername.TextSettings.Font.Size := 12;
+    LUsername.TextSettings.Font.weight := TFontWeight.Regular;
+    LUsername.TextSettings.Font.Color := $FF262626;
+    LUsername.AutoSize := True;
+    LUsername.TextSettings.MaxLines := 1;
+    LUsername.Text := AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+
+  Except
+    ALFreeAndNil(Result);
+    Raise;
+  End;
+
+end;
+
+{********************************************************************************************************************************************************}
+function TMainForm.SuggestedCarouselCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
+begin
+  Result := TALDynamicListBoxItemMainContent.Create(nil);
+  Try
+
+    Result.BoundsRect := AContext.TargetRect;
+
+    Var LBackground := TALDynamicListBoxRectangle.Create(Result);
+    LBackground.Align := TALAlignLayout.left;
+    LBackground.width := 220;
+    LBackground.Margins.Left := 6;
+    LBackground.Margins.Left := 6;
+    LBackground.Stroke.Color := $FFeaedf0;
+    LBackground.Stroke.Thickness := 1;
+    LBackground.XRadius := 3;
+    LBackground.yRadius := 3;
+    LBackground.Corners := AllCorners;
+    LBackground.CacheIndex := 10;
+    LBackground.CacheEngine := AContext.CacheEngine;
+
+    var LAvatar := TALDynamicListBoxImage.Create(LBackground);
+    LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
+    LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    LAvatar.Align := TALAlignLayout.topCenter;
+    LAvatar.Height := 148;
+    LAvatar.Width := 148;
+    LAvatar.XRadius := -50;
+    LAvatar.yRadius := -50;
+    LAvatar.Margins.top := 16;
+
+    var LUsername := TALDynamicListBoxText.Create(LBackground);
+    LUsername.Align := TALAlignLayout.topcenter;
+    LUsername.TextSettings.Font.Size := 14;
+    LUsername.TextSettings.Font.weight := TFontWeight.medium;
+    LUsername.TextSettings.Font.Color := $FF0d1014;
+    LUsername.AutoSize := True;
+    LUsername.TextSettings.MaxLines := 1;
+    LUsername.Text := AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Margins.top := 12;
+
+    var LFollowBtn := TALDynamicListBoxButton.Create(LBackground);
+    LFollowBtn.Fill.Color := $FF4193ef;
+    LFollowBtn.Stroke.Color := TalphaColors.Null;
+    LFollowBtn.TextSettings.font.Color := $FFffffff;
+    LFollowBtn.Align := TALAlignLayout.top;
+    LFollowBtn.Text := 'Follow';
+    LFollowBtn.Padding.top := 8;
+    LFollowBtn.Padding.bottom := 8;
+    LFollowBtn.Margins.Left := 12;
+    LFollowBtn.Margins.right := 12;
+    LFollowBtn.Margins.top := 12;
+    LFollowBtn.Margins.bottom := 12;
+    LFollowBtn.XRadius := 6;
+    LFollowBtn.YRadius := 6;
+    LFollowBtn.CacheIndex := 11;
+    LFollowBtn.CacheEngine := AContext.CacheEngine;
+
+    var LCloseBtn := TALDynamicListBoxButton.Create(LBackground);
+    LCloseBtn.Fill.Color := TalphaColors.Null;
+    LCloseBtn.Fill.ResourceName := 'cross';
+    LCloseBtn.Stroke.Color := TalphaColors.Null;
+    LCloseBtn.Top := 11;
+    LCloseBtn.left := 199;
+    LCloseBtn.Height := 11;
+    LCloseBtn.Width := 11;
+    LCloseBtn.CacheIndex := 12;
+    LCloseBtn.CacheEngine := AContext.CacheEngine;
+
+  Except
+    ALFreeAndNil(Result);
+    Raise;
+  End;
+
+end;
+
 {**************************************************}
 procedure TMainForm.MainDynamicListBoxDownloadItems(
             const AContext: TALDynamicListBoxView.TDownloadItemsContext;
@@ -542,7 +896,83 @@ begin
 
   // Here, we retrieve a mocked set of data from the resource.
   // In a real app, you would download the data from the Internet.
-  var LStream := TResourceStream.Create(HInstance, 'data', RT_RCDATA);
+  var LStream := TResourceStream.Create(HInstance, 'posts', RT_RCDATA);
+  try
+    AData := TALJsonDocumentW.CreateFromJSONStream(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+
+  // For the mock to work correctly, each item needs a unique ID.
+  For var I := 0 to AData.ChildNodes.Count - 1 do
+    AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+
+end;
+
+{***********************************************}
+procedure TMainForm.StoriesCarouselDownloadItems(
+            const AContext: TALDynamicListBoxView.TDownloadItemsContext;
+            out AData: TALJSONNodeW;
+            var APaginationToken: string;
+            var AErrorCode: Integer);
+begin
+
+  // Here, we need to download the JSON data that represents each item.
+  // Since we are running in a background thread, we can safely download it from
+  // the Internet without worrying about freezing the app.
+
+  // Simulate internet latency
+  sleep(1000);
+
+  // PaginationToken – A string used to track the position in paginated data,
+  // allowing retrieval of the next set of results.
+  APaginationToken := ALRandomStrW(8);
+
+  // In case of an error, assign a custom error code here that
+  // can be used later to display an error message to the end user.
+  AErrorCode := 0;
+
+  // Here, we retrieve a mocked set of data from the resource.
+  // In a real app, you would download the data from the Internet.
+  var LStream := TResourceStream.Create(HInstance, 'stories', RT_RCDATA);
+  try
+    AData := TALJsonDocumentW.CreateFromJSONStream(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+
+  // For the mock to work correctly, each item needs a unique ID.
+  For var I := 0 to AData.ChildNodes.Count - 1 do
+    AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+
+end;
+
+{*************************************************}
+procedure TMainForm.SuggestedCarouselDownloadItems(
+            const AContext: TALDynamicListBoxView.TDownloadItemsContext;
+            out AData: TALJSONNodeW;
+            var APaginationToken: string;
+            var AErrorCode: Integer);
+begin
+
+  // Here, we need to download the JSON data that represents each item.
+  // Since we are running in a background thread, we can safely download it from
+  // the Internet without worrying about freezing the app.
+
+  // Simulate internet latency
+  sleep(1000);
+
+  // PaginationToken – A string used to track the position in paginated data,
+  // allowing retrieval of the next set of results.
+  APaginationToken := ALRandomStrW(8);
+
+  // In case of an error, assign a custom error code here that
+  // can be used later to display an error message to the end user.
+  AErrorCode := 0;
+
+  // Here, we retrieve a mocked set of data from the resource.
+  // In a real app, you would download the data from the Internet.
+  var LStream := TResourceStream.Create(HInstance, 'suggested', RT_RCDATA);
   try
     AData := TALJsonDocumentW.CreateFromJSONStream(LStream);
   finally

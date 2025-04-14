@@ -2,9 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<%getTaskAllowKey%>
-	<%applicationIdentifier%>
-	<%pushNotificationKey%>
-	<%keychainAccessGroups%>
+  
+  <!--getTaskAllowKey
+  The getTaskAllowKey key appears to be unused now.
+  The <key>get-task-allow</key> value is automatically added by EnvOptions.proj through the 
+  ENV_PF_EntitlementExtraKeyValues node, which is inserted near the keychainAccessGroups section.
+  <%getTaskAllowKey%>
+  -->
+  
+  <!--applicationIdentifier-->
+  <%applicationIdentifier%>
+  <!-- -->
+    
+  <!--pushNotificationKey
+  <%pushNotificationKey%>
+  -->
+    
+  <!--keychainAccessGroups
+  This value is added via EnvOptions.proj through the node 
+  ENV_PF_KeyChainAccess. It is also a placeholder for 
+  ENV_PF_EntitlementExtraKeyValues, so we cannot delete it -->
+  <%keychainAccessGroups%>
+  <!-- -->
+  
 </dict>
 </plist>

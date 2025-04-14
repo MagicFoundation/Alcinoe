@@ -1,7 +1,12 @@
 [
   {
+    "id":NumberLong(6386439999830026827),
+    "type":"stories"
+  },
+  {
     "id":NumberLong(6386439197830026827),
-    "username":"lightroom",
+    "type":"post",
+    "username":"georgeswild",
     "geotag":"Dubai, UAE",
     "caption":"The untamed beauty of the outdoors through the lens of Austrian photographer @josefwittibschlager 🏔️✨ #MadeWithLightroom\u000A\u000A\u0022I’m Josef Wittibschlager, a mountain and outdoor photographer based in Amstetten, Austria. For me, there has never been anything better than capturing unique moments with a camera and publishing these unique outdoor experiences in the form of pictures. The peace and creativity that outdoor photography offers are an ideal retreat.\u000A\u000AFor my post-production, I use Adobe Lightroom. I really like images with deep blacks and strong whites, so I prefer to deepen my shadows and brighten the lights a bit. I almost always create a version of the classic ‘S’ curve. The \u0027S\u0027 curve deepens the shadows and brightens the lighter parts. It helps shape the atmosphere and mood of my photos.\u0022",
     "like_count":NumberInt(12447),
@@ -14,10 +19,11 @@
         "height":NumberInt(1349)
       }
     ],
-    "profile_pic_url":"https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/lightroom.jpg"
+    "profile_pic_url":"https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/georgeswild.jpg"
   },
   {
     "id":NumberLong(45491269318268339),
+    "type":"post",
     "username":"500px",
     "geotag":"Lima, Peru",
     "caption":"Nursed and cared for⁠\u000A⁠\u000Aby Jerry Tsang on #500px⁠\u000A⁠\u000A500px.com/jerry19690422⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#mountbatur #monkey #nursing #wildlife #wildlifephotography #nikonphotographer",
@@ -35,6 +41,7 @@
   },
   {
     "id":NumberLong(844051540068980366),
+    "type":"post",
     "username":"earth",
     "geotag":"Quito, Ecuador",
     "caption":"Navigating through nature.\u000Acc: @maxloew",
@@ -54,6 +61,7 @@
   },
   {
     "id":NumberLong(1512117664141252479),
+    "type":"post",
     "username":"earth",
     "geotag":"Sochi, Russia",
     "caption":"The Golden Bridge in Da Nang, Vietnam.\u000Acc: @_deepsky",
@@ -75,7 +83,12 @@
     "profile_pic_url":"https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/earth.jpg"
   },
   {
+    "id":NumberLong(638643888830026827),
+    "type":"suggested"
+  },
+  {
     "id":NumberLong(2319484548729617403),
+    "type":"post",
     "username":"earth",
     "geotag":"Copenhagen, Denmark",
     "caption":"A beautiful representation of the ocean\u0027s ecosystem in the Maldives.\u000Acc: @sujugasim",
@@ -93,6 +106,7 @@
   },
   {
     "id":NumberLong(3916497529660514989),
+    "type":"post",
     "username":"earth",
     "geotag":"Halifax, Canada",
     "caption":"Whale shark waltz.\u000Acc: @tomcannonphotography",
@@ -112,6 +126,7 @@
   },
   {
     "id":NumberLong(2432367002010910967),
+    "type":"post",
     "username":"earth",
     "geotag":"Sydney, Australia",
     "caption":"Diving through bubble rings in the West Coast of Oahu, Hawaii.\u000Acc: @gypsea_lust",
@@ -139,6 +154,7 @@
   },
   {
     "id":NumberLong(8111924972477272399),
+    "type":"post",
     "username":"earth",
     "geotag":"Volgograd, Russia",
     "caption":"A surreal field of pink salt in Salt Lake City, Utah. The salt\u0027s vivid pink color is formed by microbes known as halobacteria which produce rosy-colored pigments.\u000Acc: @karl_shakur",
@@ -161,6 +177,7 @@
   },
   {
     "id":NumberLong(3409293976898777752),
+    "type":"post",
     "username":"discovery",
     "geotag":"Sochi, Russia",
     "caption":"These reindeer have places to be! 🦌\u000A\u000A📸: Geoffrey Reynaud\u000A\u000A#reindeer #norway #snow #wildlife",
@@ -180,6 +197,7 @@
   },
   {
     "id":NumberLong(8846501364289318231),
+    "type":"post",
     "username":"earth",
     "geotag":"Milwaukee, USA",
     "caption":"A dreamy trip through the roads of Australia.\u000Acc: @karl_shakur",
@@ -207,6 +225,7 @@
   },
   {
     "id":NumberLong(4452293999175498698),
+    "type":"post",
     "username":"earth",
     "geotag":"Amman, Jordan",
     "caption":"The perfect hammock spot 🌴 \u000Acc: @danmaniel / @brianjgilman",
@@ -224,6 +243,7 @@
   },
   {
     "id":NumberLong(4989029225254603107),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Paris, France",
     "caption":"Portugal is amazing! ✨ Tag someone you want to go to Portugal with! 😍 @bezborodko_alena",
@@ -243,6 +263,7 @@
   },
   {
     "id":NumberLong(2573821451254808461),
+    "type":"post",
     "username":"earth",
     "geotag":"Detroit, USA",
     "caption":"Wandering through the breathtaking Persian architectures of Iran ✨\u000Acc: @harimaolee",
@@ -265,6 +286,7 @@
   },
   {
     "id":NumberLong(3084776767041928685),
+    "type":"post",
     "username":"earth",
     "geotag":"Nizhny Novgorod, Russia",
     "caption":"Iceland, known for its mesmerizing landscapes, is also considered as one of the cleanest countries in the entire world.\u000A\u000ANations are measured by the Environmental Performance Index (EPI), which evaluates the cleanliness of 180 countries based on 24 indicators, such as air and water quality. The latest study in 2018 ranked Iceland 11th place.\u000A\u000AThe country also aims to become carbon neutral by 2040 🌎 \u000Acc: @christiantrustrup",
@@ -297,6 +319,7 @@
   },
   {
     "id":NumberLong(4378500300385939344),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Jeddah, Saudi Arabia",
     "caption":"New Zealand is gorgeous 😍 Tag someone you want to go to New Zealand with! @jeffreyjkieffer \u000A\u000A(📍Locations:\u000A- Wharariki beach\u000A- Mt Cook national park\u000A- Milford Sound\u000A- Whirinaki forest)",
@@ -316,6 +339,7 @@
   },
   {
     "id":NumberLong(1657338565983101737),
+    "type":"post",
     "username":"earth",
     "geotag":"Rennes, France",
     "caption":"Roaming in Vancouver 🌲\u000Acc: @jamieout",
@@ -333,6 +357,7 @@
   },
   {
     "id":NumberLong(2862301331790538572),
+    "type":"post",
     "username":"earth",
     "geotag":"Port-au-Prince, Haiti",
     "caption":"Australia\u0027s beautiful ocean tones.\u000Acc: @merrwatson",
@@ -365,6 +390,7 @@
   },
   {
     "id":NumberLong(2134698468048162132),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Nairobi, Kenya",
     "caption":"Niagara Falls is a beautiful sight! Tag someone you want to go here with! 💙 @argenel",
@@ -384,6 +410,7 @@
   },
   {
     "id":NumberLong(6420216785108312504),
+    "type":"post",
     "username":"earth",
     "geotag":"Dublin, Ireland",
     "caption":"Jungle nights in Bali 🌴\u000Acc: @sebastien.nagy",
@@ -401,6 +428,7 @@
   },
   {
     "id":NumberLong(277305210378981968),
+    "type":"post",
     "username":"earth",
     "geotag":"Moscow, Russia",
     "caption":"Deep in the jungles of Bali 🌴 \u000Acc: @terplanet",
@@ -418,6 +446,7 @@
   },
   {
     "id":NumberLong(8268361816087028742),
+    "type":"post",
     "username":"discovery",
     "geotag":"Athens, Greece",
     "caption":"📍Niagara Falls\u000A\u000AThe ecosystems of the Niagara River are home to a plethora of protected and endangered animal species in New York, including the lake sturgeon fish!\u000A\u000A🎥: Stanislav Moroz\u000A\u000A#NiagaraFalls #Niagara #waterfall",
@@ -437,6 +466,7 @@
   },
   {
     "id":NumberLong(3567267799161228890),
+    "type":"post",
     "username":"earth",
     "geotag":"Manila, Philippines",
     "caption":"Appreciating the ethereal beauty of Earth ✨\u000Acc: @helloemilie",
@@ -454,6 +484,7 @@
   },
   {
     "id":NumberLong(6419890755380192693),
+    "type":"post",
     "username":"earth",
     "geotag":"Hong Kong",
     "caption":"Sunrise over the pyramids of Giza in Cairo, Egypt.\u000Acc: @cee_explorer",
@@ -476,6 +507,7 @@
   },
   {
     "id":NumberLong(2104239474167931803),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Lima, Peru",
     "caption":"The Faroe Islands are always beautiful! Tag someone you want to go here with! 💜🌅 @thepicturesquepassport",
@@ -495,6 +527,7 @@
   },
   {
     "id":NumberLong(7934299367639240131),
+    "type":"post",
     "username":"earth",
     "geotag":"Lille, France",
     "caption":"Would you take an ice bath here?\u000Acc: @antoinejans",
@@ -512,6 +545,7 @@
   },
   {
     "id":NumberLong(2758818540270976587),
+    "type":"post",
     "username":"earth",
     "geotag":"Detroit, USA",
     "caption":"Abu Dhabi, United Arab Emirates.\u000Acc: @fevonos",
@@ -529,6 +563,7 @@
   },
   {
     "id":NumberLong(484398292262668338),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Saint Petersburg, Russia",
     "caption":"Utah has such amazing views and sights! Tag someone you want to go to Utah with! ❤️😍 @gomzzzzzzzzzz",
@@ -548,6 +583,7 @@
   },
   {
     "id":NumberLong(3566000834964990763),
+    "type":"post",
     "username":"sum.utama",
     "geotag":"Vancouver, Canada",
     "caption":"Madagascar Giant Day Gecko with Orchid Mantis\u000A.\u000A.\u000A#naturephotography #nature #raw_animals #animalphotography #instaanimal #photographyanimals #animal_in_world #geckolove #reptilekeeper",
@@ -565,6 +601,7 @@
   },
   {
     "id":NumberLong(3949625376635438826),
+    "type":"post",
     "username":"earth",
     "geotag":"Santiago, Chile",
     "caption":"Alley of the Baobabs, a surreal avenue in Madagascar with trees that look like they\u0027re from another planet.\u000Acc: @josue_video",
@@ -582,6 +619,7 @@
   },
   {
     "id":NumberLong(6412311973678665090),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Tokyo, Japan",
     "caption":"This sunrise at Mount Rainier is beautiful! Tag someone you want to go to Washington with! ✨🌅 @ryanresatka",
@@ -601,6 +639,7 @@
   },
   {
     "id":NumberLong(9205664852847266464),
+    "type":"post",
     "username":"earth",
     "geotag":"Strasbourg, France",
     "caption":"Nachi Falls, Japan.\u000Acc: @_deepsky",
@@ -618,6 +657,7 @@
   },
   {
     "id":NumberLong(3676144145133260029),
+    "type":"post",
     "username":"earth",
     "geotag":"Seoul, South Korea",
     "caption":"Morning dips in the ocean 💦\u000Acc: @nolanomura",
@@ -640,6 +680,7 @@
   },
   {
     "id":NumberLong(2510181421324965156),
+    "type":"post",
     "username":"earthfever",
     "geotag":"Khabarovsk, Russia",
     "caption":"Apply to be featured and get your content seen 🎞️ Link in bio: @earthfever (earthfever.net)\u000A\u000A🌲 Time spent in the forest is never wasted.\u000A\u000A📽 @aditya_vignesh",
@@ -659,6 +700,7 @@
   },
   {
     "id":NumberLong(397922332591892299),
+    "type":"post",
     "username":"earth",
     "geotag":"Dublin, Ireland",
     "caption":"Cannon Beach, Oregon ✨\u000Acc: @emmett_sparling",
@@ -676,6 +718,7 @@
   },
   {
     "id":NumberLong(5460203411547910106),
+    "type":"post",
     "username":"earth",
     "geotag":"Havana, Cuba",
     "caption":"Magical moments in the Yucatán ✨\u000Acc: @chelseakauai / @josiahwg",
@@ -698,6 +741,7 @@
   },
   {
     "id":NumberLong(2756385364745939638),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"New Orleans, USA",
     "caption":"This lake is beautiful! Tag someone you want to go to Germany with! ✨💙 @_lukasrichter",
@@ -717,6 +761,7 @@
   },
   {
     "id":NumberLong(2550596506247594796),
+    "type":"post",
     "username":"earth",
     "geotag":"Beijing, China",
     "caption":"Living a dream off the island of Mo\u0027orea, French Polynesia.\u000Acc: @kelsealoha",
@@ -744,6 +789,7 @@
   },
   {
     "id":NumberLong(8592639640574989872),
+    "type":"post",
     "username":"earth",
     "geotag":"Muscat, Oman",
     "caption":"A golden sunset on the coast of Portugal ✨\u000Acc: @kuhrmarvin",
@@ -771,6 +817,7 @@
   },
   {
     "id":NumberLong(1557998919452362121),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Charlotte, USA",
     "caption":"This national park is beautiful in Kenya is beautiful! 💚🐘 Tag someone you want to go to Amboseli National Park with! @jackswynnerton",
@@ -790,6 +837,7 @@
   },
   {
     "id":NumberLong(2608636808529041948),
+    "type":"post",
     "username":"earth",
     "geotag":"Montpellier, France",
     "caption":"Winter wonderland in Sequoia National Park, California ❄️\u000Acc: @ryanresatka",
@@ -807,6 +855,7 @@
   },
   {
     "id":NumberLong(1155490291346985784),
+    "type":"post",
     "username":"earth",
     "geotag":"Portland, USA",
     "caption":"Who would you spend a weekend here with? ❄️\u000Acc: @michaelmatti",
@@ -824,6 +873,7 @@
   },
   {
     "id":NumberLong(8331139200777372225),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Manila, Philippines",
     "caption":"This is so dreamy! Tag someone you want to go to Scotland with! ❄️🌨️ @castlesofscotland",
@@ -843,6 +893,7 @@
   },
   {
     "id":NumberLong(5004662198248343831),
+    "type":"post",
     "username":"earth",
     "geotag":"Guadalajara, Mexico",
     "caption":"Winter in Iceland.\u000Acc: @icelandic_explorer",
@@ -860,6 +911,7 @@
   },
   {
     "id":NumberLong(2688786608509962458),
+    "type":"post",
     "username":"earth",
     "geotag":"Detroit, USA",
     "caption":"Who would you share this moment with?\u000Acc: @kefan404",
@@ -877,6 +929,7 @@
   },
   {
     "id":NumberLong(586440234877613540),
+    "type":"post",
     "username":"benedikt.hoehny",
     "geotag":"South America",
     "caption":"Mystic forest walk..🌨️❄️\u000A-\u000A-\u000A-\u000A#viral #outplanet #stayandwander #allgäu #frozen #forest #reels  #voyage #earthfocus #ourplanetdaily #folkgood #discovery #folkscenery #explorepage #folkvibe #beautifuldestination #wanderlust #moodygrams #mood #natgeo #travel #moody #picoftheday #wanderer #discoverglobe #hiking #wilderness #winter #kempten",
@@ -896,6 +949,7 @@
   },
   {
     "id":NumberLong(7913352619606795149),
+    "type":"post",
     "username":"earth",
     "geotag":"San Juan, Puerto Rico",
     "caption":"Swimming in Hawaii\u0027s enchanted ocean ✨\u000Acc: @bejamin",
@@ -918,6 +972,7 @@
   },
   {
     "id":NumberLong(1187639195355029671),
+    "type":"post",
     "username":"earth",
     "geotag":"Portland, USA",
     "caption":"Hiking the Bavarian Alps.\u000Acc: @gabornagy_photography",
@@ -935,6 +990,7 @@
   },
   {
     "id":NumberLong(172935202312327824),
+    "type":"post",
     "username":"itseriksen",
     "geotag":"Kuala Lumpur, Malaysia",
     "caption":"• When you zoom in on Amur leopards and realize their winter coat puts your Christmas sweater to shame! 🎄📸 Wishing you all a wildly merry Christmas filled with magical moments, both in front of and behind the camera! 🐾✨🐆\u000A\u000A#Christmas #MerryChristmas #Xmas #AmurLeopard #Leopard",
@@ -954,6 +1010,7 @@
   },
   {
     "id":NumberLong(1874572124628144463),
+    "type":"post",
     "username":"earth",
     "geotag":"Johannesburg, South Africa",
     "caption":"The extraordinary-looking Dragon Blood Trees, native to a single island in the Socotra archipelago.\u000Acc: @danielkordan",
@@ -976,6 +1033,7 @@
   },
   {
     "id":NumberLong(5550236132638376426),
+    "type":"post",
     "username":"earth",
     "geotag":"Astana, Kazakhstan",
     "caption":"The abandoned village of Houtouwan on Shengshan Island, China.\u000Acc: @w.n__t",
@@ -993,6 +1051,7 @@
   },
   {
     "id":NumberLong(1479103634720911953),
+    "type":"post",
     "username":"earth",
     "geotag":"Hong Kong",
     "caption":"A gathering of langurs.\u000A📸: @anirudh__vidyabhushan",
@@ -1012,6 +1071,7 @@
   },
   {
     "id":NumberLong(714588456338323247),
+    "type":"post",
     "username":"earth",
     "geotag":"Havana, Cuba",
     "caption":"The deep green forests of British Columbia 🌲 \u000Acc: @tristan.todd",
@@ -1049,6 +1109,7 @@
   },
   {
     "id":NumberLong(2094200477542235917),
+    "type":"post",
     "username":"earth",
     "geotag":"Warsaw, Poland",
     "caption":"A futuristic library in Tianjin, China.\u000Acc: @harimaolee",
@@ -1066,6 +1127,7 @@
   },
   {
     "id":NumberLong(7508958141511935446),
+    "type":"post",
     "username":"earth",
     "geotag":"Port Louis, Mauritius",
     "caption":"Flamingos move through the beautiful pink waters of Lake Maharlo. 🦩\u000Acc: @ali_aghajanzadeh",
@@ -1085,6 +1147,7 @@
   },
   {
     "id":NumberLong(8961954532963857663),
+    "type":"post",
     "username":"earth",
     "geotag":"Tehran, Iran",
     "caption":"Exploring the glacier caves of Alaska.\u000Acc: @jason_gulley_science",
@@ -1102,6 +1165,7 @@
   },
   {
     "id":NumberLong(2036212816273476970),
+    "type":"post",
     "username":"earth",
     "geotag":"Paramaribo, Suriname",
     "caption":"Cenote Ik Kil in @tulum ✨\u000Acc: @nashhagen",
@@ -1119,6 +1183,7 @@
   },
   {
     "id":NumberLong(6956505437061232632),
+    "type":"post",
     "username":"earth",
     "geotag":"Geneva, Switzerland",
     "caption":"Above and below the waterfall.\u000Acc: @matt_swack",
@@ -1138,6 +1203,7 @@
   },
   {
     "id":NumberLong(2046852494170159906),
+    "type":"post",
     "username":"500px",
     "geotag":"Warsaw, Poland",
     "caption":"She\u0027s saltyyy⁠\u000A---⁠\u000A⁠\u000APhoto by Ido Meirovich on #500px⁠\u000A@idomeirovich",
@@ -1155,6 +1221,7 @@
   },
   {
     "id":NumberLong(914206079709642317),
+    "type":"post",
     "username":"earth",
     "geotag":"Montevideo, Uruguay",
     "caption":"A 490ft deep karst spring in Croatia that looks like Mother Nature\u0027s blue eye.\u000Acc: @peter.rajkai",
@@ -1172,6 +1239,7 @@
   },
   {
     "id":NumberLong(2451018477391237922),
+    "type":"post",
     "username":"earth",
     "geotag":"Bucharest, Romania",
     "caption":"Snack time.\u000Acc: @tannerunderwater",
@@ -1191,6 +1259,7 @@
   },
   {
     "id":NumberLong(9119844485398203467),
+    "type":"post",
     "username":"earth",
     "geotag":"Apia, Samoa",
     "caption":"The jungle welcoming new life.\u000Acc: @shaazjung",
@@ -1208,6 +1277,7 @@
   },
   {
     "id":NumberLong(2871380988234431459),
+    "type":"post",
     "username":"earth",
     "geotag":"",
     "caption":"Monkey meditation.⁠\u000Acc: @shaazjung",
@@ -1225,6 +1295,7 @@
   },
   {
     "id":NumberLong(8074151739547097769),
+    "type":"post",
     "username":"earth",
     "geotag":"Doha, Qatar",
     "caption":"Midweek serenity.\u000Acc: @thefrogeye",
@@ -1244,6 +1315,7 @@
   },
   {
     "id":NumberLong(2699542492566264027),
+    "type":"post",
     "username":"earth",
     "geotag":"Sochi, Russia",
     "caption":"Petra, a famous archaeological site dating from ~300 BC in Jordan.\u000Acc: @jordhammond",
@@ -1266,6 +1338,7 @@
   },
   {
     "id":NumberLong(6925417151503132297),
+    "type":"post",
     "username":"earth",
     "geotag":"Asunción, Paraguay",
     "caption":"Julierpass in Engadina, Switzerland.\u000Acc: @jonglr",
@@ -1283,6 +1356,7 @@
   },
   {
     "id":NumberLong(8773140446292168759),
+    "type":"post",
     "username":"earth",
     "geotag":"Irkutsk, Russia",
     "caption":"Starfish 🤝 Hawksbill turtle\u000Acc: @mermaid_danii",
@@ -1302,6 +1376,7 @@
   },
   {
     "id":NumberLong(2000202435405209213),
+    "type":"post",
     "username":"earth",
     "geotag":"Kiev, Ukraine",
     "caption":"Meditative moments on the lake.\u000Acc: @casaramoon",
@@ -1319,6 +1394,7 @@
   },
   {
     "id":NumberLong(9104674704099157835),
+    "type":"post",
     "username":"earth",
     "geotag":"Prague, Czech Republic",
     "caption":"Australia tones 🌊 \u000Acc: @from.miles.away",
@@ -1336,6 +1412,7 @@
   },
   {
     "id":NumberLong(2639639888332402920),
+    "type":"post",
     "username":"earth",
     "geotag":"Charlotte, USA",
     "caption":"Surfs up. Tag someone you want to hit the water with.\u000Acc: @timmboslice_",
@@ -1355,6 +1432,7 @@
   },
   {
     "id":NumberLong(9158888290542881935),
+    "type":"post",
     "username":"earth",
     "geotag":"Nice, France",
     "caption":"Roadtrips in the UK.\u000Acc: @darylswalker",
@@ -1372,6 +1450,7 @@
   },
   {
     "id":NumberLong(2121601194634544255),
+    "type":"post",
     "username":"earth",
     "geotag":"Amsterdam, Netherlands",
     "caption":"Exploring a crashed plane in the Bahamas 🌊 \u000Acc: @jess.wandering",
@@ -1399,6 +1478,7 @@
   },
   {
     "id":NumberLong(5288153316265473600),
+    "type":"post",
     "username":"earth",
     "geotag":"Chicago, USA",
     "caption":"Hello, down there!\u000Acc: @reisestorys",
@@ -1418,6 +1498,7 @@
   },
   {
     "id":NumberLong(2722142308708601884),
+    "type":"post",
     "username":"earth",
     "geotag":"Nantes, France",
     "caption":"Who would you share this view with? ✨\u000Acc: @missangievilla",
@@ -1435,6 +1516,7 @@
   },
   {
     "id":NumberLong(4604707646085389907),
+    "type":"post",
     "username":"earth",
     "geotag":"Dubai, UAE",
     "caption":"Views of Rock Islands, Palau.\u000Acc: @storyofsage",
@@ -1452,6 +1534,7 @@
   },
   {
     "id":NumberLong(2162712678178315534),
+    "type":"post",
     "username":"earth",
     "geotag":"Kazan, Russia",
     "caption":"Hydration¹ is key.\u000Acc: @severus_snakes\u000A\u000A𑇐\u000A¹ Unlike mammals, snakes don’t have lips or cheeks to help them drink water. Instead they use their jaws or tongues to capture water.",
@@ -1471,6 +1554,7 @@
   },
   {
     "id":NumberLong(6538878665100843981),
+    "type":"post",
     "username":"earth",
     "geotag":"Bishkek, Kyrgyzstan",
     "caption":"A curious baby fox roaming in Finland. \u000Acc: @kpunkka",
@@ -1498,6 +1582,7 @@
   },
   {
     "id":NumberLong(1768140240328446171),
+    "type":"post",
     "username":"earth",
     "geotag":"Astana, Kazakhstan",
     "caption":"Montgomery Reef, Australia. This reef covers over 400 square kilometers and produces powerful tidal movements that create hundreds of cascading waterfalls along the river.\u000Acc: @great_escape_cruises",
@@ -1515,6 +1600,7 @@
   },
   {
     "id":NumberLong(146860406519319522),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Strasbourg, France",
     "caption":"This beach is beautiful! Tag someone you want to go to Tamarama Beach with! ✨😍 @sb.drone.sessions",
@@ -1534,6 +1620,7 @@
   },
   {
     "id":NumberLong(8146301430957577214),
+    "type":"post",
     "username":"earth",
     "geotag":"Prague, Czech Republic",
     "caption":"Great Ocean Road, Australia.\u000Acc: @yantastic",
@@ -1551,6 +1638,7 @@
   },
   {
     "id":NumberLong(9199679349824803149),
+    "type":"post",
     "username":"earth",
     "geotag":"Guayaquil, Ecuador",
     "caption":"Deep in the jungles of India ✨\u000Acc: @planet_zoom_59",
@@ -1568,6 +1656,7 @@
   },
   {
     "id":NumberLong(524038883721774455),
+    "type":"post",
     "username":"earth",
     "geotag":"Tbilisi, Georgia",
     "caption":"Winter wonderland.\u000Acc: @tom_juenemann",
@@ -1587,6 +1676,7 @@
   },
   {
     "id":NumberLong(2529633313102913512),
+    "type":"post",
     "username":"earth",
     "geotag":"Bogotá, Colombia",
     "caption":"A monkey roaming around Japan\u0027s thermal pools ❄️\u000Acc: @ricardobrazb",
@@ -1604,6 +1694,7 @@
   },
   {
     "id":NumberLong(7096260381859291343),
+    "type":"post",
     "username":"500px",
     "geotag":"Port Moresby, Papua New Guinea",
     "caption":"Cubism⁠\u000A⁠\u000ABy Fabian Ortiz on #500px⁠\u000A⁠\u000A@blazedrone⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#dronephotography #aerial #djimavic #aerialphotography #europe_ig #travel ⁠\u000A⁠",
@@ -1621,6 +1712,7 @@
   },
   {
     "id":NumberLong(8398599479753745701),
+    "type":"post",
     "username":"earth",
     "geotag":"Geneva, Switzerland",
     "caption":"Into the flames…of lava.\u000Acc: @kevinpages_",
@@ -1640,6 +1732,7 @@
   },
   {
     "id":NumberLong(3748330205928729993),
+    "type":"post",
     "username":"500px",
     "geotag":"Seattle, USA",
     "caption":"Concentric⁠\u000A⁠\u000ABy Phil Davson on #500px⁠\u000A⁠\u000A@phil_davson⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#minimalism #minimalist #fineart #creativephotography #captureorganicshapes #circular",
@@ -1657,6 +1750,7 @@
   },
   {
     "id":NumberLong(8168783041379767029),
+    "type":"post",
     "username":"500px",
     "geotag":"Port Louis, Mauritius",
     "caption":"Winter is breaking⁠\u000A⁠\u000ABy 御風-图图 on #500px⁠\u000A⁠\u000A500px.com/SunshineTu⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#aerialphotography #aerial #dronphotography #dronephotographer ⁠",
@@ -1674,6 +1768,7 @@
   },
   {
     "id":NumberLong(906894862621809332),
+    "type":"post",
     "username":"earth",
     "geotag":"Port Moresby, Papua New Guinea",
     "caption":"“Tương Bần (soya sauce) is a delicacy salty paste made from fermented soybeans. It is a popular dipping sauce for vegetables, Vietnamese-style spring rolls, and boiled meat. It is also used as a condiment for home cooks or restaurants. This can be found in many localities, but the most delicious one is made by locals in Ban Yen Nhan town, Hung Yen province.\u000A\u000AThe main ingredient of the sauce is soybean, sticky rice, and sea salt. The rice is washed, boiled, and left for a few days till it turns yellow with the fungus, and then it dries for a few more days. The fermented rice is then mixed with soybeans, salt, and water.\u000A\u000AThe mixture is poured into earthen or ceramic jars, which are covered tightly and dried in the sun for two to six months. Sunlight heats up the jars, contributing to advancing the speed of the process. During the drying period, artisans workers will stir the mixture every morning and noon for a few minutes so the sauce can be blended well together.” – Phuc Le\u000Acc: @phucle1204",
@@ -1693,6 +1788,7 @@
   },
   {
     "id":NumberLong(7113056286000846070),
+    "type":"post",
     "username":"500px",
     "geotag":"Murmansk, Russia",
     "caption":"In between reality and dreams⁠\u000A⁠\u000ABy Katarina Mandarina on #500px⁠\u000A⁠\u000A@katarina_mandarina⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#surrealist #underwaterphotography #cenotesmexico #freedivers #girlswhofreedive #freedivingphotography #stayandwander #visual_heaven #underwaterphotos #underwaterlife #stellar_shots #theimaged#aov5k #rediscoverearth #artofvisuals #bevisuallyinspired",
@@ -1710,6 +1806,7 @@
   },
   {
     "id":NumberLong(6380170739336158734),
+    "type":"post",
     "username":"500px",
     "geotag":"Kansas City, USA",
     "caption":"As the sun sets in Indonesia⁠\u000A⁠\u000ABy Djeff Act on #500px⁠\u000A⁠\u000A@djeffact⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#goldenhour #indonesia #sunset #shepherd #leadtheflock #magichour #creativephotography #visualartist⁠",
@@ -1727,6 +1824,7 @@
   },
   {
     "id":NumberLong(7265821338479374304),
+    "type":"post",
     "username":"earth",
     "geotag":"Gaborone, Botswana",
     "caption":"Stairway to the Temple of the Buddha and the Maitreya Temple.\u000Acc: tatar_mongolia",
@@ -1746,6 +1844,7 @@
   },
   {
     "id":NumberLong(1397829377609842568),
+    "type":"post",
     "username":"500px",
     "geotag":"Ulaanbaatar, Mongolia",
     "caption":"Healing Waters⁠\u000A⁠\u000ABy dronographer on #500px⁠\u000A⁠\u000A@dronographer.eu⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#dronephotography #dronephotographer #aerialshot #italy #topdownshot",
@@ -1763,6 +1862,7 @@
   },
   {
     "id":NumberLong(7030149115824836957),
+    "type":"post",
     "username":"500px",
     "geotag":"Tashkent, Uzbekistan",
     "caption":"Download the 500px app and share your photos where they matter. Available on iOS and Android 📲 Links in bio",
@@ -1780,6 +1880,7 @@
   },
   {
     "id":NumberLong(4719794816526360378),
+    "type":"post",
     "username":"earth",
     "geotag":"Murmansk, Russia",
     "caption":"Steep descent.\u000Acc: @sebastian_schieren",
@@ -1799,6 +1900,7 @@
   },
   {
     "id":NumberLong(9153468992620508385),
+    "type":"post",
     "username":"500px",
     "geotag":"Dakar, Senegal",
     "caption":"Journey across the nemegt canyon.⁠\u000A⁠\u000ABy Coziestone on #500px⁠\u000A⁠\u000A@coziestone⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#roadtrip #canyon #adventure #adventurephotography #travelphotography #getinspired",
@@ -1816,6 +1918,7 @@
   },
   {
     "id":NumberLong(5734710840284982286),
+    "type":"post",
     "username":"500px",
     "geotag":"Sofia, Bulgaria",
     "caption":"World Photography Day 2022 Winners 🏆\u000AAround the World in 7 Quests on #500px\u000A\u000APhoto 1: Khong Giang (Asia)\u000APhoto 2: Lisa Vaz (Antarctica)\u000APhoto 3: Stas Mandryka (Europe)\u000APhoto 4: Karol Nienartowicz (South America)\u000APhoto 5: Deanna DeShea (Africa)\u000APhoto 6: Marvin Ramos (North America)\u000APhoto 7: Benjamin Maze (Oceania)\u000A\u000AThank you to our amazing brand partners and judges\u000A@moment @godox_global @broncolor @loandsons @billinghambags @rotolight @sandmarc \u000A\u000A@sethmacey @sarazaniniiiii @williampatino_photography @tomashavel @sanisegunkabir @k0s.1122 @mattymeis",
@@ -1838,6 +1941,7 @@
   },
   {
     "id":NumberLong(7074928509731608684),
+    "type":"post",
     "username":"earth",
     "geotag":"Chihuahua, Mexico",
     "caption":"The Port Jackson shark is a nocturnal bullhead shark that lives in the coastal region of southern Australia.\u000Acc: @liamswebb",
@@ -1857,6 +1961,7 @@
   },
   {
     "id":NumberLong(4347446390998546249),
+    "type":"post",
     "username":"500px",
     "geotag":"Barcelona, Spain",
     "caption":"Contemplating Life🐒⁠\u000A⁠\u000ABy Maureen Mackenzie on #500px⁠\u000A⁠\u000A500px.com/MaureenMackenzie⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#monkey #animals #wildlife #wildlifephotography #wildlifephotographer #naturephotographer",
@@ -1874,6 +1979,7 @@
   },
   {
     "id":NumberLong(2699815846402930492),
+    "type":"post",
     "username":"earth",
     "geotag":"Irkutsk, Russia",
     "caption":"The largest terrestrial animal.\u000Acc: @solly_levi",
@@ -1901,6 +2007,7 @@
   },
   {
     "id":NumberLong(2597634224712327926),
+    "type":"post",
     "username":"earth",
     "geotag":"Belmopan, Belize",
     "caption":"Limestone peaks.\u000Acc: @thailand_adel",
@@ -1920,6 +2027,7 @@
   },
   {
     "id":NumberLong(8959626693662402691),
+    "type":"post",
     "username":"500px",
     "geotag":"Wellington, New Zealand",
     "caption":"🍥⁠\u000A⁠\u000ABy WK Cheoh on #500px⁠\u000A⁠\u000A@edutil.os⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#spiralstaircase #minimalism #theworldneedsmorespiralstaircases #topdownphotography #architecture⁠",
@@ -1937,6 +2045,7 @@
   },
   {
     "id":NumberLong(4464313244434363179),
+    "type":"post",
     "username":"500px",
     "geotag":"Honolulu, Hawaii, USA",
     "caption":"She had the moon in the palm of her hand⁠\u000A⁠\u000ABy Marketa Novak on #500px⁠\u000A⁠\u000A@marketanovakphoto⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#aerial #topdownphotography #portraiture #fineart #conceptual⁠",
@@ -1954,6 +2063,7 @@
   },
   {
     "id":NumberLong(3805387156653625753),
+    "type":"post",
     "username":"earth",
     "geotag":"Miami, USA",
     "caption":"“Absolutely surreal moment witnessing this Manta Ray feeding while exploring the tranquil waters of @villanautica.maldives” - Tim Burgess\u000Acc: @timmboslice_",
@@ -1973,6 +2083,7 @@
   },
   {
     "id":NumberLong(251419941828587566),
+    "type":"post",
     "username":"earth",
     "geotag":"Quito, Ecuador",
     "caption":"The beauty of New Zealand mornings.\u000Acc:  @rachstewartnz",
@@ -1990,6 +2101,7 @@
   },
   {
     "id":NumberLong(4183333385351884908),
+    "type":"post",
     "username":"earth",
     "geotag":"New York, USA",
     "caption":"🌊¹\u000Acc: @primpaul\u000A\u000A¹ From Paul Prim (@primpaul): “Waves are by far what fill my SD card the most. When a wave is ready to come and crash onto a rock, I take a burst of images. Then another one, and another one, each time hoping for a better looking wave.”",
@@ -2012,6 +2124,7 @@
   },
   {
     "id":NumberLong(5354618713786782003),
+    "type":"post",
     "username":"earth",
     "geotag":"Mumbai, India",
     "caption":"“I spotted this flow exiting a lava tube a couple of days ago. I found the simplicity and symmetry of it very soothing. It almost looks like an ice cream dispenser. #iceland\u000A\u000A📷 It was surprisingly challenging to capture this due to the massive RF interference. I haven’t experienced such interference before at an eruption and haven’t since. I suspect the cause was not only the large number of drones in the air but also the geomagnetic activity at the time. While I had no way to measure the temperature of the lava at the time, this could also have contributed to the poor, and often disconnecting signal.” - Jeroen Van Nieuwenhove\u000Acc: @jvn.photo",
@@ -2031,6 +2144,7 @@
   },
   {
     "id":NumberLong(9062382312759719170),
+    "type":"post",
     "username":"earth",
     "geotag":"Irkutsk, Russia",
     "caption":"Adventures around France.\u000Acc: @black.sail_",
@@ -2053,6 +2167,7 @@
   },
   {
     "id":NumberLong(2721964737439204104),
+    "type":"post",
     "username":"earth",
     "geotag":"Apia, Samoa",
     "caption":"Ice axe ready. ⛏️\u000Acc: @josefwittibschlager",
@@ -2075,6 +2190,7 @@
   },
   {
     "id":NumberLong(3009926929215351538),
+    "type":"post",
     "username":"earth",
     "geotag":"Edmonton, Canada",
     "caption":"Let the waves crash down.\u000Acc: @sb.drone.sessions",
@@ -2094,6 +2210,7 @@
   },
   {
     "id":NumberLong(5114432580392093220),
+    "type":"post",
     "username":"earth",
     "geotag":"San Antonio, USA",
     "caption":"Meditating in front of the Taj Mahal in Agra, India — an immense mausoleum of white marble built in the 17th century.\u000Acc: @kestyoga",
@@ -2111,6 +2228,7 @@
   },
   {
     "id":NumberLong(7067365451224121895),
+    "type":"post",
     "username":"earth",
     "geotag":"Singapore",
     "caption":"It’s World Wildlife Day. Drop your favorite animal below. 👇\u000Acc: @camwhitnall, @ally.photog, @anirudh__vidyabhushan, @johnbozinov, @katenewmanphoto, @timmboslice, @solly_levi",
@@ -2158,6 +2276,7 @@
   },
   {
     "id":NumberLong(2478311006483310186),
+    "type":"post",
     "username":"earth",
     "geotag":"Oceania",
     "caption":"Flying through Katla ice cave.\u000Acc: @bluemtns_explore, @lostmtns",
@@ -2177,6 +2296,7 @@
   },
   {
     "id":NumberLong(8552583363767913521),
+    "type":"post",
     "username":"earth",
     "geotag":"Cairo, Egypt",
     "caption":"Burning Man, 2019.\u000Acc: @downtofilm, @emiliomag",
@@ -2194,6 +2314,7 @@
   },
   {
     "id":NumberLong(1806249667455049391),
+    "type":"post",
     "username":"500px",
     "geotag":"Nizhny Novgorod, Russia",
     "caption":"Crack on\u000A⁠\u000Aby herbertrong1 on #500px⁠\u000A⁠\u000A500px.com/herbertrong1⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#aerial #dronephotography #aerialphotography⁠",
@@ -2211,6 +2332,7 @@
   },
   {
     "id":NumberLong(2475750243739054191),
+    "type":"post",
     "username":"earth",
     "geotag":"Caracas, Venezuela",
     "caption":"On to the next adventure.\u000Acc: @jpramzyfotos",
@@ -2230,6 +2352,7 @@
   },
   {
     "id":NumberLong(3196565799860306551),
+    "type":"post",
     "username":"earth",
     "geotag":"Miami, USA",
     "caption":"The two frontiers, yet we know more about space than we do the ocean.\u000A\u000ADropping tomorrow—our latest In Search Of prompt, our ongoing project to feature your photography and video on @earth.\u000AAll perspectives and lenses (🔭 📷 🔬📱 🎥) welcome.\u000A\u000Acc: @andrew.studer (@spacetoroambook)\u000AFreediver: @filmbyjg",
@@ -2247,6 +2370,7 @@
   },
   {
     "id":NumberLong(8829052521437825071),
+    "type":"post",
     "username":"earth",
     "geotag":"Yakutsk, Russia",
     "caption":"On the edge. Tag your crevasse crossing partner.\u000Acc: @josemostajo",
@@ -2264,6 +2388,7 @@
   },
   {
     "id":NumberLong(7961365640865943908),
+    "type":"post",
     "username":"earth",
     "geotag":"South America",
     "caption":"“Once the harsh winter is gone, when come the good and easier days, we often encounter bears swimming by the ice edge. Polar bears are extremely capable of having fun alone with whatever they find.” - Florian Ledoux\u000Acc: @florian_ledoux_photographer",
@@ -2283,6 +2408,7 @@
   },
   {
     "id":NumberLong(160622350463435831),
+    "type":"post",
     "username":"earth",
     "geotag":"Buenos Aires, Argentina",
     "caption":"“The Phantom at blue hour.”\u000Acc: @markian.b",
@@ -2300,6 +2426,7 @@
   },
   {
     "id":NumberLong(6789211698530360854),
+    "type":"post",
     "username":"earth",
     "geotag":"Seoul, South Korea",
     "caption":"Cliffhanger. \u000Acc: @hwang199",
@@ -2327,6 +2454,7 @@
   },
   {
     "id":NumberLong(8923870065804911433),
+    "type":"post",
     "username":"earth",
     "geotag":"Milwaukee, USA",
     "caption":"ISO (In Search of)—Oceans¹ 🌊 Link in bio to participate.\u000A\u000ALast month, we announced ISO, an ongoing project to feature your photography and video on @earth with the theme ‘Home.’ This month, we’re diving into the power, mystery, and beauty of our oceans.\u000A\u000ASubmit by: May 31, 2023\u000A\u000Acc: @settemsdal, @ammo_visuals, @phlyimages, @alexkyddphoto, @aquatilis_expedition, @kaushman, @maniurashydh, @saxonkent, @waterbod, @karimiliya, @barefoot.wandering, @fab.aroundtheglobe, @alexkyddphoto, @benjhicks, @bokehm0n, @shahanas_haidar_ali, @aero.aus, @andrey_shpatak, @arnarkristjans_photography, @auguyfx, @airpixels, @charlysavely, @freebius, @georgestoyle, @j.kowitz, @johndean_, @ag.lr.88, @gauihpicx, @uwlunatic, @nicolasletoublonphoto, @storyofsage, @jordan_robins, @yantastic, @timmboslice_, @sujugasim, @Mashalhashimii, @korosipeter, @kelsealoha, sensoryecology \u000A\u000A¹ Some of the greatest solutions to our planet’s most pressing issues may be found in the depths of our oceans, though we have only scratched the surface of what we know. And while we are in awe of their magnificence / beauty, we are In Search Of a deeper understanding. We recently partnered with @seed (SeedLabs) on a project that uncovers the potential to tackle one of the fundamental problems of climate change. More on this next week.",
@@ -2346,6 +2474,7 @@
   },
   {
     "id":NumberLong(472501682720502901),
+    "type":"post",
     "username":"earth",
     "geotag":"Hong Kong",
     "caption":"Ensuring structural soundness.¹\u000Acc: @travelsaigon\u000A\u000A¹ From Nguyen Minh Tuan: “ These images [were taken] of a woman checking a large net after an offshore fishing trip and preparing for the next fishing trip in Ninh Thuan sea.”",
@@ -2368,6 +2497,7 @@
   },
   {
     "id":NumberLong(3647568045975501437),
+    "type":"post",
     "username":"500px",
     "geotag":"Córdoba, Argentina",
     "caption":"Nature interrupted 🚗⁠\u000A⁠\u000ABy Daichi Keaton on #500px⁠\u000A⁠\u000A500px.com/79keith⁠\u000A⁠\u000A Join the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#winter #norway #adventurephotography",
@@ -2385,6 +2515,7 @@
   },
   {
     "id":NumberLong(4260864643200452664),
+    "type":"post",
     "username":"earth",
     "geotag":"Ulaanbaatar, Mongolia",
     "caption":"Enter a world full of the unknown: the ocean.\u000Acc: @timmboslice_, @jakewiltonphoto, @j.kowitz, @mitty, @thomaspeschak",
@@ -2424,6 +2555,7 @@
   },
   {
     "id":NumberLong(2346387457157005164),
+    "type":"post",
     "username":"earth",
     "geotag":"Calgary, Canada",
     "caption":"“It is near impossible to lay words onto the feeling of looking directly into the eyes of these divine beings. However, if you are anything like me, once you do, you will never be the same.\u000A\u000AThat first moment you find yourself within a silent exchange of mutual recognition with the most powerful beings on this Earth, a moment somehow also filled with indescribable gentleness and tenderness, leaves you simply lost for words or in humbling streams of tears. Or, in my case, starting an entire new ocean life driven by these connections and a powerful urge to discover more about these incredible giants.” – Jono Allen\u000Acc: @jonoallenphotography",
@@ -2441,6 +2573,7 @@
   },
   {
     "id":NumberLong(3374899282712908835),
+    "type":"post",
     "username":"500px",
     "geotag":"Bishkek, Kyrgyzstan",
     "caption":"To ponder⁠\u000A⁠\u000ABy Antonio Pascual on #500px⁠\u000A⁠\u000A500px.com/AntonioPascualPedrero⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#perspective #leadinglines #minimalism",
@@ -2458,6 +2591,7 @@
   },
   {
     "id":NumberLong(7640074688193934788),
+    "type":"post",
     "username":"earth",
     "geotag":"Boston, USA",
     "caption":"Majestic walks in Iceland.\u000Acc: @icelandwithsophie",
@@ -2477,6 +2611,7 @@
   },
   {
     "id":NumberLong(8162878772067023522),
+    "type":"post",
     "username":"diaz",
     "geotag":"Seattle, USA",
     "caption":"Los animales de Canaima! 🇻🇪\u000A\u000ADesliza y cuéntame cuál es tu animal favorito? A mí me encantan los colores de la guacamaya!\u000A\u000A------\u000A\u000AThe animals of Canaima! 🇻🇪\u000A\u000ASwipe and tell me what your favorite animal is? I love the colors of the macaw!\u000A\u000A#canaima #venezuela🇻🇪 #animales #venezolanosenelmundo #canonphotography #🇻🇪 #conocevenezuela #animalphotography",
@@ -2494,6 +2629,7 @@
   },
   {
     "id":NumberLong(6492708517797545317),
+    "type":"post",
     "username":"earth",
     "geotag":"Bangkok, Thailand",
     "caption":"Cheetahs of the Bagatelle Kalahari Game Ranch through the lens of Solly Levi. Which one is your favorite?\u000Acc: @solly_levi, @bagatelle_kalahari",
@@ -2536,6 +2672,7 @@
   },
   {
     "id":NumberLong(1121779492684682827),
+    "type":"post",
     "username":"earth",
     "geotag":"Quebec City, Canada",
     "caption":"Inside out\u000Acc: @ammo_visuals",
@@ -2555,6 +2692,7 @@
   },
   {
     "id":NumberLong(4089412642749838913),
+    "type":"post",
     "username":"500px",
     "geotag":"Winnipeg, Canada",
     "caption":"So you got passion⁠\u000A⁠\u000ABy Sylvie Pabion on #500px⁠\u000A⁠\u000A@sylviepabionmartin⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#foodphotography #foodstyling #passionfruit",
@@ -2572,6 +2710,7 @@
   },
   {
     "id":NumberLong(8509479774869344801),
+    "type":"post",
     "username":"earth",
     "geotag":"Athens, Greece",
     "caption":"Dalmatian Pelicans through the lens of Sean Weekly.\u000Acc: @seanweekly",
@@ -2589,6 +2728,7 @@
   },
   {
     "id":NumberLong(874301933055124075),
+    "type":"post",
     "username":"earth",
     "geotag":"Lima, Peru",
     "caption":"Flying in the Faroe Islands.\u000Acc: @settemsdal",
@@ -2608,6 +2748,7 @@
   },
   {
     "id":NumberLong(1922622464530133445),
+    "type":"post",
     "username":"500px",
     "geotag":"Bordeaux, France",
     "caption":"👁️⁠\u000A⁠\u000ABy alexander kan on #500px⁠\u000A⁠\u000A@alexanderkan_portrait⁠\u000A⁠\u000AJoin the community today. Link in bio.",
@@ -2625,6 +2766,7 @@
   },
   {
     "id":NumberLong(4723822617498208404),
+    "type":"post",
     "username":"500px",
     "geotag":"Lyon, France",
     "caption":"🐵⁠\u000A⁠\u000ABy Kosuke Kurata on #500px⁠\u000A⁠\u000A@k0s.1122⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#monkey #wildlifephotography #animalsinnature",
@@ -2642,6 +2784,7 @@
   },
   {
     "id":NumberLong(8914457852804049489),
+    "type":"post",
     "username":"earth",
     "geotag":"Antarctica",
     "caption":"Spotted.\u000Acc: @itseriksen",
@@ -2661,6 +2804,7 @@
   },
   {
     "id":NumberLong(3282549461247549312),
+    "type":"post",
     "username":"500px",
     "geotag":"Port Moresby, Papua New Guinea",
     "caption":"Babysister⁠\u000A⁠\u000ABy Prabu dennaga on #500px⁠\u000A⁠\u000A@prabudennaga⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#orangutan #wildlifephotography #beautifulmammals",
@@ -2678,6 +2822,7 @@
   },
   {
     "id":NumberLong(6707178443395451826),
+    "type":"post",
     "username":"500px",
     "geotag":"Rennes, France",
     "caption":"To travel is to live⁠\u000A⁠\u000ABy 袁大琨Aken on #500px⁠\u000A⁠\u000A500px.com/1226b6dd14ab994c395a04b0425c29443⁠\u000A⁠\u000AJoin the community today. Link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#travelphotogrpahy #wanderlust",
@@ -2695,6 +2840,7 @@
   },
   {
     "id":NumberLong(1053008363292494838),
+    "type":"post",
     "username":"earth",
     "geotag":"San Juan, Puerto Rico",
     "caption":"Aquatic staircase.\u000Acc: @ryansouthwell",
@@ -2714,6 +2860,7 @@
   },
   {
     "id":NumberLong(5134404550101216769),
+    "type":"post",
     "username":"earth",
     "geotag":"Boston, USA",
     "caption":"Deep in mystery.\u000Acc: @xak_uhrand",
@@ -2731,6 +2878,7 @@
   },
   {
     "id":NumberLong(4620165485554693944),
+    "type":"post",
     "username":"nomadict",
     "geotag":"Khabarovsk, Russia",
     "caption":"Understanding scale and proportion in photography through a visual experience in New Zealand! With @maxbuiting / New Zealand boasts a diverse landscape that includes breathtaking mountains, picturesque lakes, and lush forests. Among its natural wonders are over 50 peaks surpassing 7,500 ft (2,300 m) in elevation, making it a paradise for hikers and landscape photographers. The country’s mountainous terrain provides a spectacular backdrop for capturing awe-inspiring images that truly capture the essence of its vast scale.\u000A\u000AGenerally, achieving a sense of scale is possible when counting with these elements: a foreground, the main subject, and a meaningful background. The images presented in this series have these three components, well defined by the majestic mountains, cliffs, and rocks, and even determined by their colors.\u000A\u000AImages based on color can be interesting. When there is a slight difference in the proportions of the colors, the image looks more dynamic. Pictures 7 and 8 are good examples of this, where the colors help distinguish the different layers of the image, guiding you toward the main character or hero. By the way, are you familiar with the hero’s journey as a concept in narratology?\u000A\u000AIn a way, these images fit this category quite well as the hiker or hero goes on an adventure, is victorious in a challenging task, and comes home changed because of the experience in New Zealand.\u000A\u000AOn the other hand, pictures 2, 3, and 4 have almost the same palette of colors for the foreground, subject, and background, guiding you through the stories homogeneously.\u000A\u000AIn addition, this series conveys a great sense of scale thanks to the relative size of the subjects. So a way to enhance the impression of scale in your photos is by using proportion. For example, proportion in photography is essential when capturing a human figure - realistic human proportions make for a more lifelike portrayal. In contrast, unrealistic proportions create a more abstract and dreamy look. Therefore, by using proportion as a creative tool, you can add more or less importance to your subjects!\u000A\u000A@nomadict: You can read the full article with @maxbuiting by visiting the link in our bio!",
@@ -2763,6 +2911,7 @@
   },
   {
     "id":NumberLong(6616835754346617556),
+    "type":"post",
     "username":"earth",
     "geotag":"Taipei, Taiwan",
     "caption":"Tranquility\u000Acc: @mywildlive",
@@ -2782,6 +2931,7 @@
   },
   {
     "id":NumberLong(1591361524081239583),
+    "type":"post",
     "username":"500px",
     "geotag":"Stockholm, Sweden",
     "caption":"Knives out⁠\u000A⁠\u000APhoto by Svitlana Kosiachenko on #500px⁠\u000A⁠\u000AJoin the creative community at the link in bio.⁠\u000A⁠\u000A#stilllifephotography #productphotography #foodphotography",
@@ -2799,6 +2949,7 @@
   },
   {
     "id":NumberLong(6397133473767723225),
+    "type":"post",
     "username":"500px",
     "geotag":"Ashgabat, Turkmenistan",
     "caption":"Mega lens for a mega mountain 📸⁠\u000A⁠\u000APhoto by Paul Zizka (@paulzizkaphoto) on #500px⁠\u000A⁠\u000AJoin the creative community at the link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#travelphotography #minimalistphotography #adventurephotography #mountmorrison #banffnationalpark",
@@ -2816,6 +2967,7 @@
   },
   {
     "id":NumberLong(8986205669047338714),
+    "type":"post",
     "username":"earth",
     "geotag":"Zagreb, Croatia",
     "caption":"New heights.\u000Acc: @thomas_iceberg, @josefwittibschlager",
@@ -2835,6 +2987,7 @@
   },
   {
     "id":NumberLong(1632604685269743683),
+    "type":"post",
     "username":"500px",
     "geotag":"San Francisco, USA",
     "caption":"Ohh you don\u0027t need to dance with somebody when you can dance like this ⁠\u000A⁠\u000APhoto by #500pxambassador Yanis Ourabah (@dance_in_lyon) on #500px⁠\u000A⁠\u000AJoin the creative community at the link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#dancephotogrpahy #movewithemotion #livetodance",
@@ -2852,6 +3005,7 @@
   },
   {
     "id":NumberLong(3063722956596372164),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Tegucigalpa, Honduras",
     "caption":"What a gorgeous sunrise in Thailand! Tag someone you want to go to Thailand with! 🇹🇭🌅 @earthpix",
@@ -2869,6 +3023,7 @@
   },
   {
     "id":NumberLong(966713047925616946),
+    "type":"post",
     "username":"natgeotravel",
     "geotag":"Santiago, Chile",
     "caption":"Another name for a winter wonderland? That\u0027d be \u0022Yellowstone National Park\u0022 ❄️\u000A\u000A#NationalParksUSA is now streaming on @hulu.",
@@ -2888,6 +3043,7 @@
   },
   {
     "id":NumberLong(4079107929864772981),
+    "type":"post",
     "username":"earth",
     "geotag":"Geneva, Switzerland",
     "caption":"Say hello to Nigel, the crocodile.¹\u000A📸: @from.miles.away\u000A\u000A¹ Matt Deakin (@from.miles.away) recounts his experience capturing this moment: “This time last year, I was filming Nigel (the crocodile) in the creek, patiently tracking his movements in the shallows, when I was lucky enough to see and capture this moment when he swam over and scared a stingray on his way back home to his channel.”",
@@ -2915,6 +3071,7 @@
   },
   {
     "id":NumberLong(6284551498535300751),
+    "type":"post",
     "username":"500px",
     "geotag":"Singapore",
     "caption":"Pumpkin everything⁠\u000A⁠\u000APhoto by Irina Meliukh (@saharisha) on #500px⁠\u000A⁠\u000AJoin the creative community at the link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#foodphotography #foodstyling #deliciousdesserts",
@@ -2932,6 +3089,7 @@
   },
   {
     "id":NumberLong(6280394301234396414),
+    "type":"post",
     "username":"earth",
     "geotag":"Phoenix, USA",
     "caption":"What’s this owl up to? Drop your guesses below.\u000Acc: @dennisjohann.a, @shajitsu",
@@ -2951,6 +3109,7 @@
   },
   {
     "id":NumberLong(43939264496541981),
+    "type":"post",
     "username":"african_animal",
     "geotag":"Charlotte, USA",
     "caption":"Which Lion picture do you prefer from 1 to 10? 🦁💕\u000A-\u000APhoto 1 by @charlysavely Photo 2 by @charlysavely\u000APhoto 3 by @human.kind.photography\u000APhoto 4 by @human.kind.photography\u000APhoto 5 by The Shambala Reserve\u000APhoto 6 by @willbl\u000APhoto 7 by lionwhisperersa\u000APhoto 8: Dm credit\u000APhoto 9 by@sabine.bernert\u000APhoto 10 by@photography_grim",
@@ -2983,6 +3142,7 @@
   },
   {
     "id":NumberLong(4413004118862787176),
+    "type":"post",
     "username":"500px",
     "geotag":"Seoul, South Korea",
     "caption":"Summer berries ⁠\u000A⁠\u000APhoto by Marina Kuznetcova (@00coffeecat00) on #500px⁠\u000A⁠\u000AJoin the creative community at the link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#foodphotography #foodstyling #fruitfusion",
@@ -3000,6 +3160,7 @@
   },
   {
     "id":NumberLong(919699996342838166),
+    "type":"post",
     "username":"earth",
     "geotag":"Africa",
     "caption":"A journey long from home. “Home is behind, the world ahead, and there are many paths to tread, through shadows to the edge of night, until the stars are all alight.”\u000Acc: @ronald_soethje, @williampatino_photography, @danielw_official, @formgestalter and @moners, @marziopessoa, @cam_snaps",
@@ -3019,6 +3180,7 @@
   },
   {
     "id":NumberLong(936341212557820149),
+    "type":"post",
     "username":"piersparello",
     "geotag":"Hong Kong",
     "caption":"U n c o n v e n t i o n a l\u000A\u000A#monochrome#portrait_mf#monocrome#blackandwhite#picoftheday#photooftheday#nikonitalia#dynamicportraits#photographer#theportraitpr0ject#bnw#bnw_rose#bnw_planet#fantasticportrait#portraitphotography#emotional#portrait#ritratto#art#\u000A@manuelaquistellireal",
@@ -3036,6 +3198,7 @@
   },
   {
     "id":NumberLong(6095017135698775715),
+    "type":"post",
     "username":"500px",
     "geotag":"Asunción, Paraguay",
     "caption":"360 stares⁠\u000A⁠\u000APhoto by Alexander Schitschka on #500px⁠\u000A⁠\u000AJoin the creative community at the link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#deer #animalphotographer",
@@ -3053,6 +3216,7 @@
   },
   {
     "id":NumberLong(7604246839015716912),
+    "type":"post",
     "username":"earth",
     "geotag":"Melbourne, Australia",
     "caption":"Giants among giants.\u000Acc: @withluke",
@@ -3072,6 +3236,7 @@
   },
   {
     "id":NumberLong(1290532651058090752),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Amsterdam, Netherlands",
     "caption":"Yosemite National Park in the winter is like a winter wonderland! Tag someone you want to go to this National Park with! ❄️🏔️🩵 @ryanresatka",
@@ -3119,6 +3284,7 @@
   },
   {
     "id":NumberLong(7753110476095389817),
+    "type":"post",
     "username":"carlo_wiewaswo",
     "geotag":"Ulaanbaatar, Mongolia",
     "caption":"Today, I felt like sharing some of my favorite animal photos that I’ve collected over the years.📸\u000AI know animal photography isn’t really my area of expertise, and there are people out there who are a thousand times better at it than I am, but I still wanted to share these pictures here so they’re not just sitting on my hard drive gathering dust😅\u000A\u000A#photography #naturephotography #wildlife #animalphotography #nature",
@@ -3146,6 +3312,7 @@
   },
   {
     "id":NumberLong(1327977874858867052),
+    "type":"post",
     "username":"earth",
     "geotag":"London, UK",
     "caption":"A matter of perspective. \u000Acc: @karimiliya",
@@ -3165,6 +3332,7 @@
   },
   {
     "id":NumberLong(6453361874379248618),
+    "type":"post",
     "username":"nomadict",
     "geotag":"Casablanca, Morocco",
     "caption":"Six essential strategies to achieve a film-like aesthetic in your images and an editing breakdown from start to finish to keep developing your style! With @harrysohalphoto / “What inspires me most in photography is finding beauty in unexpected places. I’ve learned beauty isn’t about perfection but authenticity and raw emotion. By focusing on composition, color, and lighting, each image becomes more than a picture - it’s part of a larger story: \u000A\u000A1) My workflow begins with envisioning the concept and gathering inspiration. I create mood boards on Pinterest and let the ideas marinate for a few days. \u000A\u000A2) Once the concept is finalized, I seek models who can bring my vision to life. Then, I try to capture the perfect light and mood, usually resulting in about 70-80 carefully crafted shots. I start the culling process immediately to keep the concept fresh.\u000A\u000A3) For editing, I adjust the colors to match the desired vibe and refine the image with detailed touch-ups and masking techniques - you can find an example from start to finish in this carousel. \u000A\u000A4) The tone curve is my favorite tool to achieve a film-like aesthetic. It’s essential for fine-tuning contrast and tonal range. In addition, I like the dehaze slider to balance highlights and shadows, and the grain and noise tools help me add texture, creating that classic film look that gives photos a tactile, organic feel. \u000A\u000A5) Warm tones, like oranges and yellows, are integral to my style, evoking a sense of warmth, nostalgia, and vibrancy. I often shoot during golden hour, which naturally provides these colors, and in post-processing, I enhance them to emphasize the inherent warmth and depth in my images.\u000A\u000A6) My last advice to aspiring photographers is to practice consistently. Immerse yourself, edit the same image differently, and learn from each experience. \u000A\u000AThe more you experiment, the more you develop your unique style and ability to capture stunning images. Remember, the key to compelling photography is not just in the perfect shot but in the emotion, authenticity, and story it tells!” You can read the original article with @harrysohalphoto by visiting the link in our bio!",
@@ -3182,6 +3350,7 @@
   },
   {
     "id":NumberLong(5356482331196541094),
+    "type":"post",
     "username":"500px",
     "geotag":"Nantes, France",
     "caption":"Little house on the prairie 2.0⁠\u000A⁠\u000APhoto by Levente Csépke (@lcsepke) on #500px⁠\u000A⁠\u000AJoin the creative community today at the link in bio.⁠\u000A.⁠\u000A.⁠\u000A.⁠\u000A#aerialphotography #minimalistphotography",
@@ -3199,6 +3368,7 @@
   },
   {
     "id":NumberLong(2586073739065671533),
+    "type":"post",
     "username":"earth",
     "geotag":"Asunción, Paraguay",
     "caption":"Snowpiercer ❄️\u000Acc: @cunodebruin",
@@ -3218,6 +3388,7 @@
   },
   {
     "id":NumberLong(4875332123831172445),
+    "type":"post",
     "username":"reispackers",
     "geotag":"Bishkek, Kyrgyzstan",
     "caption":"Floridian sunsets with you ✨\u000A \u000A#florida #sunsetvibes #sunsetlovers #traveltogether #usatravel",
@@ -3235,6 +3406,7 @@
   },
   {
     "id":NumberLong(4268520804858263083),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Nouméa, New Caledonia",
     "caption":"This castle is gorgeous!! 🏰 Tag someone you want to go to Germany within ❄️✨ @tom_juenemann \u000A(📍Neuschwanstein Castle in Germany 🇩🇪)",
@@ -3267,6 +3439,7 @@
   },
   {
     "id":NumberLong(2385745654215300282),
+    "type":"post",
     "username":"earth",
     "geotag":"Guayaquil, Ecuador",
     "caption":"Roaming. \u000Acc: @ramirotorrents",
@@ -3286,6 +3459,7 @@
   },
   {
     "id":NumberLong(4193177035627891562),
+    "type":"post",
     "username":"tripseatravellers",
     "geotag":"Omsk, Russia",
     "caption":"Dreams do come true ✨\u000A\u000ACan you imagine yourself here? 😍\u000A\u000AThis was a bucket list moment for many years and we couldn’t believe it when we found out that we might be able to see them in a little village called Botubarani just 20 mins from Gorontalo 🥹\u000A\u000AWe weren’t guaranteed to see them as they come and go as they please, and we were visiting during low season. The government keeps track on how many are spotted each day and they limit the amount of visitors that can go on the water per day 🔎\u000A\u000AThe pricing for this experience for 2 people is around 250k ($16 USD) which includes being paddled out by a local@in a non- motorized boat, snorkeling equipment, and a grab (like Uber) from the main area in Gorontalo 🤿\u000A\u000AThe best time to visit Sulawesi is between April - November, if you can try to visit during this time we went in January and the weather was touch and go 🙄\u000A \u000A📍 Gorontalo, Sulawesi\u000A\u000A📌 Save this post for your adventures in Indonesia and follow along for more must visit places 🫶\u000A\u000A#sulawesi #gorontalo #wonderfulindonesia #traveladdict #exploreindonesia #whaleshark #whalesharks #exploretheworld #oceanlovers",
@@ -3303,6 +3477,7 @@
   },
   {
     "id":NumberLong(8845314334920953590),
+    "type":"post",
     "username":"expouserflash",
     "geotag":"Hong Kong",
     "caption":"📸 @frei.zeit.fotos \u000A\u000A..\u000A\u000A[credit goes to the respective owner]",
@@ -3320,6 +3495,7 @@
   },
   {
     "id":NumberLong(1677902337584797274),
+    "type":"post",
     "username":"earth",
     "geotag":"Puebla, Mexico",
     "caption":"Into the fire. 🔥 The Reykjanes Peninsula in Iceland has gone almost 800 years without any major volcanic activity. Now, for the second year in a row, hot magma is rising from craters in Meradalir valley. Head to Stories to see more. 🌋\u000Acc: @p_shep1",
@@ -3339,6 +3515,7 @@
   },
   {
     "id":NumberLong(2366081197324072354),
+    "type":"post",
     "username":"mankeyfoto",
     "geotag":"Auckland, New Zealand",
     "caption":"I wish you all a Happy New Year 🥳\u000A\u000ASome of my favourite photos of 2024 part 2! Let me know which one is your favourite 1-10?\u000A\u000A📷Sony A7riv / Sony FE600F/4\u000A\u000A#sonynordic\u000A#nomadict \u000A#swedishlapland \u000A#moody \u000A#nature_perfection \u000A#visualsofearth \u000A#discoverearth \u000A#fantasticeartearth \u000A#master_gallery \u000A#nomadict\u000A#earth_shotz \u000A#greatnorthcollective \u000A#wildernessculture \u000A#ourdailyplanet \u000A#modernoutdoors\u000A#roamtheplanet\u000A#earthcapture\u000A#boredpanda\u000A#ourplanetdaily\u000A#instadaily\u000A#picoftheday\u000A#sonyalpha \u000A#wildlifeonearth \u000A#wildlifephotography \u000A#birdphotography \u000A#owlsofinstagram \u000A#owl\u000A#shortearedowl \u000A#moon\u000A#astrophotography",
@@ -3366,6 +3543,7 @@
   },
   {
     "id":NumberLong(2090893449056570224),
+    "type":"post",
     "username":"lions.realm",
     "geotag":"Moscow, Russia",
     "caption":"🦁 How beautiful is this?\u000A⭐ Amazing lion related products in bio!🦁\u000A.\u000A.\u000A.\u000A.\u000A.\u000A📷 @fotofrank4387\u000A.\u000A.\u000A.\u000A.\u000A.\u000A#lion #lions #lioness #lionking #zoo #safari #cats #king #cub #cubs #animallovers #animalsofig #africa #savethelions #fox #caracal #caracalcat #cat #lynx #lynxcat #leopard",
@@ -3383,6 +3561,7 @@
   },
   {
     "id":NumberLong(2187680356386848933),
+    "type":"post",
     "username":"earth",
     "geotag":"Strasbourg, France",
     "caption":"Giants.¹\u000Acc: @dolphindronedom \u000A\u000A¹ From @dolphindronedom: “I think this is the biggest Humpback Whale I’ve ever seen in my life! I revisited this clip recently, and when I think how the average Pacific White-Sided Dolphin is typically 6-7 feet long, it’s AMAZING how tiny that is compared to this humongous Humpback! Humpbacks typically max out around 50ft long, and I believe this specimen was every bit of that…if not more! Humpbacks will become a more frequent sighting for us soon, peaking in October and November. As much as I love the Blues, it’s hard to beat the charismatic nature of a Humpback Whale!”",
@@ -3402,6 +3581,7 @@
   },
   {
     "id":NumberLong(971720335398868357),
+    "type":"post",
     "username":"manfredteh",
     "geotag":"Yakutsk, Russia",
     "caption":"Frames of some of my favourite minimalism blue\u000A\u000A#magicalmoments #cntraveler #somewheremagazine #timetobehave  #hellofrom #fantasticearth #dreamermagazine #visualambassadors #roamnation #passionpassport #thewanderco #earthoutdoors #eclectic_shotz #outside_project #folkscenery #stayandwonder #visualsofearth #roam247 #wanderfolk #roamearth #exploretocreate #nowherediary #the_folknature",
@@ -3429,6 +3609,7 @@
   },
   {
     "id":NumberLong(36562837535798267),
+    "type":"post",
     "username":"skystudiofr",
     "geotag":"Novosibirsk, Russia",
     "caption":"The Wave Rider 🌊\u000A________________________________________________\u000A\u000A➡️ swipe to see the full shot.\u000A\u000A🖼️ How good would it look in your home ?\u000A\u000A📍île de Ré \u000A.\u000A.\u000A.\u000A.\u000A#droneoftheday #dronegram #djimavic3 #djiglobal #droneheroes #droneswagger #surfporn #showmefrance #dronepals #france_focus_on #coteatlantique #cotesauvage #fromwhereidrone #topdownshot #pepitesdefrance #droneglobe #hello_france #sunrisesession #dronepals #super_france #frenchvisuals #nomadict #untourenfrance #surfphotography #destinationiledere #ilederé #charentemaritime #macharentemaritime #ilederetourisme #iledere",
@@ -3446,6 +3627,7 @@
   },
   {
     "id":NumberLong(1578130298466385509),
+    "type":"post",
     "username":"earth",
     "geotag":"Indianapolis, USA",
     "caption":"Living the high life. Would you stay here?\u000Acc: @jguzmannn",
@@ -3465,6 +3647,7 @@
   },
   {
     "id":NumberLong(6981473737072270886),
+    "type":"post",
     "username":"sonyalpha",
     "geotag":"Boston, USA",
     "caption":"“To capture these moments with your camera, you have to sacrifice hours of sleep and try to find the best light in the mornings, which in my opinion is the most important thing in a shot. That mysterious and cozy touch can only be achieved at that early time of day. Dolomites is a place that invites you to discover it and want to photograph it with your Sony Alpha from dawn until dusk.” - @onlythenico ⛰️✨ So stunning. \u000A\u000AShot with Sony Alpha 7 III (currently on sale!) + 24-70mm F2.8 G Master II (1 + 2) + 70-200mm F2.8 G Master OSS II. #SonyAlpha Valid in the US only now thru 1/26.",
@@ -3492,6 +3675,7 @@
   },
   {
     "id":NumberLong(8873818647345735959),
+    "type":"post",
     "username":"sonyalpha",
     "geotag":"Volgograd, Russia",
     "caption":"Coming to you from deep in the Galapagos. 🐊 Incredible shots by @danabjarner using Sony Alpha 7 IV. “My goal with these captures was to create a composition that embodies the essence of Fernandina Island. Inspired by its vibrant colors and textures, I focused on the marine iguanas and their remarkable adaptations to the harsh volcanic environment. These iguanas symbolize survival and resilience, thriving in such a challenging habitat. Through this composition, I aimed to select both the beauty and the harsh realities of this extraordinary ecosystem.” - Dana. #SonyAlpha",
@@ -3539,6 +3723,7 @@
   },
   {
     "id":NumberLong(2794928269618467751),
+    "type":"post",
     "username":"earth",
     "geotag":"Orlando, USA",
     "caption":"Chasing sunset.\u000Acc: @johnderting",
@@ -3558,6 +3743,7 @@
   },
   {
     "id":NumberLong(7979765750302290697),
+    "type":"post",
     "username":"500px",
     "geotag":"Addis Ababa, Ethiopia",
     "caption":"SkyPixel 10th Annual Photo \u0026 Video Contest⁠\u000A⁠\u000AWith just 5 days left to enter, the SkyPixel contest is reaching its final stretch! As the deadline approaches, we\u0027re sharing another round of breathtaking entries alongside exclusive judges\u0027 insights. These standout shots are pushing the boundaries of aerial photography—will your work be next?⁠\u000A⁠\u000A⚖️ All judge feedback from Anne Farrar:⁠\u000A⁠\u000APhoto 1 by Igor Dudkovskiy⁠\u000AMaybe a little out of the nor of what we\u0027re usually seeing in this contest - but I love the artistic vision of this image. Lava cradeling a human - like our early cradling humanity - it\u0027s really beautiful.⁠\u000A⁠\u000APhoto 2 by Alina Yantsen⁠\u000ANatural, organic and leaves you with a sense of quite winer bliss. The contract from blue to black to white helps make this a successful graphic image.⁠\u000A⁠\u000APhoto 3 by thomascapes⁠\u000A⁠\u000APhoto 4 by Julia Pylak⁠\u000AOh! Somewhere I want to go! This is a lovely drone image with cool shapes and a great sense of place. The toning is soft and shaply and accentuates the icy blue! A really pretty image!⁠\u000A⁠\u000APhoto 5 by 几奥 ⁠\u000AI think this belongs image belongs on a huge wall! The pallet is beautiful and straight striking lines of the slightly distorted trains are a patchwork pallet of beautiful.⁠\u000A⁠\u000A⁠\u000A#djipartner #skypixel⁠ @djiglobal",
@@ -3590,6 +3776,7 @@
   },
   {
     "id":NumberLong(1237803311258590565),
+    "type":"post",
     "username":"lightroom",
     "geotag":"Tashkent, Uzbekistan",
     "caption":"A bite-sized look at @mariyahnoor123\u0027s photography #MadewithLightroom \u000A\u000A\u0022I do food photography as a hobby and I love to capture the beauty of food in natural light. I believe evoking emotions is key to grabbing the viewer\u0027s attention. As for any photography editing plays a crucial role in bringing out the subtle details of a subject. Lightroom has been an indispensable tool for this purpose. \u000A\u000AThis definitely is my go-to editing app for its versatility and convenience. I love how I can do precise adjustments with the help of the masking tool. The non-destructive editing gives immense flexibility which is particularly valuable in food photography where fine-tuning makes a significant difference. The best thing about Lightroom is that despite its powerful features, it has a user-friendly interface.\u0022",
@@ -3607,6 +3794,7 @@
   },
   {
     "id":NumberLong(8365485755591425241),
+    "type":"post",
     "username":"earth",
     "geotag":"Belmopan, Belize",
     "caption":"The rise cycle 🌀 \u000Acc: @ryancantyloupe",
@@ -3626,6 +3814,7 @@
   },
   {
     "id":NumberLong(384034605458721639),
+    "type":"post",
     "username":"sonyalpha",
     "geotag":"Belgrade, Serbia",
     "caption":"If you’re looking for southwestern inspiration, @ryanditchphoto has got you covered with coverage. From the Sonoran desert to southern Utah to White Pocket - these otherworldly scenes and orange hues are brought to life with Ryan’s Alpha 7R V + 16-35mm F2.8 G Master I and II (which is the perfect set up for capturing wide landscapes in great detail, even after cropping in for socials.) 🏜️ #SonyAlpha",
@@ -3658,6 +3847,7 @@
   },
   {
     "id":NumberLong(8349142931954952233),
+    "type":"post",
     "username":"bektas__aydin",
     "geotag":"Accra, Ghana",
     "caption":"#beautifuldestinations  #gramslayers #duskmac #photos #natgeotravel  #big_shotz #landscape #canon #fotosekvizyon #naturelovers #mountains #landscapelovers #travelphotography #instagood #sunset #photographer #magicpict #500px #1x  #tree #sunsetlovers #sunrise #sunsetphotograpy",
@@ -3675,6 +3865,7 @@
   },
   {
     "id":NumberLong(5470471997502977167),
+    "type":"post",
     "username":"earth",
     "geotag":"Bucharest, Romania",
     "caption":"Meditation. Sound on. \u000Acc: @anjaspremana",
@@ -3694,6 +3885,7 @@
   },
   {
     "id":NumberLong(7454134307336976487),
+    "type":"post",
     "username":"beautifullpllaces",
     "geotag":"Miami, USA",
     "caption":"Komodo National Park seems gorgeous! Tag someone you want to go here with! ❤️✨ @awonderseeker",
@@ -3716,6 +3908,7 @@
   },
   {
     "id":NumberLong(4511977824240656634),
+    "type":"post",
     "username":"discovery",
     "geotag":"Yakutsk, Russia",
     "caption":"Hungry, hungry hippo 🦛\u000A\u000AHappy World Hippo Day! #DidYouKnow, despite their size, hippos can run at speeds of up to 19 miles per hour!\u000A\u000A📸: @seanweekly \u000A\u000A#WorldHippoDay #hippo #hippopotamus #wildlife",
@@ -3733,6 +3926,7 @@
   },
   {
     "id":NumberLong(1434012980830662110),
+    "type":"post",
     "username":"earth",
     "geotag":"Kuala Lumpur, Malaysia",
     "caption":"Meditations.\u000Acc: @denis.barbas",
@@ -3752,6 +3946,7 @@
   },
   {
     "id":NumberLong(6989382732698619620),
+    "type":"post",
     "username":"alex_dawson_photography",
     "geotag":"Melbourne, Australia",
     "caption":"This is SS Polynesian wreck just south of Malta. This huge vessel measures 152,5m and weighted 6700 gross tonnes. She was built near Marseille, France in 1890. SS Polynesian was a passenger ship armed with canons both in the bow and stern. The ship was sunk by the German submarine SM UC-22 on 10 august 1918. 17 people where killed during the battle. The wreck today rests on a slight port side angle at the depth of 68m and is a fantastic wreck-dive\u000A•\u000A•\u000A•\u000A•\u000A•\u000A#scuba #scubadiving #wreckdiving #underwaterphotography #diving #techdiving",
@@ -3769,6 +3964,7 @@
   },
   {
     "id":NumberLong(590315088185815058),
+    "type":"post",
     "username":"bjornpersson_photography",
     "geotag":"Managua, Nicaragua",
     "caption":"In the wild, our skills, intelligence, wealth, and perceived superiority as humans are irrelevant. Here, our societal rules, opinions, and moral codes hold no weight. When all cultural and material trappings are removed, leaving our essence bare, we realize that humanity is just a small component of a far grander entity. This is why I love rhinos; I cherish the feeling of insignificance they inspire. Their powerful presence vividly illustrates my humble position within the natural order.",
@@ -3786,6 +3982,7 @@
   },
   {
     "id":NumberLong(1168471878998322953),
+    "type":"post",
     "username":"earth",
     "geotag":"Rostov-on-Don, Russia",
     "caption":"On the move.\u000Acc: @ronald_soethje",
@@ -3805,6 +4002,7 @@
   },
   {
     "id":NumberLong(1552953658051924762),
+    "type":"post",
     "username":"alex_dawson_photography",
     "geotag":"San Salvador, El Salvador",
     "caption":"I’m so happy to be the winner of the wrecks category in @upycontest 2025 I also got a 3rd place and one highly commended image in the wrecks category. \u000A\u000AWinning image is the Gulf fleet No.31 wreck that sits at 104m depth in the Red Sea. \u000A\u000A3rd place is the SG115 coast guard ship that sits at 30m depth in Kaş, Türkiye. \u000A\u000AHighly commended image is the SS Carthage that sits at  84m depth near Çanakkale, Türkiye.",
@@ -3827,6 +4025,7 @@
   },
   {
     "id":NumberLong(3743170627298624742),
+    "type":"post",
     "username":"jorge_pique",
     "geotag":"Milwaukee, USA",
     "caption":"A buffalo with his inseparable companions.\u000A.\u000A#buffalo #nature #africa #masaimara #oxpecker",
@@ -3844,6 +4043,7 @@
   },
   {
     "id":NumberLong(7539020452628853118),
+    "type":"post",
     "username":"earth",
     "geotag":"Asunción, Paraguay",
     "caption":"Alien. \u000Acc: @coralmorphologic",
@@ -3863,6 +4063,7 @@
   },
   {
     "id":NumberLong(8974770316100620401),
+    "type":"post",
     "username":"bektas__aydin",
     "geotag":"Istanbul, Turkey",
     "caption":"#beautifuldestinations  #gramslayers #duskmac #photos #natgeotravel  #big_shotz #landscape #canon #fotosekvizyon #naturelovers #mountains #landscapelovers #travelphotography #instagood #sunset #photographer #magicpict #500px #1x  #tree #sunsetlovers #sunrise #sunsetphotograpy #winter",
@@ -3880,6 +4081,7 @@
   },
   {
     "id":NumberLong(2870843722331404531),
+    "type":"post",
     "username":"rballphoto",
     "geotag":"Nice, France",
     "caption":"A lone bull elephant stands his ground in the heart of the Maasai Mara, his towering presence both commanding and timeless.  Elephants like this one have roamed Africa for generations, shaping the land with their presence. He looks straight into my lens—into us, into our very soul—reminding us who truly owns the wild. \u000A\u000AThis image was taken on our Best of Africa Photo Tour I just finished co-leading with @artofseeingphotography. I’ll be leading this immersive photography trip again next year, as we visit iconic parks in Kenya and Tanzania…who wants to come?\u000A\u000AHave you downloaded my FREE Ebook guide on how to Create Impactful Wildlife Images yet?  Hit the link in bio and it’s yours, absolutely free!\u000A\u000Awww.randallballphotography.com\u000A.\u000A.\u000A.\u000A.\u000A.\u000A.\u000A.\u000A\u000A#WildlifePhotography\u000A#SaveTheZebras\u000A#WildlifeConservation\u000A#NaturePhotography\u000A#BlackAndWhitePhotography\u000A#FineArtPhotography\u000A#WildlifeArt\u000A#AfricanWildlife\u000A#SafariPhotography\u000A#AnimalPortraits\u000A#MonochromeMagic\u000A#BWPhotography\u000A#NatureLovers\u000A#WildAndFree\u000A#WildlifeFineArt\u000A#ElephantWhisperer\u000A#MaasaiMara\u000A#WildAtHeart\u000A#ElephantConservation\u000A#FineArtPrint\u000A#BWPhotography\u000A#TheEyeOfTheElephant\u000A#WildlifePortraits\u000A#MonochromeMagic",
@@ -3897,6 +4099,7 @@
   },
   {
     "id":NumberLong(2164313684652231305),
+    "type":"post",
     "username":"earth",
     "geotag":"Khabarovsk, Russia",
     "caption":"Kaieteur Falls in Guyana, South America. This waterfall has a sheer drop of 741 feet, making it one of the largest single drop waterfalls in the world.\u000Acc: @world.from.my.eyes",
@@ -3916,6 +4119,7 @@
   },
   {
     "id":NumberLong(2115872521384000931),
+    "type":"post",
     "username":"earth",
     "geotag":"Yerevan, Armenia",
     "caption":"Celestial window in the Swiss Alps.\u000Acc: @angelfux",
@@ -3943,6 +4147,7 @@
   },
   {
     "id":NumberLong(2226404839192132579),
+    "type":"post",
     "username":"earth",
     "geotag":"San Salvador, El Salvador",
     "caption":"Southwest formations.\u000Acc: @eric.kerr",
@@ -3970,6 +4175,7 @@
   },
   {
     "id":NumberLong(7897433860548111650),
+    "type":"post",
     "username":"earth",
     "geotag":"Ho Chi Minh City, Vietnam",
     "caption":"On the edge of the world in Norway.\u000Acc: @pilotviking",
@@ -3989,6 +4195,7 @@
   },
   {
     "id":NumberLong(1373370181396690352),
+    "type":"post",
     "username":"mankeyfoto",
     "geotag":"Sydney, Australia",
     "caption":"Scrathy squirrel\u000A\u000A#sonyalpha #squirrel #wildlifeofinstagram #wildlifephotography",
@@ -4006,6 +4213,7 @@
   },
   {
     "id":NumberLong(7962691445545315944),
+    "type":"post",
     "username":"earth",
     "geotag":"Nairobi, Kenya",
     "caption":"Exploring the steep canyon walls of Sedona, Arizona\u000Acc: @everchanginghorizon",
@@ -4023,6 +4231,7 @@
   },
   {
     "id":NumberLong(6892670041986132401),
+    "type":"post",
     "username":"earth",
     "geotag":"Antananarivo, Madagascar",
     "caption":"Roadtrips in Norway.\u000Acc: @eventyr",
@@ -4042,6 +4251,7 @@
   },
   {
     "id":NumberLong(1478861379304392161),
+    "type":"post",
     "username":"rustlord_architecture",
     "geotag":"Phoenix, USA",
     "caption":".\u000A⭐️✨ 𝐁𝐥𝐞𝐬𝐬𝐢𝐧𝐠𝐬 𝐑𝐮𝐬𝐭𝐥𝐨𝐫𝐝 𝐅𝐚𝐦𝐢𝐥𝐲 ✨⭐️\u000A.\u000A.\u000A📸 𝐊𝐧𝐢𝐠𝐡𝐭: @manolispr \u000A.\u000A.\u000A📌 Please share your award with your fans and accept a collaboration for 𝟐𝟑 𝐡𝐨𝐮𝐫𝐬.\u000AThis improves your likes, followers and helps us to grow organically as a new brand. \u000A.\u000A.\u000A𝐒𝐞𝐥𝐞𝐜𝐭𝐞𝐝 𝐁𝐲: \u000A@densvp 🇧🇪\u000A.\u000A.\u000A🚫 𝐙𝐞𝐫𝐨 𝐭𝐨𝐥𝐞𝐫𝐚𝐧𝐜𝐞 𝐟𝐨𝐫 𝐭𝐡𝐞𝐟𝐭!\u000A.\u000A.\u000A➖➖➖➖➖⭐️➖➖➖➖➖➖➖➖➖➖\u000A.\u000A.\u000A𝐑𝐮𝐬𝐭𝐥𝐨𝐫𝐝 𝐓𝐞𝐚𝐦\u000A.\u000A.\u000A𝐊𝐢𝐧𝐠\u000Aᴇᴛᴇʀɴᴀʟ\u000A𝙹𝚎𝚜𝚞𝚜 𝙲𝚑𝚛𝚒𝚜𝚝\u000A.\u000A𝐑𝐮𝐬𝐭𝐥𝐨𝐫𝐝 𝐐𝐮𝐞𝐞𝐧\u000A@atmosfierce\u000Aᴜsᴀ | 🇺🇸\u000A𝙲𝚊𝚗𝚍𝚒𝚜𝚎 \u000A.\u000A.\u000A𝐓𝐡𝐞 𝐐𝐮𝐞𝐞𝐧’𝐬 𝐆𝐚𝐦𝐛𝐢𝐭\u000A@densvp \u000Aʙᴇʟɢɪᴜᴍ | 🇧🇪 \u000A𝙻𝚊𝚝 \u000A.\u000A.\u000A📌 DM to join our team as a moderator! \u000A.\u000A.\u000A➖➖➖➖➖⭐️➖➖➖➖➖➖➖➖➖➖\u000A.\u000A.\u000A𝐒𝐩𝐨𝐧𝐬𝐨𝐫𝐞𝐝 𝐇𝐚𝐬𝐡𝐭𝐚𝐠𝐬\u000A.\u000A. \u000A#rustlord_architecture  ɴᴇᴡ ᴛᴀɢ\u000A#rustlord_citybeat\u000A#atmosfierce_rustlord\u000A#rustlord_unity\u000A#architecturephotography \u000A#gf_architecture\u000A#tv_lookingup\u000A#arquitecturamx \u000A#lookingup_architecture \u000A#symmetryhunters \u000A#structure_bestshots \u000A#architecture_hunter \u000A.\u000A.\u000A➖➖➖➖➖⭐️➖➖➖➖➖➖➖➖➖➖\u000A. \u000A.\u000A📌 𝐋𝐢𝐟𝐞 𝐒𝐮𝐩𝐩𝐨𝐫𝐭\u000A.\u000A.\u000A𝚂𝚘𝚖𝚎𝚝𝚒𝚖𝚎𝚜 𝚕𝚒𝚏𝚎 𝚌𝚊𝚗 𝚋𝚎 𝚌𝚑𝚊𝚕𝚕𝚎𝚗𝚐𝚒𝚗𝚐.  𝙷𝚎𝚛𝚎 𝚊𝚛𝚎 𝚝𝚠𝚘 𝚘𝚗𝚕𝚒𝚗𝚎 𝚜𝚞𝚙𝚙𝚘𝚛𝚝 𝚕𝚒𝚗𝚔𝚜 𝚝𝚑𝚊𝚝 𝚠𝚒𝚕𝚕 𝚎𝚗𝚌𝚘𝚞𝚛𝚊𝚐𝚎 𝚢𝚘𝚞 𝚊𝚗𝚍 𝚑𝚎𝚕𝚙 𝚢𝚘𝚞 𝚐𝚊𝚒𝚗 𝚖𝚘𝚖𝚎𝚗𝚝𝚞𝚖. \u000A.\u000A.\u000Awww.bible.com | ᴅᴏᴡɴʟᴏᴀᴅ ᴛʜᴇ ᴀᴘᴘ\u000Awww.prayerrequest.com | ɪɴᴛᴇʀɴᴀᴛɪᴏɴᴀʟ\u000A.\u000A.\u000A➖➖➖⭐️➖➖➖➖➖➖➖➖➖➖➖➖\u000A.\u000A.\u000A𝐓𝐡𝐞 𝐑𝐮𝐬𝐭𝐥𝐨𝐫𝐝 𝐊𝐢𝐧𝐠𝐝𝐨𝐦\u000A.\u000A@rustlord_architecture\u000A@rustlord_blue\u000A@rustlord_bnw\u000A@rustlord_citybeat\u000A@rustlord_magazine\u000A@rustlord_portrait\u000A@rustlord_texturaunique_\u000A@rustlord_timedecay\u000A.\u000A.\u000A➖➖➖⭐️➖➖➖➖➖➖➖➖➖➖➖➖\u000A.\u000A.\u000A𝐫𝐨𝐲𝐚𝐥𝐭𝐲 \u000A𝐫𝐞𝐝𝐞𝐦𝐩𝐭𝐢𝐨𝐧 \u000A💥👊🏼💥\u000A𝐫𝐮𝐬𝐭𝐥𝐨𝐫𝐝",
@@ -4059,6 +4269,7 @@
   },
   {
     "id":NumberLong(88496655328435917),
+    "type":"post",
     "username":"unique.depth",
     "geotag":"Miami, USA",
     "caption":"Do you know that feeling when you’re traveling, and your backpack just fits perfectly, everything securely stored, always within reach, and still super comfortable? 🎒✨ Without the right camera backpack, an adventure can quickly turn into a challenge. But with the perfect companion on your back and a wonderful person on your side, every journey feels even better with you, I love you ♥️\u000A\u000AWhich backpack has accompanied you on unforgettable trips? Let me know! 👇🌍📸",
@@ -4076,6 +4287,7 @@
   },
   {
     "id":NumberLong(5676301935757453853),
+    "type":"post",
     "username":"mankeyfoto",
     "geotag":"Marseille, France",
     "caption":"Small birds in flight series. Let me know which one is the best?\u000A\u000A📷Sony A7RIV \u000A📷Sony FE600mm F4 GM OSS\u000A\u000A#sonyalpha #madewithlightroom #sonynordic #yourshotphotographer #wildlifephotography #natgeo #birdphotography",
@@ -4093,6 +4305,7 @@
   },
   {
     "id":NumberLong(8403471552935091104),
+    "type":"post",
     "username":"inmybeautifulgarden",
     "geotag":"Ulaanbaatar, Mongolia",
     "caption":"March came in that winter like the meekest and mildest of lambs, bringing days that were crisp and golden and tingling, each followed by a frosty pink twilight which gradually lost itself in an elfland of moonshine.\u000A\u000A-  L.M. Montgomery\u000A\u000A📸:\u000ACamera: Sony A7 lll\u000ALens:Sony FE 90mm f/2,8 Macro\u000AEdited in Lightroom\u000A\u000A______________________________\u000A\u000AThank you for visiting my gallery✨\u000A______________________________\u000A\u000A#lisianthus #charme_of_macro #sonyalpha #sonynordic #flora_addict #flowerphotography #dreamland_arts_of_nature #flowersandmacro #_macroart #petal_perfection #dof_brilliance #natures_moods #natureloversgallery #loves_united_flora #naturehippys_ #raw_moody #thehub_macro #macro_brilliance #tv_flowers #total_dof #soulof_flower #world_bestflower",
@@ -4110,6 +4323,7 @@
   },
   {
     "id":NumberLong(3296250830901521901),
+    "type":"post",
     "username":"fernlichtsicht",
     "geotag":"Los Angeles, USA",
     "caption":"The lighthouse on a stormy day",

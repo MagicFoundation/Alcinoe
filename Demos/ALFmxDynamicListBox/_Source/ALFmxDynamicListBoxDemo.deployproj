@@ -1244,6 +1244,15 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v27\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v27\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v29\styles.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2585,6 +2594,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v27\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v27\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v29\styles.xml">
       <DeployClass>File</DeployClass>
@@ -3929,6 +3947,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v27\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v27\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\values-v29\styles.xml">
       <DeployClass>File</DeployClass>
@@ -5281,6 +5308,15 @@
       <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v21\</RemoteDir>
       <RemoteName>values-v21.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v27\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxDynamicListBoxDemo\res\values-v27\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\values-v29\styles.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -6446,4 +6482,7 @@
   <ProjectExtensions>
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
+  <PropertyGroup>
+    <OSX64_OutputDir Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">..\OSX64\Release\</OSX64_OutputDir>
+  </PropertyGroup>
 </Project>

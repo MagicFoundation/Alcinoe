@@ -10226,4 +10226,7 @@
   <ProjectExtensions>
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
+  <PropertyGroup>
+    <OSX64_OutputDir Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">..\OSX64\Release\</OSX64_OutputDir>
+  </PropertyGroup>
 </Project>

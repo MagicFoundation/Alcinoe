@@ -3559,7 +3559,7 @@ begin
   inherited;
 end;
 
-{************************************}
+{************************************************}
 procedure TALCustomTrack.TThumb.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -8839,7 +8839,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
-{************************************}
+{*****************************************}
 procedure TALRadioButton.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;

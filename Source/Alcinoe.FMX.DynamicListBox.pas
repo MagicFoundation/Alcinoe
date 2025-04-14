@@ -4616,16 +4616,16 @@ type
     property ShowWithNoItemsContent: Boolean read FShowWithNoItemsContent write FShowWithNoItemsContent;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxViewBackgroundContent = class(TALDynamicListBoxViewSurroundingContent);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxViewForegroundContent = class(TALDynamicListBoxViewSurroundingContent)
   public
     constructor Create(const AOwner: TALDynamicListBoxItem); override;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxViewTopBarContent = class(TALDynamicListBoxViewSurroundingContent)
   private
     FhidesOnScroll: Boolean;
@@ -4636,7 +4636,7 @@ type
     property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxViewBottomBarContent = class(TALDynamicListBoxViewSurroundingContent)
   private
     FhidesOnScroll: Boolean;
@@ -21925,13 +21925,13 @@ end;
 /// <ALCINOE>\Tools\CodeBuilder.           ///
 //////////////////////////////////////////////
 
-{********************************************************************}
+{***********************************************************************}
 function TALDynamicListBoxItemContent.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{**********************************************************************}
+{*************************************************************************}
 function TALDynamicListBoxItemContent.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
@@ -21947,13 +21947,13 @@ begin
   IsEphemeral := True;
 end;
 
- {******************************************************}
+{*********************************************************}
 function TALDynamicListBoxItemContent.CreateFill: TALBrush;
 begin
   result := TFill.Create;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 function TALDynamicListBoxItemContent.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
@@ -22177,7 +22177,7 @@ begin
   else OnCreateErrorContent := nil;
 end;
 
-{*************************************************************}
+{**************************************************************}
 destructor TALDynamicListBoxItem.TContentBuilderContext.Destroy;
 begin
   ALFreeAndNil(Lock);
@@ -22586,7 +22586,7 @@ begin
   AContext.NewContent := CreateContent(AContext.ContentType, AContext);
 end;
 
-{***********************************************************************************}
+{*******************************************************************************************************************************************}
 procedure TALDynamicListBoxItem.DoShiftContent(var ASrcContent: TALDynamicListBoxItemContent; var ADstContent: TALDynamicListBoxItemContent);
 begin
   If ASrcContent = nil then exit;
@@ -22653,7 +22653,7 @@ begin
   end;
 end;
 
-{***************************************************}
+{**************************************************************************}
 procedure TALDynamicListBoxItem.PreloadContent(const AContentType: Integer);
 begin
   {$IF defined(debug)}
@@ -22709,7 +22709,7 @@ begin
   result := FContentBuilderContext <> nil;
 end;
 
-{**********************************************************}
+{************************************************************************************}
 procedure TALDynamicListBoxItem.CreateAndActivateContent(const AContentType: Integer);
 begin
   CancelPreloadContent;
@@ -22723,14 +22723,14 @@ begin
   End;
 end;
 
-{*****************************************************}
+{***************************************************************************************}
 procedure TALDynamicListBoxItem.TryCreateAndActivateContent(const AContentType: Integer);
 begin
   If CanCreateContent(AContentType) then CreateAndActivateContent(AContentType)
   else ActivateContent(AContentType);
 end;
 
-{*****************************************************}
+{***************************************************************************}
 procedure TALDynamicListBoxItem.ActivateContent(const AContentType: Integer);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -22850,7 +22850,7 @@ begin
   FOnRealign := nil;
 end;
 
-{*************************************************************************************************************************}
+{************************************************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.InsertControl(const AControl: TALDynamicListBoxControl; const AIndex: Integer);
 begin
   inherited;
@@ -22861,7 +22861,7 @@ begin
   Realign(AControl.Index);
 end;
 
-{*************************************************************************************************************************}
+{*************************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.RemoveControl(const AControl: TALDynamicListBoxControl);
 begin
   if AControl.OwnerControl <> Self then exit;
@@ -22921,7 +22921,7 @@ begin
   Realign(LIndex);
 end;
 
-{*****************************************************}
+{**************************************************************}
 function TALDynamicListBoxViewMainContent.GetTopBarSize: Single;
 begin
   if (OwnerView <> nil) and
@@ -23032,7 +23032,7 @@ begin
   Result := True;
 end;
 
-{*****************************************************************************************}
+{**********************************************************************************************}
 constructor TALDynamicListBoxViewSurroundingContent.Create(const AOwner: TALDynamicListBoxItem);
 begin
   inherited;
@@ -23043,7 +23043,7 @@ begin
   FShowWithNoItemsContent := True;
 end;
 
-{*****************************************************************************************}
+{*********************************************************************************************}
 constructor TALDynamicListBoxViewForegroundContent.Create(const AOwner: TALDynamicListBoxItem);
 begin
   inherited;
@@ -23070,7 +23070,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{********************************************************************************************}
 constructor TALDynamicListBoxViewBottomBarContent.Create(const AOwner: TALDynamicListBoxItem);
 begin
   inherited;
@@ -23079,7 +23079,7 @@ begin
   FShowWithErrorContent := False;
 end;
 
-{**********************************************************}
+{*************************************************************}
 procedure TALDynamicListBoxViewBottomBarContent.VisibleChanged;
 begin
   inherited;
@@ -23161,7 +23161,7 @@ begin
   else OnCreateLoadMoreRetryContent := nil;
 end;
 
-{***************************************************************}
+{**************************************************************}
 destructor TALDynamicListBoxView.TContentBuilderContext.Destroy;
 begin
   ALFreeAndNil(NewBackgroundContent);
@@ -23376,7 +23376,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALDynamicListBoxView.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
@@ -24473,7 +24473,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{***************************************************************************}
 procedure TALDynamicListBoxView.ActivateContent(const AContentType: Integer);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}

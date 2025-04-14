@@ -125,13 +125,13 @@ begin
   inherited;
 end;
 
-{***********************************}
+{**********************************************}
 function TALRefCountObject.GetRefCount: Integer;
 begin
   Result := AtomicCmpExchange(FRefCount, -1{NewValue}, -1{Comparand});
 end;
 
-{***********************************}
+{*************************************************************}
 function TALRefCountObject.IncreaseRefCount: TALRefCountObject;
 begin
   // When calling IncreaseRefCount, it means that we already have
@@ -140,7 +140,7 @@ begin
   Result := Self;
 end;
 
-{***********************************}
+{*******************************************}
 procedure TALRefCountObject.DecreaseRefCount;
 begin
   AtomicDecrement(FRefCount);
@@ -428,7 +428,7 @@ begin
   end;
 end;
 
-{**************************************}
+{****************************************}
 procedure TALGuardianThread.FreeDrawables;
 begin
 
@@ -468,7 +468,7 @@ begin
 
 end;
 
-{***********************************************************}
+{*******************************************************************}
 procedure TALGuardianThread.FreeDrawable(var aDrawable: TALDrawable);
 begin
   if terminated then ALFreeAndNilDrawable(aDrawable)
@@ -529,7 +529,7 @@ begin
 
 end;
 
-{***********************************************************}
+{*************************************************************}
 procedure TALGuardianThread.FreeBitmap(var aBitmap: TALBitmap);
 begin
   if terminated then ALFreeAndNilBitmap(aBitmap)
@@ -565,7 +565,7 @@ begin
   end;
 end;
 
-{*****************************************************************}
+{**************************************************************************************}
 procedure TALGuardianThread.AddRefCountObject(const ARefCountObject: TALRefCountObject);
 begin
   TMonitor.Enter(FRefCountObjectsList);

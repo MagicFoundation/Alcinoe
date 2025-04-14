@@ -110,7 +110,7 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {*****************************************}
+  {*******************************************}
   TALPageControllerEditor = class(TItemsEditor)
   private
     FEditorNextPage: Integer;
@@ -128,7 +128,7 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {****************************************}
+  {*****************************************}
   TALPageViewEditor = class(TComponentEditor)
   private
   protected
@@ -488,7 +488,7 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{***************************************************************************************}
 constructor TALPageControllerEditor.Create(AComponent: TComponent; ADesigner: IDesigner);
 begin
   inherited Create(AComponent, ADesigner);
@@ -501,7 +501,7 @@ begin
   FItemsClasses[0] := TItemClassDesc.Create(TALPageView);
 end;
 
-{**********************************************************}
+{**************************************************************}
 procedure TALPageControllerEditor.DoCreateItem(Sender: TObject);
 begin
   inherited;
@@ -509,7 +509,7 @@ begin
     TALPageController(Component).ActivePageIndex := TALPageController(Component).PageCount - 1;
 end;
 
-{************************************************}
+{***********************************************************}
 function TALPageControllerEditor.GetActivePageIndex: Integer;
 begin
   if (Component is TALPageController) then
@@ -518,11 +518,12 @@ begin
     Result := -1;
 end;
 
-{********************************************************}
+{************************************************************}
 procedure TALPageControllerEditor.ExecuteVerb(Index: Integer);
 var
   LControl: TALPageController;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure SelectPage(I: Integer);
   begin
     if I >= LControl.PageCount then I := LControl.PageCount - 1;
@@ -550,7 +551,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{***************************************************************}
 function TALPageControllerEditor.GetVerb(Index: Integer): string;
 var
   S: string;
@@ -577,13 +578,13 @@ begin
     end;
 end;
 
-{*************************************************}
+{*****************************************************}
 function TALPageControllerEditor.GetVerbCount: Integer;
 begin
   Result := FVerbCount;
 end;
 
-{********************************************************************************}
+{************************************************************************************}
 procedure TALPageControllerEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   inherited;
@@ -600,7 +601,7 @@ begin
     AItem.Visible := False;
 end;
 
-{*****************************************************}
+{******************************************************}
 procedure TALPageViewEditor.ExecuteVerb(Index: Integer);
 begin
   case Index of
@@ -610,7 +611,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{*********************************************************}
 function TALPageViewEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -621,13 +622,13 @@ begin
   end;
 end;
 
-{**********************************************}
+{***********************************************}
 function TALPageViewEditor.GetVerbCount: Integer;
 begin
   Result := 1;
 end;
 
-{*****************************************************************************}
+{******************************************************************************}
 procedure TALPageViewEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   inherited PrepareItem(Index, AItem);

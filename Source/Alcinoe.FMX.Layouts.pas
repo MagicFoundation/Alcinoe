@@ -592,13 +592,13 @@ begin
     DrawDesignBorder;
 end;
 
-{******************************************************}
+{*************************************************************}
 function TALCustomScrollBox.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{********************************************************}
+{***************************************************************}
 function TALCustomScrollBox.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
@@ -751,7 +751,7 @@ begin
   inherited;
 end;
 
-{***********************************************}
+{********************************************************}
 procedure TALCustomScrollBox.TScrollBar.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -799,7 +799,7 @@ begin
   inherited;
 end;
 
-{************************************************************}
+{***************************************************************************}
 procedure TALCustomScrollBox.TScrollBar.FadeAnimationFinish(Sender: TObject);
 begin
   if FFadeAnimation.StopValue = 1{FadeIn} then begin
@@ -896,7 +896,7 @@ begin
   inherited Destroy;
 end;
 
-{**********************************************}
+{*********************************************}
 procedure TALCustomScrollBox.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -1052,19 +1052,19 @@ begin
 
 end;
 
-{**********************************************}
+{*************************************************}
 function TALCustomScrollBox.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(200, 200);
 end;
 
-{****************************************}
+{***********************************************}
 function TALCustomScrollBox.CreateFill: TALBrush;
 begin
   result := TFill.Create;
 end;
 
-{************************************************}
+{*******************************************************}
 function TALCustomScrollBox.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
@@ -1109,7 +1109,7 @@ begin
   result := FScrollEngine;
 end;
 
-{********************************************}
+{*************************************************************************}
 procedure TALCustomScrollBox.SetScrollEngine(const Value: TALScrollEngine);
 begin
   FScrollEngine.Assign(Value);

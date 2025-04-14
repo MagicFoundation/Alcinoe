@@ -11,7 +11,7 @@ uses
 
 type
 
-  {***********************************************************************}
+  {*****************************************************************}
   TALCanvasColorAdjustTextureMaterial = class(TCanvasTextureMaterial)
   private
     fShaderVariables: TALColorAdjustShaderVariables;
@@ -32,7 +32,7 @@ type
   public
   end;
 
-  {***********************************************************************************************}
+  {*****************************************************************************************}
   TALCanvasExternalOESColorAdjustTextureMaterial = class(TALCanvasExternalOESTextureMaterial)
   private
     fShaderVariables: TALColorAdjustShaderVariables;
@@ -56,7 +56,7 @@ type
     property CbCrTexture: TTexture read getCbCrTexture;
   end;
 
-  {*********************************************************************************************************************************}
+  {***************************************************************************************************************************}
   TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustTextureMaterial = class(TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial)
   private
     fShaderVariables: TALColorAdjustShaderVariables;
@@ -82,7 +82,7 @@ type
     property CrTexture: TTexture read getCrTexture;
   end;
 
-  {*********************************************************************************************************}
+  {***************************************************************************************************}
   TALCanvas420YpCbCr8PlanarColorAdjustTextureMaterial = class(TALCanvas420YpCbCr8PlanarTextureMaterial)
   private
     fShaderVariables: TALColorAdjustShaderVariables;
@@ -153,21 +153,21 @@ begin
   Result := ALDef420YpCbCr8PlanarMaterial;
 end;
 
-{**********************************************************************}
+{*****************************************************}
 constructor TALCanvasColorAdjustTextureMaterial.Create;
 begin
   inherited create;
   fShaderVariables := TALColorAdjustShaderVariables.create;
 end;
 
-{**********************************************************************}
+{*****************************************************}
 destructor TALCanvasColorAdjustTextureMaterial.Destroy;
 begin
   ALFreeAndNil(fShaderVariables);
   inherited destroy;
 end;
 
-{************************************************************************************************}
+{*******************************************************************************}
 procedure TALCanvasColorAdjustTextureMaterial.DoApply(const Context: TContext3D);
 begin
   inherited DoApply(Context);
@@ -436,21 +436,21 @@ begin
   ]);
 end;
 
-{**********************************************************************}
+{****************************************************************}
 constructor TALCanvasExternalOESColorAdjustTextureMaterial.Create;
 begin
   inherited create;
   fShaderVariables := TALColorAdjustShaderVariables.create;
 end;
 
-{**********************************************************************}
+{****************************************************************}
 destructor TALCanvasExternalOESColorAdjustTextureMaterial.Destroy;
 begin
   ALFreeAndNil(fShaderVariables);
   inherited destroy;
 end;
 
-{************************************************************************************************}
+{******************************************************************************************}
 procedure TALCanvasExternalOESColorAdjustTextureMaterial.DoApply(const Context: TContext3D);
 begin
   inherited DoApply(Context);
@@ -689,21 +689,21 @@ begin
   ]);
 end;
 
-{***************************************************************************************}
+{*********************************************************************************}
 constructor TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustTextureMaterial.Create;
 begin
   inherited create;
   fShaderVariables := TALColorAdjustShaderVariables.create;
 end;
 
-{***************************************************************************************}
+{*********************************************************************************}
 destructor TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustTextureMaterial.Destroy;
 begin
   ALFreeAndNil(fShaderVariables);
   inherited destroy;
 end;
 
-{*****************************************************************************************************************}
+{***********************************************************************************************************}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustTextureMaterial.DoApply(const Context: TContext3D);
 begin
   inherited DoApply(Context);
@@ -973,21 +973,21 @@ begin
   ]);
 end;
 
-{***************************************************************************}
+{*********************************************************************}
 constructor TALCanvas420YpCbCr8PlanarColorAdjustTextureMaterial.Create;
 begin
   inherited create;
   fShaderVariables := TALColorAdjustShaderVariables.create;
 end;
 
-{***************************************************************************}
+{*********************************************************************}
 destructor TALCanvas420YpCbCr8PlanarColorAdjustTextureMaterial.Destroy;
 begin
   ALFreeAndNil(fShaderVariables);
   inherited destroy;
 end;
 
-{*****************************************************************************************************}
+{***********************************************************************************************}
 procedure TALCanvas420YpCbCr8PlanarColorAdjustTextureMaterial.DoApply(const Context: TContext3D);
 begin
   inherited DoApply(Context);

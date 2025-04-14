@@ -659,21 +659,21 @@ uses
   Alcinoe.http.client,
   Alcinoe.FMX.Types3D;
 
-{********************}
+{*************************************************************}
 constructor TALRefCountBitmap.Create(const ABitmap: TALBitmap);
 begin
   inherited create;
   FBitmap := ABitmap;
 end;
 
-{********************}
+{***********************************}
 destructor TALRefCountBitmap.Destroy;
 begin
   ALFreeAndNilBitmap(FBitmap);
   Inherited Destroy;
 end;
 
-{********************}
+{*************************************************************}
 function TALRefCountBitmap.IncreaseRefCount: TALRefCountBitmap;
 begin
   result := TALRefCountBitmap(inherited IncreaseRefCount);
@@ -6447,7 +6447,7 @@ begin
   {$ENDIF}
 end;
 
-{*********************************************************}
+{******************************************************************************************}
 procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable; const ADelayed: boolean = false);
 begin
   IF ALIsDrawableNull(aDrawable) then exit;
@@ -6462,7 +6462,7 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************************************************}
 procedure ALFreeAndNilBitmap(var aBitmap: TALBitmap; const ADelayed: boolean = false);
 begin
   IF ALIsBitmapNull(aBitmap) then exit;

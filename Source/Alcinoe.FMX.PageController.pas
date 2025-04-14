@@ -622,37 +622,37 @@ uses
   {$ENDIF}
   FMX.Utils;
 
-{************************}
+{***********************************************************}
 function TALPageIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TALphaColors.Null;
 end;
 
-{************************}
+{*************************************************************}
 function TALPageIndicator.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TALphaColors.Null;
 end;
 
-{************************}
+{********************************************************************}
 function TALPageIndicator.TIndicator.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(3,3,3,3);
 end;
 
-{************************}
+{**********************************************************************}
 function TALPageIndicator.TIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $FFadadad;
 end;
 
-{************************}
+{************************************************************************}
 function TALPageIndicator.TIndicator.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{************************}
+{*********************************************}
 constructor TALPageIndicator.TIndicator.Create;
 begin
   inherited;
@@ -672,7 +672,7 @@ begin
   FSides := DefaultSides;
 end;
 
-{************************}
+{*********************************************}
 destructor TALPageIndicator.TIndicator.Destroy;
 begin
   ALFreeAndNil(FMargins);
@@ -682,31 +682,31 @@ begin
   inherited;
 end;
 
-{************************}
+{************************************************************}
 function TALPageIndicator.TIndicator.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-{************************}
+{********************************************************}
 function TALPageIndicator.TIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{************************}
+{****************************************************************}
 function TALPageIndicator.TIndicator.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-{************************}
+{***********************************************************}
 function TALPageIndicator.TIndicator.CreateShadow: TALShadow;
 begin
   Result := TALShadow.Create;
 end;
 
-{************************}
+{****************************************************************}
 procedure TALPageIndicator.TIndicator.Assign(Source: TPersistent);
 begin
   if Source is TIndicator then begin
@@ -730,7 +730,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{************************}
+{******************************************}
 procedure TALPageIndicator.TIndicator.Reset;
 begin
   BeginUpdate;
@@ -751,7 +751,7 @@ begin
   end;
 end;
 
-{************************}
+{*************************************************}
 procedure TALPageIndicator.TIndicator.AlignToPixel;
 begin
   BeginUpdate;
@@ -767,43 +767,43 @@ begin
   end;
 end;
 
-{************************}
+{***********************************************************}
 function TALPageIndicator.TIndicator.GetDefaultWidth: Single;
 begin
   Result := 8;
 end;
 
-{************************}
+{************************************************************}
 function TALPageIndicator.TIndicator.GetDefaultHeight: Single;
 begin
   Result := 8;
 end;
 
-{************************}
+{*************************************************************}
 function TALPageIndicator.TIndicator.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-{************************}
+{*************************************************************}
 function TALPageIndicator.TIndicator.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-{************************}
+{***************************************************************}
 function TALPageIndicator.TIndicator.GetDefaultCorners: TCorners;
 begin
   Result := AllCorners
 end;
 
-{************************}
+{***********************************************************}
 function TALPageIndicator.TIndicator.GetDefaultSides: TSides;
 begin
   Result := AllSides;
 end;
 
-{************************}
+{******************************************************************}
 procedure TALPageIndicator.TIndicator.SetWidth(const Value: Single);
 begin
   if not SameValue(FWidth, Value, TEpsilon.Position) then begin
@@ -812,7 +812,7 @@ begin
   end;
 end;
 
-{************************}
+{*******************************************************************}
 procedure TALPageIndicator.TIndicator.SetHeight(const Value: Single);
 begin
   if not SameValue(FHeight, Value, TEpsilon.Position) then begin
@@ -821,31 +821,31 @@ begin
   end;
 end;
 
-{************************}
+{***********************************************************************}
 procedure TALPageIndicator.TIndicator.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;
 
-{************************}
+{*******************************************************************}
 procedure TALPageIndicator.TIndicator.SetFill(const Value: TALBrush);
 begin
   FFill.Assign(Value);
 end;
 
-{************************}
+{***************************************************************************}
 procedure TALPageIndicator.TIndicator.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
 end;
 
-{************************}
+{**********************************************************************}
 procedure TALPageIndicator.TIndicator.SetShadow(const Value: TALShadow);
 begin
   FShadow.Assign(Value);
 end;
 
-{************************}
+{********************************************************************}
 procedure TALPageIndicator.TIndicator.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -854,7 +854,7 @@ begin
   end;
 end;
 
-{************************}
+{********************************************************************}
 procedure TALPageIndicator.TIndicator.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -863,7 +863,7 @@ begin
   end;
 end;
 
-{************************}
+{**********************************************************************}
 procedure TALPageIndicator.TIndicator.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then begin
@@ -872,7 +872,7 @@ begin
   end;
 end;
 
-{************************}
+{******************************************************************}
 procedure TALPageIndicator.TIndicator.SetSides(const Value: TSides);
 begin
   if FSides <> Value then begin
@@ -881,85 +881,85 @@ begin
   end;
 end;
 
-{************************}
+{*********************************************************************}
 procedure TALPageIndicator.TIndicator.MarginsChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{************************}
+{******************************************************************}
 procedure TALPageIndicator.TIndicator.FillChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{************************}
+{********************************************************************}
 procedure TALPageIndicator.TIndicator.StrokeChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{************************}
+{********************************************************************}
 procedure TALPageIndicator.TIndicator.ShadowChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{************************}
+{**********************************************************}
 function TALPageIndicator.TIndicator.IsWidthStored: Boolean;
 begin
   result := not SameValue(fWidth, DefaultWidth, Tepsilon.Position);
 end;
 
-{************************}
+{***********************************************************}
 function TALPageIndicator.TIndicator.IsHeightStored: Boolean;
 begin
   result := not SameValue(fHeight, DefaultHeight, Tepsilon.Position);
 end;
 
-{************************}
+{************************************************************}
 function TALPageIndicator.TIndicator.IsXRadiusStored: Boolean;
 begin
   result := not SameValue(fXRadius, DefaultXRadius, Tepsilon.Vector);
 end;
 
-{************************}
+{************************************************************}
 function TALPageIndicator.TIndicator.IsYRadiusStored: Boolean;
 begin
   result := not SameValue(fYRadius, DefaultYRadius, Tepsilon.Vector);
 end;
 
-{************************}
+{************************************************************}
 function TALPageIndicator.TIndicator.IsCornersStored: Boolean;
 begin
   Result := FCorners <> DefaultCorners;
 end;
 
-{************************}
+{**********************************************************}
 function TALPageIndicator.TIndicator.IsSidesStored: Boolean;
 begin
   Result := FSides <> Defaultsides;
 end;
 
-{************************}
+{****************************************************************************}
 function TALPageIndicator.TActiveIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $FF5e6ec1;
 end;
 
-{*********************************************}
+{**************************************************************}
 function TALPageIndicator.TActiveIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{*******************************************}
+{**************************************************************************}
 function TALPageIndicator.TActiveIndicatorControl.GetCacheSubIndex: Integer;
 begin
   Result := 1;
 end;
 
-{*******************************************}
+{****************************************************************************}
 function TALPageIndicator.TInactiveIndicatorControl.GetCacheSubIndex: Integer;
 begin
   Result := 2;
@@ -981,7 +981,7 @@ begin
   AutoSize := True;
 end;
 
-{******************************************************}
+{**********************************}
 destructor TALPageIndicator.Destroy;
 begin
   ALFreeAndNil(FActiveIndicator);
@@ -989,7 +989,7 @@ begin
   inherited;
 end;
 
-{******************************************************}
+{**************************************}
 procedure TALPageIndicator.AlignToPixel;
 begin
   BeginUpdate;
@@ -1002,19 +1002,19 @@ begin
   end;
 end;
 
-{******************************************************}
+{*********************************************}
 function TALPageIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{******************************************************}
+{*****************************************************}
 function TALPageIndicator.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-{******************************************************}
+{******************************************************************}
 procedure TALPageIndicator.SetDoubleBuffered(const AValue: Boolean);
 begin
   inherited;
@@ -1029,7 +1029,7 @@ begin
   RebuildIndicatorControls;
 end;
 
-{**************************}
+{*******************************************}
 procedure TALPageIndicator.InternalDoRealign;
 begin
   var LWidth := Padding.Left + Padding.Right +
@@ -1057,7 +1057,7 @@ begin
   UpdateActiveIndicator;
 end;
 
-{**************************************}
+{************************************}
 procedure TALPageIndicator.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
@@ -1226,16 +1226,16 @@ begin
             var LCenterX := Controls[FActivePageIndex].Position.x + LRadius;
             var LTheta := pi * (1 - LAnimationValue);
             FActiveIndicatorControl.Position.Point := TPointF.Create(
-              LCenterX + LRadius * Cos(LTheta),
-              Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta));
+                                                        LCenterX + LRadius * Cos(LTheta),
+                                                        Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta));
           end
           else begin
             var LRadius := LDistanceBetweenIndicators / 2.0;
             var LCenterX := Controls[FActivePageIndex].Position.x - LRadius;
             var LTheta := pi * -LAnimationValue;
             FActiveIndicatorControl.Position.Point := TPointF.Create(
-              LCenterX + LRadius * Cos(LTheta),
-              Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta));
+                                                        LCenterX + LRadius * Cos(LTheta),
+                                                        Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta));
           end;
         end;
 
@@ -1274,11 +1274,11 @@ begin
               var LTheta1 := pi * (1 - LAnimationValue);
               var LTheta2 := pi * (LAnimationValue);
               FActiveIndicatorControl.Position.Point := TPointF.Create(
-                LCenterX + LRadius * Cos(LTheta1),
-                Controls[FActivePageIndex].Position.y + LRadius * Sin(LTheta1));
+                                                          LCenterX + LRadius * Cos(LTheta1),
+                                                          Controls[FActivePageIndex].Position.y + LRadius * Sin(LTheta1));
               Controls[FActivePageIndex+1].Position.Point := TPointF.Create(
-                LCenterX + LRadius * Cos(LTheta2),
-                Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta2));
+                                                               LCenterX + LRadius * Cos(LTheta2),
+                                                               Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta2));
             end
             else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
               var LRadius := LDistanceBetweenIndicators / 2.0;
@@ -1286,11 +1286,11 @@ begin
               var LTheta2 := pi * (1 + LAnimationValue);
               var LTheta1 := pi * (-LAnimationValue);
               FActiveIndicatorControl.Position.Point := TPointF.Create(
-                LCenterX + LRadius * Cos(LTheta1),
-                Controls[FActivePageIndex].Position.y + LRadius * Sin(LTheta1));
+                                                          LCenterX + LRadius * Cos(LTheta1),
+                                                          Controls[FActivePageIndex].Position.y + LRadius * Sin(LTheta1));
               Controls[FActivePageIndex-1].Position.Point := TPointF.Create(
-                LCenterX + LRadius * Cos(LTheta2),
-                Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta2));
+                                                               LCenterX + LRadius * Cos(LTheta2),
+                                                               Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta2));
             end;
           end;
         end;
@@ -1339,7 +1339,7 @@ begin
 
 end;
 
-{**************************************}
+{**************************************************}
 procedure TALPageIndicator.RebuildIndicatorControls;
 begin
   If (csDestroying in componentState) or
@@ -1400,7 +1400,7 @@ begin
     DrawDesignBorder;
 end;
 
-{******************************************************}
+{****************************************************************}
 procedure TALPageIndicator.AnimationProcess(Const AValue: Single);
 begin
   if not SameValue(FAnimationValue, AValue, TEpsilon.Scale) then begin
@@ -1409,7 +1409,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{*******************************************************************************}
 procedure TALPageIndicator.ActivePageChanged(const ANewActivePageIndex: Integer);
 begin
   if ANewActivePageIndex <> FActivePageIndex then begin
@@ -1419,7 +1419,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{************************************************************************************************************}
 procedure TALPageIndicator.PageCountChanged(Const ANewPageCount: Integer; const ANewActivePageIndex: Integer);
 begin
   if ANewPageCount <> FPageCount then begin
@@ -1429,7 +1429,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{************************************************************************}
 procedure TALPageIndicator.SetAnimationType(const AValue: TAnimationType);
 begin
   If FAnimationType <> AValue then begin
@@ -1438,25 +1438,25 @@ begin
   end;
 end;
 
-{******************************************************}
+{****************************************************************************}
 procedure TALPageIndicator.SetActiveIndicator(const AValue: TActiveIndicator);
 begin
   FActiveIndicator.Assign(AValue);
 end;
 
-{******************************************************}
+{********************************************************************************}
 procedure TALPageIndicator.SetInactiveIndicator(const AValue: TInActiveIndicator);
 begin
   FInactiveIndicator.Assign(AValue);
 end;
 
-{******************************************************}
+{******************************************************************}
 procedure TALPageIndicator.ActiveIndicatorChanged(ASender: TObject);
 begin
   RebuildIndicatorControls;
 end;
 
-{******************************************************}
+{********************************************************************}
 procedure TALPageIndicator.InactiveIndicatorChanged(ASender: TObject);
 begin
   RebuildIndicatorControls;
@@ -1531,13 +1531,13 @@ begin
   FPageController := _FindPageController;
 end;
 
-{********************************************************}
+{**************************************************************}
 function TALPageController.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{*****************************************************************}
+{****************************************************************}
 constructor TALPageController.TContent.Create(AOwner: TComponent);
 begin
   ValidateInheritance(AOwner, TALPageController, False{CanBeNil});
@@ -1582,7 +1582,7 @@ begin
   end;
 end;
 
-{**************************************************************************}
+{*****************************************************************************}
 procedure TALPageController.TContent.DoRemoveObject(const AObject: TFmxObject);
 begin
   inherited;
@@ -1590,7 +1590,7 @@ begin
     FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);
 end;
 
-{*****************************************************}
+{****************************************************}
 procedure TALPageController.TContent.DoDeleteChildren;
 begin
   inherited;
@@ -1604,7 +1604,7 @@ begin
   FPageController.Realign;
 end;
 
-{*****************************************************************************}
+{****************************************************************************************}
 constructor TALPageController.TScrollEngine.Create(const APageControl: TALPageController);
 begin
   inherited Create;
@@ -1697,7 +1697,7 @@ begin
     FPageController.fOnAniStart(FPageController);
 end;
 
-{************************************************}
+{***********************************************}
 procedure TALPageController.TScrollEngine.DoStop;
 begin
   inherited DoStop;
@@ -1711,7 +1711,7 @@ begin
     FPageController.fOnAniStop(FPageController);
 end;
 
-{********************************************}
+{**************************************************}
 procedure TALPageController.TScrollEngine.DoChanged;
 begin
   {$IF defined(debug)}
@@ -1723,8 +1723,8 @@ begin
     FPageController.FDisableAlign := True;
     try
       FPageController.Content.Position.Point := -TPointF.Create(
-                                                  ViewportPosition.X,
-                                                  ViewportPosition.Y);
+                                                   ViewportPosition.X,
+                                                   ViewportPosition.Y);
     finally
       FPageController.FDisableAlign := LSaveDisableAlign;
     end;
@@ -1750,7 +1750,7 @@ begin
   inherited DoChanged;
 end;
 
-{***************************************************}
+{*******************************************************}
 constructor TALPageController.Create(AOwner: TComponent);
 begin
   inherited;
@@ -1782,7 +1782,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
-{*******************************}
+{***********************************}
 destructor TALPageController.Destroy;
 begin
   SetPageIndicator(nil);
@@ -1791,7 +1791,7 @@ begin
   inherited;
 end;
 
-{************************************}
+{********************************************}
 procedure TALPageController.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -1805,7 +1805,7 @@ begin
   inherited;
 end;
 
-{************************************************}
+{******************************************************}
 function TALPageController.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
@@ -1821,14 +1821,14 @@ begin
   Result.HitTest := False;
 end;
 
-{*************************************************}
+{***********************************************************}
 function TALPageController.CreateScrollEngine: TScrollEngine;
 begin
   Result := TScrollEngine.Create(Self);
   Result.TouchTracking := [ttHorizontal];
 end;
 
-{**************************************************************}
+{*************************************************************}
 procedure TALPageController.FreeNotification(AObject: TObject);
 begin
   inherited;
@@ -1849,20 +1849,20 @@ begin
   DoRealign;
 end;
 
-{**********************************************}
+{************************************************}
 function TALPageController.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(200, 200);
 end;
 
-{*************************************************************}
+{*****************************************************************}
 procedure TALPageController.DoAddObject(const AObject: TFmxObject);
 begin
   if (AObject is TALPageView) then FContent.AddObject(AObject)
   else inherited;
 end;
 
-{***********************************************}
+{*************************************************}
 procedure TALPageController.RefreshActivePageIndex;
 begin
   var LOldActivePageIndex := FActivePageIndex;
@@ -1902,7 +1902,7 @@ begin
     DoActivePageChanged;
 end;
 
-{***********************************************}
+{*******************************************************************************}
 procedure TALPageController.SetPageIndicator(const AValue: TALBasePageIndicator);
 begin
   if FPageIndicator <> AValue then begin
@@ -1918,7 +1918,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{*********************************************}
 function TALPageController.GetPageSize: Single;
 begin
   if Orientation = TOrientation.Horizontal then
@@ -1959,25 +1959,25 @@ begin
   else raise Exception.Createfmt('Invalid page index (%d)', [AIndex]);
 end;
 
-{********************************************}
+{************************************************}
 function TALPageController.GetItemsCount: Integer;
 begin
   Result := GetPageCount;
 end;
 
-{****************************************************************}
+{********************************************************************}
 function TALPageController.GetItem(const AIndex: Integer): TFmxObject;
 begin
   Result := GetPage(AIndex);
 end;
 
-{********************************************}
+{**********************************************************}
 function TALPageController.GetScrollEngine: TALScrollEngine;
 begin
   result := FScrollEngine;
 end;
 
-{********************************************}
+{************************************************************************}
 procedure TALPageController.SetScrollEngine(const Value: TALScrollEngine);
 begin
   FScrollEngine.Assign(Value);
@@ -1989,7 +1989,7 @@ begin
   Result := ActivePageIndex >= 0;
 end;
 
-{*****************************************************************************************************************************************}
+{*************************************************************************************************************************************}
 procedure TALPageController.SetActivePageIndex(const AValue: integer; const ATransition: TPageTransition; const AVelocity: Single = 0);
 begin
   SetActivePage(Pages[AValue], ATransition, AVelocity);
@@ -2004,14 +2004,14 @@ begin
     FActivePageIndex := AValue;
 end;
 
-{**********************************************}
+{****************************************************}
 function TALPageController.GetActivePage: TALPageView;
 begin
   if ActivePageIndex >= 0 then Result := Pages[ActivePageIndex]
   else Result := nil;
 end;
 
-{************************************************************}
+{*******************************************************************}
 procedure TALPageController.SetActivePage(const AValue: TALPageView);
 begin
   if AValue = nil then raise Exception.Create('AValue cannot be nil');
@@ -2021,7 +2021,7 @@ begin
   SetActivePage(AValue, TPageTransition.None);
 end;
 
-{*********************************************************************************************************************************************************}
+{************************************************************************************************************************************}
 procedure TALPageController.SetActivePage(const AValue: TALPageView; const ATransition: TPageTransition; const AVelocity: Single = 0);
 
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2305,7 +2305,7 @@ begin
     FOnViewportPositionChange(self, FScrollEngine.ViewportPosition, FScrollEngine.ViewportPosition);
 end;
 
-{******************************************************************}
+{***************************************************************}
 procedure TALPageController.FadeAnimationFinish(Sender: TObject);
 begin
   case TPageTransition(FFadeAnimation.Tag) of
@@ -2404,7 +2404,7 @@ begin
     fOnAniStop(Self);
 end;
 
-{**********************************************}
+{*********************************************************************}
 procedure TALPageController.SetOrientation(const AValue: TOrientation);
 begin
   if FOrientation <> AValue then begin
@@ -2430,7 +2430,7 @@ begin
   result := not sameValue(fViewportFraction, 1, Tepsilon.Scale);
 end;
 
-{****************************}
+{********************************}
 procedure TALPageController.Paint;
 begin
   inherited;
@@ -2438,7 +2438,7 @@ begin
     DrawDesignBorder;
 end;
 
-{*******************************}
+{**********************************************}
 procedure TALPageController.DoActivePageChanged;
 begin
   if Assigned(FOnActivePageChanged) then
@@ -2447,7 +2447,7 @@ begin
     FPageIndicator.ActivePageChanged(FActivePageIndex);
 end;
 
-{*******************************}
+{************************************}
 procedure TALPageController.DoRealign;
 begin
   if CSLoading in componentState then exit;
@@ -2496,7 +2496,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************}
+{*************************************************************************************************}
 procedure TALPageController.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
@@ -2518,7 +2518,7 @@ begin
   end;
 end;
 
-{************************************************************************************************}
+{****************************************************************************************************}
 procedure TALPageController.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
@@ -2538,7 +2538,7 @@ begin
   end;
 end;
 
-{**************************************************************************}
+{******************************************************************************}
 procedure TALPageController.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
@@ -2572,7 +2572,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{**************************************************************************************************}
 procedure TALPageController.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
@@ -2592,7 +2592,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{*********************************************}
 procedure TALPageController.internalMouseLeave;
 begin
   {$IFDEF DEBUG}
@@ -2605,14 +2605,14 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{********************************************************************************************}
 procedure TALPageController.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   internalMouseDown(Button, Shift, X, Y);
 end;
 
-{******************************************************************}
+{**********************************************************************}
 procedure TALPageController.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   // Inherited at the end because of
@@ -2621,14 +2621,14 @@ begin
   inherited;
 end;
 
-{**************************************************************************************}
+{******************************************************************************************}
 procedure TALPageController.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   internalMouseUp(Button, Shift, X, Y);
 end;
 
-{***********************************}
+{***************************************}
 procedure TALPageController.DoMouseLeave;
 begin
   inherited;
@@ -2694,41 +2694,41 @@ begin
 end;
 {$ENDIF}
 
-{*********************************************************************}
+{*************************************************************************}
 function TALPageController.NextPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex < PageCount - 1);
   if Result then SetActivePageIndex(ActivePageIndex + 1, ATransition);
 end;
 
-{**********************************************************************}
+{*****************************************************************************}
 function TALPageController.PreviousPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex > 0);
   if Result then SetActivePageIndex(ActivePageIndex - 1, ATransition);
 end;
 
-{*******************************************************************}
+{**************************************************************************}
 function TALPageController.FirstPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex > 0);
   if Result then SetActivePageIndex(0, ATransition);
 end;
 
-{******************************************************************}
+{*************************************************************************}
 function TALPageController.LastPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex < PageCount - 1);
   if Result then SetActivePageIndex(PageCount - 1, ATransition);
 end;
 
-{**********************************************************************}
+{**************************************************************************************}
 function TALPageController.AddPage(const APageViewClass: TALPageViewClass): TALPageView;
 begin
   Result := InsertPage(MaxInt, APageViewClass);
 end;
 
-{*****************************************************************************************************}
+{**********************************************************************************************************************}
 function TALPageController.InsertPage(const AIndex: Integer; const APageViewClass: TALPageViewClass = nil): TALPageView;
 begin
   var LIndex := EnsureRange(AIndex, 0, PageCount);
@@ -2747,7 +2747,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{************************************************************}
 procedure TALPageController.DeletePage(const AIndex: Integer);
 begin
   if (AIndex >= 0) and (AIndex <= PageCount - 1) then begin

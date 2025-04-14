@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{7F0A35A8-C14E-44A2-8A22-18E70806D6F6}</ProjectGuid>
     <MainSource>AlcinoeAthens.dpk</MainSource>
-    <ProjectVersion>20.2</ProjectVersion>
+    <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>

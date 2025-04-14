@@ -160,7 +160,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{*****************************************************************************}
 function TALBufDrawableCacheEngine.IncreaseRefCount: TALBufDrawableCacheEngine;
 begin
   result := TALBufDrawableCacheEngine(inherited IncreaseRefCount);

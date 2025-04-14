@@ -312,7 +312,7 @@ procedure TALControl.BeforeDestruction;
 begin
   if FBeforeDestructionExecuted then exit;
   FBeforeDestructionExecuted := True;
-  for var I := 0 to Controls.Count - 1 do
+  for var I := 0 to ControlsCount - 1 do
     Controls[I].BeforeDestruction;
   inherited;
 end;
@@ -1491,21 +1491,21 @@ begin
   SetAcceptsControls(False);
 end;
 
-{***************************************************************************}
+{**********************************************************}
 procedure TALContent.DoAddObject(const AObject: TFmxObject);
 begin
   inherited;
   ContentChanged;
 end;
 
-{******************************************************************************}
+{*************************************************************}
 procedure TALContent.DoRemoveObject(const AObject: TFmxObject);
 begin
   inherited;
   ContentChanged;
 end;
 
-{*****************************************************}
+{************************************}
 procedure TALContent.DoDeleteChildren;
 begin
   inherited;
@@ -1542,7 +1542,7 @@ begin
 
 end;
 
-{**********************************}
+{************************************}
 procedure TALContent.DoContentChanged;
 begin
   // Virtual

@@ -1495,7 +1495,7 @@ begin
   SetRect(DefaultValue);
 end;
 
-{************************}
+{*******************************}
 procedure TALBounds.AlignToPixel;
 begin
   SetRect(ALAlignEdgesToPixelRound(Rect, ALGetScreenScale, TEpsilon.Position));
@@ -1659,7 +1659,7 @@ begin
   Result := Format('%s (%4.2f,%4.2f)-(%4.2f,%4.2f)', [inherited ToString, FLeft, FTop, FRight, FBottom]);
 end;
 
-{***************************}
+{****************************}
 procedure TALBounds.DoChanged;
 begin
   if Assigned(OnChanged) then
@@ -1705,7 +1705,7 @@ begin
   Result := Point.IsZero;
 end;
 
-{*****************************}
+{******************************}
 procedure TALPosition.DoChanged;
 begin
   if Assigned(OnChanged) then
@@ -6282,7 +6282,7 @@ begin
   end;
 end;
 
-{**************************}
+{*****************************}
 procedure ALInitHasTouchScreen;
 begin
   if not ALHasTouchScreenInitialized then begin

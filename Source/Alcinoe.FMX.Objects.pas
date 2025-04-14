@@ -1707,7 +1707,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{***************************************************************}
 procedure TALImage.setMaskBitmap(const Value: TALRefCountBitmap);
 begin
   if FMaskBitmap <> Value then begin

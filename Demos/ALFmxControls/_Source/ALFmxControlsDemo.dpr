@@ -6,12 +6,14 @@ program ALFmxControlsDemo;
 
 uses
   System.StartUpCopy,
-  FMX.Forms,
-  FMX.Types,
+  {$IF defined(SKIA)}
   FMX.Skia,
+  {$ENDIF}
   {$IF defined(ALAppleOS)}
   FMX.Context.Metal,
   {$ENDIF}
+  FMX.Forms,
+  FMX.Types,
   Main in 'Main.pas' {MainForm},
   ScrollBoxDemo in 'ScrollBoxDemo.pas' {ScrollBoxDemoForm};
 
@@ -21,16 +23,13 @@ begin
   {$IF defined(SKIA)}
   GlobalUseSkia := True;
   GlobalUseVulkan := False;
-  {$ELSE}
-  GlobalUseSkia := FALSE;
-  GlobalUseVulkan := False;
   {$ENDIF}
-  //GlobalUseGPUCanvas := True;
   {$IF defined(ALAppleOS)}
   if TCustomContextMetal.IsMetalSupported then
     GlobalUseMetal := True;
   {$ENDIF}
   Application.Initialize;
+  Application.FormFactor.Orientations := [TFormOrientation.Portrait, TFormOrientation.InvertedPortrait];
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.

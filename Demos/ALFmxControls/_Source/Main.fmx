@@ -5,7 +5,6 @@ object MainForm: TMainForm
   ClientWidth = 380
   Fill.Kind = Solid
   Quality = HighPerformance
-  Constraints.MaxWidth = 640.000000000000000000
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -21,7 +20,7 @@ object MainForm: TMainForm
     VScrollBar.Size.PlatformDefault = False
     VScrollBar.TabOrder = 4
     VScrollBar.Thumb.Size.Width = 4.000000000000000000
-    VScrollBar.Thumb.Size.Height = 32.000000000000000000
+    VScrollBar.Thumb.Size.Height = 31.000000000000000000
     VScrollBar.Thumb.Size.PlatformDefault = False
     VScrollBar.Thumb.StateStyles.Hovered.Fill.Color = x64000000
     VScrollBar.Thumb.StateStyles.Hovered.Fill.Inherit = False
@@ -470,12 +469,21 @@ object MainForm: TMainForm
       Position.X = 16.000000000000000000
       Position.Y = 17112.000000000000000000
       Size.Width = 348.000000000000000000
-      Size.Height = 78.000000000000000000
+      Size.Height = 364.000000000000000000
       Size.PlatformDefault = False
       Text = 
-        'Note that the vertical scrollbar is deactivated when '#13#10'you navig' +
-        'ate left or right within the <span background-color="#e3e6e8" fo' +
-        'nt-weight=500>TALTabControl</span>.'
+        '<span background-color="#e3e6e8" font-weight=500>TALPageControll' +
+        'er</span> is a component that manages '#13#10'and controls page transi' +
+        'tions within your application, '#13#10'similar to Flutter'#39's PageContro' +
+        'ller. It allows you to smoothly '#13#10'navigate between different pag' +
+        'es, track the current page index, '#13#10'and customize the behavior o' +
+        'f scrolling animations and '#13#10'transitions. Note that the vertical' +
+        ' scrollbar is deactivated when '#13#10'you navigate left or right with' +
+        'in the <span background-color="#e3e6e8" font-weight=500>TALPageC' +
+        'ontroller</span>.'#13#10'The sample below demonstrates how to configur' +
+        'e '#13#10'<span background-color="#e3e6e8" font-weight=500>TALPageCont' +
+        'roller</span> '#13#10'to apply <b>zoom</b> in/out and <b>saturation</b' +
+        '> decrease/increase '#13#10'effects during page swipes.'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.IsHtml = True
       TextSettings.LineHeightMultiplier = 1.450000047683716000
@@ -530,7 +538,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = xFF79747E
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 233
+      TabOrder = 258
       Text = 'Bench TCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -579,7 +587,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 258
+      TabOrder = 285
       Text = 'Bench TALCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -587,173 +595,6 @@ object MainForm: TMainForm
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonBenchTALCircleClick
-    end
-    object ALRectangle9: TALRectangle
-      Align = Top
-      Margins.Top = 12.000000000000000000
-      Position.Y = 17214.000000000000000000
-      Size.Width = 380.000000000000000000
-      Size.Height = 300.000000000000000000
-      Size.PlatformDefault = False
-      Stroke.Color = claNull
-      object ALTabControl1: TALTabControl
-        Align = VertCenter
-        Size.Width = 380.000000000000000000
-        Size.Height = 300.000000000000000000
-        Size.PlatformDefault = False
-        TabIndex = 0
-        OnAniTransitionInit = ALTabControl1AniTransitionInit
-        OnResized = ALTabControl1Resized
-        OnViewportPositionChange = ALTabControl1ViewportPositionChange
-        object ALTabItem1: TALTabItem
-          IsSelected = True
-          object ALText3: TALText
-            Tag = 1
-            AutoSize = True
-            Position.X = 135.000000000000000000
-            Position.Y = 227.000000000000000000
-            Size.Width = 110.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'TALTabControl'
-            TextSettings.Font.Size = 16.000000000000000000
-            TextSettings.Font.Weight = Bold
-            OnResized = ALTabControl1Resized
-          end
-          object ALText4: TALText
-            Tag = 2
-            AutoSize = True
-            Position.X = 103.000000000000000000
-            Position.Y = 256.000000000000000000
-            Size.Width = 173.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'Please swipe left or right'
-            TextSettings.Font.Size = 16.000000000000000000
-            OnResized = ALTabControl1Resized
-          end
-          object alImage1: TALImage
-            Align = Center
-            HitTest = False
-            Margins.Bottom = 65.000000000000000000
-            ResourceName = 'one'
-            Size.Width = 250.000000000000000000
-            Size.Height = 180.000000000000000000
-            Size.PlatformDefault = False
-          end
-        end
-        object ALTabItem2: TALTabItem
-          IsSelected = False
-          object ALText1: TALText
-            Tag = 1
-            AutoSize = True
-            Position.X = 135.000000000000000000
-            Position.Y = 228.000000000000000000
-            Size.Width = 110.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'TALTabControl'
-            TextSettings.Font.Size = 16.000000000000000000
-            TextSettings.Font.Weight = Bold
-            OnResized = ALTabControl1Resized
-          end
-          object ALText2: TALText
-            Tag = 2
-            AutoSize = True
-            Position.X = 103.000000000000000000
-            Position.Y = 256.000000000000000000
-            Size.Width = 173.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'Please swipe left or right'
-            TextSettings.Font.Size = 16.000000000000000000
-            OnResized = ALTabControl1Resized
-          end
-          object Image2: TALImage
-            Align = Center
-            HitTest = False
-            Margins.Bottom = 65.000000000000000000
-            ResourceName = 'two'
-            Size.Width = 250.000000000000000000
-            Size.Height = 180.000000000000000000
-            Size.PlatformDefault = False
-          end
-        end
-        object ALTabItem3: TALTabItem
-          IsSelected = False
-          object ALText5: TALText
-            Tag = 1
-            AutoSize = True
-            Position.X = 135.000000000000000000
-            Position.Y = 227.000000000000000000
-            Size.Width = 110.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'TALTabControl'
-            TextSettings.Font.Size = 16.000000000000000000
-            TextSettings.Font.Weight = Bold
-            OnResized = ALTabControl1Resized
-          end
-          object ALText6: TALText
-            Tag = 2
-            AutoSize = True
-            Position.X = 103.000000000000000000
-            Position.Y = 256.000000000000000000
-            Size.Width = 173.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'Please swipe left or right'
-            TextSettings.Font.Size = 16.000000000000000000
-            OnResized = ALTabControl1Resized
-          end
-          object Image3: TALImage
-            Align = Center
-            HitTest = False
-            Margins.Bottom = 65.000000000000000000
-            ResourceName = 'tree'
-            Size.Width = 250.000000000000000000
-            Size.Height = 180.000000000000000000
-            Size.PlatformDefault = False
-          end
-        end
-        object ALTabItem4: TALTabItem
-          IsSelected = False
-          object ALText7: TALText
-            Tag = 1
-            AutoSize = True
-            Position.X = 135.000000000000000000
-            Position.Y = 228.000000000000000000
-            Size.Width = 110.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'TALTabControl'
-            TextSettings.Font.Size = 16.000000000000000000
-            TextSettings.Font.Weight = Bold
-            OnResized = ALTabControl1Resized
-          end
-          object ALText8: TALText
-            Tag = 2
-            AutoSize = True
-            Position.X = 103.000000000000000000
-            Position.Y = 256.000000000000000000
-            Size.Width = 173.000000000000000000
-            Size.Height = 21.000000000000000000
-            Size.PlatformDefault = False
-            Text = 'Please swipe left or right'
-            TextSettings.Font.Size = 16.000000000000000000
-            OnResized = ALTabControl1Resized
-          end
-          object Image4: TALImage
-            Align = Center
-            HitTest = False
-            Margins.Bottom = 65.000000000000000000
-            ResourceName = 'four'
-            Size.Width = 250.000000000000000000
-            Size.Height = 180.000000000000000000
-            Size.PlatformDefault = False
-          end
-        end
-      end
     end
     object ALRangeTrackBar1: TALRangeTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
@@ -814,7 +655,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 282
+      TabOrder = 309
       Value = 25.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.ShowOnInteraction = True
@@ -828,7 +669,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17701.000000000000000000
+      Position.Y = 18642.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 416.000000000000000000
       Size.PlatformDefault = False
@@ -886,6 +727,7 @@ object MainForm: TMainForm
       Align = Top
       AutoStartMode = WhenDisplayed
       BackgroundColor = xFF151515
+      LoadingColor = claNull
       DataSource = 
         'https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflowe' +
         'r_1080p_30fps_normal.mp4'
@@ -1072,7 +914,7 @@ object MainForm: TMainForm
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 166
+      TabOrder = 191
       object ALText53: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1129,7 +971,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 162
+      TabOrder = 187
       object ALText49: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1316,7 +1158,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 368
+      TabOrder = 396
       Text = 'Show dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1365,7 +1207,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 373
+      TabOrder = 402
       Text = 'Apply Effect to the Video'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1382,7 +1224,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 378
+      TabOrder = 408
       object ALButton6: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -1483,7 +1325,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 384
+      TabOrder = 416
       object ALButton10: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1584,7 +1426,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 387
+      TabOrder = 420
       object ALButton11: TALButton
         Align = LeftCenter
         Fill.Color = xFFF7F2FA
@@ -1693,7 +1535,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 392
+      TabOrder = 425
       object ALButton14: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1782,7 +1624,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 396
+      TabOrder = 429
       object ALButton17: TALButton
         Align = LeftCenter
         Fill.Color = claNull
@@ -2982,7 +2824,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 43.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 464
+      TabOrder = 498
       object ALLayout33: TALLayout
         Align = Left
         AutoSize = True
@@ -3115,7 +2957,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
-      Text = 'TALTabControl'
+      Text = 'TALPageController'
       TextSettings.Font.Size = 32.000000000000000000
       TextSettings.Font.Weight = Bold
     end
@@ -3165,7 +3007,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 17574.000000000000000000
+      Position.Y = 18515.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3203,7 +3045,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 66.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 488
+      TabOrder = 528
       object ALLayout36: TALLayout
         Align = Left
         AutoSize = True
@@ -3369,7 +3211,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18149.000000000000000000
+      Position.Y = 19090.000000000000000000
       PromptTextColor = xFF49454F
       Sides = [Bottom]
       Size.Width = 348.000000000000000000
@@ -3414,7 +3256,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 506
+      TabOrder = 546
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3441,7 +3283,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 509
+      TabOrder = 549
       object ALButton21: TALButton
         Align = LeftCenter
         Fill.Color = xFFE8DEF8
@@ -3555,7 +3397,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18376.500000000000000000
+      Position.Y = 19317.500000000000000000
       PromptTextColor = xFF49454F
       Sides = [Bottom]
       Size.Width = 348.000000000000000000
@@ -3600,7 +3442,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 512
+      TabOrder = 552
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3611,11 +3453,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 32.000000000000000000
-      Position.Y = 18251.000000000000000000
+      Position.Y = 19192.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 93.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 515
+      TabOrder = 555
       object ALLayout47: TALLayout
         Align = Left
         AutoSize = True
@@ -3797,7 +3639,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18518.742187500000000000
+      Position.Y = 19459.742187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 60.000000000000000000
@@ -3841,7 +3683,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 518
+      TabOrder = 558
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3864,11 +3706,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 40.000000000000000000
-      Position.Y = 18710.742187500000000000
+      Position.Y = 19651.742187500000000000
       Size.Width = 380.000000000000000000
       Size.Height = 83.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 519
+      TabOrder = 559
       object ALLayout49: TALLayout
         Align = Left
         AutoSize = True
@@ -4036,7 +3878,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18826.242187500000000000
+      Position.Y = 19767.242187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 99.242500305175780000
@@ -4080,7 +3922,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 521
+      TabOrder = 561
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4095,9 +3937,9 @@ object MainForm: TMainForm
       Margins.Top = 24.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 19051.484375000000000000
+      Position.Y = 19992.484375000000000000
       Size.Width = 380.000000000000000000
-      Size.Height = 888.484985351562500000
+      Size.Height = 864.984985351562500000
       Size.PlatformDefault = False
       Stroke.Color = claNull
       object ALText20: TALText
@@ -4204,13 +4046,13 @@ object MainForm: TMainForm
         Margins.Top = 32.000000000000000000
         Position.Y = 190.000000000000000000
         Size.Width = 380.000000000000000000
-        Size.Height = 93.500000000000000000
+        Size.Height = 70.000000000000000000
         Size.PlatformDefault = False
         object ALLayout52: TALLayout
           Align = Left
           AutoSize = True
           Size.Width = 184.000000000000000000
-          Size.Height = 93.500000000000000000
+          Size.Height = 70.000000000000000000
           Size.PlatformDefault = False
           object ALEdit8: TALEdit
             DefStyleAttr = 'Material3DarkFilledErrorEditTextStyle'
@@ -4224,7 +4066,6 @@ object MainForm: TMainForm
             LabelTextSettings.Margins.Bottom = 4.500000000000000000
             LabelTextSettings.Layout = Inline
             Margins.Left = 16.000000000000000000
-            Margins.Bottom = 23.500000000000000000
             Padding.Left = 18.000000000000000000
             Padding.Top = 13.500000000000000000
             Padding.Right = 18.000000000000000000
@@ -4391,7 +4232,7 @@ object MainForm: TMainForm
         Padding.Right = 18.000000000000000000
         Padding.Bottom = 13.500000000000000000
         Position.X = 16.000000000000000000
-        Position.Y = 315.500000000000000000
+        Position.Y = 292.000000000000000000
         PromptTextColor = xFFCAC4D0
         Sides = [Bottom]
         Size.Width = 348.000000000000000000
@@ -4458,7 +4299,7 @@ object MainForm: TMainForm
         Padding.Right = 18.000000000000000000
         Padding.Bottom = 18.000000000000000000
         Position.X = 16.000000000000000000
-        Position.Y = 457.742492675781300000
+        Position.Y = 434.242492675781300000
         PromptTextColor = xFFCAC4D0
         Size.Width = 348.000000000000000000
         Size.Height = 60.000000000000000000
@@ -4524,7 +4365,7 @@ object MainForm: TMainForm
         Align = Top
         AutoSize = True
         Margins.Top = 40.000000000000000000
-        Position.Y = 649.742492675781300000
+        Position.Y = 626.242492675781300000
         Size.Width = 380.000000000000000000
         Size.Height = 83.500000000000000000
         Size.PlatformDefault = False
@@ -4698,7 +4539,7 @@ object MainForm: TMainForm
         Padding.Right = 18.000000000000000000
         Padding.Bottom = 18.000000000000000000
         Position.X = 16.000000000000000000
-        Position.Y = 765.242492675781300000
+        Position.Y = 741.742492675781300000
         PromptTextColor = xFFCAC4D0
         Size.Width = 348.000000000000000000
         Size.Height = 99.242500305175780000
@@ -4765,7 +4606,7 @@ object MainForm: TMainForm
         Padding.Right = 18.000000000000000000
         Padding.Bottom = 18.000000000000000000
         Position.X = 16.000000000000000000
-        Position.Y = 549.742492675781300000
+        Position.Y = 526.242492675781300000
         PromptTextColor = xFFCAC4D0
         Size.Width = 348.000000000000000000
         Size.Height = 60.000000000000000000
@@ -4844,7 +4685,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18610.742187500000000000
+      Position.Y = 19551.742187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 60.000000000000000000
@@ -4888,7 +4729,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 524
+      TabOrder = 564
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4968,7 +4809,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 245
+      TabOrder = 271
       object ALAutoSizeLayoutImage: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -5175,7 +5016,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 382
+      TabOrder = 413
       object ALAnimatedImage1: TALAnimatedImage
         Align = Left
         Animation.Enabled = True
@@ -5372,13 +5213,13 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 139
+      TabOrder = 164
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = True
-        Margins.Left = 12.000000000000000000
+        Margins.Left = 16.000000000000000000
         Margins.Right = 12.000000000000000000
-        Position.X = 12.000000000000000000
+        Position.X = 16.000000000000000000
         Size.Width = 150.000000000000000000
         Size.Height = 150.000000000000000000
         Size.PlatformDefault = False
@@ -7865,9 +7706,9 @@ object MainForm: TMainForm
         Align = Client
         AutoSize = True
         HitTest = True
-        Margins.Right = 12.000000000000000000
+        Margins.Right = 16.000000000000000000
         MaxHeight = 150.000000000000000000
-        Size.Width = 194.000000000000000000
+        Size.Width = 186.000000000000000000
         Size.Height = 136.000000000000000000
         Size.PlatformDefault = False
         Text = 
@@ -7897,12 +7738,12 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 131
+      TabOrder = 156
       object ALImage14: TALImage
         Align = MostLeftTop
-        Margins.Left = 12.000000000000000000
+        Margins.Left = 16.000000000000000000
         Margins.Right = 12.000000000000000000
-        Position.X = 12.000000000000000000
+        Position.X = 16.000000000000000000
         ResourceName = 'gbrcolorprofile'
         Size.Width = 150.000000000000000000
         Size.Height = 150.000000000000000000
@@ -7912,9 +7753,9 @@ object MainForm: TMainForm
         Align = Client
         AutoSize = True
         HitTest = True
-        Margins.Right = 12.000000000000000000
+        Margins.Right = 16.000000000000000000
         MaxHeight = 150.000000000000000000
-        Size.Width = 194.000000000000000000
+        Size.Width = 186.000000000000000000
         Size.Height = 136.000000000000000000
         Size.PlatformDefault = False
         Text = 
@@ -7948,9 +7789,9 @@ object MainForm: TMainForm
       TabOrder = 12
       object ALImage15: TALImage
         Align = MostLeftTop
-        Margins.Left = 12.000000000000000000
+        Margins.Left = 16.000000000000000000
         Margins.Right = 12.000000000000000000
-        Position.X = 12.000000000000000000
+        Position.X = 16.000000000000000000
         ResourceName = 'webkitlogop3'
         Size.Width = 150.000000000000000000
         Size.Height = 150.000000000000000000
@@ -7960,10 +7801,10 @@ object MainForm: TMainForm
         Align = Top
         AutoSize = True
         HitTest = True
-        Margins.Right = 12.000000000000000000
+        Margins.Right = 16.000000000000000000
         MaxHeight = 150.000000000000000000
-        Position.X = 174.000000000000000000
-        Size.Width = 194.000000000000000000
+        Position.X = 178.000000000000000000
+        Size.Width = 186.000000000000000000
         Size.Height = 136.000000000000000000
         Size.PlatformDefault = False
         Text = 
@@ -10402,7 +10243,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18957.484375000000000000
+      Position.Y = 19898.484375000000000000
       PromptTextColor = xFF465A69
       Size.Width = 348.000000000000000000
       Size.Height = 70.000000000000000000
@@ -10435,7 +10276,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF465A69
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 391
+      TabOrder = 390
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1C2B33
       TintColor = xFF1C2B33
@@ -10508,7 +10349,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 487
+      TabOrder = 486
       Text = 'Scale-Out Effect'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -10557,7 +10398,6 @@ object MainForm: TMainForm
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
       Position.Y = 8555.000000000000000000
-      Interval = 0.050000000745058060
     end
     object ALText45: TALText
       Align = Top
@@ -10637,6 +10477,246 @@ object MainForm: TMainForm
         'mxControls/_Design/landscape.jpg?raw=true'
       Size.Width = 348.000000000000000000
       Size.Height = 150.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object ALText55: TALText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 24.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 12.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 17946.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 104.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'A sample demonstrating how to configure TalPageController to app' +
+        'ly zoom in/out and saturation decrease/increase effects during p' +
+        'age swipes'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
+    end
+    object ALPageController3: TALPageController
+      ActivePageIndex = 2
+      Align = Top
+      Fill.Color = claNull
+      Margins.Top = 16.000000000000000000
+      PageIndicator = ALPageIndicator3
+      Position.Y = 18078.000000000000000000
+      Size.Width = 380.000000000000000000
+      Size.Height = 355.000000000000000000
+      Size.PlatformDefault = False
+      ViewportFraction = 0.600000023841857900
+      OnResized = ALPageController3Resized
+      OnViewportPositionChange = ALPageController3ViewportPositionChange
+      object ALPageView3_1: TALPageView
+        object ALImageGallery3_1: TALImage
+          Align = Client
+          HitTest = False
+          ResourceName = 'gallery3_1'
+          Size.Width = 228.000015258789100000
+          Size.Height = 355.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFDDDDDD
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView3_2: TALPageView
+        object ALImageGallery3_2: TALImage
+          Align = Client
+          HitTest = False
+          ResourceName = 'gallery3_2'
+          Size.Width = 228.000015258789100000
+          Size.Height = 355.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFDDDDDD
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView3_3: TALPageView
+        object ALImageGallery3_3: TALImage
+          Align = Client
+          HitTest = False
+          ResourceName = 'gallery3_3'
+          Size.Width = 228.000015258789100000
+          Size.Height = 355.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFDDDDDD
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView3_4: TALPageView
+        object ALImageGallery3_4: TALImage
+          Align = Client
+          HitTest = False
+          ResourceName = 'gallery3_4'
+          Size.Width = 228.000015258789100000
+          Size.Height = 355.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFDDDDDD
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView3_5: TALPageView
+        object ALImageGallery3_5: TALImage
+          Align = Client
+          HitTest = False
+          ResourceName = 'gallery3_5'
+          Size.Width = 228.000015258789100000
+          Size.Height = 355.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFDDDDDD
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView3_6: TALPageView
+        object ALImageGallery3_6: TALImage
+          Align = Client
+          HitTest = False
+          ResourceName = 'gallery3_6'
+          Size.Width = 228.000015258789100000
+          Size.Height = 355.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFDDDDDD
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+    end
+    object ALPageController2: TALPageController
+      ActivePageIndex = 0
+      Align = Top
+      Fill.Color = claNull
+      Margins.Top = 16.000000000000000000
+      PageIndicator = ALPageIndicator2
+      Position.Y = 17504.000000000000000000
+      Size.Width = 380.000000000000000000
+      Size.Height = 396.000000000000000000
+      Size.PlatformDefault = False
+      OnMouseDown = ALPageController2MouseDown
+      OnMouseUp = ALPageController2MouseUp
+      OnResized = ALPageController2Resized
+      object ALPageView2_1: TALPageView
+        object ALImageGallery2_1: TALImage
+          Align = Client
+          HitTest = False
+          Margins.Left = 25.000000000000000000
+          Margins.Right = 25.000000000000000000
+          ResourceName = 'gallery2_1'
+          Size.Width = 330.000000000000000000
+          Size.Height = 396.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView2_2: TALPageView
+        object ALImageGallery2_2: TALImage
+          Align = Client
+          HitTest = False
+          Margins.Left = 25.000000000000000000
+          Margins.Right = 25.000000000000000000
+          ResourceName = 'gallery2_2'
+          Size.Width = 330.000000000000000000
+          Size.Height = 396.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView2_3: TALPageView
+        object ALImageGallery2_3: TALImage
+          Align = Client
+          HitTest = False
+          Margins.Left = 25.000000000000000000
+          Margins.Right = 25.000000000000000000
+          ResourceName = 'gallery2_3'
+          Size.Width = 330.000000000000000000
+          Size.Height = 396.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView2_4: TALPageView
+        object ALImageGallery2_4: TALImage
+          Align = Client
+          HitTest = False
+          Margins.Left = 25.000000000000000000
+          Margins.Right = 25.000000000000000000
+          ResourceName = 'gallery2_4'
+          Size.Width = 330.000000000000000000
+          Size.Height = 396.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView2_5: TALPageView
+        object ALImageGallery2_5: TALImage
+          Align = Client
+          HitTest = False
+          Margins.Left = 25.000000000000000000
+          Margins.Right = 25.000000000000000000
+          ResourceName = 'gallery2_5'
+          Size.Width = 330.000000000000000000
+          Size.Height = 396.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+      object ALPageView2_6: TALPageView
+        object ALImageGallery2_6: TALImage
+          Align = Client
+          HitTest = False
+          Margins.Left = 25.000000000000000000
+          Margins.Right = 25.000000000000000000
+          ResourceName = 'gallery2_6'
+          Size.Width = 330.000000000000000000
+          Size.Height = 396.000000000000000000
+          Size.PlatformDefault = False
+          WrapMode = FitAndCrop
+          XRadius = 16.000000000000000000
+          YRadius = 16.000000000000000000
+        end
+      end
+    end
+    object ALPageIndicator2: TALPageIndicator
+      Align = Top
+      AnimationType = Worm
+      Margins.Top = 8.000000000000000000
+      Position.Y = 17908.000000000000000000
+      Size.Width = 380.000000000000000000
+      Size.Height = 14.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object ALPageIndicator3: TALPageIndicator
+      Align = Top
+      AnimationType = LinearSwap
+      Margins.Top = 8.000000000000000000
+      Position.Y = 18441.000000000000000000
+      Size.Width = 380.000000000000000000
+      Size.Height = 14.000000000000000000
       Size.PlatformDefault = False
     end
   end

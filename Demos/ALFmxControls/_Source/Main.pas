@@ -28,12 +28,14 @@ uses
   FMX.Edit,
   FMX.Effects,
   FMX.Filter.Effects,
+  Alcinoe.Common,
+  Alcinoe.fmx.Materials.Canvas,
   Alcinoe.FMX.Themes,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.TabControl,
+  Alcinoe.FMX.PageController,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.FMX.DatePickerDialog,
@@ -42,7 +44,8 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Memo,
-  Alcinoe.FMX.Controls;
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.FilterEffects;
 
 type
 
@@ -132,24 +135,6 @@ type
     Text9: TALText;
     ButtonBenchTCircle: TALButton;
     ButtonBenchTALCircle: TALButton;
-    ALRectangle9: TALRectangle;
-    ALTabControl1: TALTabControl;
-    ALTabItem1: TALTabItem;
-    ALText3: TALText;
-    ALText4: TALText;
-    alImage1: TALImage;
-    ALTabItem2: TALTabItem;
-    ALText1: TALText;
-    ALText2: TALText;
-    Image2: TALImage;
-    ALTabItem3: TALTabItem;
-    ALText5: TALText;
-    ALText6: TALText;
-    Image3: TALImage;
-    ALTabItem4: TALTabItem;
-    ALText7: TALText;
-    ALText8: TALText;
-    Image4: TALImage;
     ALRangeTrackBar1: TALRangeTrackBar;
     ALTrackBar1: TALTrackBar;
     Text11: TALText;
@@ -407,25 +392,47 @@ type
     ALImage12: TALImage;
     ALText48: TALText;
     ALImage17: TALImage;
+    ALText55: TALText;
+    ALPageController3: TALPageController;
+    ALPageView3_1: TALPageView;
+    ALPageView3_2: TALPageView;
+    ALPageView3_6: TALPageView;
+    ALImageGallery3_1: TALImage;
+    ALImageGallery3_2: TALImage;
+    ALImageGallery3_6: TALImage;
+    ALPageView3_5: TALPageView;
+    ALPageView3_4: TALPageView;
+    ALPageView3_3: TALPageView;
+    ALImageGallery3_5: TALImage;
+    ALImageGallery3_3: TALImage;
+    ALImageGallery3_4: TALImage;
+    ALPageController2: TALPageController;
+    ALPageView2_2: TALPageView;
+    ALImageGallery2_2: TALImage;
+    ALPageView2_3: TALPageView;
+    ALImageGallery2_3: TALImage;
+    ALPageView2_4: TALPageView;
+    ALImageGallery2_4: TALImage;
+    ALPageView2_5: TALPageView;
+    ALImageGallery2_5: TALImage;
+    ALPageView2_6: TALPageView;
+    ALImageGallery2_6: TALImage;
+    ALPageView2_1: TALPageView;
+    ALImageGallery2_1: TALImage;
+    ALPageIndicator2: TALPageIndicator;
+    ALPageIndicator3: TALPageIndicator;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
     procedure ButtonBenchTALRectangleClick(Sender: TObject);
     procedure ButtonBenchTRectangleClick(Sender: TObject);
     procedure ButtonBenchTALTextClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure ButtonBenchTTextClick(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
     procedure ButtonBenchTLineClick(Sender: TObject);
     procedure ButtonBenchTALLineClick(Sender: TObject);
     procedure ButtonBenchTALCircleClick(Sender: TObject);
     procedure ButtonBenchTCircleClick(Sender: TObject);
-    procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
-    procedure ALTabControl1AniTransitionInit(
-                const sender: TObject;
-                const ATransition: TALTabTransition;
-                const aVelocity: Single;
-                const aAnimation: TALFloatPropertyAnimation);
-    procedure ALTabControl1Resized(Sender: TObject);
     procedure FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure ALVertScrollBox1Click(Sender: TObject);
@@ -442,6 +449,11 @@ type
     procedure ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
     procedure ALSwitchAnimatedImageClick(Sender: TObject);
     procedure ALVertScrollBox1Resized(Sender: TObject);
+    procedure ALPageController2Resized(Sender: TObject);
+    procedure ALPageController2MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure ALPageController2MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure ALPageController3Resized(Sender: TObject);
+    procedure ALPageController3ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TALPointD);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
@@ -454,6 +466,9 @@ type
     fCircle: TCircleStopWatch;
     FVirtualKeyboardOpen: boolean;
     FCurrentTextElements: TDictionary<TObject, TALTextElement>;
+    FPageViewAnimation: TALFloatAnimation;
+    FCanvasColorAdjustTextureMaterialGallery2: TALCanvasColorAdjustTextureMaterial;
+    procedure PageViewAnimationProcess(Sender: TObject);
   protected
     procedure PaintBackground; override;
   public
@@ -473,10 +488,12 @@ uses
   system.Math.Vectors,
   fmx.DialogService,
   Alcinoe.FMX.ScrollEngine,
-  Alcinoe.Common,
   ScrollBoxDemo;
 
 {$R *.fmx}
+
+type
+  TALImageProtectedAccess = class(TALImage);
 
 {************************************}
 procedure TMainForm.InitializeNewForm;
@@ -498,17 +515,18 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   ALLog('TMainForm.FormCreate', 'begin');
+
   TALErrorReporting.Instance;
-  {$IF defined(MSWindows)}
-  ALVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
-  {$ENDIF}
-  //special case for windows
-  if not ALVertScrollBox1.HasTouchScreen then begin
+
+  FCanvasColorAdjustTextureMaterialGallery2 := TALCanvasColorAdjustTextureMaterial.Create;
+
+  if not ALGetHasTouchScreen then begin
     ALVertScrollBox1.VScrollBar.Width := 8;
     ALVertScrollBox1.VScrollBar.Margins.Right := 3;
     ALVertScrollBox1.VScrollBar.Thumb.XRadius := -50;
     ALVertScrollBox1.VScrollBar.Thumb.yRadius := -50;
   end;
+
   FCurrentTextElements := TDictionary<TObject, TALTextElement>.Create;
   fDatePickerDialog := nil;
   FVirtualKeyboardOpen := False;
@@ -671,9 +689,13 @@ begin
   fline.LineType := TLineType.Diagonal;
   fline.HitTest := False;
 
+  FPageViewAnimation := TALFloatAnimation.Create;
+  FPageViewAnimation.OnProcess := PageViewAnimationProcess;
+
   EndUpdate;
 
-  ALTabControl1Resized(nil);
+  ALPageController2Resized(nil);
+  ALPageController3Resized(nil);
   ALVertScrollBox1Resized(nil);
   ALLog('TMainForm.FormCreate', 'end | Form.size: ' + FloatToStr(width) + 'x' + FloatToStr(height));
 end;
@@ -681,6 +703,8 @@ end;
 {***********************************************}
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  ALFreeAndNil(FCanvasColorAdjustTextureMaterialGallery2);
+  ALFreeAndNil(FPageViewAnimation);
   ALFreeAndNil(FCurrentTextElements);
 end;
 
@@ -754,54 +778,6 @@ end;
 procedure TMainForm.ALVertScrollBox1Click(Sender: TObject);
 begin
   SetFocused(nil);
-end;
-
-{*************************************************}
-procedure TMainForm.ALTabControl1AniTransitionInit(
-            const sender: TObject;
-            const ATransition: TALTabTransition;
-            const aVelocity: Single;
-            const aAnimation: TALFloatPropertyAnimation);
-begin
-  // aVelocity = pixels per seconds given by the anicalculations
-  // ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) = the number of pixel we need to scroll
-  // 6 = factor i choose to compensate the deceleration made by the quartic Interpolation
-  if comparevalue(aVelocity, 0) <> 0 then aAnimation.Duration := abs((ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X)) / aVelocity) * 6
-  else aAnimation.Duration := 0.8;
-  if aAnimation.Duration > 0.8 then aAnimation.Duration := 0.8
-  else if aAnimation.Duration < 0.1 then aAnimation.Duration := 0.1;
-  aAnimation.AnimationType := TAnimationType.out;
-  aAnimation.Interpolation := TALInterpolationType.circular;
-end;
-
-{********************************************************}
-procedure TMainForm.ALTabControl1Resized(Sender: TObject);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _updateLabels(const aTab: TalTabItem);
-  begin
-    var LText1: TalText := nil;
-    var LText2: TalText := nil;
-    for var LControl1 in aTab.Controls do begin
-      if (LControl1 is TalText) and (LControl1.Tag = 1) then LText1 := TalText(LControl1)
-      else if (LControl1 is TalText) and (LControl1.Tag = 2) then LText2 := TalText(LControl1);
-    end;
-    if LText1 <> nil then
-      LText1.Position.X := ((aTab.Width - LText1.Width) / 2) + (aTab.Position.X / 5);
-    if LText2 <> nil then
-      LText2.Position.X := ((aTab.Width - LText2.Width) / 2) + (aTab.Position.X);
-  end;
-
-begin
-  if ALTabControl1.TabIndex > 0 then _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex - 1]);
-  _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex]);
-  if ALTabControl1.TabIndex < ALTabControl1.Tabcount - 1 then _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex + 1]);
-end;
-
-{********************************************************************************************************************************}
-procedure TMainForm.ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
-begin
-  ALTabControl1Resized(nil);
 end;
 
 {*********************************************************************************************}
@@ -916,9 +892,6 @@ begin
   var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
   var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxDemoForm);
   LVertScrollBox.Parent := LScrollBoxDemoForm;
-  {$IF defined(MSWindows)}
-  LVertScrollBox.ScrollEngine.TouchTracking := [ttVertical];
-  {$ENDIF}
   LVertScrollBox.BeginUpdate;
   LVertScrollBox.Align := TALalignLayout.Client;
   LVertScrollBox.ScrollEngine.MinEdgeSpringbackEnabled := False;
@@ -1313,6 +1286,79 @@ begin
                         'Paint: ' + FormatFloat('0.#####',fALRectangle.PaintMs) + ' ms';
         end);
     end).Start;
+end;
+
+{************************************************************}
+procedure TMainForm.PageViewAnimationProcess(Sender: TObject);
+begin
+  ALImageGallery2_1.Scale := FPageViewAnimation.CurrentValue;
+  ALImageGallery2_2.Scale := FPageViewAnimation.CurrentValue;
+  ALImageGallery2_3.Scale := FPageViewAnimation.CurrentValue;
+  ALImageGallery2_4.Scale := FPageViewAnimation.CurrentValue;
+  ALImageGallery2_5.Scale := FPageViewAnimation.CurrentValue;
+  ALImageGallery2_6.Scale := FPageViewAnimation.CurrentValue;
+  FCanvasColorAdjustTextureMaterialGallery2.ShaderVariables.saturation := 4 * (FPageViewAnimation.CurrentValue - 1);
+end;
+
+{*********************************************************************************************************************}
+procedure TMainForm.ALPageController2MouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  FPageViewAnimation.StopAtCurrent;
+  FPageViewAnimation.StartValue := ALImageGallery2_1.Scale;
+  FPageViewAnimation.StopValue := 0.75;
+  FPageViewAnimation.Duration := 0.2;
+  FPageViewAnimation.Start;
+  {$IF defined(ALGpuCanvas)}
+  if TALImageProtectedAccess(ALImageGallery2_1).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_1).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageProtectedAccess(ALImageGallery2_2).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_2).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageProtectedAccess(ALImageGallery2_3).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_3).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageProtectedAccess(ALImageGallery2_4).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_4).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageProtectedAccess(ALImageGallery2_5).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_5).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageProtectedAccess(ALImageGallery2_6).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_6).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  {$ENDIF}
+end;
+
+{********************************************************************************************************************}
+procedure TMainForm.ALPageController2MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  FPageViewAnimation.StopAtCurrent;
+  FPageViewAnimation.StartValue := ALImageGallery2_1.Scale;
+  FPageViewAnimation.StopValue := 1;
+  FPageViewAnimation.Duration := 0.4;
+  FPageViewAnimation.Start;
+end;
+
+
+{************************************************************}
+procedure TMainForm.ALPageController2Resized(Sender: TObject);
+begin
+  ALPageController2.Height := (ALPageController2.Width - 50) * (1350 / 1080);
+end;
+
+{************************************************************}
+procedure TMainForm.ALPageController3Resized(Sender: TObject);
+begin
+  ALPageController3.Height := (ALPageController3.Width * 0.6) * (1349 / 1080);
+end;
+
+{**************************************************************************************************************************************}
+procedure TMainForm.ALPageController3ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TALPointD);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure UpdateImageScale(const AImage: TALImage);
+  begin
+    var LRootCenterLine := Width / 2;
+    var LImageCenterLine := AImage.LocalToAbsolute(AImage.LocalRect).Left + (AImage.Width / 2);
+    AImage.Scale := 1 + (abs(LImageCenterLine - LRootCenterLine) - 1) * ((0.8 - 1) / ((AImage.Width) - 1));
+  end;
+
+begin
+  UpdateImageScale(ALImageGallery3_1);
+  UpdateImageScale(ALImageGallery3_2);
+  UpdateImageScale(ALImageGallery3_3);
+  UpdateImageScale(ALImageGallery3_4);
+  UpdateImageScale(ALImageGallery3_5);
+  UpdateImageScale(ALImageGallery3_6);
 end;
 
 {*****************************************}

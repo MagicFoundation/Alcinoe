@@ -178,7 +178,7 @@ type
     FActiveIndicatorControl: TActiveIndicatorControl; // 8 bytes
     FActiveIndicator: TActiveIndicator;  // 8 bytes
     FInactiveIndicator: TInactiveIndicator; // 8 bytes
-    procedure SetAnimationType(const AValue: TAnimationType);
+    procedure SetAnimationType(const AValue: TALPageIndicator.TAnimationType);
     procedure SetActiveIndicator(const AValue: TActiveIndicator);
     procedure SetInactiveIndicator(const AValue: TInactiveIndicator);
     procedure ActiveIndicatorChanged(ASender: TObject);
@@ -1018,7 +1018,7 @@ end;
 procedure TALPageIndicator.SetDoubleBuffered(const AValue: Boolean);
 begin
   inherited;
-  for var I := 0 to Controls.count - 1 do
+  for var I := 0 to ControlsCount - 1 do
     TIndicatorControl(Controls[i]).DoubleBuffered := AValue;
 end;
 
@@ -1038,7 +1038,7 @@ begin
                  FInactiveIndicator.Margins.Top + FInactiveIndicator.Margins.Bottom + FInactiveIndicator.Height;
   var LCurrX := Padding.Left + ((Width - LWidth) / 2);
   var LCurrY := Padding.Top + ((Height - LHeight) / 2);
-  For var I := 0 to Controls.Count - 1 do begin
+  For var I := 0 to ControlsCount - 1 do begin
     var LIndicator := Controls[i];
     LIndicator.SetBounds(
       LCurrX + FInactiveIndicator.Margins.Left,
@@ -1113,15 +1113,15 @@ Procedure TALPageIndicator.UpdateActiveIndicator;
 begin
 
   // Exit if csDestroying or csLoading
-  If (csDestroying in componentState) or
-     (csLoading in componentState) then exit;
+  If (csLoading in componentState) or
+     (csDestroying in componentState) then exit;
 
   // Deactivate Align
   if TNonReentrantHelper.EnterSection(FDisableAlign) then begin
     try
 
       // Reset visibility/scale/color of all controls
-      for var I := 0 to Controls.Count - 1 do begin
+      for var I := 0 to ControlsCount - 1 do begin
         Controls[I].Visible := True;
         TIndicatorControl(Controls[I]).Scale := 1;
         if (Controls[I] = FactiveIndicatorControl) then
@@ -1342,8 +1342,8 @@ end;
 {**************************************************}
 procedure TALPageIndicator.RebuildIndicatorControls;
 begin
-  If (csDestroying in componentState) or
-     (csloading in componentState) then exit;
+  If (csloading in componentState) or
+     (csDestroying in componentState) then exit;
   BeginUpdate;
   try
 
@@ -1429,8 +1429,8 @@ begin
   end;
 end;
 
-{************************************************************************}
-procedure TALPageIndicator.SetAnimationType(const AValue: TAnimationType);
+{*****************************************************************************************}
+procedure TALPageIndicator.SetAnimationType(const AValue: TALPageIndicator.TAnimationType);
 begin
   If FAnimationType <> AValue then begin
     FAnimationType := AValue;

@@ -191,6 +191,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
     //--
     aSrc := FindAndReplace(aSrc, ' = class(TALControl)', ' = class(TALDynamicListBoxExtendedControl)');
     aSrc := FindAndReplace(aSrc, 'TALControl', 'TALDynamicListBoxControl');
+    aSrc := FindAndReplace(aSrc, 'TALContent', 'TALDynamicListBoxContent');
+    aSrc := FindAndReplace(aSrc, 'TALDynamicListBoxContent = class(TALDynamicListBoxControl, IContent)','TALDynamicListBoxContent = class(TALDynamicListBoxExtendedControl)');
     aSrc := FindAndReplace(aSrc, 'TALShape', 'TALDynamicListBoxShape');
     aSrc := FindAndReplace(aSrc, 'TALImage', 'TALDynamicListBoxImage');
     aSrc := FindAndReplace(aSrc, 'TALBaseRectangle', 'TALDynamicListBoxBaseRectangle');
@@ -213,6 +215,10 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'TALScrollBar', 'TALDynamicListBoxScrollBar');
     aSrc := FindAndReplace(aSrc, 'TALLayout', 'TALDynamicListBoxLayout');
     aSrc := FindAndReplace(aSrc, 'TALVideoPlayerSurface', 'TALDynamicListBoxVideoPlayerSurface');
+    aSrc := FindAndReplace(aSrc, 'TALBasePageIndicator', 'TALDynamicListBoxBasePageIndicator');
+    aSrc := FindAndReplace(aSrc, 'TALPageIndicator', 'TALDynamicListBoxPageIndicator');
+    aSrc := FindAndReplace(aSrc, 'TALPageView', 'TALDynamicListBoxPageView');
+    aSrc := FindAndReplace(aSrc, 'TALPageController', 'TALDynamicListBoxPageController');
     //---
     aSrc := FindAndReplace(aSrc, 'TALDynamicListBoxImageWrapMode', 'TALImageWrapMode');
     aSrc := FindAndReplace(aSrc, 'TALDynamicListBoxLineType', 'TALLineType');
@@ -259,16 +265,24 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, ' property OnKeyUp', ' //property OnKeyUp');
     aSrc := FindAndReplace(aSrc, ' property OnResize', ' //property OnResize');
     //--
+    aSrc := FindAndReplace(aSrc, 'if not Supports(aObject, IALNativeControl) then','//if not Supports(aObject, IALNativeControl) then');
+    aSrc := FindAndReplace(aSrc, '_TControlAccessProtected(aObject)','aObject');
+    aSrc := FindAndReplace(aSrc, 'FContent.InsertObject(Lindex, Result);','FContent.InsertControl(Result, Lindex);');
+    aSrc := FindAndReplace(aSrc, 'FContent.RemoveObject(AIndex);','FContent.RemoveControl(AIndex);');
+    aSrc := FindAndReplace(aSrc, 'if HasActivePage then ActivePage.ResetFocus;','//if HasActivePage then ActivePage.ResetFocus;');
+    aSrc := FindAndReplace(aSrc, 'if not IsChild(AValue) then raise Exception.Create','//if not IsChild(AValue) then raise Exception.Create');
+    aSrc := FindAndReplace(aSrc, 'function GetItemsCount: Integer;','//function GetItemsCount: Integer;');
+    aSrc := FindAndReplace(aSrc, 'function GetItem(const AIndex: Integer): TFmxObject;','//function GetItem(const AIndex: Integer): TFmxObject;');
+    aSrc := FindAndReplace(aSrc, 'ClipChildren := true;','//ClipChildren := true;');
+    aSrc := FindAndReplace(aSrc, 'ValidateInheritance(AOwner, TALDynamicListBoxPageController, False{CanBeNil});','//ValidateInheritance(AOwner, TALDynamicListBoxPageController, False{CanBeNil});');
     aSrc := FindAndReplace(aSrc, '_TControlAccessProtected(ParentControl)','OwnerControl');
     aSrc := FindAndReplace(aSrc, '_TControlAccessProtected(FParent).click;','FParent.click;');
-    //--
     aSrc := FindAndReplace(aSrc, 'FALParentControl := nil;','//FALParentControl := nil;');
     aSrc := FindAndReplace(aSrc, 'FALParentControl: TALDynamicListBoxControl;', '//FALParentControl: TALDynamicListBoxControl;');
     aSrc := FindAndReplace(aSrc, 'property ALParentControl: TALDynamicListBoxControl read FALParentControl;', '//property ALParentControl: TALDynamicListBoxControl read FALParentControl;');
     aSrc := FindAndReplace(aSrc, 'ALParentControl', 'OwnerControl');
     aSrc := FindAndReplace(aSrc, 'ParentControl', 'OwnerControl');
     aSrc := FindAndReplace(aSrc, 'var P: TControl := Self;','var P: TALDynamicListBoxControl := Self;');
-    //--
     aSrc := FindAndReplace(aSrc, 'Size.SetPlatformDefaultWithoutNotification(False);','//Size.SetPlatformDefaultWithoutNotification(False);');
     aSrc := FindAndReplace(aSrc, ' Size.Height ',' Height ');
     aSrc := FindAndReplace(aSrc, ' Size.Width ',' Width ');
@@ -277,52 +291,36 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'Size.Size := ALAlignDimensionToPixelRound(Size.Size, ALGetScreenScale, TEpsilon.Position);', 'SetSize(ALAlignDimensionToPixelRound(TSizeF.Create(Width, Height), ALGetScreenScale, TEpsilon.Position));');
     aSrc := FindAndReplace(aSrc, 'LMaxThumb.size.size := size.size;','LMaxThumb.SetSize(TSizeF.Create(Width, Height));');
     aSrc := FindAndReplace(aSrc, 'Size.Size.IsZero', 'BoundsRect.IsEmpty');
+    aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Size.Size := TpointF.Create(Width, Height);','FFadeOverlay.SetSize(TSizeF.Create(Width, Height));');
     aSrc := FindAndReplace(aSrc, 'function IsSizeStored: Boolean;', '//function IsSizeStored: Boolean;');
     aSrc := FindAndReplace(aSrc, '//function IsSizeStored: Boolean;','function IsSizeStored: Boolean;','TStopIndicatorBrush = class(TALPersistentObserver)','end;');
     aSrc := FindAndReplace(aSrc, '//property Size: Single read FSize write SetSize stored IsSizeStored nodefault;','property Size: Single read FSize write SetSize stored IsSizeStored nodefault;','TStopIndicatorBrush = class(TALPersistentObserver)','end;');
-    //--
     aSrc := FindAndReplace(aSrc, 'Position.X', 'Left');
     aSrc := FindAndReplace(aSrc, 'Position.Y', 'Top');
     aSrc := FindAndReplace(aSrc, 'PressedLeft','PressedPosition.X');
     aSrc := FindAndReplace(aSrc, 'PressedTop','PressedPosition.Y');
-    aSrc := FindAndReplace(aSrc, 'FPressedThumbPos := FThumb.Position.Point','FPressedThumbPos := TPointF.Create(Single(FThumb.left), Single(FThumb.top))');
+    aSrc := FindAndReplace(aSrc, 'DownLeft','DownPosition.X');
+    aSrc := FindAndReplace(aSrc, 'DownTop','DownPosition.Y');
+    aSrc := FindAndReplace(aSrc, 'UpLeft','UpPosition.X');
+    aSrc := FindAndReplace(aSrc, 'UpTop','UpPosition.Y');
+    aSrc := FindAndReplace(aSrc, 'ViewportLeft','ViewportPosition.X');
+    aSrc := FindAndReplace(aSrc, 'ViewportTop','ViewportPosition.Y');
     aSrc := FindAndReplace(aSrc, 'fCustomTrackMouseDownPos := FCustomTrack.AbsoluteToLocal(LocalToAbsolute(PressedPosition));','fCustomTrackMouseDownPos := FCustomTrack.AbsoluteToLocal(LocalToAbsolute(PressedPosition)).ReducePrecision;');
     aSrc := FindAndReplace(aSrc, 'var LCustomTrackMousePos := FCustomTrack.AbsoluteToLocal(LocalToAbsolute(TpointF.Create(X,Y)));','var LCustomTrackMousePos := FCustomTrack.AbsoluteToLocal(LocalToAbsolute(TpointF.Create(X,Y))).ReducePrecision;');
-    aSrc := FindAndReplace(
-              aSrc,
-              '    Position.Point := TpointF.Create('#13#10+
-              '                        AThumb.Left - ((Width - AThumb.Width) / 2),'#13#10+
-              '                        AThumb.Top - Height - Margins.Bottom);',
-              '    SetPosition('#13#10+
-              '      TpointF.Create('#13#10+
-              '        AThumb.Left - ((Width - AThumb.Width) / 2),'#13#10+
-              '        AThumb.Top - Height - Margins.Bottom));');
-
-
-    aSrc := FindAndReplace(
-              aSrc,
-              '    Position.Point := TpointF.Create('#13#10+
-              '                        AThumb.Left + AThumb.Width + Margins.Left,'#13#10+
-              '                        AThumb.Top - ((Height - AThumb.Height) / 2));',
-              '    SetPosition('#13#10+
-              '      TpointF.Create('#13#10+
-              '        AThumb.Left + AThumb.Width + Margins.Left,'#13#10+
-              '        AThumb.Top - ((Height - AThumb.Height) / 2)));');
-    //--
+    aSrc := FindAndReplace(aSrc, 'FPressedThumbPos := FThumb.Position.Point','FPressedThumbPos := TPointF.Create(Single(FThumb.left), Single(FThumb.top))');
+    aSrc := FindAndReplace(aSrc, 'Position.Point := TpointF.Create(','Position := TALPointD.Create(');
+    aSrc := FindAndReplace(aSrc, 'Position.Point := -TpointF.Create(','Position := -TALPointD.Create(');
+    aSrc := FindAndReplace(aSrc, 'Position.Point := ActivePage.Position.Point;','Position := ActivePage.Position;');
     aSrc := FindAndReplace(aSrc, 'SetBounds(X, Y, AWidth, AHeight: Single)','SetBounds(X, Y, AWidth, AHeight: Double)');
     aSrc := FindAndReplace(aSrc, 'PointInObjectLocal(X, Y: Single): Boolean;','PointInObjectLocal(X, Y: Double): Boolean;');
-    //--
     aSrc := FindAndReplace(aSrc, 'FControlAbsolutePosAtMouseDown: TpointF;','FControlAbsolutePosAtMouseDown: TALPointD;');
     aSrc := FindAndReplace(aSrc, 'FControlAbsolutePosAtMouseDown := TpointF.zero;','FControlAbsolutePosAtMouseDown := TALPointD.zero;');
-    //--
     aSrc := FindAndReplace(aSrc, 'FForm: TCommonCustomForm;', '//FForm: TCommonCustomForm;');
     aSrc := FindAndReplace(aSrc, 'property Form: TCommonCustomForm read FForm;', '//property Form: TCommonCustomForm read FForm;');
     aSrc := FindAndReplace(aSrc, 'FForm := nil;','//FForm := nil;');
     aSrc := FindAndReplace(aSrc, 'else //FForm := nil;','else FForm := nil;');
-    //--
     aSrc := FindAndReplace(aSrc, 'procedure DelayOnResize(Sender: TObject);','//procedure DelayOnResize(Sender: TObject);');
     aSrc := FindAndReplace(aSrc, 'procedure DelayOnResized(Sender: TObject);','//procedure DelayOnResized(Sender: TObject);');
-    //--
     aSrc := FindAndReplace(aSrc, 'DoMouseEnter','MouseEnter');
     aSrc := FindAndReplace(aSrc, 'DoMouseLeave','MouseLeave');
     aSrc := FindAndReplace(aSrc, 'TabStop := ACustomTrack.TabStop;','//TabStop := ACustomTrack.TabStop;');
@@ -330,6 +328,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'procedure _SetTabStop(const Value: Boolean);','//procedure _SetTabStop(const Value: Boolean); virtual;');
     aSrc := FindAndReplace(aSrc, 'FThumb.TabOrder := 0;','//FThumb.TabOrder := 0;');
     aSrc := FindAndReplace(aSrc, 'FMaxThumb.TabOrder := 1;','//FMaxThumb.TabOrder := 1;');
+    aSrc := FindAndReplace(aSrc, 'function GetTabStopController: ITabStopController; override;','//function GetTabStopController: ITabStopController; override;');
+    aSrc := FindAndReplace(aSrc, 'function GetTabListClass: TTabListClass; override;','//function GetTabListClass: TTabListClass; override;');
     aSrc := FindAndReplace(aSrc, 'procedure DoEnter; override;','//procedure DoEnter; override;');
     aSrc := FindAndReplace(aSrc, 'procedure DoExit; override;','//procedure DoExit; override;');
     aSrc := FindAndReplace(aSrc, 'CanFocus := True;', '//CanFocus := True;');
@@ -380,11 +380,125 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'function IsDisplayed: Boolean; virtual;','function IsDisplayed: Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'function GetAbsoluteDisplayedRect: TRectF; virtual;','//function GetAbsoluteDisplayedRect: TRectF; virtual;');
     aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay: Boolean; virtual;','function IsReadyToDisplay: Boolean; override;');
-    //--
+    aSrc := FindAndReplace(aSrc, 'procedure IContent.Changed = ContentChanged;','//procedure IContent.Changed = ContentChanged;');
+    aSrc := FindAndReplace(aSrc, 'function IsVisibleObject(const AObject: TControl): Boolean; override;','//function IsVisibleObject(const AObject: TControl): Boolean; override;');
+    aSrc := FindAndReplace(aSrc, 'FreeNotification(AObject: TObject);','FreeNotification(const AObject: TALDynamicListBoxControl);');
+    aSrc := FindAndReplace(aSrc, 'ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);','ChildrenMouseDown(const AObject: TALDynamicListBoxControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);');
+    aSrc := FindAndReplace(aSrc, 'ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);','ChildrenMouseMove(const AObject: TALDynamicListBoxControl; Shift: TShiftState; X, Y: Single);');
+    aSrc := FindAndReplace(aSrc, 'ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);','ChildrenMouseUp(const AObject: TALDynamicListBoxControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);');
+    aSrc := FindAndReplace(aSrc, 'ChildrenMouseLeave(const AObject: TControl);','ChildrenMouseLeave(const AObject: TALDynamicListBoxControl);');
+    aSrc := FindAndReplace(aSrc, 'DoAddObject(const AObject: TFmxObject);','DoInsertControl(const AControl: TALDynamicListBoxControl; const AIndex: Integer);');
+    aSrc := FindAndReplace(aSrc, 'DoRemoveObject(const AObject: TFmxObject);','DoRemoveControl(const AControl: TALDynamicListBoxControl);');
+    aSrc := FindAndReplace(aSrc, 'procedure DoDeleteChildren; override;','//procedure DoDeleteChildren; override;');
     aSrc := FindAndReplace(aSrc, 'FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;','//FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;');
     aSrc := FindAndReplace(aSrc, 'FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;','//FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;');
     aSrc := FindAndReplace(aSrc, 'TouchTargetExpansion.OnChange := TouchTargetExpansionChanged;','//TouchTargetExpansion.OnChange := TouchTargetExpansionChanged;');
     aSrc := FindAndReplace(aSrc, 'procedure TouchTargetExpansionChanged(Sender: TObject); virtual;','procedure SetTouchTargetExpansion(const AValue: TRectF); override;');
+    aSrc := FindAndReplace(aSrc, 'procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;','//procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;');
+    aSrc := FindAndReplace(aSrc, 'property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;','//property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;');
+    aSrc := FindAndReplace(aSrc, 'Locked := True;', '//Locked := True;');
+    aSrc := FindAndReplace(aSrc, 'procedure SetNewScene(AScene: IScene); override;','//procedure SetNewScene(AScene: IScene); override;');
+    aSrc := FindAndReplace(aSrc, '(scene <> nil) and // SetNewScene will call again AdjustSize', '//(scene <> nil) and // SetNewScene will call again AdjustSize');
+    aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];','//FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];');
+    aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Parent := self;','//FFadeOverlay.Parent := self;');
+    aSrc := FindAndReplace(aSrc, 'FTrack.Parent := self;','//FTrack.Parent := self;');
+    aSrc := FindAndReplace(aSrc, 'FTrack.Stored := False;','//FTrack.Stored := False;');
+    aSrc := FindAndReplace(aSrc, 'FTrack.SetSubComponent(True);','//FTrack.SetSubComponent(True);');
+    aSrc := FindAndReplace(aSrc, 'FTrack.Name := ''Track'';','//FTrack.Name := ''Track'';');
+    aSrc := FindAndReplace(aSrc, 'FThumb.Parent := FTrack;','//FThumb.Parent := FTrack;');
+    aSrc := FindAndReplace(aSrc, 'FThumb.Stored := False;','//FThumb.Stored := False;');
+    aSrc := FindAndReplace(aSrc, 'FThumb.SetSubComponent(True);','//FThumb.SetSubComponent(True);');
+    aSrc := FindAndReplace(aSrc, 'FThumb.Name := ''Thumb'';','//FThumb.Name := ''Thumb'';');
+    aSrc := FindAndReplace(aSrc, 'Result.Parent := self;','//Result.Parent := self;');
+    aSrc := FindAndReplace(aSrc, 'Result.Stored := False;','//Result.Stored := False;');
+    aSrc := FindAndReplace(aSrc, 'Result.//Locked := True;','//Result.Locked := True;');
+    aSrc := FindAndReplace(aSrc, 'Result.HitTest := False;','//Result.HitTest := False;');
+    aSrc := FindAndReplace(aSrc, 'Result.SetSubComponent(True);','//Result.SetSubComponent(True);');
+    aSrc := FindAndReplace(aSrc, 'LIndicator.Parent := Self;','//LIndicator.Parent := Self;');
+    aSrc := FindAndReplace(aSrc, 'LIndicator.Stored := False;','//LIndicator.Stored := False;');
+    aSrc := FindAndReplace(aSrc, 'LIndicator.//Locked := True;','//LIndicator.Locked := True;');
+    aSrc := FindAndReplace(aSrc, 'LIndicator.HitTest := False;','//LIndicator.HitTest := False;');
+    aSrc := FindAndReplace(aSrc, 'FActiveIndicatorControl.Parent := Self;','//FActiveIndicatorControl.Parent := Self;');
+    aSrc := FindAndReplace(aSrc, 'FActiveIndicatorControl.Stored := False;','//FActiveIndicatorControl.Stored := False;');
+    aSrc := FindAndReplace(aSrc, 'FActiveIndicatorControl.//Locked := True;','//FActiveIndicatorControl.Locked := True;');
+    aSrc := FindAndReplace(aSrc, 'FActiveIndicatorControl.HitTest := False;','//FActiveIndicatorControl.HitTest := False;');
+    aSrc := FindAndReplace(aSrc, 'SetAcceptsControls(False);', '//SetAcceptsControls(False);');
+    aSrc := FindAndReplace(aSrc, 'SetAcceptsControls(True);', '//SetAcceptsControls(True);');
+    aSrc := FindAndReplace(aSrc, 'function GetParentedVisible: Boolean; override;','//function GetParentedVisible: Boolean; override;');
+    aSrc := FindAndReplace(aSrc, 'procedure DoRootChanged; override;','//procedure DoRootChanged; override;');
+    aSrc := FindAndReplace(aSrc, 'procedure Loaded; override;', '//procedure Loaded; override;');
+    aSrc := FindAndReplace(aSrc, 'Create(AOwner: TComponent)', 'Create(const AOwner: TObject)');
+    aSrc := FindAndReplace(aSrc, 'procedure SetName(const Value: TComponentName); override;','//procedure SetName(const Value: TComponentName); override;');
+    aSrc := FindAndReplace(aSrc, 'function HasUnconstrainedAutosizeX: Boolean; virtual;','function HasUnconstrainedAutosizeX: Boolean; override;');
+    aSrc := FindAndReplace(aSrc, 'function HasUnconstrainedAutosizeY: Boolean; virtual;','function HasUnconstrainedAutosizeY: Boolean; override;');
+    aSrc := FindAndReplace(aSrc, '(csDestroying in componentState)','IsDestroying');
+    aSrc := FindAndReplace(aSrc, '(not (csDestroying in FPageController.ComponentState))','(not (FPageController.IsDestroying))');
+    aSrc := FindAndReplace(aSrc, 'if not (csLoading in ComponentState) and Assigned(FOnChange) then','//if {not (csLoading in ComponentState) and} Assigned(FOnChange) then');
+    aSrc := FindAndReplace(aSrc, 'If ([csLoading, csDestroying, csDesigning] * parent.ComponentState <> []) then Exit;','If parent.IsDestroying then Exit;');
+    aSrc := FindAndReplace(aSrc, '(not (csLoading in ComponentState)) and','//(not (csLoading in ComponentState)) and');
+    aSrc := FindAndReplace(aSrc, 'if csLoading in ComponentState then exit;','//if csLoading in ComponentState then exit;');
+    aSrc := FindAndReplace(aSrc, 'If (csLoading in componentState) or','If //(csLoading in componentState) or');
+    aSrc := FindAndReplace(aSrc, 'function IsOwnerLoading: Boolean;','//function IsOwnerLoading: Boolean;');
+    aSrc := FindAndReplace(aSrc, 'if not IsOwnerLoading then','//if not IsOwnerLoading then');
+    aSrc := FindAndReplace(aSrc, 'var LHalfHeight := GetDefaultSize.Height / 2;','//var LHalfHeight := GetDefaultSize.Height / 2;');
+    aSrc := FindAndReplace(aSrc, 'var LMarginsChange := Result.Margins.OnChange;','//var LMarginsChange := Result.Margins.OnChange;');
+    aSrc := FindAndReplace(aSrc, 'Result.Margins.OnChange := nil;','//Result.Margins.OnChange := nil;');
+    aSrc := FindAndReplace(aSrc, 'Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1);','//Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1);');
+    aSrc := FindAndReplace(aSrc, 'Result.Margins.Rect := Result.Margins.DefaultValue;','//Result.Margins.Rect := Result.Margins.DefaultValue;');
+    aSrc := FindAndReplace(aSrc, 'Result.Margins.OnChange := LMarginsChange;','//Result.Margins.OnChange := LMarginsChange;');
+    aSrc := FindAndReplace(aSrc, '(LocalRect)','(LocalRect.ReducePrecision)');
+    aSrc := FindAndReplace(aSrc, '(LocalRect,','(LocalRect.ReducePrecision,');
+    aSrc := FindAndReplace(aSrc, ' LocalRect,',' LocalRect.ReducePrecision,');
+    aSrc := FindAndReplace(aSrc, ' LocalRect;',' LocalRect.ReducePrecision;');
+    aSrc := FindAndReplace(aSrc, '.LocalRect;','.LocalRect.ReducePrecision;');
+    aSrc := FindAndReplace(aSrc, ' LocalRect'#13#10, 'LocalRect.ReducePrecision'#13#10);
+    aSrc := FindAndReplace(
+              aSrc,
+              '  if not (csLoading in componentState) then'#13#10+
+              '    SetActivePageIndex(AValue, TPageTransition.None)'#13#10+
+              '  else'#13#10+
+              '    FActivePageIndex := AValue;',
+              '  //if not (csLoading in componentState) then'#13#10+
+              '    SetActivePageIndex(AValue, TPageTransition.None)'#13#10+
+              '  //else'#13#10+
+              '  //  FActivePageIndex := AValue;');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  if (FPageController.Scene <> nil) and'#13#10+
+              '     (not (FPageController.IsDestroying)) then'#13#10+
+              '    FPageController.Scene.ChangeScrollingState(FPageController, True);',
+              '  //if (FPageController.Scene <> nil) and'#13#10+
+              '  //   (not (FPageController.IsDestroying)) then'#13#10+
+              '  //  FPageController.Scene.ChangeScrollingState(FPageController, True);');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  if (FPageController.Scene <> nil) and'#13#10+
+              '     (not (FPageController.IsDestroying)) then'#13#10+
+              '    FPageController.Scene.ChangeScrollingState(nil, False);',
+              '  //if (FPageController.Scene <> nil) and'#13#10+
+              '  //   (not (FPageController.IsDestroying)) then'#13#10+
+              '  //  FPageController.Scene.ChangeScrollingState(nil, False);');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  If not (AObject is TALDynamicListBoxPageView) then FPageController.AddObject(AObject)'#13#10+
+              '  else begin'#13#10+
+              '    inherited;'#13#10+
+              '    if FPageController.PageIndicator <> nil then'#13#10+
+              '      FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);'#13#10+
+              '  end;',
+              '  //If not (AObject is TALDynamicListBoxPageView) then FPageController.AddObject(AObject)'#13#10+
+              '  //else begin'#13#10+
+              '    inherited;'#13#10+
+              '    if FPageController.PageIndicator <> nil then'#13#10+
+              '      FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);'#13#10+
+              '  //end;');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  if (AObject is TALDynamicListBoxPageView) then FContent.AddObject(AObject)'#13#10+
+              '  else inherited;',
+              '  //if (AObject is TALDynamicListBoxPageView) then FContent.AddObject(AObject)'#13#10+
+              '  //else inherited;'#13#10+
+              '  inherited;');
     aSrc := FindAndReplace(
               aSrc,
               'procedure TALDynamicListBoxRangeTrackBar.TMinThumb.TouchTargetExpansionChanged(Sender: TObject);'#13#10+
@@ -402,51 +516,26 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  if LMaxThumb <> nil then'#13#10+
               '    LMaxThumb.TouchTargetExpansion := TouchTargetExpansion;'#13#10+
               'end;');
-    //--
-    aSrc := FindAndReplace(aSrc, 'procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;','//procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;');
-    aSrc := FindAndReplace(aSrc, 'property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;','//property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;');
-    //--
-    aSrc := FindAndReplace(aSrc, 'Locked := True;', '//Locked := True;');
-    //--
-    aSrc := FindAndReplace(aSrc, 'procedure SetNewScene(AScene: IScene); override;','//procedure SetNewScene(AScene: IScene); override;');
-    aSrc := FindAndReplace(aSrc, '(scene <> nil) and // SetNewScene will call again AdjustSize', '//(scene <> nil) and // SetNewScene will call again AdjustSize');
     aSrc := FindAndReplace(
               aSrc,
               '  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and'+#13#10+
               '     (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then begin',
               '  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (OwnerListBox <> nil) and'+#13#10+
               '     (not (Sender is TALDynamicListBoxControl) or ((Sender as TALDynamicListBoxControl).OwnerListBox = OwnerListBox)) then begin');
-    //--
-    aSrc := FindAndReplace(aSrc, 'FTrack.Parent := self;','//FTrack.Parent := self;');
-    aSrc := FindAndReplace(aSrc, 'FTrack.Stored := False;','//FTrack.Stored := False;');
-    aSrc := FindAndReplace(aSrc, 'FTrack.SetSubComponent(True);','//FTrack.SetSubComponent(True);');
-    aSrc := FindAndReplace(aSrc, 'FTrack.Name := ''Track'';','//FTrack.Name := ''Track'';');
-    aSrc := FindAndReplace(aSrc, 'FThumb.Parent := FTrack;','//FThumb.Parent := FTrack;');
-    aSrc := FindAndReplace(aSrc, 'FThumb.Stored := False;','//FThumb.Stored := False;');
-    aSrc := FindAndReplace(aSrc, 'FThumb.SetSubComponent(True);','//FThumb.SetSubComponent(True);');
-    aSrc := FindAndReplace(aSrc, 'FThumb.Name := ''Thumb'';','//FThumb.Name := ''Thumb'';');
-    aSrc := FindAndReplace(aSrc, 'Result.Parent := self;','//Result.Parent := self;');
-    aSrc := FindAndReplace(aSrc, 'Result.Stored := False;','//Result.Stored := False;');
-    aSrc := FindAndReplace(aSrc, 'Result.SetSubComponent(True);','//Result.SetSubComponent(True);');
-    //--
-    aSrc := FindAndReplace(aSrc, 'SetAcceptsControls(False);', '//SetAcceptsControls(False);');
-    aSrc := FindAndReplace(aSrc, 'function GetParentedVisible: Boolean; override;','//function GetParentedVisible: Boolean; override;');
-    aSrc := FindAndReplace(aSrc, 'procedure DoRootChanged; override;','//procedure DoRootChanged; override;');
-    aSrc := FindAndReplace(aSrc, 'procedure Loaded; override;', '//procedure Loaded; override;');
-    aSrc := FindAndReplace(aSrc, 'Create(AOwner: TComponent)', 'Create(const AOwner: TObject)');
-    aSrc := FindAndReplace(aSrc, 'procedure SetName(const Value: TComponentName); override;','//procedure SetName(const Value: TComponentName); override;');
-    //--
-    aSrc := FindAndReplace(aSrc, 'function HasUnconstrainedAutosizeX: Boolean; virtual;','function HasUnconstrainedAutosizeX: Boolean; override;');
-    aSrc := FindAndReplace(aSrc, 'function HasUnconstrainedAutosizeY: Boolean; virtual;','function HasUnconstrainedAutosizeY: Boolean; override;');
-    //--
-    aSrc := FindAndReplace(aSrc, 'if not (csLoading in ComponentState) and Assigned(FOnChange) then','//if {not (csLoading in ComponentState) and} Assigned(FOnChange) then');
-    aSrc := FindAndReplace(aSrc, 'If ([csLoading, csDestroying, csDesigning] * parent.ComponentState <> []) then Exit;','If parent.IsDestroying then Exit;');
-    aSrc := FindAndReplace(aSrc, '(not (csLoading in ComponentState)) and','//(not (csLoading in ComponentState)) and');
-    aSrc := FindAndReplace(aSrc, 'not (csDestroying in ComponentState)','not IsDestroying');
-    aSrc := FindAndReplace(aSrc, 'if csLoading in ComponentState then exit;','//if csLoading in ComponentState then exit;');
-    aSrc := FindAndReplace(aSrc, 'function IsOwnerLoading: Boolean;','//function IsOwnerLoading: Boolean;');
-    aSrc := FindAndReplace(aSrc, 'if not IsOwnerLoading then','//if not IsOwnerLoading then');
-    //--
+    aSrc := FindAndReplace(
+              aSrc,
+              '  TALDynamicListBoxPageView = class(TALDynamicListBoxBaseRectangle)',
+              '  TALDynamicListBoxPageController = class;'#13#10+
+              #13#10+
+              '  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}'#13#10+
+              '  TALDynamicListBoxPageView = class(TALDynamicListBoxBaseRectangle)');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  TALDynamicListBoxPageController = class(TALDynamicListBoxBaseRectangle, IALScrollableControl, IItemsContainer)',
+              '  TALDynamicListBoxPageViewClass = class of TALDynamicListBoxPageView;'#13#10+
+              #13#10+
+              '  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}'#13#10+
+              '  TALDynamicListBoxPageController = class(TALDynamicListBoxBaseRectangle)');
     aSrc := FindAndReplace(
               aSrc,
               '        var LALChildControl: TALDynamicListBoxControl;'+#13#10+
@@ -471,7 +560,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '        //end;'+#13#10+
               '        var LALChildControl := LChildControl;'+#13#10+
               '        var LALChildControlAlign := LALChildControl.Align;');
-    //--
     aSrc := FindAndReplace(
               aSrc,
               '  function CheckAllChildrenAreReadyToDisplay(const AControl: TControl): boolean;'+#13#10+
@@ -493,7 +581,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '      if not Result then exit;'+#13#10+
               '    end;'+#13#10+
               '  end;');
-    //--
     aSrc := FindAndReplace(
               aSrc,
               '    if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode'+#13#10+
@@ -518,13 +605,13 @@ Procedure BuildAlcinoeFMXDynamicControls;
               aSrc,
               '  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then'+#13#10+
               '  begin'+#13#10+
-              '    var R := LocalRect;'+#13#10+
+              '    var R := LocalRect.ReducePrecision;'+#13#10+
               '    system.types.InflateRect(R, -0.5, -0.5);'+#13#10+
               '    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);'+#13#10+
               '  end;',
               '  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then'+#13#10+
               '  //begin'+#13#10+
-              '  //  var R := LocalRect;'+#13#10+
+              '  //  var R := LocalRect.ReducePrecision;'+#13#10+
               '  //  system.types.InflateRect(R, -0.5, -0.5);'+#13#10+
               '  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);'+#13#10+
               '  //end;');
@@ -720,7 +807,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  //   (not (csDesigning in ComponentState)) and'+#13#10+
               '  //   (not FIsFocused) then'+#13#10+
               '  //  SetFocus;');
-
     aSrc := FindAndReplace(
               aSrc,
               '    if not (csLoading in ComponentState) then begin'+#13#10+
@@ -766,13 +852,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '      end;'+#13#10+
               '    //end;');
     //--
-    aSrc := FindAndReplace(aSrc, '(LocalRect)','(LocalRect.ReducePrecision)');
-    aSrc := FindAndReplace(aSrc, '(LocalRect,','(LocalRect.ReducePrecision,');
-    aSrc := FindAndReplace(aSrc, ' LocalRect,',' LocalRect.ReducePrecision,');
-    aSrc := FindAndReplace(aSrc, ' LocalRect;',' LocalRect.ReducePrecision;');
-    aSrc := FindAndReplace(aSrc, '.LocalRect;','.LocalRect.ReducePrecision;');
-    aSrc := FindAndReplace(aSrc, ' LocalRect'#13#10, 'LocalRect.ReducePrecision'#13#10);
-    //--
     var LSrcLst := TALStringListA.Create;
     Try
       LSrcLst.Text := aSrc;
@@ -797,11 +876,17 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetCanFocus(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetTabStop(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.TContent.IsVisibleObject(const AObject: TControl): Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetPivot: TPosition;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.SetPivot(const Value: TPosition);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.DoMatrixChanged(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetAbsoluteDisplayedRect: TRectF;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.SetName(const Value: TComponentName);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.GetItemsCount: Integer;', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.GetItem(const AIndex: Integer)', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.DoDeleteChildren;', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.GetTabListClass: TTabListClass;', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.GetTabStopController: ITabStopController;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.DelayOnResize(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.DelayOnResized(Sender: TObject);', ALTrim(LSrcLine)) > 0) then begin
@@ -856,15 +941,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicListBoxButton', 'Padding', '12{Left}, 6{Top}, 12{Right}, 6{Bottom}');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicListBoxCustomTrack.TValueIndicator', 'Margins', '6{Left}, 4{Top}, 6{Right}, 4{Bottom}');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicListBoxCustomTrack.TValueIndicator', 'Padding', '16{Left}, 12{Top}, 16{Right}, 12{Bottom}');
-    //--
-    aSrc := FindAndReplace(aSrc, 'var LHalfHeight := GetDefaultSize.Height / 2;','//var LHalfHeight := GetDefaultSize.Height / 2;');
-    aSrc := FindAndReplace(aSrc, 'var LMarginsChange := Result.Margins.OnChange;','//var LMarginsChange := Result.Margins.OnChange;');
-    aSrc := FindAndReplace(aSrc, 'Result.Margins.OnChange := nil;','//Result.Margins.OnChange := nil;');
-    aSrc := FindAndReplace(aSrc, 'Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1);','//Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1);');
-    aSrc := FindAndReplace(aSrc, 'Result.Margins.Rect := Result.Margins.DefaultValue;','//Result.Margins.Rect := Result.Margins.DefaultValue;');
-    aSrc := FindAndReplace(aSrc, 'Result.Margins.OnChange := LMarginsChange;','//Result.Margins.OnChange := LMarginsChange;');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicListBoxCustomTrack.TTrack', 'Margins', '0{Left}, 15{Top}, 0{Right}, 15{Bottom}');
-
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -984,6 +1061,7 @@ begin
   LAlcinoeFMXControlsPas := FindAndReplace(LAlcinoeFMXControlsPas, 'TALControl = class(TControl)', 'TALDynamicListBoxExtendedControl = class(TALDynamicListBoxControl)');
   LAlcinoeFMXControlsPas := FindAndReplace(LAlcinoeFMXControlsPas, ' TALControl.', ' TALDynamicListBoxExtendedControl.');
   ExtractClass(LAlcinoeFMXControlsPas, 'TALDynamicListBoxExtendedControl', LOutputInterface, LOutputImplementation);
+  ExtractClass(LAlcinoeFMXControlsPas, 'TALContent', LOutputInterface, LOutputImplementation);
   //-----
   var LAlcinoeFMXObjectsPas := ALGetStringFromFile(ALgetModulePathW + '\..\..\Source\Alcinoe.FMX.Objects.pas');
   ExtractClass(LAlcinoeFMXObjectsPas, 'TALShape', LOutputInterface, LOutputImplementation);
@@ -1017,6 +1095,12 @@ begin
   //-----
   var LAlcinoeFMXLayoutsPas := ALGetStringFromFile(ALgetModulePathW + '\..\..\Source\Alcinoe.FMX.Layouts.pas');
   ExtractClass(LAlcinoeFMXLayoutsPas, 'TALLayout', LOutputInterface, LOutputImplementation);
+  //-----
+  var LAlcinoeFMXPagecontrollerPas := ALGetStringFromFile(ALgetModulePathW + '\..\..\Source\Alcinoe.FMX.PageController.pas');
+  ExtractClass(LAlcinoeFMXPagecontrollerPas, 'TALBasePageIndicator', LOutputInterface, LOutputImplementation);
+  ExtractClass(LAlcinoeFMXPagecontrollerPas, 'TALPageIndicator', LOutputInterface, LOutputImplementation);
+  ExtractClass(LAlcinoeFMXPagecontrollerPas, 'TALPageView', LOutputInterface, LOutputImplementation);
+  ExtractClass(LAlcinoeFMXPagecontrollerPas, 'TALPageController', LOutputInterface, LOutputImplementation);
   //-----
   if (alposA(#1,LOutputInterface) > 0) or
      (alposA(#1,LOutputImplementation) > 0) then

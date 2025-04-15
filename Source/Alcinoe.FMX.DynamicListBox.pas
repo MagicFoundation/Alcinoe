@@ -5978,7 +5978,7 @@ begin
     DoRemoveControl(FControls[Index]);
 end;
 
-{*****************************************************************************************}
+{*******************************************************************************************}
 procedure TALDynamicListBoxControl.DoRemoveControl(const AControl: TALDynamicListBoxControl);
 begin
   if OwnerListBox <> nil then begin
@@ -6028,7 +6028,7 @@ begin
   DoMoveControl(AControl, LNewIndex);
 end;
 
-{*****************************************************************************************************************}
+{*******************************************************************************************************************}
 procedure TALDynamicListBoxControl.DoMoveControl(const AControl: TALDynamicListBoxControl; const ANewIndex: Integer);
 begin
   var LOldIndex := AControl.Index;
@@ -6107,7 +6107,7 @@ begin
   result := GetControlAtPos(aPos, LControlPos, ACheckHitTest);
 end;
 
-{*****************************************}
+{*****************************************************************************************}
 procedure TALDynamicListBoxControl.AddFreeNotify(const AControl: TALDynamicListBoxControl);
 begin
   if AControl <> nil then begin
@@ -6116,14 +6116,14 @@ begin
   end;
 end;
 
-{*****************************************}
+{********************************************************************************************}
 procedure TALDynamicListBoxControl.RemoveFreeNotify(const AControl: TALDynamicListBoxControl);
 begin
   if FNotifyList <> nil then
     FNotifyList.Remove(AControl);
 end;
 
-{*****************************************}
+{*******************************************************************************************}
 procedure TALDynamicListBoxControl.FreeNotification(const AObject: TALDynamicListBoxControl);
 begin
   // Virtual;
@@ -25251,7 +25251,7 @@ begin
   Result := ((FMainContent <> nil) or (FErrorContent <> nil)) and Inherited;
 end;
 
-{**************************************************************************************}
+{****************************************************************************************}
 procedure TALDynamicListBoxItem.DoRemoveControl(const AControl: TALDynamicListBoxControl);
 begin
   if Acontrol = FMainContent then FMainContent := nil
@@ -25829,7 +25829,7 @@ begin
   FOnRealign := nil;
 end;
 
-{************************************************************************************************************************}
+{**************************************************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.DoInsertControl(const AControl: TALDynamicListBoxControl; const AIndex: Integer);
 begin
   inherited;
@@ -25840,7 +25840,7 @@ begin
   Realign(AControl.Index);
 end;
 
-{*************************************************************************************************}
+{***************************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.DoRemoveControl(const AControl: TALDynamicListBoxControl);
 begin
   inherited;
@@ -26295,7 +26295,7 @@ begin
   end;
 end;
 
-{**************************************************************************************}
+{****************************************************************************************}
 procedure TALDynamicListBoxView.DoRemoveControl(const AControl: TALDynamicListBoxControl);
 begin
   if Acontrol = FNoItemsContent then FNoItemsContent := nil

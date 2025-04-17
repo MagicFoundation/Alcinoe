@@ -297,6 +297,9 @@ type
     function CreateFill: TALBrush; override;
     function CreateStroke: TALStrokeBrush; override;
     procedure ParentChanged; override;
+    {## DynamicListBox:Begin
+    function DoGetDownloadPriority: Int64; override;
+    DynamicListBox:End ##}
   public
     constructor Create(AOwner: TComponent); override;
     property PageController: TALPageController read FPageController;
@@ -1531,6 +1534,16 @@ begin
   FPageController := _FindPageController;
 end;
 
+{**********************}
+{## DynamicListBox:Begin
+function TALPageView.DoGetDownloadPriority: Int64;
+begin
+  Result := inherited;
+  if FPageController <> nil then
+    Result := Result + abs(index - FPageController.ActivePageIndex);
+end;
+DynamicListBox:End ##}
+
 {**************************************************************}
 function TALPageController.TStroke.GetDefaultColor: TAlphaColor;
 begin
@@ -2248,6 +2261,12 @@ begin
   end;
   {$ENDREGION}
 
+  // Fallback: If FScrollEngine.SetViewportPosition doesn't trigger DoChanged
+  // because the current ViewportPosition is already equal to the new one,
+  // call RefreshActivePageIndex.
+  if FActivePageIndex = -1 then
+    RefreshActivePageIndex
+
 end;
 
 {****************************************************************}
@@ -2451,10 +2470,10 @@ end;
 procedure TALPageController.DoRealign;
 begin
   if CSLoading in componentState then exit;
+  Inherited;
   if fDisableAlign then exit;
   fDisableAlign := True;
   try
-
     If orientation = Torientation.Horizontal then begin
       var LPageSize: Single := GetPageSize;
       var LCurrX: Single := 0;
@@ -2740,7 +2759,8 @@ begin
     var LActivePageIndex := ActivePageIndex;
     if LActivePageIndex >= LIndex then Inc(LActivePageIndex);
     FContent.InsertObject(Lindex, Result);
-    ActivePageIndex := LActivePageIndex;
+    if LActivePageIndex >= 0 then ActivePageIndex := LActivePageIndex
+    else ActivePageIndex := 0;
   except
     ALFreeAndNil(Result);
     Raise;

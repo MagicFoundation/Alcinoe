@@ -576,20 +576,19 @@ type
       TAutoStartMode = (None, WhenPrepared, WhenDisplayed);
   protected
     type
-      TPreviewDownloadContext = Class(TObject)
+      TPreviewDownloadContext = Class(TALDownloadContext)
       private
-        Lock: TObject;
-        FreeByThread: Boolean;
+        function GetOwner: TALVideoPlayerSurface;
       public
-        Owner: TALVideoPlayerSurface;
         Rect: TRectF;
         Scale: Single;
         AlignToPixel: Boolean;
         ResourceName: String;
         ResourceStream: TStream;
         WrapMode: TALImageWrapMode;
-        constructor Create(const AOwner: TALVideoPlayerSurface); virtual;
+        constructor Create(const AOwner: TALVideoPlayerSurface); reintroduce; virtual;
         destructor Destroy; override;
+        Property Owner: TALVideoPlayerSurface read GetOwner;
       End;
   private
     class var AutoStartedVideoPlayerSurface: TALVideoPlayerSurface;
@@ -602,7 +601,8 @@ type
     FInternalState: Integer; // 4 Bytes
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
-    FWrapMode: TALImageWrapMode; // 1 bytes
+    FWrapMode: TALImageWrapMode; // 1 byte
+    FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
@@ -667,6 +667,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -2840,95 +2841,103 @@ begin
     End;
 
     var LEngine := GetEngine(LCommand.EngineIndex);
-    case LCommand.Request.Operation of
+    if (LEngine.CoreVideoPlayer <> nil) or
+       (LCommand.Request.Operation in [TOperation.CreateEngine,
+                                       TOperation.ReleaseEngine]) then begin
 
-      TOperation.CreateEngine: begin
-        var LVideoPlayer := TALVideoPlayer.Create;
-        LVideoPlayer.Tag := LCommand.EngineIndex;
-        LVideoPlayer.OnError := DoOnError;
-        LVideoPlayer.OnPrepared := DoOnPrepared;
-        LVideoPlayer.OnFrameAvailable := DoOnFrameAvailable;
-        LVideoPlayer.OnCompletion := DoOnCompletion;
-        LVideoPlayer.OnVideoSizeChanged := DoOnVideoSizeChanged;
-        TMonitor.Enter(LEngine);
-        Try
-          {$IF defined(DEBUG)}
-          if LEngine.EmptySlot then Raise Exception.Create('Error 077B6931-5B11-4DCB-B716-93FB469C3999');
-          if LEngine.CoreVideoPlayer <> nil then Raise Exception.Create('Error 25024169-E620-44E9-A739-8813EDC26D56');
-          {$ENDIF}
-          LEngine.CoreVideoPlayer := LVideoPlayer;
-        Finally
-          Tmonitor.Exit(LEngine);
-        End;
+      case LCommand.Request.Operation of
+
+        TOperation.CreateEngine: begin
+          if LEngine.ProxyVideoPlayer <> nil then begin
+            var LVideoPlayer := TALVideoPlayer.Create;
+            LVideoPlayer.Tag := LCommand.EngineIndex;
+            LVideoPlayer.OnError := DoOnError;
+            LVideoPlayer.OnPrepared := DoOnPrepared;
+            LVideoPlayer.OnFrameAvailable := DoOnFrameAvailable;
+            LVideoPlayer.OnCompletion := DoOnCompletion;
+            LVideoPlayer.OnVideoSizeChanged := DoOnVideoSizeChanged;
+            TMonitor.Enter(LEngine);
+            Try
+              {$IF defined(DEBUG)}
+              if LEngine.EmptySlot then Raise Exception.Create('Error 077B6931-5B11-4DCB-B716-93FB469C3999');
+              if LEngine.CoreVideoPlayer <> nil then Raise Exception.Create('Error 25024169-E620-44E9-A739-8813EDC26D56');
+              {$ENDIF}
+              LEngine.CoreVideoPlayer := LVideoPlayer;
+            Finally
+              Tmonitor.Exit(LEngine);
+            End;
+          end;
+        end;
+
+        TOperation.ReleaseEngine: begin
+          TMonitor.Enter(LEngine);
+          Try
+            {$IF defined(DEBUG)}
+            if LEngine.EmptySlot then Raise Exception.Create('Error FE6C5764-EFC5-4DE7-815F-4F12B469B2FE');
+            if LEngine.ProxyVideoPlayer <> nil then Raise Exception.Create('Error A6BAEDE9-E779-45E4-9581-7D4851505EF2');
+            {$ENDIF}
+            ALFreeAndNil(LEngine.CoreVideoPlayer);
+            LEngine.EmptySlot := True;
+          Finally
+            Tmonitor.Exit(LEngine);
+          End;
+        end;
+
+        TOperation.GetState:
+          LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetState;
+
+        TOperation.GetIsPlaying:
+          LCommand.Response.Resultboolean := LEngine.CoreVideoPlayer.GetIsPlaying;
+
+        TOperation.GetLooping:
+          LCommand.Response.ResultBoolean := LEngine.CoreVideoPlayer.GetLooping;
+
+        TOperation.SetLooping:
+          LEngine.CoreVideoPlayer.SetLooping(LCommand.Request.Param1Boolean);
+
+        TOperation.GetVolume:
+          LCommand.Response.ResultSingle := LEngine.CoreVideoPlayer.GetVolume;
+
+        TOperation.SetVolume:
+          LEngine.CoreVideoPlayer.SetVolume(LCommand.Request.Param1Single);
+
+        TOperation.GetPlaybackSpeed:
+          LCommand.Response.ResultSingle := LEngine.CoreVideoPlayer.GetPlaybackSpeed;
+
+        TOperation.SetPlaybackSpeed:
+          LEngine.CoreVideoPlayer.SetPlaybackSpeed(LCommand.Request.Param1single);
+
+        TOperation.GetCurrentPosition:
+          LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetCurrentPosition;
+
+        TOperation.GetDuration:
+          LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetDuration;
+
+        TOperation.GetVideoHeight:
+          LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetVideoHeight;
+
+        TOperation.GetVideoWidth:
+          LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetVideoWidth;
+
+        TOperation.Prepare:
+          LEngine.CoreVideoPlayer.Prepare(LCommand.Request.Param1String);
+
+        TOperation.Start:
+          LEngine.CoreVideoPlayer.Start;
+
+        TOperation.Pause:
+          LEngine.CoreVideoPlayer.Pause;
+
+        TOperation.Stop:
+          LEngine.CoreVideoPlayer.Stop;
+
+        TOperation.SeekTo:
+          LEngine.CoreVideoPlayer.SeekTo(LCommand.Request.Param1Int64);
+
+        else
+          raise Exception.Create('Error 9911E409-C4EB-432C-A56C-44F9EE3CA8EC');
+
       end;
-
-      TOperation.ReleaseEngine: begin
-        TMonitor.Enter(LEngine);
-        Try
-          {$IF defined(DEBUG)}
-          if LEngine.EmptySlot then Raise Exception.Create('Error FE6C5764-EFC5-4DE7-815F-4F12B469B2FE');
-          if LEngine.ProxyVideoPlayer <> nil then Raise Exception.Create('Error A6BAEDE9-E779-45E4-9581-7D4851505EF2');
-          {$ENDIF}
-          ALFreeAndNil(LEngine.CoreVideoPlayer);
-          LEngine.EmptySlot := True;
-        Finally
-          Tmonitor.Exit(LEngine);
-        End;
-      end;
-
-      TOperation.GetState:
-        LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetState;
-
-      TOperation.GetIsPlaying:
-        LCommand.Response.Resultboolean := LEngine.CoreVideoPlayer.GetIsPlaying;
-
-      TOperation.GetLooping:
-        LCommand.Response.ResultBoolean := LEngine.CoreVideoPlayer.GetLooping;
-
-      TOperation.SetLooping:
-        LEngine.CoreVideoPlayer.SetLooping(LCommand.Request.Param1Boolean);
-
-      TOperation.GetVolume:
-        LCommand.Response.ResultSingle := LEngine.CoreVideoPlayer.GetVolume;
-
-      TOperation.SetVolume:
-        LEngine.CoreVideoPlayer.SetVolume(LCommand.Request.Param1Single);
-
-      TOperation.GetPlaybackSpeed:
-        LCommand.Response.ResultSingle := LEngine.CoreVideoPlayer.GetPlaybackSpeed;
-
-      TOperation.SetPlaybackSpeed:
-        LEngine.CoreVideoPlayer.SetPlaybackSpeed(LCommand.Request.Param1single);
-
-      TOperation.GetCurrentPosition:
-        LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetCurrentPosition;
-
-      TOperation.GetDuration:
-        LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetDuration;
-
-      TOperation.GetVideoHeight:
-        LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetVideoHeight;
-
-      TOperation.GetVideoWidth:
-        LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetVideoWidth;
-
-      TOperation.Prepare:
-        LEngine.CoreVideoPlayer.Prepare(LCommand.Request.Param1String);
-
-      TOperation.Start:
-        LEngine.CoreVideoPlayer.Start;
-
-      TOperation.Pause:
-        LEngine.CoreVideoPlayer.Pause;
-
-      TOperation.Stop:
-        LEngine.CoreVideoPlayer.Stop;
-
-      TOperation.SeekTo:
-        LEngine.CoreVideoPlayer.SeekTo(LCommand.Request.Param1Int64);
-
-      else
-        raise Exception.Create('Error 9911E409-C4EB-432C-A56C-44F9EE3CA8EC');
 
     end;
 
@@ -3276,7 +3285,6 @@ begin
   TMonitor.Enter(LEngine);
   try
     {$IF defined(DEBUG)}
-    if LEngine.CoreVideoPlayer = nil then Raise Exception.Create('Error 564F7439-CD74-45BC-B420-A0728B2EA3CB');
     if LEngine.ProxyVideoPlayer = nil then Raise Exception.Create('Error B0E9E26E-959E-4426-B82B-7406DBDDE659');
     {$ENDIF}
     LEngine.ProxyVideoPlayer := nil;
@@ -3403,24 +3411,26 @@ end;
 {****************************************************************************************************}
 constructor TALVideoPlayerSurface.TPreviewDownloadContext.Create(const AOwner: TALVideoPlayerSurface);
 begin
-  inherited Create;
-  Lock := TObject.Create;
-  FreeByThread := True;
-  Owner := AOwner;
-  Rect := Owner.LocalRect;
+  inherited Create(AOwner);
+  Rect := AOwner.LocalRect;
   Scale := ALGetScreenScale;
-  AlignToPixel := Owner.IsPixelAlignmentEnabled;
-  ResourceName := Owner.PreviewResourceName;
+  AlignToPixel := AOwner.IsPixelAlignmentEnabled;
+  ResourceName := AOwner.PreviewResourceName;
   ResourceStream := nil;
-  WrapMode := Owner.WrapMode;
+  WrapMode := AOwner.WrapMode;
 end;
 
 {***************************************************************}
 destructor TALVideoPlayerSurface.TPreviewDownloadContext.Destroy;
 begin
-  ALFreeAndNil(Lock);
   ALFreeAndNil(ResourceStream);
   inherited
+end;
+
+{*************************************************************************************}
+function TALVideoPlayerSurface.TPreviewDownloadContext.GetOwner: TALVideoPlayerSurface;
+begin
+  Result := TALVideoPlayerSurface(FOwner);
 end;
 
 {***********************************************************}
@@ -3441,6 +3451,7 @@ begin
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
   FWrapMode := TALImageWrapMode.Fit;
+  FReadyAfterResourcesLoaded := False;
   FCacheIndex := 0;
   FCacheEngine := nil;
   FPreviewDownloadContext := nil;
@@ -3474,7 +3485,7 @@ end;
 function TALVideoPlayerSurface.IsReadyToDisplay: Boolean;
 begin
   Result := Inherited and
-            (FPreviewDownloadContext = nil) and
+            ((not FReadyAfterResourcesLoaded) or (FPreviewDownloadContext = nil)) and
             ((FFadeInStartTimeNano <= 0) or
              ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
@@ -3800,12 +3811,12 @@ begin
   // to lock its access for reading or updating.
   if FPreviewDownloadContext <> nil then begin
     var LContextToFree: TPreviewDownloadContext;
-    var LLock := FPreviewDownloadContext.lock;
+    var LLock := FPreviewDownloadContext.FLock;
     TMonitor.Enter(LLock);
     try
-      if not FPreviewDownloadContext.FreeByThread then LContextToFree := FPreviewDownloadContext
+      if not FPreviewDownloadContext.FFreeByThread then LContextToFree := FPreviewDownloadContext
       else LContextToFree := nil;
-      FPreviewDownloadContext.Owner := nil;
+      FPreviewDownloadContext.FOwner := nil;
       FPreviewDownloadContext := nil;
     Finally
       TMonitor.Exit(LLock);
@@ -3818,7 +3829,7 @@ end;
 //[MultiThread]
 class function TALVideoPlayerSurface.CanStartPreviewDownload(var AContext: Tobject): boolean;
 begin
-  result := TPreviewDownloadContext(AContext).owner <> nil;
+  result := TPreviewDownloadContext(AContext).FOwner <> nil;
 end;
 
 {*************}
@@ -3826,7 +3837,7 @@ end;
 class procedure TALVideoPlayerSurface.HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
 begin
   var LContext := TPreviewDownloadContext(AContext);
-  if LContext.owner = nil then exit;
+  if LContext.FOwner = nil then exit;
   LContext.ResourceStream := AContentStream;
   TALGraphicThreadPool.Instance.ExecuteProc(
     CreateBufDrawable, // const AProc: TALWorkerThreadProc;
@@ -3841,7 +3852,7 @@ end;
 class procedure TALVideoPlayerSurface.HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject);
 begin
   var LContext := TPreviewDownloadContext(AContext);
-  if LContext.owner = nil then exit;
+  if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
   TMonitor.Enter(LContext.Lock);
   try
@@ -3860,14 +3871,14 @@ begin
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
-    TMonitor.Enter(LContext.Lock);
+    TMonitor.Enter(LContext.FLock);
     try
-      if LContext.Owner <> nil then begin
-        LContext.FreeByThread := False;
+      if LContext.FOwner <> nil then begin
+        LContext.FFreeByThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      TMonitor.Exit(LContext.Lock);
+      TMonitor.Exit(LContext.FLock);
     end;
     exit;
   end;
@@ -3904,7 +3915,7 @@ end;
 class Procedure TALVideoPlayerSurface.CreateBufDrawable(var AContext: TObject);
 begin
   var LContext := TPreviewDownloadContext(AContext);
-  if LContext.owner = nil then exit;
+  if LContext.FOwner = nil then exit;
   var LBufDrawable: TALDrawable := ALNullDrawable;
   var LBufDrawableRect: TRectF;
   Try
@@ -3926,19 +3937,20 @@ begin
   TThread.queue(nil,
     procedure
     begin
-      if LContext.Owner <> nil then begin
-        if (LContext.Owner.FFadeInDuration > 0) and
+      if LContext.FOwner <> nil then begin
+        var LOwner := LContext.Owner;
+        if (LOwner.FFadeInDuration > 0) and
            (LContext.ResourceName <> ALBrokenImageResourceName) and
            (not ALIsDrawableNull(LBufDrawable)) and
-           (ALIsDrawableNull(LContext.Owner.fVideoPlayerEngine.Drawable)) then
-          LContext.Owner.FFadeInStartTimeNano := ALElapsedTimeNano
+           (ALIsDrawableNull(LOwner.fVideoPlayerEngine.Drawable)) then
+          LOwner.FFadeInStartTimeNano := ALElapsedTimeNano
         else
-          LContext.Owner.FFadeInStartTimeNano := 0;
-        ALFreeAndNilDrawable(LContext.Owner.fBufDrawable);
-        LContext.Owner.fBufDrawable := LBufDrawable;
-        LContext.Owner.FBufDrawableRect := LBufDrawableRect;
-        LContext.Owner.FPreviewDownloadContext := nil;
-        LContext.Owner.Repaint;
+          LOwner.FFadeInStartTimeNano := 0;
+        ALFreeAndNilDrawable(LOwner.fBufDrawable);
+        LOwner.fBufDrawable := LBufDrawable;
+        LOwner.FBufDrawableRect := LBufDrawableRect;
+        LOwner.FPreviewDownloadContext := nil;
+        LOwner.Repaint;
       end;
       ALFreeAndNil(LContext);
     end);

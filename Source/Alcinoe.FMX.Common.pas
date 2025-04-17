@@ -132,12 +132,6 @@ type
 
 type
 
-  {~~~~~~~~~~~~~~~}
-  TALBrush = Class;
-  TALStateLayer = Class;
-  TALStrokeBrush = class;
-  TALShadow = class;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALScrollableControl = interface
     ['{6750E04D-8DB6-4F27-898A-B20AD55CAAF4}']
@@ -157,6 +151,25 @@ type
     function GetNativeView: TALWinNativeView;
     {$ENDIF}
   end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDownloadContext = Class(TObject)
+  protected
+    FLock: TObject;
+    FFreeByThread: Boolean;
+    FOwner: TObject;
+  public
+    constructor Create(const AOwner: TObject); virtual;
+    destructor Destroy; override;
+  End;
+
+type
+
+  {~~~~~~~~~~~~~~~}
+  TALBrush = Class;
+  TALStateLayer = Class;
+  TALStrokeBrush = class;
+  TALShadow = class;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALPersistentObserver = class(TPersistent)
@@ -1355,6 +1368,22 @@ uses
   Alcinoe.HTTP.Client,
   Alcinoe.stringList,
   ALcinoe.StringUtils;
+
+{***********************************************************}
+constructor TALDownloadContext.Create(const AOwner: TObject);
+begin
+  inherited Create;
+  FLock := TObject.Create;
+  FFreeByThread := True;
+  FOwner := AOwner;
+end;
+
+{************************************}
+destructor TALDownloadContext.Destroy;
+begin
+  ALFreeAndNil(FLock);
+  inherited
+end;
 
 {***************************************}
 constructor TALPersistentObserver.Create;

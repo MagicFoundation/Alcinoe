@@ -110,12 +110,10 @@ type
       end;
   protected
     type
-      TResourceDownloadContext = Class(TObject)
+      TResourceDownloadContext = Class(TALDownloadContext)
       private
-        Lock: TObject;
-        FreeByThread: Boolean;
+        function GetOwner: TALImage;
       public
-        Owner: TALImage;
         Rect: TRectF;
         Scale: Single;
         AlignToPixel: Boolean;
@@ -138,8 +136,9 @@ type
         XRadius: Single;
         YRadius: Single;
         BlurRadius: single;
-        constructor Create(const AOwner: TALImage); virtual;
+        constructor Create(const AOwner: TALImage); reintroduce; virtual;
         destructor Destroy; override;
+        Property Owner: TALImage read GetOwner;
       End;
   private
     FBackgroundColor: TAlphaColor; // 4 bytes
@@ -147,6 +146,7 @@ type
     fResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
     FMaskBitmap: TALRefCountBitmap; // 8 bytes
+    FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 bytes
     fExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
     fRotateAccordingToExifOrientation: Boolean; // 1 bytes
@@ -247,6 +247,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
@@ -1450,45 +1451,47 @@ end;
 {***************************************************************************}
 constructor TALImage.TResourceDownloadContext.Create(const AOwner: TALImage);
 begin
-  inherited Create;
-  Lock := TObject.Create;
-  FreeByThread := True;
-  Owner := AOwner;
-  Rect := Owner.LocalRect;
+  inherited Create(AOwner);
+  Rect := AOwner.LocalRect;
   Scale := ALGetScreenScale;
-  AlignToPixel := Owner.IsPixelAlignmentEnabled;
-  Color := Owner.BackgroundColor;
-  ResourceName := Owner.ResourceName;
+  AlignToPixel := AOwner.IsPixelAlignmentEnabled;
+  Color := AOwner.BackgroundColor;
+  ResourceName := AOwner.ResourceName;
   ResourceStream := nil;
-  MaskResourceName := Owner.MaskResourceName;
-  MaskBitmap := Owner.MaskBitmap;
+  MaskResourceName := AOwner.MaskResourceName;
+  MaskBitmap := AOwner.MaskBitmap;
   if MaskBitmap <> nil then MaskBitmap.IncreaseRefCount;
-  WrapMode := Owner.WrapMode;
-  CropCenter := Owner.CropCenter.Point;
-  RotateAccordingToExifOrientation := Owner.RotateAccordingToExifOrientation;
-  StrokeColor := Owner.Stroke.Color;
-  StrokeThickness := Owner.Stroke.Thickness;
-  ShadowBlur := Owner.Shadow.Blur;
-  ShadowOffsetX := Owner.Shadow.OffsetX;
-  ShadowOffsetY := Owner.Shadow.OffsetY;
-  ShadowColor := Owner.Shadow.Color;
-  Corners := Owner.Corners;
-  Sides := Owner.Sides;
-  XRadius := Owner.XRadius;
-  YRadius := Owner.YRadius;
-  BlurRadius := Owner.BlurRadius;
+  WrapMode := AOwner.WrapMode;
+  CropCenter := AOwner.CropCenter.Point;
+  RotateAccordingToExifOrientation := AOwner.RotateAccordingToExifOrientation;
+  StrokeColor := AOwner.Stroke.Color;
+  StrokeThickness := AOwner.Stroke.Thickness;
+  ShadowBlur := AOwner.Shadow.Blur;
+  ShadowOffsetX := AOwner.Shadow.OffsetX;
+  ShadowOffsetY := AOwner.Shadow.OffsetY;
+  ShadowColor := AOwner.Shadow.Color;
+  Corners := AOwner.Corners;
+  Sides := AOwner.Sides;
+  XRadius := AOwner.XRadius;
+  YRadius := AOwner.YRadius;
+  BlurRadius := AOwner.BlurRadius;
 end;
 
 {***************************************************}
 destructor TALImage.TResourceDownloadContext.Destroy;
 begin
-  ALFreeAndNil(Lock);
   ALFreeAndNil(ResourceStream);
   if MaskBitmap <> nil then begin
     MaskBitmap.DecreaseRefCount;
     MaskBitmap := nil;
   end;
   inherited
+end;
+
+{************************************************************}
+function TALImage.TResourceDownloadContext.GetOwner: TALImage;
+begin
+  Result := TALImage(FOwner);
 end;
 
 {**********************************************}
@@ -1500,6 +1503,7 @@ begin
   fResourceName := '';
   FMaskResourceName := '';
   FMaskBitmap := nil;
+  FReadyAfterResourcesLoaded := False;
   FWrapMode := TALImageWrapMode.Fit;
   fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   fRotateAccordingToExifOrientation := False;
@@ -1541,7 +1545,7 @@ end;
 function TALImage.IsReadyToDisplay: Boolean;
 begin
   Result := Inherited and
-            (FResourceDownloadContext = nil) and
+            ((not FReadyAfterResourcesLoaded) or (FResourceDownloadContext = nil)) and
             ((FFadeInStartTimeNano <= 0) or
              ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
@@ -1890,12 +1894,12 @@ begin
   // to lock its access for reading or updating.
   if FResourceDownloadContext <> nil then begin
     var LContextToFree: TResourceDownloadContext;
-    var LLock := FResourceDownloadContext.lock;
+    var LLock := FResourceDownloadContext.FLock;
     TMonitor.Enter(LLock);
     try
-      if not FResourceDownloadContext.FreeByThread then LContextToFree := FResourceDownloadContext
+      if not FResourceDownloadContext.FFreeByThread then LContextToFree := FResourceDownloadContext
       else LContextToFree := nil;
-      FResourceDownloadContext.Owner := nil;
+      FResourceDownloadContext.FOwner := nil;
       FResourceDownloadContext := nil;
     Finally
       TMonitor.Exit(LLock);
@@ -1908,7 +1912,7 @@ end;
 //[MultiThread]
 class function TALImage.CanStartResourceDownload(var AContext: Tobject): boolean;
 begin
-  result := TResourceDownloadContext(AContext).owner <> nil;
+  result := TResourceDownloadContext(AContext).FOwner <> nil;
 end;
 
 {*************}
@@ -1916,7 +1920,7 @@ end;
 class procedure TALImage.HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
 begin
   var LContext := TResourceDownloadContext(AContext);
-  if LContext.owner = nil then exit;
+  if LContext.FOwner = nil then exit;
   LContext.ResourceStream := AContentStream;
   TALGraphicThreadPool.Instance.ExecuteProc(
     CreateBufDrawable, // const AProc: TALWorkerThreadProc;
@@ -1931,7 +1935,7 @@ end;
 class procedure TALImage.HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject);
 begin
   var LContext := TResourceDownloadContext(AContext);
-  if LContext.owner = nil then exit;
+  if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
   TMonitor.Enter(LContext.Lock);
   try
@@ -1950,14 +1954,14 @@ begin
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
-    TMonitor.Enter(LContext.Lock);
+    TMonitor.Enter(LContext.FLock);
     try
-      if LContext.Owner <> nil then begin
-        LContext.FreeByThread := False;
+      if LContext.FOwner <> nil then begin
+        LContext.FFreeByThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      TMonitor.Exit(LContext.Lock);
+      TMonitor.Exit(LContext.FLock);
     end;
     exit;
   end;
@@ -2010,7 +2014,7 @@ end;
 class Procedure TALImage.CreateBufDrawable(var AContext: TObject);
 begin
   var LContext := TResourceDownloadContext(AContext);
-  if LContext.owner = nil then exit;
+  if LContext.FOwner = nil then exit;
   var LBufDrawable: TALDrawable := ALNullDrawable;
   var LBufDrawableRect: TRectF;
   var LExifOrientationInfo: TalExifOrientationInfo;
@@ -2050,22 +2054,23 @@ begin
   TThread.queue(nil,
     procedure
     begin
-      if LContext.Owner <> nil then begin
-        if (LContext.Owner.FFadeInDuration > 0) and
+      if LContext.FOwner <> nil then begin
+        var LOwner := LContext.Owner;
+        if (LOwner.FFadeInDuration > 0) and
            (LContext.ResourceName <> ALBrokenImageResourceName) and
            (not ALIsDrawableNull(LBufDrawable)) then begin
-          LContext.Owner.FFadeInStartTimeNano := ALElapsedTimeNano;
+          LOwner.FFadeInStartTimeNano := ALElapsedTimeNano;
         end
         else begin
-          ALFreeAndNilDrawable(LContext.Owner.fBufLoadingDrawable);
-          LContext.Owner.FFadeInStartTimeNano := 0;
+          ALFreeAndNilDrawable(LOwner.fBufLoadingDrawable);
+          LOwner.FFadeInStartTimeNano := 0;
         end;
-        ALFreeAndNilDrawable(LContext.Owner.fBufDrawable);
-        LContext.Owner.fBufDrawable := LBufDrawable;
-        LContext.Owner.FBufDrawableRect := LBufDrawableRect;
-        LContext.Owner.FExifOrientationInfo := LExifOrientationInfo;
-        LContext.Owner.FResourceDownloadContext := nil;
-        LContext.Owner.Repaint;
+        ALFreeAndNilDrawable(LOwner.fBufDrawable);
+        LOwner.fBufDrawable := LBufDrawable;
+        LOwner.FBufDrawableRect := LBufDrawableRect;
+        LOwner.FExifOrientationInfo := LExifOrientationInfo;
+        LOwner.FResourceDownloadContext := nil;
+        LOwner.Repaint;
       end;
       ALFreeAndNil(LContext);
     end);

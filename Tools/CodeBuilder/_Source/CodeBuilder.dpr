@@ -265,6 +265,9 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, ' property OnKeyUp', ' //property OnKeyUp');
     aSrc := FindAndReplace(aSrc, ' property OnResize', ' //property OnResize');
     //--
+    aSrc := FindAndReplace(aSrc, '{## DynamicListBox:Begin', '// DynamicListBox:Begin');
+    aSrc := FindAndReplace(aSrc, 'DynamicListBox:End ##}', '// DynamicListBox:End');
+    aSrc := FindAndReplace(aSrc, 'result := TALNetHttpClientPool.Instance.PriorityStartingPoint;','result := GetDownloadPriority(AContext)');
     aSrc := FindAndReplace(aSrc, 'if not Supports(aObject, IALNativeControl) then','//if not Supports(aObject, IALNativeControl) then');
     aSrc := FindAndReplace(aSrc, '_TControlAccessProtected(aObject)','aObject');
     aSrc := FindAndReplace(aSrc, 'FContent.InsertObject(Lindex, Result);','FContent.InsertControl(Result, Lindex);');
@@ -362,7 +365,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'FFocusOnMouseUp := False;','//FFocusOnMouseUp := False;');
     aSrc := FindAndReplace(aSrc, 'property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;','//property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;');
     aSrc := FindAndReplace(aSrc, 'function GetAlign: TALAlignLayout; Reintroduce;','//function GetAlign: TALAlignLayout; Reintroduce;');
-    aSrc := FindAndReplace(aSrc, 'procedure ParentChanged; override;','//procedure ParentChanged; override;');
     aSrc := FindAndReplace(aSrc, 'procedure MakeBufDrawable; virtual;','procedure MakeBufDrawable; override;', 'TALDynamicListBoxExtendedControl = class(TALDynamicListBoxControl)', 'end;');
     aSrc := FindAndReplace(aSrc, 'procedure ClearBufDrawable; virtual;','procedure ClearBufDrawable; override;', 'TALDynamicListBoxExtendedControl = class(TALDynamicListBoxControl)', 'end;');
     aSrc := FindAndReplace(aSrc, 'procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;','//procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;');
@@ -452,6 +454,17 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, ' LocalRect;',' LocalRect.ReducePrecision;');
     aSrc := FindAndReplace(aSrc, '.LocalRect;','.LocalRect.ReducePrecision;');
     aSrc := FindAndReplace(aSrc, ' LocalRect'#13#10, 'LocalRect.ReducePrecision'#13#10);
+    aSrc := FindAndReplace(aSrc, 'Result := LPageViewClass.Create(Self);','Result := LPageViewClass.Create(nil);');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  if (OwnerControl <> nil) and (OwnerControl is TALDynamicListBoxControl) then'#13#10+
+              '    FOwnerControl := TALDynamicListBoxControl(OwnerControl)'#13#10+
+              '  else'#13#10+
+              '    //FOwnerControl := nil;',
+              '  //if (OwnerControl <> nil) and (OwnerControl is TALDynamicListBoxControl) then'#13#10+
+              '  //  FOwnerControl := TALDynamicListBoxControl(OwnerControl)'#13#10+
+              '  //else'#13#10+
+              '  //  FOwnerControl := nil;');
     aSrc := FindAndReplace(
               aSrc,
               '  if not (csLoading in componentState) then'#13#10+
@@ -872,7 +885,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('.IsFocusedChanged;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.MarginsChangedHandler(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.MarginsChanged;', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('.ParentChanged;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetCanFocus(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetTabStop(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or

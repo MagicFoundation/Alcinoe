@@ -32,6 +32,7 @@ type
     FOnSuccessCallBackObjProc: TALNetHttpClientPoolOnSuccessObjProc;
     FOnErrorCallBackRefProc: TALNetHttpClientPoolOnErrorRefProc;
     FOnErrorCallBackObjProc: TALNetHttpClientPoolOnErrorObjProc;
+    FGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
     FContext: Tobject;
     FUseCache: Boolean;
   public
@@ -40,6 +41,7 @@ type
                   const ACanStartCallBack: TALNetHttpClientPoolCanStartRefFunc;
                   const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessRefProc;
                   const AOnErrorCallBack: TALNetHttpClientPoolOnErrorRefProc;
+                  const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                   const AContext: Tobject;
                   const AUseCache: Boolean); overload;
     constructor Create(
@@ -47,6 +49,7 @@ type
                   const ACanStartCallBack: TALNetHttpClientPoolCanStartObjFunc;
                   const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessObjProc;
                   const AOnErrorCallBack: TALNetHttpClientPoolOnErrorObjProc;
+                  const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                   const AContext: Tobject;
                   const AUseCache: Boolean); overload;
     destructor Destroy; override;
@@ -57,6 +60,7 @@ type
     Property OnSuccessCallBackObjProc: TALNetHttpClientPoolOnSuccessObjProc read FOnSuccessCallBackObjProc;
     Property OnErrorCallBackRefProc: TALNetHttpClientPoolOnErrorRefProc read FOnErrorCallBackRefProc;
     Property OnErrorCallBackObjProc: TALNetHttpClientPoolOnErrorObjProc read FOnErrorCallBackObjProc;
+    Property GetPriorityFunc: TALWorkerThreadGetPriorityFunc read FGetPriorityFunc;
     Property Context: Tobject read FContext;
     Property UseCache: Boolean read FUseCache;
   end;
@@ -77,6 +81,7 @@ type
   private
     FCacheData: TALNetHttpClientPoolCacheDataProc;
     FRetrieveCachedData: TALNetHttpClientPoolRetrieveCachedDataProc;
+    function DoGetPriority(const AContext: Tobject): Int64;
     procedure DoGet(var AContext: Tobject);
   protected
   public
@@ -218,6 +223,7 @@ constructor TALNetHttpClientPoolRequest.Create(
               const ACanStartCallBack: TALNetHttpClientPoolCanStartRefFunc;
               const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessRefProc;
               const AOnErrorCallBack: TALNetHttpClientPoolOnErrorRefProc;
+              const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
               const AContext: Tobject;
               const AUseCache: Boolean);
 begin
@@ -229,6 +235,7 @@ begin
   FOnSuccessCallBackObjProc := nil;
   FOnErrorCallBackRefProc := AOnErrorCallBack;
   FOnErrorCallBackObjProc := nil;
+  FGetPriorityFunc := AGetPriorityFunc;
   FContext := AContext;
   FUseCache := AUseCache;
 end;
@@ -239,6 +246,7 @@ constructor TALNetHttpClientPoolRequest.Create(
               const ACanStartCallBack: TALNetHttpClientPoolCanStartObjFunc;
               const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessObjProc;
               const AOnErrorCallBack: TALNetHttpClientPoolOnErrorObjProc;
+              const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
               const AContext: Tobject;
               const AUseCache: Boolean);
 begin
@@ -250,6 +258,7 @@ begin
   FOnSuccessCallBackObjProc := AOnSuccessCallBack;
   FOnErrorCallBackRefProc := nil;
   FOnErrorCallBackObjProc := AOnErrorCallBack;
+  FGetPriorityFunc := AGetPriorityFunc;
   FContext := AContext;
   FUseCache := AUseCache;
 end;
@@ -285,7 +294,19 @@ begin
   result := FInstance <> nil;
 end;
 
-{**********************************************************}
+{*************}
+//[MultiThread]
+function TALNetHttpClientPool.DoGetPriority(const AContext: Tobject): Int64;
+begin
+  var LNetHttpClientPoolRequest := TALNetHttpClientPoolRequest(AContext);
+  if assigned(LNetHttpClientPoolRequest.GetPriorityFunc) then
+    Result := LNetHttpClientPoolRequest.GetPriorityFunc(LNetHttpClientPoolRequest.FContext)
+  else
+    Result := 0;
+end;
+
+{*************}
+//[MultiThread]
 procedure TALNetHttpClientPool.DoGet(var AContext: Tobject);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -390,6 +411,7 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      nil,
       AContext,
       AUseCache), // const AContext: Tobject;
     APriority, // const APriority: Int64;
@@ -414,9 +436,10 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      APriority,
       AContext,
       AUseCache), // const AContext: Tobject;
-    APriority, // const APriority: TALWorkerThreadGetPriorityFunc;
+    DoGetPriority, // const APriority: TALWorkerThreadGetPriorityFunc;
     AAsync); // const AAsync: Boolean = True
 end;
 
@@ -436,6 +459,7 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      nil,
       AContext,
       true{AUseCache}), // const AContext: Tobject;
     AAsync); // const AAsync: Boolean = True
@@ -456,6 +480,7 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      nil{AGetPriorityFunc},
       nil{AContext},
       true{AUseCache}), // const AContext: Tobject;
     AAsync); // const AAsync: Boolean = True
@@ -553,6 +578,7 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      nil{AGetPriorityFunc},
       AContext,
       AUseCache), // const AContext: Tobject;
     APriority, // const APriority: Int64;
@@ -577,9 +603,10 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      APriority,
       AContext,
       AUseCache), // const AContext: Tobject;
-    APriority, // const APriority: TALWorkerThreadGetPriorityFunc;
+    DoGetPriority, // const APriority: TALWorkerThreadGetPriorityFunc;
     AAsync); // const AAsync: Boolean = True
 end;
 
@@ -599,6 +626,7 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      nil{AGetPriorityFunc},
       AContext,
       true{AUseCache}), // const AContext: Tobject;
     AAsync); // const AAsync: Boolean = True
@@ -619,6 +647,7 @@ begin
       ACanStartCallBack,
       AOnSuccessCallBack,
       AOnErrorCallBack,
+      nil{AGetPriorityFunc},
       nil{AContext},
       true{AUseCache}), // const AContext: Tobject;
     AAsync); // const AAsync: Boolean = True

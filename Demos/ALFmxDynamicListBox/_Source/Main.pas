@@ -65,8 +65,8 @@ type
                 var AErrorCode: Integer);
     function MainDynamicListBoxCreateLoadingContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemLoadingContent;
     function MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
-    function MainDynamicListBoxCreateTopBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBarContent;
-    function MainDynamicListBoxCreateBottomBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBarContent;
+    function MainDynamicListBoxCreateTopBar(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBar;
+    function MainDynamicListBoxCreateBottomBar(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBar;
     function MainDynamicListBoxCreateItem(const AContext: TALDynamicListBoxView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBoxItem;
   private
     {$IF defined(ALUIAutomationEnabled)}
@@ -76,10 +76,10 @@ type
     {$IF defined(android)}
     function ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
     {$ENDIF}
-  protected
-    procedure ALTextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
-    procedure ALTextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
-    procedure ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+    procedure TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
+    procedure TextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+    procedure TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+    procedure PageControllerActivePageChanged(Sender: TObject);
     procedure BottomBarResized(Sender: TObject);
     procedure StoriesCarouselDownloadItems(
                 const AContext: TALDynamicListBoxView.TDownloadItemsContext;
@@ -112,6 +112,7 @@ uses
   iOSapi.UIKit,
   iOSapi.CocoaTypes,
   {$ENDIF}
+  System.Net.URLClient,
   system.Diagnostics,
   system.threading,
   system.Math,
@@ -121,6 +122,7 @@ uses
   Alcinoe.Cipher,
   Alcinoe.StringUtils,
   Alcinoe.FMX.ScrollEngine,
+  Alcinoe.HTTP.Client.Net,
   Alcinoe.Common;
 
 {**********************************************}
@@ -195,31 +197,38 @@ begin
 end;
 {$ENDIF}
 
-{*********************************************************************************************}
-procedure TMainForm.ALTextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
+{*******************************************************************************************}
+procedure TMainForm.TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
 begin
   If Element.Id = 'ellipsis' then
     TALDynamicListBoxText(Sender).TextSettings.MaxLines := 65535;
 end;
 
-{**************************************************************************************************}
-procedure TMainForm.ALTextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+{************************************************************************************************}
+procedure TMainForm.TextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
 begin
   If Element.Id = 'ellipsis' then
     TALDynamicListBoxText(Sender).Cursor := crHandPoint;
 end;
 
-{**************************************************************************************************}
-procedure TMainForm.ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+{************************************************************************************************}
+procedure TMainForm.TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
 begin
   If Element.Id = 'ellipsis' then
     TALDynamicListBoxText(Sender).Cursor := crDefault;
 end;
 
+{*******************************************************************}
+procedure TMainForm.PageControllerActivePageChanged(Sender: TObject);
+begin
+  Var LPageController := TALDynamicListBoxPageController(Sender);
+  TALDynamicListBoxText(LPageController['PageCountText']).Text := AlIntToStrW(LPageController.ActivePageIndex+1)+'/'+AlIntToStrW(LPageController.PageCount);
+end;
+
 {****************************************************}
 procedure TMainForm.BottomBarResized(Sender: TObject);
 begin
-  with TALDynamicListBoxViewBottomBarContent(Sender) do begin
+  with TALDynamicListBoxViewBottomBar(Sender) do begin
     var Lbutton1 := Controls[0];
     var Lbutton2 := Controls[1];
     var Lbutton3 := Controls[2];
@@ -243,7 +252,7 @@ begin
     Lview.Height := 132;
     Lview.OnDownloadItems := StoriesCarouselDownloadItems;
     Lview.OnCreateItemMainContent := StoriesCarouselCreateItemMainContent;
-    Lview.PreloadItemCount := 50;
+    Lview.PreloadItemCount := 10;
     Result := LView;
   end
   else if AData.GetChildNodeValueText('type', '') = 'suggested' then begin
@@ -252,7 +261,7 @@ begin
     Lview.Height := 255;
     Lview.OnDownloadItems := SuggestedCarouselDownloadItems;
     Lview.OnCreateItemMainContent := SuggestedCarouselCreateItemMainContent;
-    Lview.PreloadItemCount := 50;
+    Lview.PreloadItemCount := 10;
     LView.Margins.bottom := 23;
     LView.ScrollEngine.Friction := 0.04;
     Result := LView;
@@ -361,10 +370,10 @@ begin
   End;
 end;
 
-{*********************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateTopBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBarContent;
+{*******************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateTopBar(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBar;
 begin
-  Result := TALDynamicListBoxViewTopBarContent.Create(nil);
+  Result := TALDynamicListBoxViewTopBar.Create(nil);
   try
     Result.BoundsRect := AContext.TargetRect;
     Result.Height := 56;
@@ -403,10 +412,10 @@ begin
   End;
 end;
 
-{***************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateBottomBarContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBarContent;
+{*************************************************************************************************************************************************}
+function TMainForm.MainDynamicListBoxCreateBottomBar(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBar;
 begin
-  Result := TALDynamicListBoxViewBottomBarContent.Create(nil);
+  Result := TALDynamicListBoxViewBottomBar.Create(nil);
   try
     Result.BoundsRect := AContext.TargetRect;
     {$IF defined(IOS)}
@@ -481,12 +490,10 @@ begin
     Result.BoundsRect := AContext.TargetRect;
 
     Var LLayout1 := TALDynamicListBoxLayout.Create(Result);
-    LLayout1.Name := 'Layout1';
     LLayout1.Align := TALAlignLayout.Top;
     LLayout1.Height := 38;
 
     var LRainbowCircle := TALDynamicListBoxImage.Create(LLayout1);
-    LRainbowCircle.Name := 'RainbowCircle';
     LRainbowCircle.WrapMode := TALImageWrapMode.Fit;
     LRainbowCircle.ResourceName := 'rainbowcircle';
     LRainbowCircle.Align := TALAlignLayout.LeftCenter;
@@ -497,9 +504,11 @@ begin
     LRainbowCircle.CacheEngine := AContext.CacheEngine;
 
     var LAvatar := TALDynamicListBoxImage.Create(LRainbowCircle);
-    LAvatar.Name := 'ProfilePicture';
     LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    {$IF defined(debug)}
+    LAvatar.TagString := 'Avatar_'+ALIntToStrW(AContext.Owner.index);
+    {$ENDIF}
     LAvatar.Align := TALAlignLayout.Center;
     LAvatar.Height := 30;
     LAvatar.Width := 30;
@@ -507,7 +516,6 @@ begin
     LAvatar.yRadius := -50;
 
     var LMenuBtn := TALDynamicListBoxButton.Create(LLayout1);
-    LMenuBtn.Name := 'MenuBtn';
     LMenuBtn.Fill.Color := TalphaColors.Null;
     LMenuBtn.Fill.ResourceName := 'menu';
     LMenuBtn.Stroke.Color := TalphaColors.Null;
@@ -519,22 +527,19 @@ begin
     LMenuBtn.CacheEngine := AContext.CacheEngine;
 
     Var LLayout2 := TALDynamicListBoxLayout.Create(LLayout1);
-    LLayout2.Name := 'Layout2';
     LLayout2.Align := TALAlignLayout.LeftCenter;
     LLayout2.Margins.Left := 13;
     LLayout2.AutoSize := True;
 
     var LUsername := TALDynamicListBoxText.Create(LLayout2);
-    LUsername.Name := 'Username';
     LUsername.Align := TALAlignLayout.topLeft;
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.Medium;
     LUsername.TextSettings.Font.Color := $FF262626;
     LUsername.AutoSize := True;
-    LUsername.Text := AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Text := {$IF defined(debug)}'['+ALIntToStrW(AContext.Owner.index)+']'+{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
     var LGeotag := TALDynamicListBoxText.Create(LLayout2);
-    LGeotag.Name := 'Geotag';
     LGeotag.Align := TALAlignLayout.topLeft;
     LGeotag.Margins.Top := 4;
     LGeotag.TextSettings.Font.Size := 12;
@@ -545,27 +550,61 @@ begin
 
     var LmediaNode := AContext.Owner.Data.GetChildNode('media');
     If LmediaNode.ChildNodes.Count > 1 then begin
-      var LMediumNode := LmediaNode.ChildNodes[0];
-      if LMediumNode.GetChildNodeValueBool('is_video', false) then begin
-        var LVideoPlayerSurface1 := TALDynamicListBoxVideoPlayerSurface.Create(Result);
-        LVideoPlayerSurface1.Margins.Top := 11;
-        LVideoPlayerSurface1.Align := TALAlignLayout.top;
-        LVideoPlayerSurface1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
-        LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildNodeValueText('preview_url', '');
-        LVideoPlayerSurface1.Name := 'VideoPlayer1';
-        LVideoPlayerSurface1.Looping := true;
-        LVideoPlayerSurface1.AutoStartMode := TALDynamicListBoxVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
-        LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
-      end
-      else begin
-        var LMedia1 := TALDynamicListBoxImage.Create(Result);
-        LMedia1.Name := 'Media1';
-        LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
-        LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
-        LMedia1.Margins.Top := 11;
-        LMedia1.Align := TALAlignLayout.top;
-        LMedia1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
+      var LPageController := TALDynamicListBoxPageController.Create(Result);
+      LPageController.Align := TALAlignLayout.Top;
+      LPageController.Height := (Result.Width / LmediaNode.ChildNodes[0].GetChildNodeValueInt32('width', 0)) * LmediaNode.ChildNodes[0].GetChildNodeValueInt32('height', 0);
+      LPageController.Margins.Top := 11;
+      LPageController.OnActivePageChanged := PageControllerActivePageChanged;
+      for var I := 0 to LmediaNode.ChildNodes.Count - 1 do begin
+        var LPageView := LPageController.AddPage;
+        var LMediumNode := LmediaNode.ChildNodes[I];
+        if LMediumNode.GetChildNodeValueBool('is_video', false) then begin
+          var LVideoPlayerSurface1 := TALDynamicListBoxVideoPlayerSurface.Create(LPageView);
+          LVideoPlayerSurface1.Align := TALAlignLayout.Client;
+          LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildNodeValueText('preview_url', '');
+          {$IF defined(debug)}
+          LVideoPlayerSurface1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index) + '_' + ALIntToStrW(I);
+          {$ENDIF}
+          LVideoPlayerSurface1.Looping := true;
+          LVideoPlayerSurface1.AutoStartMode := TALDynamicListBoxVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
+          LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
+        end
+        else begin
+          var LMedia1 := TALDynamicListBoxImage.Create(LPageView);
+          LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
+          LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
+          {$IF defined(debug)}
+          LMedia1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index) + '_' + ALIntToStrW(I);
+          {$ENDIF}
+          LMedia1.Align := TALAlignLayout.client;
+        end;
       end;
+      var LPageIndicator := TALDynamicListBoxPageIndicator.Create(Result);
+      LPageIndicator.Align := TALAlignLayout.Top;
+      LPageIndicator.Margins.Top := 10;
+      LPageIndicator.InactiveIndicator.Width := 6;
+      LPageIndicator.InactiveIndicator.Height := 6;
+      LpageIndicator.InactiveIndicator.Margins.Rect := TRectF.Create(1.5,1.5,1.5,1.5);
+      LpageIndicator.InactiveIndicator.Fill.Color := $FFdcdfe3;
+      LpageIndicator.ActiveIndicator.Fill.Color := $FF4193ef;
+      LPageIndicator.AnimationType := TALDynamicListBoxPageIndicator.TAnimationType.Slide;
+      LPageIndicator.CacheIndex := 8;
+      LPageIndicator.CacheEngine := AContext.CacheEngine;
+      LPageController.PageIndicator := LPageIndicator;
+      var LPageCountText := TALDynamicListBoxText.Create(LPageController);
+      LPageCountText.Name := 'PageCountText';
+      LPageCountText.Align := TALAlignLayout.TopRight;
+      LPageCountText.Margins.top := 14;
+      LPageCountText.Margins.right := 14;
+      LPageCountText.padding.Rect := TRectF.Create(10,6,10,6);
+      LPageCountText.TextSettings.Font.Size := 13;
+      LPageCountText.TextSettings.Font.weight := TFontWeight.regular;
+      LPageCountText.TextSettings.Font.Color := $FFffffff;
+      LPageCountText.Fill.Color := $B2000000;
+      LPageCountText.AutoSize := True;
+      LPageCountText.XRadius := -50;
+      LPageCountText.YRadius := -50;
+      LPageCountText.Text := '1/'+AlIntToStrW(LPageController.PageCount);
     end
     else If LmediaNode.ChildNodes.Count = 1 then begin
       var LMediumNode := LmediaNode.ChildNodes[0];
@@ -575,16 +614,20 @@ begin
         LVideoPlayerSurface1.Align := TALAlignLayout.top;
         LVideoPlayerSurface1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
         LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildNodeValueText('preview_url', '');
-        LVideoPlayerSurface1.Name := 'VideoPlayer1';
+        {$IF defined(debug)}
+        LVideoPlayerSurface1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index);
+        {$ENDIF}
         LVideoPlayerSurface1.Looping := true;
         LVideoPlayerSurface1.AutoStartMode := TALDynamicListBoxVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
         LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
       end
       else begin
         var LMedia1 := TALDynamicListBoxImage.Create(Result);
-        LMedia1.Name := 'Media1';
         LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
         LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
+        {$IF defined(debug)}
+        LMedia1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index);
+        {$ENDIF}
         LMedia1.Margins.Top := 11;
         LMedia1.Align := TALAlignLayout.top;
         LMedia1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
@@ -594,20 +637,19 @@ begin
           LUsername.TextSettings.Font.Color := $FFffffff;
           LGeotag.TextSettings.Font.Color := $FFffffff;
           LMenuBtn.Fill.ResourceName := 'menu_dark';
-          LMenuBtn.CacheIndex := 3
+          LMenuBtn.CacheIndex := 3;
+          LMenuBtn.CacheEngine := AContext.CacheEngine;
         end;
       end;
     end;
 
     Var LLayout3 := TALDynamicListBoxLayout.Create(Result);
-    LLayout3.Name := 'Layout3';
     LLayout3.Align := TALAlignLayout.Top;
     LLayout3.Height := 23;
     LLayout3.Margins.Top := 12;
     LLayout3.Margins.bottom := 10;
 
     var LLikeCountBtn := TALDynamicListBoxButton.Create(LLayout3);
-    LLikeCountBtn.Name := 'LikeCountBtn';
     LLikeCountBtn.Fill.Color := TalphaColors.Null;
     LLikeCountBtn.Fill.ResourceName := 'like';
     LLikeCountBtn.Stroke.Color := TalphaColors.Null;
@@ -619,7 +661,6 @@ begin
     LLikeCountBtn.CacheEngine := AContext.CacheEngine;
 
     var LLikeCountText := TALDynamicListBoxText.Create(LLayout3);
-    LLikeCountText.Name := 'LikeCountText';
     LLikeCountText.Align := TALAlignLayout.LeftCenter;
     LLikeCountText.Margins.Left := 5;
     LLikeCountText.TextSettings.Font.Size := 14;
@@ -629,7 +670,6 @@ begin
     LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
 
     var LCommentCountBtn := TALDynamicListBoxButton.Create(LLayout3);
-    LCommentCountBtn.Name := 'CommentCountBtn';
     LCommentCountBtn.Fill.Color := TalphaColors.Null;
     LCommentCountBtn.Fill.ResourceName := 'comments';
     LCommentCountBtn.Stroke.Color := TalphaColors.Null;
@@ -641,7 +681,6 @@ begin
     LCommentCountBtn.CacheEngine := AContext.CacheEngine;
 
     var LCommentCountText := TALDynamicListBoxText.Create(LLayout3);
-    LCommentCountText.Name := 'CommentCountText';
     LCommentCountText.Align := TALAlignLayout.LeftCenter;
     LCommentCountText.Margins.Left := 5;
     LCommentCountText.TextSettings.Font.Size := 14;
@@ -651,7 +690,6 @@ begin
     LCommentCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('comment_count', 0));
 
     var LReshareCountsBtn := TALDynamicListBoxButton.Create(LLayout3);
-    LReshareCountsBtn.Name := 'ReshareCountsBtn';
     LReshareCountsBtn.Fill.Color := TalphaColors.Null;
     LReshareCountsBtn.Fill.ResourceName := 'message';
     LReshareCountsBtn.Stroke.Color := TalphaColors.Null;
@@ -663,7 +701,6 @@ begin
     LReshareCountsBtn.CacheEngine := AContext.CacheEngine;
 
     var LReshareCountText := TALDynamicListBoxText.Create(LLayout3);
-    LReshareCountText.Name := 'ReshareCountText';
     LReshareCountText.Align := TALAlignLayout.LeftCenter;
     LReshareCountText.Margins.Left := 5;
     LReshareCountText.TextSettings.Font.Size := 14;
@@ -673,7 +710,6 @@ begin
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
 
     var LBookmarkBtn := TALDynamicListBoxButton.Create(LLayout3);
-    LBookmarkBtn.Name := 'BookmarkBtn';
     LBookmarkBtn.Fill.Color := TalphaColors.Null;
     LBookmarkBtn.Fill.ResourceName := 'bookmark';
     LBookmarkBtn.Stroke.Color := TalphaColors.Null;
@@ -685,7 +721,6 @@ begin
     LBookmarkBtn.CacheEngine := AContext.CacheEngine;
 
     var LCaption := TALDynamicListBoxText.Create(Result);
-    LCaption.Name := 'Caption';
     LCaption.Align := TALAlignLayout.Top;
     LCaption.Margins.Left := 14;
     LCaption.Margins.Right := 14;
@@ -720,12 +755,11 @@ begin
     LStr := ALStringReplaceW(LStr, #13#10, '<br/>', [RfReplaceAll]);
     LCaption.Text := LStr;
     LCaption.HitTest := True;
-    LCaption.OnElementClick := ALTextEllipsisElementClick;
-    LCaption.OnElementMouseEnter := ALTextEllipsisElementMouseEnter;
-    LCaption.OnElementMouseLeave := ALTextEllipsisElementMouseLeave;
+    LCaption.OnElementClick := TextEllipsisElementClick;
+    LCaption.OnElementMouseEnter := TextEllipsisElementMouseEnter;
+    LCaption.OnElementMouseLeave := TextEllipsisElementMouseLeave;
 
     var LDate := TALDynamicListBoxText.Create(Result);
-    LDate.Name := 'Date';
     LDate.Align := TALAlignLayout.TopLeft;
     LDate.Margins.top := 7;
     LDate.Margins.Left := 14;
@@ -773,6 +807,9 @@ begin
     var LAvatar := TALDynamicListBoxImage.Create(LRainbowCircle);
     LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    {$IF defined(debug)}
+    LAvatar.TagString := 'Stories_Avatar_'+ALIntToStrW(AContext.Owner.index);
+    {$ENDIF}
     LAvatar.Align := TALAlignLayout.Center;
     LAvatar.Height := 84;
     LAvatar.Width := 84;
@@ -786,7 +823,7 @@ begin
     LUsername.TextSettings.Font.Color := $FF262626;
     LUsername.AutoSize := True;
     LUsername.TextSettings.MaxLines := 1;
-    LUsername.Text := AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Text := {$IF defined(debug)}'['+ALIntToStrW(AContext.Owner.index)+']'+{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
   Except
     ALFreeAndNil(Result);
@@ -819,6 +856,9 @@ begin
     var LAvatar := TALDynamicListBoxImage.Create(LBackground);
     LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
+    {$IF defined(debug)}
+    LAvatar.TagString := 'Suggested_Avatar_'+ALIntToStrW(AContext.Owner.index);
+    {$ENDIF}
     LAvatar.Align := TALAlignLayout.topCenter;
     LAvatar.Height := 148;
     LAvatar.Width := 148;
@@ -833,7 +873,7 @@ begin
     LUsername.TextSettings.Font.Color := $FF0d1014;
     LUsername.AutoSize := True;
     LUsername.TextSettings.MaxLines := 1;
-    LUsername.Text := AContext.Owner.Data.GetChildNodeValueText('username', '') ;
+    LUsername.Text := {$IF defined(debug)}'['+ALIntToStrW(AContext.Owner.index)+']'+{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
     LUsername.Margins.top := 12;
 
     var LFollowBtn := TALDynamicListBoxButton.Create(LBackground);
@@ -883,29 +923,55 @@ begin
   // Since we are running in a background thread, we can safely download it from
   // the Internet without worrying about freezing the app.
 
-  // Simulate internet latency
-  sleep(1000);
-
-  // PaginationToken – A string used to track the position in paginated data,
-  // allowing retrieval of the next set of results.
-  APaginationToken := ALRandomStrW(8);
-
-  // In case of an error, assign a custom error code here that
-  // can be used later to display an error message to the end user.
   AErrorCode := 0;
-
-  // Here, we retrieve a mocked set of data from the resource.
-  // In a real app, you would download the data from the Internet.
-  var LStream := TResourceStream.Create(HInstance, 'posts', RT_RCDATA);
   try
-    AData := TALJsonDocumentW.CreateFromJSONStream(LStream);
-  finally
-    ALfreeandNil(LStream);
-  end;
 
-  // For the mock to work correctly, each item needs a unique ID.
-  For var I := 0 to AData.ChildNodes.Count - 1 do
-    AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+    // PaginationToken – A string used to track the position in paginated data,
+    // allowing retrieval of the next set of results.
+    if APaginationToken = '' then APaginationToken := '0';
+
+    // Here, we retrieve a mocked set of data from the the Internet.
+    var LNetHttpClient := ALCreateNetHTTPClient;
+    var LResponseContent := TMemoryStream.Create;
+    try
+      LNetHttpClient.CustomHeaders['Accept-Encoding'] := 'identity';
+      var LHTTPResponse := LNetHttpClient.Get('https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/posts_'+ALIntToStrW((ALStrtoint(APaginationToken) mod 4) + 1)+'.json', LResponseContent);
+      if LHTTPResponse.StatusCode <> 200 then
+        raise Exception.CreateFmt('Failed to retrieve JSON data. Server responded with HTTP status code %d.', [LHTTPResponse.StatusCode]);
+      AData := TALJsonDocumentW.CreateFromJSONStream(LResponseContent);
+    finally
+      ALFreeAndNil(LResponseContent);
+      ALFreeAndNil(LNetHttpClient);
+    end;
+
+    // For demonstration purposes: when the pagination token is greater than 4,
+    // randomly sort the nodes and then remove any node whose "type" property is not 'post'.
+    if ALStrToInt(APaginationToken) > 4 then begin
+      AData.ChildNodes.CustomSort(
+        function(List: TALJSONNodeListW; Index1, Index2: Integer): Integer
+        begin
+          Result := random(MaxInt) - Random(Maxint);
+        end);
+      for var I := AData.ChildNodes.Count - 1 downto 0 do begin
+        if AData.ChildNodes[i].GetChildNodeValueText('type', 'post') <> 'post' then
+          AData.ChildNodes.Delete(I);
+      end;
+    end;
+
+    // For the mock to work correctly, each item needs a unique ID.
+    For var I := 0 to AData.ChildNodes.Count - 1 do
+      AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+
+    // Increment the pagination token for the next data batch.
+    APaginationToken := ALInttoStrW(ALStrtoInt(APaginationToken) + 1);
+
+  Except
+    On E: Exception do begin
+      // In case of an error, assign a custom error code here that
+      // can be used later to display an error message to the end user.
+      AErrorCode := 1;
+    end;
+  end;
 
 end;
 
@@ -921,29 +987,51 @@ begin
   // Since we are running in a background thread, we can safely download it from
   // the Internet without worrying about freezing the app.
 
-  // Simulate internet latency
-  sleep(1000);
-
-  // PaginationToken – A string used to track the position in paginated data,
-  // allowing retrieval of the next set of results.
-  APaginationToken := ALRandomStrW(8);
-
-  // In case of an error, assign a custom error code here that
-  // can be used later to display an error message to the end user.
   AErrorCode := 0;
-
-  // Here, we retrieve a mocked set of data from the resource.
-  // In a real app, you would download the data from the Internet.
-  var LStream := TResourceStream.Create(HInstance, 'stories', RT_RCDATA);
   try
-    AData := TALJsonDocumentW.CreateFromJSONStream(LStream);
-  finally
-    ALfreeandNil(LStream);
-  end;
 
-  // For the mock to work correctly, each item needs a unique ID.
-  For var I := 0 to AData.ChildNodes.Count - 1 do
-    AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+    // PaginationToken – A string used to track the position in paginated data,
+    // allowing retrieval of the next set of results.
+    if APaginationToken = '' then APaginationToken := '0';
+
+    // Here, we retrieve a mocked set of data from the the Internet.
+    var LNetHttpClient := ALCreateNetHTTPClient;
+    var LResponseContent := TMemoryStream.Create;
+    try
+      LNetHttpClient.CustomHeaders['Accept-Encoding'] := 'identity';
+      var LHTTPResponse := LNetHttpClient.Get('https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/stories_'+ALIntToStrW((ALStrtoint(APaginationToken) mod 3) + 1)+'.json', LResponseContent);
+      if LHTTPResponse.StatusCode <> 200 then
+        raise Exception.CreateFmt('Failed to retrieve JSON data. Server responded with HTTP status code %d.', [LHTTPResponse.StatusCode]);
+      AData := TALJsonDocumentW.CreateFromJSONStream(LResponseContent);
+    finally
+      ALFreeAndNil(LResponseContent);
+      ALFreeAndNil(LNetHttpClient);
+    end;
+
+    // For demonstration purposes: when the pagination token is greater than 4,
+    // randomly sort the nodes.
+    if ALStrToInt(APaginationToken) > 3 then begin
+      AData.ChildNodes.CustomSort(
+        function(List: TALJSONNodeListW; Index1, Index2: Integer): Integer
+        begin
+          Result := random(MaxInt) - Random(Maxint);
+        end);
+    end;
+
+    // For the mock to work correctly, each item needs a unique ID.
+    For var I := 0 to AData.ChildNodes.Count - 1 do
+      AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+
+    // Increment the pagination token for the next data batch.
+    APaginationToken := ALInttoStrW(ALStrtoInt(APaginationToken) + 1);
+
+  Except
+    On E: Exception do begin
+      // In case of an error, assign a custom error code here that
+      // can be used later to display an error message to the end user.
+      AErrorCode := 1;
+    end;
+  end;
 
 end;
 
@@ -959,29 +1047,51 @@ begin
   // Since we are running in a background thread, we can safely download it from
   // the Internet without worrying about freezing the app.
 
-  // Simulate internet latency
-  sleep(1000);
-
-  // PaginationToken – A string used to track the position in paginated data,
-  // allowing retrieval of the next set of results.
-  APaginationToken := ALRandomStrW(8);
-
-  // In case of an error, assign a custom error code here that
-  // can be used later to display an error message to the end user.
   AErrorCode := 0;
-
-  // Here, we retrieve a mocked set of data from the resource.
-  // In a real app, you would download the data from the Internet.
-  var LStream := TResourceStream.Create(HInstance, 'suggested', RT_RCDATA);
   try
-    AData := TALJsonDocumentW.CreateFromJSONStream(LStream);
-  finally
-    ALfreeandNil(LStream);
-  end;
 
-  // For the mock to work correctly, each item needs a unique ID.
-  For var I := 0 to AData.ChildNodes.Count - 1 do
-    AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+    // PaginationToken – A string used to track the position in paginated data,
+    // allowing retrieval of the next set of results.
+    if APaginationToken = '' then APaginationToken := '0';
+
+    // Here, we retrieve a mocked set of data from the the Internet.
+    var LNetHttpClient := ALCreateNetHTTPClient;
+    var LResponseContent := TMemoryStream.Create;
+    try
+      LNetHttpClient.CustomHeaders['Accept-Encoding'] := 'identity';
+      var LHTTPResponse := LNetHttpClient.Get('https://www.magicfoundation.io/media/mockup/io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo/suggested_'+ALIntToStrW((ALStrtoint(APaginationToken) mod 3) + 1)+'.json', LResponseContent);
+      if LHTTPResponse.StatusCode <> 200 then
+        raise Exception.CreateFmt('Failed to retrieve JSON data. Server responded with HTTP status code %d.', [LHTTPResponse.StatusCode]);
+      AData := TALJsonDocumentW.CreateFromJSONStream(LResponseContent);
+    finally
+      ALFreeAndNil(LResponseContent);
+      ALFreeAndNil(LNetHttpClient);
+    end;
+
+    // For demonstration purposes: when the pagination token is greater than 4,
+    // randomly sort the nodes.
+    if ALStrToInt(APaginationToken) > 3 then begin
+      AData.ChildNodes.CustomSort(
+        function(List: TALJSONNodeListW; Index1, Index2: Integer): Integer
+        begin
+          Result := random(MaxInt) - Random(Maxint);
+        end);
+    end;
+
+    // For the mock to work correctly, each item needs a unique ID.
+    For var I := 0 to AData.ChildNodes.Count - 1 do
+      AData.ChildNodes[i].SetChildNodeValueInt64('id', ALRandom64(ALMaxInt64));
+
+    // Increment the pagination token for the next data batch.
+    APaginationToken := ALInttoStrW(ALStrtoInt(APaginationToken) + 1);
+
+  Except
+    On E: Exception do begin
+      // In case of an error, assign a custom error code here that
+      // can be used later to display an error message to the end user.
+      AErrorCode := 1;
+    end;
+  end;
 
 end;
 

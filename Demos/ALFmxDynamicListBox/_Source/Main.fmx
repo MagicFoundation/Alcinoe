@@ -17,8 +17,8 @@ object MainForm: TMainForm
     Size.Height = 870.000000000000000000
     Size.PlatformDefault = False
     OnCreateLoadingContent = MainDynamicListBoxCreateLoadingContent
-    OnCreateTopBarContent = MainDynamicListBoxCreateTopBarContent
-    OnCreateBottomBarContent = MainDynamicListBoxCreateBottomBarContent
+    OnCreateTopBar = MainDynamicListBoxCreateTopBar
+    OnCreateBottomBar = MainDynamicListBoxCreateBottomBar
     OnCreateItem = MainDynamicListBoxCreateItem
     OnCreateItemMainContent = MainDynamicListBoxCreateItemMainContent
     OnDownloadItems = MainDynamicListBoxDownloadItems

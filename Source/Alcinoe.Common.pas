@@ -86,10 +86,8 @@ type
     fPriorityDirection: TPriorityDirection;
     fThreads: TObjectList<TALWorkerThread>;
     fRequests: TObjectList<TALWorkerThreadRequest>;
-    function GetPriorityDirection: TPriorityDirection;
     function GetPriorityStartingPoint: int64;
-    function GetPriorityStartingPointExt(const AContext: Tobject): Int64;
-    procedure SetPriorityDirection(const Value: TPriorityDirection);
+    function GetPriorityStartingPointExt(const AContext: Tobject): Int64; inline;
     procedure SetPriorityStartingPoint(const Value: int64);
   protected
     procedure EnqueueRequest(const ARequest: TALWorkerThreadRequest);
@@ -161,15 +159,15 @@ type
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
                 Const AAsync: Boolean = True); overload;
-    //When we Dequeue a Request, we look for the request with a priority
-    //the most closest to PriorityStartingPoint in the PriorityDirection.
-    //Exemple if we have in the queue the requests with those priorities: 25, 75, 100, 125, 150
-    //and if PriorityStartingPoint = 110, PriorityDirection = lessThan then
-    //dequeue will return the request with a priority of 100. in the opposite
-    //way if PriorityStartingPoint = 110, PriorityDirection = greaterThan then
-    //dequeue will return 125
+    // When dequeuing a request, we search for the one with a priority
+    // that is closest to the PriorityStartingPoint, based on the specified PriorityDirection.
+    // For example, consider a queue with requests having the following priorities: 25, 75, 100, 125, 150.
+    // If PriorityStartingPoint is 110 and PriorityDirection is 'lessThan', then the dequeue operation
+    // will return the request with a priority of 100.
+    // Conversely, if PriorityStartingPoint is 110 and PriorityDirection is 'greaterThan',
+    // it will return the request with a priority of 125.
     property PriorityStartingPoint: int64 read GetPriorityStartingPoint write SetPriorityStartingPoint;
-    property PriorityDirection: TPriorityDirection read GetPriorityDirection write SetPriorityDirection;
+    property PriorityDirection: TPriorityDirection read FPriorityDirection write FPriorityDirection;
   end;
 
 {$IF CompilerVersion <= 25} // xe4
@@ -921,22 +919,6 @@ begin
   inherited;
 end;
 
-{********************************************************************}
-function TALWorkerThreadPool.GetPriorityDirection: TPriorityDirection;
-begin
-  //sizeof fPriorityDirection is 1 that mean read and write are ATOMIC
-  //no need to use any Interlock mechanism
-  result := fPriorityDirection;
-end;
-
-{**********************************************************************************}
-procedure TALWorkerThreadPool.SetPriorityDirection(const Value: TPriorityDirection);
-begin
-  //sizeof fPriorityDirection is 1 that mean read and write are ATOMIC
-  //no need to use any Interlock mechanism
-  fPriorityDirection := Value;
-end;
-
 {***********************************************************}
 function TALWorkerThreadPool.GetPriorityStartingPoint: int64;
 begin
@@ -1019,13 +1001,13 @@ begin
     for Var I := 0 to fRequests.Count - 1 do begin
       var LCompare := fRequests[i].Priority - LPriorityStartingPoint;
       if (LCompare > 0) then begin
-        if (LCompare < LGreaterThanFoundCompare) then begin
+        if (LCompare <= LGreaterThanFoundCompare) then begin
           LGreaterThanFoundCompare := LCompare;
           LGreaterThanFoundIndex := i;
         end
       end
       else if (LCompare < 0) then begin
-        if (LCompare > LLesserThanFoundCompare) then begin
+        if (LCompare >= LLesserThanFoundCompare) then begin
           LLesserThanFoundCompare := LCompare;
           LLesserThanFoundIndex := i;
         end

@@ -9559,14 +9559,14 @@ begin
   var LContext := TResourceDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
-  TMonitor.Enter(LContext.Lock);
+  TMonitor.Enter(LContext.FLock);
   try
     if LContext.Owner <> nil then begin
-      LContext.FreeByThread := False;
+      LContext.FFreeByThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    TMonitor.Exit(LContext.Lock);
+    TMonitor.Exit(LContext.FLock);
   end;
   exit;
   {$ENDIF}
@@ -22336,14 +22336,14 @@ begin
   var LContext := TPreviewDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
-  TMonitor.Enter(LContext.Lock);
+  TMonitor.Enter(LContext.FLock);
   try
     if LContext.Owner <> nil then begin
-      LContext.FreeByThread := False;
+      LContext.FFreeByThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    TMonitor.Exit(LContext.Lock);
+    TMonitor.Exit(LContext.FLock);
   end;
   exit;
   {$ENDIF}

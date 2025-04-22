@@ -153,7 +153,7 @@ uses
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Materials.Canvas,
-  Alcinoe.FMX.GeoPosition.Sensor,
+  Alcinoe.FMX.GeoLocation.Sensor,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.NotificationService,
   Alcinoe.FMX.Objects,

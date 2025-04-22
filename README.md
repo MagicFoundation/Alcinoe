@@ -670,19 +670,19 @@ Learn more at
 <br/>
 
 
-GeoPositioning for Android/iOS
-==============================
+Geolocation for Android & iOS 
+=============================
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/geopositioning.webp?raw=true" width="540" style="width:540px;"/>
 
-The **TALGeoPositionSensor** component is a Delphi component that 
+The **TALGeoLocationSensor** component is a Delphi component that 
 provides access to location services on iOS and Android devices. 
 It allows developers to retrieve the device's current location 
 and receive updates as the location changes. The component supports 
 various location providers, including GPS, cellular network 
 triangulation, and Wi-Fi positioning.
 
-In addition to accessing location services, **TALGeoPositionSensor** 
+In addition to accessing location services, **TALGeoLocationSensor** 
 automates the process of requesting user permission to use location 
 data on both iOS and Android. It also handles scenarios where users 
 have previously denied location access. By using this component, 
@@ -690,7 +690,7 @@ developers can seamlessly integrate location-based functionality
 into their apps without needing to manage the underlying 
 implementation details.
 
-Learn more at [Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
+Learn more at [Demos\ALGeoLocationSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoLocationSensor)
 <br/>
 <br/>
   
@@ -1113,6 +1113,10 @@ undesired conversions.
 
 History
 =======
+
+#### 22/04/2025 ####
+
+- **TALGeoPositionSensor** has been replaced by **TALGeoLocationSensor**.
 
 #### 13/04/2025 ####
 

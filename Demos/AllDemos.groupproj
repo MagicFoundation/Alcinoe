@@ -75,7 +75,7 @@
         <Projects Include="ALFmxGraphics\_Source\ALFmxGraphicsDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ALGeoPositionSensor\_Source\ALGeoPositionSensorDemo.dproj">
+        <Projects Include="ALGeoLocationSensor\_Source\ALGeoLocationSensorDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ALFmxControls\_Source\ALFmxControlsDemo.dproj">
@@ -308,14 +308,14 @@
     <Target Name="ALFmxGraphicsDemo:Make">
         <MSBuild Projects="ALFmxGraphics\_Source\ALFmxGraphicsDemo.dproj" Targets="Make"/>
     </Target>
-    <Target Name="ALGeoPositionSensorDemo">
-        <MSBuild Projects="ALGeoPositionSensor\_Source\ALGeoPositionSensorDemo.dproj"/>
+    <Target Name="ALGeoLocationSensorDemo">
+        <MSBuild Projects="ALGeoLocationSensor\_Source\ALGeoLocationSensorDemo.dproj"/>
     </Target>
-    <Target Name="ALGeoPositionSensorDemo:Clean">
-        <MSBuild Projects="ALGeoPositionSensor\_Source\ALGeoPositionSensorDemo.dproj" Targets="Clean"/>
+    <Target Name="ALGeoLocationSensorDemo:Clean">
+        <MSBuild Projects="ALGeoLocationSensor\_Source\ALGeoLocationSensorDemo.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="ALGeoPositionSensorDemo:Make">
-        <MSBuild Projects="ALGeoPositionSensor\_Source\ALGeoPositionSensorDemo.dproj" Targets="Make"/>
+    <Target Name="ALGeoLocationSensorDemo:Make">
+        <MSBuild Projects="ALGeoLocationSensor\_Source\ALGeoLocationSensorDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="ALFmxControlsDemo">
         <MSBuild Projects="ALFmxControls\_Source\ALFmxControlsDemo.dproj"/>
@@ -336,13 +336,13 @@
         <MSBuild Projects="ALFacebookLogin\_Source\ALFacebookLoginDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="ALJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALWinHTTPWebSocketClientDemo;ALPOP3ClientDemo;ALNotificationServiceDemo;ALDatabaseBenchmark;ALAnimationDemo;ALConfettiDemo;ALFmxGraphicsDemo;ALGeoPositionSensorDemo;ALFmxControlsDemo;ALFacebookLoginDemo"/>
+        <CallTarget Targets="ALJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALWinHTTPWebSocketClientDemo;ALPOP3ClientDemo;ALNotificationServiceDemo;ALDatabaseBenchmark;ALAnimationDemo;ALConfettiDemo;ALFmxGraphicsDemo;ALGeoLocationSensorDemo;ALFmxControlsDemo;ALFacebookLoginDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ALJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALWinHTTPWebSocketClientDemo:Clean;ALPOP3ClientDemo:Clean;ALNotificationServiceDemo:Clean;ALDatabaseBenchmark:Clean;ALAnimationDemo:Clean;ALConfettiDemo:Clean;ALFmxGraphicsDemo:Clean;ALGeoPositionSensorDemo:Clean;ALFmxControlsDemo:Clean;ALFacebookLoginDemo:Clean"/>
+        <CallTarget Targets="ALJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALWinHTTPWebSocketClientDemo:Clean;ALPOP3ClientDemo:Clean;ALNotificationServiceDemo:Clean;ALDatabaseBenchmark:Clean;ALAnimationDemo:Clean;ALConfettiDemo:Clean;ALFmxGraphicsDemo:Clean;ALGeoLocationSensorDemo:Clean;ALFmxControlsDemo:Clean;ALFacebookLoginDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ALJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALWinHTTPWebSocketClientDemo:Make;ALPOP3ClientDemo:Make;ALNotificationServiceDemo:Make;ALDatabaseBenchmark:Make;ALAnimationDemo:Make;ALConfettiDemo:Make;ALFmxGraphicsDemo:Make;ALGeoPositionSensorDemo:Make;ALFmxControlsDemo:Make;ALFacebookLoginDemo:Make"/>
+        <CallTarget Targets="ALJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALWinHTTPWebSocketClientDemo:Make;ALPOP3ClientDemo:Make;ALNotificationServiceDemo:Make;ALDatabaseBenchmark:Make;ALAnimationDemo:Make;ALConfettiDemo:Make;ALFmxGraphicsDemo:Make;ALGeoLocationSensorDemo:Make;ALFmxControlsDemo:Make;ALFacebookLoginDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

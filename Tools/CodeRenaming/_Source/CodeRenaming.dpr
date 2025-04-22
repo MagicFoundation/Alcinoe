@@ -154,6 +154,7 @@ begin
       LOldToNewNames.add('ALWebSocketClient=Alcinoe.WebSocket.Client');
       LOldToNewNames.add('ALWinHTTPWebSocketClient=Alcinoe.WebSocket.Client.WinHTTP');
       LOldToNewNames.add('Alcinoe.FMX.TabControl=Alcinoe.FMX.PageController');
+      LOldToNewNames.add('Alcinoe.FMX.GeoPosition.Sensor=Alcinoe.FMX.GeoLocation.Sensor');
 
       //Function names
       LOldToNewNames.add('ALUTF8ExtractHTMLText=ALExtractHTMLText');
@@ -551,7 +552,8 @@ begin
       LOldToNewNames.add('TALDrawMultiLineTextOptions=TALMultiLineTextOptions');
       LOldToNewNames.add('TALTabItem=TALPageView');
       LOldToNewNames.add('TALTabControl=TALPageController');
-
+      LOldToNewNames.add('TALGeoPositionSensor=TALGeoLocationSensor');
+      
       //var names
       LOldToNewNames.add('ALDefaultFormatSettings=ALDefaultFormatSettingsA');
       LOldToNewNames.add('ALDefaultFormatSettingsU=ALDefaultFormatSettingsW');

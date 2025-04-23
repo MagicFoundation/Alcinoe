@@ -177,6 +177,7 @@ end;
 destructor TALGuardianThread.Destroy;
 begin
   Terminate;
+  If Suspended then start;
   FSignal.setevent;
   WaitFor;
   ALfreeandNil(FSignal);

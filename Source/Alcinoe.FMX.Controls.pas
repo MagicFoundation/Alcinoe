@@ -1119,7 +1119,7 @@ begin
     if not LControlTmp.Visible then Exit(TRectF.Empty);
     if LControlTmp.ClipChildren then begin
       var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
-      LAbsoluteIntersectionRect.Intersect(AbsoluteClipRect);
+      LAbsoluteIntersectionRect.Intersect(LAbsoluteClipRect);
       if LAbsoluteIntersectionRect.IsEmpty then
         Exit(TRectF.Empty);
     end;

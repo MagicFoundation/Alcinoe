@@ -346,25 +346,24 @@ begin
         //get from the url
         if LNetHttpClientPoolRequest.Url <> '' then begin
           if AlIsHttpOrHttpsUrl(LNetHttpClientPoolRequest.Url) then begin
-            if LNetHttpClientPoolRequest.UseCache then begin
-              if (not assigned(RetrieveCachedData)) or
-                 (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent)) then begin
-                LHTTPResponse := _HttpGetUrl(LNetHttpClientPoolRequest.Url, LResponseContent);
-                // Client error responses (400 – 499)
-                // Server error responses (500 – 599)
-                if (LHTTPResponse = nil) or
-                   ((LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599)) then begin
-                  if assigned(LNetHttpClientPoolRequest.OnErrorCallBackObjProc) then
-                    LNetHttpClientPoolRequest.OnErrorCallBackObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext)
-                  else if assigned(LNetHttpClientPoolRequest.OnErrorCallBackRefProc) then
-                    LNetHttpClientPoolRequest.OnErrorCallBackRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext);
-                  exit;
-                end;
-                ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
-                if (assigned(CacheData)) then CacheData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent);
+            if (not LNetHttpClientPoolRequest.UseCache) or
+               (not assigned(RetrieveCachedData)) or
+               (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent)) then begin
+              LHTTPResponse := _HttpGetUrl(LNetHttpClientPoolRequest.Url, LResponseContent);
+              // Client error responses (400 – 499)
+              // Server error responses (500 – 599)
+              if (LHTTPResponse = nil) or
+                 ((LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599)) then begin
+                if assigned(LNetHttpClientPoolRequest.OnErrorCallBackObjProc) then
+                  LNetHttpClientPoolRequest.OnErrorCallBackObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext)
+                else if assigned(LNetHttpClientPoolRequest.OnErrorCallBackRefProc) then
+                  LNetHttpClientPoolRequest.OnErrorCallBackRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext);
+                exit;
               end;
-            end
-            else LHTTPResponse := _HttpGetUrl(LNetHttpClientPoolRequest.Url, LResponseContent);
+              ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
+              if (LNetHttpClientPoolRequest.UseCache) and
+                 (assigned(CacheData)) then CacheData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent);
+            end;
           end
           else LResponseContent.LoadFromFile(LNetHttpClientPoolRequest.Url);
         end;

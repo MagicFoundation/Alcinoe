@@ -23,6 +23,7 @@ unit Alcinoe.HTTP.Client.WinHTTP;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 uses
   Winapi.Windows,

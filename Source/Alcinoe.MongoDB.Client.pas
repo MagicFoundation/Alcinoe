@@ -5611,6 +5611,7 @@ end;
 destructor TAlMongoDBTailMonitoringThread.Destroy;
 begin
   Terminate;
+  If Suspended then start;
   fMongoDBClient.StopTailMonitoring := True;
   WaitFor;
   fMongoDBClient.Free;
@@ -5632,8 +5633,6 @@ end;
 {***********************************************}
 procedure TAlMongoDBTailMonitoringThread.Execute;
 begin
-
-  //loop still not terminated
   while not Terminated do begin
     Try
 

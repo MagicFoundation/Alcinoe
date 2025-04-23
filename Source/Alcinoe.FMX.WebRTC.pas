@@ -1301,6 +1301,7 @@ begin
 
   if not terminated then begin
     Terminate; // << will fire fSignal.SetEvent in TerminatedSet
+    If Suspended then start;
     WaitFor;
   end;
   //-----

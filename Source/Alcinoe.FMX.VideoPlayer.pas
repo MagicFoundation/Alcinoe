@@ -2757,8 +2757,10 @@ end;
 destructor TALVideoPlayerControllerThread.Destroy;
 begin
   Terminate;
+  If Suspended then start;
   {$IF defined(android)}
-  FLooper.quit;
+  if FLooper <> nil then
+    FLooper.quit;
   WaitFor;
   ALFreeAndNil(FHandlerCallback);
   FHandler := nil;
@@ -2808,21 +2810,23 @@ end;
 {***********************************************}
 procedure TALVideoPlayerControllerThread.Execute;
 begin
-  {$IF defined(android)}
-  TJLooper.JavaClass.Prepare;
-  FLooper := TJLooper.JavaClass.myLooper;
-  FHandlerCallback := TALVideoPlayerControllerThread.THandlerCallback.Create(Self);
-  FHandler := TJHandler.JavaClass.init(FLooper, FHandlerCallback);
-  FReady := True;
-  FHandler.sendEmptyMessage(0{what});
-  TJLooper.JavaClass.loop;
-  {$ELSE}
-  FReady := True;
-  While not terminated do begin
-    ProcessCommandQueue;
-    FSignal.WaitFor(INFINITE);
+  if not terminated then begin
+    {$IF defined(android)}
+    TJLooper.JavaClass.Prepare;
+    FLooper := TJLooper.JavaClass.myLooper;
+    FHandlerCallback := TALVideoPlayerControllerThread.THandlerCallback.Create(Self);
+    FHandler := TJHandler.JavaClass.init(FLooper, FHandlerCallback);
+    FReady := True;
+    FHandler.sendEmptyMessage(0{what});
+    TJLooper.JavaClass.loop;
+    {$ELSE}
+    FReady := True;
+    While not terminated do begin
+      ProcessCommandQueue;
+      FSignal.WaitFor(INFINITE);
+    end;
+    {$ENDIF}
   end;
-  {$ENDIF}
 end;
 
 {***********************************************************}

@@ -32,7 +32,6 @@ unit Alcinoe.ExprEval;
 interface
 
 {$I Alcinoe.inc}
-
 {$SCOPEDENUMS OFF}
 
 {$IFNDEF ALCompilerVersionSupported123}

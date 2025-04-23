@@ -15,6 +15,7 @@ unit Alcinoe.XMLDoc;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 uses
   System.Classes,

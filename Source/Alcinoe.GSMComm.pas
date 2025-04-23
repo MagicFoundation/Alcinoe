@@ -26,6 +26,8 @@ unit Alcinoe.GSMComm;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.Windows,
   Alcinoe.StringList;

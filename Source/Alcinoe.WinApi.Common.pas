@@ -5,6 +5,8 @@ unit Alcinoe.WinApi.Common;
 
 interface
 
+{$I Alcinoe.inc}
+
 {$MINENUMSIZE 4} // https://stackoverflow.com/questions/48953749/why-this-c-to-pascal-conversion-crash
 
 uses

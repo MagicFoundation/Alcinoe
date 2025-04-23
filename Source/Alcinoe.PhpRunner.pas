@@ -58,6 +58,8 @@ unit Alcinoe.PhpRunner;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   Winapi.Windows,
   Winapi.WinSock2,

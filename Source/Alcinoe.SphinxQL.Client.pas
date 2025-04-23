@@ -6,6 +6,8 @@ unit Alcinoe.SphinxQL.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Alcinoe.MySql.Client,
   Alcinoe.MySql.Wrapper;

@@ -2,6 +2,8 @@ unit Alcinoe.FMX.DatePickerDialog;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   {$IF defined(android)}
   Androidapi.JNIBridge,

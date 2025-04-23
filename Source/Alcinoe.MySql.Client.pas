@@ -7,6 +7,8 @@ unit Alcinoe.MySql.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.Windows,
   System.Contnrs,

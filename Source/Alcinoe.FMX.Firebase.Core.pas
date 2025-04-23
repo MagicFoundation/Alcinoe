@@ -2,6 +2,8 @@ unit Alcinoe.FMX.Firebase.Core;
 
 interface
 
+{$I Alcinoe.inc}
+
 implementation
 
 uses

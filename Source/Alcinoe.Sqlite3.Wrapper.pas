@@ -17,6 +17,8 @@ unit Alcinoe.Sqlite3.Wrapper;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   Winapi.Windows;
 

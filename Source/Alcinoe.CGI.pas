@@ -5,6 +5,8 @@ unit Alcinoe.CGI;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   system.classes,
   Alcinoe.IsapiHTTP,

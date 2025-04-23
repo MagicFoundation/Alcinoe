@@ -2,6 +2,8 @@ unit Alcinoe.Mime;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   System.Types,
   Alcinoe.StringList;

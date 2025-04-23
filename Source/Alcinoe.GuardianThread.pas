@@ -1,8 +1,8 @@
 unit Alcinoe.GuardianThread;
 
-{$I Alcinoe.inc}
-
 interface
+
+{$I Alcinoe.inc}
 
 uses
   system.classes,

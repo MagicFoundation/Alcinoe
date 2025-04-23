@@ -2,6 +2,8 @@ unit Alcinoe.ImageMagick;
 
 interface
 
+{$I Alcinoe.inc}
+
 //
 // https://www.imagemagick.org/script/magick-wand.php
 // https://www.imagemagick.org/MagickWand/

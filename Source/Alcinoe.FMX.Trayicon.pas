@@ -13,6 +13,8 @@ unit Alcinoe.FMX.Trayicon;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.Windows,
   Winapi.Messages,

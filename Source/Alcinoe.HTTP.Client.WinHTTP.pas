@@ -22,6 +22,8 @@ unit Alcinoe.HTTP.Client.WinHTTP;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.Windows,
   Winapi.WinHTTP,

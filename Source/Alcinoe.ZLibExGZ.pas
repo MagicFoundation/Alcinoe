@@ -2,6 +2,8 @@ unit Alcinoe.ZLibExGZ;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   system.classes;
 

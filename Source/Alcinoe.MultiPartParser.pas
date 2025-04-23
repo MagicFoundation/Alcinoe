@@ -13,6 +13,8 @@ unit Alcinoe.MultiPartParser;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   System.Classes,
   System.Contnrs,

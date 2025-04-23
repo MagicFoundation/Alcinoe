@@ -2,6 +2,8 @@ unit Alcinoe.iOSApi.AudioToolbox;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Macapi.CoreFoundation;
 

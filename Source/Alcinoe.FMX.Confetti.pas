@@ -5,6 +5,8 @@ unit Alcinoe.FMX.Confetti;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   System.Math.Vectors,
   System.types,

@@ -6,6 +6,8 @@ unit Alcinoe.Sqlite3.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   System.SysUtils,
   System.Contnrs,

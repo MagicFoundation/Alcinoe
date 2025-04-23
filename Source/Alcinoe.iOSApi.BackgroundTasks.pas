@@ -2,6 +2,8 @@ unit Alcinoe.iOSApi.BackgroundTasks;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Macapi.CoreFoundation,
   Macapi.CoreServices,

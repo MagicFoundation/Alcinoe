@@ -5,6 +5,8 @@ unit Alcinoe.WebSocket.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   system.Classes,
   Alcinoe.HTTP.Client;

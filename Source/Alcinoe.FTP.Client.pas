@@ -5,6 +5,8 @@ unit Alcinoe.FTP.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.Windows,
   System.SysUtils,

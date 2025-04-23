@@ -6,6 +6,8 @@ unit Alcinoe.WinSock;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Alcinoe.StringList;
 

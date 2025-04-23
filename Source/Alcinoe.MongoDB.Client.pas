@@ -83,6 +83,8 @@ unit Alcinoe.MongoDB.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   winapi.WinSock2,
   system.Contnrs,

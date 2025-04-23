@@ -2,6 +2,8 @@ unit Alcinoe.iOSapi.CoreFoundation;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Macapi.CoreFoundation;
 

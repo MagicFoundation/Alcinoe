@@ -2,6 +2,8 @@ unit Alcinoe.AndroidApi.Common;
 
 interface
 
+{$I Alcinoe.inc}
+
 //  Java Type    Delphi Type
 //  boolean      Boolean
 //  byte         ShortInt

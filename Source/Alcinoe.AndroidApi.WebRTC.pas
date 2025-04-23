@@ -2,6 +2,8 @@ unit Alcinoe.AndroidApi.WebRTC;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Androidapi.JNIBridge,
   Androidapi.JNI.GraphicsContentViewText,

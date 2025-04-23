@@ -6,6 +6,8 @@ unit Alcinoe.QuickSortList;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   System.Classes;
 

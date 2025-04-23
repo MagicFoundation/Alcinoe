@@ -16,6 +16,8 @@ unit Alcinoe.SMTP.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   Winapi.WinSock2,
   Alcinoe.StringList,

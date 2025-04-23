@@ -2,6 +2,8 @@ unit Alcinoe.iOSApi.MessageUI;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   iOSapi.Foundation,
   iOSapi.CocoaTypes,

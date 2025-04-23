@@ -14,6 +14,8 @@ unit Alcinoe.XMLDoc;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   System.Classes,
   System.sysutils,

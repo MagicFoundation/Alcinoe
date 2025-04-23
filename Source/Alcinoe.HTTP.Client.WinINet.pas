@@ -15,6 +15,8 @@ unit Alcinoe.HTTP.Client.WinINet;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.Windows,
   System.Classes,

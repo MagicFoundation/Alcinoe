@@ -42,6 +42,8 @@ unit Alcinoe.TbbMM;
 
 interface
 
+{$I Alcinoe.inc}
+
 implementation
 
 type

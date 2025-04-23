@@ -12,6 +12,8 @@ unit Alcinoe.MySql.Wrapper;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   Winapi.Windows;
 

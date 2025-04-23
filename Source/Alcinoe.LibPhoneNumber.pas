@@ -16,6 +16,8 @@ unit Alcinoe.LibPhoneNumber;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   system.Classes,
   system.sysutils;

@@ -2,6 +2,8 @@ unit Alcinoe.iOSApi.Photos;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Macapi.ObjectiveC,
   iOSapi.CocoaTypes,

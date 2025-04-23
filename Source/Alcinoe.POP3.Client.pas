@@ -6,6 +6,8 @@ unit Alcinoe.POP3.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   Winapi.WinSock2,
   Alcinoe.StringList,

@@ -2,6 +2,8 @@ unit Alcinoe.iOSApi.AdSupport;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Macapi.ObjectiveC,
   iOSapi.Foundation;

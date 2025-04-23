@@ -2,6 +2,8 @@ unit Alcinoe.FMX.VKontakte;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   system.Classes,
   {$IF defined(android)}

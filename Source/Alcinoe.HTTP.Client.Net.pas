@@ -2,6 +2,8 @@ unit Alcinoe.HTTP.Client.Net;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   System.Net.HttpClient,
   System.net.URLClient;

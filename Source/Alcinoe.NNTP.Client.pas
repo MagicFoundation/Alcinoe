@@ -6,6 +6,8 @@ unit Alcinoe.NNTP.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 Uses
   Winapi.WinSock2,
   Alcinoe.InternetMessages,

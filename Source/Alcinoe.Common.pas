@@ -663,6 +663,9 @@ function ALElapsedTimeMillisAsInt64: int64;
 function ALElapsedTimeSecondsAsDouble: Double;
 function ALElapsedTimeSecondsAsInt64: int64;
 
+function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
+function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): integer; // in meters
+
 {$IFDEF MSWINDOWS}
 {$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
@@ -726,7 +729,6 @@ Procedure ALWriteLN(const AStr: String); overload;
 Procedure ALWriteLN(const AStr: String; const aForegroundColor: TALConsoleColor); overload;
 Procedure ALWriteLN(const AStr: String; const aForegroundColor: TALConsoleColor; const aBackgroundColor: TALConsoleColor); overload;
 {$ENDIF}
-
 
 {~~~}
 const
@@ -3191,6 +3193,23 @@ end;
 function ALElapsedTimeSecondsAsInt64: int64;
 begin
   Result := trunc(ALElapsedTimeNano / ALNanosPerSec);
+end;
+
+{*********************************************************************}
+function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
+begin
+  result := (ALatitude >= -90) and (ALatitude <= 90) and
+            (ALongitude >= -180) and (ALongitude <= 180);
+end;
+
+{*************************************************************************************************************************}
+function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): integer; // in meters
+begin
+  //http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
+  var LCosAngle: Double := sin(aLatitude1 * (PI/180)) * sin(alatitude2 * (PI/180)) + cos(aLatitude1 * (PI/180)) * cos(alatitude2 * (PI/180)) *  cos((aLongitude2 * (PI/180)) - (aLongitude1 * (PI/180)));
+  if LCosAngle > 1 then LCosAngle := 1
+  else if LCosAngle < -1 then LCosAngle := -1;
+  result := round(6371 * arccos(LCosAngle) * 1000);
 end;
 
 {****************}

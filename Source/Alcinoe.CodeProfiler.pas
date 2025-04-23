@@ -1,8 +1,8 @@
 unit Alcinoe.CodeProfiler;
 
-{$I Alcinoe.inc}
-
 interface
+
+{$I Alcinoe.inc}
 
 type
   TALProcMetrics = record

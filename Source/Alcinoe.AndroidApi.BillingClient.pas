@@ -2,6 +2,8 @@ unit Alcinoe.AndroidApi.BillingClient;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,

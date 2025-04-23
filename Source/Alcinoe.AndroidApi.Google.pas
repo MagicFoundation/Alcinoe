@@ -2,6 +2,8 @@ unit Alcinoe.AndroidApi.Google;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Androidapi.JNI.Os,
   Androidapi.JNI.GraphicsContentViewText,

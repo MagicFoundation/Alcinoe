@@ -6,6 +6,8 @@ unit Alcinoe.FTP.Client.WinINet;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   WinApi.Windows,
   System.Classes,

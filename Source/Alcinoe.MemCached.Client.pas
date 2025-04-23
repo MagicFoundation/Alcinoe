@@ -15,6 +15,8 @@ unit Alcinoe.MemCached.Client;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Winapi.WinSock2,
   System.Contnrs,

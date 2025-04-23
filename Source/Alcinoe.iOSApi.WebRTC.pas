@@ -2,6 +2,8 @@ unit Alcinoe.iOSApi.WebRTC;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   Macapi.CoreFoundation,
   Macapi.CoreServices,

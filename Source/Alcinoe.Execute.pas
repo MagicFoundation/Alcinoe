@@ -2,6 +2,8 @@ unit Alcinoe.Execute;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   winapi.windows,
   system.classes;

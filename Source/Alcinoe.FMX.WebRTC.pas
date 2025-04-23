@@ -2,6 +2,8 @@ unit Alcinoe.FMX.WebRTC;
 
 interface
 
+{$I Alcinoe.inc}
+
 // Mandatory permissions for android :
 // <uses-permission android:name="android.permission.CAMERA" />
 // <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -23,8 +25,6 @@ interface
 // Common FPS settings
 // 30 fps
 // 15 fps
-
-{$I Alcinoe.inc}
 
 uses
   System.sysUtils,

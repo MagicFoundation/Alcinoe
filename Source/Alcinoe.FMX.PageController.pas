@@ -2191,7 +2191,7 @@ begin
       FFadeAnimation := TALFloatAnimation.Create;
       FFadeAnimation.OnProcess := FadeAnimationProcess;
       FFadeAnimation.OnFinish := FadeAnimationFinish;
-      FFadeAnimation.Duration := 2; // 0.3;
+      FFadeAnimation.Duration := 0.3;
     end;
 
     FFadeTouchMode := FScrollEngine.TouchMode;

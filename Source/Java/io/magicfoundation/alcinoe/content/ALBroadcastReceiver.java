@@ -1,4 +1,4 @@
-package io.magicfoundation.alcinoe.content;
+package io.magicfoundation.alcinoe.broadcastreceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

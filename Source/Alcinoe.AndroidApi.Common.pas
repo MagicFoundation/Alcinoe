@@ -25,8 +25,7 @@ uses
 
 type
 
-  {**********************}
-  JALFileUtil = interface;
+  {**************************************}
   JALDatePickerDialogListener = interface;
   JALDatePickerDialog = interface;
   JALKeyPreImeListener = interface;
@@ -47,17 +46,6 @@ type
   JScriptIntrinsicBlur = interface;
   JElement = interface;
   JDebug = interface;
-
-  {****************************************}
-  JALFileUtilClass = interface(JObjectClass)
-    ['{3448C3D0-1FAD-489B-88F5-329E09FE2CCF}']
-    {class} function createFileFromURI(context: JContext; uri: Jnet_Uri; fileName: Jstring): boolean; cdecl;
-  end;
-  [JavaSignature('io/magicfoundation/alcinoe/util/ALFileUtil')]
-  JALFileUtil = interface(JObject)
-    ['{5F130085-03D3-4436-87BB-84A3BB9F22E0}']
-  end;
-  TJALFileUtil = class(TJavaGenericImport<JALFileUtilClass, JALFileUtil>) end;
 
   {******************************************************}
   JALDatePickerDialogListenerClass = interface(IJavaClass)
@@ -184,7 +172,7 @@ type
   JALBroadcastReceiverListenerClass = interface(IJavaClass)
     ['{64D38904-11AB-4B0E-B9C1-D5038273BC0D}']
   end;
-  [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiverListener')]
+  [JavaSignature('io/magicfoundation/alcinoe/broadcastreceiver/ALBroadcastReceiverListener')]
   JALBroadcastReceiverListener = interface(IJavaInstance)
     ['{8AD95D78-A7FC-4613-8D94-55CC19EB1565}']
     procedure onReceive(context: JContext; intent: JIntent); cdecl;
@@ -196,7 +184,7 @@ type
     ['{23BF821F-A433-4564-AD56-7704A58D66C9}']
     {class} function init: JALBroadcastReceiver; cdecl;
   end;
-  [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiver')]
+  [JavaSignature('io/magicfoundation/alcinoe/broadcastreceiver/ALBroadcastReceiver')]
   JALBroadcastReceiver = interface(JBroadcastReceiver)
     ['{42427B26-C270-4832-8645-F788FCB549CB}']
     procedure setListener(listener: JALBroadcastReceiverListener); cdecl;
@@ -675,7 +663,6 @@ uses
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALFileUtil', TypeInfo(Alcinoe.AndroidApi.Common.JALFileUtil));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialogListener', TypeInfo(Alcinoe.AndroidApi.Common.JALDatePickerDialogListener));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialog', TypeInfo(Alcinoe.AndroidApi.Common.JALDatePickerDialog));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALKeyPreImeListener', TypeInfo(Alcinoe.AndroidApi.Common.JALKeyPreImeListener));

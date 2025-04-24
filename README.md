@@ -1114,6 +1114,10 @@ undesired conversions.
 History
 =======
 
+#### 24/04/2025 ####
+
+- Rename **alcinoe-common.jar** to **alcinoe-broadcastreceiver.jar**
+
 #### 22/04/2025 ####
 
 - **TALGeoPositionSensor** has been replaced by **TALGeoLocationSensor**.

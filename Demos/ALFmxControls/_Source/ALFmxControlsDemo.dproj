@@ -627,9 +627,6 @@
     <JavaReference Include="Android\Merged\libs\com.google.guava-guava-33.3.1-android.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\io.magicfoundation.alcinoe-alcinoe-common-1.0.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
     <JavaReference Include="Android\Merged\libs\io.magicfoundation.alcinoe-alcinoe-datepicker-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>

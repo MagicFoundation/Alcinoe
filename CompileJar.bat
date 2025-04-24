@@ -29,7 +29,7 @@ set LibraryToBuild=
 if NOT "%Standalone%"=="1" GOTO SKIP_INTERACTION
 
 echo.
-echo 1) alcinoe-common
+echo 1) alcinoe-broadcastreceiver
 echo 2) alcinoe-datepicker
 echo 3) alcinoe-edittext
 echo 4) alcinoe-facebook-share
@@ -95,7 +95,7 @@ REM Go to the library we want to build
 REM ----------------------------------
 
 if "%LibraryToBuild%"=="" goto ALL_LIBRARIES
-if "%LibraryToBuild%"=="1" goto alcinoe_common
+if "%LibraryToBuild%"=="1" goto alcinoe_broadcastreceiver
 if "%LibraryToBuild%"=="2" goto alcinoe_datepicker
 if "%LibraryToBuild%"=="3" goto alcinoe_edittext
 if "%LibraryToBuild%"=="4" goto alcinoe_facebook_share
@@ -107,17 +107,16 @@ goto FINISHED
 :ALL_LIBRARIES
 
 
-REM ------------------------
-REM Build alcinoe-common.jar
-REM ------------------------
+REM -----------------------------------
+REM Build alcinoe-broadcastreceiver.jar
+REM -----------------------------------
 
-:alcinoe_common
-echo [36mBuild alcinoe-common[0m
+:alcinoe_broadcastreceiver
+echo [36mBuild alcinoe-broadcastreceiver[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\util\*.java
-SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\content\*.java
-Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-common" "1.0.1"
+SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\broadcastreceiver\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-broadcastreceiver" "1.0.1"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 

@@ -11,7 +11,6 @@ if "%ALBaseDir%"=="" (
 set Libraries=%ALBaseDir%\Demos\ALFmxControls\_Source\Android\App\
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-edittext:1.0.0
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-datepicker:1.0.0
-set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-common:1.0.1
 set Libraries=%Libraries%;androidx.media3:media3-exoplayer:1.5.1
 set Libraries=%Libraries%;androidx.media3:media3-exoplayer-hls:1.5.1
 

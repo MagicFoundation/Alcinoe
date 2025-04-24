@@ -3108,6 +3108,9 @@ Begin
 End;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.RTTI','initialization');
+  {$ENDIF}
   ALRttiTypeInitValuesIndex := nil;
   ALRttiTypeCache := nil;
 

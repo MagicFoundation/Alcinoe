@@ -7,6 +7,7 @@ unit Alcinoe.FTP.Client.WinINet;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 uses
   WinApi.Windows,

@@ -3717,6 +3717,9 @@ end;
 
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.Common','initialization');
+  {$ENDIF}
   {$IF defined(MSWindows)}
   ALPerformanceFrequency := -1;
   {$ENDIF}
@@ -3725,7 +3728,10 @@ initialization
   ALMove := system.Move;
 
 
-Finalization
+finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.Common','finalization');
+  {$ENDIF}
   ALFreeAndNil(_ALLogHistory);
   ALFreeAndNil(_ALLogQueue);
 

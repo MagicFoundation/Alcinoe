@@ -2798,6 +2798,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.PageController','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALPageController, TALPageView]);
 
 end.

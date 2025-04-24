@@ -101,7 +101,8 @@ uses
   System.SysUtils,
   System.UITypes,
   FMX.Platform.Win,
-  FMX.Helpers.Win;
+  FMX.Helpers.Win,
+  Alcinoe.Common;
 
 {***********************************************************************************************}
 function InitWndProc(HWindow: HWND; Msg: UINT; WParam: WParam; LParam: LParam): LRESULT; stdcall;
@@ -696,8 +697,11 @@ begin
 end;
 
 initialization
-{$IFDEF WIN64}
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.NativeView.Win','initialization');
+  {$ENDIF}
+  {$IFDEF WIN64}
   UserLibrary := 0;
-{$ENDIF}
+  {$ENDIF}
 
 end.

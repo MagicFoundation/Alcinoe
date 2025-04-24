@@ -16,6 +16,7 @@ unit Alcinoe.HTTP.Client.WinINet;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 uses
   Winapi.Windows,
@@ -955,9 +956,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.WinINet','initialization');
+  {$ENDIF}
   _ALWininetHTTPClientKeepAlives := TObjectDictionary<AnsiString, TobjectList<TALWininetHTTPClient>>.create([doOwnsValues]);
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.WinINet','finalization');
+  {$ENDIF}
   ALFreeAndNil(_ALWininetHTTPClientKeepAlives);
 
 end.

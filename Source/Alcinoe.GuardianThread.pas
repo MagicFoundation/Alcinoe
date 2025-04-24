@@ -586,10 +586,16 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.GuardianThread','initialization');
+  {$ENDIF}
   TALGuardianThread.FInstance := nil;
   TALGuardianThread.CreateInstanceFunc := @TALGuardianThread.CreateInstance;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.GuardianThread','finalization');
+  {$ENDIF}
   if TALGuardianThread.HasInstance then begin
     ALCustomDelayedFreeObjectProc := nil;
     ALCustomDelayedFreeDrawableProc := nil;

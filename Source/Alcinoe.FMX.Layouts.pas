@@ -1462,6 +1462,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Layouts','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
 
 end.

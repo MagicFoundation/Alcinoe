@@ -486,7 +486,10 @@ begin
 
 end;
 
-Initialization
+initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.Mime','initialization');
+  {$ENDIF}
   AlMimeContentTypeByExtList := TALNVStringListA.Create;
   AlExtbyMimeContentTypeList := TALNVStringListA.Create;
   ALFillMimeTable;
@@ -496,6 +499,9 @@ Initialization
   TALNVStringListA(AlExtbyMimeContentTypeList).Sorted := true;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.Mime','finalization');
+  {$ENDIF}
   AlFreeandNil(AlMimeContentTypeByExtList);
   AlFreeandNil(AlExtbyMimeContentTypeList);
 

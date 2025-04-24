@@ -284,6 +284,9 @@ end;
 {$ENDREGION}
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Facebook.Core','initialization');
+  {$ENDIF}
 
   _ALFacebookInitialised := False;
 
@@ -294,6 +297,9 @@ initialization
   {$ENDREGION}
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Facebook.Core','finalization');
+  {$ENDIF}
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}

@@ -5510,9 +5510,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.Cipher','initialization');
+  {$ENDIF}
   _InitCipher;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.Cipher','finalization');
+  {$ENDIF}
   {$IF defined(MSWINDOWS)}
   AlFreeAndNil(_GoogleOAuth2AccessTokens);
   {$ENDIF}

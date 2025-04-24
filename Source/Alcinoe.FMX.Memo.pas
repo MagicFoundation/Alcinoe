@@ -1854,6 +1854,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Memo','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALMemo]);
 
 end.

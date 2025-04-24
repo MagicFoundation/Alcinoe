@@ -2780,9 +2780,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.WebRTC','initialization');
+  {$ENDIF}
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, _TProcOfObjectWrapper.ApplicationEventHandler);
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.WebRTC','finalization');
+  {$ENDIF}
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, _TProcOfObjectWrapper.ApplicationEventHandler);
 
 end.

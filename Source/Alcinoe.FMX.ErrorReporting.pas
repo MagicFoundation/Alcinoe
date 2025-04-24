@@ -97,10 +97,16 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.ErrorReporting','initialization');
+  {$ENDIF}
   TALErrorReporting.FInstance := nil;
   TALErrorReporting.CreateInstanceFunc := @TALErrorReporting.CreateInstance;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.ErrorReporting','finalization');
+  {$ENDIF}
   ALFreeAndNil(TALErrorReporting.FInstance);
 
 end.

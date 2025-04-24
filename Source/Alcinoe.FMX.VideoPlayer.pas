@@ -4355,6 +4355,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.VideoPlayer','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALVideoPlayerSurface]);
   TALVideoPlayerControllerThread.FInstance := nil;
   TALVideoPlayerControllerThread.CreateInstanceFunc := @TALVideoPlayerControllerThread.CreateInstance;
@@ -4369,6 +4372,9 @@ initialization
 
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.VideoPlayer','finalization');
+  {$ENDIF}
   ALFreeAndNil(TALVideoPlayerControllerThread.FInstance);
 
   {$REGION 'IOS'}

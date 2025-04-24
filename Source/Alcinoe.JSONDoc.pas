@@ -14594,6 +14594,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.JSONDoc','initialization');
+  {$ENDIF}
 
   ALJsonISODateFormatSettingsA := TALFormatSettingsA.Create('en-US');
   ALJsonISODateFormatSettingsA.DateSeparator := '-';

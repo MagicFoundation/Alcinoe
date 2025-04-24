@@ -1948,7 +1948,10 @@ Begin
 end;
 
 
-Initialization
+initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTML','initialization');
+  {$ENDIF}
   _ALHtmlEntities := TALStringListA.create;
   TALStringListA(_ALHtmlEntities).NameValueOptimization := False;
   ALInitHtmlEntities(_ALHtmlEntities);
@@ -1958,7 +1961,10 @@ Initialization
     Sorted := True;
   end;
 
-Finalization
+finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTML','finalization');
+  {$ENDIF}
   _ALHtmlEntities.Free;
 
 end.

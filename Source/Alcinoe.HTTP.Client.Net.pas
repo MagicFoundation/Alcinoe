@@ -105,9 +105,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.Net','initialization');
+  {$ENDIF}
   _ALNetHttpClientKeepAlives := TObjectDictionary<String, TobjectList<THTTPClient>>.create([doOwnsValues]);
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.Net','finalization');
+  {$ENDIF}
   ALFreeAndNil(_ALNetHttpClientKeepAlives);
 
 end.

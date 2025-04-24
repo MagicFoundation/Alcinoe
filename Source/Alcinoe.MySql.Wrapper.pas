@@ -13,6 +13,7 @@ unit Alcinoe.MySql.Wrapper;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 Uses
   Winapi.Windows;

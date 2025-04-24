@@ -804,9 +804,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.WebSocket.Client.WinHTTP','initialization');
+  {$ENDIF}
   TALWinHTTPWebSocketClient.ActiveWebSocketClient := TDictionary<DWORD_PTR, Boolean>.create;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.WebSocket.Client.WinHTTP','finalization');
+  {$ENDIF}
   ALFreeAndNil(TALWinHTTPWebSocketClient.ActiveWebSocketClient);
 
 end.

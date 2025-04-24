@@ -311,6 +311,9 @@ type
 
 implementation
 
+uses
+  Alcinoe.Common;
+
 {**********************}
 procedure RegisterTypes;
 begin
@@ -327,6 +330,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.AndroidApi.WebRTC','initialization');
+  {$ENDIF}
   RegisterTypes;
 
 end.

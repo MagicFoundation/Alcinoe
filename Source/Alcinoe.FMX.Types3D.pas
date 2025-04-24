@@ -337,6 +337,9 @@ end;
 {$ENDIF}
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Types3D','initialization');
+  {$ENDIF}
   {$IFDEF DEBUG}
   TotalMemoryUsedByTextures := 0;
   LastTotalMemoryUsedByTexturesLog := 0;

@@ -6,19 +6,19 @@
           android:versionCode="%versionCode%"
           android:versionName="%versionName%"
           android:installLocation="%installLocation%">
-   
+
   <uses-sdk android:minSdkVersion="%minSdkVersion%"
             android:targetSdkVersion="%targetSdkVersion%"/>
- 
+
   <%uses-permission%>
- 
+
   <uses-feature android:glEsVersion="0x00020000"
                 android:required="true"/>
-  
+
   <queries>
     <%queries-child-elements%>
   </queries>
-  
+
   <!-- ============================================ -->
   <!-- AndroidMerger auto-generated section (BEGIN) -->
   <!-- ============================================ -->
@@ -43,11 +43,11 @@
                android:resizeableActivity="true"
                android:requestLegacyExternalStorage="true"
                android:appComponentFactory="androidx.core.app.CoreComponentFactory">
- 
+
     <%provider%>
-    
+
     <%application-meta-data%>
-  
+
     <%uses-libraries%>
 
     <!-- Trigger Google Play services to install the backported photo picker module. -->
@@ -63,7 +63,7 @@
                    android:value=""/>
     </service>
 
-	  <%services%>
+    <%services%>
 
     <!-- Our activity is a subclass of the built-in NativeActivity framework class.
          This will take care of integrating with our NDK code. -->
@@ -77,17 +77,17 @@
       <meta-data android:name="android.app.lib_name"
                  android:value="%libNameValue%"/>
 
-      <intent-filter>  
+      <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
-      </intent-filter> 
+      </intent-filter>
 
     </activity>
 
     <%activity%>
 
     <%receivers%>
-    
+
     <!-- ============================================ -->
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->

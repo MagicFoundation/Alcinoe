@@ -10687,9 +10687,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.StringUtils','initialization');
+  {$ENDIF}
   _ALStringInitialization;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.StringUtils','finalization');
+  {$ENDIF}
   _ALStringFinalization;
 
 end.

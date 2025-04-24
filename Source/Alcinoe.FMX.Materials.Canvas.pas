@@ -1121,6 +1121,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Materials.Canvas','initialization');
+  {$ENDIF}
   ALDefExternalOESMaterial := nil;
   ALDef420YpCbCr8BiPlanarVideoRangeMaterial := nil;
   ALDef420YpCbCr8PlanarMaterial := nil;

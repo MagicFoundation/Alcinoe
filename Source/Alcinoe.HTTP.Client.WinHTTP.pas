@@ -921,9 +921,15 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.WinHTTP','initialization');
+  {$ENDIF}
   _ALWinHttpClientKeepAlives := TObjectDictionary<AnsiString, TobjectList<TALWinHttpClient>>.create([doOwnsValues]);
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.WinHTTP','finalization');
+  {$ENDIF}
   ALFreeAndNil(_ALWinHttpClientKeepAlives);
 
 end.

@@ -1001,11 +1001,17 @@ end;
 {$ENDREGION}
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.NotificationService','initialization');
+  {$ENDIF}
   TALNotificationService.TmpPath := '';
   TALNotificationService.FInstance := nil;
   TALNotificationService.CreateInstanceFunc := @TALNotificationService.CreateInstance;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.NotificationService','finalization');
+  {$ENDIF}
   ALFreeAndNil(TALNotificationService.FInstance);
 
 end.

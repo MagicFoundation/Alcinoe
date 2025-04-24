@@ -6750,6 +6750,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Edit','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALEdit]);
 
 end.

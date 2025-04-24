@@ -2092,6 +2092,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.MySql.Client','initialization');
+  {$ENDIF}
   ALMySQLFormatSettings := TALFormatSettingsA.Create('en-US'); // 1033 {en-US}
   ALMySQLFormatSettings.DecimalSeparator := '.';
   ALMySQLFormatSettings.ThousandSeparator := ',';

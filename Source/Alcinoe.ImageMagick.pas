@@ -3,6 +3,7 @@ unit Alcinoe.ImageMagick;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 //
 // https://www.imagemagick.org/script/magick-wand.php
@@ -1171,6 +1172,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.ImageMagick','initialization');
+  {$ENDIF}
   ALImageMagickLib := nil;
 
 end.

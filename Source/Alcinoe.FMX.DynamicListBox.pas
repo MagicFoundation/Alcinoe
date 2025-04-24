@@ -8504,7 +8504,7 @@ end;
 //    if not LControlTmp.Visible then Exit(TRectF.Empty);
 //    if LControlTmp.ClipChildren then begin
 //      var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
-//      LAbsoluteIntersectionRect.Intersect(AbsoluteClipRect);
+//      LAbsoluteIntersectionRect.Intersect(LAbsoluteClipRect);
 //      if LAbsoluteIntersectionRect.IsEmpty then
 //        Exit(TRectF.Empty);
 //    end;
@@ -28001,6 +28001,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.DynamicListBox','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALDynamicListBox]);
   TALDynamicListBoxVideoPlayerSurface.AutoStartedVideoPlayerSurface := Nil;
   _ALDummyComponent := TComponent.create(nil);
@@ -28016,6 +28019,9 @@ initialization
   {$ENDIF}
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.DynamicListBox','finalization');
+  {$ENDIF}
   AlFreeAndNil(_ALDummyComponent);
 
 end.

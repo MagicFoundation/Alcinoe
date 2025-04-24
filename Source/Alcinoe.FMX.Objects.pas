@@ -5876,6 +5876,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Objects','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALImage, TALRectangle, TALEllipse, TALCircle, TALLine, TALText]);
 
 end.

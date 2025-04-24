@@ -974,6 +974,7 @@ implementation
 uses
   system.sysutils,
   System.Math.Vectors,
+  Alcinoe.Common,
   Alcinoe.StringUtils;
 
 {***********************************************}
@@ -1360,6 +1361,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.FilterEffects','initialization');
+  {$ENDIF}
   RegisterClasses([TALColorAdjustEffect]);
   {$IF defined(ALDPK)}
   // When you compile Alcinoe.dpk inside the IDE and when Alcinoe.dpk is already installed, you could receive the error :

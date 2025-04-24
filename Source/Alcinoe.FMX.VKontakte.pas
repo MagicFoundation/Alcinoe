@@ -681,6 +681,9 @@ end;
 {$ENDREGION}
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.VKontakte','initialization');
+  {$ENDIF}
 
   _ALVKontakteInitialised := False;
 
@@ -692,6 +695,9 @@ initialization
 
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.VKontakte','finalization');
+  {$ENDIF}
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}

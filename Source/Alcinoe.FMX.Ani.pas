@@ -3035,6 +3035,9 @@ end;
 
 {************}
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Ani','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALFloatPropertyAnimation]);
   RegisterFmxClasses([TALColorPropertyAnimation]);
   RegisterFmxClasses([TALSpringForcePropertyAnimation]);
@@ -3043,6 +3046,9 @@ initialization
 
 {**********}
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Ani','finalization');
+  {$ENDIF}
   TALAnimation.Uninitialize;
 
 end.

@@ -6340,6 +6340,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Common','initialization');
+  {$ENDIF}
   ALBrokenImageResourceName := 'broken_image';
   ALBrokenImageWidth := 16;
   ALBrokenImageHeight := 16;
@@ -6361,6 +6364,9 @@ initialization
   TALBaseTextSettings.HorizontalEllipsis := '…';
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Common','finalization');
+  {$ENDIF}
   AlFreeAndNil(ALFontMetricsCache);
   {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
   ALFreeAndNil(TALFontManager.FCustomTypeFaces);

@@ -16,6 +16,7 @@ unit Alcinoe.MemCached.Client;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 uses
   Winapi.WinSock2,

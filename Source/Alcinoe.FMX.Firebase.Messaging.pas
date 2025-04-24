@@ -1144,6 +1144,9 @@ end;
 {$ENDREGION}
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Firebase.Messaging','initialization');
+  {$ENDIF}
 
   setlength(TALFirebaseMessaging.StartupNotificationMessages, 0);
   TALFirebaseMessaging.CanDeliverStartupNotificationMessages := False;
@@ -1162,6 +1165,9 @@ initialization
   {$ENDREGION}
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Firebase.Messaging','finalization');
+  {$ENDIF}
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}

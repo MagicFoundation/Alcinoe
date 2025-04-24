@@ -727,10 +727,16 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.Net.Pool','initialization');
+  {$ENDIF}
   TALNetHttpClientPool.FInstance := nil;
   TALNetHttpClientPool.CreateInstanceFunc := @TALNetHttpClientPool.CreateInstance;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.HTTP.Client.Net.Pool','finalization');
+  {$ENDIF}
   ALFreeAndNil(TALNetHttpClientPool.FInstance);
 
 end.

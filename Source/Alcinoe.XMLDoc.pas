@@ -3851,6 +3851,9 @@ Begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.XMLDoc','initialization');
+  {$ENDIF}
   ALDefaultXMLNodeIndent := '  '; { 2 spaces }
 
 end.

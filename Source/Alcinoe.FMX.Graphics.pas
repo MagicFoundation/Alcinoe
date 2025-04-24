@@ -7816,6 +7816,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Graphics','initialization');
+  {$ENDIF}
   {$IF defined(ALSkiaAvailable)}
   ALGlobalUseRasterSkSurface := True;
   ALGlobalUseRasterSkImage := True;
@@ -7843,6 +7846,9 @@ initialization
   ALIsDefaultContextOpenGLDetermined := False;
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Graphics','finalization');
+  {$ENDIF}
   ALFreeAndNil(TALGraphicThreadPool.FInstance);
   {$IF defined(ALSkiaAvailable)}
   if ALGlobalSkColorSpace <> 0 then begin

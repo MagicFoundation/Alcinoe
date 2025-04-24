@@ -3211,6 +3211,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Themes','initialization');
+  {$ENDIF}
   ALEditThemes := TDictionary<String, TALApplyEditThemeInfo>.Create;
   ALMemoThemes := TDictionary<String, TALApplyEditThemeInfo>.Create;
   ALButtonThemes := TDictionary<String, TALApplyButtonThemeInfo>.Create;
@@ -3290,6 +3293,9 @@ initialization
   ALRangeTrackBarThemes.Add('Material3.Dark', TALApplyTrackBarThemeInfo.create(ALApplyMaterial3DarkTrackBarTheme, 44{ADefaultHeight}));
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Themes','finalization');
+  {$ENDIF}
   ALFreeAndNil(ALEditThemes);
   ALFreeAndNil(ALMemoThemes);
   ALFreeAndNil(ALButtonThemes);

@@ -492,6 +492,9 @@ end;
 {$ENDIF}
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.CodeProfiler','initialization');
+  {$ENDIF}
   ALIsInCodeProfiler := False;
   ALCodeProfilerAppStartTimeStamp := TStopWatch.GetTimeStamp;
   TALStopWatchProcMetrics.ExecutionIDSequence := 0;
@@ -512,6 +515,9 @@ initialization
   {$ENDIF}
 
 finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.CodeProfiler','finalization');
+  {$ENDIF}
   {$IF (not defined(IOS)) and (not defined(ANDROID))}
   // At this point, all background threads must have completed.
   ALCodeProfilerPurgeHistories(ALCodeProfilerEnabled{ASaveHistories});

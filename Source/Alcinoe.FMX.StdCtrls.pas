@@ -11977,6 +11977,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.StdCtrls','initialization');
+  {$ENDIF}
   TALCustomTrack.TValueIndicator.Format0 := '0';
   RegisterFmxClasses(
     [TALAniIndicator, TALScrollBar, TALTrackBar,

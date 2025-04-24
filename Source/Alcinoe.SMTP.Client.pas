@@ -17,6 +17,7 @@ unit Alcinoe.SMTP.Client;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 Uses
   Winapi.WinSock2,

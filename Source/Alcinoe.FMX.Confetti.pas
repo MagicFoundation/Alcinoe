@@ -359,6 +359,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Confetti','initialization');
+  {$ENDIF}
   RegisterFmxClasses([TALConfetti]);
 
 end.

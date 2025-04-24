@@ -3549,6 +3549,9 @@ begin
 end;
 
 initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.ScrollEngine','initialization');
+  {$ENDIF}
   TALSplineOverScroller.PixelsPerInch := 0;
   TALSplineOverScroller.DECELERATION_RATE := {(Single)} (ln(0.78) / ln(0.9));
   TALSplineOverScroller.InitSpline;

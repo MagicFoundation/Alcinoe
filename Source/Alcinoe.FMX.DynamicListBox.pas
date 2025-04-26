@@ -312,7 +312,7 @@ type
     //FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
     //FDisableDoubleClickHandling: Boolean; // 1 byte
-    FIsPixelAlignmentEnabled: Boolean; // 1 byte
+    FAutoAlignToPixel: Boolean; // 1 byte
     //FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
@@ -340,8 +340,8 @@ type
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
     property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
-    function GetIsPixelAlignmentEnabled: Boolean; virtual;
-    procedure SetIsPixelAlignmentEnabled(const AValue: Boolean); Virtual;
+    function GetAutoAlignToPixel: Boolean; virtual;
+    procedure SetAutoAlignToPixel(const AValue: Boolean); Virtual;
     //property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     //property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
     //procedure DoEnter; override;
@@ -394,13 +394,13 @@ type
     procedure ClearBufDrawable; override;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
     /// <summary>
-    ///   When IsPixelAlignmentEnabled is true, all dimensions used to build the buffered drawable
+    ///   When AutoAlignToPixel is true, all dimensions used to build the buffered drawable
     ///   are aligned to the pixel grid. Additionally, after the object is loaded, all properties
     ///   related to the pixel grid (e.g., margins) are automatically aligned. Note that setting these
     ///   properties at runtime does not change their alignment; alignment is applied only via the
     ///   loading process.
     /// </summary>
-    property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
+    property AutoAlignToPixel: Boolean read GetAutoAlignToPixel write SetAutoAlignToPixel;
     //property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     //property OwnerControl: TALDynamicListBoxControl read FOwnerControl;
   end;
@@ -7672,7 +7672,7 @@ begin
   // desktops are handled by different gestures or interface elements in
   // mobile apps, leading to a more user-friendly experience.
   //FDisableDoubleClickHandling := True;
-  FIsPixelAlignmentEnabled := True;
+  FAutoAlignToPixel := True;
   //FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
   FBeforeDestructionExecuted := False;
@@ -7746,7 +7746,7 @@ end;
 //procedure TALDynamicListBoxExtendedControl.Loaded;
 //begin
 //  {$IF not DEFINED(ALDPK)}
-//  if IsPixelAlignmentEnabled then
+//  if AutoAlignToPixel then
 //    AlignToPixel;
 //  {$ENDIF}
 //  Inherited;
@@ -8457,15 +8457,15 @@ begin
 end;
 
 {****************************************************************************}
-function TALDynamicListBoxExtendedControl.GetIsPixelAlignmentEnabled: Boolean;
+function TALDynamicListBoxExtendedControl.GetAutoAlignToPixel: Boolean;
 begin
-  Result := FIsPixelAlignmentEnabled;
+  Result := FAutoAlignToPixel;
 end;
 
 {*******************************************************************************************}
-procedure TALDynamicListBoxExtendedControl.SetIsPixelAlignmentEnabled(const AValue: Boolean);
+procedure TALDynamicListBoxExtendedControl.SetAutoAlignToPixel(const AValue: Boolean);
 begin
-  FIsPixelAlignmentEnabled := AValue;
+  FAutoAlignToPixel := AValue;
 end;
 
 {******************************************************************}
@@ -9076,7 +9076,7 @@ begin
   inherited Create(AOwner);
   Rect := AOwner.LocalRect.ReducePrecision;
   Scale := ALGetScreenScale;
-  AlignToPixel := AOwner.IsPixelAlignmentEnabled;
+  AlignToPixel := AOwner.AutoAlignToPixel;
   Color := AOwner.BackgroundColor;
   ResourceName := AOwner.ResourceName;
   ResourceStream := nil;
@@ -9951,7 +9951,7 @@ begin
         FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
         LocalRect.ReducePrecision, // const ARect: TRectF;
         ALGetScreenScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+        AutoAlignToPixel, // const AAlignToPixel: Boolean;
         LoadingColor, // const AColor: TAlphaColor;
         '', // const AResourceName: String;
         nil, // const AResourceStream: TStream;
@@ -9987,7 +9987,7 @@ begin
     FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
     LocalRect.ReducePrecision, // const ARect: TRectF;
     ALGetScreenScale, // const AScale: Single;
-    IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+    AutoAlignToPixel, // const AAlignToPixel: Boolean;
     BackGroundColor, // const AColor: TAlphaColor;
     ResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
@@ -10104,7 +10104,7 @@ begin
           (LoadingColor <> TAlphaColors.Null) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LocalRect.ReducePrecision)
       .SetOpacity(AbsoluteOpacity)
       .SetFillColor(FloadingColor)
@@ -10449,7 +10449,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(ABufDrawableRect)
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, AStateLayerContentColor)
@@ -10575,7 +10575,7 @@ begin
   if ALIsDrawableNull(LDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LocalRect.ReducePrecision)
       .SetOpacity(AbsoluteOpacity)
       .SetFill(Fill)
@@ -10602,7 +10602,7 @@ begin
         ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
         TALDrawRectangleHelper.Create(FRenderTargetCanvas)
           .SetScale(ALGetScreenScale)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetAlignToPixel(AutoAlignToPixel)
           .SetDstRect(LRect)
           .SetFill(Fill)
           .SetStroke(Stroke)
@@ -10756,7 +10756,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(ABufDrawableRect))
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, AStateLayerContentColor)
@@ -10878,7 +10878,7 @@ begin
   if ALIsDrawableNull(LDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect.ReducePrecision))
       .SetOpacity(AbsoluteOpacity)
       .SetFill(Fill)
@@ -10895,7 +10895,7 @@ begin
       ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
       TALDrawRectangleHelper.Create(FRenderTargetCanvas)
         .SetScale(ALGetScreenScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LRect))
         .SetFill(Fill)
         .SetStroke(Stroke)
@@ -11971,7 +11971,7 @@ function TALDynamicListBoxBaseText.GetMultiLineTextOptions(
 begin
   Result := FMultiLineTextOptions;
   Result.Scale := AScale;
-  Result.AlignToPixel := IsPixelAlignmentEnabled;
+  Result.AlignToPixel := AutoAlignToPixel;
   Result.Opacity := AOpacity;
   //--
   Result.FontFamily := Afont.Family;
@@ -12167,7 +12167,7 @@ begin
 
     TALDrawRectangleHelper.Create(ACanvas)
       .SetScale(AScale)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(ARect)
       .SetOpacity(AOpacity)
       .SetFill(AFill)
@@ -12338,7 +12338,7 @@ begin
 
           TALDrawRectangleHelper.Create(LCanvas)
             .SetScale(AScale)
-            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetAlignToPixel(AutoAlignToPixel)
             .SetDstRect(ABufDrawableRect)
             .SetFill(AFill)
             .SetStateLayer(AStateLayer, AFont.color)
@@ -14453,7 +14453,7 @@ begin
 
   var LCanvasMatrix: TMatrix;
   var LCanvasScale: Single;
-  if IsPixelAlignmentEnabled then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
+  if AutoAlignToPixel then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
   else begin
     LCanvasMatrix := TMatrix.Identity;
     LCanvasScale := 1;
@@ -14463,14 +14463,14 @@ begin
   LRect.right := LRect.right * AScale;
   LRect.left := LRect.left * AScale;
   LRect.bottom := LRect.bottom * AScale;
-  if IsPixelAlignmentEnabled then
+  if AutoAlignToPixel then
     LRect := ALAlignToPixelRound(LRect, LCanvasMatrix, LCanvasScale, TEpsilon.Position);
   var LScaledMarginsRect := ACheckMark.Margins.Rect;
   LScaledMarginsRect.Left := LScaledMarginsRect.Left * AScale;
   LScaledMarginsRect.right := LScaledMarginsRect.right * AScale;
   LScaledMarginsRect.top := LScaledMarginsRect.top * AScale;
   LScaledMarginsRect.bottom := LScaledMarginsRect.bottom * AScale;
-  if IsPixelAlignmentEnabled then
+  if AutoAlignToPixel then
     LScaledMarginsRect := ALAlignEdgesToPixelRound(LScaledMarginsRect, LCanvasScale, TEpsilon.Position);
   LRect.Top := LRect.Top + LScaledMarginsRect.top;
   LRect.right := LRect.right - LScaledMarginsRect.right;
@@ -14485,7 +14485,7 @@ begin
     var LScaledCheckMarkThickness := ACheckMark.Thickness * AScale;
     if (ACheckMark.Color = TalphaColors.Null) or (CompareValue(LScaledCheckMarkThickness, 0, TEpsilon.position) <= 0) then
       exit;
-    if IsPixelAlignmentEnabled then
+    if AutoAlignToPixel then
       LScaledCheckMarkThickness := ALAlignDimensionToPixelRound(LScaledCheckMarkThickness, LCanvasScale, TEpsilon.Position);
 
     // exit if not checked
@@ -14624,7 +14624,7 @@ begin
   else begin
 
     TALDrawRectangleHelper.Create(ACanvas)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LRect)
       .SetFillColor(ACheckMark.Color)
       .SetFillResourceName(ACheckMark.ResourceName)
@@ -14678,7 +14678,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(ABufDrawableRect)
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, ACheckMark.Color)
@@ -14887,7 +14887,7 @@ begin
       try
 
         TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetAlignToPixel(AutoAlignToPixel)
           .SetDstRect(LRect)
           .SetFill(LCurrentAdjustedStateStyle.Fill)
           .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.CheckMark.Color)
@@ -14930,7 +14930,7 @@ begin
 
       TALDrawRectangleHelper.Create(RenderTargetCanvas)
         .SetScale(ALGetScreenScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LRect)
         .SetFill(LCurrentAdjustedStateStyle.Fill)
         .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.CheckMark.Color)
@@ -15251,7 +15251,7 @@ begin
       exit;
 
     TALDrawRectangleHelper.Create(ACanvas)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LRect))
       .SetFillColor(ACheckMark.Color)
       .SetFillResourceName(ACheckMark.ResourceName)
@@ -15266,7 +15266,7 @@ begin
   else begin
 
     TALDrawRectangleHelper.Create(ACanvas)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LRect)
       .SetFillColor(ACheckMark.Color)
       .SetFillResourceName(ACheckMark.ResourceName)
@@ -16111,7 +16111,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(ABufDrawableRect)
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, TAlphaColors.Null)
@@ -16313,7 +16313,7 @@ begin
       try
 
         TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetAlignToPixel(AutoAlignToPixel)
           .SetDstRect(LRect)
           .SetFill(LCurrentAdjustedStateStyle.Fill)
           .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TAlphaColors.Null)
@@ -16347,7 +16347,7 @@ begin
 
       TALDrawRectangleHelper.Create(RenderTargetCanvas)
         .SetScale(ALGetScreenScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LRect)
         .SetFill(LCurrentAdjustedStateStyle.Fill)
         .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TAlphaColors.Null)
@@ -19007,7 +19007,7 @@ begin
     try
 
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect.ReducePrecision)
         .SetOpacity(AbsoluteOpacity)
         .SetFill(LCurrentAdjustedStateStyle.Fill)
@@ -19036,7 +19036,7 @@ begin
 
       TALDrawRectangleHelper.Create(RenderTargetCanvas)
         .SetScale(ALGetScreenScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LRect)
         .SetOpacity(AbsoluteOpacity)
         .SetFill(LCurrentAdjustedStateStyle.Fill)
@@ -20273,7 +20273,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(ABufDrawableRect)
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, AStateLayerContentColor)
@@ -20316,7 +20316,7 @@ begin
             LDstRect.SetLocation(LDstRect.Left, Lpos);
           TALDrawRectangleHelper.Create(LCanvas)
             .SetScale(AScale)
-            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetAlignToPixel(AutoAlignToPixel)
             .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LDstRect))
             .SetFillColor(AStopIndicator.Color)
             .SetFillResourceName(AStopIndicator.ResourceName)
@@ -20376,7 +20376,7 @@ begin
     {$IF DEFINED(ALSkiaCanvas)}
 
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LocalRect.ReducePrecision)
       .SetOpacity(AbsoluteOpacity)
       .SetFill(LCurrentAdjustedStateStyle.Fill)
@@ -21896,7 +21896,7 @@ begin
   inherited Create(AOwner);
   Rect := AOwner.LocalRect.ReducePrecision;
   Scale := ALGetScreenScale;
-  AlignToPixel := AOwner.IsPixelAlignmentEnabled;
+  AlignToPixel := AOwner.AutoAlignToPixel;
   ResourceName := AOwner.PreviewResourceName;
   ResourceStream := nil;
   WrapMode := AOwner.WrapMode;
@@ -22550,7 +22550,7 @@ begin
     FBufDrawableRect, // out ABufDrawableRect: TRectF;
     LocalRect.ReducePrecision, // const ARect: TRectF;
     ALGetScreenScale, // const AScale: Single;
-    IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+    AutoAlignToPixel, // const AAlignToPixel: Boolean;
     PreviewResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
     WrapMode); // const AWrapMode: TALImageWrapMode;
@@ -22672,7 +22672,7 @@ begin
        (LoadingColor <> TAlphaColors.Null) then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect.ReducePrecision)
         .SetOpacity(AbsoluteOpacity)
         .SetFillColor(FloadingColor)
@@ -22687,7 +22687,7 @@ begin
     if BackgroundColor <> TAlphaColors.Null then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect.ReducePrecision)
         .SetOpacity(LOpacity)
         .SetFillColor(FBackgroundColor)
@@ -22742,7 +22742,7 @@ begin
        (LoadingColor <> TAlphaColors.Null) then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect.ReducePrecision)
         .SetOpacity(AbsoluteOpacity)
         .SetFillColor(FloadingColor)
@@ -22757,7 +22757,7 @@ begin
     if BackgroundColor <> TAlphaColors.Null then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect.ReducePrecision)
         .SetOpacity(LOpacity)
         .SetFillColor(FBackgroundColor)

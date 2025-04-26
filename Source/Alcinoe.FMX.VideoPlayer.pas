@@ -3418,7 +3418,7 @@ begin
   inherited Create(AOwner);
   Rect := AOwner.LocalRect;
   Scale := ALGetScreenScale;
-  AlignToPixel := AOwner.IsPixelAlignmentEnabled;
+  AlignToPixel := AOwner.AutoAlignToPixel;
   ResourceName := AOwner.PreviewResourceName;
   ResourceStream := nil;
   WrapMode := AOwner.WrapMode;
@@ -4072,7 +4072,7 @@ begin
     FBufDrawableRect, // out ABufDrawableRect: TRectF;
     LocalRect, // const ARect: TRectF;
     ALGetScreenScale, // const AScale: Single;
-    IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+    AutoAlignToPixel, // const AAlignToPixel: Boolean;
     PreviewResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
     WrapMode); // const AWrapMode: TALImageWrapMode;
@@ -4194,7 +4194,7 @@ begin
        (LoadingColor <> TAlphaColors.Null) then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect)
         .SetOpacity(AbsoluteOpacity)
         .SetFillColor(FloadingColor)
@@ -4209,7 +4209,7 @@ begin
     if BackgroundColor <> TAlphaColors.Null then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect)
         .SetOpacity(LOpacity)
         .SetFillColor(FBackgroundColor)
@@ -4264,7 +4264,7 @@ begin
        (LoadingColor <> TAlphaColors.Null) then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect)
         .SetOpacity(AbsoluteOpacity)
         .SetFillColor(FloadingColor)
@@ -4279,7 +4279,7 @@ begin
     if BackgroundColor <> TAlphaColors.Null then begin
       {$IF DEFINED(ALSkiaCanvas)}
       TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LocalRect)
         .SetOpacity(LOpacity)
         .SetFillColor(FBackgroundColor)

@@ -28,8 +28,6 @@ public class ALDatePickerDialog implements DialogInterface.OnClickListener {
     }
   }
 
-
-
   private InternalDatePickerDialog mDatePickerDialog;
   private ALDatePickerDialogListener mDatePickerDialogListener;
 
@@ -51,10 +49,13 @@ public class ALDatePickerDialog implements DialogInterface.OnClickListener {
     mDatePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
         @Override
         public void onCancel(DialogInterface dialogInterface) {
-          if (mDatePickerDialogListener != null) { mDatePickerDialogListener.onBtnClick(0, 
-                                                                                        mDatePickerDialog.getDatePicker().getYear(),
-                                                                                        mDatePickerDialog.getDatePicker().getMonth(),
-                                                                                        mDatePickerDialog.getDatePicker().getDayOfMonth()); }  
+          if (mDatePickerDialogListener != null) { 
+            mDatePickerDialogListener.onBtnClick(
+              0, 
+              mDatePickerDialog.getDatePicker().getYear(),
+              mDatePickerDialog.getDatePicker().getMonth(),
+              mDatePickerDialog.getDatePicker().getDayOfMonth()); 
+          }  
         }
     });
     
@@ -71,10 +72,13 @@ public class ALDatePickerDialog implements DialogInterface.OnClickListener {
 
   @Override
   public void onClick(DialogInterface dialog, int which) {
-    if (mDatePickerDialogListener != null) { mDatePickerDialogListener.onBtnClick(which, 
-                                                                                  mDatePickerDialog.getDatePicker().getYear(),
-                                                                                  mDatePickerDialog.getDatePicker().getMonth(),
-                                                                                  mDatePickerDialog.getDatePicker().getDayOfMonth()); }  
+    if (mDatePickerDialogListener != null) { 
+      mDatePickerDialogListener.onBtnClick(
+        which, 
+        mDatePickerDialog.getDatePicker().getYear(),
+        mDatePickerDialog.getDatePicker().getMonth(),
+        mDatePickerDialog.getDatePicker().getDayOfMonth()); 
+    }  
   }
   
 }

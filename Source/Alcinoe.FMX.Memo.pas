@@ -1775,10 +1775,10 @@ begin
       if HasUnconstrainedAutosizeY then begin
 
         var LLineHeight: Single := GetLineHeight;
-        if IsPixelAlignmentEnabled then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
+        if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
 
         var LAdjustement: Single := ((LLineHeight / 100) * 25);
-        if IsPixelAlignmentEnabled then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
+        if AutoAlignToPixel then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
 
         If LInlinedLabelText then begin
           SetFixedSizeBounds(

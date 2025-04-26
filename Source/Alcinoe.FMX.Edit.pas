@@ -5582,7 +5582,7 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
-    LOptions.AlignToPixel := IsPixelAlignmentEnabled;
+    LOptions.AlignToPixel := AutoAlignToPixel;
     //LOptions.Opacity: Single; // Default = 1
     //--
     LOptions.FontFamily := Afont.Family;
@@ -5712,7 +5712,7 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
-    LOptions.AlignToPixel := IsPixelAlignmentEnabled;
+    LOptions.AlignToPixel := AutoAlignToPixel;
     //LOptions.Opacity: Single; // Default = 1
     //--
     LOptions.FontFamily := Afont.Family;
@@ -5842,7 +5842,7 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
-    LOptions.AlignToPixel := IsPixelAlignmentEnabled;
+    LOptions.AlignToPixel := AutoAlignToPixel;
     //LOptions.Opacity: Single; // Default = 1
     //--
     LOptions.FontFamily := Afont.Family;
@@ -6310,7 +6310,7 @@ begin
       try
 
         TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetAlignToPixel(AutoAlignToPixel)
           .SetDstRect(LocalRect)
           .SetOpacity(AbsoluteOpacity)
           .SetFill(LCurrentAdjustedStateStyle.Fill)
@@ -6339,7 +6339,7 @@ begin
 
         TALDrawRectangleHelper.Create(RenderTargetCanvas)
           .SetScale(ALGetScreenScale)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetAlignToPixel(AutoAlignToPixel)
           .SetDstRect(LocalRect)
           .SetFill(LCurrentAdjustedStateStyle.Fill)
           .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.TextSettings.Font.Color)
@@ -6670,7 +6670,7 @@ begin
       if HasUnconstrainedAutosizeY then begin
 
         var LLineHeight: Single := GetLineHeight;
-        if IsPixelAlignmentEnabled then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
+        if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
 
         If LInlinedLabelText then begin
           SetFixedSizeBounds(
@@ -6727,7 +6727,7 @@ begin
       LMarginRect.Right :=  Max(LMarginRect.Right  + LStrokeSize.Right,  0);
       LMarginRect.Bottom := Max(LMarginRect.Bottom + LStrokeSize.Bottom, 0);
 
-      if IsPixelAlignmentEnabled then
+      if AutoAlignToPixel then
         LMarginRect := ALAlignEdgesToPixelRound(LMarginRect, ALGetScreenScale, TEpsilon.Position);
 
       EditControl.Margins.Rect := LMarginRect;

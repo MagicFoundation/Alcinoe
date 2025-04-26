@@ -69,6 +69,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
     property Fill: TALBrush read GetFill write SetFill;
     property Stroke: TALStrokeBrush read GetStroke write SetStroke;
@@ -247,7 +248,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
+    procedure Assign(Source: TPersistent); override;
+    property ReadyAfterResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
@@ -583,6 +585,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
@@ -1174,6 +1177,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -1350,6 +1354,24 @@ begin
   inherited;
 end;
 
+{*****************************************************}
+procedure TALShape.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALShape then begin
+      Fill.Assign(TALShape(Source).Fill);
+      Stroke.Assign(TALShape(Source).Stroke);
+      Shadow.Assign(TALShape(Source).Shadow);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {*************************************}
 function TALShape.CreateFill: TALBrush;
 begin
@@ -1454,7 +1476,7 @@ begin
   inherited Create(AOwner);
   Rect := AOwner.LocalRect;
   Scale := ALGetScreenScale;
-  AlignToPixel := AOwner.IsPixelAlignmentEnabled;
+  AlignToPixel := AOwner.AutoAlignToPixel;
   Color := AOwner.BackgroundColor;
   ResourceName := AOwner.ResourceName;
   ResourceStream := nil;
@@ -1539,6 +1561,41 @@ begin
     FMaskBitmap := nil;
   end;
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{**************************}
+procedure TALImage.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALImage then begin
+      BackgroundColor := TALImage(Source).BackgroundColor;
+      LoadingColor := TALImage(Source).LoadingColor;
+      ResourceName := TALImage(Source).ResourceName;
+      MaskResourceName := TALImage(Source).MaskResourceName;
+      MaskBitmap := TALImage(Source).MaskBitmap;
+      ReadyAfterResourcesLoaded := TALImage(Source).ReadyAfterResourcesLoaded;
+      WrapMode := TALImage(Source).WrapMode;
+      RotateAccordingToExifOrientation := TALImage(Source).RotateAccordingToExifOrientation;
+      Corners := TALImage(Source).Corners;
+      Sides := TALImage(Source).Sides;
+      XRadius := TALImage(Source).XRadius;
+      YRadius := TALImage(Source).YRadius;
+      BlurRadius := TALImage(Source).BlurRadius;
+      CacheIndex := TALImage(Source).CacheIndex;
+      LoadingCacheIndex := TALImage(Source).LoadingCacheIndex;
+      CacheEngine := TALImage(Source).CacheEngine;
+      CropCenter.Assign(TALImage(Source).CropCenter);
+      Stroke.Assign(TALImage(Source).Stroke);
+      Shadow.Assign(TALImage(Source).Shadow);
+      FadeInDuration := TALImage(Source).FadeInDuration;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {******************************************}
@@ -2329,7 +2386,7 @@ begin
         FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
         LocalRect, // const ARect: TRectF;
         ALGetScreenScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+        AutoAlignToPixel, // const AAlignToPixel: Boolean;
         LoadingColor, // const AColor: TAlphaColor;
         '', // const AResourceName: String;
         nil, // const AResourceStream: TStream;
@@ -2365,7 +2422,7 @@ begin
     FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
     LocalRect, // const ARect: TRectF;
     ALGetScreenScale, // const AScale: Single;
-    IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+    AutoAlignToPixel, // const AAlignToPixel: Boolean;
     BackGroundColor, // const AColor: TAlphaColor;
     ResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
@@ -2482,7 +2539,7 @@ begin
           (LoadingColor <> TAlphaColors.Null) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LocalRect)
       .SetOpacity(AbsoluteOpacity)
       .SetFillColor(FloadingColor)
@@ -3231,6 +3288,27 @@ begin
   inherited;
 end;
 
+{*****************************************************}
+procedure TALBaseRectangle.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALBaseRectangle then begin
+      XRadius := TALBaseRectangle(Source).XRadius;
+      YRadius := TALBaseRectangle(Source).YRadius;
+      Corners := TALBaseRectangle(Source).Corners;
+      Sides := TALBaseRectangle(Source).Sides;
+      CacheIndex := TALBaseRectangle(Source).CacheIndex;
+      CacheEngine := TALBaseRectangle(Source).CacheEngine;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {***********************************}
 procedure TALBaseRectangle.DoResized;
 begin
@@ -3435,7 +3513,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(ABufDrawableRect)
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, AStateLayerContentColor)
@@ -3561,7 +3639,7 @@ begin
   if ALIsDrawableNull(LDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LocalRect)
       .SetOpacity(AbsoluteOpacity)
       .SetFill(Fill)
@@ -3588,7 +3666,7 @@ begin
         ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
         TALDrawRectangleHelper.Create(FRenderTargetCanvas)
           .SetScale(ALGetScreenScale)
-          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetAlignToPixel(AutoAlignToPixel)
           .SetDstRect(LRect)
           .SetFill(Fill)
           .SetStroke(Stroke)
@@ -3742,7 +3820,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(ABufDrawableRect)
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, AStateLayerContentColor)
@@ -3864,7 +3942,7 @@ begin
   if ALIsDrawableNull(LDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LocalRect)
       .SetOpacity(AbsoluteOpacity)
       .SetFill(Fill)
@@ -3881,7 +3959,7 @@ begin
       ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
       TALDrawRectangleHelper.Create(FRenderTargetCanvas)
         .SetScale(ALGetScreenScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(LRect)
         .SetFill(Fill)
         .SetStroke(Stroke)
@@ -4050,7 +4128,7 @@ begin
 
       TALDrawRectangleHelper.Create(LCanvas)
         .SetScale(AScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(ABufDrawableRect))
         .SetFill(AFill)
         .SetStateLayer(AStateLayer, AStateLayerContentColor)
@@ -4172,7 +4250,7 @@ begin
   if ALIsDrawableNull(LDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect))
       .SetOpacity(AbsoluteOpacity)
       .SetFill(Fill)
@@ -4189,7 +4267,7 @@ begin
       ALClearCanvas(FRenderTargetCanvas, TAlphaColors.Null);
       TALDrawRectangleHelper.Create(FRenderTargetCanvas)
         .SetScale(ALGetScreenScale)
-        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetAlignToPixel(AutoAlignToPixel)
         .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LRect))
         .SetFill(Fill)
         .SetStroke(Stroke)
@@ -4772,6 +4850,38 @@ begin
   inherited Loaded;
 end;
 
+{**************************}
+procedure TALBaseText.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALBaseText then begin
+      OnElementClick := TALBaseText(Source).OnElementClick;
+      OnElementMouseDown := TALBaseText(Source).OnElementMouseDown;
+      OnElementMouseMove := TALBaseText(Source).OnElementMouseMove;
+      OnElementMouseUp := TALBaseText(Source).OnElementMouseUp;
+      OnElementMouseEnter := TALBaseText(Source).OnElementMouseEnter;
+      OnElementMouseLeave := TALBaseText(Source).OnElementMouseLeave;
+      CacheIndex := TALBaseText(Source).CacheIndex;
+      CacheEngine := TALBaseText(Source).CacheEngine;
+      AutoTranslate := TALBaseText(Source).AutoTranslate;
+      Text := TALBaseText(Source).Text;
+      TextSettings.Assign(TALBaseText(Source).TextSettings);
+      MaxWidth := TALBaseText(Source).MaxWidth;
+      MaxHeight := TALBaseText(Source).MaxHeight;
+      YRadius := TALBaseText(Source).YRadius;
+      XRadius := TALBaseText(Source).XRadius;
+      Corners := TALBaseText(Source).Corners;
+      Sides := TALBaseText(Source).Sides;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {*********************************}
 procedure TALBaseText.AlignToPixel;
 begin
@@ -5265,7 +5375,7 @@ function TALBaseText.GetMultiLineTextOptions(
 begin
   Result := FMultiLineTextOptions;
   Result.Scale := AScale;
-  Result.AlignToPixel := IsPixelAlignmentEnabled;
+  Result.AlignToPixel := AutoAlignToPixel;
   Result.Opacity := AOpacity;
   //--
   Result.FontFamily := Afont.Family;
@@ -5461,7 +5571,7 @@ begin
 
     TALDrawRectangleHelper.Create(ACanvas)
       .SetScale(AScale)
-      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(ARect)
       .SetOpacity(AOpacity)
       .SetFill(AFill)
@@ -5632,7 +5742,7 @@ begin
 
           TALDrawRectangleHelper.Create(LCanvas)
             .SetScale(AScale)
-            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetAlignToPixel(AutoAlignToPixel)
             .SetDstRect(ABufDrawableRect)
             .SetFill(AFill)
             .SetStateLayer(AStateLayer, AFont.color)

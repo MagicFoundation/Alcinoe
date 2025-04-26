@@ -80,7 +80,7 @@ type
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
     FDisableDoubleClickHandling: Boolean; // 1 byte
-    FIsPixelAlignmentEnabled: Boolean; // 1 byte
+    FAutoAlignToPixel: Boolean; // 1 byte
     FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
@@ -108,8 +108,8 @@ type
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
     property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
-    function GetIsPixelAlignmentEnabled: Boolean; virtual;
-    procedure SetIsPixelAlignmentEnabled(const AValue: Boolean); Virtual;
+    function GetAutoAlignToPixel: Boolean; virtual;
+    procedure SetAutoAlignToPixel(const AValue: Boolean); Virtual;
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
     procedure DoEnter; override;
@@ -142,6 +142,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
     procedure BeforeDestruction; override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
@@ -162,13 +163,13 @@ type
     procedure ClearBufDrawable; virtual;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
     /// <summary>
-    ///   When IsPixelAlignmentEnabled is true, all dimensions used to build the buffered drawable
+    ///   When AutoAlignToPixel is true, all dimensions used to build the buffered drawable
     ///   are aligned to the pixel grid. Additionally, after the object is loaded, all properties
     ///   related to the pixel grid (e.g., margins) are automatically aligned. Note that setting these
     ///   properties at runtime does not change their alignment; alignment is applied only via the
     ///   loading process.
     /// </summary>
-    property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
+    property AutoAlignToPixel: Boolean read GetAutoAlignToPixel write SetAutoAlignToPixel;
     property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     property ALParentControl: TALControl read FALParentControl;
   end;
@@ -290,7 +291,7 @@ begin
   // desktops are handled by different gestures or interface elements in
   // mobile apps, leading to a more user-friendly experience.
   FDisableDoubleClickHandling := True;
-  FIsPixelAlignmentEnabled := True;
+  FAutoAlignToPixel := True;
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
   FBeforeDestructionExecuted := False;
@@ -305,6 +306,83 @@ destructor TALControl.Destroy;
 begin
   ClearBufDrawable;
   inherited;
+end;
+
+{*****************************************************}
+procedure TALControl.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALControl then begin
+      // --TALControl
+      Align := TALControl(Source).Align;
+      AutoAlignToPixel := TALControl(Source).AutoAlignToPixel;
+      AutoSize := TALControl(Source).AutoSize;
+      DoubleBuffered := TALControl(Source).DoubleBuffered;
+      Pivot.Assign(TALControl(Source).Pivot);
+      Scale := TALControl(Source).Scale;
+      // --TControl
+      Anchors := TALControl(Source).Anchors;
+      CanFocus := TALControl(Source).CanFocus;
+      CanParentFocus := TALControl(Source).CanParentFocus;
+      ClipChildren := TALControl(Source).ClipChildren;
+      ClipParent := TALControl(Source).ClipParent;
+      Cursor := TALControl(Source).Cursor;
+      DisabledOpacity := TALControl(Source).DisabledOpacity;
+      DragMode := TALControl(Source).DragMode;
+      EnableDragHighlight := TALControl(Source).EnableDragHighlight;
+      Enabled := TALControl(Source).Enabled ;
+      Hint := TALControl(Source).Hint;
+      HitTest := TALControl(Source).HitTest;
+      Locked := TALControl(Source).Locked;
+      Margins.Assign(TALControl(Source).Margins);
+      Opacity := TALControl(Source).Opacity;
+      Padding.Assign(TALControl(Source).Padding);
+      ParentShowHint := TALControl(Source).ParentShowHint;
+      Position.Assign(TALControl(Source).Position);
+      RotationAngle := TALControl(Source).RotationAngle;
+      RotationCenter.Assign(TALControl(Source).RotationCenter);
+      ShowHint := TALControl(Source).ShowHint;
+      Size.Assign(TALControl(Source).Size);
+      StyleName := TALControl(Source).StyleName;
+      TabOrder := TALControl(Source).TabOrder;
+      TabStop := TALControl(Source).TabStop;
+      Tag := TALControl(Source).Tag;
+      TagFloat := TALControl(Source).TagFloat;
+      TagObject := TALControl(Source).TagObject;
+      TagString := TALControl(Source).TagString;
+      TouchTargetExpansion.Assign(TALControl(Source).TouchTargetExpansion);
+      Visible := TALControl(Source).Visible;
+      OnDragEnter := TALControl(Source).OnDragEnter;
+      OnDragLeave := TALControl(Source).OnDragLeave;
+      OnDragOver := TALControl(Source).OnDragOver;
+      OnDragDrop := TALControl(Source).OnDragDrop;
+      OnDragEnd := TALControl(Source).OnDragEnd;
+      OnKeyDown := TALControl(Source).OnKeyDown;
+      OnKeyUp := TALControl(Source).OnKeyUp;
+      OnClick := TALControl(Source).OnClick;
+      OnDblClick := TALControl(Source).OnDblClick;
+      OnCanFocus := TALControl(Source).OnCanFocus;
+      OnEnter := TALControl(Source).OnEnter;
+      OnExit := TALControl(Source).OnExit;
+      OnMouseDown := TALControl(Source).OnMouseDown;
+      OnMouseMove := TALControl(Source).OnMouseMove;
+      OnMouseUp := TALControl(Source).OnMouseUp;
+      OnMouseWheel := TALControl(Source).OnMouseWheel;
+      OnMouseEnter := TALControl(Source).OnMouseEnter;
+      OnMouseLeave := TALControl(Source).OnMouseLeave;
+      OnPainting := TALControl(Source).OnPainting;
+      OnPaint := TALControl(Source).OnPaint;
+      OnResize := TALControl(Source).OnResize;
+      OnResized := TALControl(Source).OnResized;
+      OnActivate := TALControl(Source).OnActivate;
+      OnDeactivate := TALControl(Source).OnDeactivate;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {*************************************}
@@ -364,7 +442,7 @@ end;
 procedure TALControl.Loaded;
 begin
   {$IF not DEFINED(ALDPK)}
-  if IsPixelAlignmentEnabled then
+  if AutoAlignToPixel then
     AlignToPixel;
   {$ENDIF}
   Inherited;
@@ -712,6 +790,7 @@ begin
       var LSize := TSizeF.Create(0,0);
       for var I := 0 to ControlsCount - 1 do begin
         var LChildControl := Controls[I];
+        if not LChildControl.Visible then Continue;
         {$IF defined(ALDPK)}
         // At design time, the Delphi IDE may add children such as
         // TGrabHandle.TGrabHandleRectangle
@@ -1073,15 +1152,15 @@ begin
 end;
 
 {******************************************************}
-function TALControl.GetIsPixelAlignmentEnabled: Boolean;
+function TALControl.GetAutoAlignToPixel: Boolean;
 begin
-  Result := FIsPixelAlignmentEnabled;
+  Result := FAutoAlignToPixel;
 end;
 
 {*********************************************************************}
-procedure TALControl.SetIsPixelAlignmentEnabled(const AValue: Boolean);
+procedure TALControl.SetAutoAlignToPixel(const AValue: Boolean);
 begin
-  FIsPixelAlignmentEnabled := AValue;
+  FAutoAlignToPixel := AValue;
 end;
 
 {********************************************}

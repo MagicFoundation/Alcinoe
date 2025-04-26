@@ -760,7 +760,7 @@ begin
   BeginUpdate;
   try
     Width := ALAlignDimensionToPixelRound(Width, ALGetScreenScale, TEpsilon.Position);
-    Height := ALAlignDimensionToPixelRound(Width, ALGetScreenScale, TEpsilon.Position);
+    Height := ALAlignDimensionToPixelRound(Height, ALGetScreenScale, TEpsilon.Position);
     Margins.AlignToPixel;
     Fill.AlignToPixel;
     Stroke.AlignToPixel;
@@ -999,7 +999,7 @@ begin
   Try
     inherited;
     FActiveIndicator.AlignToPixel;
-    FInActiveIndicator.AlignToPixel;
+    FInactiveIndicator.AlignToPixel;
   finally
     EndUpdate;
   end;
@@ -1221,8 +1221,8 @@ begin
         end;
 
         //---------------------------------
-        //TAnimationType.jumpingDotSideView
-        TAnimationType.jumpingDotSideView: begin
+        //TAnimationType.JumpingDotSideView
+        TAnimationType.JumpingDotSideView: begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else if LAnimationValue > 0 then begin
             var LRadius := LDistanceBetweenIndicators / 2.0;
@@ -1318,13 +1318,13 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
             FActiveIndicatorControl.Visible := False;
-            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInActiveIndicator.Fill.Color{Stop}, LAnimationValue);
-            TIndicatorControl(Controls[FActivePageIndex + 1]).Fill.Color := Interpolatecolor(FInActiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInactiveIndicator.Fill.Color{Stop}, LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex + 1]).Fill.Color := Interpolatecolor(FInactiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, LAnimationValue);
           end
           else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
             FActiveIndicatorControl.Visible := False;
-            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInActiveIndicator.Fill.Color{Stop}, -LAnimationValue);
-            TIndicatorControl(Controls[FActivePageIndex - 1]).Fill.Color := Interpolatecolor(FInActiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, -LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInactiveIndicator.Fill.Color{Stop}, -LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex - 1]).Fill.Color := Interpolatecolor(FInactiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, -LAnimationValue);
           end;
         end;
 
@@ -2257,7 +2257,7 @@ begin
     if Orientation = TOrientation.Horizontal then
       FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.x - GetEndPadding, AValue.Position.y))
     else
-      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.y, AValue.Position.y - GetEndPadding));
+      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.x, AValue.Position.y - GetEndPadding));
   end;
   {$ENDREGION}
 

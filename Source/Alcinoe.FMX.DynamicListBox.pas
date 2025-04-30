@@ -210,6 +210,7 @@ type
     procedure BeforeDestruction; override;
     Property IsDestroying: boolean read FIsDestroying; // [MultiThread]
     Property IsEphemeral: boolean read FIsEphemeral write FIsEphemeral; // [MultiThread]
+    procedure Assign(Source: TPersistent); virtual; abstract; // [TPersistent] procedure Assign(Source: TPersistent); virtual;
     procedure BeginUpdate; virtual; // [TControl] procedure BeginUpdate; virtual;
     procedure EndUpdate; virtual; abstract; // [TControl] procedure EndUpdate; virtual;
     function IsUpdating: Boolean; virtual; // [TControl] function IsUpdating: Boolean; virtual;

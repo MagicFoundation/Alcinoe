@@ -1133,6 +1133,14 @@ undesired conversions.
 History
 =======
 
+#### 08/05/2025
+
+- Added `ColorKey` to pair with each color property.
+- Introduced `TALStyleManager`.
+- In dark mode, resource loading now first checks for `xxx_dark` before loading `xxx`.
+- Renamed `TALIniFile` to `TALIniFileA`.
+- Added `TALUserPreferences`.
+
 #### 24/04/2025 ####
 
 - Rename **alcinoe-common.jar** to **alcinoe-broadcastreceiver.jar**

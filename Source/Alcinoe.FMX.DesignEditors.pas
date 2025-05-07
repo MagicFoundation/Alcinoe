@@ -209,7 +209,7 @@ begin
   Result := [paValueList, paMultiSelect];
 end;
 
-{*****************************************************}
+{*********************************************************}
 procedure TALColorKeyProperty.GetValues(Proc: TGetStrProc);
 begin
   var LNames := TALStyleManager.Instance.GetColorNames;
@@ -325,7 +325,7 @@ begin
   result := 1;
 end;
 
-{*******************************************************}
+{*********************************************************}
 procedure TALButtonEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Caption;
@@ -333,7 +333,7 @@ begin
   TALStyleManager.Instance.ApplyButtonStyle(LStyleName, TALButton(Component));
 end;
 
-{**************************************************************************}
+{****************************************************************************}
 procedure TALButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LNames := TALStyleManager.Instance.GetButtonStyleNames;
@@ -356,7 +356,7 @@ begin
   result := 1;
 end;
 
-{*******************************************************}
+{***********************************************************}
 procedure TALCheckBoxEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Caption;
@@ -364,7 +364,7 @@ begin
   TALStyleManager.Instance.ApplyCheckBoxStyle(LStyleName, TALCheckBox(Component));
 end;
 
-{**************************************************************************}
+{******************************************************************************}
 procedure TALCheckBoxEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LNames := TALStyleManager.Instance.GetCheckBoxStyleNames;
@@ -387,7 +387,7 @@ begin
   result := 1;
 end;
 
-{*******************************************************}
+{**************************************************************}
 procedure TALRadioButtonEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Caption;
@@ -395,7 +395,7 @@ begin
   TALStyleManager.Instance.ApplyRadioButtonStyle(LStyleName, TALRadioButton(Component));
 end;
 
-{**************************************************************************}
+{*********************************************************************************}
 procedure TALRadioButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LNames := TALStyleManager.Instance.GetRadioButtonStyleNames;
@@ -418,7 +418,7 @@ begin
   result := 1;
 end;
 
-{*******************************************************}
+{*********************************************************}
 procedure TALSwitchEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Caption;
@@ -426,7 +426,7 @@ begin
   TALStyleManager.Instance.ApplySwitchStyle(LStyleName, TALSwitch(Component));
 end;
 
-{**************************************************************************}
+{****************************************************************************}
 procedure TALSwitchEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LNames := TALStyleManager.Instance.GetSwitchStyleNames;
@@ -449,7 +449,7 @@ begin
   result := 1;
 end;
 
-{*******************************************************}
+{***********************************************************}
 procedure TALTrackBarEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Caption;
@@ -457,7 +457,7 @@ begin
   TALStyleManager.Instance.ApplyTrackBarStyle(LStyleName, TALTrackBar(Component));
 end;
 
-{**************************************************************************}
+{******************************************************************************}
 procedure TALTrackBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LNames := TALStyleManager.Instance.GetTrackBarStyleNames;
@@ -480,7 +480,7 @@ begin
   result := 1;
 end;
 
-{*******************************************************}
+{****************************************************************}
 procedure TALRangeTrackBarEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Caption;
@@ -488,7 +488,7 @@ begin
   TALStyleManager.Instance.ApplyRangeTrackBarStyle(LStyleName, TALRangeTrackBar(Component));
 end;
 
-{**************************************************************************}
+{***********************************************************************************}
 procedure TALRangeTrackBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LNames := TALStyleManager.Instance.GetRangeTrackBarStyleNames;

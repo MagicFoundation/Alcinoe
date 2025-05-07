@@ -4093,7 +4093,7 @@ begin
   end;
 end;
 
-{***********************************}
+{***************************************************************}
 procedure TALBaseEdit.TBaseStateStyle.ApplyPromptTextColorScheme;
 begin
   if FPromptTextColorKey <> '' then begin
@@ -4105,7 +4105,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*********************************************************}
 procedure TALBaseEdit.TBaseStateStyle.ApplyTintColorScheme;
 begin
   if FTintColorKey <> '' then begin
@@ -4117,7 +4117,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*****************************************************}
 procedure TALBaseEdit.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -4249,7 +4249,7 @@ begin
   end;
 end;
 
-{**********************************************************************************}
+{********************************************************************************}
 procedure TALBaseEdit.TBaseStateStyle.SetPromptTextColorKey(const AValue: String);
 begin
   if FPromptTextColorKey <> AValue then begin
@@ -4268,7 +4268,7 @@ begin
   end;
 end;
 
-{****************************************************************************}
+{**************************************************************************}
 procedure TALBaseEdit.TBaseStateStyle.SetTintColorKey(const AValue: String);
 begin
   if FTintColorKey <> AValue then begin
@@ -4301,7 +4301,7 @@ begin
   Result := TAlphaColors.Null;
 end;
 
-{**************************************************************************}
+{************************************************************************}
 function TALBaseEdit.TBaseStateStyle.GetDefaultPromptTextColorKey: String;
 begin
   Result := '';
@@ -4313,7 +4313,7 @@ begin
   Result := TAlphaColors.Null;
 end;
 
-{********************************************************************}
+{******************************************************************}
 function TALBaseEdit.TBaseStateStyle.GetDefaultTintColorKey: String;
 begin
   Result := '';
@@ -4354,7 +4354,7 @@ begin
   result := FPromptTextColor <> DefaultPromptTextColor;
 end;
 
-{********************************************************************}
+{***********************************************************************}
 function TALBaseEdit.TBaseStateStyle.IsPromptTextColorKeyStored: Boolean;
 begin
   result := FPromptTextColorKey <> DefaultPromptTextColorKey;
@@ -4366,7 +4366,7 @@ begin
   result := FTintColor <> DefaultTintColor;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 function TALBaseEdit.TBaseStateStyle.IsTintColorKeyStored: Boolean;
 begin
   result := FTintColorKey <> DefaultTintColorKey;
@@ -4539,7 +4539,7 @@ begin
   end;
 end;
 
-{********************************************}
+{**************************************************}
 procedure TALBaseEdit.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -4780,7 +4780,7 @@ begin
   end;
 end;
 
-{***********************************}
+{***********************************************}
 procedure TALBaseEdit.ApplyPromptTextColorScheme;
 begin
   if FPromptTextColorKey <> '' then begin
@@ -4793,7 +4793,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*****************************************}
 procedure TALBaseEdit.ApplyTintColorScheme;
 begin
   if FTintColorKey <> '' then begin
@@ -4805,7 +4805,7 @@ begin
   end;
 end;
 
-{******************************}
+{*************************************}
 procedure TALBaseEdit.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -5570,7 +5570,7 @@ begin
   result := FPromptTextColor;
 end;
 
-{***************************************************}
+{*************************************************}
 function TALBaseEdit.GetPromptTextColorKey: String;
 begin
   result := FPromptTextColorKey;
@@ -5587,7 +5587,7 @@ begin
   end;
 end;
 
-{*****************************************************************}
+{***************************************************************}
 procedure TALBaseEdit.setPromptTextColorKey(const Value: String);
 begin
   if FPromptTextColorKey <> Value then begin
@@ -5627,7 +5627,7 @@ begin
   result := FTintColor;
 end;
 
-{*********************************************}
+{*******************************************}
 function TALBaseEdit.GetTintColorKey: String;
 begin
   result := FTintColorKey;
@@ -5643,7 +5643,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{*********************************************************}
 procedure TALBaseEdit.setTintColorKey(const Value: String);
 begin
   if FTintColorKey <> Value then begin

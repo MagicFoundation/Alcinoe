@@ -23,7 +23,7 @@ uses
 
 Type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALUserPreferences = class(Tobject)
   private
     class function CreateInstance: TALUserPreferences;
@@ -79,7 +79,7 @@ uses
   Alcinoe.Files,
   Alcinoe.Common;
 
-{***********************************}
+{************************************}
 constructor TALUserPreferences.Create;
 begin
   {$IF defined(Android)}
@@ -98,7 +98,7 @@ begin
   inherited;
 end;
 
-{***********************************}
+{************************************}
 destructor TALUserPreferences.Destroy;
 begin
   {$IF defined(Android)}
@@ -143,7 +143,7 @@ begin
   result := FInstance <> nil;
 end;
 
-{*************}
+{*********************************************************************************}
 procedure TALUserPreferences.SetBoolean(Const AKey: String; const AValue: Boolean);
 begin
   {$IF defined(Android)}
@@ -159,7 +159,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{*****************************************************************************}
 procedure TALUserPreferences.SetInt32(Const AKey: String; const AValue: Int32);
 begin
   {$IF defined(Android)}
@@ -175,7 +175,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{*****************************************************************************}
 procedure TALUserPreferences.SetInt64(Const AKey: String; const AValue: Int64);
 begin
   {$IF defined(Android)}
@@ -191,7 +191,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{*******************************************************************************}
 procedure TALUserPreferences.SetString(Const AKey: String; const AValue: String);
 begin
   {$IF defined(Android)}
@@ -207,7 +207,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{********************************************************************************************}
 function TALUserPreferences.getBoolean(Const AKey: String; const ADefValue: Boolean): Boolean;
 begin
   {$IF defined(Android)}
@@ -224,7 +224,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{**************************************************************************************}
 function TALUserPreferences.getInt32(Const AKey: String; const ADefValue: Int32): Int32;
 begin
   {$IF defined(Android)}
@@ -241,7 +241,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{**************************************************************************************}
 function TALUserPreferences.getInt64(Const AKey: String; const ADefValue: Int64): Int64;
 begin
   {$IF defined(Android)}
@@ -258,7 +258,7 @@ begin
   {$ENDIF}
 end;
 
-{*************}
+{*****************************************************************************************}
 function TALUserPreferences.getString(Const AKey: String; const ADefValue: String): String;
 begin
   {$IF defined(Android)}

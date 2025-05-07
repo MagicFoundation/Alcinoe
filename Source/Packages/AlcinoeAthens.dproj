@@ -137,7 +137,7 @@
     <DCC_S>false</DCC_S>
     <DCC_F>false</DCC_F>
     <DCC_K>false</DCC_K>
-    <DCC_UnitSearchPath>..\CustomThemes;..\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\CustomStyles;..\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <BT_BuildType>Debug</BT_BuildType>

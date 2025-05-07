@@ -86,13 +86,13 @@ uses
   System.IOUtils,
   Alcinoe.Files;
 
-{**************************************************************}
+{***************************************************************}
 constructor TALCustomIniFileA.Create(const FileName: AnsiString);
 begin
   FFileName := FileName;
 end;
 
-{**************************************************************************}
+{***************************************************************************}
 function TALCustomIniFileA.SectionExists(const Section: AnsiString): Boolean;
 var
   S: TALStringsA;
@@ -106,7 +106,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 function TALCustomIniFileA.ReadInteger(const Section, Ident: AnsiString; Default: Integer): Integer;
 var
   IntStr: AnsiString;
@@ -118,13 +118,13 @@ begin
   Result := ALStrToIntDef(IntStr, Default);
 end;
 
-{****************************************************************************************}
+{*****************************************************************************************}
 procedure TALCustomIniFileA.WriteInteger(const Section, Ident: AnsiString; Value: Integer);
 begin
   WriteString(Section, Ident, ALIntToStrA(Value));
 end;
 
-{*******************************************************************************************}
+{********************************************************************************************}
 function TALCustomIniFileA.ReadInt64(const Section, Ident: AnsiString; Default: Int64): Int64;
 var
   IntStr: AnsiString;
@@ -136,19 +136,19 @@ begin
   Result := ALStrToInt64Def(IntStr, Default);
 end;
 
-{************************************************************************************}
+{*************************************************************************************}
 procedure TALCustomIniFileA.WriteInt64(const Section, Ident: AnsiString; Value: Int64);
 begin
   WriteString(Section, Ident, ALIntToStrA(Value));
 end;
 
-{**********************************************************************************************}
+{***********************************************************************************************}
 function TALCustomIniFileA.ReadBool(const Section, Ident: AnsiString; Default: Boolean): Boolean;
 begin
   Result := ALStrToBool(ReadString(Section, Ident, ALBoolToStrA(Default)));
 end;
 
-{********************************************************************************************************************************************}
+{*********************************************************************************************************************************************}
 function TALCustomIniFileA.ReadDate(const Section, Name: AnsiString; Default: TDateTime; const AFormatSettings: TALFormatSettingsA): TDateTime;
 var DateStr: AnsiString;
 begin
@@ -165,7 +165,7 @@ begin
   end;
 end;
 
-{************************************************************************************************************************************************}
+{*************************************************************************************************************************************************}
 function TALCustomIniFileA.ReadDateTime(const Section, Name: AnsiString; Default: TDateTime; const AFormatSettings: TALFormatSettingsA): TDateTime;
 var DateStr: AnsiString;
 begin
@@ -182,7 +182,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************************************************}
+{****************************************************************************************************************************************}
 function TALCustomIniFileA.ReadFloat(const Section, Name: AnsiString; Default: Double; const AFormatSettings: TALFormatSettingsA): Double;
 var FloatStr: AnsiString;
 begin
@@ -199,7 +199,7 @@ begin
   end;
 end;
 
-{********************************************************************************************************************************************}
+{*********************************************************************************************************************************************}
 function TALCustomIniFileA.ReadTime(const Section, Name: AnsiString; Default: TDateTime; const AFormatSettings: TALFormatSettingsA): TDateTime;
 var TimeStr: AnsiString;
 begin
@@ -216,37 +216,37 @@ begin
   end;
 end;
 
-{*********************************************************************************************************************************}
+{**********************************************************************************************************************************}
 procedure TALCustomIniFileA.WriteDate(const Section, Name: AnsiString; Value: TDateTime; const AFormatSettings: TALFormatSettingsA);
 begin
   WriteString(Section, Name, ALDateToStrA(Value, AFormatSettings));
 end;
 
-{*************************************************************************************************************************************}
+{**************************************************************************************************************************************}
 procedure TALCustomIniFileA.WriteDateTime(const Section, Name: AnsiString; Value: TDateTime; const AFormatSettings: TALFormatSettingsA);
 begin
   WriteString(Section, Name, ALDateTimeToStrA(Value, AFormatSettings));
 end;
 
-{*******************************************************************************************************************************}
+{********************************************************************************************************************************}
 procedure TALCustomIniFileA.WriteFloat(const Section, Name: AnsiString; Value: Double; const AFormatSettings: TALFormatSettingsA);
 begin
   WriteString(Section, Name, ALFloatToStrA(Value, AFormatSettings));
 end;
 
-{*********************************************************************************************************************************}
+{**********************************************************************************************************************************}
 procedure TALCustomIniFileA.WriteTime(const Section, Name: AnsiString; Value: TDateTime; const AFormatSettings: TALFormatSettingsA);
 begin
   WriteString(Section, Name, ALTimeToStrA(Value, AFormatSettings));
 end;
 
-{*************************************************************************************}
+{**************************************************************************************}
 procedure TALCustomIniFileA.WriteBool(const Section, Ident: AnsiString; Value: Boolean);
 begin
   WriteString(Section, Ident, ALBoolToStrA(Value));
 end;
 
-{*******************************************************************************}
+{********************************************************************************}
 function TALCustomIniFileA.ValueExists(const Section, Ident: AnsiString): Boolean;
 var
   S: TALStringsA;
@@ -260,7 +260,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{******************************************}
 function TALCustomIniFileA.ReadBinaryStream(
            const Section, Name: AnsiString;
            Value: TStream): Integer;
@@ -292,7 +292,7 @@ begin
   else Result := 0;
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************}
 procedure TALCustomIniFileA.WriteBinaryStream(const Section, Name: AnsiString; Value: TStream);
 var
   Text: AnsiString;
@@ -321,7 +321,7 @@ begin
   WriteString(Section, Name, Text);
 end;
 
-{**************************************************************************************************************************************}
+{***************************************************************************************************************************************}
 procedure TALCustomIniFileA.InternalReadSections(const Section: AnsiString; Strings: TALStringsA; SubSectionNamesOnly, Recurse: Boolean);
 var SLen, SectionLen, SectionEndOfs, I: Integer;
     S, SubSectionName: AnsiString;
@@ -356,26 +356,26 @@ begin
   end;
 end;
 
-{***************************************************************************************}
+{****************************************************************************************}
 procedure TALCustomIniFileA.ReadSections(const Section: AnsiString; Strings: TALStringsA);
 begin
   InternalReadSections(Section, Strings, False, True);
 end;
 
-{********************************************************************************************************************}
+{*********************************************************************************************************************}
 procedure TALCustomIniFileA.ReadSubSections(const Section: AnsiString; Strings: TALStringsA; Recurse: Boolean = False);
 begin
   InternalReadSections(Section, Strings, True, Recurse);
 end;
 
-{****************************}
+{*****************************}
 destructor TALIniFileA.Destroy;
 begin
   UpdateFile;         // flush changes to disk
   inherited Destroy;
 end;
 
-{************************************************************************************}
+{*************************************************************************************}
 function TALIniFileA.ReadString(const Section, Ident, Default: AnsiString): AnsiString;
 var
   Buffer: array[0..2047] of AnsiChar;
@@ -392,7 +392,7 @@ begin
       PAnsiChar(FFileName)));
 end;
 
-{************************************************************************}
+{*************************************************************************}
 procedure TALIniFileA.WriteString(const Section, Ident, Value: AnsiString);
 begin
   if not WritePrivateProfileStringA(
@@ -403,7 +403,7 @@ begin
     raise EALIniFileException.CreateResFmt(@SIniFileWriteError, [FileName]);
 end;
 
-{******************************************************}
+{*******************************************************}
 procedure TALIniFileA.ReadSections(Strings: TALStringsA);
 const CStdBufSize = 16384; // chars
 var P, LBuffer: PAnsiChar;
@@ -456,7 +456,7 @@ begin
   end;
 end;
 
-{********************************************************************************}
+{*********************************************************************************}
 procedure TALIniFileA.ReadSection(const Section: AnsiString; Strings: TALStringsA);
 var
   Buffer, P: PAnsiChar;
@@ -505,7 +505,7 @@ begin
   end;
 end;
 
-{**************************************************************************************}
+{***************************************************************************************}
 procedure TALIniFileA.ReadSectionValues(const Section: AnsiString; Strings: TALStringsA);
 var KeyList: TALStringListA;
     I: Integer;
@@ -526,20 +526,20 @@ begin
   end;
 end;
 
-{***********************************************************}
+{************************************************************}
 procedure TALIniFileA.EraseSection(const Section: AnsiString);
 begin
   if not WritePrivateProfileStringA(PAnsiChar(Section), nil, nil, PAnsiChar(FFileName)) then
     raise EALIniFileException.CreateResFmt(@SIniFileWriteError, [FileName]);
 end;
 
-{***************************************************************}
+{****************************************************************}
 procedure TALIniFileA.DeleteKey(const Section, Ident: AnsiString);
 begin
   WritePrivateProfileStringA(PAnsiChar(Section), PAnsiChar(Ident), nil, PAnsiChar(FFileName));
 end;
 
-{******************************}
+{*******************************}
 procedure TALIniFileA.UpdateFile;
 begin
   WritePrivateProfileStringA(nil, nil, nil, PAnsiChar(FFileName));

@@ -2009,7 +2009,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{****************************************}
+{*******************************************}
 function TALShadow.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -2039,7 +2039,7 @@ begin
   Result := TAlphaColors.null; // $96000000;
 end;
 
-{**********************************************}
+{********************************************}
 function TALShadow.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -2082,7 +2082,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{***************************************************}
 procedure TALShadow.setColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -2312,7 +2312,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*********************************}
 procedure TALFont.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -2403,7 +2403,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{**************************************}
+{*****************************************}
 function TALFont.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -2445,7 +2445,7 @@ begin
   result := TAlphaColorRec.Black;
 end;
 
-{********************************************}
+{******************************************}
 function TALFont.GetDefaultColorKey: String;
 begin
   result := '';
@@ -2528,7 +2528,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{**************************************************}
 procedure TALFont.SetColorKey(const AValue: String);
 begin
   if FColorKey <> AValue then begin
@@ -2583,7 +2583,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*******************************************}
 procedure TALTextDecoration.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -2662,7 +2662,7 @@ begin
   result := FColor <> DefaultColor
 end;
 
-{************************************************}
+{***************************************************}
 function TALTextDecoration.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey
@@ -2692,7 +2692,7 @@ begin
   Result := TAlphaColors.Null;
 end;
 
-{******************************************************}
+{****************************************************}
 function TALTextDecoration.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -2735,7 +2735,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{************************************************************}
 procedure TALTextDecoration.setColorKey(const AValue: String);
 begin
   if FColorKey <> AValue then begin
@@ -2829,7 +2829,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{*********************************************}
 procedure TALEllipsisSettings.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3146,7 +3146,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{*********************************************}
 procedure TALBaseTextSettings.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3558,7 +3558,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*************************************}
 procedure TALGradient.ApplyColorScheme;
 begin
   var Ln := length(FColorKeys);
@@ -3657,7 +3657,7 @@ begin
   end;
 end;
 
-{************************************************}
+{***************************************************}
 procedure TALGradient.ReadColorKeys(Reader: TReader);
 begin
   SetLength(FColorKeys, 0);
@@ -3672,7 +3672,7 @@ begin
   end;
 end;
 
-{*************************************************}
+{****************************************************}
 procedure TALGradient.WriteColorKeys(Writer: TWriter);
 begin
   Writer.WriteListBegin;
@@ -3797,7 +3797,7 @@ begin
   end;
 end;
 
-{****************************************************************}
+{**************************************************************}
 procedure TALGradient.SetColorKeys(const Value: TArray<String>);
 begin
   if not TEqualityComparer<TArray<String>>.Default.Equals(fColorKeys, Value) then begin
@@ -4106,7 +4106,7 @@ begin
   end;
 end;
 
-{***********************************}
+{**********************************}
 procedure TALBrush.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -4198,7 +4198,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{***************************************}
+{******************************************}
 function TALBrush.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -4228,7 +4228,7 @@ begin
   Result := TAlphaColors.white; // $FFE0E0E0;
 end;
 
-{*********************************************}
+{*******************************************}
 function TALBrush.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -4262,7 +4262,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{**************************************************}
 procedure TALBrush.setColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -4505,7 +4505,7 @@ begin
   end;
 end;
 
-{***********************************}
+{****************************************}
 procedure TALStrokeBrush.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -4561,7 +4561,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{*********************************************}
+{************************************************}
 function TALStrokeBrush.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -4579,7 +4579,7 @@ begin
   Result := TAlphaColors.Black;
 end;
 
-{***************************************************}
+{*************************************************}
 function TALStrokeBrush.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -4601,7 +4601,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{********************************************************}
 procedure TALStrokeBrush.setColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -4800,7 +4800,7 @@ begin
   end;
 end;
 
-{***********************************}
+{***************************************}
 procedure TALStateLayer.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -4876,7 +4876,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{********************************************}
+{***********************************************}
 function TALStateLayer.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -4912,7 +4912,7 @@ begin
   Result := TAlphaColors.Null;
 end;
 
-{**************************************************}
+{************************************************}
 function TALStateLayer.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -4955,7 +4955,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{*******************************************************}
 procedure TALStateLayer.setColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin

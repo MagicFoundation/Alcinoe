@@ -772,7 +772,7 @@ begin
   end;
 end;
 
-{*************************************************}
+{*****************************************************}
 procedure TALPageIndicator.TIndicator.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -1020,7 +1020,7 @@ begin
   end;
 end;
 
-{**************************************}
+{******************************************}
 procedure TALPageIndicator.ApplyColorScheme;
 begin
   BeginUpdate;

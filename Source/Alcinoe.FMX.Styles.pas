@@ -221,7 +221,7 @@ end;
 // TEXT //
 //////////
 
-{***********************************************************************************}
+{*****************************************************************************}
 procedure ALResetTextStyle(const AText: TALText; const AFontSize: Single = 16);
 begin
   With AText do begin
@@ -1843,14 +1843,14 @@ end;
 // TALStyleManager //
 /////////////////////
 
-{*********************************************************}
+{*******************************************************}
 class function TALStyleManager.GetNextSortOrder: integer;
 begin
   Result := FSortOrderCounter;
   inc(FSortOrderCounter);
 end;
 
-{***************************************************************************************************************}
+{****************************************************************************************************************************}
 constructor TALStyleManager.TTextStyleInfo.create(const AApplyStyleProc: TTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1858,7 +1858,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{***************************************************************************************************************}
+{****************************************************************************************************************************}
 constructor TALStyleManager.TEditStyleInfo.create(const AApplyStyleProc: TEditApplyStyleProc; const ADefaultFontSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1866,7 +1866,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{*****************************************************************************************************************}
+{********************************************************************************************************************************}
 constructor TALStyleManager.TButtonStyleInfo.create(const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1874,7 +1874,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{*****************************************************************************************************************}
+{**********************************************************************************************************************************}
 constructor TALStyleManager.TCheckBoxStyleInfo.create(const AApplyStyleProc: TCheckBoxApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1882,7 +1882,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{********************************************************************************************************************}
+{****************************************************************************************************************************************}
 constructor TALStyleManager.TRadioButtonStyleInfo.create(const AApplyStyleProc: TRadioButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1890,7 +1890,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{***************************************************************************************************************}
+{******************************************************************************************************************************}
 constructor TALStyleManager.TSwitchStyleInfo.create(const AApplyStyleProc: TSwitchApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1898,7 +1898,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{*****************************************************************************************************************}
+{**********************************************************************************************************************************}
 constructor TALStyleManager.TTrackbarStyleInfo.create(const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -1906,7 +1906,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{***********************************}
+{*********************************}
 constructor TALStyleManager.Create;
 begin
   FLightColors := TDictionary<string, TPair<TAlphaColor, integer{SortOrder}>>.Create;
@@ -1958,7 +1958,7 @@ begin
   inherited;
 end;
 
-{***********************************}
+{*********************************}
 destructor TALStyleManager.Destroy;
 begin
   ALFreeAndNil(FLightColors);
@@ -1976,7 +1976,7 @@ begin
   inherited;
 end;
 
-{*************}
+{***********************************}
 procedure TALStyleManager.InitStyles;
 begin
   // Note: To generate a new Material 3 color palette, you can use the following tool:
@@ -2126,7 +2126,7 @@ begin
   AddOrSetRangeTrackBarStyle('Material3.RangeTrackBar', ALApplyMaterial3TrackBarStyle, 44{ADefaultHeight});
 end;
 
-{*************}
+{***********************************}
 procedure TALStyleManager.InitColors;
 begin
   FColors.Clear;
@@ -2263,7 +2263,7 @@ begin
     InitColors;
 end;
 
-{***********************************************************************}
+{*****************************************************************************************************}
 procedure TALStyleManager.ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorName: String);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2283,7 +2283,7 @@ begin
   end;
 end;
 
-{******************************************************************}
+{*********************************************************************************************************************}
 procedure TALStyleManager.AddOrSetColor(const AName: String; Const AValue: TAlphaColor; Const AIsForDarkMode: Boolean);
 begin
   var LPair: TPair<TAlphaColor, integer{SortOrder}>;
@@ -2292,8 +2292,8 @@ begin
       fDarkColors.Add(
         AName,
         TPair<TAlphaColor, integer{SortOrder}>.Create(
-          AValue,
-          TALStyleManager.GetNextSortOrder))
+                                                 AValue,
+                                                 TALStyleManager.GetNextSortOrder))
     end
     else begin
       LPair.Key := AValue;
@@ -2305,8 +2305,8 @@ begin
       fLightColors.Add(
         AName,
         TPair<TAlphaColor, integer{SortOrder}>.Create(
-          AValue,
-          TALStyleManager.GetNextSortOrder))
+                                                 AValue,
+                                                 TALStyleManager.GetNextSortOrder))
     end
     else begin
       LPair.Key := AValue;
@@ -2315,61 +2315,61 @@ begin
   end;
 end;
 
-{******************************************************************}
+{*******************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetTextStyle(const AName: String; const AApplyStyleProc: TTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FTextStyles.AddOrSetValue(AName, TTextStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{******************************************************************}
+{*******************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetEditStyle(const AName: String; const AApplyStyleProc: TEditApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FEditStyles.AddOrSetValue(AName, TEditStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{******************************************************************}
+{*******************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetMemoStyle(const AName: String; const AApplyStyleProc: TEditApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FMemoStyles.AddOrSetValue(AName, TEditStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{******************************************************************}
+{***********************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetButtonStyle(const AName: String; const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FButtonStyles.AddOrSetValue(AName, TButtonStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{******************************************************************}
+{*************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetCheckBoxStyle(const AName: String; const AApplyStyleProc: TCheckBoxApplyStyleProc; const ADefaultHeight: Single);
 begin
   FCheckBoxStyles.AddOrSetValue(AName, TCheckBoxStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{******************************************************************}
+{*******************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetRadioButtonStyle(const AName: String; const AApplyStyleProc: TRadioButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   FRadioButtonStyles.AddOrSetValue(AName, TRadioButtonStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{******************************************************************}
+{*********************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetSwitchStyle(const AName: String; const AApplyStyleProc: TSwitchApplyStyleProc; const ADefaultHeight: Single);
 begin
   FSwitchStyles.AddOrSetValue(AName, TSwitchStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{******************************************************************}
+{*************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
 begin
   FTrackBarStyles.AddOrSetValue(AName, TTrackBarStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{******************************************************************}
+{******************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetRangeTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
 begin
   FRangeTrackBarStyles.AddOrSetValue(AName, TTrackBarStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{********************************************************************************************}
+{******************************************************************}
 function TALStyleManager.GetColor(const AName: String): TAlphaColor;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2407,7 +2407,7 @@ begin
   end;
 end;
 
-{*************************************************************************}
+{**********************************************************************************}
 procedure TALStyleManager.ApplyTextStyle(const AName: String; const AText: TALText);
 begin
   Var LApplyTextStyleInfo: TTextStyleInfo;
@@ -2430,7 +2430,7 @@ begin
   end;
 end;
 
-{*************************************************************************}
+{**************************************************************************************}
 procedure TALStyleManager.ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit);
 begin
   Var LApplyEditStyleInfo: TEditStyleInfo;
@@ -2453,7 +2453,7 @@ begin
   end;
 end;
 
-{*************************************************************************}
+{**************************************************************************************}
 procedure TALStyleManager.ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit);
 begin
   Var LApplyMemoStyleInfo: TEditStyleInfo;
@@ -2476,7 +2476,7 @@ begin
   end;
 end;
 
-{***************************************************************************}
+{****************************************************************************************}
 procedure TALStyleManager.ApplyButtonStyle(const AName: String; const AButton: TALButton);
 begin
   Var LApplyButtonStyleInfo: TButtonStyleInfo;
@@ -2499,7 +2499,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{**********************************************************************************************}
 procedure TALStyleManager.ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox);
 begin
   Var LApplyCheckBoxStyleInfo: TCheckBoxStyleInfo;
@@ -2522,7 +2522,7 @@ begin
   end;
 end;
 
-{******************************************************************************************}
+{*******************************************************************************************************}
 procedure TALStyleManager.ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton);
 begin
   Var LApplyRadioButtonStyleInfo: TRadioButtonStyleInfo;
@@ -2545,7 +2545,7 @@ begin
   end;
 end;
 
-{***************************************************************************}
+{****************************************************************************************}
 procedure TALStyleManager.ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch);
 begin
   Var LApplySwitchStyleInfo: TSwitchStyleInfo;
@@ -2568,7 +2568,7 @@ begin
   end;
 end;
 
-{************************************************************************************}
+{*************************************************************************************************}
 procedure TALStyleManager.ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack);
 begin
   Var LApplyTrackBarStyleInfo: TTrackBarStyleInfo;
@@ -2591,7 +2591,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{***********************************************************************************************************}
 procedure TALStyleManager.ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack);
 begin
   Var LApplyRangeTrackBarStyleInfo: TTrackBarStyleInfo;
@@ -2614,22 +2614,22 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{*****************************************************}
 function TALStyleManager.GetColorNames: TArray<String>;
 begin
   var LArray := FLightColors.ToArray;
   TArray.Sort<TPair<String, TPair<TAlphaColor, integer{SortOrder}>>>(LArray,
     TComparer<TPair<String, TPair<TAlphaColor, integer{SortOrder}>>>.Construct(
-      function(const Left, Right: TPair<String, TPair<TAlphaColor, integer{SortOrder}>>): Integer
-      begin
-        Result := Left.value.Value - Right.value.value;
-      end));
+                                                                       function(const Left, Right: TPair<String, TPair<TAlphaColor, integer{SortOrder}>>): Integer
+                                                                       begin
+                                                                         Result := Left.value.Value - Right.value.value;
+                                                                       end));
   SetLength(Result, Length(LArray));
   for var I := low(LArray) to High(LArray) do
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{*********************************************************}
 function TALStyleManager.GetTextStyleNames: TArray<String>;
 begin
   var LArray := FTextStyles.ToArray;
@@ -2644,7 +2644,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{*********************************************************}
 function TALStyleManager.GetEditStyleNames: TArray<String>;
 begin
   var LArray := FEditStyles.ToArray;
@@ -2659,7 +2659,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{*********************************************************}
 function TALStyleManager.GetMemoStyleNames: TArray<String>;
 begin
   var LArray := FMemoStyles.ToArray;
@@ -2674,7 +2674,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{***********************************************************}
 function TALStyleManager.GetButtonStyleNames: TArray<String>;
 begin
   var LArray := FButtonStyles.ToArray;
@@ -2689,7 +2689,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{*************************************************************}
 function TALStyleManager.GetCheckBoxStyleNames: TArray<String>;
 begin
   var LArray := FCheckBoxStyles.ToArray;
@@ -2704,7 +2704,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{****************************************************************}
 function TALStyleManager.GetRadioButtonStyleNames: TArray<String>;
 begin
   var LArray := FRadioButtonStyles.ToArray;
@@ -2719,7 +2719,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{***********************************************************}
 function TALStyleManager.GetSwitchStyleNames: TArray<String>;
 begin
   var LArray := FSwitchStyles.ToArray;
@@ -2734,7 +2734,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{*************************************************************}
 function TALStyleManager.GetTrackBarStyleNames: TArray<String>;
 begin
   var LArray := FTrackBarStyles.ToArray;
@@ -2749,7 +2749,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************************************************}
+{******************************************************************}
 function TALStyleManager.GetRangeTrackBarStyleNames: TArray<String>;
 begin
   var LArray := FRangeTrackBarStyles.ToArray;

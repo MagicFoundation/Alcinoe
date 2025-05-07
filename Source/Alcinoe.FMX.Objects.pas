@@ -1372,7 +1372,7 @@ begin
   inherited;
 end;
 
-{*****************************************************}
+{*********************************************}
 procedure TALShape.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -1422,7 +1422,7 @@ begin
   end;
 end;
 
-{******************************}
+{**********************************}
 procedure TALShape.ApplyColorScheme;
 begin
   beginUpdate;
@@ -1597,7 +1597,7 @@ begin
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
 
-{**************************}
+{*********************************************}
 procedure TALImage.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -1674,7 +1674,7 @@ begin
   end;
 end;
 
-{***********************************}
+{********************************************}
 procedure TALImage.ApplyBackgroundColorScheme;
 begin
   if FBackgroundColorKey <> '' then begin
@@ -1687,7 +1687,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*****************************************}
 procedure TALImage.ApplyLoadingColorScheme;
 begin
   if FLoadingColorKey <> '' then begin
@@ -1700,7 +1700,7 @@ begin
   end;
 end;
 
-{******************************}
+{**********************************}
 procedure TALImage.ApplyColorScheme;
 begin
   beginUpdate;
@@ -1739,7 +1739,7 @@ begin
   Result := TalphaColors.Null;
 end;
 
-{*******************************************************}
+{*****************************************************}
 function TALImage.GetDefaultBackgroundColorKey: String;
 begin
   Result := '';
@@ -1751,7 +1751,7 @@ begin
   Result := $FFe0e4e9;
 end;
 
-{****************************************************}
+{**************************************************}
 function TALImage.GetDefaultLoadingColorKey: String;
 begin
   Result := '';
@@ -1880,7 +1880,7 @@ begin
   end;
 end;
 
-{**************************************************************}
+{************************************************************}
 procedure TALImage.setBackgroundColorKey(const Value: String);
 begin
   if FBackgroundColorKey <> Value then begin
@@ -1900,7 +1900,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{*********************************************************}
 procedure TALImage.setLoadingColorKey(const Value: String);
 begin
   if FLoadingColorKey <> Value then begin
@@ -1967,7 +1967,7 @@ begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
-{*************************************************}
+{****************************************************}
 function TALImage.IsBackgroundColorKeyStored: Boolean;
 begin
   Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
@@ -1979,7 +1979,7 @@ begin
   Result := FLoadingColor <> DefaultLoadingColor;
 end;
 
-{**********************************************}
+{*************************************************}
 function TALImage.IsLoadingColorKeyStored: Boolean;
 begin
   Result := FLoadingColorKey <> DefaultLoadingColorKey;
@@ -4971,7 +4971,7 @@ begin
   inherited Loaded;
 end;
 
-{**************************}
+{************************************************}
 procedure TALBaseText.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -5017,7 +5017,7 @@ begin
   end;
 end;
 
-{******************************}
+{*************************************}
 procedure TALBaseText.ApplyColorScheme;
 begin
   beginUpdate;

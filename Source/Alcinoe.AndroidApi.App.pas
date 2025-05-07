@@ -10,10 +10,10 @@ uses
 
 type
 
-  {**************************}
+  {*************************}
   JUiModeManager = interface;
 
-  {***********************************}
+  {*******************************************}
   JUiModeManagerClass = interface(JObjectClass)
     ['{FD71340D-4C9D-4078-A322-218A2DAAEF69}']
     {class} function _GetMODE_NIGHT_AUTO: Integer; cdecl;

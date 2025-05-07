@@ -3469,7 +3469,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{************************************************************}
 procedure TALCustomTrack.TThumb.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3659,7 +3659,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{***********************************************}
 procedure TALCustomTrack.TThumb.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -4471,7 +4471,7 @@ begin
   Result := TAlphaColors.Null;
 end;
 
-{******************************************************************************}
+{****************************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -4602,7 +4602,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{************************************************************************}
+{***************************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -4636,7 +4636,7 @@ begin
   end;
 end;
 
-{*************************************************************************************}
+{***********************************************************************************}
 procedure TALCustomTrack.TTrack.TStopIndicatorBrush.SetColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -4879,7 +4879,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{***************************************************************}
 procedure TALCustomTrack.TTrack.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -5068,7 +5068,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{************************************************************}
 procedure TALCustomTrack.TTrack.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -5183,7 +5183,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{***********************************************}
 procedure TALCustomTrack.TTrack.ApplyColorScheme;
 begin
   beginUpdate;
@@ -5734,7 +5734,7 @@ begin
   Result.Name := AName; // Useful at design time in the IDE
 end;
 
-{*******************************************************}
+{************************************}
 procedure TALCustomTrack.AlignToPixel;
 begin
   BeginUpdate;
@@ -5749,7 +5749,7 @@ begin
   end;
 end;
 
-{********************************************}
+{****************************************}
 procedure TALCustomTrack.ApplyColorScheme;
 begin
   //BeginUpdate;
@@ -6482,7 +6482,7 @@ begin
   inherited;
 end;
 
-{*******************************************************}
+{**************************************}
 procedure TALRangeTrackBar.AlignToPixel;
 begin
   BeginUpdate;
@@ -6495,7 +6495,7 @@ begin
   end;
 end;
 
-{********************************************}
+{******************************************}
 procedure TALRangeTrackBar.ApplyColorScheme;
 begin
   //BeginUpdate;
@@ -7124,7 +7124,7 @@ begin
   Result := TAlphaColors.Black;
 end;
 
-{********************************************************************}
+{******************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.GetDefaultColorKey: String;
 begin
   Result := '';
@@ -7266,7 +7266,7 @@ begin
   result := FColor <> DefaultColor;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
@@ -7300,7 +7300,7 @@ begin
   end;
 end;
 
-{***************************************************************************}
+{*************************************************************************}
 procedure TALBaseCheckBox.TCheckMarkBrush.SetColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -7543,7 +7543,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*********************************************************}
 procedure TALBaseCheckBox.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -7837,7 +7837,7 @@ begin
   end;
 end;
 
-{********************************************}
+{***********************************************************}
 procedure TALBaseCheckBox.TCheckStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -7997,7 +7997,7 @@ begin
   end;
 end;
 
-{********************************************}
+{******************************************************}
 procedure TALBaseCheckBox.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -8134,7 +8134,7 @@ begin
   end;
 end;
 
-{******************************}
+{*****************************************}
 procedure TALBaseCheckBox.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -9538,7 +9538,7 @@ begin
   end;
 end;
 
-{********************************************}
+{************************************************************}
 procedure TALSwitch.TTrack.TCheckStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -9698,7 +9698,7 @@ begin
   end;
 end;
 
-{********************************************}
+{*******************************************************}
 procedure TALSwitch.TTrack.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -9836,7 +9836,7 @@ begin
   end;
 end;
 
-{******************************}
+{******************************************}
 procedure TALSwitch.TTrack.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -10798,7 +10798,7 @@ begin
   end;
 end;
 
-{******************************}
+{***********************************}
 procedure TALSwitch.ApplyColorScheme;
 begin
   //BeginUpdate;
@@ -11249,7 +11249,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{***************************************************}
 procedure TALButton.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -11554,7 +11554,7 @@ begin
   end;
 end;
 
-{********************************************}
+{************************************************}
 procedure TALButton.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -11701,7 +11701,7 @@ begin
   inherited;
 end;
 
-{**************************}
+{**********************************************}
 procedure TALButton.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -11729,7 +11729,7 @@ begin
   end;
 end;
 
-{*******************************}
+{***********************************}
 procedure TALButton.ApplyColorScheme;
 begin
   BeginUpdate;

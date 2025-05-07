@@ -3524,7 +3524,7 @@ begin
   end;
 end;
 
-{***********************************}
+{*********************************************************}
 procedure TALVideoPlayerSurface.ApplyBackgroundColorScheme;
 begin
   if FBackgroundColorKey <> '' then begin
@@ -3536,7 +3536,7 @@ begin
   end;
 end;
 
-{***********************************}
+{******************************************************}
 procedure TALVideoPlayerSurface.ApplyLoadingColorScheme;
 begin
   if FLoadingColorKey <> '' then begin
@@ -3548,7 +3548,7 @@ begin
   end;
 end;
 
-{******************************}
+{***********************************************}
 procedure TALVideoPlayerSurface.ApplyColorScheme;
 begin
   beginUpdate;
@@ -3579,7 +3579,7 @@ begin
   Result := TalphaColors.Null;
 end;
 
-{********************************************************************}
+{******************************************************************}
 function TALVideoPlayerSurface.GetDefaultBackgroundColorKey: String;
 begin
   Result := '';
@@ -3591,7 +3591,7 @@ begin
   Result := $FFe0e4e9;
 end;
 
-{*****************************************************************}
+{***************************************************************}
 function TALVideoPlayerSurface.GetDefaultLoadingColorKey: String;
 begin
   Result := '';
@@ -3820,7 +3820,7 @@ begin
   fVideoPlayerEngine.OnVideoSizeChanged := Value;
 end;
 
-{**************************************************************}
+{***************************************************************************}
 procedure TALVideoPlayerSurface.setBackgroundColor(const Value: TAlphaColor);
 begin
   if FBackgroundColor <> Value then begin
@@ -3830,7 +3830,7 @@ begin
   end;
 end;
 
-{**************************************************************}
+{*************************************************************************}
 procedure TALVideoPlayerSurface.setBackgroundColorKey(const Value: String);
 begin
   if FBackgroundColorKey <> Value then begin
@@ -3839,7 +3839,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{************************************************************************}
 procedure TALVideoPlayerSurface.setLoadingColor(const Value: TAlphaColor);
 begin
   if FLoadingColor <> Value then begin
@@ -3849,7 +3849,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+{**********************************************************************}
 procedure TALVideoPlayerSurface.setLoadingColorKey(const Value: String);
 begin
   if FLoadingColorKey <> Value then begin
@@ -3864,7 +3864,7 @@ begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 function TALVideoPlayerSurface.IsBackgroundColorKeyStored: Boolean;
 begin
   Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
@@ -3876,7 +3876,7 @@ begin
   Result := FLoadingColor <> DefaultLoadingColor;
 end;
 
-{***********************************************************}
+{**************************************************************}
 function TALVideoPlayerSurface.IsLoadingColorKeyStored: Boolean;
 begin
   Result := FLoadingColorKey <> DefaultLoadingColorKey;

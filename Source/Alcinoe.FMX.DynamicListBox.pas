@@ -210,11 +210,11 @@ type
     procedure BeforeDestruction; override;
     Property IsDestroying: boolean read FIsDestroying; // [MultiThread]
     Property IsEphemeral: boolean read FIsEphemeral write FIsEphemeral; // [MultiThread]
-    procedure Assign(Source: TPersistent); virtual; abstract; // [TPersistent] procedure Assign(Source: TPersistent); virtual;
     procedure BeginUpdate; virtual; // [TControl] procedure BeginUpdate; virtual;
     procedure EndUpdate; virtual; abstract; // [TControl] procedure EndUpdate; virtual;
     function IsUpdating: Boolean; virtual; // [TControl] function IsUpdating: Boolean; virtual;
     function IsReadyToDisplay: Boolean; virtual; abstract;
+    procedure ApplyColorScheme; virtual; abstract;
     procedure AddControl(const AControl: TALDynamicListBoxControl); inline; // [TFmxObject] procedure AddObject(const AObject: TFmxObject);
     procedure InsertControl(const AControl: TALDynamicListBoxControl; const AIndex: Integer); // [TFmxObject] procedure InsertObject(Index: Integer; const AObject: TFmxObject);
     procedure RemoveControl(const AControl: TALDynamicListBoxControl); overload; // [TFmxObject] procedure RemoveObject(const AObject: TFmxObject); overload;
@@ -376,6 +376,7 @@ type
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    //procedure Assign(Source: TPersistent); override;
     procedure EndUpdate; override;
     //procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; override;
@@ -388,6 +389,7 @@ type
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; override;
     procedure SetBounds(X, Y, AWidth, AHeight: Double); override;
     function HasUnconstrainedAutosizeX: Boolean; override;
     function HasUnconstrainedAutosizeY: Boolean; override;
@@ -483,7 +485,7 @@ type
   strict private
     FFill: TALBrush;
     FStroke: TALStrokeBrush;
-    fShadow: TALShadow;
+    FShadow: TALShadow;
     function GetFill: TALBrush;
     procedure SetFill(const Value: TALBrush);
     function GetStroke: TALStrokeBrush;
@@ -500,7 +502,9 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    //procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     property Fill: TALBrush read GetFill write SetFill;
     property Stroke: TALStrokeBrush read GetStroke write SetStroke;
     property Shadow: TALShadow read GetShadow write SetShadow;
@@ -552,14 +556,16 @@ type
       End;
   private
     FBackgroundColor: TAlphaColor; // 4 bytes
+    FBackgroundColorKey: String; // 8 bytes
     FLoadingColor: TAlphaColor; // 4 bytes
-    fResourceName: String; // 8 bytes
+    FLoadingColorKey: String; // 8 bytes
+    FResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
     FMaskBitmap: TALRefCountBitmap; // 8 bytes
     FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 bytes
-    fExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
-    fRotateAccordingToExifOrientation: Boolean; // 1 bytes
+    FExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
+    FRotateAccordingToExifOrientation: Boolean; // 1 bytes
     FCorners: TCorners; // 1 bytes
     FSides: TSides; // 1 bytes
     FXRadius: Single; // 4 bytes
@@ -570,7 +576,7 @@ type
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FCropCenter: TALPosition; // 8 bytes
     FStroke: TALStrokeBrush; // 8 bytes
-    fShadow: TALShadow; // 8 bytes
+    FShadow: TALShadow; // 8 bytes
     FResourceDownloadContext: TResourceDownloadContext; // [MultiThread] | 8 bytes
     FFadeInDuration: Single; // 4 bytes
     FFadeInStartTimeNano: Int64; // 8 bytes
@@ -586,9 +592,13 @@ type
     procedure setMaskResourceName(const Value: String);
     procedure setMaskBitmap(const Value: TALRefCountBitmap);
     procedure setBackgroundColor(const Value: TAlphaColor);
+    procedure setBackgroundColorKey(const Value: String);
     procedure setLoadingColor(const Value: TAlphaColor);
+    procedure setLoadingColorKey(const Value: String);
     function IsBackgroundColorStored: Boolean;
+    function IsBackgroundColorKeyStored: Boolean;
     function IsLoadingColorStored: Boolean;
+    function IsLoadingColorKeyStored: Boolean;
     function IsFadeInDurationStored: Boolean;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
@@ -603,11 +613,15 @@ type
     function CreateCropCenter: TALPosition; virtual;
     function CreateStroke: TALStrokeBrush; virtual;
     function CreateShadow: TALShadow; virtual;
+    procedure ApplyLoadingColorScheme; virtual;
+    procedure ApplyBackgroundColorScheme; virtual;
     function GetCacheSubIndex: Integer; virtual;
     function GetLoadingCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultBackgroundColorKey: String; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultLoadingColorKey: String; virtual;
     function GetDefaultFadeInDuration: Single; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
@@ -657,13 +671,17 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
-    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
+    //procedure Assign(Source: TPersistent); override;
+    property ReadyAfterResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultBackgroundColorKey: String read GetDefaultBackgroundColorKey;
     property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultLoadingColorKey: String read GetDefaultLoadingColorKey;
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
@@ -684,7 +702,9 @@ type
     //property Anchors;
     //property AutoSize;
     property BackgroundColor: TAlphaColor read fBackgroundColor write setBackgroundColor Stored IsBackgroundColorStored;
+    property BackgroundColorKey: String read fBackgroundColorKey write setBackgroundColorKey Stored IsBackgroundColorKeyStored;
     property LoadingColor: TAlphaColor read FLoadingColor write setLoadingColor Stored IsLoadingColorStored;
+    property LoadingColorKey: String read FLoadingColorKey write setLoadingColorKey Stored IsLoadingColorKeyStored;
     property BlurRadius: Single read FBlurRadius write SetBlurRadius stored IsBlurRadiusStored nodefault;
     //property CanFocus;
     //property CanParentFocus;
@@ -720,8 +740,8 @@ type
     // If ResourceName is a URL, the image is downloaded in the background from the internet.
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
-    property ResourceName: String read fResourceName write setResourceName;
-    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
+    property ResourceName: String read FResourceName write setResourceName;
+    property RotateAccordingToExifOrientation: Boolean read FRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
     //property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -828,6 +848,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    //procedure Assign(Source: TPersistent); override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
@@ -1296,7 +1317,9 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    //procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     function TextBroken: Boolean;
@@ -1456,6 +1479,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure ClearBufDrawable; virtual;
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALDynamicListBoxBaseStateStyle; const ANormalizedTime: Single); virtual;
@@ -1497,6 +1521,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure ClearBufDrawable; virtual;
     /// <summary>
     ///   Determines and returns the current raw state style of the control
@@ -1535,23 +1560,27 @@ type
           end;
       private
         FColor: TAlphaColor;
+        FColorKey: String;
         FResourceName: String;
         FWrapMode: TALImageWrapMode;
         FThickness: Single;
         FMargins: TALBounds;
         procedure SetColor(const Value: TAlphaColor);
+        procedure SetColorKey(const Value: String);
         procedure SetResourceName(const Value: String);
         procedure SetWrapMode(const Value: TALImageWrapMode);
         procedure SetThickness(const Value: Single);
         procedure SetMargins(const Value: TALBounds);
         procedure MarginsChanged(Sender: TObject); virtual;
         function IsColorStored: Boolean;
+        function IsColorKeyStored: Boolean;
         function IsResourceNameStored: Boolean;
         function IsWrapModeStored: Boolean;
         function IsThicknessStored: Boolean;
       protected
         function CreateMargins: TALBounds; virtual;
         function GetDefaultColor: TAlphaColor; virtual;
+        function GetDefaultColorKey: String; virtual;
         function GetDefaultResourceName: String; virtual;
         function GetDefaultWrapMode: TALImageWrapMode; virtual;
         function GetDefaultThickness: Single; virtual;
@@ -1561,15 +1590,18 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; virtual;
+        procedure ApplyColorScheme; virtual;
         procedure Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single); virtual;
         procedure InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
         function HasCheckMark: boolean;
         property DefaultColor: TAlphaColor read GetDefaultColor;
+        property DefaultColorKey: String read GetDefaultColorKey;
         property DefaultResourceName: String read GetDefaultResourceName;
         property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
         property DefaultThickness: Single read GetDefaultThickness;
       public
         property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+        property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
         property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
         property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
         property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
@@ -1631,6 +1663,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure Interpolate(const ATo: TALDynamicListBoxBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALDynamicListBoxBaseCheckBox read GetControlParent;
@@ -1720,6 +1753,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; virtual;
+        procedure ApplyColorScheme; virtual;
         procedure ClearBufDrawable; virtual;
       public
         property &Default: TDefaultStateStyle read FDefault write SetDefault;
@@ -1748,6 +1782,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure ClearBufDrawable; override;
         function GetCurrentRawStyle: TALDynamicListBoxBaseStateStyle; override;
         Property Parent: TALDynamicListBoxBaseCheckBox read GetParent;
@@ -1834,6 +1869,7 @@ type
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     //property CanFocus default True;
@@ -2169,6 +2205,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; virtual;
+            procedure ApplyColorScheme; virtual;
             procedure ClearBufDrawable; virtual;
           public
             property &Default: TDefaultStateStyle read FDefault write SetDefault;
@@ -2197,6 +2234,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure ClearBufDrawable; override;
             function GetCurrentRawStyle: TALDynamicListBoxBaseStateStyle; override;
             Property Parent: TTrack read GetParent;
@@ -2267,6 +2305,7 @@ type
         constructor Create(const AOwner: TObject); override;
         destructor Destroy; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
         property DefaultXRadius: Single read GetDefaultXRadius;
@@ -2590,6 +2629,7 @@ type
     procedure BeforeDestruction; override;
     procedure AfterConstruction; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
@@ -2742,7 +2782,6 @@ type
       private
         FText: String;
         FTextSettings: TBaseStateStyle.TTextSettings;
-        FPriorSupersedeText: String;
         function GetStateStyleParent: TBaseStateStyle;
         function GetControlParent: TALDynamicListBoxButton;
         procedure SetText(const Value: string);
@@ -2762,6 +2801,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure Interpolate(const ATo: TALDynamicListBoxBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALDynamicListBoxButton read GetControlParent;
@@ -2843,6 +2883,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure ClearBufDrawable; override;
         function GetCurrentRawStyle: TALDynamicListBoxBaseStateStyle; override;
         Property Parent: TALDynamicListBoxButton read GetParent;
@@ -2884,7 +2925,9 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    //procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property CacheEngine;
@@ -2996,19 +3039,23 @@ type
           TStopIndicatorBrush = class(TALPersistentObserver)
           private
             FColor: TAlphaColor;
+            FColorKey: String;
             FResourceName: String;
             FWrapMode: TALImageWrapMode;
             FSize: Single;
             procedure SetColor(const Value: TAlphaColor);
+            procedure SetColorKey(const Value: String);
             procedure SetResourceName(const Value: String);
             procedure SetWrapMode(const Value: TALImageWrapMode);
             procedure SetSize(const Value: Single);
             function IsColorStored: Boolean;
+            function IsColorKeyStored: Boolean;
             function IsResourceNameStored: Boolean;
             function IsWrapModeStored: Boolean;
             function IsSizeStored: Boolean;
           protected
             function GetDefaultColor: TAlphaColor; virtual;
+            function GetDefaultColorKey: String; virtual;
             function GetDefaultResourceName: String; virtual;
             function GetDefaultWrapMode: TALImageWrapMode; virtual;
             function GetDefaultSize: Single; virtual;
@@ -3017,15 +3064,18 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; virtual;
+            procedure ApplyColorScheme; virtual;
             procedure Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single); virtual;
             procedure InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
             function hasStopIndicator: Boolean;
             property DefaultColor: TAlphaColor read GetDefaultColor;
+            property DefaultColorKey: String read GetDefaultColorKey;
             property DefaultResourceName: String read GetDefaultResourceName;
             property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
             property DefaultSize: Single read GetDefaultSize;
           public
             property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+            property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
             property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
             property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
             property Size: Single read FSize write SetSize stored IsSizeStored nodefault;
@@ -3088,6 +3138,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure Interpolate(const ATo: TALDynamicListBoxBaseStateStyle; const ANormalizedTime: Single); override;
             property ControlParent: TTrack read GetControlParent;
           public
@@ -3127,6 +3178,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure ClearBufDrawable; override;
             function GetCurrentRawStyle: TALDynamicListBoxBaseStateStyle; override;
             Property Parent: TTrack read GetParent;
@@ -3180,6 +3232,7 @@ type
         constructor Create(const ACustomTrack: TALDynamicListBoxCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
         property HitTest default false;
@@ -3389,6 +3442,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure ClearBufDrawable; override;
             function GetCurrentRawStyle: TALDynamicListBoxBaseStateStyle; override;
             Property Parent: TThumb read GetParent;
@@ -3434,6 +3488,7 @@ type
         destructor Destroy; override;
         procedure BeforeDestruction; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         function GetValue: Double;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
@@ -3737,6 +3792,8 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     procedure AfterConstruction; override;
+    procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
@@ -3924,6 +3981,8 @@ type
     procedure AlignTracks; override;
   public
     constructor Create(const AOwner: TObject); override;
+    procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
   public
@@ -4238,7 +4297,9 @@ type
     FDataSource: String; // 8 bytes
     fPreviewResourceName: String; // 8 bytes
     FBackgroundColor: TAlphaColor; // 4 bytes
+    FBackgroundColorKey: String; // 8 bytes
     FLoadingColor: TAlphaColor; // 4 bytes
+    FLoadingColorKey: String; // 4 bytes
     FInternalState: Integer; // 4 Bytes
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
@@ -4271,8 +4332,14 @@ type
     procedure SetOnCompletionEvent(const Value: TNotifyEvent);
     function GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
     procedure SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
+    procedure setBackgroundColor(const Value: TAlphaColor);
+    procedure setBackgroundColorKey(const Value: String);
+    procedure setLoadingColor(const Value: TAlphaColor);
+    procedure setLoadingColorKey(const Value: String);
     function IsBackgroundColorStored: Boolean;
+    function IsBackgroundColorKeyStored: Boolean;
     function IsLoadingColorStored: Boolean;
+    function IsLoadingColorKeyStored: Boolean;
     function IsFadeInDurationStored: Boolean;
     function IsDataSourceStored: Boolean;
     function IsPlaybackSpeedStored: Boolean;
@@ -4280,10 +4347,14 @@ type
   protected
     fBufDrawable: TALDrawable; // 8 bytes
     fBufDrawableRect: TRectF; // 16 bytes
+    procedure ApplyLoadingColorScheme; virtual;
+    procedure ApplyBackgroundColorScheme; virtual;
     function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultBackgroundColorKey: String; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultLoadingColorKey: String; virtual;
     function GetDefaultFadeInDuration: Single; virtual;
     procedure CancelPreviewDownload;
     class function CanStartPreviewDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
@@ -4310,10 +4381,13 @@ type
     procedure BeforeDestruction; override;
     property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultBackgroundColorKey: String read GetDefaultBackgroundColorKey;
     property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultLoadingColorKey: String read GetDefaultLoadingColorKey;
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     function GetCurrentPosition: Int64;
     function GetDuration: Int64;
@@ -4338,8 +4412,10 @@ type
     //property Anchors;
     //property AutoSize;
     property AutoStartMode: TAutoStartMode read FAutoStartMode write SetAutoStartMode default TAutoStartMode.None;
-    property BackgroundColor: TAlphaColor read fBackgroundColor write fBackgroundColor Stored IsBackgroundColorStored;
-    property LoadingColor: TAlphaColor read FLoadingColor write FLoadingColor Stored IsLoadingColorStored;
+    property BackgroundColor: TAlphaColor read fBackgroundColor write SetBackgroundColor Stored IsBackgroundColorStored;
+    property BackgroundColorKey: String read fBackgroundColorKey write SetBackgroundColorKey Stored IsBackgroundColorKeyStored;
+    property LoadingColor: TAlphaColor read FLoadingColor write SetLoadingColor Stored IsLoadingColorStored;
+    property LoadingColorKey: String read FLoadingColorKey write SetLoadingColorKey Stored IsLoadingColorKeyStored;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -4572,6 +4648,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; virtual;
+        procedure ApplyColorScheme; virtual;
         property DefaultWidth: Single read GetDefaultWidth;
         property DefaultHeight: Single read GetDefaultHeight;
         property DefaultXRadius: Single read GetDefaultXRadius;
@@ -4650,6 +4727,7 @@ type
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure AnimationProcess(Const AValue: Single); override;
     procedure ActivePageChanged(const ANewActivePageIndex: Integer); override;
     procedure PageCountChanged(Const ANewPageCount: Integer; const ANewActivePageIndex: Integer); override;
@@ -5754,6 +5832,7 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Cipher,
   Alcinoe.FMX.Layouts,
+  Alcinoe.fmx.Styles,
   Alcinoe.HTTP.Client.Net.Pool;
 
 {*}
@@ -7700,6 +7779,83 @@ begin
   inherited;
 end;
 
+{***********************************************************************}
+//procedure TALDynamicListBoxExtendedControl.Assign(Source: TPersistent);
+//begin
+//  BeginUpdate;
+//  Try
+//    if Source is TALDynamicListBoxControl then begin
+//      // --TALDynamicListBoxControl
+//      Align := TALDynamicListBoxControl(Source).Align;
+//      AutoAlignToPixel := TALDynamicListBoxControl(Source).AutoAlignToPixel;
+//      AutoSize := TALDynamicListBoxControl(Source).AutoSize;
+//      DoubleBuffered := TALDynamicListBoxControl(Source).DoubleBuffered;
+//      Pivot.Assign(TALDynamicListBoxControl(Source).Pivot);
+//      Scale := TALDynamicListBoxControl(Source).Scale;
+//      // --TControl
+//      Anchors := TALDynamicListBoxControl(Source).Anchors;
+//      CanFocus := TALDynamicListBoxControl(Source).CanFocus;
+//      CanParentFocus := TALDynamicListBoxControl(Source).CanParentFocus;
+//      ClipChildren := TALDynamicListBoxControl(Source).ClipChildren;
+//      ClipParent := TALDynamicListBoxControl(Source).ClipParent;
+//      Cursor := TALDynamicListBoxControl(Source).Cursor;
+//      DisabledOpacity := TALDynamicListBoxControl(Source).DisabledOpacity;
+//      DragMode := TALDynamicListBoxControl(Source).DragMode;
+//      EnableDragHighlight := TALDynamicListBoxControl(Source).EnableDragHighlight;
+//      Enabled := TALDynamicListBoxControl(Source).Enabled ;
+//      Hint := TALDynamicListBoxControl(Source).Hint;
+//      HitTest := TALDynamicListBoxControl(Source).HitTest;
+//      Locked := TALDynamicListBoxControl(Source).Locked;
+//      Margins.Assign(TALDynamicListBoxControl(Source).Margins);
+//      Opacity := TALDynamicListBoxControl(Source).Opacity;
+//      Padding.Assign(TALDynamicListBoxControl(Source).Padding);
+//      ParentShowHint := TALDynamicListBoxControl(Source).ParentShowHint;
+//      Position.Assign(TALDynamicListBoxControl(Source).Position);
+//      RotationAngle := TALDynamicListBoxControl(Source).RotationAngle;
+//      RotationCenter.Assign(TALDynamicListBoxControl(Source).RotationCenter);
+//      ShowHint := TALDynamicListBoxControl(Source).ShowHint;
+//      Size.Assign(TALDynamicListBoxControl(Source).Size);
+//      StyleName := TALDynamicListBoxControl(Source).StyleName;
+//      TabOrder := TALDynamicListBoxControl(Source).TabOrder;
+//      TabStop := TALDynamicListBoxControl(Source).TabStop;
+//      Tag := TALDynamicListBoxControl(Source).Tag;
+//      TagFloat := TALDynamicListBoxControl(Source).TagFloat;
+//      TagObject := TALDynamicListBoxControl(Source).TagObject;
+//      TagString := TALDynamicListBoxControl(Source).TagString;
+//      TouchTargetExpansion.Assign(TALDynamicListBoxControl(Source).TouchTargetExpansion);
+//      Visible := TALDynamicListBoxControl(Source).Visible;
+//      OnDragEnter := TALDynamicListBoxControl(Source).OnDragEnter;
+//      OnDragLeave := TALDynamicListBoxControl(Source).OnDragLeave;
+//      OnDragOver := TALDynamicListBoxControl(Source).OnDragOver;
+//      OnDragDrop := TALDynamicListBoxControl(Source).OnDragDrop;
+//      OnDragEnd := TALDynamicListBoxControl(Source).OnDragEnd;
+//      OnKeyDown := TALDynamicListBoxControl(Source).OnKeyDown;
+//      OnKeyUp := TALDynamicListBoxControl(Source).OnKeyUp;
+//      OnClick := TALDynamicListBoxControl(Source).OnClick;
+//      OnDblClick := TALDynamicListBoxControl(Source).OnDblClick;
+//      OnCanFocus := TALDynamicListBoxControl(Source).OnCanFocus;
+//      OnEnter := TALDynamicListBoxControl(Source).OnEnter;
+//      OnExit := TALDynamicListBoxControl(Source).OnExit;
+//      OnMouseDown := TALDynamicListBoxControl(Source).OnMouseDown;
+//      OnMouseMove := TALDynamicListBoxControl(Source).OnMouseMove;
+//      OnMouseUp := TALDynamicListBoxControl(Source).OnMouseUp;
+//      OnMouseWheel := TALDynamicListBoxControl(Source).OnMouseWheel;
+//      OnMouseEnter := TALDynamicListBoxControl(Source).OnMouseEnter;
+//      OnMouseLeave := TALDynamicListBoxControl(Source).OnMouseLeave;
+//      OnPainting := TALDynamicListBoxControl(Source).OnPainting;
+//      OnPaint := TALDynamicListBoxControl(Source).OnPaint;
+//      OnResize := TALDynamicListBoxControl(Source).OnResize;
+//      OnResized := TALDynamicListBoxControl(Source).OnResized;
+//      OnActivate := TALDynamicListBoxControl(Source).OnActivate;
+//      OnDeactivate := TALDynamicListBoxControl(Source).OnDeactivate;
+//    end
+//    else
+//      ALAssignError(Source{ASource}, Self{ADest});
+//  Finally
+//    EndUpdate;
+//  End;
+//end;
+
 {***************************************************************}
 // The current implementation of TControl's BeginUpdate/EndUpdate
 // and Realign methods is inefficient—particularly for TALDynamicListBoxText,
@@ -7746,7 +7902,7 @@ end;
 {**************************************************}
 //procedure TALDynamicListBoxExtendedControl.Loaded;
 //begin
-//  {$IF not DEFINED(ALDPK)}
+//  {$IF not defined(ALDPK)}
 //  if AutoAlignToPixel then
 //    AlignToPixel;
 //  {$ENDIF}
@@ -7977,11 +8133,6 @@ end;
 {**********************************************************************************}
 procedure TALDynamicListBoxExtendedControl.SetBounds(X, Y, AWidth, AHeight: Double);
 begin
-  if FIsSetBoundsLocked then begin
-    AWidth := Width;
-    AHeight := Height;
-  end;
-
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
@@ -8060,6 +8211,11 @@ begin
   //  end;
   //end;
 
+  if FIsSetBoundsLocked then begin
+    AWidth := Width;
+    AHeight := Height;
+  end;
+
   {$IF defined(debug)}
   //var LMoved := not (SameValue(X, Left, TEpsilon.Position) and SameValue(Y, Top, TEpsilon.Position));
   //var LSizeChanged := not (SameValue(AWidth, Width, TEpsilon.Position) and SameValue(AHeight, Height, TEpsilon.Position));
@@ -8077,7 +8233,6 @@ begin
      (not IsDestroying) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
-     //(scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -8095,6 +8250,7 @@ begin
       var LSize := TSizeF.Create(0,0);
       for var I := 0 to ControlsCount - 1 do begin
         var LChildControl := Controls[I];
+        if not LChildControl.Visible then Continue;
         {$IF defined(ALDPK)}
         // At design time, the Delphi IDE may add children such as
         // TGrabHandle.TGrabHandleRectangle
@@ -8137,9 +8293,7 @@ begin
 
           //--
           TALAlignLayout.Top,
-          TALAlignLayout.MostTop,
-          TALAlignLayout.Bottom,
-          TALAlignLayout.MostBottom: begin
+          TALAlignLayout.MostTop: begin
             if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
               // If the child control has autosize enabled on the X-axis, adjusts
               // AControl width to ensure it contains the child control at its
@@ -8157,18 +8311,31 @@ begin
           end;
 
           //--
+          TALAlignLayout.Bottom,
+          TALAlignLayout.MostBottom: begin
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
+              // If the child control has autosize enabled on the X-axis, adjusts
+              // AControl width to ensure it contains the child control at its
+              // current position. For example, TALDynamicListBoxText will never have
+              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Top,
+              // but TALDynamicListBoxLayout/TRectangle will have it set to true if their
+              // autosize property is enabled.
+              LSize.Width := Max(LSize.Width, LChildControl.Left + LChildControl.width + LChildControl.Margins.right + padding.right)
+            else
+              // Otherwise, do not adjust AControl width.
+              LSize.Width := Max(LSize.Width, Width);
+            // Adjusts AControl height to ensure it contains
+            // the child control at its current position.
+            LSize.height := Max(LSize.height, Height - LChildControl.Top + LChildControl.Margins.Top + padding.Top);
+          end;
+
+          //--
           TALAlignLayout.TopCenter,
           TALAlignLayout.TopLeft,
           TALAlignLayout.TopRight,
-          TALAlignLayout.BottomCenter,
-          TALAlignLayout.BottomLeft,
-          TALAlignLayout.BottomRight,
           TALAlignLayout.MostTopCenter,
           TALAlignLayout.MostTopLeft,
-          TALAlignLayout.MostTopRight,
-          TALAlignLayout.MostBottomCenter,
-          TALAlignLayout.MostBottomLeft,
-          TALAlignLayout.MostBottomRight: begin
+          TALAlignLayout.MostTopRight: begin
             // Adjusts AControl width to ensure it contains the
             // child control without considering its current position.
             // !! Note: This may not work well if there is another child control
@@ -8180,10 +8347,25 @@ begin
           end;
 
           //--
+          TALAlignLayout.BottomCenter,
+          TALAlignLayout.BottomLeft,
+          TALAlignLayout.BottomRight,
+          TALAlignLayout.MostBottomCenter,
+          TALAlignLayout.MostBottomLeft,
+          TALAlignLayout.MostBottomRight: begin
+            // Adjusts AControl width to ensure it contains the
+            // child control without considering its current position.
+            // !! Note: This may not work well if there is another child control
+            //    that is not aligned to the top or bottom. !!
+            LSize.Width := Max(LSize.Width, LChildControl.Margins.left + padding.left + LChildControl.width + LChildControl.Margins.right + padding.right);
+            // Adjusts AControl height to ensure it contains
+            // the child control at its current position.
+            LSize.height := Max(LSize.height, Height - LChildControl.Top + LChildControl.Margins.Top + padding.Top);
+          end;
+
+          //--
           TALAlignLayout.Left,
-          TALAlignLayout.MostLeft,
-          TALAlignLayout.Right,
-          TALAlignLayout.MostRight: Begin
+          TALAlignLayout.MostLeft: Begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
             LSize.Width := Max(LSize.Width, LChildControl.Left + LChildControl.width + LChildControl.Margins.right + padding.right);
@@ -8201,21 +8383,51 @@ begin
           End;
 
           //--
+          TALAlignLayout.Right,
+          TALAlignLayout.MostRight: Begin
+            // Adjusts AControl width to ensure it contains
+            // the child control at its current position.
+            LSize.Width := Max(LSize.Width, Width - LChildControl.Left + LChildControl.Margins.left + padding.left);
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeY then
+              // If the child control has autosize enabled on the X-axis, adjusts
+              // AControl height to ensure it contains the child control at its
+              // current position. For example, TALDynamicListBoxText will never have
+              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Left,
+              // but TALDynamicListBoxLayout/TRectangle will have it set to true if their
+              // autosize property is enabled.
+              LSize.height := Max(LSize.height, LChildControl.Top + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
+            else
+              // Otherwise, do not adjust AControl height.
+              LSize.height := Max(LSize.Height, Height);
+          End;
+
+          //--
           TALAlignLayout.LeftCenter,
           TALAlignLayout.LeftTop,
           TALAlignLayout.LeftBottom,
+          TALAlignLayout.MostLeftCenter,
+          TALAlignLayout.MostLeftTop,
+          TALAlignLayout.MostLeftBottom: begin
+            // Adjusts AControl width to ensure it contains
+            // the child control at its current position.
+            LSize.Width := Max(LSize.Width, LChildControl.Left + LChildControl.width + LChildControl.Margins.right + padding.right);
+            // Adjusts AControl height to ensure it contains the
+            // child control without considering its current position.
+            // !! Note: This may not work well if there is another child control
+            //    that is not aligned to the left or right. !!
+            LSize.height := Max(LSize.height, LChildControl.Margins.top + padding.top + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom);
+          end;
+
+          //--
           TALAlignLayout.RightCenter,
           TALAlignLayout.RightTop,
           TALAlignLayout.RightBottom,
-          TALAlignLayout.MostLeftCenter,
-          TALAlignLayout.MostLeftTop,
-          TALAlignLayout.MostLeftBottom,
           TALAlignLayout.MostRightCenter,
           TALAlignLayout.MostRightTop,
           TALAlignLayout.MostRightBottom: begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
-            LSize.Width := Max(LSize.Width, LChildControl.Left + LChildControl.width + LChildControl.Margins.right + padding.right);
+            LSize.Width := Max(LSize.Width, Width - LChildControl.Left + LChildControl.Margins.left + padding.left);
             // Adjusts AControl height to ensure it contains the
             // child control without considering its current position.
             // !! Note: This may not work well if there is another child control
@@ -8359,6 +8571,25 @@ begin
   end;
 end;
 
+{**********************************************************}
+procedure TALDynamicListBoxExtendedControl.ApplyColorScheme;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure ApplyColorSchemeRecursive(const AControl: TALDynamicListBoxControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do
+      if AControl.Controls[i] is TALDynamicListBoxControl then TALDynamicListBoxControl(AControl.Controls[i]).ApplyColorScheme
+      else ApplyColorSchemeRecursive(AControl.Controls[i]);
+  end;
+
+begin
+  // ClearBufDrawable because when switching between dark and light mode,
+  // the resource name remains the same, but the loaded resource changes
+  // (e.g., xxx_dark instead of xxx in dark mode).
+  ClearBufDrawable;
+  ApplyColorSchemeRecursive(self);
+end;
+
 {**************************************************************************}
 //procedure TALDynamicListBoxExtendedControl.DelayOnResize(Sender: TObject);
 //begin
@@ -8457,13 +8688,13 @@ begin
  // Virtual;
 end;
 
-{****************************************************************************}
+{*********************************************************************}
 function TALDynamicListBoxExtendedControl.GetAutoAlignToPixel: Boolean;
 begin
   Result := FAutoAlignToPixel;
 end;
 
-{*******************************************************************************************}
+{************************************************************************************}
 procedure TALDynamicListBoxExtendedControl.SetAutoAlignToPixel(const AValue: Boolean);
 begin
   FAutoAlignToPixel := AValue;
@@ -8527,11 +8758,6 @@ end;
 //  var LPrevIsFocused := IsFocused;
 //  var LPrevIsMouseOver := IsMouseOver;
 //  inherited;
-//  // At design time, when a new TEdit/TMemo is added to the form,
-//  // or a new TALDynamicListBoxBaseText control with AutoSize=true is added to the form,
-//  // the size will not adjust and will remain at its default (200x50).
-//  // Calling AdjustSize here will correct this.
-//  AdjustSize;
 //  {$IF defined(ANDROID) or defined(IOS)}
 //  FIsMouseOver := False;
 //  {$ENDIF}
@@ -8960,8 +9186,8 @@ begin
   FFill.OnChanged := FillChanged;
   FStroke := CreateStroke;
   FStroke.OnChanged := StrokeChanged;
-  fShadow := CreateShadow;
-  fShadow.OnChanged := ShadowChanged;
+  FShadow := CreateShadow;
+  FShadow.OnChanged := ShadowChanged;
 end;
 
 {****************************************}
@@ -8969,9 +9195,27 @@ destructor TALDynamicListBoxShape.Destroy;
 begin
   ALFreeAndNil(FFill);
   ALFreeAndNil(FStroke);
-  ALFreeAndNil(fShadow);
+  ALFreeAndNil(FShadow);
   inherited;
 end;
+
+{*************************************************************}
+//procedure TALDynamicListBoxShape.Assign(Source: TPersistent);
+//begin
+//  BeginUpdate;
+//  Try
+//    if Source is TALDynamicListBoxShape then begin
+//      Fill.Assign(TALDynamicListBoxShape(Source).Fill);
+//      Stroke.Assign(TALDynamicListBoxShape(Source).Stroke);
+//      Shadow.Assign(TALDynamicListBoxShape(Source).Shadow);
+//    end
+//    else
+//      ALAssignError(Source{ASource}, Self{ADest});
+//    inherited Assign(Source);
+//  Finally
+//    EndUpdate;
+//  End;
+//end;
 
 {***************************************************}
 function TALDynamicListBoxShape.CreateFill: TALBrush;
@@ -9000,6 +9244,20 @@ begin
     Fill.AlignToPixel;
     Stroke.AlignToPixel;
     Shadow.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{************************************************}
+procedure TALDynamicListBoxShape.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    Fill.ApplyColorScheme;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -9122,14 +9380,16 @@ constructor TALDynamicListBoxImage.Create(const AOwner: TObject);
 begin
   inherited Create(AOwner);
   FBackgroundColor := DefaultBackgroundColor;
+  FBackgroundColorKey := DefaultBackgroundColorKey;
   FLoadingColor := DefaultLoadingColor;
-  fResourceName := '';
+  FLoadingColorKey := DefaultLoadingColorKey;
+  FResourceName := '';
   FMaskResourceName := '';
   FMaskBitmap := nil;
   FReadyAfterResourcesLoaded := False;
   FWrapMode := TALImageWrapMode.Fit;
-  fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-  fRotateAccordingToExifOrientation := False;
+  FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+  FRotateAccordingToExifOrientation := False;
   FCorners := AllCorners;
   FSides := AllSides;
   FXRadius := DefaultXRadius;
@@ -9142,8 +9402,8 @@ begin
   FCropCenter.OnChanged := CropCenterChanged;
   FStroke := CreateStroke;
   FStroke.OnChanged := StrokeChanged;
-  fShadow := CreateShadow;
-  fShadow.OnChanged := ShadowChanged;
+  FShadow := CreateShadow;
+  FShadow.OnChanged := ShadowChanged;
   FResourceDownloadContext := nil;
   FFadeInDuration := DefaultFadeInDuration;
   FFadeInStartTimeNano := 0;
@@ -9156,13 +9416,50 @@ destructor TALDynamicListBoxImage.Destroy;
 begin
   ALFreeAndNil(fCropCenter);
   ALFreeAndNil(FStroke);
-  ALFreeAndNil(fShadow);
+  ALFreeAndNil(FShadow);
   if FMaskBitmap <> nil then begin
     FMaskBitmap.DecreaseRefCount;
     FMaskBitmap := nil;
   end;
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
+
+{*************************************************************}
+//procedure TALDynamicListBoxImage.Assign(Source: TPersistent);
+//begin
+//  BeginUpdate;
+//  Try
+//    if Source is TALDynamicListBoxImage then begin
+//      BackgroundColor := TALDynamicListBoxImage(Source).BackgroundColor;
+//      BackgroundColorKey := TALDynamicListBoxImage(Source).BackgroundColorKey;
+//      LoadingColor := TALDynamicListBoxImage(Source).LoadingColor;
+//      LoadingColorKey := TALDynamicListBoxImage(Source).LoadingColorKey;
+//      ResourceName := TALDynamicListBoxImage(Source).ResourceName;
+//      MaskResourceName := TALDynamicListBoxImage(Source).MaskResourceName;
+//      MaskBitmap := TALDynamicListBoxImage(Source).MaskBitmap;
+//      ReadyAfterResourcesLoaded := TALDynamicListBoxImage(Source).ReadyAfterResourcesLoaded;
+//      WrapMode := TALDynamicListBoxImage(Source).WrapMode;
+//      RotateAccordingToExifOrientation := TALDynamicListBoxImage(Source).RotateAccordingToExifOrientation;
+//      Corners := TALDynamicListBoxImage(Source).Corners;
+//      Sides := TALDynamicListBoxImage(Source).Sides;
+//      XRadius := TALDynamicListBoxImage(Source).XRadius;
+//      YRadius := TALDynamicListBoxImage(Source).YRadius;
+//      BlurRadius := TALDynamicListBoxImage(Source).BlurRadius;
+//      CacheIndex := TALDynamicListBoxImage(Source).CacheIndex;
+//      LoadingCacheIndex := TALDynamicListBoxImage(Source).LoadingCacheIndex;
+//      CacheEngine := TALDynamicListBoxImage(Source).CacheEngine;
+//      CropCenter.Assign(TALDynamicListBoxImage(Source).CropCenter);
+//      Stroke.Assign(TALDynamicListBoxImage(Source).Stroke);
+//      Shadow.Assign(TALDynamicListBoxImage(Source).Shadow);
+//      FadeInDuration := TALDynamicListBoxImage(Source).FadeInDuration;
+//    end
+//    else
+//      ALAssignError(Source{ASource}, Self{ADest});
+//    inherited Assign(Source);
+//  Finally
+//    EndUpdate;
+//  End;
+//end;
 
 {********************************************************}
 function TALDynamicListBoxImage.IsReadyToDisplay: Boolean;
@@ -9204,6 +9501,47 @@ begin
   end;
 end;
 
+{**********************************************************}
+procedure TALDynamicListBoxImage.ApplyBackgroundColorScheme;
+begin
+  if FBackgroundColorKey <> '' then begin
+    var LBackgroundColor := TALStyleManager.Instance.GetColor(FBackgroundColorKey);
+    if FBackgroundColor <> LBackgroundColor then begin
+      FBackgroundColor := LBackgroundColor;
+      ClearBufDrawable;
+      Repaint;
+    end;
+  end;
+end;
+
+{*******************************************************}
+procedure TALDynamicListBoxImage.ApplyLoadingColorScheme;
+begin
+  if FLoadingColorKey <> '' then begin
+    var LLoadingColor := TALStyleManager.Instance.GetColor(FLoadingColorKey);
+    if FLoadingColor <> LLoadingColor then begin
+      FLoadingColor := LLoadingColor;
+      ClearBufDrawable;
+      Repaint;
+    end;
+  end;
+end;
+
+{************************************************}
+procedure TALDynamicListBoxImage.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
+    ApplyBackgroundColorScheme;
+    ApplyLoadingColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {********************************************************}
 function TALDynamicListBoxImage.GetCacheSubIndex: Integer;
 begin
@@ -9228,10 +9566,22 @@ begin
   Result := TalphaColors.Null;
 end;
 
+{*******************************************************************}
+function TALDynamicListBoxImage.GetDefaultBackgroundColorKey: String;
+begin
+  Result := '';
+end;
+
 {******************************************************************}
 function TALDynamicListBoxImage.GetDefaultLoadingColor: TalphaColor;
 begin
   Result := $FFe0e4e9;
+end;
+
+{****************************************************************}
+function TALDynamicListBoxImage.GetDefaultLoadingColorKey: String;
+begin
+  Result := '';
 end;
 
 {***************************************************************}
@@ -9350,9 +9700,19 @@ end;
 procedure TALDynamicListBoxImage.setBackgroundColor(const Value: TAlphaColor);
 begin
   if FBackgroundColor <> Value then begin
-    ClearBufDrawable;
     FBackgroundColor := Value;
+    FBackgroundColorKey := '';
+    ClearBufDrawable;
     Repaint;
+  end;
+end;
+
+{**************************************************************************}
+procedure TALDynamicListBoxImage.setBackgroundColorKey(const Value: String);
+begin
+  if FBackgroundColorKey <> Value then begin
+    FBackgroundColorKey := Value;
+    ApplyBackgroundColorScheme;
   end;
 end;
 
@@ -9360,9 +9720,19 @@ end;
 procedure TALDynamicListBoxImage.setLoadingColor(const Value: TAlphaColor);
 begin
   if FLoadingColor <> Value then begin
-    ClearBufDrawable;
     FLoadingColor := Value;
+    FLoadingColorKey := '';
+    ClearBufDrawable;
     Repaint;
+  end;
+end;
+
+{***********************************************************************}
+procedure TALDynamicListBoxImage.setLoadingColorKey(const Value: String);
+begin
+  if FLoadingColorKey <> Value then begin
+    FLoadingColorKey := Value;
+    ApplyLoadingColorScheme;
   end;
 end;
 
@@ -9424,10 +9794,22 @@ begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
+{******************************************************************}
+function TALDynamicListBoxImage.IsBackgroundColorKeyStored: Boolean;
+begin
+  Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
+end;
+
 {************************************************************}
 function TALDynamicListBoxImage.IsLoadingColorStored: Boolean;
 begin
   Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{***************************************************************}
+function TALDynamicListBoxImage.IsLoadingColorKeyStored: Boolean;
+begin
+  Result := FLoadingColorKey <> DefaultLoadingColorKey;
 end;
 
 {**************************************************************}
@@ -9896,8 +10278,8 @@ begin
 
   if //--- Do not create BufDrawable if the size is 0
      (BoundsRect.IsEmpty) or
-     //--- Do not create BufDrawable if fResourceName is empty
-     (fResourceName = '')
+     //--- Do not create BufDrawable if FResourceName is empty
+     (FResourceName = '')
   then begin
     ClearBufDrawable;
     exit;
@@ -10128,8 +10510,8 @@ begin
   if FFadeInStartTimeNano <= 0 then
     ALFreeAndNilDrawable(fBufLoadingDrawable);
 
-  // Handle the fExifOrientationInfo
-  case fExifOrientationInfo of
+  // Handle the FExifOrientationInfo
+  case FExifOrientationInfo of
     TalExifOrientationInfo.FLIP_HORIZONTAL: begin
       var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
@@ -10245,6 +10627,27 @@ begin
   {$ENDIF}
   inherited;
 end;
+
+{*********************************************************************}
+//procedure TALDynamicListBoxBaseRectangle.Assign(Source: TPersistent);
+//begin
+//  BeginUpdate;
+//  Try
+//    if Source is TALDynamicListBoxBaseRectangle then begin
+//      XRadius := TALDynamicListBoxBaseRectangle(Source).XRadius;
+//      YRadius := TALDynamicListBoxBaseRectangle(Source).YRadius;
+//      Corners := TALDynamicListBoxBaseRectangle(Source).Corners;
+//      Sides := TALDynamicListBoxBaseRectangle(Source).Sides;
+//      CacheIndex := TALDynamicListBoxBaseRectangle(Source).CacheIndex;
+//      CacheEngine := TALDynamicListBoxBaseRectangle(Source).CacheEngine;
+//    end
+//    else
+//      ALAssignError(Source{ASource}, Self{ADest});
+//    inherited Assign(Source);
+//  Finally
+//    EndUpdate;
+//  End;
+//end;
 
 {*************************************************}
 procedure TALDynamicListBoxBaseRectangle.DoResized;
@@ -11479,6 +11882,38 @@ end;
 //  inherited Loaded;
 //end;
 
+{****************************************************************}
+//procedure TALDynamicListBoxBaseText.Assign(Source: TPersistent);
+//begin
+//  BeginUpdate;
+//  Try
+//    if Source is TALDynamicListBoxBaseText then begin
+//      OnElementClick := TALDynamicListBoxBaseText(Source).OnElementClick;
+//      OnElementMouseDown := TALDynamicListBoxBaseText(Source).OnElementMouseDown;
+//      OnElementMouseMove := TALDynamicListBoxBaseText(Source).OnElementMouseMove;
+//      OnElementMouseUp := TALDynamicListBoxBaseText(Source).OnElementMouseUp;
+//      OnElementMouseEnter := TALDynamicListBoxBaseText(Source).OnElementMouseEnter;
+//      OnElementMouseLeave := TALDynamicListBoxBaseText(Source).OnElementMouseLeave;
+//      CacheIndex := TALDynamicListBoxBaseText(Source).CacheIndex;
+//      CacheEngine := TALDynamicListBoxBaseText(Source).CacheEngine;
+//      AutoTranslate := TALDynamicListBoxBaseText(Source).AutoTranslate;
+//      Text := TALDynamicListBoxBaseText(Source).Text;
+//      TextSettings.Assign(TALDynamicListBoxBaseText(Source).TextSettings);
+//      MaxWidth := TALDynamicListBoxBaseText(Source).MaxWidth;
+//      MaxHeight := TALDynamicListBoxBaseText(Source).MaxHeight;
+//      YRadius := TALDynamicListBoxBaseText(Source).YRadius;
+//      XRadius := TALDynamicListBoxBaseText(Source).XRadius;
+//      Corners := TALDynamicListBoxBaseText(Source).Corners;
+//      Sides := TALDynamicListBoxBaseText(Source).Sides;
+//    end
+//    else
+//      ALAssignError(Source{ASource}, Self{ADest});
+//    inherited Assign(Source);
+//  Finally
+//    EndUpdate;
+//  End;
+//end;
+
 {***********************************************}
 procedure TALDynamicListBoxBaseText.AlignToPixel;
 begin
@@ -11488,6 +11923,18 @@ begin
     MaxWidth := ALAlignDimensionToPixelRound(MaxWidth, ALGetScreenScale, Tepsilon.position);
     MaxHeight := ALAlignDimensionToPixelRound(MaxHeight, ALGetScreenScale, Tepsilon.position);
     TextSettings.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{***************************************************}
+procedure TALDynamicListBoxBaseText.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    TextSettings.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -11511,7 +11958,6 @@ begin
      (not IsDestroying) and // if csDestroying do not do autosize
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // if AutoSize is false nothing to adjust
      (Text <> '') and // if Text is empty do not do autosize
-     //(scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
 
@@ -12690,6 +13136,20 @@ begin
 end;
 
 {*********************************************************}
+procedure TALDynamicListBoxBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Fill.ApplyColorScheme;
+    StateLayer.ApplyColorScheme;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************}
 procedure TALDynamicListBoxBaseStateStyle.ClearBufDrawable;
 begin
   ALFreeAndNilDrawable(FBufDrawable);
@@ -13096,6 +13556,12 @@ begin
 end;
 
 {**********************************************************}
+procedure TALDynamicListBoxBaseStateStyles.ApplyColorScheme;
+begin
+  // Virtual
+end;
+
+{**********************************************************}
 procedure TALDynamicListBoxBaseStateStyles.ClearBufDrawable;
 begin
   // Virtual
@@ -13190,6 +13656,7 @@ begin
   inherited Create;
   //--
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FResourceName := DefaultResourceName;
   FWrapMode := DefaultWrapMode;
   FThickness := DefaultThickness;
@@ -13217,6 +13684,12 @@ begin
   Result := TAlphaColors.Black;
 end;
 
+{********************************************************************************}
+function TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.GetDefaultColorKey: String;
+begin
+  Result := '';
+end;
+
 {************************************************************************************}
 function TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.GetDefaultResourceName: String;
 begin
@@ -13242,6 +13715,7 @@ begin
     BeginUpdate;
     Try
       Color := TCheckMarkBrush(Source).Color;
+      ColorKey := TCheckMarkBrush(Source).ColorKey;
       ResourceName := TCheckMarkBrush(Source).ResourceName;
       WrapMode := TCheckMarkBrush(Source).WrapMode;
       Thickness := TCheckMarkBrush(Source).Thickness;
@@ -13261,6 +13735,7 @@ begin
   Try
     inherited;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     ResourceName := DefaultResourceName;
     WrapMode := DefaultWrapMode;
     Thickness := DefaultThickness;
@@ -13282,11 +13757,24 @@ begin
   end;
 end;
 
+{***********************************************************************}
+procedure TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*****************************************************************************************************************************}
 procedure TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       ResourceName := ATo.ResourceName;
@@ -13307,6 +13795,7 @@ begin
       Margins.Top := InterpolateSingle(Margins.Top{Start}, Margins.DefaultValue.Top{Stop}, ANormalizedTime);
       Margins.Bottom := InterpolateSingle(Margins.Bottom{Start}, Margins.DefaultValue.Bottom{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -13337,6 +13826,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{*******************************************************************************}
+function TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {***********************************************************************************}
 function TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.IsResourceNameStored: Boolean;
 begin
@@ -13360,7 +13855,17 @@ procedure TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.SetColor(const Value: TA
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicListBoxBaseCheckBox.TCheckMarkBrush.SetColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -13596,6 +14101,18 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{***********************************************************************}
+procedure TALDynamicListBoxBaseCheckBox.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Inherited;
+    CheckMark.ApplyColorScheme;
+  finally
+    EndUpdate;
+  End;
 end;
 
 {*********************************************************************************************************************************************}
@@ -13881,6 +14398,21 @@ begin
 end;
 
 {*************************************************************************}
+procedure TALDynamicListBoxBaseCheckBox.TCheckStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Default.ApplyColorScheme;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************************************************************}
 procedure TALDynamicListBoxBaseCheckBox.TCheckStateStyles.ClearBufDrawable;
 begin
   Default.ClearBufDrawable;
@@ -14026,6 +14558,19 @@ begin
 end;
 
 {********************************************************************}
+procedure TALDynamicListBoxBaseCheckBox.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Checked.ApplyColorScheme;
+    Unchecked.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************************************}
 procedure TALDynamicListBoxBaseCheckBox.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -14144,6 +14689,19 @@ begin
     inherited;
     StateStyles.AlignToPixel;
     CheckMark.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************************************}
+procedure TALDynamicListBoxBaseCheckBox.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    StateStyles.ApplyColorScheme;
+    CheckMark.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -15541,6 +16099,21 @@ begin
 end;
 
 {**************************************************************************}
+procedure TALDynamicListBoxSwitch.TTrack.TCheckStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Default.ApplyColorScheme;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************************************************}
 procedure TALDynamicListBoxSwitch.TTrack.TCheckStateStyles.ClearBufDrawable;
 begin
   Default.ClearBufDrawable;
@@ -15686,6 +16259,19 @@ begin
 end;
 
 {*********************************************************************}
+procedure TALDynamicListBoxSwitch.TTrack.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Checked.ApplyColorScheme;
+    Unchecked.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************}
 procedure TALDynamicListBoxSwitch.TTrack.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -15805,6 +16391,18 @@ begin
   try
     inherited;
     StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************************}
+procedure TALDynamicListBoxSwitch.TTrack.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -16772,6 +17370,19 @@ begin
   end;
 end;
 
+{*************************************************}
+procedure TALDynamicListBoxSwitch.ApplyColorScheme;
+begin
+  //BeginUpdate;
+  //try
+    inherited;
+    //Thumb.ApplyColorScheme;
+    //Track.ApplyColorScheme;
+  //finally
+    //EndUpdate;
+  //end;
+end;
+
 {************************************************}
 procedure TALDynamicListBoxSwitch.MakeBufDrawable;
 begin
@@ -17137,13 +17748,10 @@ constructor TALDynamicListBoxButton.TBaseStateStyle.Create(const AParent: TObjec
 begin
   inherited Create(AParent);
   FText := DefaultText;
-  //--
   if StateStyleParent <> nil then FTextSettings := CreateTextSettings(StateStyleParent.TextSettings)
   else if ControlParent <> nil then FTextSettings := CreateTextSettings(ControlParent.TextSettings)
   else FTextSettings := CreateTextSettings(nil);
   FTextSettings.OnChanged := TextSettingsChanged;
-  //--
-  //FPriorSupersedeText
 end;
 
 {*********************************************************}
@@ -17213,6 +17821,18 @@ begin
   end;
 end;
 
+{*****************************************************************}
+procedure TALDynamicListBoxButton.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    TextSettings.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***************************************************************************************************************************************}
 procedure TALDynamicListBoxButton.TBaseStateStyle.Interpolate(const ATo: TALDynamicListBoxBaseStateStyle; const ANormalizedTime: Single);
 begin
@@ -17253,9 +17873,6 @@ end;
 procedure TALDynamicListBoxButton.TBaseStateStyle.DoSupersede;
 begin
   Inherited;
-  //--
-  FPriorSupersedeText := Text;
-  //--
   if Text = '' then begin
     if StateStyleParent <> nil then Text := StateStyleParent.Text
     else Text := ControlParent.Text;
@@ -17510,6 +18127,21 @@ begin
 end;
 
 {**************************************************************}
+procedure TALDynamicListBoxButton.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************************************}
 procedure TALDynamicListBoxButton.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -17650,7 +18282,23 @@ end;
 //  _ConvertFontFamily(StateStyles.Hovered);
 //  _ConvertFontFamily(StateStyles.Pressed);
 //  _ConvertFontFamily(StateStyles.Focused);
-//  inherited Loaded;
+//  inherited;
+//end;
+
+{**************************************************************}
+//procedure TALDynamicListBoxButton.Assign(Source: TPersistent);
+//begin
+//  BeginUpdate;
+//  Try
+//    if Source is TALDynamicListBoxButton then begin
+//      StateStyles.Assign(TALDynamicListBoxButton(Source).StateStyles);
+//    end
+//    else
+//      ALAssignError(Source{ASource}, Self{ADest});
+//    inherited Assign(Source);
+//  Finally
+//    EndUpdate;
+//  End;
 //end;
 
 {*********************************************}
@@ -17660,6 +18308,18 @@ begin
   try
     inherited;
     StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************************************}
+procedure TALDynamicListBoxButton.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -17733,12 +18393,20 @@ procedure TALDynamicListBoxButton.TextSettingsChanged(Sender: TObject);
       if APrevStateStyle.TextSettings.font.Weight = AToStateStyle.TextSettings.font.Weight then AToStateStyle.TextSettings.font.Weight := TextSettings.font.Weight;
       if APrevStateStyle.TextSettings.font.Slant = AToStateStyle.TextSettings.font.Slant then AToStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
       if APrevStateStyle.TextSettings.font.Stretch = AToStateStyle.TextSettings.font.Stretch then AToStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
-      if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+      if (APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color) and
+         (APrevStateStyle.TextSettings.font.ColorKey = AToStateStyle.TextSettings.font.ColorKey) then begin
+        AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+        AToStateStyle.TextSettings.font.ColorKey := TextSettings.font.ColorKey;
+      end;
 
       if APrevStateStyle.TextSettings.Decoration.Kinds = AToStateStyle.TextSettings.Decoration.Kinds then AToStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
       if APrevStateStyle.TextSettings.Decoration.Style = AToStateStyle.TextSettings.Decoration.Style then AToStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
       if SameValue(APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier, AToStateStyle.TextSettings.Decoration.ThicknessMultiplier, TEpsilon.Scale) then AToStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
-      if APrevStateStyle.TextSettings.Decoration.Color = AToStateStyle.TextSettings.Decoration.Color then AToStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+      if (APrevStateStyle.TextSettings.Decoration.Color = AToStateStyle.TextSettings.Decoration.Color) and
+         (APrevStateStyle.TextSettings.Decoration.ColorKey = AToStateStyle.TextSettings.Decoration.ColorKey) then begin
+        AToStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+        AToStateStyle.TextSettings.Decoration.ColorKey := TextSettings.Decoration.ColorKey;
+      end;
 
     end;
 
@@ -17748,11 +18416,13 @@ procedure TALDynamicListBoxButton.TextSettingsChanged(Sender: TObject);
     APrevStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
     APrevStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
     APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+    APrevStateStyle.TextSettings.font.ColorKey := TextSettings.font.ColorKey;
 
     APrevStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
     APrevStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
     APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
     APrevStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+    APrevStateStyle.TextSettings.Decoration.ColorKey := TextSettings.Decoration.ColorKey;
 
   end;
   {$ENDIF}
@@ -18401,6 +19071,21 @@ begin
 end;
 
 {**************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TThumb.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************************************************}
 procedure TALDynamicListBoxCustomTrack.TThumb.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -18570,6 +19255,18 @@ begin
   try
     inherited;
     StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************************************************}
+procedure TALDynamicListBoxCustomTrack.TThumb.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -19387,6 +20084,7 @@ constructor TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.Create;
 begin
   inherited Create;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FResourceName := DefaultResourceName;
   FWrapMode := DefaultWrapMode;
   FSize := DefaultSize;
@@ -19396,6 +20094,12 @@ end;
 function TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
+end;
+
+{******************************************************************************************}
+function TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {**********************************************************************************************}
@@ -19423,6 +20127,7 @@ begin
     BeginUpdate;
     Try
       Color := TStopIndicatorBrush(Source).Color;
+      ColorKey := TStopIndicatorBrush(Source).ColorKey;
       ResourceName := TStopIndicatorBrush(Source).ResourceName;
       WrapMode := TStopIndicatorBrush(Source).WrapMode;
       Size := TStopIndicatorBrush(Source).Size;
@@ -19441,6 +20146,7 @@ begin
   Try
     inherited;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     ResourceName := DefaultResourceName;
     WrapMode := DefaultWrapMode;
     Size := DefaultSize;
@@ -19460,11 +20166,24 @@ begin
   end;
 end;
 
+{*********************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*******************************************************************************************************************************************}
 procedure TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       ResourceName := ATo.ResourceName;
@@ -19477,6 +20196,7 @@ begin
       WrapMode := DefaultWrapMode;
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -19507,6 +20227,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{*****************************************************************************************}
+function TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {*********************************************************************************************}
 function TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.IsResourceNameStored: Boolean;
 begin
@@ -19530,7 +20256,17 @@ procedure TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.SetColor(const
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*************************************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TTrack.TStopIndicatorBrush.SetColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -19768,6 +20504,18 @@ begin
   end;
 end;
 
+{*****************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TTrack.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Inherited;
+    StopIndicator.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***************************************************************************************************************************************************}
 procedure TALDynamicListBoxCustomTrack.TTrack.TBaseStateStyle.Interpolate(const ATo: TALDynamicListBoxBaseStateStyle; const ANormalizedTime: Single);
 begin
@@ -19946,6 +20694,18 @@ begin
 end;
 
 {**************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TTrack.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************************************************}
 procedure TALDynamicListBoxCustomTrack.TTrack.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -20055,6 +20815,19 @@ begin
     inherited;
     StateStyles.AlignToPixel;
     StopIndicator.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************************************************}
+procedure TALDynamicListBoxCustomTrack.TTrack.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
+    StopIndicator.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -20596,6 +21369,36 @@ begin
   //Result.Stored := False;
   //Result.SetSubComponent(True);
   Result.Name := AName; // Useful at design time in the IDE
+end;
+
+{**************************************************}
+procedure TALDynamicListBoxCustomTrack.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    if FInactiveTrack <> nil then FInactiveTrack.AlignToPixel;
+    if FActiveTrack <> nil then FActiveTrack.AlignToPixel;
+    if FThumb <> nil then FThumb.AlignToPixel;
+    if FValueIndicator <> nil then FValueIndicator.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************************************}
+procedure TALDynamicListBoxCustomTrack.ApplyColorScheme;
+begin
+  //BeginUpdate;
+  //Try
+    inherited;
+    //if FInactiveTrack <> nil then FInactiveTrack.ApplyColorScheme;
+    //if FActiveTrack <> nil then FActiveTrack.ApplyColorScheme;
+    //if FThumb <> nil then FThumb.ApplyColorScheme;
+    //if FValueIndicator <> nil then FValueIndicator.ApplyColorScheme;
+  //finally
+    //EndUpdate;
+  //end;
 end;
 
 {*****************************************************}
@@ -21315,6 +22118,32 @@ end;
 //  inherited;
 //end;
 
+{****************************************************}
+procedure TALDynamicListBoxRangeTrackBar.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    if FMaxInactiveTrack <> nil then FMaxInactiveTrack.AlignToPixel;
+    if FMaxThumb <> nil then FMaxThumb.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************************}
+procedure TALDynamicListBoxRangeTrackBar.ApplyColorScheme;
+begin
+  //BeginUpdate;
+  //Try
+    inherited;
+    //if FMaxInactiveTrack <> nil then FMaxInactiveTrack.ApplyColorScheme;
+    //if FMaxThumb <> nil then FMaxThumb.ApplyColorScheme;
+  //finally
+    //EndUpdate;
+  //end;
+end;
+
 {******************************************************}
 procedure TALDynamicListBoxRangeTrackBar.EnabledChanged;
 begin
@@ -21929,7 +22758,9 @@ begin
   FDataSource := '';
   fPreviewResourceName := '';
   FBackgroundColor := DefaultBackgroundColor;
+  FBackgroundColorKey := DefaultBackgroundColorKey;
   FLoadingColor := DefaultLoadingColor;
+  FLoadingColorKey := DefaultLoadingColorKey;
   FInternalState := VPSIdle;
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
@@ -21983,6 +22814,43 @@ end;
 //  end;
 //end;
 
+{***********************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.ApplyBackgroundColorScheme;
+begin
+  if FBackgroundColorKey <> '' then begin
+    var LBackgroundColor := TALStyleManager.Instance.GetColor(FBackgroundColorKey);
+    if FBackgroundColor <> LBackgroundColor then begin
+      FBackgroundColor := LBackgroundColor;
+      Repaint;
+    end;
+  end;
+end;
+
+{********************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.ApplyLoadingColorScheme;
+begin
+  if FLoadingColorKey <> '' then begin
+    var LLoadingColor := TALStyleManager.Instance.GetColor(FLoadingColorKey);
+    if FLoadingColor <> LLoadingColor then begin
+      FLoadingColor := LLoadingColor;
+      Repaint;
+    end;
+  end;
+end;
+
+{*************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    ApplyBackgroundColorScheme;
+    ApplyLoadingColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {*********************************************************************}
 function TALDynamicListBoxVideoPlayerSurface.GetCacheSubIndex: Integer;
 begin
@@ -22001,10 +22869,22 @@ begin
   Result := TalphaColors.Null;
 end;
 
+{********************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDefaultBackgroundColorKey: String;
+begin
+  Result := '';
+end;
+
 {*******************************************************************************}
 function TALDynamicListBoxVideoPlayerSurface.GetDefaultLoadingColor: TalphaColor;
 begin
   Result := $FFe0e4e9;
+end;
+
+{*****************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.GetDefaultLoadingColorKey: String;
+begin
+  Result := '';
 end;
 
 {****************************************************************************}
@@ -22230,16 +23110,66 @@ begin
   fVideoPlayerEngine.OnVideoSizeChanged := Value;
 end;
 
+{*****************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.setBackgroundColor(const Value: TAlphaColor);
+begin
+  if FBackgroundColor <> Value then begin
+    FBackgroundColor := Value;
+    FBackgroundColorKey := '';
+    Repaint;
+  end;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.setBackgroundColorKey(const Value: String);
+begin
+  if FBackgroundColorKey <> Value then begin
+    FBackgroundColorKey := Value;
+    ApplyBackgroundColorScheme;
+  end;
+end;
+
+{**************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.setLoadingColor(const Value: TAlphaColor);
+begin
+  if FLoadingColor <> Value then begin
+    FLoadingColor := Value;
+    FLoadingColorKey := '';
+    Repaint;
+  end;
+end;
+
+{************************************************************************************}
+procedure TALDynamicListBoxVideoPlayerSurface.setLoadingColorKey(const Value: String);
+begin
+  if FLoadingColorKey <> Value then begin
+    FLoadingColorKey := Value;
+    ApplyLoadingColorScheme;
+  end;
+end;
+
 {****************************************************************************}
 function TALDynamicListBoxVideoPlayerSurface.IsBackgroundColorStored: Boolean;
 begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
+{*******************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsBackgroundColorKeyStored: Boolean;
+begin
+  Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
+end;
+
 {*************************************************************************}
 function TALDynamicListBoxVideoPlayerSurface.IsLoadingColorStored: Boolean;
 begin
   Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{****************************************************************************}
+function TALDynamicListBoxVideoPlayerSurface.IsLoadingColorKeyStored: Boolean;
+begin
+  Result := FLoadingColorKey <> DefaultLoadingColorKey;
 end;
 
 {***************************************************************************}
@@ -22973,11 +23903,24 @@ begin
   BeginUpdate;
   try
     Width := ALAlignDimensionToPixelRound(Width, ALGetScreenScale, TEpsilon.Position);
-    Height := ALAlignDimensionToPixelRound(Width, ALGetScreenScale, TEpsilon.Position);
+    Height := ALAlignDimensionToPixelRound(Height, ALGetScreenScale, TEpsilon.Position);
     Margins.AlignToPixel;
     Fill.AlignToPixel;
     Stroke.AlignToPixel;
     Shadow.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************************************************}
+procedure TALDynamicListBoxPageIndicator.TIndicator.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Fill.ApplyColorScheme;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -23212,7 +24155,20 @@ begin
   Try
     inherited;
     FActiveIndicator.AlignToPixel;
-    FInActiveIndicator.AlignToPixel;
+    FInactiveIndicator.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************************}
+procedure TALDynamicListBoxPageIndicator.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    FActiveIndicator.ApplyColorScheme;
+    FInactiveIndicator.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -23280,7 +24236,6 @@ begin
      (not IsDestroying) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
-     //(scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -23434,8 +24389,8 @@ begin
         end;
 
         //---------------------------------
-        //TAnimationType.jumpingDotSideView
-        TAnimationType.jumpingDotSideView: begin
+        //TAnimationType.JumpingDotSideView
+        TAnimationType.JumpingDotSideView: begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else if LAnimationValue > 0 then begin
             var LRadius := LDistanceBetweenIndicators / 2.0;
@@ -23531,13 +24486,13 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
             FActiveIndicatorControl.Visible := False;
-            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInActiveIndicator.Fill.Color{Stop}, LAnimationValue);
-            TIndicatorControl(Controls[FActivePageIndex + 1]).Fill.Color := Interpolatecolor(FInActiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInactiveIndicator.Fill.Color{Stop}, LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex + 1]).Fill.Color := Interpolatecolor(FInactiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, LAnimationValue);
           end
           else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
             FActiveIndicatorControl.Visible := False;
-            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInActiveIndicator.Fill.Color{Stop}, -LAnimationValue);
-            TIndicatorControl(Controls[FActivePageIndex - 1]).Fill.Color := Interpolatecolor(FInActiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, -LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex]).fill.Color := Interpolatecolor(FActiveIndicatorControl.fill.Color{Start}, FInactiveIndicator.Fill.Color{Stop}, -LAnimationValue);
+            TIndicatorControl(Controls[FActivePageIndex - 1]).Fill.Color := Interpolatecolor(FInactiveIndicator.Fill.Color{Start}, FActiveIndicatorControl.fill.Color{Stop}, -LAnimationValue);
           end;
         end;
 
@@ -24405,7 +25360,7 @@ begin
       FFadeAnimation := TALFloatAnimation.Create;
       FFadeAnimation.OnProcess := FadeAnimationProcess;
       FFadeAnimation.OnFinish := FadeAnimationFinish;
-      FFadeAnimation.Duration := 2; // 0.3;
+      FFadeAnimation.Duration := 0.3;
     end;
 
     FFadeTouchMode := FScrollEngine.TouchMode;
@@ -24471,7 +25426,7 @@ begin
     if Orientation = TOrientation.Horizontal then
       FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Left - GetEndPadding, AValue.Top))
     else
-      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Top, AValue.Top - GetEndPadding));
+      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Left, AValue.Top - GetEndPadding));
   end;
   {$ENDREGION}
 

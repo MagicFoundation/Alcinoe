@@ -320,7 +320,7 @@ begin
   inherited;
 end;
 
-{*****************************************************}
+{***********************************************}
 procedure TALControl.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -1227,13 +1227,13 @@ begin
  // Virtual;
 end;
 
-{******************************************************}
+{***********************************************}
 function TALControl.GetAutoAlignToPixel: Boolean;
 begin
   Result := FAutoAlignToPixel;
 end;
 
-{*********************************************************************}
+{**************************************************************}
 procedure TALControl.SetAutoAlignToPixel(const AValue: Boolean);
 begin
   FAutoAlignToPixel := AValue;

@@ -280,7 +280,7 @@ begin
 
   { Creating Root view container for picker }
   FUIContainerView := TUIView.Create;
-  FUIContainerView.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.whiteColor));
+  FUIContainerView.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.systemBackgroundColor));
   FUIContainerView.setAutoresizingMask(
     UIViewAutoresizingFlexibleWidth or
     UIViewAutoresizingFlexibleLeftMargin or

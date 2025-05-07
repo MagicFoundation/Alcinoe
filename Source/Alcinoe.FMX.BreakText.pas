@@ -122,10 +122,10 @@ type
     //   * <br>
     //   * <b>...</b>
     //   * <i>...</i>
-    //   * <font color="#FFFFFF"
+    //   * <font color="#FFFFFF or {ColorKey}"
     //           face="Roboto">...</font>
     //   * <span id="xxx"
-    //           color="#FFFFFF"
+    //           color="#FFFFFF or {ColorKey}"
     //           font-family="Roboto"
     //           font-size="14px"
     //           font-weight="bold"
@@ -134,10 +134,10 @@ type
     //           text-decoration-line="underline overline"
     //           text-decoration-style="solid"
     //           text-decoration-thickness="3"
-    //           text-decoration-color="#FFFFFF"
+    //           text-decoration-color="#FFFFFF or {ColorKey}"
     //           line-height="1.6"
     //           letter-spacing="2px"
-    //           background-color="#FFFFFF">...</span>
+    //           background-color="#FFFFFF or {ColorKey}">...</span>
     //   * <img src="{ResourceName}"
     //          width="xxx"
     //          height="xxx">
@@ -318,6 +318,7 @@ uses
   FMX.Helpers.Win,
   FMX.Utils,
   {$ENDIF}
+  Alcinoe.FMX.Styles,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
   Alcinoe.Common;
@@ -674,12 +675,17 @@ procedure ALDrawMultiLineText(
   Function _TryStrColorToInt(const AColorStr: String; out AColorInt: Cardinal): boolean;
   begin
     Result := False;
-    if (AColorStr <> '') and (AColorStr[low(AColorStr)] = '#') then begin
+    if AColorStr = '' then exit;
+    if AColorStr[low(AColorStr)] = '#' then begin
       var LAlphaColor: TAlphaColor;
       if ALTryRGBAHexToAlphaColor(AlcopyStr(AColorStr, 2, MaxInt), LAlphaColor) then begin
         Result := True;
         AColorInt := Cardinal(LAlphaColor);
       end;
+    end
+    else if (AColorStr[low(AColorStr)] = '{') and (AColorStr[high(AColorStr)] = '}') then begin
+      AColorInt := Cardinal(TALStyleManager.Instance.GetColor(AlcopyStr(AColorStr, 2, length(AColorStr)-2)));
+      Result := True;
     end;
   end;
   {$ENDREGION}

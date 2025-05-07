@@ -283,14 +283,17 @@ type
     FOffsetX: Single; // 4 bytes
     FOffsetY: Single; // 4 bytes
     FColor: TAlphaColor; // 4 bytes
+    FColorKey: String; // 8 bytes
     procedure setblur(const Value: Single);
     procedure setOffsetX(const Value: Single);
     procedure setOffsetY(const Value: Single);
     procedure setColor(const Value: TAlphaColor);
+    procedure setColorKey(const Value: String);
     function IsblurStored: Boolean;
     function IsOffsetXStored: Boolean;
     function IsOffsetYStored: Boolean;
     function IsColorStored: Boolean;
+    function IsColorKeyStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadEnabled(Reader: TReader);
@@ -302,11 +305,13 @@ type
     function GetDefaultOffsetX: Single; virtual;
     function GetDefaultOffsetY: Single; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
+    function GetDefaultColorKey: String; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALShadow; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
     function HasShadow: boolean; virtual;
@@ -314,11 +319,13 @@ type
     property DefaultOffsetX: Single read GetDefaultOffsetX;
     property DefaultOffsetY: Single read GetDefaultOffsetY;
     property DefaultColor: TAlphaColor read GetDefaultColor;
+    property DefaultColorKey: String read GetDefaultColorKey;
   published
     property blur: Single read fblur write setblur stored IsblurStored nodefault;
     property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored nodefault;
     property OffsetY: Single read fOffsetY write setOffsetY stored IsOffsetYStored nodefault;
     property Color: TAlphaColor read fColor write setColor stored IsColorStored;
+    property ColorKey: String read fColorKey write setColorKey stored IsColorKeyStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -363,18 +370,21 @@ type
     FSlant: TFontSlant; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
     FStretch: TFontStretch; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
     FColor: TAlphaColor; // 4 bytes
+    FColorKey: String; // 8 bytes
     procedure SetFamily(const AValue: TFontName);
     procedure SetSize(const AValue: Single);
     procedure SetWeight(const AValue: TFontWeight);
     procedure SetSlant(const AValue: TFontSlant);
     procedure SetStretch(const AValue: TFontStretch);
     procedure SetColor(const AValue: TAlphaColor);
+    procedure SetColorKey(const AValue: String);
     function IsFamilyStored: Boolean;
     function IsSizeStored: Boolean;
     function IsWeightStored: Boolean;
     function IsSlantStored: Boolean;
     function IsStretchStored: Boolean;
     function IsColorStored: Boolean;
+    function IsColorKeyStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadStyleExt(AStream: TStream);
@@ -389,11 +399,13 @@ type
     function GetDefaultSlant: TFontSlant; virtual;
     function GetDefaultStretch: TFontStretch; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
+    function GetDefaultColorKey: String; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALFont; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
     property DefaultFamily: TFontName read GetDefaultFamily;
@@ -402,6 +414,7 @@ type
     property DefaultSlant: TFontSlant read GetDefaultSlant;
     property DefaultStretch: TFontStretch read GetDefaultStretch;
     property DefaultColor: TAlphaColor read GetDefaultColor;
+    property DefaultColorKey: String read GetDefaultColorKey;
   published
     property Family: TFontName read FFamily write SetFamily stored IsFamilyStored nodefault;
     property Size: Single read FSize write SetSize stored IsSizeStored nodefault;
@@ -409,6 +422,7 @@ type
     property Slant: TFontSlant read FSlant write SetSlant stored IsSlantStored;
     property Stretch: TFontStretch read FStretch write SetStretch stored IsStretchStored;
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -418,34 +432,41 @@ type
     FStyle: TALTextDecorationStyle; // 1 byte
     FThicknessMultiplier: Single; // 4 bytes
     FColor: TAlphaColor; // 4 bytes
+    FColorKey: String; // 8 bytes
     procedure SetKinds(const AValue: TALTextDecorationKinds);
     procedure SetStyle(const AValue: TALTextDecorationStyle);
     procedure SetThicknessMultiplier(const AValue: Single);
     procedure SetColor(const AValue: TAlphaColor);
+    procedure SetColorKey(const AValue: String);
     function IsKindsStored: Boolean;
     function IsStyleStored: Boolean;
     function IsThicknessMultiplierStored: Boolean;
     function IsColorStored: Boolean;
+    function IsColorKeyStored: Boolean;
   protected
     function GetDefaultKinds: TALTextDecorationKinds; virtual;
     function GetDefaultStyle: TALTextDecorationStyle; virtual;
     function GetDefaultThicknessMultiplier: Single; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
+    function GetDefaultColorKey: String; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
     property DefaultKinds: TALTextDecorationKinds read GetDefaultKinds;
     property DefaultStyle: TALTextDecorationStyle read GetDefaultStyle;
     property DefaultThicknessMultiplier: Single read GetDefaultThicknessMultiplier;
     property DefaultColor: TAlphaColor read GetDefaultColor;
+    property DefaultColorKey: String read GetDefaultColorKey;
   published
     property Kinds: TALTextDecorationKinds read FKinds write SetKinds Stored IsKindsStored;
     property Style: TALTextDecorationStyle read FStyle write SetStyle Stored IsStyleStored;
     property ThicknessMultiplier: Single read FThicknessMultiplier write SetThicknessMultiplier Stored IsThicknessMultiplierStored nodefault;
     property Color: TAlphaColor read FColor write SetColor Stored IsColorStored;
+    property ColorKey: String read FColorKey write SetColorKey Stored IsColorKeyStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -470,6 +491,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
     property DefaultInherit: Boolean read GetDefaultInherit;
@@ -543,6 +565,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
     //--
@@ -612,17 +635,21 @@ type
     FStyle: TGradientStyle; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
     FAngle: Single; // 4 bytes
     FColors: TArray<TAlphaColor>; // 8 bytes
+    FColorKeys: TArray<String>; // 8 bytes
     FOffsets: TArray<Single>; // 8 bytes
     function GetCSSFormat: String;
     procedure SetStyle(const Value: TGradientStyle);
     procedure SetAngle(const Value: Single);
     procedure SetColors(const Value: TArray<TAlphaColor>);
+    procedure SetColorKeys(const Value: TArray<String>);
     procedure SetOffsets(const Value: TArray<Single>);
     procedure SetCSSFormat(const Value: String);
     function IsStyleStored: Boolean;
     function IsAngleStored: Boolean;
     procedure ReadColors(Reader: TReader);
     procedure WriteColors(Writer: TWriter);
+    procedure ReadColorKeys(Reader: TReader);
+    procedure WriteColorKeys(Writer: TWriter);
     procedure ReadOffsets(Reader: TReader);
     procedure WriteOffsets(Writer: TWriter);
   protected
@@ -633,11 +660,13 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALGradient; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single);
     property DefaultStyle: TGradientStyle read GetDefaultStyle;
     property DefaultAngle: Single read GetDefaultAngle;
     property Colors: TArray<TAlphaColor> read FColors write SetColors;
+    property ColorKeys: TArray<String> read FColorKeys write SetColorKeys;
     property Offsets: TArray<Single> read FOffsets write SetOffsets;
     property CSSFormat: String read GetCSSFormat Write SetCSSFormat;
   published
@@ -654,6 +683,7 @@ type
   private
     {--- Logical order ---
     FColor: TAlphaColor;
+    FColorKey: String;
     FGradient: TALGradient;
     FResourceName: String;
     FBackgroundMargins: TALBounds;
@@ -668,7 +698,9 @@ type
     FImageNoRadius: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 byte
     FColor: TAlphaColor; // 4 bytes
+    FColorKey: String; // 8 bytes
     procedure SetColor(const Value: TAlphaColor);
+    procedure SetColorKey(const Value: String);
     procedure SetGradient(const Value: TALGradient);
     procedure SetResourceName(const Value: String);
     procedure SetBackgroundMargins(const Value: TALBounds);
@@ -679,6 +711,7 @@ type
     procedure BackgroundMarginsChanged(Sender: TObject); virtual;
     procedure ImageMarginsChanged(Sender: TObject); virtual;
     function IsColorStored: Boolean;
+    function IsColorKeyStored: Boolean;
     function IsResourceNameStored: Boolean;
     function IsImageNoRadiusStored: Boolean;
     function IsWrapModeStored: Boolean;
@@ -692,6 +725,7 @@ type
     function CreateBackgroundMargins: TALBounds; virtual;
     function CreateImageMargins: TALBounds; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
+    function GetDefaultColorKey: String; virtual;
     function GetDefaultResourceName: String; virtual;
     function GetDefaultImageNoRadius: Boolean; virtual;
     function GetDefaultWrapMode: TALImageWrapMode; virtual;
@@ -701,17 +735,20 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALBrush; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
     function HasFill: boolean; virtual;
     function Styles: TALBrushStyles; virtual;
     function IsRemoteResource: Boolean;
     property DefaultColor: TAlphaColor read GetDefaultColor;
+    property DefaultColorKey: String read GetDefaultColorKey;
     property DefaultResourceName: String read GetDefaultResourceName;
     property DefaultImageNoRadius: Boolean read GetDefaultImageNoRadius;
     property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
   published
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
     property Gradient: TALGradient read FGradient write SetGradient;
     property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
     property BackgroundMargins: TALBounds read FBackgroundMargins write SetBackgroundMargins;
@@ -746,10 +783,13 @@ type
   TALStrokeBrush = class(TALPersistentObserver)
   private
     FColor: TAlphaColor; // 4 bytes
+    FColorKey: String; // 8 bytes
     FThickness: Single; // 4 bytes
     procedure SetColor(const Value: TAlphaColor);
+    procedure SetColorKey(const Value: String);
     procedure SetThickness(const Value: Single);
     function IsColorStored: Boolean;
+    function IsColorKeyStored: Boolean;
     function IsThicknessStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
@@ -759,19 +799,23 @@ type
   {$ENDIF}
   protected
     function GetDefaultColor: TAlphaColor; virtual;
+    function GetDefaultColorKey: String; virtual;
     function GetDefaultThickness: Single; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
     function HasStroke: boolean; virtual;
     property DefaultColor: TAlphaColor read GetDefaultColor;
+    property DefaultColorKey: String read GetDefaultColorKey;
     property DefaultThickness: Single read GetDefaultThickness;
   published
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
     property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
   end;
 
@@ -807,12 +851,14 @@ type
   private
     FOpacity: Single; // 4 bytes
     FColor: TAlphaColor; // 4 bytes
+    FColorKey: String; // 8 bytes
     FUseContentColor: Boolean; // 1 byte
     FMargins: TALBounds; // 8 bytes
     FXRadius: Single; // 4 bytes
     FYRadius: Single; // 4 bytes
     procedure SetOpacity(const Value: Single);
     procedure SetColor(const Value: TAlphaColor);
+    procedure SetColorKey(const Value: String);
     procedure SetUseContentColor(const Value: Boolean);
     procedure SetMargins(const Value: TALBounds);
     procedure SetXRadius(const Value: Single);
@@ -820,6 +866,7 @@ type
     procedure MarginsChanged(Sender: TObject); virtual;
     function IsOpacityStored: Boolean;
     function IsColorStored: Boolean;
+    function IsColorKeyStored: Boolean;
     function IsUseContentColorStored: Boolean;
     function IsXRadiusStored: Boolean;
     function IsYRadiusStored: Boolean;
@@ -827,6 +874,7 @@ type
     function CreateMargins: TALBounds; virtual;
     function GetDefaultOpacity: Single; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
+    function GetDefaultColorKey: String; virtual;
     function GetDefaultUseContentColor: Boolean; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
@@ -836,17 +884,20 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
     function HasFill: boolean; virtual;
     property DefaultOpacity: Single read GetDefaultOpacity;
     property DefaultColor: TAlphaColor read GetDefaultColor;
+    property DefaultColorKey: String read GetDefaultColorKey;
     property DefaultUseContentColor: Boolean read GetDefaultUseContentColor;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
   published
     property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
     /// <summary>
     ///   When UseContentColor is true, the color property is ignored, and the
     ///   color is derived from the component content, such as the color of a
@@ -938,6 +989,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure ClearBufDrawable; virtual;
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
@@ -1010,6 +1062,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure ClearBufDrawable; virtual;
     /// <summary>
     ///   Determines and returns the current raw state style of the control
@@ -1077,6 +1130,7 @@ function  ALGetFontMetrics(
             const AFontSize: single;
             const AFontWeight: TFontWeight;
             const AFontSlant: TFontSlant): TALFontMetrics;
+function  ALCreateResourceStream(const AResourceName: String): TResourceStream;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
 Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffered: Boolean = True);
@@ -1324,6 +1378,7 @@ uses
   System.SyncObjs,
   System.IOutils,
   System.UIConsts,
+  System.Generics.Defaults,
   FMX.Utils,
   Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
@@ -1365,6 +1420,7 @@ uses
   Alcinoe.FMX.StdCtrls,
   Alcinoe.Common,
   Alcinoe.files,
+  Alcinoe.fmx.Styles,
   Alcinoe.HTTP.Client,
   Alcinoe.stringList,
   ALcinoe.StringUtils;
@@ -1807,6 +1863,7 @@ begin
   FOffsetX := DefaultOffsetX;
   FOffsetY := DefaultOffsetY;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
 end;
 
 {*********************************}
@@ -1832,10 +1889,11 @@ begin
   if Source is TALShadow then begin
     BeginUpdate;
     Try
-      Blur    := TALShadow(Source).Blur;
-      OffsetX := TALShadow(Source).OffsetX;
-      OffsetY := TALShadow(Source).OffsetY;
-      Color   := TALShadow(Source).Color;
+      Blur     := TALShadow(Source).Blur;
+      OffsetX  := TALShadow(Source).OffsetX;
+      OffsetY  := TALShadow(Source).OffsetY;
+      Color    := TALShadow(Source).Color;
+      ColorKey := TALShadow(Source).ColorKey;
     Finally
       EndUpdate;
     End;
@@ -1854,6 +1912,7 @@ begin
     OffsetX := DefaultOffsetX;
     OffsetY := DefaultOffsetY;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
   finally
     EndUpdate;
   end;
@@ -1872,11 +1931,24 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALShadow.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {***********************************************************************************}
 procedure TALShadow.Interpolate(const ATo: TALShadow; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       blur := InterpolateSingle(blur{Start}, ATo.blur{Stop}, ANormalizedTime);
       OffsetX := InterpolateSingle(OffsetX{Start}, ATo.OffsetX{Stop}, ANormalizedTime);
@@ -1889,6 +1961,7 @@ begin
       OffsetY := InterpolateSingle(OffsetY{Start}, DefaultOffsetY{Stop}, ANormalizedTime);
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -1937,6 +2010,12 @@ begin
 end;
 
 {****************************************}
+function TALShadow.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
+{****************************************}
 function TALShadow.GetDefaultblur: Single;
 begin
   Result := 0; // 12
@@ -1958,6 +2037,12 @@ end;
 function TALShadow.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null; // $96000000;
+end;
+
+{**********************************************}
+function TALShadow.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {***********************************************}
@@ -1992,7 +2077,17 @@ procedure TALShadow.setColor(const Value: TAlphaColor);
 begin
   if FColor <> Value then begin
     FColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALShadow.setColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -2108,6 +2203,7 @@ begin
   FSlant := DefaultSlant;
   FStretch := DefaultStretch;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
 end;
 
 {*********************************}
@@ -2163,6 +2259,7 @@ begin
       Slant       := TALFont(Source).Slant;
       Stretch     := TALFont(Source).Stretch;
       Color       := TALFont(Source).Color;
+      ColorKey    := TALFont(Source).ColorKey;
     Finally
       EndUpdate;
     End;
@@ -2176,6 +2273,7 @@ begin
       Slant       := TFont(Source).StyleExt.Slant;
       Stretch     := TFont(Source).StyleExt.Stretch;
       Color       := DefaultColor;
+      ColorKey    := DefaultColorKey;
     Finally
       EndUpdate;
     End;
@@ -2196,6 +2294,7 @@ begin
     Slant := DefaultSlant;
     Stretch := DefaultStretch;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
   finally
     EndUpdate;
   end;
@@ -2213,11 +2312,24 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALFont.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*******************************************************************************}
 procedure TALFont.Interpolate(const ATo: TALFont; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Family := ATo.Family;
       Size := InterpolateSingle(Size{Start}, ATo.Size{Stop}, ANormalizedTime);
@@ -2238,6 +2350,7 @@ begin
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(DefaultStretch), ANormalizedTime)));
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -2290,6 +2403,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{**************************************}
+function TALFont.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {*******************************************}
 function TALFont.GetDefaultFamily: TFontName;
 begin
@@ -2324,6 +2443,12 @@ end;
 function TALFont.GetDefaultColor: TAlphaColor;
 begin
   result := TAlphaColorRec.Black;
+end;
+
+{********************************************}
+function TALFont.GetDefaultColorKey: String;
+begin
+  result := '';
 end;
 
 {***************************************************}
@@ -2398,7 +2523,17 @@ procedure TALFont.SetColor(const AValue: TAlphaColor);
 begin
   if FColor <> AValue then begin
     FColor := AValue;
+    FColorKey := '';
     change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALFont.SetColorKey(const AValue: String);
+begin
+  if FColorKey <> AValue then begin
+    FColorKey := AValue;
+    ApplyColorScheme;
   end;
 end;
 
@@ -2410,6 +2545,7 @@ begin
   FStyle := DefaultStyle;
   FThicknessMultiplier := DefaultThicknessMultiplier;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
 end;
 
 {******************************************************}
@@ -2421,7 +2557,8 @@ begin
       Kinds := TALTextDecoration(Source).Kinds;
       Style := TALTextDecoration(Source).Style;
       ThicknessMultiplier := TALTextDecoration(Source).ThicknessMultiplier;
-      Color  := TALTextDecoration(Source).Color;
+      Color := TALTextDecoration(Source).Color;
+      ColorKey := TALTextDecoration(Source).ColorKey;
     Finally
       EndUpdate;
     End;
@@ -2440,8 +2577,21 @@ begin
     Style := DefaultStyle;
     ThicknessMultiplier := DefaultThicknessMultiplier;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
   finally
     EndUpdate;
+  end;
+end;
+
+{***********************************}
+procedure TALTextDecoration.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
   end;
 end;
 
@@ -2450,6 +2600,7 @@ procedure TALTextDecoration.Interpolate(const ATo: TALTextDecoration; const ANor
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Kinds := ATo.Kinds;
       Style := ATo.Style;
@@ -2470,6 +2621,7 @@ begin
       else
         Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -2510,6 +2662,12 @@ begin
   result := FColor <> DefaultColor
 end;
 
+{************************************************}
+function TALTextDecoration.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey
+end;
+
 {*****************************************************************}
 function TALTextDecoration.GetDefaultKinds: TALTextDecorationKinds;
 begin
@@ -2532,6 +2690,12 @@ end;
 function TALTextDecoration.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
+end;
+
+{******************************************************}
+function TALTextDecoration.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {*************************************************************************}
@@ -2566,7 +2730,17 @@ procedure TALTextDecoration.SetColor(const AValue: TAlphaColor);
 begin
   If FColor <> AValue then begin
     FColor := AValue;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALTextDecoration.setColorKey(const AValue: String);
+begin
+  if FColorKey <> AValue then begin
+    FColorKey := AValue;
+    ApplyColorScheme;
   end;
 end;
 
@@ -2650,6 +2824,18 @@ begin
   try
     // I'm not sure if doing this will impact anything
     Font.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************}
+procedure TALEllipsisSettings.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Font.ApplyColorScheme;
+    Decoration.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -2955,6 +3141,19 @@ begin
     Font.AlignToPixel;
     EllipsisSettings.AlignToPixel;
     LetterSpacing := ALAlignDimensionToPixelRound(LetterSpacing, ALGetScreenScale, TEpsilon.FontSize);
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************}
+procedure TALBaseTextSettings.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Font.ApplyColorScheme;
+    Decoration.ApplyColorScheme;
+    EllipsisSettings.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -3320,6 +3519,7 @@ begin
   FStyle := DefaultStyle;
   FAngle := DefaultAngle;
   FColors := [];
+  FColorKeys := [];
   FOffsets := [];
 end;
 
@@ -3332,6 +3532,7 @@ begin
       Style := TALGradient(Source).Style;
       Angle := TALGradient(Source).Angle;
       Colors := TALGradient(Source).Colors;
+      ColorKeys := TALGradient(Source).ColorKeys;
       Offsets := TALGradient(Source).Offsets;
     Finally
       EndUpdate;
@@ -3350,9 +3551,26 @@ begin
     Style := DefaultStyle;
     Angle := DefaultAngle;
     Colors := [];
+    ColorKeys := [];
     Offsets := [];
   finally
     EndUpdate;
+  end;
+end;
+
+{***********************************}
+procedure TALGradient.ApplyColorScheme;
+begin
+  var Ln := length(FColorKeys);
+  if Ln > 0 then begin
+    var LColors: TArray<TAlphaColor>;
+    setlength(LColors, Ln);
+    for var I := Low(FColorKeys) to High(FColorKeys) do
+      LColors[i] := TALStyleManager.Instance.GetColor(FColorKeys[i]);
+    if not TEqualityComparer<TArray<TAlphaColor>>.Default.Equals(fColors, LColors) then begin
+      FColors := LColors;
+      Change;
+    end;
   end;
 end;
 
@@ -3361,6 +3579,7 @@ procedure TALGradient.Interpolate(const ATo: TALGradient; const ANormalizedTime:
 begin
   BeginUpdate;
   Try
+    var LPrevColorKeys := FColorKeys;
     if ATo <> nil then begin
       if (Style = ATo.Style) and
          (length(Colors) = length(ATo.Colors)) and
@@ -3385,6 +3604,7 @@ begin
       Colors := [];
       Offsets := [];
     end;
+    var FColorKeys := LPrevColorKeys;
   finally
     EndUpdate;
   end;
@@ -3406,6 +3626,7 @@ procedure TALGradient.DefineProperties(Filer: TFiler);
 begin
   inherited;
   Filer.DefineProperty('Colors', ReadColors, WriteColors, Length(FColors) > 0);
+  Filer.DefineProperty('ColorKeys', ReadColorKeys, WriteColorKeys, Length(FColorKeys) > 0);
   Filer.DefineProperty('Offsets', ReadOffsets, WriteOffsets, Length(FOffsets) > 0);
 end;
 
@@ -3431,6 +3652,33 @@ begin
   try
     for var I := Low(FColors) to High(FColors) do
       Writer.WriteInteger(FColors[I]);
+  finally
+    Writer.WriteListEnd;
+  end;
+end;
+
+{************************************************}
+procedure TALGradient.ReadColorKeys(Reader: TReader);
+begin
+  SetLength(FColorKeys, 0);
+  Reader.ReadListBegin;
+  try
+    while not Reader.EndOfList do begin
+      SetLength(FColorKeys, length(FColorKeys)+1);
+      FColorKeys[high(FColorKeys)] := Reader.ReadString;
+    end;
+  finally
+    Reader.ReadListEnd;
+  end;
+end;
+
+{*************************************************}
+procedure TALGradient.WriteColorKeys(Writer: TWriter);
+begin
+  Writer.WriteListBegin;
+  try
+    for var I := Low(FColorKeys) to High(FColorKeys) do
+      Writer.WriteString(FColorKeys[I]);
   finally
     Writer.WriteListEnd;
   end;
@@ -3542,9 +3790,19 @@ end;
 {****************************************************************}
 procedure TALGradient.SetColors(const Value: TArray<TAlphaColor>);
 begin
-  if fColors <> Value then begin
+  if not TEqualityComparer<TArray<TAlphaColor>>.Default.Equals(fColors, Value) then begin
     fColors := Value;
+    fColorKeys := [];
     Change;
+  end;
+end;
+
+{****************************************************************}
+procedure TALGradient.SetColorKeys(const Value: TArray<String>);
+begin
+  if not TEqualityComparer<TArray<String>>.Default.Equals(fColorKeys, Value) then begin
+    FColorKeys := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -3744,6 +4002,7 @@ constructor TALBrush.Create;
 begin
   inherited Create;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FGradient := TALGradient.Create;
   FGradient.OnChanged := GradientChanged;
   FResourceName := DefaultResourceName;
@@ -3801,6 +4060,7 @@ begin
     BeginUpdate;
     Try
       Color := TALBrush(Source).Color;
+      ColorKey := TALBrush(Source).ColorKey;
       Gradient.Assign(TALBrush(Source).Gradient);
       ResourceName := TALBrush(Source).ResourceName;
       BackgroundMargins.Assign(TALBrush(Source).BackgroundMargins);
@@ -3822,6 +4082,7 @@ begin
   Try
     inherited;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     Gradient.Reset;
     ResourceName := DefaultResourceName;
     BackgroundMargins.Rect := BackgroundMargins.DefaultValue;
@@ -3845,11 +4106,24 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALBrush.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*********************************************************************************}
 procedure TALBrush.Interpolate(const ATo: TALBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
@@ -3880,6 +4154,7 @@ begin
       ImageNoRadius := DefaultImageNoRadius;
       WrapMode := DefaultWrapMode;
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -3923,6 +4198,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{***************************************}
+function TALBrush.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {**********************************************}
 function TALBrush.IsResourceNameStored: Boolean;
 begin
@@ -3945,6 +4226,12 @@ end;
 function TALBrush.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.white; // $FFE0E0E0;
+end;
+
+{*********************************************}
+function TALBrush.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {***********************************************}
@@ -3970,7 +4257,17 @@ procedure TALBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALBrush.setColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -4144,6 +4441,7 @@ constructor TALStrokeBrush.Create;
 begin
   inherited Create;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FThickness := DefaultThickness;
 end;
 
@@ -4172,6 +4470,7 @@ begin
     BeginUpdate;
     Try
       Color := TALStrokeBrush(Source).Color;
+      ColorKey := TALStrokeBrush(Source).ColorKey;
       Thickness := TALStrokeBrush(Source).Thickness;
     Finally
       EndUpdate;
@@ -4188,6 +4487,7 @@ begin
   Try
     inherited;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     Thickness := DefaultThickness;
   finally
     EndUpdate;
@@ -4205,11 +4505,24 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALStrokeBrush.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*********************************************************************************************}
 procedure TALStrokeBrush.Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Thickness := InterpolateSingle(Thickness{Start}, ATo.Thickness{Stop}, ANormalizedTime);
@@ -4218,6 +4531,7 @@ begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       Thickness := InterpolateSingle(Thickness{Start}, DefaultThickness{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -4247,6 +4561,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{*********************************************}
+function TALStrokeBrush.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {*************************************************}
 function TALStrokeBrush.IsThicknessStored: Boolean;
 begin
@@ -4257,6 +4577,12 @@ end;
 function TALStrokeBrush.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Black;
+end;
+
+{***************************************************}
+function TALStrokeBrush.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {**************************************************}
@@ -4270,7 +4596,17 @@ procedure TALStrokeBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALStrokeBrush.setColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -4392,6 +4728,7 @@ begin
   //--
   FOpacity := DefaultOpacity;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FUseContentColor := DefaultUseContentColor;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
@@ -4421,6 +4758,7 @@ begin
     Try
       Opacity := TALStateLayer(Source).Opacity;
       Color := TALStateLayer(Source).Color;
+      ColorKey := TALStateLayer(Source).ColorKey;
       UseContentColor := TALStateLayer(Source).UseContentColor;
       Margins.Assign(TALStateLayer(Source).Margins);
       XRadius := TALStateLayer(Source).XRadius;
@@ -4441,6 +4779,7 @@ begin
     inherited;
     Opacity := DefaultOpacity;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     UseContentColor := DefaultUseContentColor;
     Margins.Rect := Margins.DefaultValue;
     XRadius := DefaultXRadius;
@@ -4461,11 +4800,24 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALStateLayer.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*******************************************************************************************}
 procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Opacity := InterpolateSingle(Opacity{Start}, ATo.Opacity{Stop}, ANormalizedTime);
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
@@ -4488,6 +4840,7 @@ begin
       XRadius := InterpolateSingle(XRadius{Start}, DefaultXRadius{Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, DefaultYRadius{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -4523,6 +4876,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{********************************************}
+function TALStateLayer.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {******************************************************}
 function TALStateLayer.IsUseContentColorStored: Boolean;
 begin
@@ -4551,6 +4910,12 @@ end;
 function TALStateLayer.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
+end;
+
+{**************************************************}
+function TALStateLayer.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {********************************************************}
@@ -4585,7 +4950,17 @@ procedure TALStateLayer.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALStateLayer.setColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -4896,6 +5271,20 @@ begin
     StateLayer.AlignToPixel;
     Stroke.AlignToPixel;
     Shadow.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************************}
+procedure TALBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Fill.ApplyColorScheme;
+    StateLayer.ApplyColorScheme;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -5308,6 +5697,12 @@ begin
 end;
 
 {********************************************}
+procedure TALBaseStateStyles.ApplyColorScheme;
+begin
+  // Virtual
+end;
+
+{********************************************}
 procedure TALBaseStateStyles.ClearBufDrawable;
 begin
   // Virtual
@@ -5395,7 +5790,7 @@ class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName:
 begin
 
   {$IF defined(ALSkiaEngine)}
-  var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  var LStream := ALCreateResourceStream(AResourceName);
   try
     TSkDefaultProviders.RegisterTypeface(LStream);
   finally
@@ -5404,7 +5799,7 @@ begin
   {$ENDIF}
 
   {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
-  var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  var LStream := ALCreateResourceStream(AResourceName);
   try
     Var LfileName := TPath.GetTempFileName;
     Lstream.SaveToFile(LfileName);
@@ -5421,7 +5816,7 @@ begin
   {$ENDIF}
 
   {$IF (not defined(ALSkiaEngine)) and (defined(ALAppleOS))}
-  var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  var LStream := ALCreateResourceStream(AResourceName);
   try
     var LDataProviderRef := CGDataProviderCreateWithData(nil, LStream.Memory, LStream.Size, nil);
     if LDataProviderRef = nil then raise Exception.Create('Failed to create data provider from resource stream');
@@ -5784,6 +6179,20 @@ begin
     ALFontMetricsCacheLock.endWrite;
   end;
 
+end;
+
+{****************************************************************************}
+function ALCreateResourceStream(const AResourceName: String): TResourceStream;
+begin
+  if TALStyleManager.Instance.isDarkMode then begin
+    var LDarkResourceName := AResourceName + '_dark';
+    if FindResource(HInstance, PChar(LDarkResourceName), RT_RCDATA) <> 0 then
+      Result := TResourceStream.Create(HInstance, LDarkResourceName, RT_RCDATA)
+    else
+      Result := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  end
+  else
+    Result := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
 end;
 
 {******************************************************************}

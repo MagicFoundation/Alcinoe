@@ -142,8 +142,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TPersistent); override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; virtual;
@@ -156,6 +156,7 @@ type
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
+    procedure ApplyColorScheme; virtual;
     procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
     function HasUnconstrainedAutosizeX: Boolean; virtual;
     function HasUnconstrainedAutosizeY: Boolean; virtual;
@@ -256,6 +257,7 @@ uses
   System.Math,
   System.Math.Vectors,
   Fmx.utils,
+  Alcinoe.FMX.styles,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.StringUtils,
@@ -305,6 +307,16 @@ end;
 destructor TALControl.Destroy;
 begin
   ClearBufDrawable;
+  inherited;
+end;
+
+{*************************************}
+procedure TALControl.BeforeDestruction;
+begin
+  if FBeforeDestructionExecuted then exit;
+  FBeforeDestructionExecuted := True;
+  for var I := 0 to ControlsCount - 1 do
+    Controls[I].BeforeDestruction;
   inherited;
 end;
 
@@ -385,16 +397,6 @@ begin
   End;
 end;
 
-{*************************************}
-procedure TALControl.BeforeDestruction;
-begin
-  if FBeforeDestructionExecuted then exit;
-  FBeforeDestructionExecuted := True;
-  for var I := 0 to ControlsCount - 1 do
-    Controls[I].BeforeDestruction;
-  inherited;
-end;
-
 {***************************************************************}
 // The current implementation of TControl's BeginUpdate/EndUpdate
 // and Realign methods is inefficient—particularly for TALText,
@@ -441,7 +443,7 @@ end;
 {**************************}
 procedure TALControl.Loaded;
 begin
-  {$IF not DEFINED(ALDPK)}
+  {$IF not defined(ALDPK)}
   if AutoAlignToPixel then
     AlignToPixel;
   {$ENDIF}
@@ -672,11 +674,6 @@ end;
 {************************************************************}
 procedure TALControl.SetBounds(X, Y, AWidth, AHeight: Single);
 begin
-  if FIsSetBoundsLocked then begin
-    AWidth := Width;
-    AHeight := Height;
-  end;
-
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
@@ -755,6 +752,11 @@ begin
     end;
   end;
 
+  if FIsSetBoundsLocked then begin
+    AWidth := Width;
+    AHeight := Height;
+  end;
+
   {$IF defined(debug)}
   //var LMoved := not (SameValue(X, Position.X, TEpsilon.Position) and SameValue(Y, Position.Y, TEpsilon.Position));
   //var LSizeChanged := not (SameValue(AWidth, Width, TEpsilon.Position) and SameValue(AHeight, Height, TEpsilon.Position));
@@ -772,7 +774,6 @@ begin
      (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
-     (scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -831,9 +832,7 @@ begin
 
           //--
           TALAlignLayout.Top,
-          TALAlignLayout.MostTop,
-          TALAlignLayout.Bottom,
-          TALAlignLayout.MostBottom: begin
+          TALAlignLayout.MostTop: begin
             if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
               // If the child control has autosize enabled on the X-axis, adjusts
               // AControl width to ensure it contains the child control at its
@@ -851,18 +850,31 @@ begin
           end;
 
           //--
+          TALAlignLayout.Bottom,
+          TALAlignLayout.MostBottom: begin
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
+              // If the child control has autosize enabled on the X-axis, adjusts
+              // AControl width to ensure it contains the child control at its
+              // current position. For example, TALText will never have
+              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Top,
+              // but TALLayout/TRectangle will have it set to true if their
+              // autosize property is enabled.
+              LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
+            else
+              // Otherwise, do not adjust AControl width.
+              LSize.Width := Max(LSize.Width, Width);
+            // Adjusts AControl height to ensure it contains
+            // the child control at its current position.
+            LSize.height := Max(LSize.height, Height - LChildControl.Position.Y + LChildControl.Margins.Top + padding.Top);
+          end;
+
+          //--
           TALAlignLayout.TopCenter,
           TALAlignLayout.TopLeft,
           TALAlignLayout.TopRight,
-          TALAlignLayout.BottomCenter,
-          TALAlignLayout.BottomLeft,
-          TALAlignLayout.BottomRight,
           TALAlignLayout.MostTopCenter,
           TALAlignLayout.MostTopLeft,
-          TALAlignLayout.MostTopRight,
-          TALAlignLayout.MostBottomCenter,
-          TALAlignLayout.MostBottomLeft,
-          TALAlignLayout.MostBottomRight: begin
+          TALAlignLayout.MostTopRight: begin
             // Adjusts AControl width to ensure it contains the
             // child control without considering its current position.
             // !! Note: This may not work well if there is another child control
@@ -874,10 +886,25 @@ begin
           end;
 
           //--
+          TALAlignLayout.BottomCenter,
+          TALAlignLayout.BottomLeft,
+          TALAlignLayout.BottomRight,
+          TALAlignLayout.MostBottomCenter,
+          TALAlignLayout.MostBottomLeft,
+          TALAlignLayout.MostBottomRight: begin
+            // Adjusts AControl width to ensure it contains the
+            // child control without considering its current position.
+            // !! Note: This may not work well if there is another child control
+            //    that is not aligned to the top or bottom. !!
+            LSize.Width := Max(LSize.Width, LChildControl.Margins.left + padding.left + LChildControl.width + LChildControl.Margins.right + padding.right);
+            // Adjusts AControl height to ensure it contains
+            // the child control at its current position.
+            LSize.height := Max(LSize.height, Height - LChildControl.Position.Y + LChildControl.Margins.Top + padding.Top);
+          end;
+
+          //--
           TALAlignLayout.Left,
-          TALAlignLayout.MostLeft,
-          TALAlignLayout.Right,
-          TALAlignLayout.MostRight: Begin
+          TALAlignLayout.MostLeft: Begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
             LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right);
@@ -895,21 +922,51 @@ begin
           End;
 
           //--
+          TALAlignLayout.Right,
+          TALAlignLayout.MostRight: Begin
+            // Adjusts AControl width to ensure it contains
+            // the child control at its current position.
+            LSize.Width := Max(LSize.Width, Width - LChildControl.Position.X + LChildControl.Margins.left + padding.left);
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeY then
+              // If the child control has autosize enabled on the X-axis, adjusts
+              // AControl height to ensure it contains the child control at its
+              // current position. For example, TALText will never have
+              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Left,
+              // but TALLayout/TRectangle will have it set to true if their
+              // autosize property is enabled.
+              LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
+            else
+              // Otherwise, do not adjust AControl height.
+              LSize.height := Max(LSize.Height, Height);
+          End;
+
+          //--
           TALAlignLayout.LeftCenter,
           TALAlignLayout.LeftTop,
           TALAlignLayout.LeftBottom,
+          TALAlignLayout.MostLeftCenter,
+          TALAlignLayout.MostLeftTop,
+          TALAlignLayout.MostLeftBottom: begin
+            // Adjusts AControl width to ensure it contains
+            // the child control at its current position.
+            LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right);
+            // Adjusts AControl height to ensure it contains the
+            // child control without considering its current position.
+            // !! Note: This may not work well if there is another child control
+            //    that is not aligned to the left or right. !!
+            LSize.height := Max(LSize.height, LChildControl.Margins.top + padding.top + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom);
+          end;
+
+          //--
           TALAlignLayout.RightCenter,
           TALAlignLayout.RightTop,
           TALAlignLayout.RightBottom,
-          TALAlignLayout.MostLeftCenter,
-          TALAlignLayout.MostLeftTop,
-          TALAlignLayout.MostLeftBottom,
           TALAlignLayout.MostRightCenter,
           TALAlignLayout.MostRightTop,
           TALAlignLayout.MostRightBottom: begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
-            LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right);
+            LSize.Width := Max(LSize.Width, Width - LChildControl.Position.X + LChildControl.Margins.left + padding.left);
             // Adjusts AControl height to ensure it contains the
             // child control without considering its current position.
             // !! Note: This may not work well if there is another child control
@@ -1051,6 +1108,25 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{************************************}
+procedure TALControl.ApplyColorScheme;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure ApplyColorSchemeRecursive(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do
+      if AControl.Controls[i] is TALControl then TALControl(AControl.Controls[i]).ApplyColorScheme
+      else ApplyColorSchemeRecursive(AControl.Controls[i]);
+  end;
+
+begin
+  // ClearBufDrawable because when switching between dark and light mode,
+  // the resource name remains the same, but the loaded resource changes
+  // (e.g., xxx_dark instead of xxx in dark mode).
+  ClearBufDrawable;
+  ApplyColorSchemeRecursive(self);
 end;
 
 {**************************************************}
@@ -1220,11 +1296,6 @@ begin
   var LPrevIsFocused := IsFocused;
   var LPrevIsMouseOver := IsMouseOver;
   inherited;
-  // At design time, when a new TEdit/TMemo is added to the form,
-  // or a new TALBaseText control with AutoSize=true is added to the form,
-  // the size will not adjust and will remain at its default (200x50).
-  // Calling AdjustSize here will correct this.
-  AdjustSize;
   {$IF defined(ANDROID) or defined(IOS)}
   FIsMouseOver := False;
   {$ENDIF}

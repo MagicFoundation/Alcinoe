@@ -1867,7 +1867,7 @@ begin
     var LFileName := ALGetResourceFilename(AResourceName);
     if LFileName <> '' then LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(LFileName))))
     else begin
-      var LResourceStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+      var LResourceStream := ALCreateResourceStream(AResourceName);
       try
         var LSkStream: sk_streamadapter_t := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
         try
@@ -2326,7 +2326,7 @@ begin
     var LFileName := ALGetResourceFilename(AResourceName);
     if LFileName <> '' then LBitmap := _CreateJBitmapFromFile(LFileName)
     else begin
-      var LResourceStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+      var LResourceStream := ALCreateResourceStream(AResourceName);
       try
         LBitmap := _CreateJBitmapFromStream(LResourceStream)
       finally
@@ -2776,7 +2776,7 @@ begin
     var LFileName := ALGetResourceFilename(AResourceName);
     if LFileName <> '' then LOSImage := _CreateOSImageFromFile(LFileName)
     else begin
-      var LResourceStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+      var LResourceStream := ALCreateResourceStream(AResourceName);
       try
         LOSImage := _CreateOSImageFromStream(LResourceStream)
       finally
@@ -3117,7 +3117,7 @@ begin
     var LFileName := ALGetResourceFilename(AResourceName);
     if LFileName <> '' then LBitmap := Tbitmap.CreateFromFile(LFileName)
     else begin
-      var LResourceStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+      var LResourceStream := ALCreateResourceStream(AResourceName);
       try
         LBitmap := Tbitmap.CreateFromStream(LResourceStream);
       finally

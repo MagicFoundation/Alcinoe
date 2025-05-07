@@ -74,6 +74,20 @@ type
   end;
   TALUIScreen = class(TOCGenericImport<ALUIScreenClass, ALUIScreen>)  end;
 
+  {*************************************}
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3457 has been resolved. If resolved, remove the class definition below.'}
+  {$ENDIF}
+  ALUIViewClass = interface(UIViewClass)
+    ['{A4F960AE-EE39-4836-BE06-6DE2E0599899}']
+  end;
+  ALUIView = interface(UIView)
+    ['{CA0301A9-FC64-43FC-875C-7CCDB375A0F4}']
+    procedure setOverrideUserInterfaceStyle(overrideUserInterfaceStyle: UIUserInterfaceStyle); cdecl;
+    function overrideUserInterfaceStyle: UIUserInterfaceStyle; cdecl;
+  end;
+  TALUIView = class(TOCGenericImport<ALUIViewClass, ALUIView>)  end;
+
 implementation
 
 end.

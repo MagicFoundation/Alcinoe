@@ -52,7 +52,7 @@ type
   strict private
     FFill: TALBrush;
     FStroke: TALStrokeBrush;
-    fShadow: TALShadow;
+    FShadow: TALShadow;
     function GetFill: TALBrush;
     procedure SetFill(const Value: TALBrush);
     function GetStroke: TALStrokeBrush;
@@ -71,6 +71,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     property Fill: TALBrush read GetFill write SetFill;
     property Stroke: TALStrokeBrush read GetStroke write SetStroke;
     property Shadow: TALShadow read GetShadow write SetShadow;
@@ -143,14 +144,16 @@ type
       End;
   private
     FBackgroundColor: TAlphaColor; // 4 bytes
+    FBackgroundColorKey: String; // 8 bytes
     FLoadingColor: TAlphaColor; // 4 bytes
-    fResourceName: String; // 8 bytes
+    FLoadingColorKey: String; // 8 bytes
+    FResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
     FMaskBitmap: TALRefCountBitmap; // 8 bytes
     FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 bytes
-    fExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
-    fRotateAccordingToExifOrientation: Boolean; // 1 bytes
+    FExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
+    FRotateAccordingToExifOrientation: Boolean; // 1 bytes
     FCorners: TCorners; // 1 bytes
     FSides: TSides; // 1 bytes
     FXRadius: Single; // 4 bytes
@@ -161,7 +164,7 @@ type
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FCropCenter: TALPosition; // 8 bytes
     FStroke: TALStrokeBrush; // 8 bytes
-    fShadow: TALShadow; // 8 bytes
+    FShadow: TALShadow; // 8 bytes
     FResourceDownloadContext: TResourceDownloadContext; // [MultiThread] | 8 bytes
     FFadeInDuration: Single; // 4 bytes
     FFadeInStartTimeNano: Int64; // 8 bytes
@@ -177,9 +180,13 @@ type
     procedure setMaskResourceName(const Value: String);
     procedure setMaskBitmap(const Value: TALRefCountBitmap);
     procedure setBackgroundColor(const Value: TAlphaColor);
+    procedure setBackgroundColorKey(const Value: String);
     procedure setLoadingColor(const Value: TAlphaColor);
+    procedure setLoadingColorKey(const Value: String);
     function IsBackgroundColorStored: Boolean;
+    function IsBackgroundColorKeyStored: Boolean;
     function IsLoadingColorStored: Boolean;
+    function IsLoadingColorKeyStored: Boolean;
     function IsFadeInDurationStored: Boolean;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
@@ -194,11 +201,15 @@ type
     function CreateCropCenter: TALPosition; virtual;
     function CreateStroke: TALStrokeBrush; virtual;
     function CreateShadow: TALShadow; virtual;
+    procedure ApplyLoadingColorScheme; virtual;
+    procedure ApplyBackgroundColorScheme; virtual;
     function GetCacheSubIndex: Integer; virtual;
     function GetLoadingCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultBackgroundColorKey: String; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultLoadingColorKey: String; virtual;
     function GetDefaultFadeInDuration: Single; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
@@ -252,10 +263,13 @@ type
     property ReadyAfterResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultBackgroundColorKey: String read GetDefaultBackgroundColorKey;
     property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultLoadingColorKey: String read GetDefaultLoadingColorKey;
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
@@ -276,7 +290,9 @@ type
     property Anchors;
     //property AutoSize;
     property BackgroundColor: TAlphaColor read fBackgroundColor write setBackgroundColor Stored IsBackgroundColorStored;
+    property BackgroundColorKey: String read fBackgroundColorKey write setBackgroundColorKey Stored IsBackgroundColorKeyStored;
     property LoadingColor: TAlphaColor read FLoadingColor write setLoadingColor Stored IsLoadingColorStored;
+    property LoadingColorKey: String read FLoadingColorKey write setLoadingColorKey Stored IsLoadingColorKeyStored;
     property BlurRadius: Single read FBlurRadius write SetBlurRadius stored IsBlurRadiusStored nodefault;
     //property CanFocus;
     //property CanParentFocus;
@@ -312,8 +328,8 @@ type
     // If ResourceName is a URL, the image is downloaded in the background from the internet.
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
-    property ResourceName: String read fResourceName write setResourceName;
-    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
+    property ResourceName: String read FResourceName write setResourceName;
+    property RotateAccordingToExifOrientation: Boolean read FRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -433,7 +449,7 @@ type
         {$ENDIF}
       {$ENDIF}
     {$ENDIF}
-    fResourceName: String;
+    FResourceName: String;
     FWrapMode: TALImageWrapMode;
     FOnAnimationFirstFrame: TNotifyEvent;
     FOnAnimationProcess: TNotifyEvent;
@@ -480,7 +496,7 @@ type
     // specified file (With the full path of the file obtained using ALGetResourceFilename).
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
-    property ResourceName: String read fResourceName write setResourceName;
+    property ResourceName: String read FResourceName write setResourceName;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -1179,6 +1195,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     function TextBroken: Boolean;
@@ -1328,6 +1345,7 @@ uses
   DesignIntf,
   system.ioutils,
   {$ENDIF}
+  Alcinoe.fmx.Styles,
   Alcinoe.Http.Client,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.StringUtils,
@@ -1341,8 +1359,8 @@ begin
   FFill.OnChanged := FillChanged;
   FStroke := CreateStroke;
   FStroke.OnChanged := StrokeChanged;
-  fShadow := CreateShadow;
-  fShadow.OnChanged := ShadowChanged;
+  FShadow := CreateShadow;
+  FShadow.OnChanged := ShadowChanged;
 end;
 
 {**************************}
@@ -1350,7 +1368,7 @@ destructor TALShape.Destroy;
 begin
   ALFreeAndNil(FFill);
   ALFreeAndNil(FStroke);
-  ALFreeAndNil(fShadow);
+  ALFreeAndNil(FShadow);
   inherited;
 end;
 
@@ -1399,6 +1417,20 @@ begin
     Fill.AlignToPixel;
     Stroke.AlignToPixel;
     Shadow.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALShape.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    Fill.ApplyColorScheme;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -1521,14 +1553,16 @@ constructor TALImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FBackgroundColor := DefaultBackgroundColor;
+  FBackgroundColorKey := DefaultBackgroundColorKey;
   FLoadingColor := DefaultLoadingColor;
-  fResourceName := '';
+  FLoadingColorKey := DefaultLoadingColorKey;
+  FResourceName := '';
   FMaskResourceName := '';
   FMaskBitmap := nil;
   FReadyAfterResourcesLoaded := False;
   FWrapMode := TALImageWrapMode.Fit;
-  fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-  fRotateAccordingToExifOrientation := False;
+  FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+  FRotateAccordingToExifOrientation := False;
   FCorners := AllCorners;
   FSides := AllSides;
   FXRadius := DefaultXRadius;
@@ -1541,8 +1575,8 @@ begin
   FCropCenter.OnChanged := CropCenterChanged;
   FStroke := CreateStroke;
   FStroke.OnChanged := StrokeChanged;
-  fShadow := CreateShadow;
-  fShadow.OnChanged := ShadowChanged;
+  FShadow := CreateShadow;
+  FShadow.OnChanged := ShadowChanged;
   FResourceDownloadContext := nil;
   FFadeInDuration := DefaultFadeInDuration;
   FFadeInStartTimeNano := 0;
@@ -1555,7 +1589,7 @@ destructor TALImage.Destroy;
 begin
   ALFreeAndNil(fCropCenter);
   ALFreeAndNil(FStroke);
-  ALFreeAndNil(fShadow);
+  ALFreeAndNil(FShadow);
   if FMaskBitmap <> nil then begin
     FMaskBitmap.DecreaseRefCount;
     FMaskBitmap := nil;
@@ -1570,7 +1604,9 @@ begin
   Try
     if Source is TALImage then begin
       BackgroundColor := TALImage(Source).BackgroundColor;
+      BackgroundColorKey := TALImage(Source).BackgroundColorKey;
       LoadingColor := TALImage(Source).LoadingColor;
+      LoadingColorKey := TALImage(Source).LoadingColorKey;
       ResourceName := TALImage(Source).ResourceName;
       MaskResourceName := TALImage(Source).MaskResourceName;
       MaskBitmap := TALImage(Source).MaskBitmap;
@@ -1638,6 +1674,47 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALImage.ApplyBackgroundColorScheme;
+begin
+  if FBackgroundColorKey <> '' then begin
+    var LBackgroundColor := TALStyleManager.Instance.GetColor(FBackgroundColorKey);
+    if FBackgroundColor <> LBackgroundColor then begin
+      FBackgroundColor := LBackgroundColor;
+      ClearBufDrawable;
+      Repaint;
+    end;
+  end;
+end;
+
+{***********************************}
+procedure TALImage.ApplyLoadingColorScheme;
+begin
+  if FLoadingColorKey <> '' then begin
+    var LLoadingColor := TALStyleManager.Instance.GetColor(FLoadingColorKey);
+    if FLoadingColor <> LLoadingColor then begin
+      FLoadingColor := LLoadingColor;
+      ClearBufDrawable;
+      Repaint;
+    end;
+  end;
+end;
+
+{******************************}
+procedure TALImage.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
+    ApplyBackgroundColorScheme;
+    ApplyLoadingColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {******************************************}
 function TALImage.GetCacheSubIndex: Integer;
 begin
@@ -1662,10 +1739,22 @@ begin
   Result := TalphaColors.Null;
 end;
 
+{*******************************************************}
+function TALImage.GetDefaultBackgroundColorKey: String;
+begin
+  Result := '';
+end;
+
 {****************************************************}
 function TALImage.GetDefaultLoadingColor: TalphaColor;
 begin
   Result := $FFe0e4e9;
+end;
+
+{****************************************************}
+function TALImage.GetDefaultLoadingColorKey: String;
+begin
+  Result := '';
 end;
 
 {*************************************************}
@@ -1784,9 +1873,19 @@ end;
 procedure TALImage.setBackgroundColor(const Value: TAlphaColor);
 begin
   if FBackgroundColor <> Value then begin
-    ClearBufDrawable;
     FBackgroundColor := Value;
+    FBackgroundColorKey := '';
+    ClearBufDrawable;
     Repaint;
+  end;
+end;
+
+{**************************************************************}
+procedure TALImage.setBackgroundColorKey(const Value: String);
+begin
+  if FBackgroundColorKey <> Value then begin
+    FBackgroundColorKey := Value;
+    ApplyBackgroundColorScheme;
   end;
 end;
 
@@ -1794,9 +1893,19 @@ end;
 procedure TALImage.setLoadingColor(const Value: TAlphaColor);
 begin
   if FLoadingColor <> Value then begin
-    ClearBufDrawable;
     FLoadingColor := Value;
+    FLoadingColorKey := '';
+    ClearBufDrawable;
     Repaint;
+  end;
+end;
+
+{***********************************************************}
+procedure TALImage.setLoadingColorKey(const Value: String);
+begin
+  if FLoadingColorKey <> Value then begin
+    FLoadingColorKey := Value;
+    ApplyLoadingColorScheme;
   end;
 end;
 
@@ -1858,10 +1967,22 @@ begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
+{*************************************************}
+function TALImage.IsBackgroundColorKeyStored: Boolean;
+begin
+  Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
+end;
+
 {**********************************************}
 function TALImage.IsLoadingColorStored: Boolean;
 begin
   Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{**********************************************}
+function TALImage.IsLoadingColorKeyStored: Boolean;
+begin
+  Result := FLoadingColorKey <> DefaultLoadingColorKey;
 end;
 
 {************************************************}
@@ -2330,8 +2451,8 @@ begin
 
   if //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
-     //--- Do not create BufDrawable if fResourceName is empty
-     (fResourceName = '')
+     //--- Do not create BufDrawable if FResourceName is empty
+     (FResourceName = '')
   then begin
     ClearBufDrawable;
     exit;
@@ -2562,8 +2683,8 @@ begin
   if FFadeInStartTimeNano <= 0 then
     ALFreeAndNilDrawable(fBufLoadingDrawable);
 
-  // Handle the fExifOrientationInfo
-  case fExifOrientationInfo of
+  // Handle the FExifOrientationInfo
+  case FExifOrientationInfo of
     TalExifOrientationInfo.FLIP_HORIZONTAL: begin
       var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
@@ -2921,7 +3042,7 @@ begin
       {$ENDIF}
     {$ENDIF}
   {$ENDIF}
-  fResourceName := '';
+  FResourceName := '';
   FWrapMode := TALImageWrapMode.Fit;
   FOnAnimationFirstFrame := nil;
   FOnAnimationProcess := nil;
@@ -2944,8 +3065,8 @@ begin
 
   if //--- Do not create Codec if the size is 0
      (Size.Size.IsZero) or
-     //--- Do not create Codec if fResourceName is empty
-     (fResourceName = '')
+     //--- Do not create Codec if FResourceName is empty
+     (FResourceName = '')
   then begin
     ReleaseCodec;
     exit;
@@ -2962,7 +3083,7 @@ begin
     {$IFDEF ALDPK}
     fSkottieAnimation := 0
     {$ELSE}
-    var LResourceStream := TResourceStream.Create(HInstance, fResourceName, RT_RCDATA);
+    var LResourceStream := ALCreateResourceStream(FResourceName);
     try
       var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
       try
@@ -2993,7 +3114,7 @@ begin
       {$IFDEF ALDPK}
       fAnimCodecPlayer := 0
       {$ELSE}
-      var LResourceStream := TResourceStream.Create(HInstance, fResourceName, RT_RCDATA);
+      var LResourceStream := ALCreateResourceStream(FResourceName);
       try
         var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
         try
@@ -3016,7 +3137,7 @@ begin
 
   if (fSkottieAnimation = 0) and (fAnimCodecPlayer = 0) then
     {$IF not defined(ALDPK)}
-    Raise Exception.CreateFmt('Failed to create the animation codec for resource "%s". Please ensure the resource exists and is in a valid format', [fResourceName]);
+    Raise Exception.CreateFmt('Failed to create the animation codec for resource "%s". Please ensure the resource exists and is in a valid format', [FResourceName]);
     {$ELSE}
     Exit;
     {$ENDIF}
@@ -3037,7 +3158,7 @@ begin
   if SameValue(LSize.width, 0, Tepsilon.Position) or
      SameValue(LSize.Height, 0, Tepsilon.Position) then begin
     {$IF not defined(ALDPK)}
-    Raise Exception.CreateFmt('The animation "%s" has invalid dimensions (width or height is zero)', [fResourceName]);
+    Raise Exception.CreateFmt('The animation "%s" has invalid dimensions (width or height is zero)', [FResourceName]);
     {$ELSE}
     ReleaseCodec;
     Exit;
@@ -4897,6 +5018,18 @@ begin
 end;
 
 {******************************}
+procedure TALBaseText.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    TextSettings.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
 procedure TALBaseText.DoResized;
 begin
   if not FIsAdjustingSize then begin
@@ -4914,7 +5047,6 @@ begin
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // if AutoSize is false nothing to adjust
      (Text <> '') and // if Text is empty do not do autosize
-     (scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
 

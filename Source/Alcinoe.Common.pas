@@ -695,7 +695,7 @@ function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
 procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
-var ALMove: procedure (const Source; var Dest; Count: NativeInt);
+procedure ALMove(const Source; var Dest; Count: NativeInt); inline;
 {$IFDEF MSWINDOWS}
 type
   TALConsoleColor = (
@@ -3452,6 +3452,12 @@ begin
   raise EConvertError.CreateResFmt(@SAssignError, [LSourceName, LDestName]);
 end;
 
+{*********************************************************}
+procedure ALMove(const Source; var Dest; Count: NativeInt);
+begin
+  Move(Source, Dest, Count);
+end;
+
 {******************************************************}
 {Accepts number of milliseconds in the parameter aValue,
  provides 1000 times more precise value of TDateTime}
@@ -3725,8 +3731,6 @@ initialization
   {$ENDIF}
   _ALLogQueue := TList<_TALLogItem>.Create;
   _ALLogHistory := TList<_TALLogItem>.Create;
-  ALMove := system.Move;
-
 
 finalization
   {$IF defined(DEBUG)}

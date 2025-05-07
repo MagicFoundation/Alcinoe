@@ -597,7 +597,9 @@ type
     FDataSource: String; // 8 bytes
     fPreviewResourceName: String; // 8 bytes
     FBackgroundColor: TAlphaColor; // 4 bytes
+    FBackgroundColorKey: String; // 8 bytes
     FLoadingColor: TAlphaColor; // 4 bytes
+    FLoadingColorKey: String; // 4 bytes
     FInternalState: Integer; // 4 Bytes
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
@@ -630,8 +632,14 @@ type
     procedure SetOnCompletionEvent(const Value: TNotifyEvent);
     function GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
     procedure SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
+    procedure setBackgroundColor(const Value: TAlphaColor);
+    procedure setBackgroundColorKey(const Value: String);
+    procedure setLoadingColor(const Value: TAlphaColor);
+    procedure setLoadingColorKey(const Value: String);
     function IsBackgroundColorStored: Boolean;
+    function IsBackgroundColorKeyStored: Boolean;
     function IsLoadingColorStored: Boolean;
+    function IsLoadingColorKeyStored: Boolean;
     function IsFadeInDurationStored: Boolean;
     function IsDataSourceStored: Boolean;
     function IsPlaybackSpeedStored: Boolean;
@@ -639,10 +647,14 @@ type
   protected
     fBufDrawable: TALDrawable; // 8 bytes
     fBufDrawableRect: TRectF; // 16 bytes
+    procedure ApplyLoadingColorScheme; virtual;
+    procedure ApplyBackgroundColorScheme; virtual;
     function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultBackgroundColorKey: String; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultLoadingColorKey: String; virtual;
     function GetDefaultFadeInDuration: Single; virtual;
     procedure CancelPreviewDownload;
     class function CanStartPreviewDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
@@ -669,10 +681,13 @@ type
     procedure BeforeDestruction; override;
     property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultBackgroundColorKey: String read GetDefaultBackgroundColorKey;
     property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultLoadingColorKey: String read GetDefaultLoadingColorKey;
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     function GetCurrentPosition: Int64;
     function GetDuration: Int64;
@@ -697,8 +712,10 @@ type
     property Anchors;
     //property AutoSize;
     property AutoStartMode: TAutoStartMode read FAutoStartMode write SetAutoStartMode default TAutoStartMode.None;
-    property BackgroundColor: TAlphaColor read fBackgroundColor write fBackgroundColor Stored IsBackgroundColorStored;
-    property LoadingColor: TAlphaColor read FLoadingColor write FLoadingColor Stored IsLoadingColorStored;
+    property BackgroundColor: TAlphaColor read fBackgroundColor write SetBackgroundColor Stored IsBackgroundColorStored;
+    property BackgroundColorKey: String read fBackgroundColorKey write SetBackgroundColorKey Stored IsBackgroundColorKeyStored;
+    property LoadingColor: TAlphaColor read FLoadingColor write SetLoadingColor Stored IsLoadingColorStored;
+    property LoadingColorKey: String read FLoadingColorKey write SetLoadingColorKey Stored IsLoadingColorKeyStored;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -807,6 +824,7 @@ uses
   Fmx.types,
   fmx.controls,
   fmx.Types3d,
+  Alcinoe.fmx.Styles,
   Alcinoe.StringUtils,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.Net.Pool,
@@ -3450,7 +3468,9 @@ begin
   FDataSource := '';
   fPreviewResourceName := '';
   FBackgroundColor := DefaultBackgroundColor;
+  FBackgroundColorKey := DefaultBackgroundColorKey;
   FLoadingColor := DefaultLoadingColor;
+  FLoadingColorKey := DefaultLoadingColorKey;
   FInternalState := VPSIdle;
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
@@ -3504,6 +3524,43 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALVideoPlayerSurface.ApplyBackgroundColorScheme;
+begin
+  if FBackgroundColorKey <> '' then begin
+    var LBackgroundColor := TALStyleManager.Instance.GetColor(FBackgroundColorKey);
+    if FBackgroundColor <> LBackgroundColor then begin
+      FBackgroundColor := LBackgroundColor;
+      Repaint;
+    end;
+  end;
+end;
+
+{***********************************}
+procedure TALVideoPlayerSurface.ApplyLoadingColorScheme;
+begin
+  if FLoadingColorKey <> '' then begin
+    var LLoadingColor := TALStyleManager.Instance.GetColor(FLoadingColorKey);
+    if FLoadingColor <> LLoadingColor then begin
+      FLoadingColor := LLoadingColor;
+      Repaint;
+    end;
+  end;
+end;
+
+{******************************}
+procedure TALVideoPlayerSurface.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    ApplyBackgroundColorScheme;
+    ApplyLoadingColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {*******************************************************}
 function TALVideoPlayerSurface.GetCacheSubIndex: Integer;
 begin
@@ -3522,10 +3579,22 @@ begin
   Result := TalphaColors.Null;
 end;
 
+{********************************************************************}
+function TALVideoPlayerSurface.GetDefaultBackgroundColorKey: String;
+begin
+  Result := '';
+end;
+
 {*****************************************************************}
 function TALVideoPlayerSurface.GetDefaultLoadingColor: TalphaColor;
 begin
   Result := $FFe0e4e9;
+end;
+
+{*****************************************************************}
+function TALVideoPlayerSurface.GetDefaultLoadingColorKey: String;
+begin
+  Result := '';
 end;
 
 {**************************************************************}
@@ -3752,15 +3821,65 @@ begin
 end;
 
 {**************************************************************}
+procedure TALVideoPlayerSurface.setBackgroundColor(const Value: TAlphaColor);
+begin
+  if FBackgroundColor <> Value then begin
+    FBackgroundColor := Value;
+    FBackgroundColorKey := '';
+    Repaint;
+  end;
+end;
+
+{**************************************************************}
+procedure TALVideoPlayerSurface.setBackgroundColorKey(const Value: String);
+begin
+  if FBackgroundColorKey <> Value then begin
+    FBackgroundColorKey := Value;
+    ApplyBackgroundColorScheme;
+  end;
+end;
+
+{***********************************************************}
+procedure TALVideoPlayerSurface.setLoadingColor(const Value: TAlphaColor);
+begin
+  if FLoadingColor <> Value then begin
+    FLoadingColor := Value;
+    FLoadingColorKey := '';
+    Repaint;
+  end;
+end;
+
+{***********************************************************}
+procedure TALVideoPlayerSurface.setLoadingColorKey(const Value: String);
+begin
+  if FLoadingColorKey <> Value then begin
+    FLoadingColorKey := Value;
+    ApplyLoadingColorScheme;
+  end;
+end;
+
+{**************************************************************}
 function TALVideoPlayerSurface.IsBackgroundColorStored: Boolean;
 begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
+end;
+
+{**************************************************************}
+function TALVideoPlayerSurface.IsBackgroundColorKeyStored: Boolean;
+begin
+  Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
 end;
 
 {***********************************************************}
 function TALVideoPlayerSurface.IsLoadingColorStored: Boolean;
 begin
   Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{***********************************************************}
+function TALVideoPlayerSurface.IsLoadingColorKeyStored: Boolean;
+begin
+  Result := FLoadingColorKey <> DefaultLoadingColorKey;
 end;
 
 {*************************************************************}

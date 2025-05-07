@@ -26,12 +26,12 @@ type
   TALNetHttpClientPoolRequest = Class(Tobject)
   private
     FUrl: String;
-    FCanStartCallBackRefFunc: TALNetHttpClientPoolCanStartRefFunc;
-    FCanStartCallBackObjFunc: TALNetHttpClientPoolCanStartObjFunc;
-    FOnSuccessCallBackRefProc: TALNetHttpClientPoolOnSuccessRefProc;
-    FOnSuccessCallBackObjProc: TALNetHttpClientPoolOnSuccessObjProc;
-    FOnErrorCallBackRefProc: TALNetHttpClientPoolOnErrorRefProc;
-    FOnErrorCallBackObjProc: TALNetHttpClientPoolOnErrorObjProc;
+    FCanStartRefFunc: TALNetHttpClientPoolCanStartRefFunc;
+    FCanStartObjFunc: TALNetHttpClientPoolCanStartObjFunc;
+    FOnSuccessRefProc: TALNetHttpClientPoolOnSuccessRefProc;
+    FOnSuccessObjProc: TALNetHttpClientPoolOnSuccessObjProc;
+    FOnErrorRefProc: TALNetHttpClientPoolOnErrorRefProc;
+    FOnErrorObjProc: TALNetHttpClientPoolOnErrorObjProc;
     FGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
     FContext: Tobject;
     FUseCache: Boolean;
@@ -54,12 +54,12 @@ type
                   const AUseCache: Boolean); overload;
     destructor Destroy; override;
     Property Url: String read FUrl;
-    Property CanStartCallBackRefFunc: TALNetHttpClientPoolCanStartRefFunc read FCanStartCallBackRefFunc;
-    Property CanStartCallBackObjFunc: TALNetHttpClientPoolCanStartObjFunc read FCanStartCallBackObjFunc;
-    Property OnSuccessCallBackRefProc: TALNetHttpClientPoolOnSuccessRefProc read FOnSuccessCallBackRefProc;
-    Property OnSuccessCallBackObjProc: TALNetHttpClientPoolOnSuccessObjProc read FOnSuccessCallBackObjProc;
-    Property OnErrorCallBackRefProc: TALNetHttpClientPoolOnErrorRefProc read FOnErrorCallBackRefProc;
-    Property OnErrorCallBackObjProc: TALNetHttpClientPoolOnErrorObjProc read FOnErrorCallBackObjProc;
+    Property CanStartRefFunc: TALNetHttpClientPoolCanStartRefFunc read FCanStartRefFunc;
+    Property CanStartObjFunc: TALNetHttpClientPoolCanStartObjFunc read FCanStartObjFunc;
+    Property OnSuccessRefProc: TALNetHttpClientPoolOnSuccessRefProc read FOnSuccessRefProc;
+    Property OnSuccessObjProc: TALNetHttpClientPoolOnSuccessObjProc read FOnSuccessObjProc;
+    Property OnErrorRefProc: TALNetHttpClientPoolOnErrorRefProc read FOnErrorRefProc;
+    Property OnErrorObjProc: TALNetHttpClientPoolOnErrorObjProc read FOnErrorObjProc;
     Property GetPriorityFunc: TALWorkerThreadGetPriorityFunc read FGetPriorityFunc;
     Property Context: Tobject read FContext;
     Property UseCache: Boolean read FUseCache;
@@ -229,12 +229,12 @@ constructor TALNetHttpClientPoolRequest.Create(
 begin
   inherited create;
   FUrl := AUrl;
-  FCanStartCallBackRefFunc := ACanStartCallBack;
-  FCanStartCallBackObjFunc := nil;
-  FOnSuccessCallBackRefProc := AOnSuccessCallBack;
-  FOnSuccessCallBackObjProc := nil;
-  FOnErrorCallBackRefProc := AOnErrorCallBack;
-  FOnErrorCallBackObjProc := nil;
+  FCanStartRefFunc := ACanStartCallBack;
+  FCanStartObjFunc := nil;
+  FOnSuccessRefProc := AOnSuccessCallBack;
+  FOnSuccessObjProc := nil;
+  FOnErrorRefProc := AOnErrorCallBack;
+  FOnErrorObjProc := nil;
   FGetPriorityFunc := AGetPriorityFunc;
   FContext := AContext;
   FUseCache := AUseCache;
@@ -252,12 +252,12 @@ constructor TALNetHttpClientPoolRequest.Create(
 begin
   inherited create;
   FUrl := AUrl;
-  FCanStartCallBackRefFunc := nil;
-  FCanStartCallBackObjFunc := ACanStartCallBack;
-  FOnSuccessCallBackRefProc := nil;
-  FOnSuccessCallBackObjProc := AOnSuccessCallBack;
-  FOnErrorCallBackRefProc := nil;
-  FOnErrorCallBackObjProc := AOnErrorCallBack;
+  FCanStartRefFunc := nil;
+  FCanStartObjFunc := ACanStartCallBack;
+  FOnSuccessRefProc := nil;
+  FOnSuccessObjProc := AOnSuccessCallBack;
+  FOnErrorRefProc := nil;
+  FOnErrorObjProc := AOnErrorCallBack;
   FGetPriorityFunc := AGetPriorityFunc;
   FContext := AContext;
   FUseCache := AUseCache;
@@ -331,12 +331,12 @@ begin
   try
 
     //init the http
-    if ((not assigned(LNetHttpClientPoolRequest.CanStartCallBackObjFunc)) and
-        (not assigned(LNetHttpClientPoolRequest.CanStartCallBackRefFunc))) or
-       (assigned(LNetHttpClientPoolRequest.CanStartCallBackObjFunc) and
-        LNetHttpClientPoolRequest.CanStartCallBackObjFunc(LNetHttpClientPoolRequest.FContext)) or
-       (assigned(LNetHttpClientPoolRequest.CanStartCallBackRefFunc) and
-        LNetHttpClientPoolRequest.CanStartCallBackRefFunc(LNetHttpClientPoolRequest.FContext)) then begin
+    if ((not assigned(LNetHttpClientPoolRequest.CanStartObjFunc)) and
+        (not assigned(LNetHttpClientPoolRequest.CanStartRefFunc))) or
+       (assigned(LNetHttpClientPoolRequest.CanStartObjFunc) and
+        LNetHttpClientPoolRequest.CanStartObjFunc(LNetHttpClientPoolRequest.FContext)) or
+       (assigned(LNetHttpClientPoolRequest.CanStartRefFunc) and
+        LNetHttpClientPoolRequest.CanStartRefFunc(LNetHttpClientPoolRequest.FContext)) then begin
 
       //create the http
       var LHTTPResponse: IHTTPResponse := nil;
@@ -354,10 +354,10 @@ begin
               // Server error responses (500 – 599)
               if (LHTTPResponse = nil) or
                  ((LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599)) then begin
-                if assigned(LNetHttpClientPoolRequest.OnErrorCallBackObjProc) then
-                  LNetHttpClientPoolRequest.OnErrorCallBackObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext)
-                else if assigned(LNetHttpClientPoolRequest.OnErrorCallBackRefProc) then
-                  LNetHttpClientPoolRequest.OnErrorCallBackRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext);
+                if assigned(LNetHttpClientPoolRequest.OnErrorObjProc) then
+                  LNetHttpClientPoolRequest.OnErrorObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext)
+                else if assigned(LNetHttpClientPoolRequest.OnErrorRefProc) then
+                  LNetHttpClientPoolRequest.OnErrorRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext);
                 exit;
               end;
               ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
@@ -369,10 +369,10 @@ begin
         end;
 
         //fire the OnSuccess
-        if assigned(LNetHttpClientPoolRequest.OnSuccessCallBackObjProc) then
-          LNetHttpClientPoolRequest.OnSuccessCallBackObjProc(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FContext)
-        else if assigned(LNetHttpClientPoolRequest.OnSuccessCallBackRefProc) then
-          LNetHttpClientPoolRequest.OnSuccessCallBackRefProc(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FContext);
+        if assigned(LNetHttpClientPoolRequest.OnSuccessObjProc) then
+          LNetHttpClientPoolRequest.OnSuccessObjProc(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FContext)
+        else if assigned(LNetHttpClientPoolRequest.OnSuccessRefProc) then
+          LNetHttpClientPoolRequest.OnSuccessRefProc(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FContext);
 
       finally
         LHTTPResponse := nil;
@@ -383,10 +383,10 @@ begin
 
   except
     on E: exception do begin
-      if assigned(LNetHttpClientPoolRequest.OnErrorCallBackObjProc) then
-        LNetHttpClientPoolRequest.OnErrorCallBackObjProc(E.Message, LNetHttpClientPoolRequest.FContext)
-      else if assigned(LNetHttpClientPoolRequest.OnErrorCallBackRefProc) then
-        LNetHttpClientPoolRequest.OnErrorCallBackRefProc(E.Message, LNetHttpClientPoolRequest.FContext);
+      if assigned(LNetHttpClientPoolRequest.OnErrorObjProc) then
+        LNetHttpClientPoolRequest.OnErrorObjProc(E.Message, LNetHttpClientPoolRequest.FContext)
+      else if assigned(LNetHttpClientPoolRequest.OnErrorRefProc) then
+        LNetHttpClientPoolRequest.OnErrorRefProc(E.Message, LNetHttpClientPoolRequest.FContext);
     end;
   end;
 

@@ -120,6 +120,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; virtual;
+        procedure ApplyColorScheme; virtual;
         property DefaultWidth: Single read GetDefaultWidth;
         property DefaultHeight: Single read GetDefaultHeight;
         property DefaultXRadius: Single read GetDefaultXRadius;
@@ -198,6 +199,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure AnimationProcess(Const AValue: Single); override;
     procedure ActivePageChanged(const ANewActivePageIndex: Integer); override;
     procedure PageCountChanged(Const ANewPageCount: Integer; const ANewActivePageIndex: Integer); override;
@@ -770,6 +772,19 @@ begin
   end;
 end;
 
+{*************************************************}
+procedure TALPageIndicator.TIndicator.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Fill.ApplyColorScheme;
+    Stroke.ApplyColorScheme;
+    Shadow.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***********************************************************}
 function TALPageIndicator.TIndicator.GetDefaultWidth: Single;
 begin
@@ -1005,6 +1020,19 @@ begin
   end;
 end;
 
+{**************************************}
+procedure TALPageIndicator.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    FActiveIndicator.ApplyColorScheme;
+    FInactiveIndicator.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {*********************************************}
 function TALPageIndicator.CreateFill: TALBrush;
 begin
@@ -1067,7 +1095,6 @@ begin
      (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
-     (scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 

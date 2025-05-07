@@ -744,16 +744,18 @@ type
           end;
       private
         FPromptTextColor: TalphaColor;
+        FPromptTextColorKey: String;
         FTintColor: TalphaColor;
+        FTintColorKey: String;
         FTextSettings: TBaseStateStyle.TTextSettings;
         FLabelTextSettings: TBaseStateStyle.TLabelTextSettings;
         FSupportingTextSettings: TBaseStateStyle.TSupportingTextSettings;
-        FPriorSupersedePromptTextColor: TalphaColor;
-        FPriorSupersedeTintColor: TalphaColor;
         function GetStateStyleParent: TBaseStateStyle;
         function GetControlParent: TALBaseEdit;
         procedure SetPromptTextColor(const AValue: TAlphaColor);
+        procedure SetPromptTextColorKey(const AValue: String);
         procedure SetTintColor(const AValue: TAlphaColor);
+        procedure SetTintColorKey(const AValue: String);
         procedure SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
         procedure SetLabelTextSettings(const AValue: TBaseStateStyle.TLabelTextSettings);
         procedure SetSupportingTextSettings(const AValue: TBaseStateStyle.TSupportingTextSettings);
@@ -761,14 +763,20 @@ type
         procedure LabelTextSettingsChanged(ASender: TObject);
         procedure SupportingTextSettingsChanged(ASender: TObject);
         function IsPromptTextColorStored: Boolean;
+        function IsPromptTextColorKeyStored: Boolean;
         function IsTintColorStored: Boolean;
+        function IsTintColorKeyStored: Boolean;
       protected
         function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
         function CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings; virtual;
         function CreateLabelTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TLabelTextSettings; virtual;
         function CreateSupportingTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TSupportingTextSettings; virtual;
+        procedure ApplyPromptTextColorScheme; virtual;
+        procedure ApplyTintColorScheme; virtual;
         function GetDefaultPromptTextColor: TalphaColor; virtual;
+        function GetDefaultPromptTextColorKey: String; virtual;
         function GetDefaultTintColor: TalphaColor; virtual;
+        function GetDefaultTintColorKey: String; virtual;
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
@@ -788,17 +796,22 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseEdit read GetControlParent;
         property DefaultPromptTextColor: TalphaColor read GetDefaultPromptTextColor;
+        property DefaultPromptTextColorKey: String read GetDefaultPromptTextColorKey;
         property DefaultTintColor: TalphaColor read GetDefaultTintColor;
+        property DefaultTintColorKey: String read GetDefaultTintColorKey;
       published
         property LabelTextSettings: TBaseStateStyle.TLabelTextSettings read fLabelTextSettings write SetLabelTextSettings;
         property PromptTextColor: TAlphaColor read FPromptTextColor write SetPromptTextColor stored IsPromptTextColorStored;
+        property PromptTextColorKey: String read FPromptTextColorKey write SetPromptTextColorKey stored IsPromptTextColorKeyStored;
         property SupportingTextSettings: TBaseStateStyle.TSupportingTextSettings read fSupportingTextSettings write SetSupportingTextSettings;
         property TextSettings: TBaseStateStyle.TTextSettings read fTextSettings write SetTextSettings;
         property TintColor: TAlphaColor read FTintColor write SetTintColor stored IsTintColorStored;
+        property TintColorKey: String read FTintColorKey write SetTintColorKey stored IsTintColorKeyStored;
       end;
       // -------------------
       // TDisabledStateStyle
@@ -864,6 +877,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure ClearBufDrawable; override;
         procedure ClearBufPromptTextDrawable;
         procedure ClearBufLabelTextDrawable;
@@ -885,7 +899,9 @@ type
     FTextSettings: TTextSettings;
     FPromptText: String;
     FPromptTextColor: TAlphaColor;
+    FPromptTextColorKey: String;
     FTintcolor: TAlphaColor;
+    FTintcolorKey: String;
     FLabelText: String;
     FLabelTextSettings: TLabelTextSettings;
     FlabelTextAnimation: TALFloatAnimation;
@@ -912,11 +928,15 @@ type
     function GetPromptText: String;
     procedure setPromptText(const Value: String);
     function GetPromptTextColor: TAlphaColor;
+    function GetPromptTextColorKey: String;
     procedure setPromptTextColor(const Value: TAlphaColor);
+    procedure setPromptTextColorKey(const Value: String);
     procedure setLabelText(const Value: String);
     procedure setSupportingText(const Value: String);
     function GetTintColor: TAlphaColor;
+    function GetTintColorKey: String;
     procedure setTintColor(const Value: TAlphaColor);
+    procedure setTintColorKey(const Value: String);
     procedure SetTextSettings(const Value: TTextSettings);
     procedure SetLabelTextSettings(const Value: TLabelTextSettings);
     procedure SetSupportingTextSettings(const Value: TSupportingTextSettings);
@@ -958,6 +978,9 @@ type
     function CreateSupportingTextSettings: TSupportingTextSettings; virtual;
     function CreateStateStyles: TStateStyles; virtual;
     function CreateEditControl: TALBaseEditControl; virtual;
+    procedure RecreateEditControl; virtual;
+    procedure ApplyPromptTextColorScheme; virtual;
+    procedure ApplyTintColorScheme; virtual;
     function GetEditControl: TALBaseEditControl; virtual;
     property EditControl: TALBaseEditControl read GetEditControl;
     {$IF defined(android)}
@@ -1022,6 +1045,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -1094,7 +1118,11 @@ type
     property PopupMenu;
     property Position;
     property PromptText: String read GetPromptText write setPromptText;
-    property PromptTextColor: TAlphaColor read GetPromptTextColor write setPromptTextColor default TalphaColors.null; // Null mean use the default PromptTextColor
+    /// <summary>
+    ///   Null mean use the default PromptTextColor
+    /// </summary>
+    property PromptTextColor: TAlphaColor read GetPromptTextColor write setPromptTextColor default TalphaColors.null;
+    property PromptTextColorKey: String read GetPromptTextColorKey write setPromptTextColorKey;
     //property ReadOnly;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     //property RotationAngle;
@@ -1112,7 +1140,12 @@ type
     property TabStop;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read FTextSettings write SetTextSettings;
-    property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColors.null; // IOS only - the color of the cursor caret and the text selection handles. null mean use the default TintColor
+    /// <summary>
+    ///   IOS only - the color of the cursor caret and the text
+    ///   selection handles. null mean use the default TintColor
+    /// </summary>
+    property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColors.null;
+    property TintColorKey: String read GetTintColorKey write setTintColorKey;
     property TouchTargetExpansion;
     property Visible;
     property Width;
@@ -1210,6 +1243,7 @@ uses
   {$ENDIF}
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.BreakText,
+  Alcinoe.fmx.Styles,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
@@ -3939,7 +3973,9 @@ begin
   inherited Create(AParent);
   //--
   FPromptTextColor := DefaultPromptTextColor;
+  FPromptTextColorKey := DefaultPromptTextColorKey;
   FTintColor := DefaultTintColor;
+  FTintColorKey := DefaultTintColorKey;
   //--
   if StateStyleParent <> nil then begin
     FTextSettings := CreateTextSettings(StateStyleParent.TextSettings);
@@ -3967,9 +4003,6 @@ begin
   //BufLabelTextDrawableRect: TRectF;
   BufSupportingTextDrawable := ALNullDrawable;
   //BufSupportingTextDrawableRect: TRectF;
-  //--
-  //FPriorSupersedePromptTextColor
-  //FPriorSupersedeTintColor
 end;
 
 {*********************************************}
@@ -4012,7 +4045,9 @@ begin
     BeginUpdate;
     Try
       PromptTextColor := TBaseStateStyle(Source).PromptTextColor;
+      PromptTextColorKey := TBaseStateStyle(Source).PromptTextColorKey;
       TintColor := TBaseStateStyle(Source).TintColor;
+      TintColorKey := TBaseStateStyle(Source).TintColorKey;
       TextSettings.Assign(TBaseStateStyle(Source).TextSettings);
       LabelTextSettings.Assign(TBaseStateStyle(Source).LabelTextSettings);
       SupportingTextSettings.Assign(TBaseStateStyle(Source).SupportingTextSettings);
@@ -4033,7 +4068,9 @@ begin
   Try
     inherited;
     PromptTextColor := DefaultPromptTextColor;
+    PromptTextColorKey := DefaultPromptTextColorKey;
     TintColor := DefaultTintColor;
+    TintColorKey := DefaultTintColorKey;
     TextSettings.Reset;
     LabelTextSettings.Reset;
     SupportingTextSettings.Reset;
@@ -4054,6 +4091,46 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{***********************************}
+procedure TALBaseEdit.TBaseStateStyle.ApplyPromptTextColorScheme;
+begin
+  if FPromptTextColorKey <> '' then begin
+    var LPromptTextColor := TALStyleManager.Instance.GetColor(FPromptTextColorKey);
+    if FPromptTextColor <> LPromptTextColor then begin
+      FPromptTextColor := LPromptTextColor;
+      Change;
+    end;
+  end;
+end;
+
+{***********************************}
+procedure TALBaseEdit.TBaseStateStyle.ApplyTintColorScheme;
+begin
+  if FTintColorKey <> '' then begin
+    var LTintColor := TALStyleManager.Instance.GetColor(FTintColorKey);
+    if FTintColor <> LTintColor then begin
+      FTintColor := LTintColor;
+      Change;
+    end;
+  end;
+end;
+
+{***********************************}
+procedure TALBaseEdit.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Inherited;
+    TextSettings.ApplyColorScheme;
+    LabelTextSettings.ApplyColorScheme;
+    SupportingTextSettings.ApplyColorScheme;
+    ApplyPromptTextColorScheme;
+    ApplyTintColorScheme;
+  finally
+    EndUpdate;
+  End;
 end;
 
 {*****************************************************}
@@ -4092,7 +4169,11 @@ begin
   {$ENDIF}
   BeginUpdate;
   Try
+    var LPrevPromptTextColorKey := FPromptTextColorKey;
+    var LPrevTintColorKey := FTintColorKey;
+
     inherited Interpolate(ATo, ANormalizedTime);
+
     if ATo <> nil then begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, TBaseStateStyle(ATo).PromptTextColor{Stop}, ANormalizedTime);
       TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
@@ -4111,6 +4192,9 @@ begin
       TextSettings.Interpolate(nil, ANormalizedTime);
       TintColor := ALInterpolateColor(TintColor{Start}, DefaultTintColor{Stop}, ANormalizedTime);
     end;
+
+    var FPromptTextColorKey := LPrevPromptTextColorKey;
+    var FTintColorKey := LPrevTintColorKey;
   finally
     EndUpdate;
   end;
@@ -4120,10 +4204,6 @@ end;
 procedure TALBaseEdit.TBaseStateStyle.DoSupersede;
 begin
   inherited;
-  //--
-  FPriorSupersedePromptTextColor := FPromptTextColor;
-  FPriorSupersedeTintColor := FTintColor;
-  //--
   if StateStyleParent <> nil then begin
     if PromptTextColor = TAlphaColors.Null then PromptTextColor := StateStyleParent.PromptTextColor;
     if TintColor = TAlphaColors.Null then TintColor := StateStyleParent.TintColor;
@@ -4164,7 +4244,17 @@ procedure TALBaseEdit.TBaseStateStyle.SetPromptTextColor(const AValue: TAlphaCol
 begin
   if FPromptTextColor <> AValue then begin
     FPromptTextColor := AValue;
+    FPromptTextColorKey := '';
     Change;
+  end;
+end;
+
+{**********************************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.SetPromptTextColorKey(const AValue: String);
+begin
+  if FPromptTextColorKey <> AValue then begin
+    FPromptTextColorKey := AValue;
+    ApplyPromptTextColorScheme;
   end;
 end;
 
@@ -4173,7 +4263,17 @@ procedure TALBaseEdit.TBaseStateStyle.SetTintColor(const AValue: TAlphaColor);
 begin
   if FTintColor <> AValue then begin
     FTintColor := AValue;
+    FTintColorKey := '';
     Change;
+  end;
+end;
+
+{****************************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.SetTintColorKey(const AValue: String);
+begin
+  if FTintColorKey <> AValue then begin
+    FTintColorKey := AValue;
+    ApplyTintColorScheme;
   end;
 end;
 
@@ -4201,10 +4301,22 @@ begin
   Result := TAlphaColors.Null;
 end;
 
+{**************************************************************************}
+function TALBaseEdit.TBaseStateStyle.GetDefaultPromptTextColorKey: String;
+begin
+  Result := '';
+end;
+
 {********************************************************************}
 function TALBaseEdit.TBaseStateStyle.GetDefaultTintColor: TalphaColor;
 begin
   Result := TAlphaColors.Null;
+end;
+
+{********************************************************************}
+function TALBaseEdit.TBaseStateStyle.GetDefaultTintColorKey: String;
+begin
+  Result := '';
 end;
 
 {*******************************************************}
@@ -4242,10 +4354,22 @@ begin
   result := FPromptTextColor <> DefaultPromptTextColor;
 end;
 
+{********************************************************************}
+function TALBaseEdit.TBaseStateStyle.IsPromptTextColorKeyStored: Boolean;
+begin
+  result := FPromptTextColorKey <> DefaultPromptTextColorKey;
+end;
+
 {**************************************************************}
 function TALBaseEdit.TBaseStateStyle.IsTintColorStored: Boolean;
 begin
   result := FTintColor <> DefaultTintColor;
+end;
+
+{**************************************************************}
+function TALBaseEdit.TBaseStateStyle.IsTintColorKeyStored: Boolean;
+begin
+  result := FTintColorKey <> DefaultTintColorKey;
 end;
 
 {****************************************************************}
@@ -4415,6 +4539,20 @@ begin
   end;
 end;
 
+{********************************************}
+procedure TALBaseEdit.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {**************************************************}
 procedure TALBaseEdit.TStateStyles.ClearBufDrawable;
 begin
@@ -4515,8 +4653,10 @@ begin
   //--
   FPromptText := '';
   FPromptTextColor := TAlphaColors.null;
+  FPromptTextColorKey := '';
   //--
   FTintcolor := TAlphaColors.null;
+  FTintcolorKey := '';
   //--
   FLabelText := '';
   FLabelTextSettings := CreateLabelTextSettings;
@@ -4640,6 +4780,51 @@ begin
   end;
 end;
 
+{***********************************}
+procedure TALBaseEdit.ApplyPromptTextColorScheme;
+begin
+  if FPromptTextColorKey <> '' then begin
+    var LPromptTextColor := TALStyleManager.Instance.GetColor(FPromptTextColorKey);
+    if FPromptTextColor <> LPromptTextColor then begin
+      FPromptTextColor := LPromptTextColor;
+      ClearBufPromptTextDrawable;
+      UpdateEditControlStyle;
+    end;
+  end;
+end;
+
+{***********************************}
+procedure TALBaseEdit.ApplyTintColorScheme;
+begin
+  if FTintColorKey <> '' then begin
+    var LTintColor := TALStyleManager.Instance.GetColor(FTintColorKey);
+    if FTintColor <> LTintColor then begin
+      FTintColor := LTintColor;
+      UpdateEditControlStyle;
+    end;
+  end;
+end;
+
+{******************************}
+procedure TALBaseEdit.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    TextSettings.ApplyColorScheme;
+    LabelTextSettings.ApplyColorScheme;
+    SupportingTextSettings.ApplyColorScheme;
+    StateStyles.ApplyColorScheme;
+    ApplyPromptTextColorScheme;
+    ApplyTintColorScheme;
+    {$IFDEF ANDROID}
+    RecreateEditControl;
+    {$ENDIF}
+  finally
+    EndUpdate;
+  end;
+end;
+
 {************************************************}
 function TALBaseEdit.CreateStroke: TALStrokeBrush;
 begin
@@ -4684,6 +4869,34 @@ begin
   {$ELSE}
     Not implemented
   {$ENDIF}
+end;
+
+{****************************************}
+procedure TALBaseEdit.RecreateEditControl;
+begin
+  if (fEditControl <> nil) and
+     (not (csLoading in componentState)) then begin
+    var LReturnKeyType := fEditControl.ReturnKeyType;
+    var LKeyboardType := fEditControl.KeyboardType;
+    var LAutoCapitalizationType := fEditControl.AutoCapitalizationType;
+    var LPassword := fEditControl.Password;
+    var LMaxLength := fEditControl.MaxLength;
+    var LText := fEditControl.Text;
+    var LCheckSpelling := fEditControl.CheckSpelling;
+    ALFreeAndNil(fEditControl);
+    FEditControl := CreateEditControl;
+    InitEditControl;
+    UpdateEditControlStyle;
+    UpdateEditControlPromptText;
+    fEditControl.ReturnKeyType := LReturnKeyType;
+    fEditControl.KeyboardType := LKeyboardType;
+    fEditControl.AutoCapitalizationType := LAutoCapitalizationType;
+    fEditControl.Password := LPassword;
+    fEditControl.MaxLength := LMaxLength;
+    fEditControl.Text := LText;
+    fEditControl.CheckSpelling := LCheckSpelling;
+    UpdateNativeViewVisibility;
+  end;
 end;
 
 {************************************}
@@ -4793,11 +5006,7 @@ begin
   if Value <> fDefStyleAttr then begin
     fDefStyleAttr := Value;
     {$IFDEF ANDROID}
-    if not (csLoading in componentState) then begin
-      ALFreeAndNil(fEditControl);
-      FEditControl := CreateEditControl;
-      InitEditControl;
-    end;
+    RecreateEditControl;
     {$ENDIF}
   end;
 end;
@@ -4808,11 +5017,7 @@ begin
   if Value <> fDefStyleRes then begin
     fDefStyleRes := Value;
     {$IFDEF ANDROID}
-    if not (csLoading in componentState) then begin
-      ALFreeAndNil(fEditControl);
-      FEditControl := CreateEditControl;
-      InitEditControl;
-    end;
+    RecreateEditControl;
     {$ENDIF}
   end;
 end;
@@ -5094,7 +5299,11 @@ procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
       if APrevStateStyle.TextSettings.font.Weight = AToStateStyle.TextSettings.font.Weight then AToStateStyle.TextSettings.font.Weight := TextSettings.font.Weight;
       if APrevStateStyle.TextSettings.font.Slant = AToStateStyle.TextSettings.font.Slant then AToStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
       if APrevStateStyle.TextSettings.font.Stretch = AToStateStyle.TextSettings.font.Stretch then AToStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
-      if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+      if (APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color) and
+         (APrevStateStyle.TextSettings.font.ColorKey = AToStateStyle.TextSettings.font.ColorKey) then begin
+        AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+        AToStateStyle.TextSettings.font.ColorKey := TextSettings.font.ColorKey;
+      end;
 
     end;
 
@@ -5104,6 +5313,7 @@ procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
     APrevStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
     APrevStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
     APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+    APrevStateStyle.TextSettings.font.ColorKey := TextSettings.font.ColorKey;
 
   end;
   {$ENDIF}
@@ -5196,7 +5406,11 @@ procedure TALBaseEdit.LabelTextSettingsChanged(Sender: TObject);
       if APrevStateStyle.LabelTextSettings.font.Weight = AToStateStyle.LabelTextSettings.font.Weight then AToStateStyle.LabelTextSettings.font.Weight := LabelTextSettings.font.Weight;
       if APrevStateStyle.LabelTextSettings.font.Slant = AToStateStyle.LabelTextSettings.font.Slant then AToStateStyle.LabelTextSettings.font.Slant := LabelTextSettings.font.Slant;
       if APrevStateStyle.LabelTextSettings.font.Stretch = AToStateStyle.LabelTextSettings.font.Stretch then AToStateStyle.LabelTextSettings.font.Stretch := LabelTextSettings.font.Stretch;
-      if APrevStateStyle.LabelTextSettings.font.Color = AToStateStyle.LabelTextSettings.font.Color then AToStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
+      if (APrevStateStyle.LabelTextSettings.font.Color = AToStateStyle.LabelTextSettings.font.Color) and
+         (APrevStateStyle.LabelTextSettings.font.ColorKey = AToStateStyle.LabelTextSettings.font.ColorKey) then begin
+        AToStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
+        AToStateStyle.LabelTextSettings.font.ColorKey := LabelTextSettings.font.ColorKey;
+      end;
 
     end;
 
@@ -5206,6 +5420,7 @@ procedure TALBaseEdit.LabelTextSettingsChanged(Sender: TObject);
     APrevStateStyle.LabelTextSettings.font.Slant := LabelTextSettings.font.Slant;
     APrevStateStyle.LabelTextSettings.font.Stretch := LabelTextSettings.font.Stretch;
     APrevStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
+    APrevStateStyle.LabelTextSettings.font.ColorKey := LabelTextSettings.font.ColorKey;
 
   end;
   {$ENDIF}
@@ -5248,7 +5463,11 @@ procedure TALBaseEdit.SupportingTextSettingsChanged(Sender: TObject);
       if APrevStateStyle.SupportingTextSettings.font.Weight = AToStateStyle.SupportingTextSettings.font.Weight then AToStateStyle.SupportingTextSettings.font.Weight := SupportingTextSettings.font.Weight;
       if APrevStateStyle.SupportingTextSettings.font.Slant = AToStateStyle.SupportingTextSettings.font.Slant then AToStateStyle.SupportingTextSettings.font.Slant := SupportingTextSettings.font.Slant;
       if APrevStateStyle.SupportingTextSettings.font.Stretch = AToStateStyle.SupportingTextSettings.font.Stretch then AToStateStyle.SupportingTextSettings.font.Stretch := SupportingTextSettings.font.Stretch;
-      if APrevStateStyle.SupportingTextSettings.font.Color = AToStateStyle.SupportingTextSettings.font.Color then AToStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
+      if (APrevStateStyle.SupportingTextSettings.font.Color = AToStateStyle.SupportingTextSettings.font.Color) and
+         (APrevStateStyle.SupportingTextSettings.font.ColorKey = AToStateStyle.SupportingTextSettings.font.ColorKey) then begin
+        AToStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
+        AToStateStyle.SupportingTextSettings.font.ColorKey := SupportingTextSettings.font.ColorKey;
+      end;
 
     end;
 
@@ -5258,6 +5477,7 @@ procedure TALBaseEdit.SupportingTextSettingsChanged(Sender: TObject);
     APrevStateStyle.SupportingTextSettings.font.Slant := SupportingTextSettings.font.Slant;
     APrevStateStyle.SupportingTextSettings.font.Stretch := SupportingTextSettings.font.Stretch;
     APrevStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
+    APrevStateStyle.SupportingTextSettings.font.ColorKey := SupportingTextSettings.font.ColorKey;
 
   end;
   {$ENDIF}
@@ -5336,8 +5556,8 @@ end;
 procedure TALBaseEdit.setPromptText(const Value: String);
 begin
   if FPromptText <> Value then begin
-    ClearBufPromptTextDrawable;
     FPromptText := Value;
+    ClearBufPromptTextDrawable;
     UpdateEditControlPromptText;
     UpdateNativeViewVisibility;
     repaint;
@@ -5350,13 +5570,29 @@ begin
   result := FPromptTextColor;
 end;
 
+{***************************************************}
+function TALBaseEdit.GetPromptTextColorKey: String;
+begin
+  result := FPromptTextColorKey;
+end;
+
 {*****************************************************************}
 procedure TALBaseEdit.setPromptTextColor(const Value: TAlphaColor);
 begin
   if FPromptTextColor <> Value then begin
-    ClearBufPromptTextDrawable;
     FPromptTextColor := Value;
+    FPromptTextColorKey := '';
+    ClearBufPromptTextDrawable;
     UpdateEditControlStyle;
+  end;
+end;
+
+{*****************************************************************}
+procedure TALBaseEdit.setPromptTextColorKey(const Value: String);
+begin
+  if FPromptTextColorKey <> Value then begin
+    FPromptTextColorKey := Value;
+    ApplyPromptTextColorScheme;
   end;
 end;
 
@@ -5364,9 +5600,9 @@ end;
 procedure TALBaseEdit.setLabelText(const Value: String);
 begin
   if FLabelText <> Value then begin
+    FLabelText := Value;
     ClearBufPromptTextDrawable;
     ClearBufLabelTextDrawable;
-    FLabelText := Value;
     UpdateEditControlPromptText;
     UpdateNativeViewVisibility;
     if FLabelTextSettings.Layout = TLabelTextLayout.Inline then
@@ -5379,8 +5615,8 @@ end;
 procedure TALBaseEdit.setSupportingText(const Value: String);
 begin
   if FSupportingText <> Value then begin
-    ClearBufSupportingTextDrawable;
     FSupportingText := Value;
+    ClearBufSupportingTextDrawable;
     Repaint;
   end;
 end;
@@ -5391,12 +5627,28 @@ begin
   result := FTintColor;
 end;
 
+{*********************************************}
+function TALBaseEdit.GetTintColorKey: String;
+begin
+  result := FTintColorKey;
+end;
+
 {***********************************************************}
 procedure TALBaseEdit.setTintColor(const Value: TAlphaColor);
 begin
   if FTintColor <> Value then begin
     FTintColor := Value;
+    FTintColorKey := '';
     UpdateEditControlStyle;
+  end;
+end;
+
+{***********************************************************}
+procedure TALBaseEdit.setTintColorKey(const Value: String);
+begin
+  if FTintColorKey <> Value then begin
+    FTintColorKey := Value;
+    ApplyTintColorScheme;
   end;
 end;
 
@@ -6024,6 +6276,7 @@ begin
   if ALIsDrawableNull(FBufPromptTextDrawable) then begin
     var LFont := TextSettings.Font;
     var LPrevFontColor := LFont.Color;
+    var LPrevFontColorKey := LFont.ColorKey;
     var LPrevFontOnchanged: TNotifyEvent := LFont.OnChanged;
     LFont.OnChanged := nil;
     if LUsePromptTextColor then begin
@@ -6041,6 +6294,7 @@ begin
         Lfont); // const AFont: TALFont;
     finally
       Lfont.Color := LPrevFontColor;
+      Lfont.ColorKey := LPrevFontColorKey;
       LFont.OnChanged := LPrevFontOnchanged;
     end;
   end;
@@ -6053,6 +6307,7 @@ begin
   LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
     var LPrevFontColor := LStateStyle.TextSettings.font.Color;
+    var LPrevFontColorKey := LStateStyle.TextSettings.font.ColorKey;
     var LPrevFontOnchanged: TNotifyEvent;
     LPrevFontOnchanged := LStateStyle.TextSettings.OnChanged;
     LStateStyle.TextSettings.OnChanged := nil;
@@ -6072,6 +6327,7 @@ begin
         LStateStyle.TextSettings.font); // const AFont: TALFont;
     finally
       LStateStyle.TextSettings.font.Color := LPrevFontColor;
+      LStateStyle.TextSettings.font.ColorKey := LPrevFontColorKey;
       LStateStyle.TextSettings.OnChanged := LPrevFontOnchanged;
     end;
   finally
@@ -6641,7 +6897,6 @@ procedure TALEdit.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
 

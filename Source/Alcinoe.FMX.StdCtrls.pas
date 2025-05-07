@@ -364,23 +364,27 @@ type
           end;
       private
         FColor: TAlphaColor;
+        FColorKey: String;
         FResourceName: String;
         FWrapMode: TALImageWrapMode;
         FThickness: Single;
         FMargins: TALBounds;
         procedure SetColor(const Value: TAlphaColor);
+        procedure SetColorKey(const Value: String);
         procedure SetResourceName(const Value: String);
         procedure SetWrapMode(const Value: TALImageWrapMode);
         procedure SetThickness(const Value: Single);
         procedure SetMargins(const Value: TALBounds);
         procedure MarginsChanged(Sender: TObject); virtual;
         function IsColorStored: Boolean;
+        function IsColorKeyStored: Boolean;
         function IsResourceNameStored: Boolean;
         function IsWrapModeStored: Boolean;
         function IsThicknessStored: Boolean;
       protected
         function CreateMargins: TALBounds; virtual;
         function GetDefaultColor: TAlphaColor; virtual;
+        function GetDefaultColorKey: String; virtual;
         function GetDefaultResourceName: String; virtual;
         function GetDefaultWrapMode: TALImageWrapMode; virtual;
         function GetDefaultThickness: Single; virtual;
@@ -390,15 +394,18 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; virtual;
+        procedure ApplyColorScheme; virtual;
         procedure Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single); virtual;
         procedure InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
         function HasCheckMark: boolean;
         property DefaultColor: TAlphaColor read GetDefaultColor;
+        property DefaultColorKey: String read GetDefaultColorKey;
         property DefaultResourceName: String read GetDefaultResourceName;
         property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
         property DefaultThickness: Single read GetDefaultThickness;
       published
         property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+        property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
         property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
         property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
         property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
@@ -460,6 +467,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseCheckBox read GetControlParent;
@@ -549,6 +557,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; virtual;
+        procedure ApplyColorScheme; virtual;
         procedure ClearBufDrawable; virtual;
       published
         property &Default: TDefaultStateStyle read FDefault write SetDefault;
@@ -577,6 +586,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure ClearBufDrawable; override;
         function GetCurrentRawStyle: TALBaseStateStyle; override;
         Property Parent: TALBaseCheckBox read GetParent;
@@ -663,6 +673,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property CanFocus default True;
@@ -1001,6 +1012,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; virtual;
+            procedure ApplyColorScheme; virtual;
             procedure ClearBufDrawable; virtual;
           published
             property &Default: TDefaultStateStyle read FDefault write SetDefault;
@@ -1029,6 +1041,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure ClearBufDrawable; override;
             function GetCurrentRawStyle: TALBaseStateStyle; override;
             Property Parent: TTrack read GetParent;
@@ -1099,6 +1112,7 @@ type
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
         property DefaultXRadius: Single read GetDefaultXRadius;
@@ -1414,6 +1428,7 @@ type
     procedure BeforeDestruction; override;
     procedure AfterConstruction; override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
@@ -1559,7 +1574,6 @@ type
       private
         FText: String;
         FTextSettings: TBaseStateStyle.TTextSettings;
-        FPriorSupersedeText: String;
         function GetStateStyleParent: TBaseStateStyle;
         function GetControlParent: TALButton;
         procedure SetText(const Value: string);
@@ -1579,6 +1593,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALButton read GetControlParent;
@@ -1660,6 +1675,7 @@ type
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure ClearBufDrawable; override;
         function GetCurrentRawStyle: TALBaseStateStyle; override;
         Property Parent: TALButton read GetParent;
@@ -1703,6 +1719,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property CacheEngine;
@@ -1806,19 +1823,23 @@ type
           TStopIndicatorBrush = class(TALPersistentObserver)
           private
             FColor: TAlphaColor;
+            FColorKey: String;
             FResourceName: String;
             FWrapMode: TALImageWrapMode;
             FSize: Single;
             procedure SetColor(const Value: TAlphaColor);
+            procedure SetColorKey(const Value: String);
             procedure SetResourceName(const Value: String);
             procedure SetWrapMode(const Value: TALImageWrapMode);
             procedure SetSize(const Value: Single);
             function IsColorStored: Boolean;
+            function IsColorKeyStored: Boolean;
             function IsResourceNameStored: Boolean;
             function IsWrapModeStored: Boolean;
             function IsSizeStored: Boolean;
           protected
             function GetDefaultColor: TAlphaColor; virtual;
+            function GetDefaultColorKey: String; virtual;
             function GetDefaultResourceName: String; virtual;
             function GetDefaultWrapMode: TALImageWrapMode; virtual;
             function GetDefaultSize: Single; virtual;
@@ -1827,15 +1848,18 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; virtual;
+            procedure ApplyColorScheme; virtual;
             procedure Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single); virtual;
             procedure InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
             function hasStopIndicator: Boolean;
             property DefaultColor: TAlphaColor read GetDefaultColor;
+            property DefaultColorKey: String read GetDefaultColorKey;
             property DefaultResourceName: String read GetDefaultResourceName;
             property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
             property DefaultSize: Single read GetDefaultSize;
           published
             property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+            property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
             property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
             property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
             property Size: Single read FSize write SetSize stored IsSizeStored nodefault;
@@ -1898,6 +1922,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
             property ControlParent: TTrack read GetControlParent;
           published
@@ -1937,6 +1962,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure ClearBufDrawable; override;
             function GetCurrentRawStyle: TALBaseStateStyle; override;
             Property Parent: TTrack read GetParent;
@@ -1990,6 +2016,7 @@ type
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
         property HitTest default false;
@@ -2199,6 +2226,7 @@ type
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; override;
+            procedure ApplyColorScheme; override;
             procedure ClearBufDrawable; override;
             function GetCurrentRawStyle: TALBaseStateStyle; override;
             Property Parent: TThumb read GetParent;
@@ -2244,6 +2272,7 @@ type
         destructor Destroy; override;
         procedure BeforeDestruction; override;
         procedure AlignToPixel; override;
+        procedure ApplyColorScheme; override;
         function GetValue: Double;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
@@ -2531,6 +2560,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure AfterConstruction; override;
+    procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
@@ -2720,6 +2751,8 @@ type
     procedure AlignTracks; override;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure AlignToPixel; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
   published
@@ -3038,6 +3071,7 @@ uses
   fmx.consts,
   fmx.utils,
   Alcinoe.StringUtils,
+  Alcinoe.fmx.Styles,
   Alcinoe.Common;
 
 {**}
@@ -3435,6 +3469,21 @@ begin
   end;
 end;
 
+{********************************************************}
+procedure TALCustomTrack.TThumb.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {************************************************************}
 procedure TALCustomTrack.TThumb.TStateStyles.ClearBufDrawable;
 begin
@@ -3605,6 +3654,18 @@ begin
   try
     inherited;
     StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************************}
+procedure TALCustomTrack.TThumb.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -4398,6 +4459,7 @@ constructor TALCustomTrack.TTrack.TStopIndicatorBrush.Create;
 begin
   inherited Create;
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FResourceName := DefaultResourceName;
   FWrapMode := DefaultWrapMode;
   FSize := DefaultSize;
@@ -4407,6 +4469,12 @@ end;
 function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
+end;
+
+{******************************************************************************}
+function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColorKey: String;
+begin
+  Result := '';
 end;
 
 {********************************************************************************}
@@ -4434,6 +4502,7 @@ begin
     BeginUpdate;
     Try
       Color := TStopIndicatorBrush(Source).Color;
+      ColorKey := TStopIndicatorBrush(Source).ColorKey;
       ResourceName := TStopIndicatorBrush(Source).ResourceName;
       WrapMode := TStopIndicatorBrush(Source).WrapMode;
       Size := TStopIndicatorBrush(Source).Size;
@@ -4452,6 +4521,7 @@ begin
   Try
     inherited;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     ResourceName := DefaultResourceName;
     WrapMode := DefaultWrapMode;
     Size := DefaultSize;
@@ -4471,11 +4541,24 @@ begin
   end;
 end;
 
+{*******************************************************************}
+procedure TALCustomTrack.TTrack.TStopIndicatorBrush.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {*****************************************************************************************************************************}
 procedure TALCustomTrack.TTrack.TStopIndicatorBrush.Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       ResourceName := ATo.ResourceName;
@@ -4488,6 +4571,7 @@ begin
       WrapMode := DefaultWrapMode;
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -4518,6 +4602,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{************************************************************************}
+function TALCustomTrack.TTrack.TStopIndicatorBrush.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {*******************************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.IsResourceNameStored: Boolean;
 begin
@@ -4541,7 +4631,17 @@ procedure TALCustomTrack.TTrack.TStopIndicatorBrush.SetColor(const Value: TAlpha
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{*************************************************************************************}
+procedure TALCustomTrack.TTrack.TStopIndicatorBrush.SetColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -4779,6 +4879,18 @@ begin
   end;
 end;
 
+{***********************************************************}
+procedure TALCustomTrack.TTrack.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Inherited;
+    StopIndicator.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***********************************************************************************************************************}
 procedure TALCustomTrack.TTrack.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
@@ -4956,6 +5068,18 @@ begin
   end;
 end;
 
+{********************************************************}
+procedure TALCustomTrack.TTrack.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {************************************************************}
 procedure TALCustomTrack.TTrack.TStateStyles.ClearBufDrawable;
 begin
@@ -5054,6 +5178,19 @@ begin
     inherited;
     StateStyles.AlignToPixel;
     StopIndicator.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************************}
+procedure TALCustomTrack.TTrack.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
+    StopIndicator.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -5595,6 +5732,36 @@ begin
   Result.Stored := False;
   Result.SetSubComponent(True);
   Result.Name := AName; // Useful at design time in the IDE
+end;
+
+{*******************************************************}
+procedure TALCustomTrack.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    if FInactiveTrack <> nil then FInactiveTrack.AlignToPixel;
+    if FActiveTrack <> nil then FActiveTrack.AlignToPixel;
+    if FThumb <> nil then FThumb.AlignToPixel;
+    if FValueIndicator <> nil then FValueIndicator.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************}
+procedure TALCustomTrack.ApplyColorScheme;
+begin
+  //BeginUpdate;
+  //Try
+    inherited;
+    //if FInactiveTrack <> nil then FInactiveTrack.ApplyColorScheme;
+    //if FActiveTrack <> nil then FActiveTrack.ApplyColorScheme;
+    //if FThumb <> nil then FThumb.ApplyColorScheme;
+    //if FValueIndicator <> nil then FValueIndicator.ApplyColorScheme;
+  //finally
+    //EndUpdate;
+  //end;
 end;
 
 {***************************************}
@@ -6315,6 +6482,32 @@ begin
   inherited;
 end;
 
+{*******************************************************}
+procedure TALRangeTrackBar.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    if FMaxInactiveTrack <> nil then FMaxInactiveTrack.AlignToPixel;
+    if FMaxThumb <> nil then FMaxThumb.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************}
+procedure TALRangeTrackBar.ApplyColorScheme;
+begin
+  //BeginUpdate;
+  //Try
+    inherited;
+    //if FMaxInactiveTrack <> nil then FMaxInactiveTrack.ApplyColorScheme;
+    //if FMaxThumb <> nil then FMaxThumb.ApplyColorScheme;
+  //finally
+    //EndUpdate;
+  //end;
+end;
+
 {****************************************}
 procedure TALRangeTrackBar.EnabledChanged;
 begin
@@ -6903,6 +7096,7 @@ begin
   inherited Create;
   //--
   FColor := DefaultColor;
+  FColorKey := DefaultColorKey;
   FResourceName := DefaultResourceName;
   FWrapMode := DefaultWrapMode;
   FThickness := DefaultThickness;
@@ -6930,6 +7124,12 @@ begin
   Result := TAlphaColors.Black;
 end;
 
+{********************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.GetDefaultColorKey: String;
+begin
+  Result := '';
+end;
+
 {**********************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.GetDefaultResourceName: String;
 begin
@@ -6955,6 +7155,7 @@ begin
     BeginUpdate;
     Try
       Color := TCheckMarkBrush(Source).Color;
+      ColorKey := TCheckMarkBrush(Source).ColorKey;
       ResourceName := TCheckMarkBrush(Source).ResourceName;
       WrapMode := TCheckMarkBrush(Source).WrapMode;
       Thickness := TCheckMarkBrush(Source).Thickness;
@@ -6974,6 +7175,7 @@ begin
   Try
     inherited;
     Color := DefaultColor;
+    ColorKey := DefaultColorKey;
     ResourceName := DefaultResourceName;
     WrapMode := DefaultWrapMode;
     Thickness := DefaultThickness;
@@ -6995,11 +7197,24 @@ begin
   end;
 end;
 
+{*********************************************************}
+procedure TALBaseCheckBox.TCheckMarkBrush.ApplyColorScheme;
+begin
+  if FColorKey <> '' then begin
+    var LColor := TALStyleManager.Instance.GetColor(FColorKey);
+    if FColor <> LColor then begin
+      FColor := LColor;
+      Change;
+    end;
+  end;
+end;
+
 {***************************************************************************************************************}
 procedure TALBaseCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       ResourceName := ATo.ResourceName;
@@ -7020,6 +7235,7 @@ begin
       Margins.Top := InterpolateSingle(Margins.Top{Start}, Margins.DefaultValue.Top{Stop}, ANormalizedTime);
       Margins.Bottom := InterpolateSingle(Margins.Bottom{Start}, Margins.DefaultValue.Bottom{Stop}, ANormalizedTime);
     end;
+    FColorKey := LPrevColorKey;
   finally
     EndUpdate;
   end;
@@ -7050,6 +7266,12 @@ begin
   result := FColor <> DefaultColor;
 end;
 
+{**************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.IsColorKeyStored: Boolean;
+begin
+  result := FColorKey <> DefaultColorKey;
+end;
+
 {*********************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.IsResourceNameStored: Boolean;
 begin
@@ -7073,7 +7295,17 @@ procedure TALBaseCheckBox.TCheckMarkBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
     fColor := Value;
+    FColorKey := '';
     Change;
+  end;
+end;
+
+{***************************************************************************}
+procedure TALBaseCheckBox.TCheckMarkBrush.SetColorKey(const Value: String);
+begin
+  if FColorKey <> Value then begin
+    FColorKey := Value;
+    ApplyColorScheme;
   end;
 end;
 
@@ -7309,6 +7541,18 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{***********************************}
+procedure TALBaseCheckBox.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Inherited;
+    CheckMark.ApplyColorScheme;
+  finally
+    EndUpdate;
+  End;
 end;
 
 {*****************************************************************************************************************}
@@ -7593,6 +7837,21 @@ begin
   end;
 end;
 
+{********************************************}
+procedure TALBaseCheckBox.TCheckStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Default.ApplyColorScheme;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***********************************************************}
 procedure TALBaseCheckBox.TCheckStateStyles.ClearBufDrawable;
 begin
@@ -7738,6 +7997,19 @@ begin
   end;
 end;
 
+{********************************************}
+procedure TALBaseCheckBox.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Checked.ApplyColorScheme;
+    Unchecked.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {******************************************************}
 procedure TALBaseCheckBox.TStateStyles.ClearBufDrawable;
 begin
@@ -7857,6 +8129,19 @@ begin
     inherited;
     StateStyles.AlignToPixel;
     CheckMark.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALBaseCheckBox.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    StateStyles.ApplyColorScheme;
+    CheckMark.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -8907,8 +9192,8 @@ end;
 {**********************************************************************************}
 procedure TALRadioButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
 begin
-  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and
-     (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then begin
+  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Root <> nil) and
+     (not (Sender is TControl) or ((Sender as TControl).Root = Root)) then begin
     var LOldMandatory := fMandatory;
     fMandatory := False;
     try
@@ -9253,6 +9538,21 @@ begin
   end;
 end;
 
+{********************************************}
+procedure TALSwitch.TTrack.TCheckStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    Default.ApplyColorScheme;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {************************************************************}
 procedure TALSwitch.TTrack.TCheckStateStyles.ClearBufDrawable;
 begin
@@ -9398,6 +9698,19 @@ begin
   end;
 end;
 
+{********************************************}
+procedure TALSwitch.TTrack.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Checked.ApplyColorScheme;
+    Unchecked.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {*******************************************************}
 procedure TALSwitch.TTrack.TStateStyles.ClearBufDrawable;
 begin
@@ -9518,6 +9831,18 @@ begin
   try
     inherited;
     StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALSwitch.TTrack.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -10473,6 +10798,19 @@ begin
   end;
 end;
 
+{******************************}
+procedure TALSwitch.ApplyColorScheme;
+begin
+  //BeginUpdate;
+  //try
+    inherited;
+    //Thumb.ApplyColorScheme;
+    //Track.ApplyColorScheme;
+  //finally
+    //EndUpdate;
+  //end;
+end;
+
 {**********************************}
 procedure TALSwitch.MakeBufDrawable;
 begin
@@ -10838,13 +11176,10 @@ constructor TALButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FText := DefaultText;
-  //--
   if StateStyleParent <> nil then FTextSettings := CreateTextSettings(StateStyleParent.TextSettings)
   else if ControlParent <> nil then FTextSettings := CreateTextSettings(ControlParent.TextSettings)
   else FTextSettings := CreateTextSettings(nil);
   FTextSettings.OnChanged := TextSettingsChanged;
-  //--
-  //FPriorSupersedeText
 end;
 
 {*******************************************}
@@ -10914,6 +11249,18 @@ begin
   end;
 end;
 
+{***********************************************}
+procedure TALButton.TBaseStateStyle.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    TextSettings.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***********************************************************************************************************}
 procedure TALButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
@@ -10954,9 +11301,6 @@ end;
 procedure TALButton.TBaseStateStyle.DoSupersede;
 begin
   Inherited;
-  //--
-  FPriorSupersedeText := Text;
-  //--
   if Text = '' then begin
     if StateStyleParent <> nil then Text := StateStyleParent.Text
     else Text := ControlParent.Text;
@@ -11210,6 +11554,21 @@ begin
   end;
 end;
 
+{********************************************}
+procedure TALButton.TStateStyles.ApplyColorScheme;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.ApplyColorScheme;
+    Hovered.ApplyColorScheme;
+    Pressed.ApplyColorScheme;
+    Focused.ApplyColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {************************************************}
 procedure TALButton.TStateStyles.ClearBufDrawable;
 begin
@@ -11339,7 +11698,7 @@ begin
   _ConvertFontFamily(StateStyles.Hovered);
   _ConvertFontFamily(StateStyles.Pressed);
   _ConvertFontFamily(StateStyles.Focused);
-  inherited Loaded;
+  inherited;
 end;
 
 {**************************}
@@ -11365,6 +11724,18 @@ begin
   try
     inherited;
     StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************}
+procedure TALButton.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    inherited;
+    StateStyles.ApplyColorScheme;
   finally
     EndUpdate;
   end;
@@ -11438,12 +11809,20 @@ procedure TALButton.TextSettingsChanged(Sender: TObject);
       if APrevStateStyle.TextSettings.font.Weight = AToStateStyle.TextSettings.font.Weight then AToStateStyle.TextSettings.font.Weight := TextSettings.font.Weight;
       if APrevStateStyle.TextSettings.font.Slant = AToStateStyle.TextSettings.font.Slant then AToStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
       if APrevStateStyle.TextSettings.font.Stretch = AToStateStyle.TextSettings.font.Stretch then AToStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
-      if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+      if (APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color) and
+         (APrevStateStyle.TextSettings.font.ColorKey = AToStateStyle.TextSettings.font.ColorKey) then begin
+        AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+        AToStateStyle.TextSettings.font.ColorKey := TextSettings.font.ColorKey;
+      end;
 
       if APrevStateStyle.TextSettings.Decoration.Kinds = AToStateStyle.TextSettings.Decoration.Kinds then AToStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
       if APrevStateStyle.TextSettings.Decoration.Style = AToStateStyle.TextSettings.Decoration.Style then AToStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
       if SameValue(APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier, AToStateStyle.TextSettings.Decoration.ThicknessMultiplier, TEpsilon.Scale) then AToStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
-      if APrevStateStyle.TextSettings.Decoration.Color = AToStateStyle.TextSettings.Decoration.Color then AToStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+      if (APrevStateStyle.TextSettings.Decoration.Color = AToStateStyle.TextSettings.Decoration.Color) and
+         (APrevStateStyle.TextSettings.Decoration.ColorKey = AToStateStyle.TextSettings.Decoration.ColorKey) then begin
+        AToStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+        AToStateStyle.TextSettings.Decoration.ColorKey := TextSettings.Decoration.ColorKey;
+      end;
 
     end;
 
@@ -11453,11 +11832,13 @@ procedure TALButton.TextSettingsChanged(Sender: TObject);
     APrevStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
     APrevStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
     APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+    APrevStateStyle.TextSettings.font.ColorKey := TextSettings.font.ColorKey;
 
     APrevStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
     APrevStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
     APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
     APrevStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+    APrevStateStyle.TextSettings.Decoration.ColorKey := TextSettings.Decoration.ColorKey;
 
   end;
   {$ENDIF}

@@ -389,6 +389,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);','ChildrenMouseMove(const AObject: TALDynamicListBoxControl; Shift: TShiftState; X, Y: Single);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);','ChildrenMouseUp(const AObject: TALDynamicListBoxControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseLeave(const AObject: TControl);','ChildrenMouseLeave(const AObject: TALDynamicListBoxControl);');
+    aSrc := FindAndReplace(aSrc, 'ApplyColorSchemeRecursive(const AControl: TControl);','ApplyColorSchemeRecursive(const AControl: TALDynamicListBoxControl);');
     aSrc := FindAndReplace(aSrc, 'DoAddObject(const AObject: TFmxObject);','DoInsertControl(const AControl: TALDynamicListBoxControl; const AIndex: Integer);');
     aSrc := FindAndReplace(aSrc, 'DoRemoveObject(const AObject: TFmxObject);','DoRemoveControl(const AControl: TALDynamicListBoxControl);');
     aSrc := FindAndReplace(aSrc, 'procedure DoDeleteChildren; override;','//procedure DoDeleteChildren; override;');
@@ -400,7 +401,13 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;','//property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;');
     aSrc := FindAndReplace(aSrc, 'Locked := True;', '//Locked := True;');
     aSrc := FindAndReplace(aSrc, 'procedure SetNewScene(AScene: IScene); override;','//procedure SetNewScene(AScene: IScene); override;');
-    aSrc := FindAndReplace(aSrc, '(scene <> nil) and // SetNewScene will call again AdjustSize', '//(scene <> nil) and // SetNewScene will call again AdjustSize');
+    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxExtendedControl = class(', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxShape = class(', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxImage = class(', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxBaseRectangle = class(', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxBaseText = class(', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); override;', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'procedure ApplyColorScheme; virtual;','procedure ApplyColorScheme; override;','TALDynamicListBoxExtendedControl = class(', #13#10'  end;');
     aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];','//FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];');
     aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Parent := self;','//FFadeOverlay.Parent := self;');
     aSrc := FindAndReplace(aSrc, 'FTrack.Parent := self;','//FTrack.Parent := self;');
@@ -531,8 +538,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
               'end;');
     aSrc := FindAndReplace(
               aSrc,
-              '  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and'+#13#10+
-              '     (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then begin',
+              '  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Root <> nil) and'+#13#10+
+              '     (not (Sender is TControl) or ((Sender as TControl).Root = Root)) then begin',
               '  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (OwnerListBox <> nil) and'+#13#10+
               '     (not (Sender is TALDynamicListBoxControl) or ((Sender as TALDynamicListBoxControl).OwnerListBox = OwnerListBox)) then begin');
     aSrc := FindAndReplace(
@@ -883,6 +890,12 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('.GetParentedVisible: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetAlign: TALAlignLayout;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.IsFocusedChanged;', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('TALDynamicListBoxShape.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('TALDynamicListBoxImage.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('TALDynamicListBoxBaseRectangle.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('TALDynamicListBoxBaseText.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('TALDynamicListBoxButton.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.MarginsChangedHandler(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.MarginsChanged;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or

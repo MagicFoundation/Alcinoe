@@ -553,6 +553,7 @@ begin
       LOldToNewNames.add('TALTabItem=TALPageView');
       LOldToNewNames.add('TALTabControl=TALPageController');
       LOldToNewNames.add('TALGeoPositionSensor=TALGeoLocationSensor');
+      LOldToNewNames.add('TALIniFile=TALIniFileA');
 
       //var names
       LOldToNewNames.add('ALDefaultFormatSettings=ALDefaultFormatSettingsA');

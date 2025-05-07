@@ -347,6 +347,25 @@ Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/t
 <br/>
 <br/>
   
+Effortless Theming with TALStyleManager
+=======================================
+
+All Alcinoe controls can be easily styled using **TALStyleManager**. To achieve 
+this, you simply define a custom style for each control by modifying
+**Alcinoe.FMX.CustomStyles.pas**.
+
+In addition, the **TALStyleManager** makes it straightforward to implement light 
+and dark theme variants—or any other custom theme.
+
+The core of this flexibility lies in the fact that each Alcinoe control associates 
+a **ColorKey** with every **Color** property. You can assign a symbolic value to 
+this key, such as **Material3.Color.Primary**. Then, within **TALStyleManager**,
+you define the actual color value mapped to **Material3.Color.Primary**.
+
+This design allows you to switch effortlessly between light, dark, or custom 
+themes—ensuring both consistency and maintainability.
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/lightdarkmode.jpg?raw=true" />
 
 High-Performance Text Control with HTML Formatting and Interactive Capabilities
 ===============================================================================

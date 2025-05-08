@@ -75,7 +75,6 @@ type
     FALParentControl: TALControl; // 8 bytes
     FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
-    FScale: Single; // 4 bytes
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
@@ -91,7 +90,6 @@ type
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
     procedure MarginsChangedHandler(Sender: TObject);
-    function IsScaledStored: Boolean;
   protected
     FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
@@ -100,8 +98,6 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
-    procedure SetScale(const AValue: Single); virtual;
-    property Scale: Single read FScale write SetScale stored IsScaledStored nodefault;
     property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
@@ -281,7 +277,6 @@ begin
   FForm := nil;
   FALParentControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
-  FScale := 1;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
@@ -1153,16 +1148,6 @@ begin
   // Not supported
 end;
 
-{**************************************************}
-procedure TALControl.SetScale(const AValue: Single);
-begin
-  if not SameValue(FScale, AValue, TEpsilon.Scale) then begin
-    FScale := AValue;
-    DoMatrixChanged(nil);
-    Repaint;
-  end;
-end;
-
 {***************************************}
 function TALControl.GetAutoSize: Boolean;
 begin
@@ -1488,7 +1473,7 @@ begin
   {$ENDIF}
   if not FInPaintTo and not IsUpdating then
     Repaint;
-  if SameValue(Scale, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
+  if SameValue(Scale.X, 1.0, TEpsilon.Scale) and SameValue(Scale.Y, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
   begin
     if (ParentControl <> nil) and not TALControlAccessPrivate(ParentControl).FSimpleTransform then
       TALControlAccessPrivate(Self).FSimpleTransform := False
@@ -1504,17 +1489,17 @@ begin
     begin
       FLocalMatrix :=
         TMatrix.CreateTranslation(-Pivot.X * FSize.Width, -Pivot.Y * FSize.Height) *
-        TMatrix.CreateScaling(Scale, Scale) *
+        TMatrix.CreateScaling(Scale.X, Scale.Y) *
         TMatrix.CreateRotation(DegToRad(RotationAngle)) *
         TMatrix.CreateTranslation(Pivot.X * FSize.Width + Position.X, Pivot.Y * FSize.Height + Position.Y);
     end
     else
     begin
       FLocalMatrix := TMatrix.Identity;
-      FLocalMatrix.m31 := Position.X + ((1 - Scale) * Pivot.X * FSize.Width);
-      FLocalMatrix.m32 := Position.Y + ((1 - Scale) * Pivot.Y * FSize.Height);
-      FLocalMatrix.m11 := Scale;
-      FLocalMatrix.m22 := Scale;
+      FLocalMatrix.m31 := Position.X + ((1 - Scale.X) * Pivot.X * FSize.Width);
+      FLocalMatrix.m32 := Position.Y + ((1 - Scale.Y) * Pivot.Y * FSize.Height);
+      FLocalMatrix.m11 := Scale.X;
+      FLocalMatrix.m22 := Scale.Y;
     end;
   end
   else
@@ -1599,12 +1584,6 @@ begin
   if Assigned(FFormerMarginsChangedHandler) then
     FFormerMarginsChangedHandler(Sender);
   MarginsChanged;
-end;
-
-{******************************************}
-function TALControl.IsScaledStored: Boolean;
-begin
-  Result := not SameValue(FScale, 1, TEpsilon.Scale);
 end;
 
 {*************************************}

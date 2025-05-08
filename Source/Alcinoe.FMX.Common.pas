@@ -982,6 +982,18 @@ type
     property Shadow: TALInheritShadow read FShadow write SetShadow;
     property StateLayer: TALStateLayer read FStateLayer write SetStateLayer;
     property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
+    /// <summary>
+    ///   The scale defined here is distinct from the scale defined on the control.
+    ///   The control's scale acts as a zoom factor—e.g., an image created at 100×100
+    ///   pixels with a scale of 1.2 will be rendered on screen at 120×120 pixels.
+    ///   <para/>
+    ///   In contrast, the scale defined here affects the image generation itself.
+    ///   That means the image will be created directly at 120×120 pixels, resulting
+    ///   in higher quality when displayed.
+    ///   <para/>
+    ///   The control's scale is typically used for animations, where high image quality
+    ///   is less critical and performance is more important.
+    /// </summary>
     property Scale: Single read FScale write SetScale stored IsScaleStored nodefault;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;

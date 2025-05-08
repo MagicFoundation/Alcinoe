@@ -1153,7 +1153,7 @@ begin
       // Reset visibility/scale/color of all controls
       for var I := 0 to ControlsCount - 1 do begin
         Controls[I].Visible := True;
-        TIndicatorControl(Controls[I]).Scale := 1;
+        TIndicatorControl(Controls[I]).Scale.Point := TPointF.Create(1, 1);
         if (Controls[I] = FactiveIndicatorControl) then
           TIndicatorControl(Controls[I]).Fill.Color := FActiveIndicator.Fill.Color
         else
@@ -1243,7 +1243,9 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else begin
             FActiveIndicatorControl.Position.x := Controls[FActivePageIndex].Position.x + (LDistanceBetweenIndicators * LAnimationValue);
-            FActiveIndicatorControl.Scale := 1 + abs(LAnimationValue * 1.2);
+            FActiveIndicatorControl.Scale.Point := TPointF.Create(
+                                                     1 + abs(LAnimationValue * 1.2),
+                                                     1 + abs(LAnimationValue * 1.2));
           end;
         end;
 
@@ -1281,14 +1283,25 @@ begin
         TAnimationType.Scale: begin
           const LMaxDeltaScale = 0.5;
           if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
-            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale := 1 + (LAnimationValue * LMaxDeltaScale);
-            TIndicatorControl(Controls[FActivePageIndex]).Scale := 1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale);
+            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale.Point := TPointF.Create(
+                                                                               1 + (LAnimationValue * LMaxDeltaScale),
+                                                                               1 + (LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
+                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale),
+                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale));
           end
           else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
-            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale := 1 + (-LAnimationValue * LMaxDeltaScale);
-            TIndicatorControl(Controls[FActivePageIndex]).Scale := 1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale);
+            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale.Point := TPointF.Create(
+                                                                               1 + (-LAnimationValue * LMaxDeltaScale),
+                                                                               1 + (-LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
+                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale),
+                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale));
           end
-          else TIndicatorControl(Controls[FActivePageIndex ]).Scale := 1 + LMaxDeltaScale;
+          else
+            TIndicatorControl(Controls[FActivePageIndex ]).Scale.Point := TPointF.Create(
+                                                                            1 + LMaxDeltaScale,
+                                                                            1 + LMaxDeltaScale);
           FActiveIndicatorControl.Visible := False;
         end;
 

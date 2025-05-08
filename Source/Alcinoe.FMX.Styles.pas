@@ -446,6 +446,72 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
+procedure ALApplyMaterial3EditHybridStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+begin
+  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
+  With AEdit do begin
+    BeginUpdate;
+    Try
+
+      //--Enabled (default)--
+      ALResetEditStyle(AEdit, AFontSize * LRatio);
+      padding.Rect := TRectF.Create(16*LRatio{Left}, 16*LRatio{Top}, 16*LRatio{Right}, 16*LRatio{Bottom}).RoundTo(-2);
+      XRadius := RoundTo(4 * LRatio, -2);
+      YRadius := RoundTo(4 * LRatio, -2);
+      DefStyleAttr := 'material3EditOutlined';
+      TintColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Stroke.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      LabelTextSettings.Layout := TALEdit.TLabelTextLayout.Inline;
+      LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*LRatio,0,4*LRatio).RoundTo(-2);
+      SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
+      SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Duration := 0.2;
+      //--Disabled--
+      StateStyles.Disabled.Opacity := 1;
+      StateStyles.Disabled.Stroke.assign(Stroke);
+      StateStyles.Disabled.Stroke.Inherit := False;
+      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Assign(TextSettings);
+      StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
+      StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
+      StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
+      //--Hovered--
+      StateStyles.Hovered.Stroke.assign(Stroke);
+      StateStyles.Hovered.Stroke.Inherit := False;
+      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
+      StateStyles.Hovered.LabelTextSettings.Inherit := False;
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
+      //--Focused--
+      StateStyles.Focused.Stroke.assign(Stroke);
+      StateStyles.Focused.Stroke.Inherit := False;
+      StateStyles.Focused.Stroke.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
+      StateStyles.Focused.LabelTextSettings.Inherit := False;
+      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.PromptTextcolorKey := StateStyles.Focused.LabelTextSettings.Font.ColorKey;
+
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
 procedure ALApplyMaterial3EditFilledErrorStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
 begin
   var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
@@ -535,6 +601,68 @@ begin
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.floating;
       LabelTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       LabelTextSettings.Margins.Rect := TRectF.Create(0,0,0,-6*LRatio).RoundTo(-2);
+      SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
+      SupportingTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Duration := 0.2;
+      //--Disabled--
+      StateStyles.Disabled.Opacity := 1;
+      StateStyles.Disabled.Stroke.assign(Stroke);
+      StateStyles.Disabled.Stroke.Inherit := False;
+      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Assign(TextSettings);
+      StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
+      StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
+      StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
+      //--Hovered--
+      StateStyles.Hovered.Stroke.assign(Stroke);
+      StateStyles.Hovered.Stroke.Inherit := False;
+      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
+      StateStyles.Hovered.LabelTextSettings.Inherit := False;
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
+      //--Focused--
+      StateStyles.Focused.Stroke.assign(Stroke);
+      StateStyles.Focused.Stroke.Inherit := False;
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.PromptTextcolorKey := LabelTextSettings.Font.ColorKey;
+
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
+procedure ALApplyMaterial3EditHybridErrorStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+begin
+  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
+  With AEdit do begin
+    BeginUpdate;
+    Try
+
+      //--Enabled (default)--
+      ALResetEditStyle(AEdit, AFontSize * LRatio);
+      padding.Rect := TRectF.Create(16*LRatio{Left}, 16*LRatio{Top}, 16*LRatio{Right}, 16*LRatio{Bottom}).RoundTo(-2);
+      XRadius := RoundTo(4 * LRatio, -2);
+      YRadius := RoundTo(4 * LRatio, -2);
+      DefStyleAttr := 'material3EditOutlinedError';
+      TintColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      Fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Stroke.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      LabelTextSettings.Layout := TALEdit.TLabelTextLayout.Inline;
+      LabelTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*LRatio,0,4*LRatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
       SupportingTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
@@ -2090,6 +2218,8 @@ begin
   AddOrSetEditStyle('Material3.Edit.Filled.Error', ALApplyMaterial3EditFilledErrorStyle, 16{ADefaultFontSize});
   AddOrSetEditStyle('Material3.Edit.Outlined', ALApplyMaterial3EditOutlinedStyle, 16{ADefaultFontSize});
   AddOrSetEditStyle('Material3.Edit.Outlined.Error', ALApplyMaterial3EditOutlinedErrorStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material3.Edit.Hybrid', ALApplyMaterial3EditHybridStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material3.Edit.Hybrid.Error', ALApplyMaterial3EditHybridErrorStyle, 16{ADefaultFontSize});
 
   AddOrSetMemoStyle('Default', ALResetEditStyle, 16{ADefaultFontSize});
   AddOrSetMemoStyle('Material3.Memo.Filled', ALApplyMaterial3EditFilledStyle, 16{ADefaultFontSize});

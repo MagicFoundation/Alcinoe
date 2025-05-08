@@ -4315,12 +4315,12 @@ begin
         TAnimation.ScaleInOut: begin
           AdjustPosition(AThumb);
           Opacity := 1;
-          Scale := 0;
+          Scale.Point := TPointF.Create(0, 0);
         end;
         TAnimation.Opacity: begin
           AdjustPosition(AThumb);
           Opacity := 0;
-          Scale := 1;
+          Scale.Point := TPointF.Create(1, 1);
         end
         else
           Raise Exception.Create('Error A2F4F658-97FC-4F92-AFA4-3BB8192003A8')
@@ -4360,7 +4360,7 @@ end;
 procedure TALCustomTrack.TValueIndicator.AnimationProcess(Sender: TObject);
 begin
   case FAnimation of
-    TAnimation.ScaleInOut: Scale := FFloatAnimation.CurrentValue;
+    TAnimation.ScaleInOut: Scale.Point := TPointF.Create(FFloatAnimation.CurrentValue, FFloatAnimation.CurrentValue);
     TAnimation.Opacity: Opacity := FFloatAnimation.CurrentValue
     else Raise Exception.Create('Error D6F17D76-E47E-4144-8FBA-5CAD3EBF84F3')
   end;
@@ -4372,7 +4372,7 @@ begin
   FFloatAnimation.Enabled := False;
   case FAnimation of
     TAnimation.ScaleInOut: begin
-      if SameValue(Scale, 0, TEpsilon.Scale) then
+      if SameValue(Scale.X, 0, TEpsilon.Scale) and SameValue(Scale.Y, 0, TEpsilon.Scale) then
         visible := False;
     end;
     TAnimation.Opacity: begin

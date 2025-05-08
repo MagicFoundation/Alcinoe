@@ -75,6 +75,7 @@ type
     FALParentControl: TALControl; // 8 bytes
     FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
+    FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
@@ -83,6 +84,7 @@ type
     FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
+    procedure SetScale(const AValue: TPosition);
     function GetPivot: TPosition;
     procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
@@ -98,6 +100,7 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
+    property Scale: TPosition read FScale write SetScale;
     property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
@@ -277,6 +280,8 @@ begin
   FForm := nil;
   FALParentControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
+  FScale := TPosition.Create(TPointF.Create(1, 1));
+  FScale.OnChange := DoMatrixChanged;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
@@ -302,6 +307,7 @@ end;
 destructor TALControl.Destroy;
 begin
   ClearBufDrawable;
+  ALFreeAndNil(FScale);
   inherited;
 end;
 
@@ -327,7 +333,7 @@ begin
       AutoSize := TALControl(Source).AutoSize;
       DoubleBuffered := TALControl(Source).DoubleBuffered;
       Pivot.Assign(TALControl(Source).Pivot);
-      Scale := TALControl(Source).Scale;
+      Scale.assign(TALControl(Source).Scale);
       // --TControl
       Anchors := TALControl(Source).Anchors;
       CanFocus := TALControl(Source).CanFocus;
@@ -1146,6 +1152,12 @@ end;
 procedure TALControl.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not supported
+end;
+
+{*****************************************************}
+procedure TALControl.SetScale(const AValue: TPosition);
+begin
+  FScale.Assign(AValue);
 end;
 
 {***************************************}

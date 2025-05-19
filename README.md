@@ -359,8 +359,8 @@ and dark theme variants—or any other custom theme.
 
 The core of this flexibility lies in the fact that each Alcinoe control associates 
 a **ColorKey** with every **Color** property. You can assign a symbolic value to 
-this key, such as **Material3.Color.Primary**. Then, within **TALStyleManager**,
-you define the actual color value mapped to **Material3.Color.Primary**.
+this key, such as **Material.Color.Primary**. Then, within **TALStyleManager**,
+you define the actual color value mapped to **Material.Color.Primary**.
 
 This design allows you to switch effortlessly between light, dark, or custom 
 themes—ensuring both consistency and maintainability.
@@ -1132,6 +1132,34 @@ undesired conversions.
 
 History
 =======
+
+#### 19/05/2025
+
+- Added the following easing types to TALInterpolationType, matching Material Design 3 motion system:
+  - MaterialExpressiveFastSpatial
+  - MaterialExpressiveDefaultSpatial
+  - MaterialExpressiveSlowSpatial
+  - MaterialExpressiveFastEffects
+  - MaterialExpressiveDefaultEffects
+  - MaterialExpressiveSlowEffects
+  - MaterialStandardFastSpatial
+  - MaterialStandardDefaultSpatial
+  - MaterialStandardSlowSpatial
+  - MaterialStandardFastEffects
+  - MaterialStandardDefaultEffects
+  - MaterialStandardSlowEffects
+  - MaterialEmphasized
+  - MaterialEmphasizedDecelerate
+  - MaterialEmphasizedAccelerate
+- Removed Overshoot from TALInterpolatedAnimation.
+- Added imageTintColor to TALBrush to allow tinting images with a defined color.
+- Added support for image tint in HTML via:
+  `<img src="{ResourceName}" color="#FFFFFF or {ColorKey} or inherit">`
+- Removed ALConvertFontFamily and replaced it with ALResolveFontFamily.
+- Set TextSettings.IsHtml to true by default.
+- HasTouchScreen is now disabled in debug mode on devices without a touchscreen.
+- Added TALAlignLayout.contents.
+- Introduced new TALDialog component.
 
 #### 08/05/2025
 

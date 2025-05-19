@@ -30,7 +30,7 @@ uses
   FMX.Effects,
   FMX.Filter.Effects,
   FMX.Ani,
-  Alcinoe.FMX.Themes,
+  Alcinoe.FMX.Styles,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Common,
@@ -130,6 +130,10 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   TALErrorReporting.Instance;
   TALGuardianThread.Instance;
+  {$IF defined(DEBUG)}
+  ALInitHasTouchScreen;
+  ALHasTouchScreen := true;
+  {$ENDIF}
   {$IF defined(ALUIAutomationEnabled)}
   TThread.ForceQueue(nil,
     procedure

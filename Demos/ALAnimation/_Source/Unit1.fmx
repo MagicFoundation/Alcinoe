@@ -73,7 +73,7 @@ object Form1: TForm1
             'Custom')
           ItemIndex = 0
           Position.X = 112.000000000000000000
-          Size.Width = 129.000000000000000000
+          Size.Width = 233.000000000000000000
           Size.Height = 22.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 3

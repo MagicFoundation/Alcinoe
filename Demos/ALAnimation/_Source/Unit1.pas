@@ -62,8 +62,10 @@ type
     procedure LayoutSpringForceMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseLeave(Sender: TObject);
     procedure ComboBoxInterpolationChange(Sender: TObject);
+    procedure ButtonStartTestClick(Sender: TObject);
   private
     FPoints: Array[TALInterpolationType] of Tlist<Tpointf>;
+    FTestPoints: Array[TALInterpolationType] of Tlist<Tpointf>;
     FStartTime: int64;
     FIsDragging: Boolean;
     FOffset: TPointF;  // This will store the offset
@@ -79,6 +81,11 @@ implementation
 {$R *.fmx}
 
 uses
+  {$IF defined(Android)}
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  {$ENDIF}
   system.Math,
   System.TypInfo,
   Alcinoe.Common;
@@ -88,6 +95,12 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   for var I := Low(FPoints) to High(FPoints) do
     FPoints[i] := Tlist<Tpointf>.create;
+  for var I := Low(FTestPoints) to High(FTestPoints) do
+    FTestPoints[i] := Tlist<Tpointf>.create;
+  ComboBoxInterpolation.Items.Clear;
+  for var I := Ord(Low(TALInterpolationType)) to Ord(High(TALInterpolationType)) do
+    ComboBoxInterpolation.Items.Add(GetEnumName(TypeInfo(TALInterpolationType), I));
+  ComboBoxInterpolation.ItemIndex := 0;
   LayoutResized(nil);
 end;
 
@@ -96,6 +109,8 @@ procedure TForm1.FormDestroy(Sender: TObject);
 begin
   for var I := Low(FPoints) to High(FPoints) do
     AlFreeAndNil(FPoints[i]);
+  for var I := Low(FTestPoints) to High(FTestPoints) do
+    AlFreeAndNil(FTestPoints[i]);
 end;
 
 {***********************************************************************************}
@@ -209,7 +224,7 @@ end;
 procedure TForm1.ButtonStartClick(Sender: TObject);
 begin
   FStartTime := ALElapsedTimeMillisAsInt64;
-  ALFloatPropertyAnimation.Duration := 3;
+  ALFloatPropertyAnimation.Duration := 2;
   ALFloatPropertyAnimation.StartValue := -CircleBullet.height / 2;
   ALFloatPropertyAnimation.StopValue := (LayoutBullet.height / 1.4) - (CircleBullet.height / 2);
   ALFloatPropertyAnimation.Interpolation := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex]));
@@ -223,13 +238,16 @@ procedure TForm1.CheckBoxClearGraphChange(Sender: TObject);
 begin
   for var I := Low(FPoints) to High(FPoints) do
     FPoints[i].Clear;
+  for var I := Low(FTestPoints) to High(FTestPoints) do
+    FTestPoints[i].Clear;
   invalidate;
 end;
 
 {************************************************************}
 procedure TForm1.ComboBoxInterpolationChange(Sender: TObject);
 begin
-  ComboBoxCustomInterpolation.Enabled := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex])) = TALInterpolationType.Custom;
+  if ComboBoxInterpolation.ItemIndex >= 0 then
+    ComboBoxCustomInterpolation.Enabled := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex])) = TALInterpolationType.Custom;
 end;
 
 {********************************************************************}
@@ -283,12 +301,63 @@ begin
       TALInterpolationType.Elastic: Lcolor := TAlphaColorRec.Darkolivegreen;
       TALInterpolationType.Back: Lcolor := TAlphaColorRec.Green;
       TALInterpolationType.Bounce: Lcolor := TAlphaColorRec.Darkorchid;
+      TALInterpolationType.MaterialExpressiveFastSpatial: Lcolor := TAlphaColorRec.Salmon;
+      TALInterpolationType.MaterialExpressiveDefaultSpatial: Lcolor := TAlphaColorRec.Sienna;
+      TALInterpolationType.MaterialExpressiveSlowSpatial: Lcolor := TAlphaColorRec.Mediumorchid;
+      TALInterpolationType.MaterialExpressiveFastEffects: Lcolor := TAlphaColorRec.Teal;
+      TALInterpolationType.MaterialExpressiveDefaultEffects: Lcolor := TAlphaColorRec.Limegreen;
+      TALInterpolationType.MaterialExpressiveSlowEffects: Lcolor := TAlphaColorRec.Mediumvioletred;
+      TALInterpolationType.MaterialStandardFastSpatial: Lcolor := TAlphaColorRec.Orangered;
+      TALInterpolationType.MaterialStandardDefaultSpatial: Lcolor := TAlphaColorRec.Olivedrab;
+      TALInterpolationType.MaterialStandardSlowSpatial: Lcolor := TAlphaColorRec.Gray;
+      TALInterpolationType.MaterialStandardFastEffects: Lcolor := TAlphaColorRec.Sandybrown;
+      TALInterpolationType.MaterialStandardDefaultEffects: Lcolor := TAlphaColorRec.Lightcoral;
+      TALInterpolationType.MaterialStandardSlowEffects: Lcolor := TAlphaColorRec.Firebrick;
+      TALInterpolationType.MaterialEmphasized: Lcolor := TAlphaColorRec.Chocolate;
+      TALInterpolationType.MaterialEmphasizedDecelerate: Lcolor := TAlphaColorRec.Indigo;
+      TALInterpolationType.MaterialEmphasizedAccelerate: Lcolor := TAlphaColorRec.Palevioletred;
       TALInterpolationType.Custom: Lcolor := TAlphaColorRec.Darkred;
       else Lcolor := TAlphaColorRec.Black;
     end;
     if (CheckBoxClearGraph.IsChecked) and
        (LInterpolationType <> ALFloatPropertyAnimation.Interpolation) then continue;
     _drawGraph(FPoints[LInterpolationType], Lcolor);
+  end;
+  for var LInterpolationType := Low(FTestPoints) to High(FTestPoints) do begin
+    Var Lcolor: TAlphaColor;
+    case LInterpolationType of
+      TALInterpolationType.Linear: Lcolor := TAlphaColorRec.Darkblue;
+      TALInterpolationType.Quadratic: Lcolor := TAlphaColorRec.Darkcyan;
+      TALInterpolationType.Cubic: Lcolor := TAlphaColorRec.Darkgoldenrod;
+      TALInterpolationType.Quartic: Lcolor := TAlphaColorRec.Darkviolet;
+      TALInterpolationType.Quintic: Lcolor := TAlphaColorRec.Darkgreen;
+      TALInterpolationType.Sinusoidal: Lcolor := TAlphaColorRec.Darkslateblue;
+      TALInterpolationType.Exponential: Lcolor := TAlphaColorRec.Brown;
+      TALInterpolationType.Circular: Lcolor := TAlphaColorRec.Darkmagenta;
+      TALInterpolationType.Elastic: Lcolor := TAlphaColorRec.Darkolivegreen;
+      TALInterpolationType.Back: Lcolor := TAlphaColorRec.Green;
+      TALInterpolationType.Bounce: Lcolor := TAlphaColorRec.Darkorchid;
+      TALInterpolationType.MaterialExpressiveFastSpatial: Lcolor := TAlphaColorRec.Salmon;
+      TALInterpolationType.MaterialExpressiveDefaultSpatial: Lcolor := TAlphaColorRec.Sienna;
+      TALInterpolationType.MaterialExpressiveSlowSpatial: Lcolor := TAlphaColorRec.Mediumorchid;
+      TALInterpolationType.MaterialExpressiveFastEffects: Lcolor := TAlphaColorRec.Teal;
+      TALInterpolationType.MaterialExpressiveDefaultEffects: Lcolor := TAlphaColorRec.Limegreen;
+      TALInterpolationType.MaterialExpressiveSlowEffects: Lcolor := TAlphaColorRec.Mediumvioletred;
+      TALInterpolationType.MaterialStandardFastSpatial: Lcolor := TAlphaColorRec.Orangered;
+      TALInterpolationType.MaterialStandardDefaultSpatial: Lcolor := TAlphaColorRec.Olivedrab;
+      TALInterpolationType.MaterialStandardSlowSpatial: Lcolor := TAlphaColorRec.Gray;
+      TALInterpolationType.MaterialStandardFastEffects: Lcolor := TAlphaColorRec.Sandybrown;
+      TALInterpolationType.MaterialStandardDefaultEffects: Lcolor := TAlphaColorRec.Lightcoral;
+      TALInterpolationType.MaterialStandardSlowEffects: Lcolor := TAlphaColorRec.Firebrick;
+      TALInterpolationType.MaterialEmphasized: Lcolor := TAlphaColorRec.Chocolate;
+      TALInterpolationType.MaterialEmphasizedDecelerate: Lcolor := TAlphaColorRec.Indigo;
+      TALInterpolationType.MaterialEmphasizedAccelerate: Lcolor := TAlphaColorRec.Palevioletred;
+      TALInterpolationType.Custom: Lcolor := TAlphaColorRec.Darkred;
+      else Lcolor := TAlphaColorRec.Black;
+    end;
+    if (CheckBoxClearGraph.IsChecked) and
+       (LInterpolationType <> ALFloatPropertyAnimation.Interpolation) then continue;
+    _drawGraph(FTestPoints[LInterpolationType], Lcolor);
   end;
 end;
 
@@ -351,6 +420,69 @@ begin
     ALSpringForcePropertyAnimationY.InitialVelocity := 0;
     ALSpringForcePropertyAnimationY.Start;
   end;
+end;
+
+
+////////////////////////
+/// For Testing only ///
+////////////////////////
+
+{$IF defined(android)}
+type
+  [JavaSignature('android/view/animation/PathInterpolator')]
+  JPathInterpolator = interface(JObject)
+    ['{E4F2C0D1-8A3B-4F3E-9C56-5A1D9F8B7C02}']
+    function getInterpolation(input: Single): Single; cdecl;
+  end;
+  JPathInterpolatorClass = interface(JObjectClass)
+    ['{B7A1F631-09D3-4C5D-87F4-23E4C1A9E1AB}']
+    { constructor overloads }
+    function init(path: JPath): JPathInterpolator; cdecl; overload;
+    function init(controlX1, controlY1, controlX2, controlY2: Single): JPathInterpolator; cdecl; overload;
+  end;
+  TJPathInterpolator = class(TJavaGenericImport<JPathInterpolatorClass, JPathInterpolator>) end;
+{$ENDIF}
+
+{*****************************************************}
+procedure TForm1.ButtonStartTestClick(Sender: TObject);
+begin
+  for var I := Low(FPoints) to High(FPoints) do
+    FPoints[i].Clear;
+  for var I := Low(FTestPoints) to High(FTestPoints) do
+    FTestPoints[i].Clear;
+  CheckBoxClearGraph.IsChecked := False;
+  ALFloatPropertyAnimation.Duration := 2;
+  ALFloatPropertyAnimation.StartValue := -CircleBullet.height / 2;
+  ALFloatPropertyAnimation.StopValue := (LayoutBullet.height / 1.4) - (CircleBullet.height / 2);
+
+  {$IF defined(android)}
+  var Path := TJPath.JavaClass.init;
+  Path.moveTo(0, 0);
+  Path.cubicTo(0.05, 0, 0.133333, 0.06, 0.166666, 0.4);
+  Path.cubicTo(0.208333, 0.82, 0.25, 1, 1, 1);
+  var Interpolator := TJPathInterpolator.JavaClass.init(Path);
+  {$ENDIF}
+
+  const StepCount = 100;
+  for var I: Integer := 0 to StepCount do
+  begin
+    var t: Single := I / StepCount;              // 0.00, 0.01, …, 1.00
+    var y1: Single := ALInterpolateMaterialEmphasized(t, 1);
+    FPoints[TALInterpolationType.MaterialEmphasized].Add(
+      TpointF.Create(
+        t * 1000 * 3,
+        ALFloatPropertyAnimation.StartValue + (y1 * (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue))));
+
+    {$IF defined(android)}
+    var y2: Single := Interpolator.getInterpolation(t);
+    FTestPoints[TALInterpolationType.MaterialEmphasized].Add(
+      TpointF.Create(
+        t * 1000 * 3,
+        ALFloatPropertyAnimation.StartValue + (y2 * (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue))));
+    {$ENDIF}
+
+  end;
+  Invalidate;
 end;
 
 initialization

@@ -84,7 +84,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 13
+      TabOrder = 15
       Text = 'Recreate Buffers'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -133,7 +133,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 11
+      TabOrder = 13
       Text = 'Test FPS'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -286,7 +286,6 @@ object MainForm: TMainForm
         '_Skia_Vulkan, Release_Skia_Metal, etc.) in the project tool wind' +
         'ow.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.IsHtml = True
       TextSettings.HorzAlign = Center
       TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
@@ -307,7 +306,6 @@ object MainForm: TMainForm
         'ensuring accurate '#13#10'representation of images using <b>P3</b> and' +
         ' other color profiles.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.IsHtml = True
       TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout72: TALLayout
@@ -2829,7 +2827,6 @@ object MainForm: TMainForm
         TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
         TextSettings.EllipsisSettings.Font.Weight = Semibold
         TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-        TextSettings.IsHtml = True
         OnElementClick = TextEllipsisElementClick
         OnElementMouseEnter = TextEllipsisElementMouseEnter
         OnElementMouseLeave = TextEllipsisElementMouseLeave
@@ -2877,7 +2874,6 @@ object MainForm: TMainForm
         TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
         TextSettings.EllipsisSettings.Font.Weight = Semibold
         TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-        TextSettings.IsHtml = True
         OnElementClick = TextEllipsisElementClick
         OnElementMouseEnter = TextEllipsisElementMouseEnter
         OnElementMouseLeave = TextEllipsisElementMouseLeave
@@ -2926,7 +2922,6 @@ object MainForm: TMainForm
         TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
         TextSettings.EllipsisSettings.Font.Weight = Semibold
         TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-        TextSettings.IsHtml = True
         OnElementClick = TextEllipsisElementClick
         OnElementMouseEnter = TextEllipsisElementMouseEnter
         OnElementMouseLeave = TextEllipsisElementMouseLeave
@@ -2947,7 +2942,6 @@ object MainForm: TMainForm
         'Here are some examples of the Alcinoe graphic functions for imag' +
         'e manipulation.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.IsHtml = True
       TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
   end

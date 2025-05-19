@@ -56,17 +56,20 @@ Procedure BuildAlcinoeFMXDynamicControls;
       ALSaveStringToFile(BlockStartPattern, ALgetModulePathW + 'Error_FindAndReplace_BlockStartPattern.pas');
       Raise Exception.Create('Could not find BlockStartPattern: '+ String(BlockStartPattern));
     end;
-    var P2 := ALPosIgnoreCaseA(BlockEndPattern, Source, P1);
-    If P2 <= 0 then begin
-      ALSaveStringToFile(Source, ALgetModulePathW + 'Error_FindAndReplace_Source.pas');
-      ALSaveStringToFile(BlockEndPattern, ALgetModulePathW + 'Error_FindAndReplace_BlockEndPattern.pas');
-      Raise Exception.Create('Could not find BlockEndPattern: '+ String(BlockEndPattern));
+    While P1 > 0 do begin
+      var P2 := ALPosIgnoreCaseA(BlockEndPattern, Source, P1);
+      If P2 <= 0 then begin
+        ALSaveStringToFile(Source, ALgetModulePathW + 'Error_FindAndReplace_Source.pas');
+        ALSaveStringToFile(BlockEndPattern, ALgetModulePathW + 'Error_FindAndReplace_BlockEndPattern.pas');
+        Raise Exception.Create('Could not find BlockEndPattern: '+ String(BlockEndPattern));
+      end;
+      var LStr := ALcopyStr(Source, P1, P2-P1);
+      LStr := FindAndReplace(LStr, OldPattern, NewPattern);
+      result := Source;
+      delete(Result, P1, P2-P1);
+      insert(LStr, Result, P1);
+      P1 := ALPosIgnoreCaseA(BlockStartPattern, Source, P1 + 1);
     end;
-    var LStr := ALcopyStr(Source, P1, P2-P1);
-    LStr := FindAndReplace(LStr, OldPattern, NewPattern);
-    result := Source;
-    delete(Result, P1, P2-P1);
-    insert(LStr, Result, P1);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -273,6 +276,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'FContent.InsertObject(Lindex, Result);','FContent.InsertControl(Result, Lindex);');
     aSrc := FindAndReplace(aSrc, 'FContent.RemoveObject(AIndex);','FContent.RemoveControl(AIndex);');
     aSrc := FindAndReplace(aSrc, 'if HasActivePage then ActivePage.ResetFocus;','//if HasActivePage then ActivePage.ResetFocus;');
+    aSrc := FindAndReplace(aSrc, 'ActivePage.ResetFocus;','//ActivePage.ResetFocus;');
     aSrc := FindAndReplace(aSrc, 'if not IsChild(AValue) then raise Exception.Create','//if not IsChild(AValue) then raise Exception.Create');
     aSrc := FindAndReplace(aSrc, 'function GetItemsCount: Integer;','//function GetItemsCount: Integer;');
     aSrc := FindAndReplace(aSrc, 'function GetItem(const AIndex: Integer): TFmxObject;','//function GetItem(const AIndex: Integer): TFmxObject;');
@@ -369,7 +373,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'procedure ClearBufDrawable; virtual;','procedure ClearBufDrawable; override;', 'TALDynamicListBoxExtendedControl = class(TALDynamicListBoxControl)', 'end;');
     aSrc := FindAndReplace(aSrc, 'procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;','//procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;');
     aSrc := FindAndReplace(aSrc, 'procedure DoMatrixChanged(Sender: TObject); override;','//procedure DoMatrixChanged(Sender: TObject); override;');
-    aSrc := FindAndReplace(aSrc, 'DoMatrixChanged(nil);','//DoMatrixChanged(nil);');
     aSrc := FindAndReplace(aSrc, 'function GetPivot: TPosition;','//function GetPivot: TPosition;');
     aSrc := FindAndReplace(aSrc, 'procedure SetPivot(const Value: TPosition);','//procedure SetPivot(const Value: TPosition);');
     aSrc := FindAndReplace(aSrc, 'property Pivot: TPosition read GetPivot write SetPivot;','//property Pivot: TPosition read GetPivot write SetPivot;');
@@ -399,14 +402,51 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'procedure TouchTargetExpansionChanged(Sender: TObject); virtual;','procedure SetTouchTargetExpansion(const AValue: TRectF); override;');
     aSrc := FindAndReplace(aSrc, 'procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;','//procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;');
     aSrc := FindAndReplace(aSrc, 'property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;','//property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;');
+    aSrc := FindAndReplace(aSrc, 'AutoAlignToPixel := TALDynamicListBoxControl(Source).AutoAlignToPixel;','//AutoAlignToPixel := TALDynamicListBoxControl(Source).AutoAlignToPixel;');
+    aSrc := FindAndReplace(aSrc, 'AutoSize := TALDynamicListBoxControl(Source).AutoSize;','//AutoSize := TALDynamicListBoxControl(Source).AutoSize;');
+    aSrc := FindAndReplace(aSrc, 'DoubleBuffered := TALDynamicListBoxControl(Source).DoubleBuffered;','//DoubleBuffered := TALDynamicListBoxControl(Source).DoubleBuffered;');
+    aSrc := FindAndReplace(aSrc, 'Pivot.Assign(TALDynamicListBoxControl(Source).Pivot);','//Pivot.Assign(TALDynamicListBoxControl(Source).Pivot);');
+    aSrc := FindAndReplace(aSrc, 'Scale.assign(TALDynamicListBoxControl(Source).Scale);','//Scale.assign(TALDynamicListBoxControl(Source).Scale);');
+    aSrc := FindAndReplace(aSrc, 'Anchors := TALDynamicListBoxControl(Source).Anchors;','//Anchors := TALDynamicListBoxControl(Source).Anchors;');
+    aSrc := FindAndReplace(aSrc, 'CanFocus := TALDynamicListBoxControl(Source).CanFocus;','//CanFocus := TALDynamicListBoxControl(Source).CanFocus;');
+    aSrc := FindAndReplace(aSrc, 'CanParentFocus := TALDynamicListBoxControl(Source).CanParentFocus;','//CanParentFocus := TALDynamicListBoxControl(Source).CanParentFocus;');
+    aSrc := FindAndReplace(aSrc, 'ClipChildren := TALDynamicListBoxControl(Source).ClipChildren;','//ClipChildren := TALDynamicListBoxControl(Source).ClipChildren;');
+    aSrc := FindAndReplace(aSrc, 'ClipParent := TALDynamicListBoxControl(Source).ClipParent;','//ClipParent := TALDynamicListBoxControl(Source).ClipParent;');
+    aSrc := FindAndReplace(aSrc, 'DragMode := TALDynamicListBoxControl(Source).DragMode;','//DragMode := TALDynamicListBoxControl(Source).DragMode;');
+    aSrc := FindAndReplace(aSrc, 'EnableDragHighlight := TALDynamicListBoxControl(Source).EnableDragHighlight;','//EnableDragHighlight := TALDynamicListBoxControl(Source).EnableDragHighlight;');
+    aSrc := FindAndReplace(aSrc, 'Hint := TALDynamicListBoxControl(Source).Hint;','//Hint := TALDynamicListBoxControl(Source).Hint;');
+    aSrc := FindAndReplace(aSrc, 'Locked := TALDynamicListBoxControl(Source).Locked;','//Locked := TALDynamicListBoxControl(Source).Locked;');
+    aSrc := FindAndReplace(aSrc, 'ParentShowHint := TALDynamicListBoxControl(Source).ParentShowHint;','//ParentShowHint := TALDynamicListBoxControl(Source).ParentShowHint;');
+    aSrc := FindAndReplace(aSrc, 'Position.Assign(TALDynamicListBoxControl(Source).Position);','//Position.Assign(TALDynamicListBoxControl(Source).Position);');
+    aSrc := FindAndReplace(aSrc, 'RotationAngle := TALDynamicListBoxControl(Source).RotationAngle;','//RotationAngle := TALDynamicListBoxControl(Source).RotationAngle;');
+    aSrc := FindAndReplace(aSrc, 'ShowHint := TALDynamicListBoxControl(Source).ShowHint;','//ShowHint := TALDynamicListBoxControl(Source).ShowHint;');
+    aSrc := FindAndReplace(aSrc, 'Size.Assign(TALDynamicListBoxControl(Source).Size);','//Size.Assign(TALDynamicListBoxControl(Source).Size);');
+    aSrc := FindAndReplace(aSrc, 'StyleName := TALDynamicListBoxControl(Source).StyleName;','//StyleName := TALDynamicListBoxControl(Source).StyleName;');
+    aSrc := FindAndReplace(aSrc, 'TabOrder := TALDynamicListBoxControl(Source).TabOrder;','//TabOrder := TALDynamicListBoxControl(Source).TabOrder;');
+    aSrc := FindAndReplace(aSrc, 'TabStop := TALDynamicListBoxCustomTrack(Source).TabStop;','//TabStop := TALDynamicListBoxCustomTrack(Source).TabStop;');
+    aSrc := FindAndReplace(aSrc, 'TabStop := TALDynamicListBoxControl(Source).TabStop;','//TabStop := TALDynamicListBoxControl(Source).TabStop;');
+    aSrc := FindAndReplace(aSrc, 'TagFloat := TALDynamicListBoxControl(Source).TagFloat;','//TagFloat := TALDynamicListBoxControl(Source).TagFloat;');
+    aSrc := FindAndReplace(aSrc, 'TagObject := TALDynamicListBoxControl(Source).TagObject;','//TagObject := TALDynamicListBoxControl(Source).TagObject;');
+    aSrc := FindAndReplace(aSrc, 'TouchTargetExpansion.Assign(TALDynamicListBoxControl(Source).TouchTargetExpansion);','//TouchTargetExpansion.Assign(TALDynamicListBoxControl(Source).TouchTargetExpansion);');
+    aSrc := FindAndReplace(aSrc, 'OnDragEnter := TALDynamicListBoxControl(Source).OnDragEnter;','//OnDragEnter := TALDynamicListBoxControl(Source).OnDragEnter;');
+    aSrc := FindAndReplace(aSrc, 'OnDragLeave := TALDynamicListBoxControl(Source).OnDragLeave;','//OnDragLeave := TALDynamicListBoxControl(Source).OnDragLeave;');
+    aSrc := FindAndReplace(aSrc, 'OnDragOver := TALDynamicListBoxControl(Source).OnDragOver;','//OnDragOver := TALDynamicListBoxControl(Source).OnDragOver;');
+    aSrc := FindAndReplace(aSrc, 'OnDragDrop := TALDynamicListBoxControl(Source).OnDragDrop;','//OnDragDrop := TALDynamicListBoxControl(Source).OnDragDrop;');
+    aSrc := FindAndReplace(aSrc, 'OnDragEnd := TALDynamicListBoxControl(Source).OnDragEnd;','//OnDragEnd := TALDynamicListBoxControl(Source).OnDragEnd;');
+    aSrc := FindAndReplace(aSrc, 'OnKeyDown := TALDynamicListBoxControl(Source).OnKeyDown;','//OnKeyDown := TALDynamicListBoxControl(Source).OnKeyDown;');
+    aSrc := FindAndReplace(aSrc, 'OnKeyUp := TALDynamicListBoxControl(Source).OnKeyUp;','//OnKeyUp := TALDynamicListBoxControl(Source).OnKeyUp;');
+    aSrc := FindAndReplace(aSrc, 'OnDblClick := TALDynamicListBoxControl(Source).OnDblClick;','//OnDblClick := TALDynamicListBoxControl(Source).OnDblClick;');
+    aSrc := FindAndReplace(aSrc, 'OnCanFocus := TALDynamicListBoxControl(Source).OnCanFocus;','//OnCanFocus := TALDynamicListBoxControl(Source).OnCanFocus;');
+    aSrc := FindAndReplace(aSrc, 'OnEnter := TALDynamicListBoxControl(Source).OnEnter;','//OnEnter := TALDynamicListBoxControl(Source).OnEnter;');
+    aSrc := FindAndReplace(aSrc, 'OnExit := TALDynamicListBoxControl(Source).OnExit;','//OnExit := TALDynamicListBoxControl(Source).OnExit;');
+    aSrc := FindAndReplace(aSrc, 'OnMouseWheel := TALDynamicListBoxControl(Source).OnMouseWheel;','//OnMouseWheel := TALDynamicListBoxControl(Source).OnMouseWheel;');
+    aSrc := FindAndReplace(aSrc, 'OnResize := TALDynamicListBoxControl(Source).OnResize;','//OnResize := TALDynamicListBoxControl(Source).OnResize;');
+    aSrc := FindAndReplace(aSrc, 'OnActivate := TALDynamicListBoxControl(Source).OnActivate;','//OnActivate := TALDynamicListBoxControl(Source).OnActivate;');
+    aSrc := FindAndReplace(aSrc, 'OnDeactivate := TALDynamicListBoxControl(Source).OnDeactivate;','//OnDeactivate := TALDynamicListBoxControl(Source).OnDeactivate;');
+    aSrc := FindAndReplace(aSrc, 'DoMatrixChanged(Sender);','Repaint; // DoMatrixChanged(Sender);');
     aSrc := FindAndReplace(aSrc, 'Locked := True;', '//Locked := True;');
     aSrc := FindAndReplace(aSrc, 'procedure SetNewScene(AScene: IScene); override;','//procedure SetNewScene(AScene: IScene); override;');
-    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxExtendedControl = class(', #13#10'  end;');
-    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxShape = class(', #13#10'  end;');
-    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxImage = class(', #13#10'  end;');
-    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxBaseRectangle = class(', #13#10'  end;');
-    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'TALDynamicListBoxBaseText = class(', #13#10'  end;');
-    aSrc := FindAndReplace(aSrc, 'procedure Assign(Source: TPersistent)','//procedure Assign(Source: TPersistent)', 'Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); override;', #13#10'  end;');
+    aSrc := FindAndReplace(aSrc, 'Assign(Source: TPersistent{TALDynamicListBoxControl})','Assign(Source: TALDynamicListBoxControl)');
     aSrc := FindAndReplace(aSrc, 'procedure ApplyColorScheme; virtual;','procedure ApplyColorScheme; override;','TALDynamicListBoxExtendedControl = class(', #13#10'  end;');
     aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];','//FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];');
     aSrc := FindAndReplace(aSrc, 'FFadeOverlay.Parent := self;','//FFadeOverlay.Parent := self;');
@@ -890,12 +930,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('.GetParentedVisible: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetAlign: TALAlignLayout;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.IsFocusedChanged;', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicListBoxShape.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicListBoxImage.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicListBoxBaseRectangle.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicListBoxBaseText.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicListBoxButton.Assign(Source: TPersistent);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.MarginsChangedHandler(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicListBoxExtendedControl.MarginsChanged;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or

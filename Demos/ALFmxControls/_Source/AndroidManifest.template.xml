@@ -25,6 +25,10 @@
   
   <!-- ===== androidx.media3.exoplayer ===== -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <!-- ===== androidx.core ===== -->
+  <permission android:name="%package%.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              android:protectionLevel="signature"/>
+  <uses-permission android:name="%package%.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
   
   <!-- ========================================== -->
   <!-- AndroidMerger auto-generated section (END) -->
@@ -37,7 +41,7 @@
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
                android:icon="@mipmap/ic_launcher"
-               android:theme="@style/AppTheme"
+               android:theme="@style/Theme.App"
                android:hardwareAccelerated="%hardwareAccelerated%"
                android:usesCleartextTraffic="true"
                android:resizeableActivity="true"
@@ -92,13 +96,20 @@
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->
     
-    <!-- ===== androidx.profileinstaller ===== -->
+    <!-- ===== androidx.lifecycle.process ===== -->
     <provider android:name="androidx.startup.InitializationProvider"
               android:authorities="%package%.androidx-startup"
               android:exported="false">
+      <meta-data android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                 android:value="androidx.startup"/>
+      <!-- ===== androidx.profileinstaller ===== -->
       <meta-data android:name="androidx.profileinstaller.ProfileInstallerInitializer"
                  android:value="androidx.startup"/>
+      <!-- ===== androidx.emoji2 ===== -->
+      <meta-data android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                 android:value="androidx.startup"/>
     </provider>
+    <!-- ===== androidx.profileinstaller ===== -->
     <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver"
               android:directBootAware="false"
               android:enabled="true"

@@ -9,6 +9,8 @@ uses
   System.UITypes,
   FMX.Controls,
   Fmx.forms,
+  Alcinoe.FMX.Layouts,
+  Alcinoe.fmx.Dialogs,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.StdCtrls;
@@ -37,9 +39,9 @@ Type
       // -----------------
       // TDarkModeBehavior
       TDarkModeBehavior = (FollowSystem, AlwaysDark, AlwaysLight);
-      // -------------------
+      // --------------
       // TTextStyleInfo
-      TTextApplyStyleProc = Procedure(const AText: TALText; const AFontSize: Single);
+      TTextApplyStyleProc = Procedure(const AText: TALBaseText; const ARatio: Single = 1);
       TTextStyleInfo = record
       public
         SortOrder: Integer;
@@ -47,9 +49,9 @@ Type
         DefaultFontSize: Single;
         constructor create(const AApplyStyleProc: TTextApplyStyleProc; const ADefaultFontSize: Single);
       end;
-      // -------------------
+      // --------------
       // TEditStyleInfo
-      TEditApplyStyleProc = Procedure(const AEdit: TALBaseEdit; const AFontSize: Single);
+      TEditApplyStyleProc = Procedure(const AEdit: TALBaseEdit; const ARatio: Single = 1);
       TEditStyleInfo = record
       public
         SortOrder: Integer;
@@ -57,19 +59,20 @@ Type
         DefaultFontSize: Single;
         constructor create(const AApplyStyleProc: TEditApplyStyleProc; const ADefaultFontSize: Single);
       end;
-      // ---------------------
+      // ----------------
       // TButtonStyleInfo
-      TButtonApplyStyleProc = Procedure(const AButton: TALButton; const AFontSize: Single);
+      TButtonApplyStyleProc = Procedure(const AButton: TALButton; const ARatio: Single = 1);
       TButtonStyleInfo = record
       public
         SortOrder: Integer;
         ApplyStyleProc: TButtonApplyStyleProc;
         DefaultFontSize: Single;
-        constructor create(const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single);
+        DefaultHeight: Single;
+        constructor create(const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single; const ADefaultHeight: Single);
       end;
-      // -----------------------
+      // ------------------
       // TCheckBoxStyleInfo
-      TCheckBoxApplyStyleProc = Procedure(const ACheckBox: TALCheckBox; const AHeight: Single);
+      TCheckBoxApplyStyleProc = Procedure(const ACheckBox: TALBaseCheckBox; const ARatio: Single = 1);
       TCheckBoxStyleInfo = record
       public
         SortOrder: Integer;
@@ -77,9 +80,9 @@ Type
         DefaultHeight: Single;
         constructor create(const AApplyStyleProc: TCheckBoxApplyStyleProc; const ADefaultHeight: Single);
       end;
-      // --------------------------
+      // ---------------------
       // TRadioButtonStyleInfo
-      TRadioButtonApplyStyleProc = Procedure(const ARadioButton: TALRadioButton; const AHeight: Single);
+      TRadioButtonApplyStyleProc = Procedure(const ARadioButton: TALRadioButton; const ARatio: Single = 1);
       TRadioButtonStyleInfo = record
       public
         SortOrder: Integer;
@@ -87,9 +90,9 @@ Type
         DefaultHeight: Single;
         constructor create(const AApplyStyleProc: TRadioButtonApplyStyleProc; const ADefaultHeight: Single);
       end;
-      // ---------------------
+      // ----------------
       // TSwitchStyleInfo
-      TSwitchApplyStyleProc = Procedure(const ASwitch: TALSwitch; const AHeight: Single);
+      TSwitchApplyStyleProc = Procedure(const ASwitch: TALSwitch; const ARatio: Single = 1);
       TSwitchStyleInfo = record
       public
         SortOrder: Integer;
@@ -97,20 +100,60 @@ Type
         DefaultHeight: Single;
         constructor create(const AApplyStyleProc: TSwitchApplyStyleProc; const ADefaultHeight: Single);
       end;
-      // -----------------------
+      // ------------------
       // TTrackBarStyleInfo
-      TTrackBarApplyStyleProc = Procedure(const ATrackBar: TALCustomTrack; const AHeight: Single);
+      TTrackBarApplyStyleProc = Procedure(const ATrackBar: TALCustomTrack; const ARatio: Single = 1);
       TTrackBarStyleInfo = record
       public
         SortOrder: Integer;
         ApplyStyleProc: TTrackBarApplyStyleProc;
-        DefaultHeight: Single;
-        constructor create(const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
+        DefaultSize: Single;
+        constructor create(const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultSize: Single);
+      end;
+      // ------------------
+      // TScrollBarStyleInfo
+      TScrollBarApplyStyleProc = Procedure(const AScrollBar: TALCustomScrollBar; const ARatio: Single = 1);
+      TScrollBarStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TScrollBarApplyStyleProc;
+        DefaultSize: Single;
+        constructor create(const AApplyStyleProc: TScrollBarApplyStyleProc; const ADefaultSize: Single);
+      end;
+      // ------------------
+      // TScrollBoxStyleInfo
+      TScrollBoxApplyStyleProc = Procedure(const AScrollBox: TALCustomScrollBox);
+      TScrollBoxStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TScrollBoxApplyStyleProc;
+        constructor create(const AApplyStyleProc: TScrollBoxApplyStyleProc);
+      end;
+      // -----------------------
+      // TDialogManagerStyleInfo
+      TDialogManagerApplyStyleProc = Procedure(const ADialogManager: TALDialogManager; const ARatio: Single = 1);
+      TDialogManagerStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TDialogManagerApplyStyleProc;
+        DefaultFontSize: Single;
+        constructor create(const AApplyStyleProc: TDialogManagerApplyStyleProc; const ADefaultFontSize: Single);
+      end;
+      // ----------------
+      // TDialogStyleInfo
+      TDialogApplyStyleProc = Procedure(const ADialog: TALDialog; const ARatio: Single = 1);
+      TDialogStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TDialogApplyStyleProc;
+        DefaultFontSize: Single;
+        constructor create(const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
       end;
   private
     FLightColors: TDictionary<string, TPair<TAlphaColor, integer{SortOrder}>>;
     FDarkColors: TDictionary<string, TPair<TAlphaColor, integer{SortOrder}>>;
     FColors: TDictionary<string, TAlphaColor>;
+    FFontFamilies: TDictionary<string, string>;
     FTextStyles: TDictionary<String, TTextStyleInfo>;
     FEditStyles: TDictionary<String, TEditStyleInfo>;
     FMemoStyles: TDictionary<String, TEditStyleInfo>;
@@ -120,6 +163,10 @@ Type
     FSwitchStyles: TDictionary<String, TSwitchStyleInfo>;
     FTrackBarStyles: TDictionary<String, TTrackBarStyleInfo>;
     FRangeTrackBarStyles: TDictionary<String, TTrackBarStyleInfo>;
+    FScrollBarStyles: TDictionary<String, TScrollBarStyleInfo>;
+    FScrollBoxStyles: TDictionary<String, TScrollBoxStyleInfo>;
+    FDialogManagerStyles: TDictionary<String, TDialogManagerStyleInfo>;
+    FDialogStyles: TDictionary<String, TDialogStyleInfo>;
     FIsDarkMode: Boolean;
     function GetSystemIsDarkMode: Boolean;
     function GetDarkModeBehavior: TDarkModeBehavior;
@@ -135,28 +182,53 @@ Type
     procedure ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorName: String); virtual;
     //--
     procedure AddOrSetColor(const AName: String; Const AValue: TAlphaColor; Const AIsForDarkMode: Boolean);
+    procedure AddOrSetFontFamily(const AName: String; Const AValue: String);
     procedure AddOrSetTextStyle(const AName: String; const AApplyStyleProc: TTextApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetEditStyle(const AName: String; const AApplyStyleProc: TEditApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetMemoStyle(const AName: String; const AApplyStyleProc: TEditApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetButtonStyle(const AName: String; const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetButtonIconStyle(const AName: String; const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultHeight: Single);
     procedure AddOrSetCheckBoxStyle(const AName: String; const AApplyStyleProc: TCheckBoxApplyStyleProc; const ADefaultHeight: Single);
     procedure AddOrSetRadioButtonStyle(const AName: String; const AApplyStyleProc: TRadioButtonApplyStyleProc; const ADefaultHeight: Single);
     procedure AddOrSetSwitchStyle(const AName: String; const AApplyStyleProc: TSwitchApplyStyleProc; const ADefaultHeight: Single);
-    procedure AddOrSetTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
-    procedure AddOrSetRangeTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
+    procedure AddOrSetTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultSize: Single);
+    procedure AddOrSetRangeTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultSize: Single);
+    procedure AddOrSetScrollBarStyle(const AName: String; const AApplyStyleProc: TScrollBarApplyStyleProc; const ADefaultSize: Single);
+    procedure AddOrSetScrollBoxStyle(const AName: String; const AApplyStyleProc: TScrollBoxApplyStyleProc);
+    procedure AddOrSetDialogManagerStyle(const AName: String; const AApplyStyleProc: TDialogManagerApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
     //--
     function GetColor(const AName: String): TAlphaColor;
-    procedure ApplyTextStyle(const AName: String; const AText: TALText);
-    procedure ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit);
-    procedure ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit);
-    procedure ApplyButtonStyle(const AName: String; const AButton: TALButton);
-    procedure ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox);
-    procedure ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton);
-    procedure ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch);
-    procedure ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack);
-    procedure ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack);
+    function GetFontFamily(const AName: String): String;
+    procedure ApplyTextStyle(const AName: String; const AText: TALText; const AFontSize: Single); overload;
+    procedure ApplyTextStyle(const AName: String; const AText: TALText); overload;
+    procedure ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit; const AFontSize: Single); overload;
+    procedure ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit); overload;
+    procedure ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit; const AFontSize: Single); overload;
+    procedure ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit); overload;
+    procedure ApplyButtonStyle(const AName: String; const AButton: TALButton; const AFontSize: Single); overload;
+    procedure ApplyButtonIconStyle(const AName: String; const AButton: TALButton; const AHeight: Single);
+    procedure ApplyButtonStyle(const AName: String; const AButton: TALButton); overload;
+    procedure ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox; const AHeight: Single); overload;
+    procedure ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox); overload;
+    procedure ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton; const AHeight: Single); overload;
+    procedure ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton); overload;
+    procedure ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch; const AHeight: Single); overload;
+    procedure ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch); overload;
+    procedure ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack; const ASize: Single); overload;
+    procedure ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack); overload;
+    procedure ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack; const ASize: Single); overload;
+    procedure ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack); overload;
+    procedure ApplyScrollBarStyle(const AName: String; const AScrollBar: TALCustomScrollBar; const ASize: Single); overload;
+    procedure ApplyScrollBarStyle(const AName: String; const AScrollBar: TALCustomScrollBar); overload;
+    procedure ApplyScrollBoxStyle(const AName: String; const AScrollBox: TALCustomScrollBox);
+    procedure ApplyDialogManagerStyle(const AName: String; const ADialogManager: TALDialogManager; const AFontSize: Single); overload;
+    procedure ApplyDialogManagerStyle(const AName: String; const ADialogManager: TALDialogManager); overload;
+    procedure ApplyDialogStyle(const AName: String; const ADialog: TALDialog; const AFontSize: Single); overload;
+    procedure ApplyDialogStyle(const AName: String; const ADialog: TALDialog); overload;
     //--
     function GetColorNames: TArray<String>;
+    function GetFontFamilyNames: TArray<String>;
     function GetTextStyleNames: TArray<String>;
     function GetEditStyleNames: TArray<String>;
     function GetMemoStyleNames: TArray<String>;
@@ -166,6 +238,10 @@ Type
     function GetSwitchStyleNames: TArray<String>;
     function GetTrackBarStyleNames: TArray<String>;
     function GetRangeTrackBarStyleNames: TArray<String>;
+    function GetScrollBarStyleNames: TArray<String>;
+    function GetScrollBoxStyleNames: TArray<String>;
+    function GetDialogManagerStyleNames: TArray<String>;
+    function GetDialogStyleNames: TArray<String>;
   end;
 
 implementation
@@ -175,8 +251,10 @@ uses
   System.SysUtils,
   System.Types,
   System.Math,
+  System.math.Vectors,
   FMX.Platform,
   FMX.types,
+  FMX.Graphics,
   {$IF defined(ANDROID)}
   Androidapi.Helpers,
   Androidapi.JNI.App,
@@ -187,6 +265,8 @@ uses
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.Helpers,
+  Macapi.ObjectiveC,
+  iOSapi.Foundation,
   iOSapi.Helpers,
   iOSapi.UIKit,
   Alcinoe.iOSapi.UIKit,
@@ -196,18 +276,17 @@ uses
   {$ENDIF}
   Alcinoe.Common,
   Alcinoe.StringUtils,
+  Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.UserPreferences,
   Alcinoe.FMX.Graphics;
 
-type
-  TALControlAccessProtected = Class(TALControl);
-
-{****************************************************************************************}
-function ALGetStyleSizeRatio(const ACaption: String; const ADefaultValue: Single): Single;
+{**********************************************************************************************************}
+function ALGetStyleRatio(const ACaption: String; const AValue: Single; const ADefaultValue: Single): Single;
 begin
-  var LValueF: Single := ADefaultValue;
+  if ADefaultValue = 0 then exit(1);
+  var LValueF: Single := AValue;
   {$IF defined(ALDPK)}
   While True do begin
     var LValueStr := InputBox(ACaption, '', ALFloatToStrW(ADefaultValue, ALDefaultFormatSettingsW));
@@ -217,34 +296,190 @@ begin
   Result := LValueF / ADefaultValue;
 end;
 
-//////////
-// TEXT //
-//////////
-
-{*****************************************************************************}
-procedure ALResetTextStyle(const AText: TALText; const AFontSize: Single = 16);
+{***********************************************************************}
+function ALEstimateLineHeightMultiplier(Const AFontSize: Single): Single;
 begin
-  With AText do begin
+  // Excellent reference:
+  // https://pimpmytype.com/line-length-line-height
+  // There is no universal rule for ideal line height — it depends on many factors
+  // such as line length, typeface, font size, device, and context.
+  // This function provides an approximate estimation only.
+  case round(AFontSize) of
+    10: Result := 1.33;
+    11: Result := 1.33; // 16/12 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
+    12: Result := 1.33; // 16/12 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
+    13: Result := 1.50;
+    14: Result := 1.43; // 20/14 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
+    15: Result := 1.48;
+    16: Result := 1.50; // 24/16 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
+    17: Result := 1.45;
+    18: result := 1.42;
+    19: Result := 1.40;
+    20: Result := 1.37;
+    21: Result := 1.32;
+    22: result := 1.27; // 28/22 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
+    23: Result := 1.33;
+    24: result := 1.33; // 32/24 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
+    else
+      Result := 0;
+  end;
+end;
+
+/////////////
+// CONTROL //
+/////////////
+
+{**********************************************************************************}
+procedure ALResetControlStyle(const AControl: TALControl; const ARatio: Single = 1);
+begin
+  //With AControl do begin
+    //BeginUpdate;
+    //Try
+      // --TALControl
+      //Align
+      //AutoAlignToPixel
+      //AutoSize
+      //DoubleBuffered
+      //Pivot
+      //Scale
+      // --TControl
+      //Anchors
+      //CanFocus
+      //CanParentFocus
+      //ClipChildren
+      //ClipParent
+      //Cursor
+      //DisabledOpacity
+      //DragMode
+      //EnableDragHighlight
+      //Enabled
+      //Hint
+      //HitTest
+      //Locked
+      //Margins
+      //Opacity
+      //Padding
+      //ParentShowHint
+      //Position
+      //RotationAngle
+      //ShowHint
+      //Size
+      //StyleName
+      //TabOrder
+      //TabStop
+      //Tag
+      //TagFloat
+      //TagObject
+      //TagString
+      //TouchTargetExpansion
+      //Visible
+    //Finally
+      //EndUpdate;
+    //End;
+  //end;
+end;
+
+///////////
+// SHAPE //
+///////////
+
+{****************************************************************************}
+procedure ALResetShapeStyle(const AShape: TALShape; const ARatio: Single = 1);
+begin
+  With AShape do begin
     BeginUpdate;
     Try
-      var LRatio: Single := AFontSize / TextSettings.Font.DefaultSize;
-      AutoSize := True;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := 0;
-      YRadius := 0;
+      ALResetControlStyle(AShape, ARatio);
       Fill.Reset;
       Stroke.Reset;
-      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * LRatio, -2);
+      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * ARatio, -2);
       Shadow.Reset;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * LRatio, -2);
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+///////////////
+// RECTANGLE //
+///////////////
+
+{********************************************************************************************}
+procedure ALResetRectangleStyle(const ARectangle: TALBaseRectangle; const ARatio: Single = 1);
+begin
+  With ARectangle do begin
+    BeginUpdate;
+    Try
+      ALResetShapeStyle(ARectangle, ARatio);
+      //DoubleBuffered
+      XRadius := ARectangle.DefaultXRadius;
+      YRadius := ARectangle.DefaultYRadius;
+      if XRadius > 0 then XRadius := RoundTo(XRadius * ARatio, -2);
+      if YRadius > 0 then YRadius := RoundTo(YRadius * ARatio, -2);
+      Corners := ARectangle.DefaultCorners;
+      Sides := ARectangle.DefaultSides;
+      //CacheIndex
+      //CacheEngine
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+////////////
+// LAYOUT //
+////////////
+
+{*******************************************************************************}
+procedure ALResetLayoutStyle(const ALayout: TALLayout; const ARatio: Single = 1);
+begin
+  //With ALayout do begin
+    //BeginUpdate;
+    //Try
+      //ALResetControlStyle(AShape, ARatio);
+    //Finally
+      //EndUpdate;
+    //End;
+  //end;
+end;
+
+///////////
+// IMAGE //
+///////////
+
+{****************************************************************************}
+procedure ALResetImageStyle(const AImage: TALImage; const ARatio: Single = 1);
+begin
+  With AImage do begin
+    BeginUpdate;
+    Try
+      ALResetControlStyle(AImage, ARatio);
+      BackgroundColor := DefaultBackgroundColor;
+      BackgroundColorKey := DefaultBackgroundColorKey;
+      LoadingColor := DefaultLoadingColor;
+      LoadingColorKey := DefaultLoadingColorKey;
+      //ResourceName
+      //MaskResourceName
+      //MaskBitmap
+      //ReadyAfterResourcesLoaded
+      //WrapMode
+      //ExifOrientationInfo
+      //RotateAccordingToExifOrientation
+      Corners := DefaultCorners;
+      Sides := DefaultSides;
+      XRadius := DefaultXRadius;
+      YRadius := DefaultYRadius;
+      if XRadius > 0 then XRadius := RoundTo(XRadius * ARatio, -2);
+      if YRadius > 0 then YRadius := RoundTo(YRadius * ARatio, -2);
+      BlurRadius := DefaultBlurRadius;
+      //CacheIndex
+      //LoadingCacheIndex
+      //CacheEngine
+      //CropCenter
+      Stroke.Reset;
+      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * ARatio, -2);
+      Shadow.Reset;
+      //FadeInDuration
     Finally
       EndUpdate;
     End;
@@ -252,55 +487,400 @@ begin
 end;
 
 //////////
+// TEXT //
+//////////
+
+Type
+  _TALBaseTextProtectedAccess = Class(TALBaseText);
+
+{*****************************************************************************}
+procedure ALResetTextStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+  With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      ALResetShapeStyle(AText, ARatio);
+      //DoubleBuffered
+      //CacheIndex
+      //CacheEngine
+      //AutoTranslate
+      //Text
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * ARatio, -2);
+      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * ARatio, -2);
+      //MaxWidth
+      //MaxHeight
+      XRadius := DefaultXRadius;
+      YRadius := DefaultYRadius;
+      if XRadius > 0 then XRadius := RoundTo(XRadius * ARatio, -2);
+      if YRadius > 0 then YRadius := RoundTo(YRadius * ARatio, -2);
+      Corners := AllCorners;
+      Sides := AllSides;
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+{*************************************************************************************************}
+procedure ALApplyMaterialTextDisplayLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 57;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 64/TextSettings.font.Size;
+      TextSettings.LetterSpacing := -0.25;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{**************************************************************************************************}
+procedure ALApplyMaterialTextDisplayMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 45;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 52/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{*************************************************************************************************}
+procedure ALApplyMaterialTextDisplaySmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 36;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 44/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{**************************************************************************************************}
+procedure ALApplyMaterialTextHeadlineLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 32;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 40/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***************************************************************************************************}
+procedure ALApplyMaterialTextHeadlineMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 28;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 36/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{**************************************************************************************************}
+procedure ALApplyMaterialTextHeadlineSmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 24;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 32/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***********************************************************************************************}
+procedure ALApplyMaterialTextTitleLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 22;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 28/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{************************************************************************************************}
+procedure ALApplyMaterialTextTitleMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 16;
+      TextSettings.Font.Weight := TFontWeight.Medium;
+      TextSettings.LineHeightMultiplier := 24/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.15;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***********************************************************************************************}
+procedure ALApplyMaterialTextTitleSmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 14;
+      TextSettings.Font.Weight := TFontWeight.Medium;
+      TextSettings.LineHeightMultiplier := 20/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.1;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{**********************************************************************************************}
+procedure ALApplyMaterialTextBodyLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 16;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 24/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.5;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***********************************************************************************************}
+procedure ALApplyMaterialTextBodyMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 14;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 20/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.25;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{**********************************************************************************************}
+procedure ALApplyMaterialTextBodySmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 12;
+      TextSettings.Font.Weight := TFontWeight.Regular;
+      TextSettings.LineHeightMultiplier := 16/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.4;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***********************************************************************************************}
+procedure ALApplyMaterialTextLabelLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 14;
+      TextSettings.Font.Weight := TFontWeight.Medium;
+      TextSettings.LineHeightMultiplier := 20/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.1;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{************************************************************************************************}
+procedure ALApplyMaterialTextLabelMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 12;
+      TextSettings.Font.Weight := TFontWeight.Medium;
+      TextSettings.LineHeightMultiplier := 16/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.5;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***********************************************************************************************}
+procedure ALApplyMaterialTextLabelSmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
+begin
+   With _TALBaseTextProtectedAccess(AText) do begin
+    BeginUpdate;
+    Try
+      var LPrevFontColor := TextSettings.Font.Color;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.Font.Color := LPrevFontColor;
+      TextSettings.Font.Size := 11;
+      TextSettings.Font.Weight := TFontWeight.Medium;
+      TextSettings.LineHeightMultiplier := 16/TextSettings.font.Size;
+      TextSettings.LetterSpacing := 0.5;
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+//////////
 // EDIT //
 //////////
 
-{*********************************************************************************}
-procedure ALResetEditStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+{*****************************************************************************}
+procedure ALResetEditStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
   With AEdit do begin
     BeginUpdate;
     Try
-      var LRatio: Single := AFontSize / TextSettings.Font.DefaultSize;
+      ALResetRectangleStyle(AEdit, ARatio);
       if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
       else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 0;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := 0;
-      YRadius := 0;
+      //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
+      Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
+      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
       TintColor := TalphaColors.null;
       TintColorKey := '';
       PromptTextcolor := TAlphaColors.null;
       PromptTextcolorKey := '';
       DefStyleAttr := '';
       DefStyleRes := '';
-      Fill.Reset;
-      Stroke.Reset;
-      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * LRatio, -2);
-      Shadow.Reset;
       //--
       var LPrevIsHtml := TextSettings.IsHtml;
       TextSettings.Reset;
-      TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * LRatio, -2);
       TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
+      TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * ARatio, -2);
+      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * ARatio, -2);
       //--
       LPrevIsHtml := LabelTextSettings.IsHtml;
       LabelTextSettings.Reset;
-      LabelTextSettings.Font.Size := RoundTo(LabelTextSettings.Font.DefaultSize * LRatio, -2);
       LabelTextSettings.IsHtml := LPrevIsHtml;
-      LabelTextSettings.LetterSpacing := RoundTo(LabelTextSettings.DefaultLetterSpacing * LRatio, -2);
-      LabelTextSettings.Margins.Rect := ALScaleRect(LabelTextSettings.Margins.DefaultValue, LRatio).RoundTo(-2);
+      LabelTextSettings.Font.Size := RoundTo(LabelTextSettings.Font.DefaultSize * ARatio, -2);
+      LabelTextSettings.LetterSpacing := RoundTo(LabelTextSettings.DefaultLetterSpacing * ARatio, -2);
+      LabelTextSettings.Margins.Rect := ALScaleRect(LabelTextSettings.Margins.DefaultValue, ARatio).RoundTo(-2);
       //--
       LPrevIsHtml := SupportingTextSettings.IsHtml;
       SupportingTextSettings.Reset;
-      SupportingTextSettings.Font.Size := RoundTo(SupportingTextSettings.Font.DefaultSize * LRatio, -2);
       SupportingTextSettings.IsHtml := LPrevIsHtml;
-      SupportingTextSettings.LetterSpacing := RoundTo(SupportingTextSettings.DefaultLetterSpacing * LRatio, -2);
-      //SupportingTextSettings.Margins.Rect := ALScaleRect(SupportingTextSettings.Margins.DefaultValue, LRatio).RoundTo(-2);
+      SupportingTextSettings.Font.Size := RoundTo(SupportingTextSettings.Font.DefaultSize * ARatio, -2);
+      SupportingTextSettings.LetterSpacing := RoundTo(SupportingTextSettings.DefaultLetterSpacing * ARatio, -2);
+      //SupportingTextSettings.Margins.Rect := ALScaleRect(SupportingTextSettings.Margins.DefaultValue, ARatio).RoundTo(-2);
       //--
       StateStyles.Reset;
     Finally
@@ -311,65 +891,65 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
-procedure ALApplyMaterial3EditFilledStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+procedure ALApplyMaterialEditFilledStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
   With AEdit do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetEditStyle(AEdit, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(16*LRatio{Left}, 12*LRatio{Top}, 16*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetEditStyle(AEdit, ARatio);
+      padding.Rect := TRectF.Create(16*ARatio{Left}, 12*ARatio{Top}, 16*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       Corners := [TCorner.TopLeft, Tcorner.TopRight];
       Sides := [TSide.Bottom];
-      XRadius := RoundTo(4 * LRatio, -2);
-      YRadius := RoundTo(4 * LRatio, -2);
-      DefStyleAttr := 'material3EditFilled';
-      TintColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      Fill.ColorKey := 'Material3.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
-      Stroke.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      XRadius := RoundTo(4 * ARatio, -2);
+      YRadius := RoundTo(4 * ARatio, -2);
+      DefStyleAttr := 'MaterialEditFilled';
+      TintColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ColorKey := 'Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Stroke.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.Inline;
-      LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*LRatio,0,4*LRatio).RoundTo(-2);
+      LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*ARatio,0,4*ARatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
-      SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
-      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha04'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha04'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.Stroke.assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
-      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
-      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
       StateStyles.Hovered.Stroke.assign(Stroke);
       StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.Stroke.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Focused--
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.Inherit := False;
-      StateStyles.Focused.Stroke.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.Stroke.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * ARatio, -2);
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
-      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Focused.PromptTextcolorKey := StateStyles.Focused.LabelTextSettings.Font.ColorKey;
 
     finally
@@ -380,62 +960,62 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#e4964192-72ad-414f-85b4-4b4357abb83c
-procedure ALApplyMaterial3EditOutlinedStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+procedure ALApplyMaterialEditOutlinedStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
   With AEdit do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetEditStyle(AEdit, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(16*LRatio{Left}, 16*LRatio{Top}, 16*LRatio{Right}, 16*LRatio{Bottom}).RoundTo(-2);
-      XRadius := RoundTo(4 * LRatio, -2);
-      YRadius := RoundTo(4 * LRatio, -2);
-      DefStyleAttr := 'material3EditOutlined';
-      TintColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      Fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
-      Stroke.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      ALResetEditStyle(AEdit, ARatio);
+      padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
+      XRadius := RoundTo(4 * ARatio, -2);
+      YRadius := RoundTo(4 * ARatio, -2);
+      DefStyleAttr := 'MaterialEditOutlined';
+      TintColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.floating;
-      LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      LabelTextSettings.Margins.Rect := TRectF.Create(0,0,0,-6*LRatio).RoundTo(-2);
+      LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,0,0,-6*ARatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
-      SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
-      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
-      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
-      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
       //--Hovered--
       StateStyles.Hovered.Stroke.assign(Stroke);
       StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.Stroke.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
-      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
       //--Focused--
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.Inherit := False;
-      StateStyles.Focused.Stroke.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.Stroke.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * ARatio, -2);
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
-      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Focused.PromptTextcolorKey := StateStyles.Focused.LabelTextSettings.Font.ColorKey;
 
     finally
@@ -446,62 +1026,62 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
-procedure ALApplyMaterial3EditHybridStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+procedure ALApplyMaterialEditHybridStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
   With AEdit do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetEditStyle(AEdit, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(16*LRatio{Left}, 16*LRatio{Top}, 16*LRatio{Right}, 16*LRatio{Bottom}).RoundTo(-2);
-      XRadius := RoundTo(4 * LRatio, -2);
-      YRadius := RoundTo(4 * LRatio, -2);
-      DefStyleAttr := 'material3EditOutlined';
-      TintColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      Fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
-      Stroke.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      ALResetEditStyle(AEdit, ARatio);
+      padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
+      XRadius := RoundTo(4 * ARatio, -2);
+      YRadius := RoundTo(4 * ARatio, -2);
+      DefStyleAttr := 'MaterialEditOutlined';
+      TintColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.Inline;
-      LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*LRatio,0,4*LRatio).RoundTo(-2);
+      LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*ARatio,0,4*ARatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
-      SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
-      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
-      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
-      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
       //--Hovered--
       StateStyles.Hovered.Stroke.assign(Stroke);
       StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.Stroke.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
-      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
       //--Focused--
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.Inherit := False;
-      StateStyles.Focused.Stroke.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.Stroke.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * ARatio, -2);
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
-      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.LabelTextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Focused.PromptTextcolorKey := StateStyles.Focused.LabelTextSettings.Font.ColorKey;
 
     finally
@@ -512,65 +1092,65 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
-procedure ALApplyMaterial3EditFilledErrorStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+procedure ALApplyMaterialEditFilledErrorStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
   With AEdit do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetEditStyle(AEdit, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(16*LRatio{Left}, 12*LRatio{Top}, 16*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetEditStyle(AEdit, ARatio);
+      padding.Rect := TRectF.Create(16*ARatio{Left}, 12*ARatio{Top}, 16*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       Corners := [TCorner.TopLeft, Tcorner.TopRight];
       Sides := [TSide.Bottom];
-      XRadius := RoundTo(4 * LRatio, -2);
-      YRadius := RoundTo(4 * LRatio, -2);
-      DefStyleAttr := 'material3EditFilledError';
-      TintColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      Fill.ColorKey := 'Material3.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
-      Stroke.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      XRadius := RoundTo(4 * ARatio, -2);
+      YRadius := RoundTo(4 * ARatio, -2);
+      DefStyleAttr := 'MaterialEditFilledError';
+      TintColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      Fill.ColorKey := 'Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.Inline;
-      LabelTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*LRatio,0,4*LRatio).RoundTo(-2);
+      LabelTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*ARatio,0,4*ARatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
-      SupportingTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
-      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha04'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha04'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.Stroke.assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
-      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
-      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
       StateStyles.Hovered.Stroke.assign(Stroke);
       StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.Stroke.ColorKey := 'Material.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
-      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
       StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
       //--Focused--
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.Inherit := False;
-      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * ARatio, -2);
       StateStyles.Focused.PromptTextcolorKey := LabelTextSettings.Font.ColorKey;
 
     finally
@@ -581,58 +1161,58 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#e4964192-72ad-414f-85b4-4b4357abb83c
-procedure ALApplyMaterial3EditOutlinedErrorStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+procedure ALApplyMaterialEditOutlinedErrorStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
   With AEdit do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetEditStyle(AEdit, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(16*LRatio{Left}, 16*LRatio{Top}, 16*LRatio{Right}, 16*LRatio{Bottom}).RoundTo(-2);
-      XRadius := RoundTo(4 * LRatio, -2);
-      YRadius := RoundTo(4 * LRatio, -2);
-      DefStyleAttr := 'material3EditOutlinedError';
-      TintColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      Fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
-      Stroke.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      ALResetEditStyle(AEdit, ARatio);
+      padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
+      XRadius := RoundTo(4 * ARatio, -2);
+      YRadius := RoundTo(4 * ARatio, -2);
+      DefStyleAttr := 'MaterialEditOutlinedError';
+      TintColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.floating;
-      LabelTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      LabelTextSettings.Margins.Rect := TRectF.Create(0,0,0,-6*LRatio).RoundTo(-2);
+      LabelTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,0,0,-6*ARatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
-      SupportingTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
-      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
-      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
-      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
       //--Hovered--
       StateStyles.Hovered.Stroke.assign(Stroke);
       StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.Stroke.ColorKey := 'Material.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
-      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
       StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
       //--Focused--
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.Inherit := False;
-      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * ARatio, -2);
       StateStyles.Focused.PromptTextcolorKey := LabelTextSettings.Font.ColorKey;
 
     finally
@@ -643,58 +1223,58 @@ end;
 
 {****************************************************************************************}
 //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
-procedure ALApplyMaterial3EditHybridErrorStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+procedure ALApplyMaterialEditHybridErrorStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the edit', AFontSize);
   With AEdit do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetEditStyle(AEdit, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(16*LRatio{Left}, 16*LRatio{Top}, 16*LRatio{Right}, 16*LRatio{Bottom}).RoundTo(-2);
-      XRadius := RoundTo(4 * LRatio, -2);
-      YRadius := RoundTo(4 * LRatio, -2);
-      DefStyleAttr := 'material3EditOutlinedError';
-      TintColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      Fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
-      Stroke.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      ALResetEditStyle(AEdit, ARatio);
+      padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
+      XRadius := RoundTo(4 * ARatio, -2);
+      YRadius := RoundTo(4 * ARatio, -2);
+      DefStyleAttr := 'MaterialEditOutlinedError';
+      TintColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       LabelTextSettings.Layout := TALEdit.TLabelTextLayout.Inline;
-      LabelTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*LRatio,0,4*LRatio).RoundTo(-2);
+      LabelTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      LabelTextSettings.Margins.Rect := TRectF.Create(0,-4*ARatio,0,4*ARatio).RoundTo(-2);
       SupportingTextSettings.Layout := TALEdit.TSupportingTextLayout.Inline;
-      SupportingTextSettings.Font.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
-      PromptTextColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      SupportingTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
+      PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
-      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.LabelTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
-      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.PromptTextcolorKey := StateStyles.Disabled.LabelTextSettings.Font.ColorKey;
       //--Hovered--
       StateStyles.Hovered.Stroke.assign(Stroke);
       StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.Stroke.ColorKey := 'Material.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
-      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material3.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
+      StateStyles.Hovered.LabelTextSettings.Font.ColorKey := 'Material.Color.OnErrorContainer'; // md.sys.color.on-error-container / md.ref.palette.error30 / #8C1D18
       StateStyles.Hovered.PromptTextcolorKey := StateStyles.Hovered.LabelTextSettings.Font.ColorKey;
       //--Focused--
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.Inherit := False;
-      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * LRatio, -2);
+      StateStyles.Focused.Stroke.Thickness := RoundTo(3 * ARatio, -2);
       StateStyles.Focused.PromptTextcolorKey := LabelTextSettings.Font.ColorKey;
 
     finally
@@ -707,30 +1287,17 @@ end;
 // BUTTON //
 ////////////
 
-{***********************************************************************************}
-procedure ALResetButtonStyle(const AButton: TALButton; const AFontSize: Single = 14);
+{*******************************************************************************}
+procedure ALResetButtonStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   With AButton do begin
     BeginUpdate;
     Try
-      var LRatio: Single := AFontSize / TextSettings.Font.DefaultSize;
+      ALResetTextStyle(AButton, ARatio);
       AutoSize := True;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := 0;
-      YRadius := 0;
-      Fill.Reset;
-      Stroke.Reset;
-      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * LRatio, -2);
-      Shadow.Reset;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * LRatio, -2);
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
+      //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
+      Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
+      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
       StateStyles.Reset;
     Finally
       EndUpdate;
@@ -740,45 +1307,51 @@ end;
 
 {************************************************************************************}
 //https://m3.material.io/components/buttons/specs#cbfd91a6-d688-4be7-9a69-672549de3ea9
-procedure ALApplyMaterial3ButtonFilledStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonFilledStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the button', AFontSize);
   With AButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetButtonStyle(AButton, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(24*LRatio{Left}, 12*LRatio{Top}, 24*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetButtonStyle(AButton, ARatio);
+      padding.Rect := TRectF.Create(24*ARatio{Left}, 12*ARatio{Top}, 24*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       XRadius := -50;
       YRadius := -50;
-      Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Stroke.Color := Talphacolors.Null;
       Stroke.ColorKey := '';
-      TextSettings.Font.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
-      TextSettings.LetterSpacing := RoundTo(0.1 * LRatio, -2);
+      TextSettings.Font.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
-      StateStyles.Hovered.Shadow.blur := RoundTo(2 * LRatio, -2);
-      StateStyles.Hovered.Shadow.OffsetY := RoundTo(1 * LRatio, -2);
+      StateStyles.Hovered.Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+      StateStyles.Hovered.Shadow.blur := RoundTo(2 * ARatio, -2);
+      StateStyles.Hovered.Shadow.OffsetY := RoundTo(1 * ARatio, -2);
       //--Pressed--
       StateStyles.Pressed.StateLayer.UseContentColor := True;
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
       StateStyles.Focused.StateLayer.UseContentColor := True;
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -788,44 +1361,50 @@ end;
 
 {************************************************************************************}
 //https://m3.material.io/components/buttons/specs#4a0c06da-0b2f-47de-a583-97e0ae80b5a5
-procedure ALApplyMaterial3ButtonOutlinedStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonOutlinedStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the button', AFontSize);
   With AButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetButtonStyle(AButton, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(24*LRatio{Left}, 12*LRatio{Top}, 24*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetButtonStyle(AButton, ARatio);
+      padding.Rect := TRectF.Create(24*ARatio{Left}, 12*ARatio{Top}, 24*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       XRadius := -50;
       YRadius := -50;
       Fill.Color := Talphacolors.Null;
       Fill.ColorKey := '';
-      Stroke.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      TextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      TextSettings.LetterSpacing := RoundTo(0.1 * LRatio, -2);
+      Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.Assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       //--Pressed--
       StateStyles.Pressed.StateLayer.UseContentColor := True;
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
       StateStyles.Focused.StateLayer.UseContentColor := True;
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
       StateStyles.Focused.Stroke.assign(Stroke);
       StateStyles.Focused.Stroke.inherit := False;
-      StateStyles.Focused.Stroke.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Focused.Stroke.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
 
     finally
       EndUpdate;
@@ -835,39 +1414,45 @@ end;
 
 {************************************************************************************}
 //https://m3.material.io/components/buttons/specs#398d84eb-fc8a-4c8a-bfb4-82d2e85dee4d
-procedure ALApplyMaterial3ButtonTextStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonTextStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the button', AFontSize);
   With AButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetButtonStyle(AButton, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(12*LRatio{Left}, 12*LRatio{Top}, 12*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetButtonStyle(AButton, ARatio);
+      padding.Rect := TRectF.Create(12*ARatio{Left}, 12*ARatio{Top}, 12*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       XRadius := -50;
       YRadius := -50;
       Fill.Color := Talphacolors.Null;
       Fill.ColorKey := '';
       Stroke.Color := Talphacolors.Null;
       Stroke.ColorKey := '';
-      TextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      TextSettings.LetterSpacing := RoundTo(0.1 * LRatio, -2);
+      TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       //--Pressed--
       StateStyles.Pressed.StateLayer.UseContentColor := True;
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
       StateStyles.Focused.StateLayer.UseContentColor := True;
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -877,49 +1462,55 @@ end;
 
 {************************************************************************************}
 //https://m3.material.io/components/buttons/specs#c75be779-5a59-4748-98d4-e47fc888d0b1
-procedure ALApplyMaterial3ButtonElevatedStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonElevatedStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the button', AFontSize);
   With AButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetButtonStyle(AButton, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(24*LRatio{Left}, 12*LRatio{Top}, 24*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetButtonStyle(AButton, ARatio);
+      padding.Rect := TRectF.Create(24*ARatio{Left}, 12*ARatio{Top}, 24*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       XRadius := -50;
       YRadius := -50;
-      Fill.ColorKey := 'Material3.Color.SurfaceContainerLow'; // md.sys.color.surface-container-low / md.ref.palette.neutral96 / #F7F2FA
+      Fill.ColorKey := 'Material.Color.SurfaceContainerLow'; // md.sys.color.surface-container-low / md.ref.palette.neutral96 / #F7F2FA
       Stroke.Color := Talphacolors.Null;
       Stroke.ColorKey := '';
-      TextSettings.Font.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      TextSettings.LetterSpacing := RoundTo(0.1 * LRatio, -2);
-      Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
-      Shadow.blur := RoundTo(2 * LRatio, -2);
-      Shadow.OffsetY := RoundTo(1 * LRatio, -2);
+      TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
+      Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+      Shadow.blur := RoundTo(2 * ARatio, -2);
+      Shadow.OffsetY := RoundTo(1 * ARatio, -2);
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.Shadow.inherit := False;
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
-      StateStyles.Hovered.Shadow.blur := RoundTo(3 * LRatio, -2);
-      StateStyles.Hovered.Shadow.OffsetY := RoundTo(1 * LRatio, -2);
+      StateStyles.Hovered.Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+      StateStyles.Hovered.Shadow.blur := RoundTo(3 * ARatio, -2);
+      StateStyles.Hovered.Shadow.OffsetY := RoundTo(1 * ARatio, -2);
       //--Pressed--
       StateStyles.Pressed.StateLayer.UseContentColor := True;
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
       StateStyles.Focused.StateLayer.UseContentColor := True;
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -929,45 +1520,51 @@ end;
 
 {************************************************************************************}
 //https://m3.material.io/components/buttons/specs#6ce8b926-87c4-4600-9bec-5deb4aaa65d8
-procedure ALApplyMaterial3ButtonTonalStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonTonalStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired font size for the button', AFontSize);
   With AButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetButtonStyle(AButton, AFontSize * LRatio);
-      padding.Rect := TRectF.Create(24*LRatio{Left}, 12*LRatio{Top}, 24*LRatio{Right}, 12*LRatio{Bottom}).RoundTo(-2);
+      ALResetButtonStyle(AButton, ARatio);
+      padding.Rect := TRectF.Create(24*ARatio{Left}, 12*ARatio{Top}, 24*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
       XRadius := -50;
       YRadius := -50;
-      Fill.ColorKey := 'Material3.Color.SecondaryContainer'; // md.sys.color.secondary-container / md.ref.palette.secondary90 / #E8DEF8
+      Fill.ColorKey := 'Material.Color.SecondaryContainer'; // md.sys.color.secondary-container / md.ref.palette.secondary90 / #E8DEF8
       Stroke.Color := Talphacolors.Null;
       Stroke.ColorKey := '';
-      TextSettings.Font.ColorKey := 'Material3.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
-      TextSettings.LetterSpacing := RoundTo(0.1 * LRatio, -2);
+      TextSettings.Font.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
+      TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Hovered--
       StateStyles.Hovered.StateLayer.UseContentColor := True;
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
-      StateStyles.Hovered.Shadow.blur := RoundTo(2 * LRatio, -2);
-      StateStyles.Hovered.Shadow.OffsetY := RoundTo(1 * LRatio, -2);
+      StateStyles.Hovered.Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+      StateStyles.Hovered.Shadow.blur := RoundTo(2 * ARatio, -2);
+      StateStyles.Hovered.Shadow.OffsetY := RoundTo(1 * ARatio, -2);
       //--Pressed--
       StateStyles.Pressed.StateLayer.UseContentColor := True;
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
       StateStyles.Focused.StateLayer.UseContentColor := True;
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -977,9 +1574,8 @@ end;
 
 {*****************************************************************************************}
 //https://m3.material.io/components/icon-buttons/specs#5309610a-4515-44f9-830d-880e2a2240a2
-procedure ALApplyMaterial3ButtonIconFilledStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonIconFilledStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the button', 40);
   With AButton do begin
     BeginUpdate;
     Try
@@ -988,38 +1584,42 @@ begin
       var LPrevResourceName := Abutton.Fill.ResourceName;
       var LPrevDisabledResourceName := Abutton.StateStyles.Disabled.Fill.ResourceName;
       ALResetButtonStyle(AButton);
-      Width := RoundTo(40 * LRatio, -2);
-      Height := RoundTo(40 * LRatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      Width := RoundTo(40 * ARatio, -2);
+      Height := RoundTo(40 * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
-      Fill.ImageMargins.Rect := TRectF.Create(8*LRatio,8*LRatio,8*LRatio,8*LRatio).RoundTo(-2);
-      Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ImageMargins.Rect := TRectF.Create(8*ARatio,8*ARatio,8*ARatio,8*ARatio).RoundTo(-2);
+      Fill.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ImageTintColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
-      //Filled icon button icon color: $FFFFFFFF
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ImageTintColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.Fill.ResourceName := LPrevDisabledResourceName;
-      //Filled icon button disabled icon color: $FF1D1B20 with 0.38 opacity
       //--Hovered--
-      StateStyles.Hovered.StateLayer.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      StateStyles.Hovered.StateLayer.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
-      //Filled icon button hover icon color: $FFFFFFFF
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       //--Pressed--
-      StateStyles.Pressed.StateLayer.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      StateStyles.Pressed.StateLayer.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Filled icon button pressed icon color: $FFFFFFFF
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
-      StateStyles.Focused.StateLayer.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      StateStyles.Focused.StateLayer.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Filled icon button focus icon color: $FFFFFFFF
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -1029,9 +1629,8 @@ end;
 
 {*****************************************************************************************}
 //https://m3.material.io/components/icon-buttons/specs#ba97cf8a-2112-47dc-af87-2e32aabccdde
-procedure ALApplyMaterial3ButtonIconTonalStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonIconTonalStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the button', 40);
   With AButton do begin
     BeginUpdate;
     Try
@@ -1040,38 +1639,42 @@ begin
       var LPrevResourceName := Abutton.Fill.ResourceName;
       var LPrevDisabledResourceName := Abutton.StateStyles.Disabled.Fill.ResourceName;
       ALResetButtonStyle(AButton);
-      Width := RoundTo(40 * LRatio, -2);
-      Height := RoundTo(40 * LRatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      Width := RoundTo(40 * ARatio, -2);
+      Height := RoundTo(40 * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
-      Fill.ImageMargins.Rect := TRectF.Create(8*LRatio,8*LRatio,8*LRatio,8*LRatio).RoundTo(-2);
-      Fill.ColorKey := 'Material3.Color.SecondaryContainer'; // md.sys.color.secondary-container / md.ref.palette.secondary90 / #E8DEF8
+      Fill.ImageMargins.Rect := TRectF.Create(8*ARatio,8*ARatio,8*ARatio,8*ARatio).RoundTo(-2);
+      Fill.ColorKey := 'Material.Color.SecondaryContainer'; // md.sys.color.secondary-container / md.ref.palette.secondary90 / #E8DEF8
+      Fill.ImageTintColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
-      //Filled tonal icon button icon color: $FF1D192B
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ImageTintColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.Fill.ResourceName := LPrevDisabledResourceName;
-      //Filled tonal icon button disabled icon color: $FF1D1B20 with 0.38 opacity
       //--Hovered--
-      StateStyles.Hovered.StateLayer.ColorKey := 'Material3.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
+      StateStyles.Hovered.StateLayer.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
-      //Filled tonal icon button hover icon color: $FF1D192B
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       //--Pressed--
-      StateStyles.Pressed.StateLayer.ColorKey := 'Material3.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
+      StateStyles.Pressed.StateLayer.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Filled tonal icon button pressed icon color: $FF1D192B
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
-      StateStyles.Focused.StateLayer.ColorKey := 'Material3.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
+      StateStyles.Focused.StateLayer.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Filled tonal icon button focus icon color: $FF1D192B
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -1081,9 +1684,8 @@ end;
 
 {*****************************************************************************************}
 //https://m3.material.io/components/icon-buttons/specs#05e02b7f-ebf2-4f02-9709-8230db3702b4
-procedure ALApplyMaterial3ButtonIconOutlinedStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonIconOutlinedStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the button', 40);
   With AButton do begin
     BeginUpdate;
     Try
@@ -1092,41 +1694,45 @@ begin
       var LPrevResourceName := Abutton.Fill.ResourceName;
       var LPrevDisabledResourceName := Abutton.StateStyles.Disabled.Fill.ResourceName;
       ALResetButtonStyle(AButton);
-      Width := RoundTo(40 * LRatio, -2);
-      Height := RoundTo(40 * LRatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      Width := RoundTo(40 * ARatio, -2);
+      Height := RoundTo(40 * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
-      Fill.ImageMargins.Rect := TRectF.Create(8*LRatio,8*LRatio,8*LRatio,8*LRatio).RoundTo(-2);
+      Fill.ImageMargins.Rect := TRectF.Create(8*ARatio,8*ARatio,8*ARatio,8*ARatio).RoundTo(-2);
       Fill.Color := TalphaColorRec.Null;
       Fill.ColorKey := '';
+      Fill.ImageTintColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Fill.ResourceName := LPrevResourceName;
-      Stroke.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
-      //Outlined icon button unselected icon color: $FF49454F
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
       StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ImageTintColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Disabled.Fill.ResourceName := LPrevDisabledResourceName;
       StateStyles.Disabled.Stroke.Assign(Stroke);
       StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
-      //Outlined icon button disabled icon color: $FF1D1B20 with 0.38 opacity
+      StateStyles.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Hovered--
-      StateStyles.Hovered.StateLayer.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Hovered.StateLayer.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
-      //Outlined icon button unselected hover icon color: $FF49454F
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       //--Pressed--
-      StateStyles.Pressed.StateLayer.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Pressed.StateLayer.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Outlined icon button unselected pressed icon color: $FF49454F
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
-      StateStyles.Focused.StateLayer.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Focused.StateLayer.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Outlined icon button focus icon color: $FF49454F
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -1136,9 +1742,8 @@ end;
 
 {*****************************************************************************************}
 //https://m3.material.io/components/icon-buttons/specs#e63a9b45-a20c-402c-8cc5-2c67ad8aae25
-procedure ALApplyMaterial3ButtonIconStandardStyle(const AButton: TALButton; const AFontSize: Single = 14);
+procedure ALApplyMaterialButtonIconStandardStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the button', 40);
   With AButton do begin
     BeginUpdate;
     Try
@@ -1147,40 +1752,42 @@ begin
       var LPrevResourceName := Abutton.Fill.ResourceName;
       var LPrevDisabledResourceName := Abutton.StateStyles.Disabled.Fill.ResourceName;
       ALResetButtonStyle(AButton);
-      Width := RoundTo(40 * LRatio, -2);
-      Height := RoundTo(40 * LRatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      Width := RoundTo(40 * ARatio, -2);
+      Height := RoundTo(40 * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
-      Fill.ImageMargins.Rect := TRectF.Create(8*LRatio,8*LRatio,8*LRatio,8*LRatio).RoundTo(-2);
+      Fill.ImageMargins.Rect := TRectF.Create(8*ARatio,8*ARatio,8*ARatio,8*ARatio).RoundTo(-2);
       Fill.ResourceName := LPrevResourceName;
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
+      Fill.ImageTintColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
-      //Icon button unselected icon color: $FF49454F
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
-      if LPrevDisabledResourceName <> '' then begin
-        StateStyles.Disabled.Fill.Assign(Fill);
-        StateStyles.Disabled.Fill.Inherit := False;
-        StateStyles.Disabled.Fill.ResourceName := LPrevDisabledResourceName;
-      end;
-      //Icon button disabled icon color: $FF1D1B20 with 0.38 opacity
+      StateStyles.Disabled.Fill.Assign(Fill);
+      StateStyles.Disabled.Fill.Inherit := False;
+      StateStyles.Disabled.Fill.ImageTintColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Disabled.Fill.ResourceName := LPrevDisabledResourceName;
       //--Hovered--
-      StateStyles.Hovered.StateLayer.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Hovered.StateLayer.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Hovered.StateLayer.Opacity := 0.08;
-      //Icon button unselected hover icon color: $FF49454F
+      StateStyles.Hovered.StateLayer.XRadius := -50;
+      StateStyles.Hovered.StateLayer.YRadius := -50;
       //--Pressed--
-      StateStyles.Pressed.StateLayer.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Pressed.StateLayer.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Icon button unselected pressed icon color: $FF49454F
+      StateStyles.Pressed.StateLayer.XRadius := -50;
+      StateStyles.Pressed.StateLayer.YRadius := -50;
       //--Focused--
-      StateStyles.Focused.StateLayer.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      StateStyles.Focused.StateLayer.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-      //Icon button unselected focus icon color: $FF49454F
+      StateStyles.Focused.StateLayer.XRadius := -50;
+      StateStyles.Focused.StateLayer.YRadius := -50;
 
     finally
       EndUpdate;
@@ -1192,38 +1799,37 @@ end;
 // CHECKBOX //
 //////////////
 
-{***************************************************************************************}
-procedure ALResetCheckBoxStyle(const ACheckBox: TALCheckBox; const AHeight: Single = 18);
+type
+  TALBaseCheckBoxStateStylesProtectedAccess = class(TALBaseCheckBox.TStateStyles);
+
+{*****************************************************************************************}
+procedure ALResetCheckBoxStyle(const ACheckBox: TALBaseCheckBox; const ARatio: Single = 1);
 begin
   With ACheckBox do begin
     BeginUpdate;
     Try
+      ALResetShapeStyle(ACheckBox, ARatio);
       var LSize := DefaultSize;
-      var LRatio: Single := AHeight / LSize.Height;
-      LSize.Height := RoundTo(LSize.Height * LRatio, -2);
-      LSize.Width := RoundTo(LSize.Width * LRatio, -2);
+      LSize.Height := RoundTo(LSize.Height * ARatio, -2);
+      LSize.Width := RoundTo(LSize.Width * ARatio, -2);
       Size.Size := LSize;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
+      Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
+      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
       XRadius := DefaultXRadius;
       YRadius := DefaultYRadius;
-      if XRadius > 0 then XRadius := RoundTo(XRadius * LRatio, -2);
-      if YRadius > 0 then YRadius := RoundTo(YRadius * LRatio, -2);
+      if XRadius > 0 then XRadius := RoundTo(XRadius * ARatio, -2);
+      if YRadius > 0 then YRadius := RoundTo(YRadius * ARatio, -2);
       Checkmark.Reset;
-      Checkmark.Margins.Rect := ALScaleRect(Checkmark.Margins.DefaultValue, LRatio).RoundTo(-2);
-      CheckMark.Thickness := RoundTo(CheckMark.DefaultThickness * LRatio, -2);
-      Fill.Reset;
-      Stroke.Reset;
-      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * LRatio, -2);
-      Shadow.Reset;
+      Checkmark.Margins.Rect := ALScaleRect(Checkmark.Margins.DefaultValue, ARatio).RoundTo(-2);
+      CheckMark.Thickness := RoundTo(CheckMark.DefaultThickness * ARatio, -2);
       StateStyles.Reset;
-      StateStyles.Checked.Hovered.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.Checked.Pressed.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.Checked.Focused.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.UnChecked.Hovered.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.UnChecked.Pressed.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.UnChecked.Focused.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
+      StateStyles.Checked.Hovered.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Hovered.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      StateStyles.Checked.Pressed.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Pressed.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      StateStyles.Checked.Focused.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Focused.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      StateStyles.UnChecked.Hovered.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Hovered.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      StateStyles.UnChecked.Pressed.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Pressed.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      StateStyles.UnChecked.Focused.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Focused.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
     Finally
       EndUpdate;
     End;
@@ -1232,75 +1838,75 @@ end;
 
 {*************************************************************************************}
 //https://m3.material.io/components/checkbox/specs#fd29f662-6e61-4c1f-9b97-1145c3b33075
-procedure ALApplyMaterial3CheckBoxStyle(const ACheckBox: TALCheckBox; const AHeight: Single = 18);
+procedure ALApplyMaterialCheckBoxStyle(const ACheckBox: TALBaseCheckBox; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the checkbox', AHeight);
   With ACheckBox do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetCheckBoxStyle(ACheckBox, AHeight * LRatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      ALResetCheckBoxStyle(ACheckBox, ARatio);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
-      XRadius := RoundTo(2 * LRatio, -2);
-      YRadius := RoundTo(2 * LRatio, -2);
+      XRadius := RoundTo(2 * ARatio, -2);
+      YRadius := RoundTo(2 * ARatio, -2);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
-      Stroke.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      Stroke.Thickness := RoundTo(2 * LRatio, -2);
+      Stroke.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
       CheckMark.ColorKey := ''; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Transition.Duration := 0.2;
+      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
       //--Default (Checked)--
       StateStyles.Checked.Default.Fill.Assign(Fill);
       StateStyles.Checked.Default.Fill.Inherit := False;
-      StateStyles.Checked.Default.Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Default.Fill.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Default.Stroke.Assign(Stroke);
       StateStyles.Checked.Default.Stroke.Inherit := False;
       StateStyles.Checked.Default.Stroke.Thickness := 0;
       StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Default.CheckMark.Inherit := False;
-      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
 
       //--Disabled (UnChecked)--
       StateStyles.UnChecked.Disabled.Opacity := 1;
       StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
       StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
-      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
-      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Disabled (Checked)--
       StateStyles.Checked.Disabled.Opacity := 1;
       StateStyles.Checked.Disabled.Fill.Assign(Fill);
       StateStyles.Checked.Disabled.Fill.Inherit := False;
-      StateStyles.Checked.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Checked.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Disabled.CheckMark.Inherit := False;
-      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
 
       //--Hovered (UnChecked)--
-      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
       //--Hovered (Checked)--
-      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
 
       //--Pressed (UnChecked)--
-      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
       //--Pressed (Checked)--
-      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
 
       //--Focused (UnChecked)--
-      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
       //--Focused (Checked)--
-      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
 
     finally
@@ -1311,75 +1917,75 @@ end;
 
 {*************************************************************************************}
 //https://m3.material.io/components/checkbox/specs#fd29f662-6e61-4c1f-9b97-1145c3b33075
-procedure ALApplyMaterial3CheckBoxErrorStyle(const ACheckBox: TALCheckBox; const AHeight: Single = 18);
+procedure ALApplyMaterialCheckBoxErrorStyle(const ACheckBox: TALBaseCheckBox; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the checkbox', AHeight);
   With ACheckBox do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetCheckBoxStyle(ACheckBox, AHeight * LRatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      ALResetCheckBoxStyle(ACheckBox, ARatio);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
-      XRadius := RoundTo(2 * LRatio, -2);
-      YRadius := RoundTo(2 * LRatio, -2);
+      XRadius := RoundTo(2 * ARatio, -2);
+      YRadius := RoundTo(2 * ARatio, -2);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
-      Stroke.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      Stroke.Thickness := RoundTo(2 * LRatio, -2);
+      Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
       CheckMark.ColorKey := ''; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
-      StateStyles.Transition.Duration := 0.2;
+      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
       //--Default (Checked)--
       StateStyles.Checked.Default.Fill.Assign(Fill);
       StateStyles.Checked.Default.Fill.Inherit := False;
-      StateStyles.Checked.Default.Fill.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Default.Fill.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Default.Stroke.Assign(Stroke);
       StateStyles.Checked.Default.Stroke.Inherit := False;
       StateStyles.Checked.Default.Stroke.Thickness := 0;
       StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Default.CheckMark.Inherit := False;
-      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material3.Color.OnError'; // md.sys.color.on-error / md.ref.palette.error100 / #FFFFFF
+      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material.Color.OnError'; // md.sys.color.on-error / md.ref.palette.error100 / #FFFFFF
 
       //--Disabled (UnChecked)--
       StateStyles.UnChecked.Disabled.Opacity := 1;
       StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
       StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
-      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
-      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Disabled (Checked)--
       StateStyles.Checked.Disabled.Opacity := 1;
       StateStyles.Checked.Disabled.Fill.Assign(Fill);
       StateStyles.Checked.Disabled.Fill.Inherit := False;
-      StateStyles.Checked.Disabled.Fill.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Checked.Disabled.Fill.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Disabled.CheckMark.Inherit := False;
-      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
 
       //--Hovered (UnChecked)--
-      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
       //--Hovered (Checked)--
-      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
 
       //--Pressed (UnChecked)--
-      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
       //--Pressed (Checked)--
-      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
 
       //--Focused (UnChecked)--
-      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
       //--Focused (Checked)--
-      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
 
     finally
@@ -1392,110 +1998,78 @@ end;
 // RADIOBUTTON //
 /////////////////
 
-{************************************************************************************************}
-procedure ALResetRadioButtonStyle(const ARadioButton: TALRadioButton; const AHeight: Single = 20);
+{**********************************************************************************************}
+procedure ALResetRadioButtonStyle(const ARadioButton: TALRadioButton; const ARatio: Single = 1);
 begin
-  With ARadioButton do begin
-    BeginUpdate;
-    Try
-      var LSize := DefaultSize;
-      var LRatio: Single := AHeight / LSize.Height;
-      LSize.Height := RoundTo(LSize.Height * LRatio, -2);
-      LSize.Width := RoundTo(LSize.Width * LRatio, -2);
-      Size.Size := LSize;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      XRadius := DefaultXRadius;
-      YRadius := DefaultYRadius;
-      if XRadius > 0 then XRadius := RoundTo(XRadius * LRatio, -2);
-      if YRadius > 0 then YRadius := RoundTo(YRadius * LRatio, -2);
-      Checkmark.Reset;
-      Checkmark.Margins.Rect := ALScaleRect(Checkmark.Margins.DefaultValue, LRatio).RoundTo(-2);
-      CheckMark.Thickness := RoundTo(CheckMark.DefaultThickness * LRatio, -2);
-      Fill.Reset;
-      Stroke.Reset;
-      Stroke.Thickness := RoundTo(Stroke.DefaultThickness * LRatio, -2);
-      Shadow.Reset;
-      StateStyles.Reset;
-      StateStyles.Checked.Hovered.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.Checked.Pressed.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.Checked.Focused.statelayer.margins.rect := ALScaleRect(StateStyles.Checked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.UnChecked.Hovered.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.UnChecked.Pressed.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      StateStyles.UnChecked.Focused.statelayer.margins.rect := ALScaleRect(StateStyles.UnChecked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-    Finally
-      EndUpdate;
-    End;
-  end;
+  ALResetCheckBoxStyle(ARadioButton, ARatio);
 end;
 
 {*****************************************************************************************}
 //https://m3.material.io/components/radio-button/specs#4eca59b9-dfb5-4ca4-9c76-8e664fb02137
-procedure ALApplyMaterial3RadioButtonStyle(const ARadioButton: TALRadioButton; const AHeight: Single = 20);
+procedure ALApplyMaterialRadioButtonStyle(const ARadioButton: TALRadioButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the radio button', AHeight);
   With ARadioButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetRadioButtonStyle(ARadioButton, AHeight * LRatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      ALResetRadioButtonStyle(ARadioButton, ARatio);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
-      Stroke.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      Stroke.Thickness := RoundTo(2 * LRatio, -2);
+      Stroke.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
       CheckMark.ColorKey := ''; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
       //--Default (Checked)--
       StateStyles.Checked.Default.Stroke.Assign(Stroke);
       StateStyles.Checked.Default.Stroke.Inherit := False;
-      StateStyles.Checked.Default.Stroke.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Default.Stroke.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Default.CheckMark.Inherit := False;
-      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
 
       //--Disabled (UnChecked)--
       StateStyles.UnChecked.Disabled.Opacity := 1;
       StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
       StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
-      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
-      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Disabled (Checked)--
       StateStyles.Checked.Disabled.Opacity := 1;
       StateStyles.Checked.Disabled.Stroke.assign(Stroke);
       StateStyles.Checked.Disabled.Stroke.Inherit := False;
-      StateStyles.Checked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Checked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Disabled.CheckMark.Inherit := False;
-      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
 
       //--Hovered (UnChecked)--
-      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
       //--Hovered (Checked)--
-      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
 
       //--Pressed (UnChecked)--
-      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
       //--Pressed (Checked)--
-      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
 
       //--Focused (UnChecked)--
-      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
       //--Focused (Checked)--
-      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
 
     finally
@@ -1506,67 +2080,67 @@ end;
 
 {*****************************************************************************************}
 //https://m3.material.io/components/radio-button/specs#4eca59b9-dfb5-4ca4-9c76-8e664fb02137
-procedure ALApplyMaterial3RadioButtonErrorStyle(const ARadioButton: TALRadioButton; const AHeight: Single = 20);
+procedure ALApplyMaterialRadioButtonErrorStyle(const ARadioButton: TALRadioButton; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the radio button', AHeight);
   With ARadioButton do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetRadioButtonStyle(ARadioButton, AHeight * LRatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * LRatio, -2);
+      ALResetRadioButtonStyle(ARadioButton, ARatio);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
-      Stroke.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
-      Stroke.Thickness := RoundTo(2 * LRatio, -2);
+      Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
       CheckMark.ColorKey := ''; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
+      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
       //--Default (Checked)--
       StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Default.CheckMark.Inherit := False;
-      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Default.CheckMark.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
 
       //--Disabled (UnChecked)--
       StateStyles.UnChecked.Disabled.Opacity := 1;
       StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
       StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
-      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
-      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--Disabled (Checked)--
       StateStyles.Checked.Disabled.Opacity := 1;
       StateStyles.Checked.Disabled.Stroke.assign(Stroke);
       StateStyles.Checked.Disabled.Stroke.Inherit := False;
-      StateStyles.Checked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Checked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
       StateStyles.Checked.Disabled.CheckMark.Inherit := False;
-      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
 
       //--Hovered (UnChecked)--
-      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
       //--Hovered (Checked)--
-      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
 
       //--Pressed (UnChecked)--
-      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
       //--Pressed (Checked)--
-      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
 
       //--Focused (UnChecked)--
-      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
       //--Focused (Checked)--
-      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material3.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
+      StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
 
     finally
@@ -1579,62 +2153,39 @@ end;
 // SWITCH //
 ////////////
 
-{*********************************************************************************}
-procedure ALResetSwitchStyle(const ASwitch: TALSwitch; const AHeight: Single = 32);
+{*******************************************************************************}
+procedure ALResetSwitchStyle(const ASwitch: TALSwitch; const ARatio: Single = 1);
 begin
   With ASwitch do begin
     BeginUpdate;
     Try
       var LSize := DefaultSize;
-      var LRatio: Single := AHeight / LSize.Height;
-      LSize.Height := RoundTo(LSize.Height * LRatio, -2);
-      LSize.Width := RoundTo(LSize.Width * LRatio, -2);
+      LSize.Height := RoundTo(LSize.Height * ARatio, -2);
+      LSize.Width := RoundTo(LSize.Width * ARatio, -2);
       Size.Size := LSize;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
+      Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
+      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
       //--
-      Track.Margins.Rect := ALScaleRect(Track.Margins.DefaultValue, LRatio).RoundTo(-2);
-      Track.Padding.Rect := ALScaleRect(Track.Padding.DefaultValue, LRatio).RoundTo(-2);
-      Track.TouchTargetExpansion.Rect := ALScaleRect(Track.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      ALResetShapeStyle(Track, ARatio);
+      Track.Margins.Rect := ALScaleRect(Track.Margins.DefaultValue, ARatio).RoundTo(-2);
+      Track.Padding.Rect := ALScaleRect(Track.Padding.DefaultValue, ARatio).RoundTo(-2);
+      Track.TouchTargetExpansion.Rect := ALScaleRect(Track.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
       Track.XRadius := Track.DefaultXRadius;
       Track.YRadius := Track.DefaultYRadius;
-      if Track.XRadius > 0 then Track.XRadius := RoundTo(Track.XRadius * LRatio, -2);
-      if Track.YRadius > 0 then Track.YRadius := RoundTo(Track.YRadius * LRatio, -2);
-      Track.Fill.Reset;
-      Track.Stroke.Reset;
-      Track.Stroke.Thickness := RoundTo(Track.Stroke.DefaultThickness * LRatio, -2);
-      Track.Shadow.Reset;
+      if Track.XRadius > 0 then Track.XRadius := RoundTo(Track.XRadius * ARatio, -2);
+      if Track.YRadius > 0 then Track.YRadius := RoundTo(Track.YRadius * ARatio, -2);
       Track.StateStyles.Reset;
-      Track.StateStyles.Checked.Hovered.statelayer.margins.rect := ALScaleRect(Track.StateStyles.Checked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Track.StateStyles.Checked.Pressed.statelayer.margins.rect := ALScaleRect(Track.StateStyles.Checked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Track.StateStyles.Checked.Focused.statelayer.margins.rect := ALScaleRect(Track.StateStyles.Checked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Track.StateStyles.UnChecked.Hovered.statelayer.margins.rect := ALScaleRect(Track.StateStyles.UnChecked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Track.StateStyles.UnChecked.Pressed.statelayer.margins.rect := ALScaleRect(Track.StateStyles.UnChecked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Track.StateStyles.UnChecked.Focused.statelayer.margins.rect := ALScaleRect(Track.StateStyles.UnChecked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
+      Track.StateStyles.Checked.Hovered.statelayer.margins.rect := ALScaleRect(Track.StateStyles.Checked.Hovered.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      Track.StateStyles.Checked.Pressed.statelayer.margins.rect := ALScaleRect(Track.StateStyles.Checked.Pressed.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      Track.StateStyles.Checked.Focused.statelayer.margins.rect := ALScaleRect(Track.StateStyles.Checked.Focused.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      Track.StateStyles.UnChecked.Hovered.statelayer.margins.rect := ALScaleRect(Track.StateStyles.UnChecked.Hovered.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      Track.StateStyles.UnChecked.Pressed.statelayer.margins.rect := ALScaleRect(Track.StateStyles.UnChecked.Pressed.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      Track.StateStyles.UnChecked.Focused.statelayer.margins.rect := ALScaleRect(Track.StateStyles.UnChecked.Focused.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
       //--
-      Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, LRatio).RoundTo(-2);
+      ALResetCheckBoxStyle(Thumb, ARatio);
+      Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, ARatio).RoundTo(-2);
       Thumb.Width := Height - Thumb.Margins.Top - Thumb.Margins.bottom;
-      Thumb.Padding.Rect := ALScaleRect(Thumb.Padding.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.TouchTargetExpansion.Rect := ALScaleRect(Thumb.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.XRadius := Thumb.DefaultXRadius;
-      Thumb.YRadius := Thumb.DefaultYRadius;
-      if Thumb.XRadius > 0 then Thumb.XRadius := RoundTo(Thumb.XRadius * LRatio, -2);
-      if Thumb.YRadius > 0 then Thumb.YRadius := RoundTo(Thumb.YRadius * LRatio, -2);
-      Thumb.Checkmark.Reset;
-      Thumb.Checkmark.Margins.Rect := ALScaleRect(Thumb.Checkmark.Margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.CheckMark.Thickness := RoundTo(Thumb.CheckMark.DefaultThickness * LRatio, -2);
-      Thumb.Fill.Reset;
-      Thumb.Stroke.Reset;
-      Thumb.Stroke.Thickness := RoundTo(Thumb.Stroke.DefaultThickness * LRatio, -2);
-      Thumb.Shadow.Reset;
-      Thumb.StateStyles.Reset;
-      Thumb.StateStyles.Checked.Hovered.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Checked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.Checked.Pressed.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Checked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.Checked.Focused.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Checked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Hovered.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.UnChecked.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Pressed.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.UnChecked.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Focused.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.UnChecked.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
     Finally
       EndUpdate;
     End;
@@ -1643,122 +2194,121 @@ end;
 
 {***********************************************************************************}
 //https://m3.material.io/components/switch/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
-procedure ALApplyMaterial3SwitchStyle(const ASwitch: TALSwitch; const AHeight: Single = 32);
+procedure ALApplyMaterialSwitchStyle(const ASwitch: TALSwitch; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the switch', AHeight);
   With ASwitch do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetSwitchStyle(ASwitch, AHeight * LRatio);
+      ALResetSwitchStyle(ASwitch, ARatio);
 
       //--Default (UnChecked)--
       Track.StateStyles.UnChecked.Default.Stroke.Assign(Track.Stroke);
       Track.StateStyles.UnChecked.Default.Stroke.Inherit := False;
-      Track.StateStyles.UnChecked.Default.Stroke.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      Track.StateStyles.UnChecked.Default.Stroke.Thickness := RoundTo(2 * LRatio, -2);
+      Track.StateStyles.UnChecked.Default.Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      Track.StateStyles.UnChecked.Default.Stroke.Thickness := RoundTo(2 * ARatio, -2);
       Track.StateStyles.UnChecked.Default.fill.Assign(Track.fill);
       Track.StateStyles.UnChecked.Default.fill.Inherit := False;
-      Track.StateStyles.UnChecked.Default.fill.ColorKey := 'Material3.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Track.StateStyles.UnChecked.Default.fill.ColorKey := 'Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
       //--
       Thumb.StateStyles.UnChecked.Default.fill.Assign(Thumb.fill);
       Thumb.StateStyles.UnChecked.Default.fill.Inherit := False;
-      Thumb.StateStyles.UnChecked.Default.fill.ColorKey := 'Material3.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      Thumb.StateStyles.UnChecked.Default.Fill.BackgroundMargins.Rect := TRectF.Create(4*LRatio,4*LRatio,4*LRatio,4*LRatio).RoundTo(-2);
+      Thumb.StateStyles.UnChecked.Default.fill.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
+      Thumb.StateStyles.UnChecked.Default.Fill.BackgroundMargins.Rect := TRectF.Create(4*ARatio,4*ARatio,4*ARatio,4*ARatio).RoundTo(-2);
       Thumb.StateStyles.UnChecked.Default.CheckMark.Assign(Thumb.CheckMark);
       Thumb.StateStyles.UnChecked.Default.CheckMark.Inherit := False;
-      Thumb.StateStyles.UnChecked.Default.CheckMark.Color := TAlphacolors.Null; // TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
-      Thumb.StateStyles.UnChecked.Default.CheckMark.ColorKey := ''; // TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Color := TAlphacolors.Null; // TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Thumb.StateStyles.UnChecked.Default.CheckMark.ColorKey := ''; // TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
       //--Default (Checked)--
       Track.StateStyles.Checked.Default.fill.Assign(Track.fill);
       Track.StateStyles.Checked.Default.fill.Inherit := False;
-      Track.StateStyles.Checked.Default.fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Track.StateStyles.Checked.Default.fill.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       //--
       Thumb.StateStyles.Checked.Default.fill.Assign(Thumb.fill);
       Thumb.StateStyles.Checked.Default.fill.Inherit := False;
-      Thumb.StateStyles.Checked.Default.fill.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      Thumb.StateStyles.Checked.Default.fill.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       Thumb.StateStyles.Checked.Default.CheckMark.Assign(Thumb.CheckMark);
       Thumb.StateStyles.Checked.Default.CheckMark.Inherit := False;
-      Thumb.StateStyles.Checked.Default.CheckMark.ColorKey := 'Material3.Color.OnPrimaryContainer'; // md.sys.color.on-primary-container / md.ref.palette.primary30 / #4F378B
+      Thumb.StateStyles.Checked.Default.CheckMark.ColorKey := 'Material.Color.OnPrimaryContainer'; // md.sys.color.on-primary-container / md.ref.palette.primary30 / #4F378B
 
       //--Disabled (UnChecked)--
       Track.StateStyles.UnChecked.Disabled.Opacity := 1;
       Track.StateStyles.UnChecked.Disabled.Stroke.Assign(Track.Stroke);
       Track.StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
-      Track.StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
-      Track.StateStyles.UnChecked.Disabled.Stroke.Thickness := RoundTo(2 * LRatio, -2);
+      Track.StateStyles.UnChecked.Disabled.Stroke.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Track.StateStyles.UnChecked.Disabled.Stroke.Thickness := RoundTo(2 * ARatio, -2);
       Track.StateStyles.UnChecked.Disabled.fill.Assign(Track.fill);
       Track.StateStyles.UnChecked.Disabled.fill.Inherit := False;
-      Track.StateStyles.UnChecked.Disabled.fill.ColorKey := 'Material3.Color.SurfaceContainerHighest.Alpha12'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Track.StateStyles.UnChecked.Disabled.fill.ColorKey := 'Material.Color.SurfaceContainerHighest.Alpha12'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
       //--
       Thumb.StateStyles.UnChecked.Disabled.Opacity := 1;
       Thumb.StateStyles.UnChecked.Disabled.fill.Assign(Thumb.fill);
       Thumb.StateStyles.UnChecked.Disabled.fill.Inherit := False;
-      Thumb.StateStyles.UnChecked.Disabled.fill.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
-      Thumb.StateStyles.UnChecked.Disabled.Fill.BackgroundMargins.Rect := TRectF.Create(4*LRatio,4*LRatio,4*LRatio,4*LRatio).RoundTo(-2);
+      Thumb.StateStyles.UnChecked.Disabled.fill.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Thumb.StateStyles.UnChecked.Disabled.Fill.BackgroundMargins.Rect := TRectF.Create(4*ARatio,4*ARatio,4*ARatio,4*ARatio).RoundTo(-2);
       Thumb.StateStyles.UnChecked.Disabled.CheckMark.Assign(Thumb.CheckMark);
       Thumb.StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
-      Thumb.StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material3.Color.SurfaceContainerHighest.Alpha38'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.ColorKey := 'Material.Color.SurfaceContainerHighest.Alpha38'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
       //--Disabled (Checked)--
       Track.StateStyles.Checked.Disabled.Opacity := 1;
       Track.StateStyles.Checked.Disabled.fill.Assign(Track.fill);
       Track.StateStyles.Checked.Disabled.fill.Inherit := False;
-      Track.StateStyles.Checked.Disabled.fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Track.StateStyles.Checked.Disabled.fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--
       Thumb.StateStyles.Checked.Disabled.Opacity := 1;
       Thumb.StateStyles.Checked.Disabled.fill.Assign(Thumb.fill);
       Thumb.StateStyles.Checked.Disabled.fill.Inherit := False;
-      Thumb.StateStyles.Checked.Disabled.fill.ColorKey := 'Material3.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
+      Thumb.StateStyles.Checked.Disabled.fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
       Thumb.StateStyles.Checked.Disabled.CheckMark.Assign(Thumb.CheckMark);
       Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit := False;
-      Thumb.StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Thumb.StateStyles.Checked.Disabled.CheckMark.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
 
       //--Hovered (UnChecked)--
       Thumb.StateStyles.UnChecked.Hovered.fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
       Thumb.StateStyles.UnChecked.Hovered.fill.Inherit := False;
-      Thumb.StateStyles.UnChecked.Hovered.fill.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Thumb.StateStyles.UnChecked.Hovered.fill.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*ARatio,-8*ARatio,-8*ARatio,-8*ARatio).RoundTo(-2);
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       Thumb.StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
       //--Hovered (Checked)--
       Thumb.StateStyles.Checked.Hovered.fill.Assign(Thumb.StateStyles.Checked.Default.fill);
       Thumb.StateStyles.Checked.Hovered.fill.Inherit := False;
-      Thumb.StateStyles.Checked.Hovered.fill.ColorKey := 'Material3.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
-      Thumb.StateStyles.Checked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio).RoundTo(-2);
-      Thumb.StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Thumb.StateStyles.Checked.Hovered.fill.ColorKey := 'Material.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*ARatio,-8*ARatio,-8*ARatio,-8*ARatio).RoundTo(-2);
+      Thumb.StateStyles.Checked.Hovered.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Thumb.StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
 
       //--Pressed (UnChecked)--
       Thumb.StateStyles.UnChecked.Pressed.Fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
       Thumb.StateStyles.UnChecked.Pressed.Fill.Inherit := False;
-      Thumb.StateStyles.UnChecked.Pressed.fill.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      Thumb.StateStyles.UnChecked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*LRatio,-2*LRatio,-2*LRatio,-2*LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Thumb.StateStyles.UnChecked.Pressed.fill.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      Thumb.StateStyles.UnChecked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*ARatio,-2*ARatio,-2*ARatio,-2*ARatio).RoundTo(-2);
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*ARatio,-8*ARatio,-8*ARatio,-8*ARatio).RoundTo(-2);
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       Thumb.StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
       //--Pressed (Checked)--
       Thumb.StateStyles.Checked.Pressed.Fill.Assign(Thumb.StateStyles.Checked.Default.fill);
       Thumb.StateStyles.Checked.Pressed.Fill.Inherit := False;
-      Thumb.StateStyles.Checked.Pressed.fill.ColorKey := 'Material3.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
-      Thumb.StateStyles.Checked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*LRatio,-2*LRatio,-2*LRatio,-2*LRatio).RoundTo(-2);
-      Thumb.StateStyles.Checked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio).RoundTo(-2);
-      Thumb.StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Thumb.StateStyles.Checked.Pressed.fill.ColorKey := 'Material.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
+      Thumb.StateStyles.Checked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*ARatio,-2*ARatio,-2*ARatio,-2*ARatio).RoundTo(-2);
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*ARatio,-8*ARatio,-8*ARatio,-8*ARatio).RoundTo(-2);
+      Thumb.StateStyles.Checked.Pressed.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Thumb.StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
 
       //--Focused (UnChecked)--
       Thumb.StateStyles.UnChecked.Focused.fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
       Thumb.StateStyles.UnChecked.Focused.fill.Inherit := False;
-      Thumb.StateStyles.UnChecked.Focused.fill.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      Thumb.StateStyles.UnChecked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio).RoundTo(-2);
-      Thumb.StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material3.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Thumb.StateStyles.UnChecked.Focused.fill.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*ARatio,-8*ARatio,-8*ARatio,-8*ARatio).RoundTo(-2);
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       Thumb.StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
       //--Focused (Checked)--
       Thumb.StateStyles.Checked.Focused.fill.Assign(Thumb.StateStyles.Checked.Default.fill);
       Thumb.StateStyles.Checked.Focused.fill.Inherit := False;
-      Thumb.StateStyles.Checked.Focused.fill.ColorKey := 'Material3.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
-      Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio).RoundTo(-2);
-      Thumb.StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Thumb.StateStyles.Checked.Focused.fill.ColorKey := 'Material.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
+      Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*ARatio,-8*ARatio,-8*ARatio,-8*ARatio).RoundTo(-2);
+      Thumb.StateStyles.Checked.Focused.StateLayer.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Thumb.StateStyles.Checked.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
 
     finally
@@ -1774,94 +2324,135 @@ end;
 type
   _TALCustomTrackProtectedAccess = class(TALCustomTrack);
 
-{******************************************************************************************}
-procedure ALResetTrackBarStyle(const ATrackBar: TALCustomTrack; const AHeight: Single = 32);
+{****************************************************************************************}
+procedure ALResetTrackBarStyle(const ATrackBar: TALCustomTrack; const ARatio: Single = 1);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function SwapTopBottomWithLeftRight(Const ARect: TrectF): TRectF;
+  Begin
+    Result.Left := ARect.Top;
+    Result.Top := ARect.Left;
+    Result.Right := ARect.Bottom;
+    Result.Bottom := ARect.Right;
+  End;
+
 begin
   With _TALCustomTrackProtectedAccess(ATrackBar) do begin
     BeginUpdate;
     Try
-      var LSize := DefaultSize;
-      var LRatio: Single := AHeight / LSize.Height;
-      LSize.Height := RoundTo(LSize.Height * LRatio, -2);
-      LSize.Width := RoundTo(LSize.Width * LRatio, -2);
-      Size.Size := LSize;
-      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
-      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
-      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+        Height := RoundTo(DefaultSize.Height * ARatio, -2);
+        //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
+        Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
+        TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
+      end
+      else begin
+        Width := RoundTo(DefaultSize.Height * ARatio, -2);
+        //Margins.Rect := SwapTopBottomWithLeftRight(ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2));
+        Padding.Rect := SwapTopBottomWithLeftRight(ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2));
+        TouchTargetExpansion.Rect := SwapTopBottomWithLeftRight(ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2));
+      end;
       //--
-      InactiveTrack.Margins.Rect := ALScaleRect(InactiveTrack.Margins.DefaultValue, LRatio).RoundTo(-2);
-      InactiveTrack.Padding.Rect := ALScaleRect(InactiveTrack.Padding.DefaultValue, LRatio).RoundTo(-2);
-      InactiveTrack.TouchTargetExpansion.Rect := ALScaleRect(InactiveTrack.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      InactiveTrack.XRadius := InactiveTrack.DefaultXRadius;
-      InactiveTrack.YRadius := InactiveTrack.DefaultYRadius;
-      if InactiveTrack.XRadius > 0 then InactiveTrack.XRadius := RoundTo(InactiveTrack.XRadius * LRatio, -2);
-      if InactiveTrack.YRadius > 0 then InactiveTrack.YRadius := RoundTo(InactiveTrack.YRadius * LRatio, -2);
-      InactiveTrack.Corners := AllCorners;
-      InactiveTrack.Opacity := 1;
-      InactiveTrack.Fill.Reset;
-      InactiveTrack.Stroke.Reset;
-      InactiveTrack.Stroke.Thickness := RoundTo(InactiveTrack.Stroke.DefaultThickness * LRatio, -2);
-      InactiveTrack.Shadow.Reset;
-      InactiveTrack.stopIndicator.Reset;
-      InactiveTrack.stopIndicator.Size := RoundTo(InactiveTrack.stopIndicator.DefaultSize * LRatio, -2);
-      InactiveTrack.StateStyles.Reset;
+      if InactiveTrack <> nil then begin
+        If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+          InactiveTrack.Margins.Rect := ALScaleRect(InactiveTrack.Margins.DefaultValue, ARatio).RoundTo(-2);
+          InactiveTrack.Padding.Rect := ALScaleRect(InactiveTrack.Padding.DefaultValue, ARatio).RoundTo(-2);
+          InactiveTrack.TouchTargetExpansion.Rect := ALScaleRect(InactiveTrack.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
+        end
+        else begin
+          InactiveTrack.Margins.Rect := SwapTopBottomWithLeftRight(ALScaleRect(InactiveTrack.Margins.DefaultValue, ARatio).RoundTo(-2));
+          InactiveTrack.Padding.Rect := SwapTopBottomWithLeftRight(ALScaleRect(InactiveTrack.Padding.DefaultValue, ARatio).RoundTo(-2));
+          InactiveTrack.TouchTargetExpansion.Rect := SwapTopBottomWithLeftRight(ALScaleRect(InactiveTrack.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2));
+        end;
+        InactiveTrack.XRadius := InactiveTrack.DefaultXRadius;
+        InactiveTrack.YRadius := InactiveTrack.DefaultYRadius;
+        if InactiveTrack.XRadius > 0 then InactiveTrack.XRadius := RoundTo(InactiveTrack.XRadius * ARatio, -2);
+        if InactiveTrack.YRadius > 0 then InactiveTrack.YRadius := RoundTo(InactiveTrack.YRadius * ARatio, -2);
+        InactiveTrack.Corners := AllCorners;
+        InactiveTrack.Opacity := 1;
+        InactiveTrack.Fill.Reset;
+        InactiveTrack.Stroke.Reset;
+        InactiveTrack.Stroke.Thickness := RoundTo(InactiveTrack.Stroke.DefaultThickness * ARatio, -2);
+        InactiveTrack.Shadow.Reset;
+        InactiveTrack.stopIndicator.Reset;
+        InactiveTrack.stopIndicator.Size := RoundTo(InactiveTrack.stopIndicator.DefaultSize * ARatio, -2);
+        InactiveTrack.StateStyles.Reset;
+      end;
       //--
-      ActiveTrack.Margins.Rect := ALScaleRect(ActiveTrack.Margins.DefaultValue, LRatio).RoundTo(-2);
-      ActiveTrack.Padding.Rect := ALScaleRect(ActiveTrack.Padding.DefaultValue, LRatio).RoundTo(-2);
-      ActiveTrack.TouchTargetExpansion.Rect := ALScaleRect(ActiveTrack.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      ActiveTrack.XRadius := ActiveTrack.DefaultXRadius;
-      ActiveTrack.YRadius := ActiveTrack.DefaultYRadius;
-      if ActiveTrack.XRadius > 0 then ActiveTrack.XRadius := RoundTo(ActiveTrack.XRadius * LRatio, -2);
-      if ActiveTrack.YRadius > 0 then ActiveTrack.YRadius := RoundTo(ActiveTrack.YRadius * LRatio, -2);
-      ActiveTrack.Corners := AllCorners;
-      ActiveTrack.Opacity := 1;
-      ActiveTrack.Fill.Reset;
-      ActiveTrack.Stroke.Reset;
-      ActiveTrack.Stroke.Thickness := RoundTo(ActiveTrack.Stroke.DefaultThickness * LRatio, -2);
-      ActiveTrack.Shadow.Reset;
-      ActiveTrack.stopIndicator.Reset;
-      ActiveTrack.stopIndicator.Size := RoundTo(ActiveTrack.stopIndicator.DefaultSize * LRatio, -2);
-      ActiveTrack.StateStyles.Reset;
+      if ActiveTrack <> nil then begin
+        If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+          ActiveTrack.Margins.Rect := ALScaleRect(ActiveTrack.Margins.DefaultValue, ARatio).RoundTo(-2);
+          ActiveTrack.Padding.Rect := ALScaleRect(ActiveTrack.Padding.DefaultValue, ARatio).RoundTo(-2);
+          ActiveTrack.TouchTargetExpansion.Rect := ALScaleRect(ActiveTrack.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
+        end
+        else begin
+          ActiveTrack.Margins.Rect := SwapTopBottomWithLeftRight(ALScaleRect(ActiveTrack.Margins.DefaultValue, ARatio).RoundTo(-2));
+          ActiveTrack.Padding.Rect := SwapTopBottomWithLeftRight(ALScaleRect(ActiveTrack.Padding.DefaultValue, ARatio).RoundTo(-2));
+          ActiveTrack.TouchTargetExpansion.Rect := SwapTopBottomWithLeftRight(ALScaleRect(ActiveTrack.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2));
+        end;
+        ActiveTrack.XRadius := ActiveTrack.DefaultXRadius;
+        ActiveTrack.YRadius := ActiveTrack.DefaultYRadius;
+        if ActiveTrack.XRadius > 0 then ActiveTrack.XRadius := RoundTo(ActiveTrack.XRadius * ARatio, -2);
+        if ActiveTrack.YRadius > 0 then ActiveTrack.YRadius := RoundTo(ActiveTrack.YRadius * ARatio, -2);
+        ActiveTrack.Corners := AllCorners;
+        ActiveTrack.Opacity := 1;
+        ActiveTrack.Fill.Reset;
+        ActiveTrack.Stroke.Reset;
+        ActiveTrack.Stroke.Thickness := RoundTo(ActiveTrack.Stroke.DefaultThickness * ARatio, -2);
+        ActiveTrack.Shadow.Reset;
+        ActiveTrack.stopIndicator.Reset;
+        ActiveTrack.stopIndicator.Size := RoundTo(ActiveTrack.stopIndicator.DefaultSize * ARatio, -2);
+        ActiveTrack.StateStyles.Reset;
+      end;
       //--
-      Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.Padding.Rect := ALScaleRect(Thumb.Padding.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.TouchTargetExpansion.Rect := ALScaleRect(Thumb.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.XRadius := Thumb.DefaultXRadius;
-      Thumb.YRadius := Thumb.DefaultYRadius;
-      if Thumb.XRadius > 0 then Thumb.XRadius := RoundTo(Thumb.XRadius * LRatio, -2);
-      if Thumb.YRadius > 0 then Thumb.YRadius := RoundTo(Thumb.YRadius * LRatio, -2);
-      Thumb.Corners := AllCorners;
-      Thumb.Opacity := 1;
-      Thumb.Fill.Reset;
-      Thumb.Stroke.Reset;
-      Thumb.Stroke.Thickness := RoundTo(Thumb.Stroke.DefaultThickness * LRatio, -2);
-      Thumb.Shadow.Reset;
-      Thumb.StateStyles.Reset;
-      Thumb.StateStyles.Hovered.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.Pressed.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      Thumb.StateStyles.Focused.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
-      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
-        Thumb.Width := ATrackBar.Height - ATrackBar.Padding.Top - ATrackBar.Padding.Bottom - Thumb.Margins.Top - Thumb.Margins.Bottom
-      else
-        Thumb.Height := ATrackBar.Width - ATrackBar.Padding.left - ATrackBar.Padding.right - Thumb.Margins.left - Thumb.Margins.right;
+      if Thumb <> nil then begin
+        If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+          Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, ARatio).RoundTo(-2);
+          Thumb.Padding.Rect := ALScaleRect(Thumb.Padding.DefaultValue, ARatio).RoundTo(-2);
+          Thumb.TouchTargetExpansion.Rect := ALScaleRect(Thumb.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
+          Thumb.Width := ATrackBar.Height - ATrackBar.Padding.Top - ATrackBar.Padding.Bottom - Thumb.Margins.Top - Thumb.Margins.Bottom
+        end
+        else begin
+          Thumb.Margins.Rect := SwapTopBottomWithLeftRight(ALScaleRect(Thumb.Margins.DefaultValue, ARatio).RoundTo(-2));
+          Thumb.Padding.Rect := SwapTopBottomWithLeftRight(ALScaleRect(Thumb.Padding.DefaultValue, ARatio).RoundTo(-2));
+          Thumb.TouchTargetExpansion.Rect := SwapTopBottomWithLeftRight(ALScaleRect(Thumb.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2));
+          Thumb.Height := ATrackBar.Width - ATrackBar.Padding.left - ATrackBar.Padding.right - Thumb.Margins.left - Thumb.Margins.right;
+        end;
+        Thumb.XRadius := Thumb.DefaultXRadius;
+        Thumb.YRadius := Thumb.DefaultYRadius;
+        if Thumb.XRadius > 0 then Thumb.XRadius := RoundTo(Thumb.XRadius * ARatio, -2);
+        if Thumb.YRadius > 0 then Thumb.YRadius := RoundTo(Thumb.YRadius * ARatio, -2);
+        Thumb.Corners := AllCorners;
+        Thumb.Opacity := 1;
+        Thumb.Fill.Reset;
+        Thumb.Stroke.Reset;
+        Thumb.Stroke.Thickness := RoundTo(Thumb.Stroke.DefaultThickness * ARatio, -2);
+        Thumb.Shadow.Reset;
+        Thumb.StateStyles.Reset;
+        Thumb.StateStyles.Hovered.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Hovered.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+        Thumb.StateStyles.Pressed.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Pressed.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+        Thumb.StateStyles.Focused.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Focused.statelayer.margins.DefaultValue, ARatio).RoundTo(-2);
+      end;
       //--
-      //ValueIndicator.Margins.Rect := ALScaleRect(ValueIndicator.Margins.DefaultValue, LRatio).RoundTo(-2);
-      ValueIndicator.Padding.Rect := ALScaleRect(ValueIndicator.Padding.DefaultValue, LRatio).RoundTo(-2);
-      ValueIndicator.TouchTargetExpansion.Rect := ALScaleRect(ValueIndicator.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
-      ValueIndicator.XRadius := ValueIndicator.DefaultXRadius;
-      ValueIndicator.YRadius := ValueIndicator.DefaultYRadius;
-      if ValueIndicator.XRadius > 0 then ValueIndicator.XRadius := RoundTo(ValueIndicator.XRadius * LRatio, -2);
-      if ValueIndicator.YRadius > 0 then ValueIndicator.YRadius := RoundTo(ValueIndicator.YRadius * LRatio, -2);
-      ValueIndicator.Animation := TValueIndicator.TAnimation.ScaleInOut;
-      ValueIndicator.AutoSize := true;
-      ValueIndicator.Corners := AllCorners;
-      ValueIndicator.Sides := AllSides;
-      ValueIndicator.Opacity := 1;
-      ValueIndicator.Fill.Reset;
-      ValueIndicator.Stroke.Reset;
-      ValueIndicator.Stroke.Thickness := RoundTo(ValueIndicator.Stroke.DefaultThickness * LRatio, -2);
-      ValueIndicator.Shadow.Reset;
-      ValueIndicator.TextSettings.Reset;
+      if ValueIndicator <> nil then begin
+        //ValueIndicator.Margins.Rect := ALScaleRect(ValueIndicator.Margins.DefaultValue, ARatio).RoundTo(-2);
+        ValueIndicator.Padding.Rect := ALScaleRect(ValueIndicator.Padding.DefaultValue, ARatio).RoundTo(-2);
+        ValueIndicator.TouchTargetExpansion.Rect := ALScaleRect(ValueIndicator.TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
+        ValueIndicator.XRadius := ValueIndicator.DefaultXRadius;
+        ValueIndicator.YRadius := ValueIndicator.DefaultYRadius;
+        if ValueIndicator.XRadius > 0 then ValueIndicator.XRadius := RoundTo(ValueIndicator.XRadius * ARatio, -2);
+        if ValueIndicator.YRadius > 0 then ValueIndicator.YRadius := RoundTo(ValueIndicator.YRadius * ARatio, -2);
+        ValueIndicator.Animation := TValueIndicator.TAnimation.ScaleInOut;
+        ValueIndicator.AutoSize := true;
+        ValueIndicator.Corners := AllCorners;
+        ValueIndicator.Sides := AllSides;
+        ValueIndicator.Opacity := 1;
+        ValueIndicator.Fill.Reset;
+        ValueIndicator.Stroke.Reset;
+        ValueIndicator.Stroke.Thickness := RoundTo(ValueIndicator.Stroke.DefaultThickness * ARatio, -2);
+        ValueIndicator.Shadow.Reset;
+        ValueIndicator.TextSettings.Reset;
+      end;
     Finally
       EndUpdate;
     End;
@@ -1870,53 +2461,55 @@ end;
 
 {*************************************************************************************}
 //https://m3.material.io/components/TrackBar/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
-procedure ALApplyMaterial3TrackBarStyle(const ATrackBar: TALCustomTrack; const AHeight: Single = 44);
+procedure ALApplyMaterialTrackBarStyle(const ATrackBar: TALCustomTrack; const ARatio: Single = 1);
 begin
-  var LRatio: Single := ALGetStyleSizeRatio('Please enter the desired height for the TrackBar', AHeight);
   With _TALCustomTrackProtectedAccess(ATrackBar) do begin
     BeginUpdate;
     Try
 
       //--Enabled (default)--
-      ALResetTrackBarStyle(ATrackBar, AHeight * LRatio);
+      ALResetTrackBarStyle(ATrackBar, ARatio);
       If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
-        InactiveTrack.Margins.Rect := TRectF.Create(0,14*LRatio,0,14*LRatio).RoundTo(-2);
-        ActiveTrack.Margins.Rect := TRectF.Create(0,14*LRatio,0,14*LRatio).RoundTo(-2);
-        InactiveTrack.Padding.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
-        ActiveTrack.Padding.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+        Height := RoundTo(44 * ARatio, -2);
+        InactiveTrack.Margins.Rect := TRectF.Create(0,14*ARatio,0,14*ARatio).RoundTo(-2);
+        ActiveTrack.Margins.Rect := TRectF.Create(0,14*ARatio,0,14*ARatio).RoundTo(-2);
+        InactiveTrack.Padding.Rect := TRectF.Create(6*ARatio,0,6*ARatio,0).RoundTo(-2);
+        ActiveTrack.Padding.Rect := TRectF.Create(6*ARatio,0,6*ARatio,0).RoundTo(-2);
       end
       else begin
-        InactiveTrack.Margins.Rect := TRectF.Create(14*LRatio,0,14*LRatio,0).RoundTo(-2);
-        ActiveTrack.Margins.Rect := TRectF.Create(14*LRatio,0,14*LRatio,0).RoundTo(-2);
-        InactiveTrack.Padding.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
-        ActiveTrack.Padding.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+        Width := RoundTo(44 * ARatio, -2);
+        InactiveTrack.Margins.Rect := TRectF.Create(14*ARatio,0,14*ARatio,0).RoundTo(-2);
+        ActiveTrack.Margins.Rect := TRectF.Create(14*ARatio,0,14*ARatio,0).RoundTo(-2);
+        InactiveTrack.Padding.Rect := TRectF.Create(0,6*ARatio,0,6*ARatio).RoundTo(-2);
+        ActiveTrack.Padding.Rect := TRectF.Create(0,6*ARatio,0,6*ARatio).RoundTo(-2);
       end;
       InactiveTrack.XRadius := -50;
       InactiveTrack.YRadius := -50;
       ActiveTrack.XRadius := -50;
       ActiveTrack.YRadius := -50;
-      InactiveTrack.Fill.ColorKey := 'Material3.Color.SecondaryContainer'; // md.sys.color.secondary-container / md.ref.palette.secondary90 / #E8DEF8
-      ActiveTrack.Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      InactiveTrack.StopIndicator.Size := RoundTo(4 * LRatio, -2);
-      ActiveTrack.StopIndicator.Size := RoundTo(4 * LRatio, -2);
-      InactiveTrack.StopIndicator.ColorKey := 'Material3.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
-      ActiveTrack.StopIndicator.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
-      ValueIndicator.TextSettings.Font.ColorKey := 'Material3.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
-      ValueIndicator.TextSettings.Font.Size := RoundTo(14 * LRatio, -2);
-      ValueIndicator.padding.Rect := TRectF.create(16 * LRatio{Left}, 12 * LRatio{Top}, 16 * LRatio{Right}, 12 * LRatio{Bottom}).RoundTo(-2);
-      ValueIndicator.Fill.ColorKey := 'Material3.Color.InverseSurface'; // md.sys.color.inverse-surface / md.ref.palette.neutral20 / #322F35
-      Thumb.Width := RoundTo(4 * LRatio, -2);
-      Thumb.Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      Thumb.Stroke.Color := TalphaColors.Null;
-      Thumb.Stroke.ColorKey := '';
+      InactiveTrack.Fill.ColorKey := 'Material.Color.SecondaryContainer'; // md.sys.color.secondary-container / md.ref.palette.secondary90 / #E8DEF8
+      ActiveTrack.Fill.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      InactiveTrack.StopIndicator.Size := RoundTo(4 * ARatio, -2);
+      ActiveTrack.StopIndicator.Size := RoundTo(4 * ARatio, -2);
+      InactiveTrack.StopIndicator.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
+      ActiveTrack.StopIndicator.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      ValueIndicator.TextSettings.Font.ColorKey := 'Material.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+      ValueIndicator.TextSettings.Font.Size := RoundTo(14 * ARatio, -2);
+      ValueIndicator.padding.Rect := TRectF.create(16 * ARatio{Left}, 12 * ARatio{Top}, 16 * ARatio{Right}, 12 * ARatio{Bottom}).RoundTo(-2);
+      ValueIndicator.Fill.ColorKey := 'Material.Color.InverseSurface'; // md.sys.color.inverse-surface / md.ref.palette.neutral20 / #322F35
       If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
-        Thumb.Margins.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
-        Thumb.TouchTargetExpansion.Rect := TRectF.Create(22*LRatio,2*LRatio,22*LRatio,2*LRatio).RoundTo(-2);
+        Thumb.Margins.Rect := TRectF.Create(6*ARatio,0,6*ARatio,0).RoundTo(-2);
+        Thumb.TouchTargetExpansion.Rect := TRectF.Create(22*ARatio,2*ARatio,22*ARatio,2*ARatio).RoundTo(-2);
+        Thumb.Width := RoundTo(4 * ARatio, -2)
       end
       else begin
-        Thumb.Margins.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
-        Thumb.TouchTargetExpansion.Rect := TRectF.Create(2*LRatio,22*LRatio,2*LRatio,22*LRatio).RoundTo(-2);
+        Thumb.Margins.Rect := TRectF.Create(0,6*ARatio,0,6*ARatio).RoundTo(-2);
+        Thumb.TouchTargetExpansion.Rect := TRectF.Create(2*ARatio,22*ARatio,2*ARatio,22*ARatio).RoundTo(-2);
+        Thumb.Height := RoundTo(4 * ARatio, -2);
       end;
+      Thumb.Fill.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Thumb.Stroke.Color := TalphaColors.Null;
+      Thumb.Stroke.ColorKey := '';
 
       //--Disabled--
       InactiveTrack.StateStyles.Disabled.Opacity := 1;
@@ -1924,24 +2517,24 @@ begin
       //--
       InactiveTrack.StateStyles.Disabled.fill.Assign(InactiveTrack.Fill);
       InactiveTrack.StateStyles.Disabled.fill.Inherit := False;
-      InactiveTrack.StateStyles.Disabled.fill.ColorKey := 'Material3.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      InactiveTrack.StateStyles.Disabled.fill.ColorKey := 'Material.Color.OnSurface.Alpha12'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--
       ActiveTrack.StateStyles.Disabled.fill.Assign(ActiveTrack.Fill);
       ActiveTrack.StateStyles.Disabled.fill.Inherit := False;
-      ActiveTrack.StateStyles.Disabled.fill.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      ActiveTrack.StateStyles.Disabled.fill.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--
       InactiveTrack.StateStyles.Disabled.StopIndicator.Assign(InactiveTrack.StopIndicator);
       InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit := False;
-      InactiveTrack.StateStyles.Disabled.StopIndicator.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      InactiveTrack.StateStyles.Disabled.StopIndicator.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
       //--
       ActiveTrack.StateStyles.Disabled.StopIndicator.Assign(ActiveTrack.StopIndicator);
       ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit := False;
-      ActiveTrack.StateStyles.Disabled.StopIndicator.ColorKey := 'Material3.Color.InverseOnSurface.Alpha66'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+      ActiveTrack.StateStyles.Disabled.StopIndicator.ColorKey := 'Material.Color.InverseOnSurface.Alpha66'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
       //--
       Thumb.StateStyles.Disabled.Opacity := 1;
       Thumb.StateStyles.Disabled.fill.Assign(Thumb.Fill);
       Thumb.StateStyles.Disabled.fill.Inherit := False;
-      Thumb.StateStyles.Disabled.fill.ColorKey := 'Material3.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+      Thumb.StateStyles.Disabled.fill.ColorKey := 'Material.Color.OnSurface.Alpha38'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
 
       //--Hovered--
 
@@ -1949,21 +2542,300 @@ begin
       Thumb.StateStyles.Pressed.fill.Assign(Thumb.Fill);
       Thumb.StateStyles.Pressed.fill.Inherit := False;
       If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
-        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(1*LRatio,0,1*LRatio,0).RoundTo(-2)
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(1*ARatio,0,1*ARatio,0).RoundTo(-2)
       else
-        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(0,1*LRatio,0,1*LRatio).RoundTo(-2);
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(0,1*ARatio,0,1*ARatio).RoundTo(-2);
 
       //--Focused--
       Thumb.StateStyles.Focused.fill.Assign(Thumb.Fill);
       Thumb.StateStyles.Focused.fill.Inherit := False;
       If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
-        Thumb.StateStyles.Focused.fill.BackgroundMargins.Rect := TRectF.Create(1*LRatio,0,1*LRatio,0).RoundTo(-2)
+        Thumb.StateStyles.Focused.fill.BackgroundMargins.Rect := TRectF.Create(1*ARatio,0,1*ARatio,0).RoundTo(-2)
       else
-        Thumb.StateStyles.Focused.fill.BackgroundMargins.Rect := TRectF.Create(0,1*LRatio,0,1*LRatio).RoundTo(-2);
+        Thumb.StateStyles.Focused.fill.BackgroundMargins.Rect := TRectF.Create(0,1*ARatio,0,1*ARatio).RoundTo(-2);
 
     finally
       EndUpdate;
     end;
+  end;
+end;
+
+///////////////
+// SCROLLBAR //
+///////////////
+
+{**********************************************************************************************}
+procedure ALResetScrollBarStyle(const AScrollBar: TALCustomScrollBar; const ARatio: Single = 1);
+begin
+  ALResetTrackBarStyle(AScrollBar, ARatio);
+end;
+
+{**************************************************************************************}
+//https://m3.material.io/components/ScrollBar/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
+procedure ALApplyMaterialScrollBarStyle(const AScrollBar: TALCustomScrollBar; const ARatio: Single = 1);
+begin
+  With _TALCustomTrackProtectedAccess(AScrollBar) do begin
+    BeginUpdate;
+    Try
+      ALResetScrollBarStyle(AScrollBar, ARatio);
+      Thumb.Fill.ColorKey := 'Material.Color.OnSurface.alpha30';
+      //--Disabled--
+      //--Hovered--
+      Thumb.StateStyles.Hovered.StateLayer.ColorKey := 'Material.Color.OnSurface';
+      Thumb.StateStyles.Hovered.StateLayer.Opacity := 0.08;
+      //--Pressed--
+      Thumb.StateStyles.Pressed.StateLayer.ColorKey := 'Material.Color.OnSurface';
+      Thumb.StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      //--Focused--
+      Thumb.StateStyles.Focused.StateLayer.ColorKey := 'Material.Color.OnSurface';
+      Thumb.StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+///////////////
+// SCROLLBOX //
+///////////////
+
+type
+  _TALCustomScrollBoxProtectedAccess = class(TALCustomScrollBox);
+
+{********************************************************************}
+procedure ALResetScrollBoxStyle(const AScrollBox: TALCustomScrollBox);
+begin
+  With _TALCustomScrollBoxProtectedAccess(AScrollBox) do begin
+    BeginUpdate;
+    Try
+      ALResetRectangleStyle(AScrollBox);
+      if HScrollBar <> nil then ALResetScrollBarStyle(HScrollBar);
+      if VScrollBar <> nil then ALResetScrollBarStyle(VScrollBar);
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+{****************************************************************************}
+procedure ALApplyMaterialScrollBoxStyle(const AScrollBox: TALCustomScrollBox);
+begin
+  With _TALCustomScrollBoxProtectedAccess(AScrollBox) do begin
+    BeginUpdate;
+    Try
+      ALResetRectangleStyle(AScrollBox);
+      if HScrollBar <> nil then ALApplyMaterialScrollBarStyle(HScrollBar);
+      if VScrollBar <> nil then ALApplyMaterialScrollBarStyle(VScrollBar);
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+///////////////////
+// DIALOGMANAGER //
+///////////////////
+
+{****************************************************************************************************}
+procedure ALResetDialogManagerStyle(const ADialogManager: TALDialogManager; const ARatio: Single = 1);
+begin
+  With ADialogManager do begin
+
+    // DefaultScrim
+    ALResetRectangleStyle(DefaultScrim, ARatio);
+    DefaultScrim.Align := TALAlignLayout.Contents;
+    DefaultScrim.Fill.Color := $52000000; {Alpha = 32%}
+    DefaultScrim.Stroke.Color := TAlphaColors.Null;
+    DefaultScrim.Stroke.ColorKey := '';
+
+    // DefaultContainer
+    ALResetRectangleStyle(DefaultContainer);
+    DefaultContainer.Padding.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
+    DefaultContainer.AutoSize := True;
+    DefaultContainer.Align := TALAlignLayout.Center;
+    DefaultContainer.Fill.Color := $FFFFFFFF;
+    DefaultContainer.Fill.ColorKey := '';
+    DefaultContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultContainer.Stroke.ColorKey := '';
+    DefaultContainer.XRadius := RoundTo(28 * ARatio, -2);
+    DefaultContainer.YRadius := RoundTo(28 * ARatio, -2);
+
+    // DefaultIcon
+    ALResetImageStyle(DefaultIcon);
+    DefaultIcon.Width := RoundTo(24 * ARatio, -2);
+    DefaultIcon.Height := RoundTo(24 * ARatio, -2);
+    DefaultIcon.Align := TALAlignLayout.TopCenter;
+
+    // DefaultHeadline
+    var LRatio: Single := 24 / DefaultHeadline.Textsettings.Font.DefaultSize;
+    ALResetTextStyle(DefaultHeadline, LRatio);
+    if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
+    DefaultHeadline.Margins.Top := RoundTo(16 * ARatio, -2);
+    DefaultHeadline.AutoSize := True;
+    DefaultHeadline.Align := TALAlignLayout.TopLeft;
+
+    // DefaultContent
+    DefaultContent.Align := TALAlignLayout.TopLeft;
+    DefaultContent.Margins.Rect := TRectF.Create(-24*ARatio{Left}, 16*ARatio{Top}, -24*ARatio{Right}, 0{Bottom}).RoundTo(-2);
+
+    // DefaultMessage
+    LRatio := 14 / DefaultMessage.Textsettings.Font.DefaultSize;
+    ALResetTextStyle(DefaultMessage, LRatio * ARatio);
+    DefaultMessage.Margins.Rect := TRectF.Create(24*ARatio{Left}, 0{Top}, 24*ARatio{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultMessage.AutoSize := True;
+    DefaultMessage.Align := TALAlignLayout.TopLeft;
+
+    // DefaultOptionLayout
+    ALResetLayoutStyle(DefaultOptionLayout);
+    DefaultOptionLayout.Margins.Rect := TRectF.Create(24*ARatio{Left}, 16*ARatio{Top}, 24*ARatio{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultOptionLayout.TagFloat := 12 * LRatio; // The padding top of the first item (except message) and padding bottom of the last item (except message)
+    DefaultOptionLayout.AutoSize := True;
+    DefaultOptionLayout.Align := TALAlignLayout.TopLeft;
+
+    // DefaultRadioButton
+    LRatio := (20 + ((14 * ARatio) - 14) / 2) / DefaultRadioButton.DefaultSize.Height;
+    ALResetRadioButtonStyle(DefaultRadioButton, LRatio);
+    DefaultRadioButton.Align := TALAlignLayout.MostLeftCenter;
+
+    // DefaultCheckBox
+    LRatio := (18 + ((14 * ARatio) - 14) / 2) / DefaultCheckBox.DefaultSize.Height;
+    ALResetCheckBoxStyle(DefaultCheckBox, LRatio);
+    DefaultCheckBox.Align := TALAlignLayout.MostLeftCenter;
+
+    // DefaultInlineButton
+    LRatio := 14 / DefaultInlineButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultInlineButton, LRatio * ARatio);
+    DefaultInlineButton.Margins.Rect := TRectF.Create(
+                                          24*ARatio{Left},
+                                          12*ARatio{Top},
+                                          24*ARatio{Right},
+                                          0{Bottom}).RoundTo(-2);
+    DefaultInlineButton.TagFloat := 0; // The padding top of the first item (except message) and padding bottom of the last item (except message)
+    DefaultInlineButton.AutoSize := True;
+    DefaultInlineButton.Align := TALAlignLayout.TopLeft;
+
+    // DefaultEdit
+    LRatio := 16 / DefaultEdit.Textsettings.Font.DefaultSize;
+    ALResetEditStyle(DefaultEdit, LRatio * ARatio);
+    DefaultEdit.Margins.Rect := TRectF.Create(0{Left}, 16*ARatio{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultEdit.AutoSize := True;
+    DefaultEdit.Align := TALAlignLayout.TopLeft;
+
+    // DefaultMemo
+    LRatio := 16 / DefaultMemo.Textsettings.Font.DefaultSize;
+    ALResetEditStyle(DefaultMemo, LRatio * ARatio);
+    DefaultMemo.Margins.Rect := TRectF.Create(0{Left}, 16*ARatio{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultMemo.AutoSizeLineCount := 3;
+    DefaultMemo.Align := TALAlignLayout.TopLeft;
+
+    // DefaultLabel
+    LRatio := 14 / DefaultLabel.Textsettings.Font.DefaultSize;
+    ALResetTextStyle(DefaultLabel, LRatio * ARatio);
+    DefaultLabel.Margins.Left := RoundTo(12 * ARatio, -2);
+    DefaultLabel.AutoSize := True;
+    DefaultLabel.Align := TALAlignLayout.LeftCenter;
+
+    // DefaultFooterBar
+    ALResetRectangleStyle(DefaultFooterBar, ARatio);
+    DefaultFooterBar.Margins.Top := RoundTo(24{* ARatio}, -2);
+    DefaultFooterBar.AutoSize := True;
+    DefaultFooterBar.Align := TALAlignLayout.TopRight;
+    DefaultFooterBar.Fill.Color := TalphaColors.Null;
+    DefaultFooterBar.Fill.ColorKey := '';
+    DefaultFooterBar.Stroke.Color := TAlphaColors.Null;
+    DefaultFooterBar.Stroke.ColorKey := '';
+
+    // DefaultFooterButton
+    LRatio := 14 / DefaultFooterButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultFooterButton, LRatio);
+    DefaultFooterButton.Margins.Left := RoundTo(8 * ARatio, -2);
+    DefaultFooterButton.Align := TALAlignLayout.RightCenter;
+
+  end;
+end;
+
+{************************************************************************************}
+//https://m3.material.io/components/dialogs/specs#8e0c5daf-d82a-4963-8759-94769997de9f
+procedure ALApplyMaterialDialogManagerStyle(const ADialogManager: TALDialogManager; const ARatio: Single = 1);
+begin
+  With ADialogManager do begin
+
+    // Default
+    ALResetDialogManagerStyle(ADialogManager, ARatio);
+
+    // DefaultScrim
+    // https://m3.material.io/styles/elevation/applying-elevation#eb0451aa-61b5-4c35-8d5f-f5b434f63654
+    DefaultScrim.Fill.ColorKey := 'Material.Color.Scrim.Alpha32'; // Scrims use the scrim color role at an opacity of 32%.
+
+    // DefaultContainer
+    DefaultContainer.Fill.ColorKey := 'Material.Color.SurfaceContainerHigh'; // md.sys.color.surface-container-high / md.ref.palette.neutral92 / #ECE6F0
+    DefaultContainer.Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultContainer.Shadow.blur := RoundTo(6 * ARatio, -2);
+    DefaultContainer.Shadow.OffsetY := RoundTo(2 * ARatio, -2);
+
+    // DefaultIcon
+    DefaultIcon.TintColorKey := 'Material.Color.Secondary'; // md.sys.color.secondary / md.ref.palette.secondary40 / #625B71
+
+    // DefaultHeadline
+    DefaultHeadline.TextSettings.Font.ColorKey := 'Material.Color.OnSurface'; // md.sys.color.on-surface / md.ref.palette.neutral10 / #1D1B20
+    DefaultHeadline.TextSettings.LineHeightMultiplier := 32/24;
+
+    // DefaultContent
+    ALApplyMaterialScrollBoxStyle(DefaultContent);
+
+    // DefaultMessage
+    DefaultMessage.TextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+    if CompareValue(ARatio, 1, TEpsilon.scale) = 0 then begin
+      DefaultMessage.TextSettings.LineHeightMultiplier := 20/14;
+      DefaultMessage.TextSettings.LetterSpacing := RoundTo(0.25 * ARatio, -2);
+    end
+    else
+      DefaultMessage.TextSettings.LineHeightMultiplier := ALEstimateLineHeightMultiplier(DefaultMessage.TextSettings.Font.Size);
+
+    // DefaultOptionLayout
+
+    // DefaultRadioButton
+    var LRatio := (20 + ((14 * ARatio) - 14) / 2) / DefaultRadioButton.DefaultSize.Height;
+    ALApplyMaterialRadioButtonStyle(DefaultRadioButton, LRatio);
+
+    // DefaultCheckBox
+    LRatio := (18 + ((14 * ARatio) - 14) / 2) / DefaultCheckBox.DefaultSize.Height;
+    ALApplyMaterialCheckBoxStyle(DefaultCheckBox, LRatio);
+
+    // DefaultInlineButton
+    LRatio := 14 / DefaultInlineButton.Textsettings.Font.DefaultSize;
+    ALApplyMaterialButtonTextStyle(DefaultInlineButton, LRatio * ARatio);
+    DefaultInlineButton.Margins.Rect := TRectF.Create(
+                                          (24*ARatio) - (DefaultInlineButton.Padding.Left){Left},
+                                          12*ARatio{Top},
+                                          (24*ARatio) - (DefaultInlineButton.Padding.Right){Right},
+                                          -12*ARatio{Bottom}).RoundTo(-2);
+    DefaultInlineButton.TextSettings.Font.ColorKey := DefaultMessage.TextSettings.Font.ColorKey;
+    DefaultInlineButton.TextSettings.Font.Weight := TFontWeight.Regular;
+
+    // DefaultEdit
+    LRatio := 14 / DefaultEdit.Textsettings.Font.DefaultSize;
+    ALApplyMaterialEditHybridStyle(DefaultEdit, LRatio * ARatio);
+
+    // DefaultMemo
+    LRatio := 14 / DefaultMemo.Textsettings.Font.DefaultSize;
+    ALApplyMaterialEditHybridStyle(DefaultMemo, LRatio * ARatio);
+
+    // DefaultLabel
+    DefaultLabel.TextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+    if CompareValue(ARatio, 1, TEpsilon.scale) = 0 then begin
+      DefaultLabel.TextSettings.LineHeightMultiplier := 20 / 14;
+      DefaultLabel.TextSettings.LetterSpacing := RoundTo(0.25 * ARatio, -2);
+    end
+    else
+      DefaultLabel.TextSettings.LineHeightMultiplier := ALEstimateLineHeightMultiplier(DefaultLabel.TextSettings.Font.Size);
+
+    // DefaultFooterBar
+
+    // DefaultFooterButton
+    LRatio := 14 / DefaultFooterButton.Textsettings.Font.DefaultSize;
+    ALApplyMaterialButtonTextStyle(DefaultFooterButton, LRatio * ARatio);
+
   end;
 end;
 
@@ -1994,12 +2866,13 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{********************************************************************************************************************************}
-constructor TALStyleManager.TButtonStyleInfo.create(const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single);
+{**************************************************************************************************************************************************************}
+constructor TALStyleManager.TButtonStyleInfo.create(const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
   ApplyStyleProc := AApplyStyleProc;
   DefaultFontSize := ADefaultFontSize;
+  DefaultHeight := ADefaultHeight;
 end;
 
 {**********************************************************************************************************************************}
@@ -2026,12 +2899,43 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{**********************************************************************************************************************************}
-constructor TALStyleManager.TTrackbarStyleInfo.create(const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
+{********************************************************************************************************************************}
+constructor TALStyleManager.TTrackbarStyleInfo.create(const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
   ApplyStyleProc := AApplyStyleProc;
-  DefaultHeight := ADefaultHeight;
+  DefaultSize := ADefaultSize;
+end;
+
+{**********************************************************************************************************************************}
+constructor TALStyleManager.TScrollbarStyleInfo.create(const AApplyStyleProc: TScrollBarApplyStyleProc; const ADefaultSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultSize := ADefaultSize;
+end;
+
+{******************************************************************************************************}
+constructor TALStyleManager.TScrollboxStyleInfo.create(const AApplyStyleProc: TScrollBoxApplyStyleProc);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+end;
+
+{**********************************************************************************************************************************************}
+constructor TALStyleManager.TDialogManagerStyleInfo.create(const AApplyStyleProc: TDialogManagerApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
+{********************************************************************************************************************************}
+constructor TALStyleManager.TDialogStyleInfo.create(const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultFontSize := ADefaultFontSize;
 end;
 
 {*********************************}
@@ -2040,6 +2944,7 @@ begin
   FLightColors := TDictionary<string, TPair<TAlphaColor, integer{SortOrder}>>.Create;
   FDarkColors := TDictionary<string, TPair<TAlphaColor, integer{SortOrder}>>.Create;
   fColors := TDictionary<string, TAlphaColor>.create;
+  FFontFamilies := TDictionary<string, string>.create;
   FTextStyles := TDictionary<String, TTextStyleInfo>.create;
   FEditStyles := TDictionary<String, TEditStyleInfo>.create;
   FMemoStyles := TDictionary<String, TEditStyleInfo>.create;
@@ -2049,6 +2954,10 @@ begin
   FSwitchStyles := TDictionary<String, TSwitchStyleInfo>.create;
   FTrackBarStyles := TDictionary<String, TTrackBarStyleInfo>.create;
   FRangeTrackBarStyles := TDictionary<String, TTrackBarStyleInfo>.create;
+  FScrollBarStyles := TDictionary<String, TScrollBarStyleInfo>.create;
+  FScrollBoxStyles := TDictionary<String, TScrollBoxStyleInfo>.create;
+  FDialogManagerStyles := TDictionary<String, TDialogManagerStyleInfo>.create;
+  FDialogStyles := TDictionary<String, TDialogStyleInfo>.create;
   {$IF defined(ALDPK)}
   FIsDarkMode := False;
   {$ELSEIF defined(Android)}
@@ -2092,6 +3001,7 @@ begin
   ALFreeAndNil(FLightColors);
   ALFreeAndNil(FDarkColors);
   AlFreeAndNil(fColors);
+  AlFreeAndNil(FFontFamilies);
   AlFreeAndNil(FTextStyles);
   AlFreeAndNil(FEditStyles);
   AlFreeAndNil(FMemoStyles);
@@ -2101,6 +3011,10 @@ begin
   AlFreeAndNil(FSwitchStyles);
   AlFreeAndNil(FTrackBarStyles);
   AlFreeAndNil(FRangeTrackBarStyles);
+  AlFreeAndNil(FScrollBarStyles);
+  AlFreeAndNil(FScrollBoxStyles);
+  AlFreeAndNil(FDialogManagerStyles);
+  AlFreeAndNil(FDialogStyles);
   inherited;
 end;
 
@@ -2111,149 +3025,231 @@ begin
   // https://www.figma.com/community/plugin/1034969338659738588/material-theme-builder
   // Select Export > Material Theme (JSON)
 
-  AddOrSetColor('Material3.Color.Primary', $FF6750A4, False); // md.ref.palette.primary40 | Main color used across screens and components
-  AddOrSetColor('Material3.Color.OnPrimary', $FFFFFFFF, False); // md.ref.palette.primary100 | Text and icons shown against the primary color
-  AddOrSetColor('Material3.Color.PrimaryContainer', $FFEADDFF, False); // md.ref.palette.primary90 | Standout container color for key components
-  AddOrSetColor('Material3.Color.OnPrimaryContainer', $FF4F378B, False); // md.ref.palette.primary30 | Contrast-passing color shown against the primary container
-  AddOrSetColor('Material3.Color.Secondary', $FF625B71, False); // md.ref.palette.secondary40 | Accent color used across screens and components
-  AddOrSetColor('Material3.Color.OnSecondary', $FFFFFFFF, False); // md.ref.palette.secondary100 | Text and icons shown against the secondary color
-  AddOrSetColor('Material3.Color.SecondaryContainer', $FFE8DEF8, False); // md.ref.palette.secondary90 | Less prominent container color, for components like tonal buttons
-  AddOrSetColor('Material3.Color.OnSecondaryContainer', $FF4A4458, False); // md.ref.palette.secondary30 | Contrast-passing color shown against the secondary container
-  AddOrSetColor('Material3.Color.Tertiary', $FF7D5260, False); // md.ref.palette.tertiary40
-  AddOrSetColor('Material3.Color.OnTertiary', $FFFFFFFF, False); // md.ref.palette.tertiary100
-  AddOrSetColor('Material3.Color.TertiaryContainer', $FFFFD8E4, False); // md.ref.palette.tertiary90 | Contrasting container color, for components like input fields
-  AddOrSetColor('Material3.Color.OnTertiaryContainer', $FF633B48, False); // md.ref.palette.tertiary30 | Contrast-passing color shown against the tertiary container
-  AddOrSetColor('Material3.Color.Error', $FFB3261E, False); // md.ref.palette.error40 | Indicates errors, such as invalid input in a date picker
-  AddOrSetColor('Material3.Color.OnError', $FFFFFFFF, False); // md.ref.palette.error100 | Used for text and icons on the error color
-  AddOrSetColor('Material3.Color.ErrorContainer', $FFF9DEDC, False); // md.ref.palette.error90
-  AddOrSetColor('Material3.Color.OnErrorContainer', $FF8C1D18, False); // md.ref.palette.error30
-  AddOrSetColor('Material3.Color.Surface', $FFFEF7FF, False); // md.ref.palette.neutral98 | Surface color for components like cards, sheets, and menus
-  AddOrSetColor('Material3.Color.OnSurface', $FF1D1B20, False); // md.ref.palette.neutral10 | Text and icons shown against the surface color
-  AddOrSetColor('Material3.Color.SurfaceVariant', $FFE7E0EC, False); // md.ref.palette.neutral-variant90 | Alternate surface color, can be used for active states
-  AddOrSetColor('Material3.Color.OnSurfaceVariant', $FF49454F, False); // md.ref.palette.neutral-variant30 | For text and icons to indicate active or inactive component state
-  AddOrSetColor('Material3.Color.SurfaceContainerHighest', $FFE6E0E9, False); // md.ref.palette.neutral90
-  AddOrSetColor('Material3.Color.SurfaceContainerHigh', $FFECE6F0, False); // md.ref.palette.neutral92
-  AddOrSetColor('Material3.Color.SurfaceContainer', $FFF3EDF7, False); // md.ref.palette.neutral94
-  AddOrSetColor('Material3.Color.SurfaceContainerLow', $FFF7F2FA, False); // md.ref.palette.neutral96
-  AddOrSetColor('Material3.Color.SurfaceContainerLowest', $FFFFFFFF, False); // md.ref.palette.neutral100
-  AddOrSetColor('Material3.Color.InverseSurface', $FF322F35, False); // md.ref.palette.neutral20 | Displays opposite color of the surrounding UI
-  AddOrSetColor('Material3.Color.InverseOnSurface', $FFF5EFF7, False); // md.ref.palette.neutral95 | Used for text and icons shown against the inverse surface color
-  AddOrSetColor('Material3.Color.SurfaceTint', $FF6750A4, False); // md.ref.palette.primary40
-  AddOrSetColor('Material3.Color.Outline', $FF79747E, False); // md.ref.palette.neutral-variant50 | Subtle color used for boundaries
-  AddOrSetColor('Material3.Color.OutlineVariant', $FFCAC4D0, False); // md.ref.palette.neutral-variant80 | Outline-variant is used to define the border of a component where 3:1 contrast ratio isn’t required, a container, or a divider.
-  AddOrSetColor('Material3.Color.PrimaryFixed', $FFEADDFF, False); // md.ref.palette.primary90
-  AddOrSetColor('Material3.Color.OnPrimaryFixed', $FF21005D, False); // md.ref.palette.primary10
-  AddOrSetColor('Material3.Color.PrimaryFixedDim', $FFD0BCFF, False); // md.ref.palette.primary80
-  AddOrSetColor('Material3.Color.OnPrimaryFixedVariant', $FF4F378B, False); // md.ref.palette.primary30
-  AddOrSetColor('Material3.Color.InversePrimary', $FFD0BCFF, False); // md.ref.palette.primary80 | Displays opposite of the primary color
-  AddOrSetColor('Material3.Color.SecondaryFixed', $FFE8DEF8, False); // md.ref.palette.secondary90
-  AddOrSetColor('Material3.Color.OnSecondaryFixed', $FF1D192B, False); // md.ref.palette.secondary10
-  AddOrSetColor('Material3.Color.SecondaryFixedDim', $FFCCC2DC, False); // md.ref.palette.secondary80
-  AddOrSetColor('Material3.Color.OnSecondaryFixedVariant', $FF4A4458, False); // md.ref.palette.secondary30
-  AddOrSetColor('Material3.Color.TertiaryFixed', $FFFFD8E4, False); // md.ref.palette.tertiary90
-  AddOrSetColor('Material3.Color.OnTertiaryFixed', $FF31111D, False); // md.ref.palette.tertiary10
-  AddOrSetColor('Material3.Color.TertiaryFixedDim', $FFEFB8C8, False); // md.ref.palette.tertiary80
-  AddOrSetColor('Material3.Color.OnTertiaryFixedVariant', $FF633B48, False); // md.ref.palette.tertiary30
-  //AddOrSetColor('Material3.Color.Background', $FFFEF7FF, False); // md.ref.palette.neutral98 | Note: Background is a legacy color role. It is recommended to use Surface instead of Background.
-  //AddOrSetColor('Material3.Color.OnBackground', $FF1D1B20, False); // md.ref.palette.neutral10 | Used for text and icons shown against the background color
-  AddOrSetColor('Material3.Color.SurfaceBright', $FFFEF7FF, False); // md.ref.palette.neutral98
-  AddOrSetColor('Material3.Color.SurfaceDim', $FFDED8E1, False); // md.ref.palette.neutral87
-  AddOrSetColor('Material3.Color.Scrim', $FF000000, False); // md.ref.palette.neutral0 | Used for scrims which help separate floating components from the background.
-  AddOrSetColor('Material3.Color.Shadow', $FF000000, False); // md.ref.palette.neutral0 | For shadows applied to elevated components
+  AddOrSetColor('Material.Color.Primary', $FF6750A4, False); // md.ref.palette.primary40 | Main color used across screens and components
+  AddOrSetColor('Material.Color.OnPrimary', $FFFFFFFF, False); // md.ref.palette.primary100 | Text and icons shown against the primary color
+  AddOrSetColor('Material.Color.PrimaryContainer', $FFEADDFF, False); // md.ref.palette.primary90 | Standout container color for key components
+  AddOrSetColor('Material.Color.OnPrimaryContainer', $FF4F378B, False); // md.ref.palette.primary30 | Contrast-passing color shown against the primary container
+  AddOrSetColor('Material.Color.Secondary', $FF625B71, False); // md.ref.palette.secondary40 | Accent color used across screens and components
+  AddOrSetColor('Material.Color.OnSecondary', $FFFFFFFF, False); // md.ref.palette.secondary100 | Text and icons shown against the secondary color
+  AddOrSetColor('Material.Color.SecondaryContainer', $FFE8DEF8, False); // md.ref.palette.secondary90 | Less prominent container color, for components like tonal buttons
+  AddOrSetColor('Material.Color.OnSecondaryContainer', $FF4A4458, False); // md.ref.palette.secondary30 | Contrast-passing color shown against the secondary container
+  AddOrSetColor('Material.Color.Tertiary', $FF7D5260, False); // md.ref.palette.tertiary40
+  AddOrSetColor('Material.Color.OnTertiary', $FFFFFFFF, False); // md.ref.palette.tertiary100
+  AddOrSetColor('Material.Color.TertiaryContainer', $FFFFD8E4, False); // md.ref.palette.tertiary90 | Contrasting container color, for components like input fields
+  AddOrSetColor('Material.Color.OnTertiaryContainer', $FF633B48, False); // md.ref.palette.tertiary30 | Contrast-passing color shown against the tertiary container
+  AddOrSetColor('Material.Color.Error', $FFB3261E, False); // md.ref.palette.error40 | Indicates errors, such as invalid input in a date picker
+  AddOrSetColor('Material.Color.OnError', $FFFFFFFF, False); // md.ref.palette.error100 | Used for text and icons on the error color
+  AddOrSetColor('Material.Color.ErrorContainer', $FFF9DEDC, False); // md.ref.palette.error90
+  AddOrSetColor('Material.Color.OnErrorContainer', $FF8C1D18, False); // md.ref.palette.error30
+  AddOrSetColor('Material.Color.Surface', $FFFEF7FF, False); // md.ref.palette.neutral98 | Surface color for components like cards, sheets, and menus
+  AddOrSetColor('Material.Color.OnSurface', $FF1D1B20, False); // md.ref.palette.neutral10 | Text and icons shown against the surface color
+  AddOrSetColor('Material.Color.SurfaceVariant', $FFE7E0EC, False); // md.ref.palette.neutral-variant90 | Alternate surface color, can be used for active states
+  AddOrSetColor('Material.Color.OnSurfaceVariant', $FF49454F, False); // md.ref.palette.neutral-variant30 | For text and icons to indicate active or inactive component state
+  AddOrSetColor('Material.Color.SurfaceContainerHighest', $FFE6E0E9, False); // md.ref.palette.neutral90
+  AddOrSetColor('Material.Color.SurfaceContainerHigh', $FFECE6F0, False); // md.ref.palette.neutral92
+  AddOrSetColor('Material.Color.SurfaceContainer', $FFF3EDF7, False); // md.ref.palette.neutral94
+  AddOrSetColor('Material.Color.SurfaceContainerLow', $FFF7F2FA, False); // md.ref.palette.neutral96
+  AddOrSetColor('Material.Color.SurfaceContainerLowest', $FFFFFFFF, False); // md.ref.palette.neutral100
+  AddOrSetColor('Material.Color.InverseSurface', $FF322F35, False); // md.ref.palette.neutral20 | Displays opposite color of the surrounding UI
+  AddOrSetColor('Material.Color.InverseOnSurface', $FFF5EFF7, False); // md.ref.palette.neutral95 | Used for text and icons shown against the inverse surface color
+  AddOrSetColor('Material.Color.SurfaceTint', $FF6750A4, False); // md.ref.palette.primary40
+  AddOrSetColor('Material.Color.Outline', $FF79747E, False); // md.ref.palette.neutral-variant50 | Subtle color used for boundaries
+  AddOrSetColor('Material.Color.OutlineVariant', $FFCAC4D0, False); // md.ref.palette.neutral-variant80 | Outline-variant is used to define the border of a component where 3:1 contrast ratio isn’t required, a container, or a divider.
+  AddOrSetColor('Material.Color.PrimaryFixed', $FFEADDFF, False); // md.ref.palette.primary90
+  AddOrSetColor('Material.Color.OnPrimaryFixed', $FF21005D, False); // md.ref.palette.primary10
+  AddOrSetColor('Material.Color.PrimaryFixedDim', $FFD0BCFF, False); // md.ref.palette.primary80
+  AddOrSetColor('Material.Color.OnPrimaryFixedVariant', $FF4F378B, False); // md.ref.palette.primary30
+  AddOrSetColor('Material.Color.InversePrimary', $FFD0BCFF, False); // md.ref.palette.primary80 | Displays opposite of the primary color
+  AddOrSetColor('Material.Color.SecondaryFixed', $FFE8DEF8, False); // md.ref.palette.secondary90
+  AddOrSetColor('Material.Color.OnSecondaryFixed', $FF1D192B, False); // md.ref.palette.secondary10
+  AddOrSetColor('Material.Color.SecondaryFixedDim', $FFCCC2DC, False); // md.ref.palette.secondary80
+  AddOrSetColor('Material.Color.OnSecondaryFixedVariant', $FF4A4458, False); // md.ref.palette.secondary30
+  AddOrSetColor('Material.Color.TertiaryFixed', $FFFFD8E4, False); // md.ref.palette.tertiary90
+  AddOrSetColor('Material.Color.OnTertiaryFixed', $FF31111D, False); // md.ref.palette.tertiary10
+  AddOrSetColor('Material.Color.TertiaryFixedDim', $FFEFB8C8, False); // md.ref.palette.tertiary80
+  AddOrSetColor('Material.Color.OnTertiaryFixedVariant', $FF633B48, False); // md.ref.palette.tertiary30
+  //AddOrSetColor('Material.Color.Background', $FFFEF7FF, False); // md.ref.palette.neutral98 | Note: Background is a legacy color role. It is recommended to use Surface instead of Background.
+  //AddOrSetColor('Material.Color.OnBackground', $FF1D1B20, False); // md.ref.palette.neutral10 | Used for text and icons shown against the background color
+  AddOrSetColor('Material.Color.SurfaceBright', $FFFEF7FF, False); // md.ref.palette.neutral98
+  AddOrSetColor('Material.Color.SurfaceDim', $FFDED8E1, False); // md.ref.palette.neutral87
+  AddOrSetColor('Material.Color.Scrim', $FF000000, False); // md.ref.palette.neutral0 | Used for scrims which help separate floating components from the background.
+  AddOrSetColor('Material.Color.Shadow', $FF000000, False); // md.ref.palette.neutral0 | For shadows applied to elevated components
 
-  AddOrSetColor('Material3.Color.Primary', $FFD0BCFF, True); // md.ref.palette.primary80 | Main color used across screens and components
-  AddOrSetColor('Material3.Color.OnPrimary', $FF381E72, True); // md.ref.palette.primary20 | Text and icons shown against the primary color
-  AddOrSetColor('Material3.Color.PrimaryContainer', $FF4F378B, True); // md.ref.palette.primary30 | Standout container color for key components
-  AddOrSetColor('Material3.Color.OnPrimaryContainer', $FFEADDFF, True); // md.ref.palette.primary90 | Contrast-passing color shown against the primary container
-  AddOrSetColor('Material3.Color.Secondary', $FFCCC2DC, True); // md.ref.palette.secondary80 | Accent color used across screens and components
-  AddOrSetColor('Material3.Color.OnSecondary', $FF332D41, True); // md.ref.palette.secondary20 | Text and icons shown against the secondary color
-  AddOrSetColor('Material3.Color.SecondaryContainer', $FF4A4458, True); // md.ref.palette.secondary30 | Less prominent container color, for components like tonal buttons
-  AddOrSetColor('Material3.Color.OnSecondaryContainer', $FFE8DEF8, True); // md.ref.palette.secondary90 | Contrast-passing color shown against the secondary container
-  AddOrSetColor('Material3.Color.Tertiary', $FFEFB8C8, True); // md.ref.palette.tertiary80
-  AddOrSetColor('Material3.Color.OnTertiary', $FF492532, True); // md.ref.palette.tertiary20
-  AddOrSetColor('Material3.Color.TertiaryContainer', $FF633B48, True); // md.ref.palette.tertiary30 | Contrasting container color, for components like input fields
-  AddOrSetColor('Material3.Color.OnTertiaryContainer', $FFFFD8E4, True); // md.ref.palette.tertiary90 | Contrast-passing color shown against the tertiary container
-  AddOrSetColor('Material3.Color.Error', $FFF2B8B5, True); // md.ref.palette.error80 | Indicates errors, such as invalid input in a date picker
-  AddOrSetColor('Material3.Color.OnError', $FF601410, True); // md.ref.palette.error20 | Used for text and icons on the error color
-  AddOrSetColor('Material3.Color.ErrorContainer', $FF8C1D18, True); // md.ref.palette.error30
-  AddOrSetColor('Material3.Color.OnErrorContainer', $FFF9DEDC, True); // md.ref.palette.error90
-  AddOrSetColor('Material3.Color.Surface', $FF141218, True); // md.ref.palette.neutral6 | Surface color for components like cards, sheets, and menus
-  AddOrSetColor('Material3.Color.OnSurface', $FFE6E0E9, True); // md.ref.palette.neutral90 | Text and icons shown against the surface color
-  AddOrSetColor('Material3.Color.SurfaceVariant', $FF49454F, True); // md.ref.palette.neutral-variant30 | Alternate surface color, can be used for active states
-  AddOrSetColor('Material3.Color.OnSurfaceVariant', $FFCAC4D0, True); // md.ref.palette.neutral-variant80 | For text and icons to indicate active or inactive component state
-  AddOrSetColor('Material3.Color.SurfaceContainerHighest', $FF36343B, True); // md.ref.palette.neutral22
-  AddOrSetColor('Material3.Color.SurfaceContainerHigh', $FF2B2930, True); // md.ref.palette.neutral17
-  AddOrSetColor('Material3.Color.SurfaceContainer', $FF211F26, True); // md.ref.palette.neutral12
-  AddOrSetColor('Material3.Color.SurfaceContainerLow', $FF1D1B20, True); // md.ref.palette.neutral10
-  AddOrSetColor('Material3.Color.SurfaceContainerLowest', $FF0F0D13, True); // md.ref.palette.neutral4
-  AddOrSetColor('Material3.Color.InverseSurface', $FFE6E0E9, True); // md.ref.palette.neutral90 | Displays opposite color of the surrounding UI
-  AddOrSetColor('Material3.Color.InverseOnSurface', $FF322F35, True); // md.ref.palette.neutral20 | Used for text and icons shown against the inverse surface color
-  AddOrSetColor('Material3.Color.SurfaceTint', $FFD0BCFF, True); // md.ref.palette.primary80
-  AddOrSetColor('Material3.Color.Outline', $FF938F99, True); // md.ref.palette.neutral-variant60 | Subtle color used for boundaries
-  AddOrSetColor('Material3.Color.OutlineVariant', $FF49454F, True); // md.ref.palette.neutral-variant30 | Outline-variant is used to define the border of a component where 3:1 contrast ratio isn’t required, a container, or a divider.
-  AddOrSetColor('Material3.Color.PrimaryFixed', $FFEADDFF, True); // md.ref.palette.primary90
-  AddOrSetColor('Material3.Color.OnPrimaryFixed', $FF21005D, True); // md.ref.palette.primary10
-  AddOrSetColor('Material3.Color.PrimaryFixedDim', $FFD0BCFF, True); // md.ref.palette.primary80
-  AddOrSetColor('Material3.Color.OnPrimaryFixedVariant', $FF4F378B, True); // md.ref.palette.primary30
-  AddOrSetColor('Material3.Color.InversePrimary', $FF6750A4, True); // md.ref.palette.primary40 | Displays opposite of the primary color
-  AddOrSetColor('Material3.Color.SecondaryFixed', $FFE8DEF8, True); // md.ref.palette.secondary90
-  AddOrSetColor('Material3.Color.OnSecondaryFixed', $FF1D192B, True); // md.ref.palette.secondary10
-  AddOrSetColor('Material3.Color.SecondaryFixedDim', $FFCCC2DC, True); // md.ref.palette.secondary80
-  AddOrSetColor('Material3.Color.OnSecondaryFixedVariant', $FF4A4458, True); // md.ref.palette.secondary30
-  AddOrSetColor('Material3.Color.TertiaryFixed', $FFFFD8E4, True); // md.ref.palette.tertiary90
-  AddOrSetColor('Material3.Color.OnTertiaryFixed', $FF31111D, True); // md.ref.palette.tertiary10
-  AddOrSetColor('Material3.Color.TertiaryFixedDim', $FFEFB8C8, True); // md.ref.palette.tertiary80
-  AddOrSetColor('Material3.Color.OnTertiaryFixedVariant', $FF633B48, True); // md.ref.palette.tertiary30
-  //AddOrSetColor('Material3.Color.Background', $FF141218, True); // md.ref.palette.neutral6 | Note: Background is a legacy color role. It is recommended to use Surface instead of Background.
-  //AddOrSetColor('Material3.Color.OnBackground', $FFE6E0E9, True); // md.ref.palette.neutral90 | Used for text and icons shown against the background color
-  AddOrSetColor('Material3.Color.SurfaceBright', $FF3B383E, True); // md.ref.palette.neutral24
-  AddOrSetColor('Material3.Color.SurfaceDim', $FF141218, True); // md.ref.palette.neutral6
-  AddOrSetColor('Material3.Color.Scrim', $FF000000, True); // md.ref.palette.neutral0 | Used for scrims which help separate floating components from the background.
-  AddOrSetColor('Material3.Color.Shadow', $FF000000, True); // md.ref.palette.neutral0 | For shadows applied to elevated components
+  AddOrSetColor('Material.Color.Primary', $FFD0BCFF, True); // md.ref.palette.primary80 | Main color used across screens and components
+  AddOrSetColor('Material.Color.OnPrimary', $FF381E72, True); // md.ref.palette.primary20 | Text and icons shown against the primary color
+  AddOrSetColor('Material.Color.PrimaryContainer', $FF4F378B, True); // md.ref.palette.primary30 | Standout container color for key components
+  AddOrSetColor('Material.Color.OnPrimaryContainer', $FFEADDFF, True); // md.ref.palette.primary90 | Contrast-passing color shown against the primary container
+  AddOrSetColor('Material.Color.Secondary', $FFCCC2DC, True); // md.ref.palette.secondary80 | Accent color used across screens and components
+  AddOrSetColor('Material.Color.OnSecondary', $FF332D41, True); // md.ref.palette.secondary20 | Text and icons shown against the secondary color
+  AddOrSetColor('Material.Color.SecondaryContainer', $FF4A4458, True); // md.ref.palette.secondary30 | Less prominent container color, for components like tonal buttons
+  AddOrSetColor('Material.Color.OnSecondaryContainer', $FFE8DEF8, True); // md.ref.palette.secondary90 | Contrast-passing color shown against the secondary container
+  AddOrSetColor('Material.Color.Tertiary', $FFEFB8C8, True); // md.ref.palette.tertiary80
+  AddOrSetColor('Material.Color.OnTertiary', $FF492532, True); // md.ref.palette.tertiary20
+  AddOrSetColor('Material.Color.TertiaryContainer', $FF633B48, True); // md.ref.palette.tertiary30 | Contrasting container color, for components like input fields
+  AddOrSetColor('Material.Color.OnTertiaryContainer', $FFFFD8E4, True); // md.ref.palette.tertiary90 | Contrast-passing color shown against the tertiary container
+  AddOrSetColor('Material.Color.Error', $FFF2B8B5, True); // md.ref.palette.error80 | Indicates errors, such as invalid input in a date picker
+  AddOrSetColor('Material.Color.OnError', $FF601410, True); // md.ref.palette.error20 | Used for text and icons on the error color
+  AddOrSetColor('Material.Color.ErrorContainer', $FF8C1D18, True); // md.ref.palette.error30
+  AddOrSetColor('Material.Color.OnErrorContainer', $FFF9DEDC, True); // md.ref.palette.error90
+  AddOrSetColor('Material.Color.Surface', $FF141218, True); // md.ref.palette.neutral6 | Surface color for components like cards, sheets, and menus
+  AddOrSetColor('Material.Color.OnSurface', $FFE6E0E9, True); // md.ref.palette.neutral90 | Text and icons shown against the surface color
+  AddOrSetColor('Material.Color.SurfaceVariant', $FF49454F, True); // md.ref.palette.neutral-variant30 | Alternate surface color, can be used for active states
+  AddOrSetColor('Material.Color.OnSurfaceVariant', $FFCAC4D0, True); // md.ref.palette.neutral-variant80 | For text and icons to indicate active or inactive component state
+  AddOrSetColor('Material.Color.SurfaceContainerHighest', $FF36343B, True); // md.ref.palette.neutral22
+  AddOrSetColor('Material.Color.SurfaceContainerHigh', $FF2B2930, True); // md.ref.palette.neutral17
+  AddOrSetColor('Material.Color.SurfaceContainer', $FF211F26, True); // md.ref.palette.neutral12
+  AddOrSetColor('Material.Color.SurfaceContainerLow', $FF1D1B20, True); // md.ref.palette.neutral10
+  AddOrSetColor('Material.Color.SurfaceContainerLowest', $FF0F0D13, True); // md.ref.palette.neutral4
+  AddOrSetColor('Material.Color.InverseSurface', $FFE6E0E9, True); // md.ref.palette.neutral90 | Displays opposite color of the surrounding UI
+  AddOrSetColor('Material.Color.InverseOnSurface', $FF322F35, True); // md.ref.palette.neutral20 | Used for text and icons shown against the inverse surface color
+  AddOrSetColor('Material.Color.SurfaceTint', $FFD0BCFF, True); // md.ref.palette.primary80
+  AddOrSetColor('Material.Color.Outline', $FF938F99, True); // md.ref.palette.neutral-variant60 | Subtle color used for boundaries
+  AddOrSetColor('Material.Color.OutlineVariant', $FF49454F, True); // md.ref.palette.neutral-variant30 | Outline-variant is used to define the border of a component where 3:1 contrast ratio isn’t required, a container, or a divider.
+  AddOrSetColor('Material.Color.PrimaryFixed', $FFEADDFF, True); // md.ref.palette.primary90
+  AddOrSetColor('Material.Color.OnPrimaryFixed', $FF21005D, True); // md.ref.palette.primary10
+  AddOrSetColor('Material.Color.PrimaryFixedDim', $FFD0BCFF, True); // md.ref.palette.primary80
+  AddOrSetColor('Material.Color.OnPrimaryFixedVariant', $FF4F378B, True); // md.ref.palette.primary30
+  AddOrSetColor('Material.Color.InversePrimary', $FF6750A4, True); // md.ref.palette.primary40 | Displays opposite of the primary color
+  AddOrSetColor('Material.Color.SecondaryFixed', $FFE8DEF8, True); // md.ref.palette.secondary90
+  AddOrSetColor('Material.Color.OnSecondaryFixed', $FF1D192B, True); // md.ref.palette.secondary10
+  AddOrSetColor('Material.Color.SecondaryFixedDim', $FFCCC2DC, True); // md.ref.palette.secondary80
+  AddOrSetColor('Material.Color.OnSecondaryFixedVariant', $FF4A4458, True); // md.ref.palette.secondary30
+  AddOrSetColor('Material.Color.TertiaryFixed', $FFFFD8E4, True); // md.ref.palette.tertiary90
+  AddOrSetColor('Material.Color.OnTertiaryFixed', $FF31111D, True); // md.ref.palette.tertiary10
+  AddOrSetColor('Material.Color.TertiaryFixedDim', $FFEFB8C8, True); // md.ref.palette.tertiary80
+  AddOrSetColor('Material.Color.OnTertiaryFixedVariant', $FF633B48, True); // md.ref.palette.tertiary30
+  //AddOrSetColor('Material.Color.Background', $FF141218, True); // md.ref.palette.neutral6 | Note: Background is a legacy color role. It is recommended to use Surface instead of Background.
+  //AddOrSetColor('Material.Color.OnBackground', $FFE6E0E9, True); // md.ref.palette.neutral90 | Used for text and icons shown against the background color
+  AddOrSetColor('Material.Color.SurfaceBright', $FF3B383E, True); // md.ref.palette.neutral24
+  AddOrSetColor('Material.Color.SurfaceDim', $FF141218, True); // md.ref.palette.neutral6
+  AddOrSetColor('Material.Color.Scrim', $FF000000, True); // md.ref.palette.neutral0 | Used for scrims which help separate floating components from the background.
+  AddOrSetColor('Material.Color.Shadow', $FF000000, True); // md.ref.palette.neutral0 | For shadows applied to elevated components
 
-  AddOrSetTextStyle('Default', ALResetTextStyle, 16{ADefaultFontSize});
+  var LDefaultSystemFontFamily: String;
+  {$if defined(ANDROID)}
+  // In Android, when you want to use the default system font, you should
+  // specify "sans-serif" as the font name. Roboto has been the default font
+  // for Android since Android 4.0 (Ice Cream Sandwich), and specifying
+  // "sans-serif" in your Java/Kotlin code will use Roboto or whichever font
+  // is the system default on the user's device. This approach ensures that
+  // your application uses the default system font, which provides a consistent
+  // user experience across different devices and versions of Android.
+  //   sans-serif
+  //   sans-serif-thin
+  //   sans-serif-light
+  //   sans-serif-medium
+  //   sans-serif-black
+  //   sans-serif-condensed
+  //   sans-serif-smallcaps
+  LDefaultSystemFontFamily := 'sans-serif';
+  {$ELSEif defined(ALAppleOS)}
+  // https://developer.apple.com/fonts/system-fonts/
+  //   Helvetica Neue
+  //   Helvetica Neue Thin
+  //   Helvetica Neue Light
+  //   Helvetica Neue Medium
+  //   Helvetica Neue Bold
+  LDefaultSystemFontFamily := 'Helvetica Neue';
+  {$ELSEIF defined(MSWINDOWS)}
+  // Segoe UI Light
+  // Segoe UI Light
+  // Segoe UI Semibold
+  // Segoe UI Black
+  LDefaultSystemFontFamily := 'Segoe UI';
+  {$ELSE}
+  LDefaultSystemFontFamily := 'sans-serif';
+  {$endif}
+  AddOrSetFontFamily('sans-serif', LDefaultSystemFontFamily);
+  // Material 3 typography tokens live at:
+  // https://m3.material.io/styles/typography/type-scale-tokens
+  // I’m not using them here because they conflate font family with size—
+  // in our app we often change sizes without swapping families—
+  // and, in practice, they all resolve to the same face (“Roboto”).
+  AddOrSetFontFamily('Material.Font.Display.Large', LDefaultSystemFontFamily); // md.sys.typescale.display-large.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Display.Medium', LDefaultSystemFontFamily); // md.sys.typescale.display-medium.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Display.Small', LDefaultSystemFontFamily); // md.sys.typescale.display-small.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Headline.Large', LDefaultSystemFontFamily); // md.sys.typescale.headline-large.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Headline.Medium', LDefaultSystemFontFamily); // md.sys.typescale.headline-medium.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Headline.Small', LDefaultSystemFontFamily); // md.sys.typescale.headline-small.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Title.Large', LDefaultSystemFontFamily); // md.sys.typescale.title-large.font / md.ref.typeface.brand / Roboto
+  AddOrSetFontFamily('Material.Font.Title.Medium', LDefaultSystemFontFamily); // md.sys.typescale.title-medium.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Title.Small', LDefaultSystemFontFamily); // md.sys.typescale.title-small.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Body.Large', LDefaultSystemFontFamily); // md.sys.typescale.body-large.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Body.Medium', LDefaultSystemFontFamily); // md.sys.typescale.body-medium.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Body.Small', LDefaultSystemFontFamily); // md.sys.typescale.body-small.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Label.Large', LDefaultSystemFontFamily); // md.sys.typescale.label-large.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Label.Medium', LDefaultSystemFontFamily); // md.sys.typescale.label-medium.font / md.ref.typeface.plain / Roboto
+  AddOrSetFontFamily('Material.Font.Label.Small', LDefaultSystemFontFamily); // md.sys.typescale.label-small.font / md.ref.typeface.plain / Roboto
+
+  AddOrSetTextStyle('Default', ALResetTextStyle, 14{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Display.Large', ALApplyMaterialTextDisplayLargeStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Display.Medium', ALApplyMaterialTextDisplayMediumStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Display.Small', ALApplyMaterialTextDisplaySmallStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Headline.Large', ALApplyMaterialTextHeadlineLargeStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Headline.Medium', ALApplyMaterialTextHeadlineMediumStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Headline.Small', ALApplyMaterialTextHeadlineSmallStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Title.Large', ALApplyMaterialTextTitleLargeStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Title.Medium', ALApplyMaterialTextTitleMediumStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Title.Small', ALApplyMaterialTextTitleSmallStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Body.Large', ALApplyMaterialTextBodyLargeStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Body.Medium', ALApplyMaterialTextBodyMediumStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Body.Small', ALApplyMaterialTextBodySmallStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Label.Large', ALApplyMaterialTextLabelLargeStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Label.Medium', ALApplyMaterialTextLabelMediumStyle, 0{ADefaultFontSize});
+  AddOrSetTextStyle('Material.Text.Label.Small', ALApplyMaterialTextLabelSmallStyle, 0{ADefaultFontSize});
 
   AddOrSetEditStyle('Default', ALResetEditStyle, 16{ADefaultFontSize});
-  AddOrSetEditStyle('Material3.Edit.Filled', ALApplyMaterial3EditFilledStyle, 16{ADefaultFontSize});
-  AddOrSetEditStyle('Material3.Edit.Filled.Error', ALApplyMaterial3EditFilledErrorStyle, 16{ADefaultFontSize});
-  AddOrSetEditStyle('Material3.Edit.Outlined', ALApplyMaterial3EditOutlinedStyle, 16{ADefaultFontSize});
-  AddOrSetEditStyle('Material3.Edit.Outlined.Error', ALApplyMaterial3EditOutlinedErrorStyle, 16{ADefaultFontSize});
-  AddOrSetEditStyle('Material3.Edit.Hybrid', ALApplyMaterial3EditHybridStyle, 16{ADefaultFontSize});
-  AddOrSetEditStyle('Material3.Edit.Hybrid.Error', ALApplyMaterial3EditHybridErrorStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material.Edit.Filled', ALApplyMaterialEditFilledStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material.Edit.Filled.Error', ALApplyMaterialEditFilledErrorStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material.Edit.Outlined', ALApplyMaterialEditOutlinedStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material.Edit.Outlined.Error', ALApplyMaterialEditOutlinedErrorStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material.Edit.Hybrid', ALApplyMaterialEditHybridStyle, 16{ADefaultFontSize});
+  AddOrSetEditStyle('Material.Edit.Hybrid.Error', ALApplyMaterialEditHybridErrorStyle, 16{ADefaultFontSize});
 
   AddOrSetMemoStyle('Default', ALResetEditStyle, 16{ADefaultFontSize});
-  AddOrSetMemoStyle('Material3.Memo.Filled', ALApplyMaterial3EditFilledStyle, 16{ADefaultFontSize});
-  AddOrSetMemoStyle('Material3.Memo.Filled.Error', ALApplyMaterial3EditFilledErrorStyle, 16{ADefaultFontSize});
-  AddOrSetMemoStyle('Material3.Memo.Outlined', ALApplyMaterial3EditOutlinedStyle, 16{ADefaultFontSize});
-  AddOrSetMemoStyle('Material3.Memo.Outlined.Error', ALApplyMaterial3EditOutlinedErrorStyle, 16{ADefaultFontSize});
+  AddOrSetMemoStyle('Material.Memo.Filled', ALApplyMaterialEditFilledStyle, 16{ADefaultFontSize});
+  AddOrSetMemoStyle('Material.Memo.Filled.Error', ALApplyMaterialEditFilledErrorStyle, 16{ADefaultFontSize});
+  AddOrSetMemoStyle('Material.Memo.Outlined', ALApplyMaterialEditOutlinedStyle, 16{ADefaultFontSize});
+  AddOrSetMemoStyle('Material.Memo.Outlined.Error', ALApplyMaterialEditOutlinedErrorStyle, 16{ADefaultFontSize});
+  AddOrSetMemoStyle('Material.Memo.Hybrid', ALApplyMaterialEditHybridStyle, 16{ADefaultFontSize});
+  AddOrSetMemoStyle('Material.Memo.Hybrid.Error', ALApplyMaterialEditHybridErrorStyle, 16{ADefaultFontSize});
 
   AddOrSetButtonStyle('Default', ALResetButtonStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Filled', ALApplyMaterial3ButtonFilledStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Outlined', ALApplyMaterial3ButtonOutlinedStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Text', ALApplyMaterial3ButtonTextStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Elevated', ALApplyMaterial3ButtonElevatedStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Tonal', ALApplyMaterial3ButtonTonalStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Icon.Filled', ALApplyMaterial3ButtonIconFilledStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Icon.Outlined', ALApplyMaterial3ButtonIconOutlinedStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Icon.Standard', ALApplyMaterial3ButtonIconStandardStyle, 14{ADefaultFontSize});
-  AddOrSetButtonStyle('Material3.Button.Icon.Tonal', ALApplyMaterial3ButtonIconTonalStyle, 14{ADefaultFontSize});
+  AddOrSetButtonStyle('Material.Button.Filled', ALApplyMaterialButtonFilledStyle, 14{ADefaultFontSize});
+  AddOrSetButtonStyle('Material.Button.Outlined', ALApplyMaterialButtonOutlinedStyle, 14{ADefaultFontSize});
+  AddOrSetButtonStyle('Material.Button.Text', ALApplyMaterialButtonTextStyle, 14{ADefaultFontSize});
+  AddOrSetButtonStyle('Material.Button.Elevated', ALApplyMaterialButtonElevatedStyle, 14{ADefaultFontSize});
+  AddOrSetButtonStyle('Material.Button.Tonal', ALApplyMaterialButtonTonalStyle, 14{ADefaultFontSize});
+  AddOrSetButtonIconStyle('Material.Button.Icon.Filled', ALApplyMaterialButtonIconFilledStyle, 40{ADefaultHeight});
+  AddOrSetButtonIconStyle('Material.Button.Icon.Outlined', ALApplyMaterialButtonIconOutlinedStyle, 40{ADefaultHeight});
+  AddOrSetButtonIconStyle('Material.Button.Icon.Standard', ALApplyMaterialButtonIconStandardStyle, 40{ADefaultHeight});
+  AddOrSetButtonIconStyle('Material.Button.Icon.Tonal', ALApplyMaterialButtonIconTonalStyle, 40{ADefaultHeight});
 
   AddOrSetCheckBoxStyle('Default', ALResetCheckBoxStyle, 18{ADefaultHeight});
-  AddOrSetCheckBoxStyle('Material3.CheckBox', ALApplyMaterial3CheckBoxStyle, 18{ADefaultHeight});
-  AddOrSetCheckBoxStyle('Material3.CheckBox.Error', ALApplyMaterial3CheckBoxErrorStyle, 18{ADefaultHeight});
+  AddOrSetCheckBoxStyle('Material.CheckBox', ALApplyMaterialCheckBoxStyle, 18{ADefaultHeight});
+  AddOrSetCheckBoxStyle('Material.CheckBox.Error', ALApplyMaterialCheckBoxErrorStyle, 18{ADefaultHeight});
 
   AddOrSetRadioButtonStyle('Default', ALResetRadioButtonStyle, 20{ADefaultHeight});
-  AddOrSetRadioButtonStyle('Material3.RadioButton', ALApplyMaterial3RadioButtonStyle, 20{ADefaultHeight});
-  AddOrSetRadioButtonStyle('Material3.RadioButton.Error', ALApplyMaterial3RadioButtonErrorStyle, 20{ADefaultHeight});
+  AddOrSetRadioButtonStyle('Material.RadioButton', ALApplyMaterialRadioButtonStyle, 20{ADefaultHeight});
+  AddOrSetRadioButtonStyle('Material.RadioButton.Error', ALApplyMaterialRadioButtonErrorStyle, 20{ADefaultHeight});
 
   AddOrSetSwitchStyle('Default', ALResetSwitchStyle, 32{ADefaultHeight});
-  AddOrSetSwitchStyle('Material3.Switch', ALApplyMaterial3SwitchStyle, 32{ADefaultHeight});
+  AddOrSetSwitchStyle('Material.Switch', ALApplyMaterialSwitchStyle, 32{ADefaultHeight});
 
-  AddOrSetTrackBarStyle('Default', ALResetTrackBarStyle, 32{ADefaultHeight});
-  AddOrSetTrackBarStyle('Material3.TrackBar', ALApplyMaterial3TrackBarStyle, 44{ADefaultHeight});
+  AddOrSetTrackBarStyle('Default', ALResetTrackBarStyle, 32{ADefaultSize});
+  AddOrSetTrackBarStyle('Material.TrackBar', ALApplyMaterialTrackBarStyle, 44{ADefaultSize});
 
-  AddOrSetRangeTrackBarStyle('Default', ALResetTrackBarStyle, 32{ADefaultHeight});
-  AddOrSetRangeTrackBarStyle('Material3.RangeTrackBar', ALApplyMaterial3TrackBarStyle, 44{ADefaultHeight});
+  AddOrSetRangeTrackBarStyle('Default', ALResetTrackBarStyle, 32{ADefaultSize});
+  AddOrSetRangeTrackBarStyle('Material.RangeTrackBar', ALApplyMaterialTrackBarStyle, 44{ADefaultSize});
+
+  AddOrSetScrollBarStyle('Default', ALResetScrollBarStyle, 18{ADefaultSize});
+  AddOrSetScrollBarStyle('Material.ScrollBar', ALApplyMaterialScrollBarStyle, 18{ADefaultSize});
+
+  AddOrSetScrollBoxStyle('Default', ALResetScrollBoxStyle);
+  AddOrSetScrollBoxStyle('Material.ScrollBox', ALApplyMaterialScrollBoxStyle);
+
+  AddOrSetDialogManagerStyle('Default', ALResetDialogManagerStyle, 14{ADefaultFontSize});
+  AddOrSetDialogManagerStyle('Material.DialogManager', ALApplyMaterialDialogManagerStyle, 14{ADefaultFontSize});
 end;
 
 {***********************************}
@@ -2445,6 +3441,12 @@ begin
   end;
 end;
 
+{**************************************************************************************}
+procedure TALStyleManager.AddOrSetFontFamily(const AName: String; Const AValue: String);
+begin
+  FFontFamilies.AddOrSetValue(AName, AValue);
+end;
+
 {*******************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetTextStyle(const AName: String; const AApplyStyleProc: TTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
@@ -2466,7 +3468,13 @@ end;
 {***********************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetButtonStyle(const AName: String; const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultFontSize: Single);
 begin
-  FButtonStyles.AddOrSetValue(AName, TButtonStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+  FButtonStyles.AddOrSetValue(AName, TButtonStyleInfo.create(AApplyStyleProc, ADefaultFontSize, 0{ADefaultHeight}));
+end;
+
+{*************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetButtonIconStyle(const AName: String; const AApplyStyleProc: TButtonApplyStyleProc; const ADefaultHeight: Single);
+begin
+  FButtonStyles.AddOrSetValue(AName, TButtonStyleInfo.create(AApplyStyleProc, 0{ADefaultFontSize}, ADefaultHeight));
 end;
 
 {*************************************************************************************************************************************************}
@@ -2487,16 +3495,40 @@ begin
   FSwitchStyles.AddOrSetValue(AName, TSwitchStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{*************************************************************************************************************************************************}
-procedure TALStyleManager.AddOrSetTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
+{***********************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultSize: Single);
 begin
-  FTrackBarStyles.AddOrSetValue(AName, TTrackBarStyleInfo.create(AApplyStyleProc, ADefaultHeight));
+  FTrackBarStyles.AddOrSetValue(AName, TTrackBarStyleInfo.create(AApplyStyleProc, ADefaultSize));
 end;
 
-{******************************************************************************************************************************************************}
-procedure TALStyleManager.AddOrSetRangeTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultHeight: Single);
+{****************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetRangeTrackBarStyle(const AName: String; const AApplyStyleProc: TTrackBarApplyStyleProc; const ADefaultSize: Single);
 begin
-  FRangeTrackBarStyles.AddOrSetValue(AName, TTrackBarStyleInfo.create(AApplyStyleProc, ADefaultHeight));
+  FRangeTrackBarStyles.AddOrSetValue(AName, TTrackBarStyleInfo.create(AApplyStyleProc, ADefaultSize));
+end;
+
+{*************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetScrollBarStyle(const AName: String; const AApplyStyleProc: TScrollBarApplyStyleProc; const ADefaultSize: Single);
+begin
+  FScrollBarStyles.AddOrSetValue(AName, TScrollBarStyleInfo.create(AApplyStyleProc, ADefaultSize));
+end;
+
+{*********************************************************************************************************************}
+procedure TALStyleManager.AddOrSetScrollBoxStyle(const AName: String; const AApplyStyleProc: TScrollBoxApplyStyleProc);
+begin
+  FScrollBoxStyles.AddOrSetValue(AName, TScrollBoxStyleInfo.create(AApplyStyleProc));
+end;
+
+{*************************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetDialogManagerStyle(const AName: String; const AApplyStyleProc: TDialogManagerApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  FDialogManagerStyles.AddOrSetValue(AName, TDialogManagerStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+end;
+
+{***********************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  FDialogStyles.AddOrSetValue(AName, TDialogStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
 {******************************************************************}
@@ -2505,7 +3537,7 @@ function TALStyleManager.GetColor(const AName: String): TAlphaColor;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _TryGetValueWithAlpha(out AValue: TAlphacolor): Boolean;
   begin
-    // Ex: Material3.Color.Primary.Alpha08
+    // Ex: Material.Color.Primary.Alpha08
     var Ln := length(AName);
     Result := (Ln > 8) and
               (AName[Ln-7] = '.') and
@@ -2537,31 +3569,54 @@ begin
   end;
 end;
 
-{**********************************************************************************}
-procedure TALStyleManager.ApplyTextStyle(const AName: String; const AText: TALText);
+{******************************************************************}
+function TALStyleManager.GetFontFamily(const AName: String): String;
+begin
+  if (not FFontFamilies.TryGetValue(AName, Result)) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Font "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit('');
+  end;
+end;
+
+{***********************************************************************************************************}
+procedure TALStyleManager.ApplyTextStyle(const AName: String; const AText: TALText; const AFontSize: Single);
 begin
   Var LApplyTextStyleInfo: TTextStyleInfo;
   if not fTextStyles.TryGetValue(AName, LApplyTextStyleInfo) then begin
     {$IF not defined(ALDPK)}
-    ALLog('TALStyleManager', 'Color "%s" not found in style manager', [AName], TALLogType.ERROR);
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
     {$ENDIF}
     Exit;
   end;
 
   AText.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyTextStyleInfo.ApplyStyleProc(AText, LApplyTextStyleInfo.DefaultFontSize);
-    {$ELSE}
-    LApplyTextStyleInfo.ApplyStyleProc(AText, AText.TextSettings.Font.Size);
+    LApplyTextStyleInfo.ApplyStyleProc(AText, AFontSize / LApplyTextStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if AText.AutoAlignToPixel then AText.AlignToPixel;
     {$ENDIF}
   finally
     AText.EndUpdate;
   end;
 end;
 
-{**************************************************************************************}
-procedure TALStyleManager.ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit);
+{**********************************************************************************}
+procedure TALStyleManager.ApplyTextStyle(const AName: String; const AText: TALText);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyTextStyleInfo: TTextStyleInfo;
+  if not fTextStyles.TryGetValue(AName, LApplyTextStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplyTextStyleInfo.DefaultFontSize, LApplyTextStyleInfo.DefaultFontSize);
+  ApplyTextStyle(AName, AText, LApplyTextStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplyTextStyle(AName, AText, AText.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{***************************************************************************************************************}
+procedure TALStyleManager.ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit; const AFontSize: Single);
 begin
   Var LApplyEditStyleInfo: TEditStyleInfo;
   if not fEditStyles.TryGetValue(AName, LApplyEditStyleInfo) then begin
@@ -2573,10 +3628,9 @@ begin
 
   AEdit.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyEditStyleInfo.ApplyStyleProc(AEdit, LApplyEditStyleInfo.DefaultFontSize);
-    {$ELSE}
-    LApplyEditStyleInfo.ApplyStyleProc(AEdit, AEdit.TextSettings.Font.Size);
+    LApplyEditStyleInfo.ApplyStyleProc(AEdit, AFontSize / LApplyEditStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if AEdit.AutoAlignToPixel then AEdit.AlignToPixel;
     {$ENDIF}
   finally
     AEdit.EndUpdate;
@@ -2584,7 +3638,20 @@ begin
 end;
 
 {**************************************************************************************}
-procedure TALStyleManager.ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit);
+procedure TALStyleManager.ApplyEditStyle(const AName: String; const AEdit: TALBaseEdit);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyEditStyleInfo: TEditStyleInfo;
+  if not fEditStyles.TryGetValue(AName, LApplyEditStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplyEditStyleInfo.DefaultFontSize, LApplyEditStyleInfo.DefaultFontSize);
+  ApplyEditStyle(AName, AEdit, LApplyEditStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplyEditStyle(AName, AEdit, AEdit.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{***************************************************************************************************************}
+procedure TALStyleManager.ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit; const AFontSize: Single);
 begin
   Var LApplyMemoStyleInfo: TEditStyleInfo;
   if not fMemoStyles.TryGetValue(AName, LApplyMemoStyleInfo) then begin
@@ -2596,13 +3663,69 @@ begin
 
   AMemo.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyMemoStyleInfo.ApplyStyleProc(AMemo, LApplyMemoStyleInfo.DefaultFontSize);
-    {$ELSE}
-    LApplyMemoStyleInfo.ApplyStyleProc(AMemo, AMemo.TextSettings.Font.Size);
+    LApplyMemoStyleInfo.ApplyStyleProc(AMemo, AFontSize / LApplyMemoStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if AMemo.AutoAlignToPixel then AMemo.AlignToPixel;
     {$ENDIF}
   finally
     AMemo.EndUpdate;
+  end;
+end;
+
+{**************************************************************************************}
+procedure TALStyleManager.ApplyMemoStyle(const AName: String; const AMemo: TALBaseEdit);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyMemoStyleInfo: TEditStyleInfo;
+  if not fMemoStyles.TryGetValue(AName, LApplyMemoStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplyMemoStyleInfo.DefaultFontSize, LApplyMemoStyleInfo.DefaultFontSize);
+  ApplyMemoStyle(AName, AMemo, LApplyMemoStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplyMemoStyle(AName, AMemo, AMemo.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************************************}
+procedure TALStyleManager.ApplyButtonStyle(const AName: String; const AButton: TALButton; const AFontSize: Single);
+begin
+  Var LApplyButtonStyleInfo: TButtonStyleInfo;
+  if not fButtonStyles.TryGetValue(AName, LApplyButtonStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  AButton.BeginUpdate;
+  try
+    LApplyButtonStyleInfo.ApplyStyleProc(AButton, AFontSize / LApplyButtonStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if AButton.AutoAlignToPixel then AButton.AlignToPixel;
+    {$ENDIF}
+  finally
+    AButton.EndUpdate;
+  end;
+end;
+
+{*******************************************************************************************************************}
+procedure TALStyleManager.ApplyButtonIconStyle(const AName: String; const AButton: TALButton; const AHeight: Single);
+begin
+  Var LApplyButtonStyleInfo: TButtonStyleInfo;
+  if not fButtonStyles.TryGetValue(AName, LApplyButtonStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  AButton.BeginUpdate;
+  try
+    LApplyButtonStyleInfo.ApplyStyleProc(AButton, AHeight / LApplyButtonStyleInfo.DefaultHeight);
+    {$IF not defined(ALDPK)}
+    if AButton.AutoAlignToPixel then AButton.AlignToPixel;
+    {$ENDIF}
+  finally
+    AButton.EndUpdate;
   end;
 end;
 
@@ -2616,21 +3739,26 @@ begin
     {$ENDIF}
     Exit;
   end;
-
-  AButton.BeginUpdate;
-  try
+  if LApplyButtonStyleInfo.DefaultFontSize > 0 then begin
     {$IF defined(ALDPK)}
-    LApplyButtonStyleInfo.ApplyStyleProc(AButton, LApplyButtonStyleInfo.DefaultFontSize);
+    var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplyButtonStyleInfo.DefaultFontSize, LApplyButtonStyleInfo.DefaultFontSize);
+    ApplyButtonStyle(AName, AButton, LApplyButtonStyleInfo.DefaultFontSize * LRatio);
     {$ELSE}
-    LApplyButtonStyleInfo.ApplyStyleProc(AButton, AButton.TextSettings.Font.Size);
+    ApplyButtonStyle(AName, AButton, AButton.TextSettings.Font.Size);
     {$ENDIF}
-  finally
-    AButton.EndUpdate;
+  end
+  else begin
+    {$IF defined(ALDPK)}
+    var LRatio: Single := ALGetStyleRatio('Please enter the desired height', LApplyButtonStyleInfo.DefaultHeight, LApplyButtonStyleInfo.DefaultHeight);
+    ApplyButtonIconStyle(AName, AButton, LApplyButtonStyleInfo.DefaultHeight * LRatio);
+    {$ELSE}
+    ApplyButtonIconStyle(AName, AButton, AButton.Height);
+    {$ENDIF}
   end;
 end;
 
-{**********************************************************************************************}
-procedure TALStyleManager.ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox);
+{*********************************************************************************************************************}
+procedure TALStyleManager.ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox; const AHeight: Single);
 begin
   Var LApplyCheckBoxStyleInfo: TCheckBoxStyleInfo;
   if not fCheckBoxStyles.TryGetValue(AName, LApplyCheckBoxStyleInfo) then begin
@@ -2642,18 +3770,30 @@ begin
 
   ACheckBox.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyCheckBoxStyleInfo.ApplyStyleProc(ACheckBox, LApplyCheckBoxStyleInfo.DefaultHeight);
-    {$ELSE}
-    LApplyCheckBoxStyleInfo.ApplyStyleProc(ACheckBox, ACheckBox.Height);
+    LApplyCheckBoxStyleInfo.ApplyStyleProc(ACheckBox, AHeight / LApplyCheckBoxStyleInfo.DefaultHeight);
+    {$IF not defined(ALDPK)}
+    if ACheckBox.AutoAlignToPixel then ACheckBox.AlignToPixel;
     {$ENDIF}
   finally
     ACheckBox.EndUpdate;
   end;
 end;
 
-{*******************************************************************************************************}
-procedure TALStyleManager.ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton);
+{**********************************************************************************************}
+procedure TALStyleManager.ApplyCheckBoxStyle(const AName: String; const ACheckBox: TALCheckBox);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyCheckBoxStyleInfo: TCheckBoxStyleInfo;
+  if not fCheckBoxStyles.TryGetValue(AName, LApplyCheckBoxStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired height', LApplyCheckBoxStyleInfo.DefaultHeight, LApplyCheckBoxStyleInfo.DefaultHeight);
+  ApplyCheckBoxStyle(AName, ACheckBox, LApplyCheckBoxStyleInfo.DefaultHeight * LRatio);
+  {$ELSE}
+  ApplyCheckBoxStyle(AName, ACheckBox, ACheckBox.Height);
+  {$ENDIF}
+end;
+
+{******************************************************************************************************************************}
+procedure TALStyleManager.ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton; const AHeight: Single);
 begin
   Var LApplyRadioButtonStyleInfo: TRadioButtonStyleInfo;
   if not fRadioButtonStyles.TryGetValue(AName, LApplyRadioButtonStyleInfo) then begin
@@ -2665,18 +3805,30 @@ begin
 
   ARadioButton.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyRadioButtonStyleInfo.ApplyStyleProc(ARadioButton, LApplyRadioButtonStyleInfo.DefaultHeight);
-    {$ELSE}
-    LApplyRadioButtonStyleInfo.ApplyStyleProc(ARadioButton, ARadioButton.Height);
+    LApplyRadioButtonStyleInfo.ApplyStyleProc(ARadioButton, AHeight / LApplyRadioButtonStyleInfo.DefaultHeight);
+    {$IF not defined(ALDPK)}
+    if ARadioButton.AutoAlignToPixel then ARadioButton.AlignToPixel;
     {$ENDIF}
   finally
     ARadioButton.EndUpdate;
   end;
 end;
 
-{****************************************************************************************}
-procedure TALStyleManager.ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch);
+{*******************************************************************************************************}
+procedure TALStyleManager.ApplyRadioButtonStyle(const AName: String; const ARadioButton: TALRadioButton);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyRadioButtonStyleInfo: TRadioButtonStyleInfo;
+  if not fRadioButtonStyles.TryGetValue(AName, LApplyRadioButtonStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired height', LApplyRadioButtonStyleInfo.DefaultHeight, LApplyRadioButtonStyleInfo.DefaultHeight);
+  ApplyRadioButtonStyle(AName, ARadioButton, LApplyRadioButtonStyleInfo.DefaultHeight * LRatio);
+  {$ELSE}
+  ApplyRadioButtonStyle(AName, ARadioButton, ARadioButton.Height);
+  {$ENDIF}
+end;
+
+{***************************************************************************************************************}
+procedure TALStyleManager.ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch; const AHeight: Single);
 begin
   Var LApplySwitchStyleInfo: TSwitchStyleInfo;
   if not fSwitchStyles.TryGetValue(AName, LApplySwitchStyleInfo) then begin
@@ -2688,18 +3840,30 @@ begin
 
   ASwitch.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplySwitchStyleInfo.ApplyStyleProc(ASwitch, LApplySwitchStyleInfo.DefaultHeight);
-    {$ELSE}
-    LApplySwitchStyleInfo.ApplyStyleProc(ASwitch, ASwitch.Height);
+    LApplySwitchStyleInfo.ApplyStyleProc(ASwitch, AHeight / LApplySwitchStyleInfo.DefaultHeight);
+    {$IF not defined(ALDPK)}
+    if ASwitch.AutoAlignToPixel then ASwitch.AlignToPixel;
     {$ENDIF}
   finally
     ASwitch.EndUpdate;
   end;
 end;
 
-{*************************************************************************************************}
-procedure TALStyleManager.ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack);
+{****************************************************************************************}
+procedure TALStyleManager.ApplySwitchStyle(const AName: String; const ASwitch: TALSwitch);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplySwitchStyleInfo: TSwitchStyleInfo;
+  if not fSwitchStyles.TryGetValue(AName, LApplySwitchStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired height', LApplySwitchStyleInfo.DefaultHeight, LApplySwitchStyleInfo.DefaultHeight);
+  ApplySwitchStyle(AName, ASwitch, LApplySwitchStyleInfo.DefaultHeight * LRatio);
+  {$ELSE}
+  ApplySwitchStyle(AName, ASwitch, ASwitch.Height);
+  {$ENDIF}
+end;
+
+{**********************************************************************************************************************}
+procedure TALStyleManager.ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack; const ASize: Single);
 begin
   Var LApplyTrackBarStyleInfo: TTrackBarStyleInfo;
   if not fTrackBarStyles.TryGetValue(AName, LApplyTrackBarStyleInfo) then begin
@@ -2711,18 +3875,37 @@ begin
 
   ATrackBar.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyTrackBarStyleInfo.ApplyStyleProc(ATrackBar, LApplyTrackBarStyleInfo.DefaultHeight);
-    {$ELSE}
-    LApplyTrackBarStyleInfo.ApplyStyleProc(ATrackBar, ATrackBar.Height);
+    LApplyTrackBarStyleInfo.ApplyStyleProc(ATrackBar, ASize / LApplyTrackBarStyleInfo.DefaultSize);
+    {$IF not defined(ALDPK)}
+    if ATrackBar.AutoAlignToPixel then ATrackBar.AlignToPixel;
     {$ENDIF}
   finally
     ATrackBar.EndUpdate;
   end;
 end;
 
-{***********************************************************************************************************}
-procedure TALStyleManager.ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack);
+{*************************************************************************************************}
+procedure TALStyleManager.ApplyTrackBarStyle(const AName: String; const ATrackBar: TALCustomTrack);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyTrackBarStyleInfo: TTrackBarStyleInfo;
+  if not fTrackBarStyles.TryGetValue(AName, LApplyTrackBarStyleInfo) then Exit;
+  var LRatio: Single;
+  If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+    LRatio := ALGetStyleRatio('Please enter the desired height', LApplyTrackBarStyleInfo.DefaultSize, LApplyTrackBarStyleInfo.DefaultSize)
+  else
+    LRatio := ALGetStyleRatio('Please enter the desired width', LApplyTrackBarStyleInfo.DefaultSize, LApplyTrackBarStyleInfo.DefaultSize);
+  ApplyTrackBarStyle(AName, ATrackBar, LApplyTrackBarStyleInfo.DefaultSize * LRatio);
+  {$ELSE}
+  If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+    ApplyTrackBarStyle(AName, ATrackBar, ATrackBar.Height)
+  else
+    ApplyTrackBarStyle(AName, ATrackBar, ATrackBar.Width);
+  {$ENDIF}
+end;
+
+{********************************************************************************************************************************}
+procedure TALStyleManager.ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack; const ASize: Single);
 begin
   Var LApplyRangeTrackBarStyleInfo: TTrackBarStyleInfo;
   if not fRangeTrackBarStyles.TryGetValue(AName, LApplyRangeTrackBarStyleInfo) then begin
@@ -2734,29 +3917,203 @@ begin
 
   ARangeTrackBar.BeginUpdate;
   try
-    {$IF defined(ALDPK)}
-    LApplyRangeTrackBarStyleInfo.ApplyStyleProc(ARangeTrackBar, LApplyRangeTrackBarStyleInfo.DefaultHeight);
-    {$ELSE}
-    LApplyRangeTrackBarStyleInfo.ApplyStyleProc(ARangeTrackBar, ARangeTrackBar.Height);
+    LApplyRangeTrackBarStyleInfo.ApplyStyleProc(ARangeTrackBar, ASize / LApplyRangeTrackBarStyleInfo.DefaultSize);
+    {$IF not defined(ALDPK)}
+    if ARangeTrackBar.AutoAlignToPixel then ARangeTrackBar.AlignToPixel;
     {$ENDIF}
   finally
     ARangeTrackBar.EndUpdate;
   end;
 end;
 
+{***********************************************************************************************************}
+procedure TALStyleManager.ApplyRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALCustomTrack);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyRangeTrackBarStyleInfo: TTrackBarStyleInfo;
+  if not fRangeTrackBarStyles.TryGetValue(AName, LApplyRangeTrackBarStyleInfo) then Exit;
+  var LRatio: Single;
+  If ARangeTrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+    LRatio := ALGetStyleRatio('Please enter the desired height', LApplyRangeTrackBarStyleInfo.DefaultSize, LApplyRangeTrackBarStyleInfo.DefaultSize)
+  else
+    LRatio := ALGetStyleRatio('Please enter the desired width', LApplyRangeTrackBarStyleInfo.DefaultSize, LApplyRangeTrackBarStyleInfo.DefaultSize);
+  ApplyRangeTrackBarStyle(AName, ARangeTrackBar, LApplyRangeTrackBarStyleInfo.DefaultSize * LRatio);
+  {$ELSE}
+  If ARangeTrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+    ApplyRangeTrackBarStyle(AName, ARangeTrackBar, ARangeTrackBar.Height)
+  else
+    ApplyRangeTrackBarStyle(AName, ARangeTrackBar, ARangeTrackBar.Width);
+  {$ENDIF}
+end;
+
+{****************************************************************************************************************************}
+procedure TALStyleManager.ApplyScrollBarStyle(const AName: String; const AScrollBar: TALCustomScrollBar; const ASize: Single);
+begin
+  Var LApplyScrollBarStyleInfo: TScrollBarStyleInfo;
+  if not fScrollBarStyles.TryGetValue(AName, LApplyScrollBarStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  AScrollBar.BeginUpdate;
+  try
+    LApplyScrollBarStyleInfo.ApplyStyleProc(AScrollBar, ASize / LApplyScrollBarStyleInfo.DefaultSize);
+    {$IF not defined(ALDPK)}
+    if AScrollBar.AutoAlignToPixel then AScrollBar.AlignToPixel;
+    {$ENDIF}
+  finally
+    AScrollBar.EndUpdate;
+  end;
+end;
+
+{*******************************************************************************************************}
+procedure TALStyleManager.ApplyScrollBarStyle(const AName: String; const AScrollBar: TALCustomScrollBar);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyScrollBarStyleInfo: TScrollBarStyleInfo;
+  if not fScrollBarStyles.TryGetValue(AName, LApplyScrollBarStyleInfo) then Exit;
+  var LRatio: Single;
+  If AScrollBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+    LRatio := ALGetStyleRatio('Please enter the desired height', LApplyScrollBarStyleInfo.DefaultSize, LApplyScrollBarStyleInfo.DefaultSize)
+  else
+    LRatio := ALGetStyleRatio('Please enter the desired width', LApplyScrollBarStyleInfo.DefaultSize, LApplyScrollBarStyleInfo.DefaultSize);
+  ApplyScrollBarStyle(AName, AScrollBar, LApplyScrollBarStyleInfo.DefaultSize * LRatio);
+  {$ELSE}
+  If AScrollBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+    ApplyScrollBarStyle(AName, AScrollBar, AScrollBar.Height)
+  else
+    ApplyScrollBarStyle(AName, AScrollBar, AScrollBar.Width);
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************}
+procedure TALStyleManager.ApplyScrollBoxStyle(const AName: String; const AScrollBox: TALCustomScrollBox);
+begin
+  Var LApplyScrollBoxStyleInfo: TScrollBoxStyleInfo;
+  if not fScrollBoxStyles.TryGetValue(AName, LApplyScrollBoxStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  AScrollBox.BeginUpdate;
+  try
+    LApplyScrollBoxStyleInfo.ApplyStyleProc(AScrollBox);
+    {$IF not defined(ALDPK)}
+    if AScrollBox.AutoAlignToPixel then AScrollBox.AlignToPixel;
+    {$ENDIF}
+  finally
+    AScrollBox.EndUpdate;
+  end;
+end;
+
+{**************************************************************************************************************************************}
+procedure TALStyleManager.ApplyDialogManagerStyle(const AName: String; const ADialogManager: TALDialogManager; const AFontSize: Single);
+begin
+  Var LApplyDialogManagerStyleInfo: TDialogManagerStyleInfo;
+  if not fDialogManagerStyles.TryGetValue(AName, LApplyDialogManagerStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  LApplyDialogManagerStyleInfo.ApplyStyleProc(ADialogManager, AFontSize / LApplyDialogManagerStyleInfo.DefaultFontSize);
+  {$IF not defined(ALDPK)}
+  if ADialogManager.DefaultScrim.AutoAlignToPixel then ADialogManager.DefaultScrim.AlignToPixel;
+  if ADialogManager.DefaultContainer.AutoAlignToPixel then ADialogManager.DefaultContainer.AlignToPixel;
+  if ADialogManager.DefaultIcon.AutoAlignToPixel then ADialogManager.DefaultIcon.AlignToPixel;
+  if ADialogManager.DefaultHeadline.AutoAlignToPixel then ADialogManager.DefaultHeadline.AlignToPixel;
+  if ADialogManager.DefaultContent.AutoAlignToPixel then ADialogManager.DefaultContent.AlignToPixel;
+  if ADialogManager.DefaultMessage.AutoAlignToPixel then ADialogManager.DefaultMessage.AlignToPixel;
+  if ADialogManager.DefaultOptionLayout.AutoAlignToPixel then ADialogManager.DefaultOptionLayout.AlignToPixel;
+  if ADialogManager.DefaultRadioButton.AutoAlignToPixel then ADialogManager.DefaultRadioButton.AlignToPixel;
+  if ADialogManager.DefaultCheckBox.AutoAlignToPixel then ADialogManager.DefaultCheckBox.AlignToPixel;
+  if ADialogManager.DefaultInlineButton.AutoAlignToPixel then ADialogManager.DefaultInlineButton.AlignToPixel;
+  if ADialogManager.DefaultEdit.AutoAlignToPixel then ADialogManager.DefaultEdit.AlignToPixel;
+  if ADialogManager.DefaultMemo.AutoAlignToPixel then ADialogManager.DefaultMemo.AlignToPixel;
+  if ADialogManager.DefaultLabel.AutoAlignToPixel then ADialogManager.DefaultLabel.AlignToPixel;
+  if ADialogManager.DefaultFooterBar.AutoAlignToPixel then ADialogManager.DefaultFooterBar.AlignToPixel;
+  if ADialogManager.DefaultFooterButton.AutoAlignToPixel then ADialogManager.DefaultFooterButton.AlignToPixel;
+  {$ENDIF}
+end;
+
+{*************************************************************************************************************}
+procedure TALStyleManager.ApplyDialogManagerStyle(const AName: String; const ADialogManager: TALDialogManager);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyDialogManagerStyleInfo: TDialogManagerStyleInfo;
+  if not fDialogManagerStyles.TryGetValue(AName, LApplyDialogManagerStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplyDialogManagerStyleInfo.DefaultFontSize, LApplyDialogManagerStyleInfo.DefaultFontSize);
+  ApplyDialogManagerStyle(AName, ADialogManager, LApplyDialogManagerStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplyDialogManagerStyle(AName, ADialogManager, ADialogManager.DefaultMessage.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************************************}
+procedure TALStyleManager.ApplyDialogStyle(const AName: String; const ADialog: TALDialog; const AFontSize: Single);
+begin
+  Var LApplyDialogStyleInfo: TDialogStyleInfo;
+  if not fDialogStyles.TryGetValue(AName, LApplyDialogStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  ADialog.BeginUpdate;
+  try
+    LApplyDialogStyleInfo.ApplyStyleProc(ADialog, AFontSize / LApplyDialogStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if ADialog.AutoAlignToPixel then ADialog.AlignToPixel;
+    {$ENDIF}
+  finally
+    ADialog.EndUpdate;
+  end;
+end;
+
+{****************************************************************************************}
+procedure TALStyleManager.ApplyDialogStyle(const AName: String; const ADialog: TALDialog);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplyDialogStyleInfo: TDialogStyleInfo;
+  if not fDialogStyles.TryGetValue(AName, LApplyDialogStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplyDialogStyleInfo.DefaultFontSize, LApplyDialogStyleInfo.DefaultFontSize);
+  ApplyDialogStyle(AName, ADialog, LApplyDialogStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplyDialogStyle(AName, ADialog, ADialog.Message.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
 {*****************************************************}
 function TALStyleManager.GetColorNames: TArray<String>;
 begin
   var LArray := FLightColors.ToArray;
-  TArray.Sort<TPair<String, TPair<TAlphaColor, integer{SortOrder}>>>(LArray,
-    TComparer<TPair<String, TPair<TAlphaColor, integer{SortOrder}>>>.Construct(
-                                                                       function(const Left, Right: TPair<String, TPair<TAlphaColor, integer{SortOrder}>>): Integer
+  TArray.Sort<TPair<string, TPair<TAlphaColor, integer{SortOrder}>>>(LArray,
+    TComparer<TPair<string, TPair<TAlphaColor, integer{SortOrder}>>>.Construct(
+                                                                       function(const Left, Right: TPair<string, TPair<TAlphaColor, integer{SortOrder}>>): Integer
                                                                        begin
-                                                                         Result := Left.value.Value - Right.value.value;
+                                                                         Result := Left.value.value - Right.value.value;
                                                                        end));
   SetLength(Result, Length(LArray));
   for var I := low(LArray) to High(LArray) do
     Result[I] := LArray[I].Key;
+end;
+
+{**********************************************************}
+function TALStyleManager.GetFontFamilyNames: TArray<String>;
+begin
+  Result := FFontFamilies.Keys.ToArray;
+  TArray.Sort<String>(Result,
+    TComparer<String>.Construct(
+      function(const Left, Right: String): Integer
+      begin
+        Result := ALCompareStrW(Left, Right);
+      end));
 end;
 
 {*********************************************************}
@@ -2886,6 +4243,66 @@ begin
   TArray.Sort<TPair<String, TTrackBarStyleInfo>>(LArray,
     TComparer<TPair<String, TTrackBarStyleInfo>>.Construct(
       function(const Left, Right: TPair<String, TTrackBarStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{**************************************************************}
+function TALStyleManager.GetScrollBarStyleNames: TArray<String>;
+begin
+  var LArray := FScrollBarStyles.ToArray;
+  TArray.Sort<TPair<String, TScrollBarStyleInfo>>(LArray,
+    TComparer<TPair<String, TScrollBarStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TScrollBarStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{**************************************************************}
+function TALStyleManager.GetScrollBoxStyleNames: TArray<String>;
+begin
+  var LArray := FScrollBoxStyles.ToArray;
+  TArray.Sort<TPair<String, TScrollBoxStyleInfo>>(LArray,
+    TComparer<TPair<String, TScrollBoxStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TScrollBoxStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{******************************************************************}
+function TALStyleManager.GetDialogManagerStyleNames: TArray<String>;
+begin
+  var LArray := FDialogManagerStyles.ToArray;
+  TArray.Sort<TPair<String, TDialogManagerStyleInfo>>(LArray,
+    TComparer<TPair<String, TDialogManagerStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TDialogManagerStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{***********************************************************}
+function TALStyleManager.GetDialogStyleNames: TArray<String>;
+begin
+  var LArray := FDialogStyles.ToArray;
+  TArray.Sort<TPair<String, TDialogStyleInfo>>(LArray,
+    TComparer<TPair<String, TDialogStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TDialogStyleInfo>): Integer
       begin
         Result := Left.value.SortOrder - Right.value.SortOrder;
       end));

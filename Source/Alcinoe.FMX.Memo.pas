@@ -397,10 +397,17 @@ type
     procedure AdjustSize; override;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure Assign(Source: TPersistent); override;
     function HasUnconstrainedAutosizeX: Boolean; override;
   published
     property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+  end;
+
+  {***************************}
+  TALDummyMemo = class(TALMemo)
+  protected
+    function CreateEditControl: TALBaseEditControl; override;
   end;
 
 procedure Register;
@@ -948,7 +955,7 @@ end;
 {***************************************************************}
 procedure TALIosMemoControl.TextSettingsChanged(Sender: TObject);
 begin
-  var LFontRef := ALCreateCTFontRef(TextSettings.Font.Family, TextSettings.Font.Size, TextSettings.Font.Weight, TextSettings.Font.Slant);
+  var LFontRef := ALCreateCTFontRef(ALResolveFontFamily(TextSettings.Font.Family), TextSettings.Font.Size, TextSettings.Font.Weight, TextSettings.Font.Slant);
   try
 
     // LineHeightMultiplier
@@ -1457,7 +1464,7 @@ end;
 {***************************************************************}
 procedure TALMacMemoControl.TextSettingsChanged(Sender: TObject);
 begin
-  var LFontRef := ALCreateCTFontRef(TextSettings.Font.Family, TextSettings.Font.Size, TextSettings.Font.Weight, TextSettings.Font.Slant);
+  var LFontRef := ALCreateCTFontRef(ALResolveFontFamily(TextSettings.Font.Family), TextSettings.Font.Size, TextSettings.Font.Weight, TextSettings.Font.Slant);
   try
 
     // LineHeightMultiplier
@@ -1559,7 +1566,7 @@ end;
 function TALMacMemoControl.getLineHeight: Single;
 begin
   var LfontMetrics := ALGetFontMetrics(
-                        TextSettings.Font.Family, // const AFontFamily: String;
+                        ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
                         TextSettings.Font.Size, // const AFontSize: single;
                         TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
                         TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
@@ -1703,6 +1710,22 @@ begin
   FAutosizeLineCount := 0;
 end;
 
+{********************************************}
+procedure TALMemo.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALMemo then begin
+      AutosizeLineCount := TALMemo(Source).AutoSizeLineCount;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {***********************************************************}
 function TALMemo.CreateStateStyles: TALBaseEdit.TStateStyles;
 begin
@@ -1839,6 +1862,12 @@ begin
     FAutoSizeLineCount := Max(0, Value);
     AdjustSize;
   end;
+end;
+
+{**********************************************************}
+function TALDummyMemo.CreateEditControl: TALBaseEditControl;
+begin
+  Result := TALDummyEditControl.Create(self);
 end;
 
 {*****************}

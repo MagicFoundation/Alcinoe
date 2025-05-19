@@ -167,6 +167,7 @@ type
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
         procedure BeforeDestruction; override;
+        procedure Assign(Source: TPersistent); override;
         property FadeEnabled: boolean read GetFadeEnabled;
         property Locked stored false;
         property Min stored false;
@@ -305,6 +306,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TPersistent); override;
     property ScrollEngine: TALScrollEngine read GetScrollEngine write SetScrollEngine;
     procedure Sort(Compare: TFmxObjectSortCompare); override;
     procedure ScrollBy(const Dx, Dy: Single);
@@ -762,6 +764,25 @@ begin
   Inherited;
 end;
 
+{******************************************************************}
+procedure TALCustomScrollBox.TScrollBar.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TScrollBar then begin
+      FadeMode := TScrollBar(Source).FadeMode;
+      FadeDuration := TScrollBar(Source).FadeDuration;
+      FadeDelay := TScrollBar(Source).FadeDelay;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+    FExplicitVisible := TScrollBar(Source).FExplicitVisible;
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {*************************************************************}
 function TALCustomScrollBox.TScrollBar.GetFadeEnabled: Boolean;
 begin
@@ -907,6 +928,30 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   FScrollEngine.Stop(true{AAbruptly});
   inherited;
+end;
+
+{*******************************************************}
+procedure TALCustomScrollBox.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALCustomScrollBox then begin
+      ScrollEngine.Assign(TALCustomScrollBox(Source).ScrollEngine);
+      if HScrollBar <> nil then HScrollBar.Assign(TALCustomScrollBox(Source).HScrollBar);
+      if VScrollBar <> nil then VScrollBar.Assign(TALCustomScrollBox(Source).VScrollBar);
+      DisableMouseWheel := TALCustomScrollBox(Source).DisableMouseWheel;
+      OnViewportPositionChange := TALCustomScrollBox(Source).OnViewportPositionChange;
+      OnAniStart := TALCustomScrollBox(Source).OnAniStart;
+      OnAniStop := TALCustomScrollBox(Source).OnAniStop;
+      MaxContentWidth := TALCustomScrollBox(Source).MaxContentWidth;
+      MaxContentHeight := TALCustomScrollBox(Source).MaxContentHeight;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {***********************************************************}

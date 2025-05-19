@@ -210,6 +210,7 @@ type
     procedure BeforeDestruction; override;
     Property IsDestroying: boolean read FIsDestroying; // [MultiThread]
     Property IsEphemeral: boolean read FIsEphemeral write FIsEphemeral; // [MultiThread]
+    procedure Assign(Source: TALDynamicListBoxControl); virtual; abstract;
     procedure BeginUpdate; virtual; // [TControl] procedure BeginUpdate; virtual;
     procedure EndUpdate; virtual; abstract; // [TControl] procedure EndUpdate; virtual;
     function IsUpdating: Boolean; virtual; // [TControl] function IsUpdating: Boolean; virtual;
@@ -308,7 +309,7 @@ type
     //FOwnerControl: TALDynamicListBoxControl; // 8 bytes
     //FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TALPointD; // 8 bytes
-    FScale: Single; // 4 bytes
+    FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     //FFocusOnMouseDown: Boolean; // 1 byte
     //FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
@@ -317,6 +318,7 @@ type
     //FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
+    procedure SetScale(const AValue: TPosition);
     //function GetPivot: TPosition;
     //procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
@@ -324,7 +326,7 @@ type
     //procedure DelayOnResize(Sender: TObject);
     //procedure DelayOnResized(Sender: TObject);
     //procedure MarginsChangedHandler(Sender: TObject);
-    function IsScaledStored: Boolean;
+    procedure ScaleChangedHandler(Sender: TObject);
   protected
     FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
@@ -333,8 +335,7 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    procedure SetScale(const AValue: Single); virtual;
-    property Scale: Single read FScale write SetScale stored IsScaledStored nodefault;
+    property Scale: TPosition read FScale write SetScale;
     //property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
@@ -376,7 +377,7 @@ type
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
-    //procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure EndUpdate; override;
     //procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; override;
@@ -502,7 +503,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
-    //procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     property Fill: TALBrush read GetFill write SetFill;
@@ -532,6 +533,7 @@ type
         Scale: Single;
         AlignToPixel: Boolean;
         Color: TAlphaColor;
+        TintColor: TAlphaColor;
         ResourceName: String;
         ResourceStream: TStream;
         MaskResourceName: String;
@@ -559,6 +561,8 @@ type
     FBackgroundColorKey: String; // 8 bytes
     FLoadingColor: TAlphaColor; // 4 bytes
     FLoadingColorKey: String; // 8 bytes
+    FTintColor: TAlphaColor; // 4 bytes
+    FTintColorKey: String; // 8 bytes
     FResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
     FMaskBitmap: TALRefCountBitmap; // 8 bytes
@@ -595,10 +599,14 @@ type
     procedure setBackgroundColorKey(const Value: String);
     procedure setLoadingColor(const Value: TAlphaColor);
     procedure setLoadingColorKey(const Value: String);
+    procedure SetTintColor(const Value: TAlphaColor); virtual;
+    procedure setTintColorKey(const Value: String);
     function IsBackgroundColorStored: Boolean;
     function IsBackgroundColorKeyStored: Boolean;
     function IsLoadingColorStored: Boolean;
     function IsLoadingColorKeyStored: Boolean;
+    function IsTintColorStored: Boolean;
+    function IsTintColorKeyStored: Boolean;
     function IsFadeInDurationStored: Boolean;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
@@ -613,8 +621,9 @@ type
     function CreateCropCenter: TALPosition; virtual;
     function CreateStroke: TALStrokeBrush; virtual;
     function CreateShadow: TALShadow; virtual;
-    procedure ApplyLoadingColorScheme; virtual;
     procedure ApplyBackgroundColorScheme; virtual;
+    procedure ApplyLoadingColorScheme; virtual;
+    procedure ApplyTintColorScheme; virtual;
     function GetCacheSubIndex: Integer; virtual;
     function GetLoadingCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
@@ -622,7 +631,11 @@ type
     function GetDefaultBackgroundColorKey: String; virtual;
     function GetDefaultLoadingColor: TalphaColor; virtual;
     function GetDefaultLoadingColorKey: String; virtual;
+    function GetDefaultTintColor: TAlphaColor; virtual;
+    function GetDefaultTintColorKey: String; virtual;
     function GetDefaultFadeInDuration: Single; virtual;
+    function GetDefaultCorners: TCorners; virtual;
+    function GetDefaultSides: TSides; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
     function GetDefaultBlurRadius: Single; virtual;
@@ -648,6 +661,7 @@ type
                       const AScale: Single;
                       const AAlignToPixel: Boolean;
                       const AColor: TAlphaColor;
+                      const ATintColor: TAlphaColor;
                       const AResourceName: String;
                       const AResourceStream: TStream;
                       const AMaskResourceName: String;
@@ -671,7 +685,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
-    //procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     property ReadyAfterResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
     function IsReadyToDisplay: Boolean; override;
     procedure AlignToPixel; override;
@@ -682,7 +696,11 @@ type
     property DefaultBackgroundColorKey: String read GetDefaultBackgroundColorKey;
     property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
     property DefaultLoadingColorKey: String read GetDefaultLoadingColorKey;
+    property DefaultTintColor: TAlphaColor read GetDefaultTintColor;
+    property DefaultTintColorKey: String read GetDefaultTintColorKey;
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
+    property DefaultCorners: TCorners read GetDefaultCorners;
+    property DefaultSides: TSides read GetDefaultSides;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
     property DefaultBlurRadius: Single read GetDefaultBlurRadius;
@@ -705,6 +723,8 @@ type
     property BackgroundColorKey: String read fBackgroundColorKey write setBackgroundColorKey Stored IsBackgroundColorKeyStored;
     property LoadingColor: TAlphaColor read FLoadingColor write setLoadingColor Stored IsLoadingColorStored;
     property LoadingColorKey: String read FLoadingColorKey write setLoadingColorKey Stored IsLoadingColorKeyStored;
+    property TintColor: TAlphaColor read FTintColor write SetTintColor stored IsTintColorStored;
+    property TintColorKey: String read FTintColorKey write setTintColorKey Stored IsTintColorKeyStored;
     property BlurRadius: Single read FBlurRadius write SetBlurRadius stored IsBlurRadiusStored nodefault;
     //property CanFocus;
     //property CanParentFocus;
@@ -808,6 +828,8 @@ type
     function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
+    function GetDefaultCorners: TCorners; virtual;
+    function GetDefaultSides: TSides; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
     procedure SetXRadius(const Value: Single); virtual;
@@ -848,7 +870,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
-    //procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
@@ -856,6 +878,8 @@ type
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
+    property DefaultCorners: TCorners read GetDefaultCorners;
+    property DefaultSides: TSides read GetDefaultSides;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
   end;
@@ -1215,6 +1239,8 @@ type
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
+    function GetDefaultCorners: TCorners; virtual;
+    function GetDefaultSides: TSides; virtual;
     function GetDefaultXRadius: Single; virtual;
     function GetDefaultYRadius: Single; virtual;
     procedure SetXRadius(const Value: Single); virtual;
@@ -1317,7 +1343,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
-    //procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -1334,6 +1360,8 @@ type
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
     property DoubleBuffered default true;
+    property DefaultCorners: TCorners read GetDefaultCorners;
+    property DefaultSides: TSides read GetDefaultSides;
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
   end;
@@ -1472,6 +1500,18 @@ type
     property Shadow: TALInheritShadow read FShadow write SetShadow;
     property StateLayer: TALStateLayer read FStateLayer write SetStateLayer;
     property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
+    /// <summary>
+    ///   The scale defined here is distinct from the scale defined on the control.
+    ///   The control's scale acts as a zoom factor—e.g., an image created at 100×100
+    ///   pixels with a scale of 1.2 will be rendered on screen at 120×120 pixels.
+    ///   <para/>
+    ///   In contrast, the scale defined here affects the image generation itself.
+    ///   That means the image will be created directly at 120×120 pixels, resulting
+    ///   in higher quality when displayed.
+    ///   <para/>
+    ///   The control's scale is typically used for animations, where high image quality
+    ///   is less critical and performance is more important.
+    /// </summary>
     property Scale: Single read FScale write SetScale stored IsScaleStored nodefault;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;
@@ -1868,6 +1908,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -2070,6 +2111,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
   public
     property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
     property Mandatory: Boolean read fMandatory write fMandatory default false;
@@ -2921,11 +2963,10 @@ type
     function GetRenderTargetRect(const ARect: TrectF): TRectF; override;
     {$ENDIF}
     procedure Paint; override;
-    //procedure Loaded; override;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
-    //procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -3231,6 +3272,7 @@ type
       public
         constructor Create(const ACustomTrack: TALDynamicListBoxCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
+        procedure Assign(Source: TALDynamicListBoxControl); override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
         procedure MakeBufDrawable; override;
@@ -3487,6 +3529,7 @@ type
         constructor Create(const ACustomTrack: TALDynamicListBoxCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
         procedure BeforeDestruction; override;
+        procedure Assign(Source: TALDynamicListBoxControl); override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
         function GetValue: Double;
@@ -3638,6 +3681,7 @@ type
       public
         constructor Create(const ACustomTrack: TALDynamicListBoxCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
+        procedure Assign(Source: TALDynamicListBoxControl); override;
         procedure Refresh(const AThumb: TThumb);
         property DefaultFormat: String read GetDefaultFormat;
         property Visible default false;
@@ -3792,6 +3836,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     procedure AfterConstruction; override;
+    procedure Assign(Source: TALDynamicListBoxControl); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -7740,7 +7785,8 @@ begin
   //FForm := nil;
   //FOwnerControl := nil;
   FControlAbsolutePosAtMouseDown := TALPointD.zero;
-  FScale := 1;
+  FScale := TPosition.Create(TPointF.Create(1, 1));
+  FScale.OnChange := ScaleChangedHandler;
   //FFocusOnMouseDown := False;
   //FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
@@ -7766,6 +7812,7 @@ end;
 destructor TALDynamicListBoxExtendedControl.Destroy;
 begin
   ClearBufDrawable;
+  ALFreeAndNil(FScale);
   inherited;
 end;
 
@@ -7779,82 +7826,81 @@ begin
   inherited;
 end;
 
-{***********************************************************************}
-//procedure TALDynamicListBoxExtendedControl.Assign(Source: TPersistent);
-//begin
-//  BeginUpdate;
-//  Try
-//    if Source is TALDynamicListBoxControl then begin
-//      // --TALDynamicListBoxControl
-//      Align := TALDynamicListBoxControl(Source).Align;
-//      AutoAlignToPixel := TALDynamicListBoxControl(Source).AutoAlignToPixel;
-//      AutoSize := TALDynamicListBoxControl(Source).AutoSize;
-//      DoubleBuffered := TALDynamicListBoxControl(Source).DoubleBuffered;
-//      Pivot.Assign(TALDynamicListBoxControl(Source).Pivot);
-//      Scale := TALDynamicListBoxControl(Source).Scale;
-//      // --TControl
-//      Anchors := TALDynamicListBoxControl(Source).Anchors;
-//      CanFocus := TALDynamicListBoxControl(Source).CanFocus;
-//      CanParentFocus := TALDynamicListBoxControl(Source).CanParentFocus;
-//      ClipChildren := TALDynamicListBoxControl(Source).ClipChildren;
-//      ClipParent := TALDynamicListBoxControl(Source).ClipParent;
-//      Cursor := TALDynamicListBoxControl(Source).Cursor;
-//      DisabledOpacity := TALDynamicListBoxControl(Source).DisabledOpacity;
-//      DragMode := TALDynamicListBoxControl(Source).DragMode;
-//      EnableDragHighlight := TALDynamicListBoxControl(Source).EnableDragHighlight;
-//      Enabled := TALDynamicListBoxControl(Source).Enabled ;
-//      Hint := TALDynamicListBoxControl(Source).Hint;
-//      HitTest := TALDynamicListBoxControl(Source).HitTest;
-//      Locked := TALDynamicListBoxControl(Source).Locked;
-//      Margins.Assign(TALDynamicListBoxControl(Source).Margins);
-//      Opacity := TALDynamicListBoxControl(Source).Opacity;
-//      Padding.Assign(TALDynamicListBoxControl(Source).Padding);
-//      ParentShowHint := TALDynamicListBoxControl(Source).ParentShowHint;
-//      Position.Assign(TALDynamicListBoxControl(Source).Position);
-//      RotationAngle := TALDynamicListBoxControl(Source).RotationAngle;
-//      RotationCenter.Assign(TALDynamicListBoxControl(Source).RotationCenter);
-//      ShowHint := TALDynamicListBoxControl(Source).ShowHint;
-//      Size.Assign(TALDynamicListBoxControl(Source).Size);
-//      StyleName := TALDynamicListBoxControl(Source).StyleName;
-//      TabOrder := TALDynamicListBoxControl(Source).TabOrder;
-//      TabStop := TALDynamicListBoxControl(Source).TabStop;
-//      Tag := TALDynamicListBoxControl(Source).Tag;
-//      TagFloat := TALDynamicListBoxControl(Source).TagFloat;
-//      TagObject := TALDynamicListBoxControl(Source).TagObject;
-//      TagString := TALDynamicListBoxControl(Source).TagString;
-//      TouchTargetExpansion.Assign(TALDynamicListBoxControl(Source).TouchTargetExpansion);
-//      Visible := TALDynamicListBoxControl(Source).Visible;
-//      OnDragEnter := TALDynamicListBoxControl(Source).OnDragEnter;
-//      OnDragLeave := TALDynamicListBoxControl(Source).OnDragLeave;
-//      OnDragOver := TALDynamicListBoxControl(Source).OnDragOver;
-//      OnDragDrop := TALDynamicListBoxControl(Source).OnDragDrop;
-//      OnDragEnd := TALDynamicListBoxControl(Source).OnDragEnd;
-//      OnKeyDown := TALDynamicListBoxControl(Source).OnKeyDown;
-//      OnKeyUp := TALDynamicListBoxControl(Source).OnKeyUp;
-//      OnClick := TALDynamicListBoxControl(Source).OnClick;
-//      OnDblClick := TALDynamicListBoxControl(Source).OnDblClick;
-//      OnCanFocus := TALDynamicListBoxControl(Source).OnCanFocus;
-//      OnEnter := TALDynamicListBoxControl(Source).OnEnter;
-//      OnExit := TALDynamicListBoxControl(Source).OnExit;
-//      OnMouseDown := TALDynamicListBoxControl(Source).OnMouseDown;
-//      OnMouseMove := TALDynamicListBoxControl(Source).OnMouseMove;
-//      OnMouseUp := TALDynamicListBoxControl(Source).OnMouseUp;
-//      OnMouseWheel := TALDynamicListBoxControl(Source).OnMouseWheel;
-//      OnMouseEnter := TALDynamicListBoxControl(Source).OnMouseEnter;
-//      OnMouseLeave := TALDynamicListBoxControl(Source).OnMouseLeave;
-//      OnPainting := TALDynamicListBoxControl(Source).OnPainting;
-//      OnPaint := TALDynamicListBoxControl(Source).OnPaint;
-//      OnResize := TALDynamicListBoxControl(Source).OnResize;
-//      OnResized := TALDynamicListBoxControl(Source).OnResized;
-//      OnActivate := TALDynamicListBoxControl(Source).OnActivate;
-//      OnDeactivate := TALDynamicListBoxControl(Source).OnDeactivate;
-//    end
-//    else
-//      ALAssignError(Source{ASource}, Self{ADest});
-//  Finally
-//    EndUpdate;
-//  End;
-//end;
+{**********************************************************************************}
+procedure TALDynamicListBoxExtendedControl.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxControl then begin
+      // --TALDynamicListBoxControl
+      Align := TALDynamicListBoxControl(Source).Align;
+      //AutoAlignToPixel := TALDynamicListBoxControl(Source).AutoAlignToPixel;
+      //AutoSize := TALDynamicListBoxControl(Source).AutoSize;
+      //DoubleBuffered := TALDynamicListBoxControl(Source).DoubleBuffered;
+      //Pivot.Assign(TALDynamicListBoxControl(Source).Pivot);
+      //Scale.assign(TALDynamicListBoxControl(Source).Scale);
+      // --TControl
+      //Anchors := TALDynamicListBoxControl(Source).Anchors;
+      //CanFocus := TALDynamicListBoxControl(Source).CanFocus;
+      //CanParentFocus := TALDynamicListBoxControl(Source).CanParentFocus;
+      //ClipChildren := TALDynamicListBoxControl(Source).ClipChildren;
+      //ClipParent := TALDynamicListBoxControl(Source).ClipParent;
+      Cursor := TALDynamicListBoxControl(Source).Cursor;
+      DisabledOpacity := TALDynamicListBoxControl(Source).DisabledOpacity;
+      //DragMode := TALDynamicListBoxControl(Source).DragMode;
+      //EnableDragHighlight := TALDynamicListBoxControl(Source).EnableDragHighlight;
+      Enabled := TALDynamicListBoxControl(Source).Enabled;
+      //Hint := TALDynamicListBoxControl(Source).Hint;
+      HitTest := TALDynamicListBoxControl(Source).HitTest;
+      //Locked := TALDynamicListBoxControl(Source).Locked;
+      Margins.Assign(TALDynamicListBoxControl(Source).Margins);
+      Opacity := TALDynamicListBoxControl(Source).Opacity;
+      Padding.Assign(TALDynamicListBoxControl(Source).Padding);
+      //ParentShowHint := TALDynamicListBoxControl(Source).ParentShowHint;
+      //Position.Assign(TALDynamicListBoxControl(Source).Position);
+      //RotationAngle := TALDynamicListBoxControl(Source).RotationAngle;
+      //ShowHint := TALDynamicListBoxControl(Source).ShowHint;
+      //Size.Assign(TALDynamicListBoxControl(Source).Size);
+      //StyleName := TALDynamicListBoxControl(Source).StyleName;
+      //TabOrder := TALDynamicListBoxControl(Source).TabOrder;
+      //TabStop := TALDynamicListBoxControl(Source).TabStop;
+      Tag := TALDynamicListBoxControl(Source).Tag;
+      //TagFloat := TALDynamicListBoxControl(Source).TagFloat;
+      //TagObject := TALDynamicListBoxControl(Source).TagObject;
+      TagString := TALDynamicListBoxControl(Source).TagString;
+      //TouchTargetExpansion.Assign(TALDynamicListBoxControl(Source).TouchTargetExpansion);
+      Visible := TALDynamicListBoxControl(Source).Visible;
+      //OnDragEnter := TALDynamicListBoxControl(Source).OnDragEnter;
+      //OnDragLeave := TALDynamicListBoxControl(Source).OnDragLeave;
+      //OnDragOver := TALDynamicListBoxControl(Source).OnDragOver;
+      //OnDragDrop := TALDynamicListBoxControl(Source).OnDragDrop;
+      //OnDragEnd := TALDynamicListBoxControl(Source).OnDragEnd;
+      //OnKeyDown := TALDynamicListBoxControl(Source).OnKeyDown;
+      //OnKeyUp := TALDynamicListBoxControl(Source).OnKeyUp;
+      OnClick := TALDynamicListBoxControl(Source).OnClick;
+      //OnDblClick := TALDynamicListBoxControl(Source).OnDblClick;
+      //OnCanFocus := TALDynamicListBoxControl(Source).OnCanFocus;
+      //OnEnter := TALDynamicListBoxControl(Source).OnEnter;
+      //OnExit := TALDynamicListBoxControl(Source).OnExit;
+      OnMouseDown := TALDynamicListBoxControl(Source).OnMouseDown;
+      OnMouseMove := TALDynamicListBoxControl(Source).OnMouseMove;
+      OnMouseUp := TALDynamicListBoxControl(Source).OnMouseUp;
+      //OnMouseWheel := TALDynamicListBoxControl(Source).OnMouseWheel;
+      OnMouseEnter := TALDynamicListBoxControl(Source).OnMouseEnter;
+      OnMouseLeave := TALDynamicListBoxControl(Source).OnMouseLeave;
+      OnPainting := TALDynamicListBoxControl(Source).OnPainting;
+      OnPaint := TALDynamicListBoxControl(Source).OnPaint;
+      //OnResize := TALDynamicListBoxControl(Source).OnResize;
+      OnResized := TALDynamicListBoxControl(Source).OnResized;
+      //OnActivate := TALDynamicListBoxControl(Source).OnActivate;
+      //OnDeactivate := TALDynamicListBoxControl(Source).OnDeactivate;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+  Finally
+    EndUpdate;
+  End;
+end;
 
 {***************************************************************}
 // The current implementation of TControl's BeginUpdate/EndUpdate
@@ -7948,7 +7994,7 @@ end;
 //      TALAlignLayout.MostLeft: LLegacyAlign := TAlignLayout.MostLeft;
 //      TALAlignLayout.MostRight: LLegacyAlign := TAlignLayout.MostRight;
 //      TALAlignLayout.Client: LLegacyAlign := TAlignLayout.Client;
-//      //TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
+//      TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
 //      TALAlignLayout.Center: LLegacyAlign := TAlignLayout.Center;
 //      TALAlignLayout.VertCenter: LLegacyAlign := TAlignLayout.VertCenter;
 //      TALAlignLayout.HorzCenter: LLegacyAlign := TAlignLayout.HorzCenter;
@@ -8436,7 +8482,7 @@ begin
           end;
 
           //--
-          //TALAlignLayout.Contents,
+          TALAlignLayout.Contents,
           //TALAlignLayout.Scale,
           //TALAlignLayout.Fit,
           //TALAlignLayout.FitLeft,
@@ -8552,7 +8598,7 @@ begin
         TALAlignLayout.HorzCenter:
           Width := ALAlignDimensionToPixelRound(Width, ALGetScreenScale, TEpsilon.Position);
         //--
-        //TALAlignLayout.Contents,
+        TALAlignLayout.Contents,
         //TALAlignLayout.Scale,
         //TALAlignLayout.Fit,
         //TALAlignLayout.FitLeft,
@@ -8614,14 +8660,10 @@ begin
   // Not supported
 end;
 
-{************************************************************************}
-procedure TALDynamicListBoxExtendedControl.SetScale(const AValue: Single);
+{***************************************************************************}
+procedure TALDynamicListBoxExtendedControl.SetScale(const AValue: TPosition);
 begin
-  if not SameValue(FScale, AValue, TEpsilon.Scale) then begin
-    FScale := AValue;
-    //DoMatrixChanged(nil);
-    Repaint;
-  end;
+  FScale.Assign(AValue);
 end;
 
 {*************************************************************}
@@ -8646,7 +8688,7 @@ begin
   Result := GetAutoSize;
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
-                             //TALAlignLayout.Contents,
+                             TALAlignLayout.Contents,
                              TALAlignLayout.Top,
                              TALAlignLayout.Bottom,
                              TALAlignLayout.MostTop,
@@ -8664,7 +8706,7 @@ begin
   Result := GetAutoSize;
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
-                             //TALAlignLayout.Contents,
+                             TALAlignLayout.Contents,
                              TALAlignLayout.Left,
                              TALAlignLayout.Right,
                              TALAlignLayout.MostLeft,
@@ -8950,7 +8992,7 @@ end;
 //  {$ENDIF}
 //  if not FInPaintTo and not IsUpdating then
 //    Repaint;
-//  if SameValue(Scale, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
+//  if SameValue(Scale.X, 1.0, TEpsilon.Scale) and SameValue(Scale.Y, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
 //  begin
 //    if (OwnerControl <> nil) and not TALDynamicListBoxControlAccessPrivate(OwnerControl).FSimpleTransform then
 //      TALDynamicListBoxControlAccessPrivate(Self).FSimpleTransform := False
@@ -8966,17 +9008,17 @@ end;
 //    begin
 //      FLocalMatrix :=
 //        TMatrix.CreateTranslation(-Pivot.X * FSize.Width, -Pivot.Y * FSize.Height) *
-//        TMatrix.CreateScaling(Scale, Scale) *
+//        TMatrix.CreateScaling(Scale.X, Scale.Y) *
 //        TMatrix.CreateRotation(DegToRad(RotationAngle)) *
 //        TMatrix.CreateTranslation(Pivot.X * FSize.Width + Left, Pivot.Y * FSize.Height + Top);
 //    end
 //    else
 //    begin
 //      FLocalMatrix := TMatrix.Identity;
-//      FLocalMatrix.m31 := Left + ((1 - Scale) * Pivot.X * FSize.Width);
-//      FLocalMatrix.m32 := Top + ((1 - Scale) * Pivot.Y * FSize.Height);
-//      FLocalMatrix.m11 := Scale;
-//      FLocalMatrix.m22 := Scale;
+//      FLocalMatrix.m31 := Left + ((1 - Scale.X) * Pivot.X * FSize.Width);
+//      FLocalMatrix.m32 := Top + ((1 - Scale.Y) * Pivot.Y * FSize.Height);
+//      FLocalMatrix.m11 := Scale.X;
+//      FLocalMatrix.m22 := Scale.Y;
 //    end;
 //  end
 //  else
@@ -9063,10 +9105,10 @@ end;
 //  MarginsChanged;
 //end;
 
-{****************************************************************}
-function TALDynamicListBoxExtendedControl.IsScaledStored: Boolean;
+{******************************************************************************}
+procedure TALDynamicListBoxExtendedControl.ScaleChangedHandler(Sender: TObject);
 begin
-  Result := not SameValue(FScale, 1, TEpsilon.Scale);
+  Repaint; // DoMatrixChanged(Sender);
 end;
 
 {*****************************************************************}
@@ -9199,23 +9241,23 @@ begin
   inherited;
 end;
 
-{*************************************************************}
-//procedure TALDynamicListBoxShape.Assign(Source: TPersistent);
-//begin
-//  BeginUpdate;
-//  Try
-//    if Source is TALDynamicListBoxShape then begin
-//      Fill.Assign(TALDynamicListBoxShape(Source).Fill);
-//      Stroke.Assign(TALDynamicListBoxShape(Source).Stroke);
-//      Shadow.Assign(TALDynamicListBoxShape(Source).Shadow);
-//    end
-//    else
-//      ALAssignError(Source{ASource}, Self{ADest});
-//    inherited Assign(Source);
-//  Finally
-//    EndUpdate;
-//  End;
-//end;
+{************************************************************************}
+procedure TALDynamicListBoxShape.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxShape then begin
+      Fill.Assign(TALDynamicListBoxShape(Source).Fill);
+      Stroke.Assign(TALDynamicListBoxShape(Source).Stroke);
+      Shadow.Assign(TALDynamicListBoxShape(Source).Shadow);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
 
 {***************************************************}
 function TALDynamicListBoxShape.CreateFill: TALBrush;
@@ -9337,6 +9379,7 @@ begin
   Scale := ALGetScreenScale;
   AlignToPixel := AOwner.AutoAlignToPixel;
   Color := AOwner.BackgroundColor;
+  TintColor := AOwner.TintColor;
   ResourceName := AOwner.ResourceName;
   ResourceStream := nil;
   MaskResourceName := AOwner.MaskResourceName;
@@ -9383,6 +9426,8 @@ begin
   FBackgroundColorKey := DefaultBackgroundColorKey;
   FLoadingColor := DefaultLoadingColor;
   FLoadingColorKey := DefaultLoadingColorKey;
+  FTintColor := DefaultTintColor;
+  FTintColorKey := DefaultTintColorKey;
   FResourceName := '';
   FMaskResourceName := '';
   FMaskBitmap := nil;
@@ -9390,8 +9435,8 @@ begin
   FWrapMode := TALImageWrapMode.Fit;
   FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   FRotateAccordingToExifOrientation := False;
-  FCorners := AllCorners;
-  FSides := AllSides;
+  FCorners := DefaultCorners;
+  FSides := DefaultSides;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
   FBlurRadius := DefaultBlurRadius;
@@ -9424,42 +9469,44 @@ begin
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
 
-{*************************************************************}
-//procedure TALDynamicListBoxImage.Assign(Source: TPersistent);
-//begin
-//  BeginUpdate;
-//  Try
-//    if Source is TALDynamicListBoxImage then begin
-//      BackgroundColor := TALDynamicListBoxImage(Source).BackgroundColor;
-//      BackgroundColorKey := TALDynamicListBoxImage(Source).BackgroundColorKey;
-//      LoadingColor := TALDynamicListBoxImage(Source).LoadingColor;
-//      LoadingColorKey := TALDynamicListBoxImage(Source).LoadingColorKey;
-//      ResourceName := TALDynamicListBoxImage(Source).ResourceName;
-//      MaskResourceName := TALDynamicListBoxImage(Source).MaskResourceName;
-//      MaskBitmap := TALDynamicListBoxImage(Source).MaskBitmap;
-//      ReadyAfterResourcesLoaded := TALDynamicListBoxImage(Source).ReadyAfterResourcesLoaded;
-//      WrapMode := TALDynamicListBoxImage(Source).WrapMode;
-//      RotateAccordingToExifOrientation := TALDynamicListBoxImage(Source).RotateAccordingToExifOrientation;
-//      Corners := TALDynamicListBoxImage(Source).Corners;
-//      Sides := TALDynamicListBoxImage(Source).Sides;
-//      XRadius := TALDynamicListBoxImage(Source).XRadius;
-//      YRadius := TALDynamicListBoxImage(Source).YRadius;
-//      BlurRadius := TALDynamicListBoxImage(Source).BlurRadius;
-//      CacheIndex := TALDynamicListBoxImage(Source).CacheIndex;
-//      LoadingCacheIndex := TALDynamicListBoxImage(Source).LoadingCacheIndex;
-//      CacheEngine := TALDynamicListBoxImage(Source).CacheEngine;
-//      CropCenter.Assign(TALDynamicListBoxImage(Source).CropCenter);
-//      Stroke.Assign(TALDynamicListBoxImage(Source).Stroke);
-//      Shadow.Assign(TALDynamicListBoxImage(Source).Shadow);
-//      FadeInDuration := TALDynamicListBoxImage(Source).FadeInDuration;
-//    end
-//    else
-//      ALAssignError(Source{ASource}, Self{ADest});
-//    inherited Assign(Source);
-//  Finally
-//    EndUpdate;
-//  End;
-//end;
+{************************************************************************}
+procedure TALDynamicListBoxImage.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxImage then begin
+      BackgroundColor := TALDynamicListBoxImage(Source).BackgroundColor;
+      BackgroundColorKey := TALDynamicListBoxImage(Source).BackgroundColorKey;
+      LoadingColor := TALDynamicListBoxImage(Source).LoadingColor;
+      LoadingColorKey := TALDynamicListBoxImage(Source).LoadingColorKey;
+      TintColor := TALDynamicListBoxImage(Source).TintColor;
+      TintColorKey := TALDynamicListBoxImage(Source).TintColorKey;
+      ResourceName := TALDynamicListBoxImage(Source).ResourceName;
+      MaskResourceName := TALDynamicListBoxImage(Source).MaskResourceName;
+      MaskBitmap := TALDynamicListBoxImage(Source).MaskBitmap;
+      ReadyAfterResourcesLoaded := TALDynamicListBoxImage(Source).ReadyAfterResourcesLoaded;
+      WrapMode := TALDynamicListBoxImage(Source).WrapMode;
+      RotateAccordingToExifOrientation := TALDynamicListBoxImage(Source).RotateAccordingToExifOrientation;
+      Corners := TALDynamicListBoxImage(Source).Corners;
+      Sides := TALDynamicListBoxImage(Source).Sides;
+      XRadius := TALDynamicListBoxImage(Source).XRadius;
+      YRadius := TALDynamicListBoxImage(Source).YRadius;
+      BlurRadius := TALDynamicListBoxImage(Source).BlurRadius;
+      CacheIndex := TALDynamicListBoxImage(Source).CacheIndex;
+      LoadingCacheIndex := TALDynamicListBoxImage(Source).LoadingCacheIndex;
+      CacheEngine := TALDynamicListBoxImage(Source).CacheEngine;
+      CropCenter.Assign(TALDynamicListBoxImage(Source).CropCenter);
+      Stroke.Assign(TALDynamicListBoxImage(Source).Stroke);
+      Shadow.Assign(TALDynamicListBoxImage(Source).Shadow);
+      FadeInDuration := TALDynamicListBoxImage(Source).FadeInDuration;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
 
 {********************************************************}
 function TALDynamicListBoxImage.IsReadyToDisplay: Boolean;
@@ -9527,6 +9574,19 @@ begin
   end;
 end;
 
+{****************************************************}
+procedure TALDynamicListBoxImage.ApplyTintColorScheme;
+begin
+  if FTintColorKey <> '' then begin
+    var LTintColor := TALStyleManager.Instance.GetColor(FTintColorKey);
+    if FTintColor <> LTintColor then begin
+      FTintColor := LTintColor;
+      ClearBufDrawable;
+      Repaint;
+    end;
+  end;
+end;
+
 {************************************************}
 procedure TALDynamicListBoxImage.ApplyColorScheme;
 begin
@@ -9537,6 +9597,7 @@ begin
     Shadow.ApplyColorScheme;
     ApplyBackgroundColorScheme;
     ApplyLoadingColorScheme;
+    ApplyTintColorScheme;
   finally
     EndUpdate;
   end;
@@ -9585,9 +9646,33 @@ begin
 end;
 
 {***************************************************************}
+function TALDynamicListBoxImage.GetDefaultTintColor: TAlphaColor;
+begin
+  Result := 0;
+end;
+
+{*************************************************************}
+function TALDynamicListBoxImage.GetDefaulttintColorKey: String;
+begin
+  Result := '';
+end;
+
+{***************************************************************}
 function TALDynamicListBoxImage.GetDefaultFadeInDuration: Single;
 begin
   Result := 0.250;
+end;
+
+{**********************************************************}
+function TALDynamicListBoxImage.GetDefaultCorners: TCorners;
+begin
+  Result := AllCorners;
+end;
+
+{******************************************************}
+function TALDynamicListBoxImage.GetDefaultSides: TSides;
+begin
+  Result := AllSides;
 end;
 
 {********************************************************}
@@ -9736,6 +9821,26 @@ begin
   end;
 end;
 
+{**********************************************************************}
+procedure TALDynamicListBoxImage.setTintColor(const Value: TAlphaColor);
+begin
+  if FTintColor <> Value then begin
+    FTintColor := Value;
+    FTintColorKey := '';
+    ClearBufDrawable;
+    Repaint;
+  end;
+end;
+
+{********************************************************************}
+procedure TALDynamicListBoxImage.setTintColorKey(const Value: String);
+begin
+  if FTintColorKey <> Value then begin
+    FTintColorKey := Value;
+    ApplyTintColorScheme;
+  end;
+end;
+
 {***************************************************************}
 procedure TALDynamicListBoxImage.SetXRadius(const Value: Single);
 begin
@@ -9812,6 +9917,18 @@ begin
   Result := FLoadingColorKey <> DefaultLoadingColorKey;
 end;
 
+{*********************************************************}
+function TALDynamicListBoxImage.IsTintColorStored: Boolean;
+begin
+  Result := FTintColor <> DefaultTintColor;
+end;
+
+{************************************************************}
+function TALDynamicListBoxImage.IsTintColorKeyStored: Boolean;
+begin
+  Result := FTintColorKey <> DefaultTintColorKey;
+end;
+
 {**************************************************************}
 function TALDynamicListBoxImage.IsFadeInDurationStored: Boolean;
 begin
@@ -9821,13 +9938,13 @@ end;
 {*******************************************************}
 function TALDynamicListBoxImage.IsCornersStored: Boolean;
 begin
-  Result := FCorners <> AllCorners;
+  Result := FCorners <> DefaultCorners;
 end;
 
 {*****************************************************}
 function TALDynamicListBoxImage.IsSidesStored: Boolean;
 begin
-  Result := FSides <> AllSides
+  Result := FSides <> DefaultSides;
 end;
 
 {*******************************************************}
@@ -9982,6 +10099,7 @@ begin
   //LContext.Scale: Single;
   //LContext.AlignToPixel: Boolean;
   LContext.Color := TalphaColors.Null;
+  LContext.TintColor := TAlphaColors.Null;
   LContext.ResourceName := ALBrokenImageResourceName;
   ALFreeAndNil(LContext.ResourceStream);
   LContext.MaskResourceName := '';
@@ -10032,6 +10150,7 @@ begin
       LContext.Scale, // const AScale: Single;
       LContext.AlignToPixel, // const AAlignToPixel: Boolean;
       LContext.Color, // const AColor: TAlphaColor;
+      LContext.TintColor, // const ATintColor: TAlphaColor;
       LContext.ResourceName, // const AResourceName: String;
       LContext.ResourceStream, // const AResourceStream: TStream;
       LContext.MaskResourceName, // const AMaskResourceName: String;
@@ -10048,7 +10167,7 @@ begin
       LContext.Corners, // const ACorners: TCorners;
       LContext.Sides, // const ASides: TSides;
       LContext.XRadius, // const AXRadius: Single;
-      LContext.YRadius, // const AYRadius: Single)
+      LContext.YRadius, // const AYRadius: Single;
       LContext.BlurRadius); // const ABlurRadius: Single)
   except
     On E: Exception do begin
@@ -10092,6 +10211,7 @@ class Procedure TALDynamicListBoxImage.CreateBufDrawable(
                   const AScale: Single;
                   const AAlignToPixel: Boolean;
                   const AColor: TAlphaColor;
+                  const ATintColor: TAlphaColor;
                   const AResourceName: String;
                   const AResourceStream: TStream;
                   const AMaskResourceName: String;
@@ -10181,6 +10301,7 @@ begin
                         ARect.Width, ARect.Height, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         ACropCenter, // const ACropCenter: TpointF;
+                        ATintColor, // const ATintColor: TAlphaColor;
                         ABlurRadius, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
                         AYRadius); // const AYRadius: Single);
@@ -10203,6 +10324,7 @@ begin
   {$REGION 'Use TALDrawRectangleHelper'}
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AAlignToPixel, // const AAlignToPixel: Boolean;
                         AColor, // const AFillColor: TAlphaColor;
                         [], // const AFillGradientColors: TArray<TAlphaColor>;
                         LResourceName, // const AFillResourceName: String;
@@ -10241,6 +10363,7 @@ begin
         .SetFillResourceStream(AResourceStream)
         .SetFillMaskResourceName(AMaskResourceName)
         .SetFillMaskBitmap(LMaskBitmap)
+        .SetFillImageTintColor(ATintColor)
         .SetFillWrapMode(AWrapMode)
         .SetFillCropCenter(ACropCenter)
         .SetFillBlurRadius(ABlurRadius)
@@ -10336,6 +10459,7 @@ begin
         ALGetScreenScale, // const AScale: Single;
         AutoAlignToPixel, // const AAlignToPixel: Boolean;
         LoadingColor, // const AColor: TAlphaColor;
+        TAlphaColors.Null, // const ATintColor: TAlphaColor;
         '', // const AResourceName: String;
         nil, // const AResourceStream: TStream;
         MaskResourceName, // const AMaskResourceName: String;
@@ -10372,6 +10496,7 @@ begin
     ALGetScreenScale, // const AScale: Single;
     AutoAlignToPixel, // const AAlignToPixel: Boolean;
     BackGroundColor, // const AColor: TAlphaColor;
+    TintColor, // const ATintColor: TAlphaColor;
     ResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
     MaskResourceName, // const AMaskResourceName: String;
@@ -10388,7 +10513,7 @@ begin
     Corners, // const ACorners: TCorners;
     Sides, // const ASides: TSides;
     XRadius, // const AXRadius: Single;
-    YRadius, // const AYRadius: Single)
+    YRadius, // const AYRadius: Single;
     BlurRadius); // const ABlurRadius: Single);
 
 end;
@@ -10607,8 +10732,8 @@ begin
   fDoubleBuffered := true;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
-  FCorners := AllCorners;
-  FSides := AllSides;
+  FCorners := DefaultCorners;
+  FSides := DefaultSides;
   FCacheIndex := 0;
   FCacheEngine := nil;
   {$IF NOT DEFINED(ALSkiaCanvas)}
@@ -10628,26 +10753,26 @@ begin
   inherited;
 end;
 
-{*********************************************************************}
-//procedure TALDynamicListBoxBaseRectangle.Assign(Source: TPersistent);
-//begin
-//  BeginUpdate;
-//  Try
-//    if Source is TALDynamicListBoxBaseRectangle then begin
-//      XRadius := TALDynamicListBoxBaseRectangle(Source).XRadius;
-//      YRadius := TALDynamicListBoxBaseRectangle(Source).YRadius;
-//      Corners := TALDynamicListBoxBaseRectangle(Source).Corners;
-//      Sides := TALDynamicListBoxBaseRectangle(Source).Sides;
-//      CacheIndex := TALDynamicListBoxBaseRectangle(Source).CacheIndex;
-//      CacheEngine := TALDynamicListBoxBaseRectangle(Source).CacheEngine;
-//    end
-//    else
-//      ALAssignError(Source{ASource}, Self{ADest});
-//    inherited Assign(Source);
-//  Finally
-//    EndUpdate;
-//  End;
-//end;
+{********************************************************************************}
+procedure TALDynamicListBoxBaseRectangle.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxBaseRectangle then begin
+      XRadius := TALDynamicListBoxBaseRectangle(Source).XRadius;
+      YRadius := TALDynamicListBoxBaseRectangle(Source).YRadius;
+      Corners := TALDynamicListBoxBaseRectangle(Source).Corners;
+      Sides := TALDynamicListBoxBaseRectangle(Source).Sides;
+      CacheIndex := TALDynamicListBoxBaseRectangle(Source).CacheIndex;
+      CacheEngine := TALDynamicListBoxBaseRectangle(Source).CacheEngine;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
 
 {*************************************************}
 procedure TALDynamicListBoxBaseRectangle.DoResized;
@@ -10670,13 +10795,13 @@ end;
 {***************************************************************}
 function TALDynamicListBoxBaseRectangle.IsCornersStored: Boolean;
 begin
-  Result := FCorners <> AllCorners;
+  Result := FCorners <> DefaultCorners;
 end;
 
 {*************************************************************}
 function TALDynamicListBoxBaseRectangle.IsSidesStored: Boolean;
 begin
-  Result := FSides <> AllSides
+  Result := FSides <> DefaultSides;
 end;
 
 {***************************************************************}
@@ -10719,6 +10844,18 @@ begin
     else ClearRenderTargets;
     {$ENDIF}
   end;
+end;
+
+{******************************************************************}
+function TALDynamicListBoxBaseRectangle.GetDefaultCorners: TCorners;
+begin
+  Result := AllCorners;
+end;
+
+{**************************************************************}
+function TALDynamicListBoxBaseRectangle.GetDefaultSides: TSides;
+begin
+  Result := AllSides;
 end;
 
 {****************************************************************}
@@ -10832,6 +10969,7 @@ begin
   ABufDrawableRect := LocalRect.ReducePrecision;
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
@@ -10924,6 +11062,7 @@ function TALDynamicListBoxBaseRectangle.GetRenderTargetRect(const ARect: TrectF)
 begin
   Result := ALGetShapeSurfaceRect(
               ARect, // const ARect: TRectF;
+              AutoAlignToPixel, // const AAlignToPixel: Boolean;
               Fill, // const AFill: TALBrush;
               nil, // const AFillResourceStream: TStream;
               nil, // const AStateLayer: TALStateLayer;
@@ -11139,6 +11278,7 @@ begin
   ABufDrawableRect := LocalRect.ReducePrecision;
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
@@ -11227,6 +11367,7 @@ function TALDynamicListBoxCircle.GetRenderTargetRect(const ARect: TrectF): TRect
 begin
   Result := ALGetShapeSurfaceRect(
               ARect, // const ARect: TRectF;
+              AutoAlignToPixel, // const AAlignToPixel: Boolean;
               Fill, // const AFill: TALBrush;
               nil, // const AFillResourceStream: TStream;
               nil, // const AStateLayer: TALStateLayer;
@@ -11801,10 +11942,10 @@ begin
   fAllTextDrawn := False;
   SetLength(fElements, 0);
   //-----
-  FCorners := AllCorners;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
-  FSides := AllSides;
+  FCorners := DefaultCorners;
+  FSides := DefaultSides;
   //-----
   HitTest := False;
   //-----
@@ -11871,48 +12012,40 @@ end;
 //     (not (csDesigning in ComponentState)) then
 //    Text := ALTranslate(Text);
 //
-//  if (TextSettings.Font.Family <> '') and
-//     (not (csDesigning in ComponentState)) then
-//    TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
-//
-//  if (TextSettings.EllipsisSettings.Font.Family <> '') and
-//     (not (csDesigning in ComponentState)) then
-//    TextSettings.EllipsisSettings.Font.Family := ALConvertFontFamily(TextSettings.EllipsisSettings.Font.Family);
-//
 //  inherited Loaded;
 //end;
 
-{****************************************************************}
-//procedure TALDynamicListBoxBaseText.Assign(Source: TPersistent);
-//begin
-//  BeginUpdate;
-//  Try
-//    if Source is TALDynamicListBoxBaseText then begin
-//      OnElementClick := TALDynamicListBoxBaseText(Source).OnElementClick;
-//      OnElementMouseDown := TALDynamicListBoxBaseText(Source).OnElementMouseDown;
-//      OnElementMouseMove := TALDynamicListBoxBaseText(Source).OnElementMouseMove;
-//      OnElementMouseUp := TALDynamicListBoxBaseText(Source).OnElementMouseUp;
-//      OnElementMouseEnter := TALDynamicListBoxBaseText(Source).OnElementMouseEnter;
-//      OnElementMouseLeave := TALDynamicListBoxBaseText(Source).OnElementMouseLeave;
-//      CacheIndex := TALDynamicListBoxBaseText(Source).CacheIndex;
-//      CacheEngine := TALDynamicListBoxBaseText(Source).CacheEngine;
-//      AutoTranslate := TALDynamicListBoxBaseText(Source).AutoTranslate;
-//      Text := TALDynamicListBoxBaseText(Source).Text;
-//      TextSettings.Assign(TALDynamicListBoxBaseText(Source).TextSettings);
-//      MaxWidth := TALDynamicListBoxBaseText(Source).MaxWidth;
-//      MaxHeight := TALDynamicListBoxBaseText(Source).MaxHeight;
-//      YRadius := TALDynamicListBoxBaseText(Source).YRadius;
-//      XRadius := TALDynamicListBoxBaseText(Source).XRadius;
-//      Corners := TALDynamicListBoxBaseText(Source).Corners;
-//      Sides := TALDynamicListBoxBaseText(Source).Sides;
-//    end
-//    else
-//      ALAssignError(Source{ASource}, Self{ADest});
-//    inherited Assign(Source);
-//  Finally
-//    EndUpdate;
-//  End;
-//end;
+{***************************************************************************}
+procedure TALDynamicListBoxBaseText.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxBaseText then begin
+      OnElementClick := TALDynamicListBoxBaseText(Source).OnElementClick;
+      OnElementMouseDown := TALDynamicListBoxBaseText(Source).OnElementMouseDown;
+      OnElementMouseMove := TALDynamicListBoxBaseText(Source).OnElementMouseMove;
+      OnElementMouseUp := TALDynamicListBoxBaseText(Source).OnElementMouseUp;
+      OnElementMouseEnter := TALDynamicListBoxBaseText(Source).OnElementMouseEnter;
+      OnElementMouseLeave := TALDynamicListBoxBaseText(Source).OnElementMouseLeave;
+      CacheIndex := TALDynamicListBoxBaseText(Source).CacheIndex;
+      CacheEngine := TALDynamicListBoxBaseText(Source).CacheEngine;
+      AutoTranslate := TALDynamicListBoxBaseText(Source).AutoTranslate;
+      Text := TALDynamicListBoxBaseText(Source).Text;
+      TextSettings.Assign(TALDynamicListBoxBaseText(Source).TextSettings);
+      MaxWidth := TALDynamicListBoxBaseText(Source).MaxWidth;
+      MaxHeight := TALDynamicListBoxBaseText(Source).MaxHeight;
+      YRadius := TALDynamicListBoxBaseText(Source).YRadius;
+      XRadius := TALDynamicListBoxBaseText(Source).XRadius;
+      Corners := TALDynamicListBoxBaseText(Source).Corners;
+      Sides := TALDynamicListBoxBaseText(Source).Sides;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
 
 {***********************************************}
 procedure TALDynamicListBoxBaseText.AlignToPixel;
@@ -12133,16 +12266,28 @@ begin
   inherited;
 end;
 
+{*************************************************************}
+function TALDynamicListBoxBaseText.GetDefaultCorners: TCorners;
+begin
+  Result := AllCorners;
+end;
+
+{*********************************************************}
+function TALDynamicListBoxBaseText.GetDefaultSides: TSides;
+begin
+  Result := AllSides;
+end;
+
 {**********************************************************}
 function TALDynamicListBoxBaseText.IsCornersStored: Boolean;
 begin
-  Result := FCorners <> AllCorners;
+  Result := FCorners <> DefaultCorners;
 end;
 
 {********************************************************}
 function TALDynamicListBoxBaseText.IsSidesStored: Boolean;
 begin
-  Result := FSides <> AllSides
+  Result := FSides <> DefaultSides;
 end;
 
 {********************************************************************}
@@ -12217,6 +12362,7 @@ function TALDynamicListBoxBaseText.GetRenderTargetRect(const ARect: TrectF): TRe
 begin
   Result := ALGetShapeSurfaceRect(
               ARect, // const ARect: TRectF;
+              AutoAlignToPixel, // const AAlignToPixel: Boolean;
               Fill, // const AFill: TALBrush;
               nil, // const AFillResourceStream: TStream;
               nil, // const AStateLayer: TALStateLayer;
@@ -12477,6 +12623,7 @@ begin
   Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
   Result.FillImageMargins := AFill.ImageMargins.Rect;
   Result.FillImageNoRadius := AFill.ImageNoRadius;
+  Result.FillImageTintColor := AFill.ImageTintColor;
   Result.FillWrapMode := AFill.WrapMode;
   Result.FillCropCenter := TPointF.create(-50,-50);
   Result.FillBlurRadius := 0;
@@ -12748,6 +12895,7 @@ begin
     ABufDrawableRect := LocalRect.ReducePrecision;
     var LSurfaceRect := ALGetShapeSurfaceRect(
                           ABufDrawableRect, // const ARect: TRectF;
+                          AutoAlignToPixel, // const AAlignToPixel: Boolean;
                           AFill, // const AFill: TALBrush;
                           nil, // const AFillResourceStream: TStream;
                           AStateLayer, // const AStateLayer: TALStateLayer;
@@ -12962,7 +13110,7 @@ end;
 //    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBlack
 //    else LFontWeight := TFontWeight.black;
 //  end
-//  else LFontFamily := ALConvertFontFamily(LFontFamily);
+//  else LFontFamily := ALResolveFontFamily(LFontFamily);
 //  var LFontMetrics := ALGetFontMetrics(
 //                        LFontFamily, // TextSettings const AFontFamily: String;
 //                        TextSettings.Font.Size, // const AFontSize: single;
@@ -14669,6 +14817,30 @@ begin
   inherited;
 end;
 
+{*******************************************************************************}
+procedure TALDynamicListBoxBaseCheckBox.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxBaseCheckBox then begin
+      StateStyles.Assign(TALDynamicListBoxBaseCheckBox(Source).StateStyles);
+      CheckMark.Assign(TALDynamicListBoxBaseCheckBox(Source).CheckMark);
+      Checked := TALDynamicListBoxBaseCheckBox(Source).Checked;
+      DoubleBuffered := TALDynamicListBoxBaseCheckBox(Source).DoubleBuffered;
+      XRadius := TALDynamicListBoxBaseCheckBox(Source).XRadius;
+      YRadius := TALDynamicListBoxBaseCheckBox(Source).YRadius;
+      CacheIndex := TALDynamicListBoxBaseCheckBox(Source).CacheIndex;
+      CacheEngine := TALDynamicListBoxBaseCheckBox(Source).CacheEngine;
+      OnChange := TALDynamicListBoxBaseCheckBox(Source).OnChange;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {**********************************************************************}
 function TALDynamicListBoxBaseCheckBox.CreateCheckMark: TCheckMarkBrush;
 begin
@@ -15211,13 +15383,16 @@ begin
   ABufDrawableRect := LocalRect.ReducePrecision;
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   if ACheckMark.HasCheckMark then begin
+    var LCheckMarkMarginsRect := ACheckMark.margins.Rect;
+    if AutoAlignToPixel then LCheckMarkMarginsRect := ALAlignEdgesToPixelRound(LCheckMarkMarginsRect, ALGetScreenScale, TEpsilon.Position);
     var LCheckMarkRect := ABufDrawableRect;
-    LCheckMarkRect.Inflate(-ACheckMark.margins.Left, -ACheckMark.margins.top, -ACheckMark.margins.right, -ACheckMark.margins.Bottom);
+    LCheckMarkRect.Inflate(-LCheckMarkMarginsRect.Left, -LCheckMarkMarginsRect.top, -LCheckMarkMarginsRect.right, -LCheckMarkMarginsRect.Bottom);
     LSurfaceRect := TRectF.Union(LCheckMarkRect, LSurfaceRect);
   end;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -15281,6 +15456,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -15290,6 +15466,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -15302,6 +15479,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -15310,6 +15488,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -15424,6 +15603,7 @@ begin
       if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then begin
         var LLayerRect := ALGetShapeSurfaceRect(
                             LRect, // const ARect: TrectF;
+                            AutoAlignToPixel, // const AAlignToPixel: Boolean;
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
@@ -15697,6 +15877,23 @@ begin
   inherited;
 end;
 
+{******************************************************************************}
+procedure TALDynamicListBoxRadioButton.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxRadioButton then begin
+      GroupName := TALDynamicListBoxRadioButton(Source).GroupName;
+      Mandatory := TALDynamicListBoxRadioButton(Source).Mandatory;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {***************************************************************************************************}
 function TALDynamicListBoxRadioButton.CreateCheckMark: TALDynamicListBoxBaseCheckBox.TCheckMarkBrush;
 begin
@@ -15786,16 +15983,27 @@ procedure TALDynamicListBoxRadioButton.DrawCheckMark(
             const ACheckMark: TALDynamicListBoxBaseCheckBox.TCheckMarkBrush);
 begin
 
+  var LCanvasMatrix: TMatrix;
+  var LCanvasScale: Single;
+  if AutoAlignToPixel then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
+  else begin
+    LCanvasMatrix := TMatrix.Identity;
+    LCanvasScale := 1;
+  end;
   var LRect := ADstRect;
   LRect.Top := LRect.Top * AScale;
   LRect.right := LRect.right * AScale;
   LRect.left := LRect.left * AScale;
   LRect.bottom := LRect.bottom * AScale;
+  if AutoAlignToPixel then
+    LRect := ALAlignToPixelRound(LRect, LCanvasMatrix, LCanvasScale, TEpsilon.Position);
   var LScaledMarginsRect := ACheckMark.Margins.Rect;
   LScaledMarginsRect.Left := LScaledMarginsRect.Left * AScale;
   LScaledMarginsRect.right := LScaledMarginsRect.right * AScale;
   LScaledMarginsRect.top := LScaledMarginsRect.top * AScale;
   LScaledMarginsRect.bottom := LScaledMarginsRect.bottom * AScale;
+  if AutoAlignToPixel then
+    LScaledMarginsRect := ALAlignEdgesToPixelRound(LScaledMarginsRect, LCanvasScale, TEpsilon.Position);
   LRect.Top := LRect.Top + LScaledMarginsRect.top;
   LRect.right := LRect.right - LScaledMarginsRect.right;
   LRect.left := LRect.left + LScaledMarginsRect.left;
@@ -16689,6 +16897,7 @@ begin
   ABufDrawableRect := LocalRect.ReducePrecision;
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
@@ -16747,6 +16956,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -16756,6 +16966,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -16768,6 +16979,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -16776,6 +16988,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -16890,6 +17103,7 @@ begin
       if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then begin
         var LLayerRect := ALGetShapeSurfaceRect(
                             LRect, // const ARect: TrectF;
+                            AutoAlignToPixel, // const AAlignToPixel: Boolean;
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
@@ -18266,40 +18480,21 @@ begin
   inherited Destroy;
 end;
 
-{*****************************************}
-//procedure TALDynamicListBoxButton.Loaded;
-//
-//  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-//  procedure _ConvertFontFamily(const AStateStyle: TBaseStateStyle);
-//  begin
-//    if (AStateStyle.TextSettings.Font.Family <> '') and
-//       (not (csDesigning in ComponentState)) then
-//      AStateStyle.TextSettings.Font.Family := ALConvertFontFamily(AStateStyle.TextSettings.Font.Family);
-//  end;
-//
-//begin
-//  _ConvertFontFamily(StateStyles.Disabled);
-//  _ConvertFontFamily(StateStyles.Hovered);
-//  _ConvertFontFamily(StateStyles.Pressed);
-//  _ConvertFontFamily(StateStyles.Focused);
-//  inherited;
-//end;
-
-{**************************************************************}
-//procedure TALDynamicListBoxButton.Assign(Source: TPersistent);
-//begin
-//  BeginUpdate;
-//  Try
-//    if Source is TALDynamicListBoxButton then begin
-//      StateStyles.Assign(TALDynamicListBoxButton(Source).StateStyles);
-//    end
-//    else
-//      ALAssignError(Source{ASource}, Self{ADest});
-//    inherited Assign(Source);
-//  Finally
-//    EndUpdate;
-//  End;
-//end;
+{*************************************************************************}
+procedure TALDynamicListBoxButton.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxButton then begin
+      StateStyles.Assign(TALDynamicListBoxButton(Source).StateStyles);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
 
 {*********************************************}
 procedure TALDynamicListBoxButton.AlignToPixel;
@@ -18650,6 +18845,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -18659,6 +18855,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -18671,6 +18868,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -18679,6 +18877,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -19222,6 +19421,22 @@ begin
   inherited;
 end;
 
+{*************************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TThumb.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TThumb then begin
+      StateStyles.Assign(TThumb(Source).StateStyles);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {************************************************************************}
 function TALDynamicListBoxCustomTrack.TThumb.CreateStroke: TALStrokeBrush;
 begin
@@ -19615,6 +19830,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -19624,6 +19840,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALDynamicListBoxBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -19636,6 +19853,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -19644,6 +19862,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -19898,6 +20117,25 @@ begin
   inherited;
 end;
 
+{**********************************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TValueIndicator.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TValueIndicator then begin
+      Format := TValueIndicator(Source).Format;
+      OnCustomFormat := TValueIndicator(Source).OnCustomFormat;
+      Animation := TValueIndicator(Source).Animation;
+      ShowOnInteraction := TValueIndicator(Source).ShowOnInteraction;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {******************************************************************************************}
 procedure TALDynamicListBoxCustomTrack.TValueIndicator.AdjustPosition(const AThumb: TThumb);
 begin
@@ -19940,12 +20178,12 @@ begin
         TAnimation.ScaleInOut: begin
           AdjustPosition(AThumb);
           Opacity := 1;
-          Scale := 0;
+          Scale.Point := TPointF.Create(0, 0);
         end;
         TAnimation.Opacity: begin
           AdjustPosition(AThumb);
           Opacity := 0;
-          Scale := 1;
+          Scale.Point := TPointF.Create(1, 1);
         end
         else
           Raise Exception.Create('Error A2F4F658-97FC-4F92-AFA4-3BB8192003A8')
@@ -19985,7 +20223,7 @@ end;
 procedure TALDynamicListBoxCustomTrack.TValueIndicator.AnimationProcess(Sender: TObject);
 begin
   case FAnimation of
-    TAnimation.ScaleInOut: Scale := FFloatAnimation.CurrentValue;
+    TAnimation.ScaleInOut: Scale.Point := TPointF.Create(FFloatAnimation.CurrentValue, FFloatAnimation.CurrentValue);
     TAnimation.Opacity: Opacity := FFloatAnimation.CurrentValue
     else Raise Exception.Create('Error D6F17D76-E47E-4144-8FBA-5CAD3EBF84F3')
   end;
@@ -19997,7 +20235,7 @@ begin
   FFloatAnimation.Enabled := False;
   case FAnimation of
     TAnimation.ScaleInOut: begin
-      if SameValue(Scale, 0, TEpsilon.Scale) then
+      if SameValue(Scale.X, 0, TEpsilon.Scale) and SameValue(Scale.Y, 0, TEpsilon.Scale) then
         visible := False;
     end;
     TAnimation.Opacity: begin
@@ -20783,6 +21021,23 @@ begin
   inherited;
 end;
 
+{*************************************************************************************}
+procedure TALDynamicListBoxCustomTrack.TTrack.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TTrack then begin
+      StateStyles.Assign(TTrack(Source).StateStyles);
+      StopIndicator.Assign(TTrack(Source).StopIndicator);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {****************************************************************}
 function TALDynamicListBoxCustomTrack.TTrack.CreateFill: TALBrush;
 begin
@@ -21026,6 +21281,7 @@ begin
     ABufDrawableRect.Height := FCustomTrack.GetTrackSize(true{AIncludeTrackPadding});
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
@@ -21289,6 +21545,28 @@ procedure TALDynamicListBoxCustomTrack.AfterConstruction;
 begin
   inherited;
   realign;
+end;
+
+{******************************************************************************}
+procedure TALDynamicListBoxCustomTrack.Assign(Source: TALDynamicListBoxControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicListBoxCustomTrack then begin
+      //TabStop := TALDynamicListBoxCustomTrack(Source).TabStop;
+      if InactiveTrack <> nil then InactiveTrack.assign(TALDynamicListBoxCustomTrack(Source).InactiveTrack);
+      if ActiveTrack <> nil then ActiveTrack.assign(TALDynamicListBoxCustomTrack(Source).ActiveTrack);
+      if Thumb <> nil then Thumb.assign(TALDynamicListBoxCustomTrack(Source).Thumb);
+      if ValueIndicator <> nil then ValueIndicator.assign(TALDynamicListBoxCustomTrack(Source).ValueIndicator);
+      Orientation := TALDynamicListBoxCustomTrack(Source).Orientation;
+      OnChange := TALDynamicListBoxCustomTrack(Source).OnChange;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {**********************************************}
@@ -23407,6 +23685,7 @@ begin
                         ARect.Width, ARect.Height, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                        TalphaColors.Null, // const ATintColor: TalphaColor;
                         0, // const ABlurRadius: single;
                         0, // const AXRadius: Single;
                         0); // const AYRadius: Single);
@@ -24294,7 +24573,7 @@ begin
       // Reset visibility/scale/color of all controls
       for var I := 0 to ControlsCount - 1 do begin
         Controls[I].Visible := True;
-        TIndicatorControl(Controls[I]).Scale := 1;
+        TIndicatorControl(Controls[I]).Scale.Point := TPointF.Create(1, 1);
         if (Controls[I] = FactiveIndicatorControl) then
           TIndicatorControl(Controls[I]).Fill.Color := FActiveIndicator.Fill.Color
         else
@@ -24384,7 +24663,9 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else begin
             FActiveIndicatorControl.Left := Controls[FActivePageIndex].Left + (LDistanceBetweenIndicators * LAnimationValue);
-            FActiveIndicatorControl.Scale := 1 + abs(LAnimationValue * 1.2);
+            FActiveIndicatorControl.Scale.Point := TPointF.Create(
+                                                     1 + abs(LAnimationValue * 1.2),
+                                                     1 + abs(LAnimationValue * 1.2));
           end;
         end;
 
@@ -24422,14 +24703,25 @@ begin
         TAnimationType.Scale: begin
           const LMaxDeltaScale = 0.5;
           if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
-            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale := 1 + (LAnimationValue * LMaxDeltaScale);
-            TIndicatorControl(Controls[FActivePageIndex]).Scale := 1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale);
+            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale.Point := TPointF.Create(
+                                                                               1 + (LAnimationValue * LMaxDeltaScale),
+                                                                               1 + (LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
+                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale),
+                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale));
           end
           else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
-            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale := 1 + (-LAnimationValue * LMaxDeltaScale);
-            TIndicatorControl(Controls[FActivePageIndex]).Scale := 1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale);
+            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale.Point := TPointF.Create(
+                                                                               1 + (-LAnimationValue * LMaxDeltaScale),
+                                                                               1 + (-LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
+                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale),
+                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale));
           end
-          else TIndicatorControl(Controls[FActivePageIndex ]).Scale := 1 + LMaxDeltaScale;
+          else
+            TIndicatorControl(Controls[FActivePageIndex ]).Scale.Point := TPointF.Create(
+                                                                            1 + LMaxDeltaScale,
+                                                                            1 + LMaxDeltaScale);
           FActiveIndicatorControl.Visible := False;
         end;
 

@@ -14,11 +14,12 @@ implementation
 //  Alcinoe.FMX.Styles,
 //  Alcinoe.FMX.Edit;
 
-//procedure ALApplyMyCustomEditStyle(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
+//procedure ALApplyMyCustomEditStyle(const AEdit: TALBaseEdit; const ARatio: Single = 1);
 //begin
-//  With AEdit do begin
-//    Update here the look of your edit according to your custom style
-//  end;
+//  Apply your custom visual style to the edit control here.
+//  ARatio represents the scaling factor between the DefaultFontSize
+//  defined in TALStyleManager.Instance.AddOrSetEditStyle and the target font size
+//  you want to apply to this specific edit control.
 //end;
 
 //initialization

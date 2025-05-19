@@ -94,6 +94,7 @@ type
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
     FillImageNoRadius: Boolean; // default = False
+    FillImageTintColor: TAlphaColor; // default = TAlphaColors.null
     FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
     FillBlurRadius: single; // default = 0
@@ -140,7 +141,8 @@ type
     //           background-color="#FFFFFF or {ColorKey}">...</span>
     //   * <img src="{ResourceName}"
     //          width="xxx"
-    //          height="xxx">
+    //          height="xxx"
+    //          color="#FFFFFF or {ColorKey} or inherit">
     //   * Other "<" and ">" must be encoded with "&lt;" and "&gt;"
     //
     // Note: You can also use the "style" attribute for inline styling
@@ -392,6 +394,7 @@ begin
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
   FillImageNoRadius := False;
+  FillImageTintColor := TAlphaColors.null;
   FillWrapMode := TALImageWrapMode.Fit;
   FillCropCenter := TPointF.create(-50,-50);
   FillBlurRadius := 0;
@@ -481,6 +484,7 @@ begin
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
   FillImageNoRadius := Source.FillImageNoRadius;
+  FillImageTintColor := Source.FillImageTintColor;
   FillWrapMode := Source.FillWrapMode;
   FillCropCenter := Source.FillCropCenter;
   FillBlurRadius := Source.FillBlurRadius;
@@ -542,9 +546,9 @@ begin
     Scale := 1;
   end;
   if AlignToPixel then begin
-    FontSize := ALAlignDimensionToPixelRound(FontSize, ACanvasScale, TEpsilon.FontSize);
-    EllipsisFontSize := ALAlignDimensionToPixelRound(EllipsisFontSize, ACanvasScale, TEpsilon.FontSize);
-    LetterSpacing := ALAlignDimensionToPixelRound(LetterSpacing, ACanvasScale, TEpsilon.FontSize);
+    //FontSize := ALAlignDimensionToPixelRound(FontSize, ACanvasScale, TEpsilon.FontSize);
+    //EllipsisFontSize := ALAlignDimensionToPixelRound(EllipsisFontSize, ACanvasScale, TEpsilon.FontSize);
+    //LetterSpacing := ALAlignDimensionToPixelRound(LetterSpacing, ACanvasScale, TEpsilon.Position);
     FillBackgroundMargins := ALAlignEdgesToPixelRound(FillBackgroundMargins, ACanvasScale, TEpsilon.Position);
     FillImageMargins := ALAlignEdgesToPixelRound(FillImageMargins, ACanvasScale, TEpsilon.Position);
     StateLayerMargins := ALAlignEdgesToPixelRound(StateLayerMargins, ACanvasScale, TEpsilon.Position);
@@ -612,6 +616,7 @@ procedure ALDrawMultiLineText(
       DecorationThicknessMultiplier: Single;
       DecorationColor: TAlphaColor;
       ImgSrc: String;
+      ImgTintColor: TAlphaColor;
     end;
   {$ENDIF}
   {$ENDREGION}
@@ -717,7 +722,8 @@ procedure ALDrawMultiLineText(
               const ALetterSpacings: TList<Single>;
               out AImgSrc: String;
               out AImgWidth: Single;
-              out AImgHeight: Single); overload;
+              out AImgHeight: Single;
+              out AImgTintColor: String); overload;
   begin
     var LParamList := TALStringListW.Create;
     try
@@ -769,6 +775,7 @@ procedure ALDrawMultiLineText(
       if AFontFamilies <> nil then begin
         var LFontFamily := LParamList.Values['face']; // <font face="Arial">
         if LFontFamily = '' then LFontFamily := LParamList.Values['font-family']; // <span font-family="Arial">
+        LFontFamily := ALResolveFontFamily(LFontFamily);
         if LFontFamily <> '' then AFontFamilies.Add(LFontFamily)
         else if AFontFamilies.Count > 0 then AFontFamilies.Add(AFontFamilies[AFontFamilies.Count - 1])
         else AFontFamilies.Add(LOptions.FontFamily);
@@ -890,10 +897,16 @@ procedure ALDrawMultiLineText(
       end;
       //--
       AImgSrc := LParamList.Values['src'];
-      //--
-      AImgWidth := ALStrToFloatDef(LParamList.Values['width'], 0, ALDefaultFormatSettingsW) * LScale;
-      //--
-      AImgHeight := ALStrToFloatDef(LParamList.Values['height'], 0, ALDefaultFormatSettingsW) * LScale;
+      if AImgSrc <> '' then begin
+        AImgWidth := ALStrToFloatDef(LParamList.Values['width'], 0, ALDefaultFormatSettingsW) * LScale;
+        AImgHeight := ALStrToFloatDef(LParamList.Values['height'], 0, ALDefaultFormatSettingsW) * LScale;
+        AImgTintColor := LParamList.Values['color'];
+      end
+      else begin
+        AImgWidth := 0;
+        AImgHeight := 0;
+        AImgTintColor := '';
+      end;
     finally
       ALFreeAndNil(LParamList);
     end;
@@ -921,6 +934,7 @@ procedure ALDrawMultiLineText(
     Var LImgSrc: String;
     Var LImgWidth: Single;
     Var LImgHeight: Single;
+    Var LImgTintColor: String;
     _getInfosFromTag(
       ATag, // const ATag: String; // color="#ffffff" id="xxx"
       ASpanIds, // const ASpanIds: TALStringListW;
@@ -939,7 +953,8 @@ procedure ALDrawMultiLineText(
       ALetterSpacings, // const ALetterSpacings: TList<Single>;
       LImgSrc, // out AImgSrc: String;
       LImgWidth, // out AImgWidth: Single;
-      LImgHeight); // out AImgHeight: Single)
+      LImgHeight, // out AImgHeight: Single;
+      LImgTintColor); // out AImgTintColor: String)
   end;
   {$ENDREGION}
 
@@ -954,6 +969,7 @@ procedure ALDrawMultiLineText(
     Var LImgSrc: String;
     Var LImgWidth: Single;
     Var LImgHeight: Single;
+    Var LImgTintColor: String;
     _getInfosFromTag(
       ATag, // const ATag: String; // color="#ffffff" id="xxx"
       ASpanIds, // const ASpanIds: TALStringListW;
@@ -972,7 +988,8 @@ procedure ALDrawMultiLineText(
       nil, // const ALetterSpacings: TList<Single>;
       LImgSrc, // out AImgSrc: String;
       LImgWidth, // out AImgWidth: Single;
-      LImgHeight); // out AImgHeight: Single)
+      LImgHeight, // out AImgHeight: Single;
+      LImgTintColor); // out AImgTintColor: String)
   end;
   {$ENDREGION}
 
@@ -984,6 +1001,7 @@ procedure ALDrawMultiLineText(
     Var LImgSrc: String;
     Var LImgWidth: Single;
     Var LImgHeight: Single;
+    Var LImgTintColor: String;
     _getInfosFromTag(
       ATag, // const ATag: String; // color="#ffffff" id="xxx"
       ASpanIds, // const ASpanIds: TALStringListW;
@@ -1002,7 +1020,8 @@ procedure ALDrawMultiLineText(
       nil, // const ALetterSpacings: TList<Single>;
       LImgSrc, // out AImgSrc: String;
       LImgWidth, // out AImgWidth: Single;
-      LImgHeight); // out AImgHeight: Single)
+      LImgHeight, // out AImgHeight: Single;
+      LImgTintColor); // out AImgTintColor: String)
   end;
   {$ENDREGION}
 
@@ -1011,7 +1030,8 @@ procedure ALDrawMultiLineText(
               const ATag: String; // color="#ffffff" id="xxx"
               out AImgSrc: String;
               out AImgWidth: Single;
-              out AImgHeight: Single); overload;
+              out AImgHeight: Single;
+              out AImgTintColor: String); overload;
   begin
     _getInfosFromTag(
       ATag, // const ATag: String; // color="#ffffff" id="xxx"
@@ -1031,22 +1051,9 @@ procedure ALDrawMultiLineText(
       nil, // const ALetterSpacings: TList<Single>;
       AImgSrc, // out AImgSrc: String;
       AImgWidth, // out AImgWidth: Single;
-      AImgHeight); // out AImgHeight: Single)
+      AImgHeight, // out AImgHeight: Single;
+      AImgTintColor); // out AImgTintColor: String)
   end;
-  {$ENDREGION}
-
-  {$REGION '_getFontFamily'}
-  {$IF not defined(ALSkiaEngine)}
-  function _getFontFamily(const AFontFamilies: String): String;
-  begin
-    Result := '';
-    var LFontFamilies := AFontFamilies.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
-    for var I := low(LFontFamilies) to high(LFontFamilies) do begin
-      Result := ALTrim(LFontFamilies[I]);
-      if Result <> '' then break;
-    end;
-  end;
-  {$ENDIF}
   {$ENDREGION}
 
   {$REGION '_getFontStyleExt'}
@@ -1105,7 +1112,7 @@ procedure ALDrawMultiLineText(
        (ADecorationStyle = _CurrDecorationStyle) and
        (SameValue(ADecorationThicknessMultiplier, _CurrDecorationThicknessMultiplier, TEpsilon.Scale)) and
        (ADecorationColor = _CurrDecorationColor) and
-       (SameValue(ALetterSpacing, _CurrLetterSpacing, TEpsilon.FontSize)) then exit;
+       (SameValue(ALetterSpacing, _CurrLetterSpacing, TEpsilon.Position)) then exit;
 
     _CurrFontFamily := AFontFamily;
     _CurrFontSize := AFontSize;
@@ -1119,7 +1126,7 @@ procedure ALDrawMultiLineText(
     _CurrDecorationColor := ADecorationColor;
     _CurrLetterSpacing := ALetterSpacing;
 
-    var LFontFamily := _getFontFamily(AFontFamily);
+    var LFontFamily := ALExtractPrimaryFontFamily(AFontFamily);
     var LTypeface: JTypeFace := TALFontManager.GetCustomTypeFace(LFontFamily);
     if LTypeface = nil then begin
       var LFontStyles: TFontStyles := [];
@@ -1253,7 +1260,7 @@ procedure ALDrawMultiLineText(
                 end;
               end;
               //--
-              if not sameValue(ALetterSpacing, 0, TEpsilon.FontSize) then begin
+              if not sameValue(ALetterSpacing, 0, TEpsilon.Position) then begin
                 var LValue: Single := ALetterSpacing;
                 var LKernAttributeValue := CFNumberCreate(nil, kCFNumberFloat32Type, @LValue);
                 if LKernAttributeValue = nil then raise Exception.Create('Failed to create CFNumber');
@@ -1609,7 +1616,7 @@ procedure ALDrawMultiLineText(
     // Since the Windows API only works with integers, I multiply the font size by 100
     // and later divide the result by 100 to achieve better precision.
     //
-    //var LFontFamily := _getFontFamily(AFontFamily);
+    //var LFontFamily := ALExtractPrimaryFontFamily(AFontFamily);
     //var LFont := CreateFont(
     //               -Round(AFontSize*100), // nHeight: Integer;
     //               0, // nWidth: Integer;
@@ -1654,7 +1661,7 @@ procedure ALDrawMultiLineText(
       Result := LText.Length;
       While Result > 0 do begin
         LLayout.BeginUpdate;
-        LLayout.Font.Family := _getFontFamily(AFontFamily);
+        LLayout.Font.Family := ALExtractPrimaryFontFamily(AFontFamily);
         LLayout.Font.StyleExt := _getFontStyleExt(AFontWeight, AFontSlant, AFontStretch, ADecorationKinds);
         LLayout.Font.Size := aFontSize;
         LLayout.MaxSize := Tpointf.Create(65535, 65535);
@@ -1706,6 +1713,8 @@ begin
   LOptions := TALMultiLineTextOptions.Create;
   LOptions.Assign(AOptions);
   LOptions.ScaleAndAlignProperties(LCanvasScale);
+  LOptions.FontFamily := ALResolveFontFamily(LOptions.FontFamily);
+  LOptions.EllipsisFontFamily := ALResolveFontFamily(LOptions.EllipsisFontFamily);
   ARect.Top := ARect.Top * LScale;
   ARect.right := ARect.right * LScale;
   ARect.left := ARect.left * LScale;
@@ -1887,6 +1896,7 @@ begin
               var LCurrImgSrc: String;
               var LcurrImgWidth: Single;
               var LcurrImgHeight: Single;
+              var LcurrImgTintColor: TAlphaColor;
 
 
               /////////////////////////
@@ -1917,6 +1927,7 @@ begin
                 LCurrImgSrc := '';
                 LcurrImgWidth := 0;
                 LcurrImgHeight := 0;
+                LcurrImgTintColor := TAlphaColors.Null;
                 LInsertEllipsisAt := Maxint;
                 P1 := Maxint;
               end
@@ -1938,6 +1949,7 @@ begin
                   LCurrText := '';
                   LcurrImgWidth := 0;
                   LcurrImgHeight := 0;
+                  LcurrImgTintColor := TAlphaColors.Null;
                   var P2 := ALPosW('>', Ltext, P1+1); // blablabla <font color="#ffffff">blablabla</font> blablabla
                                                       //           ^P1                  ^P2
                   if P2 <= 0 then break;
@@ -1970,7 +1982,18 @@ begin
                   //-----
                   else if (ALPosW('<img ', LTag) = 1) or
                           (LTag = '<img/>') then begin // <img src="xxx">
-                    _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight);
+                    var LcurrImgTintColorStr: String;
+                    _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight, LcurrImgTintColorStr);
+                    if LcurrImgTintColorStr = '' then LcurrImgTintColor := TAlphaColors.Null
+                    else if ALSameTextW(LcurrImgTintColorStr, 'inherit') then begin
+                      if LFontColors.Count > 0 then LcurrImgTintColor := LFontColors[LFontColors.Count - 1]
+                      else LcurrImgTintColor := LOptions.FontColor;
+                    end
+                    else begin
+                      var LcurrImgTintColorInt: Cardinal;
+                      if _TryStrColorToInt(LcurrImgTintColorStr, LcurrImgTintColorInt) then LcurrImgTintColor := TalphaColor(LcurrImgTintColorInt)
+                      else LcurrImgTintColor := TAlphaColors.Null;
+                    end;
                   end
 
                   //-----
@@ -2013,6 +2036,7 @@ begin
                   LCurrImgSrc := '';
                   LcurrImgWidth := 0;
                   LcurrImgHeight := 0;
+                  LcurrImgTintColor := TAlphaColors.Null;
                   var P2 := ALPosW('<', Ltext, P1);  // blablabla <font color="#ffffff">blablabla</font> blablabla
                                                      //                                 ^P1      ^P2
                   if P2 <= 0 then P2 := Maxint;
@@ -2034,6 +2058,7 @@ begin
                 LCurrImgSrc := '';
                 LcurrImgWidth := 0;
                 LcurrImgHeight := 0;
+                LcurrImgTintColor := TAlphaColors.Null;
                 P1 := Maxint;
               end;
 
@@ -2245,7 +2270,7 @@ begin
                   // https://api.flutter.dev/flutter/painting/TextStyle/letterSpacing.html
                   // The amount of space (in logical pixels) to add between each letter. A negative value
                   // can be used to bring the letters closer.
-                  if not SameValue(LLetterSpacing, 0, TEpsilon.FontSize) then
+                  if not SameValue(LLetterSpacing, 0, TEpsilon.Position) then
                     sk4d_textstyle_set_letter_spacing(LTextStyle, LLetterSpacing);
 
                   // set half_leading
@@ -2288,7 +2313,7 @@ begin
                     LPlaceholderStyle.baseline_offset := 0.0;
                     sk4d_paragraphbuilder_add_placeholder(LParagraphBuilder, @LPlaceholderStyle);
                     LTextForRange := LTextForRange + '_';
-                    LPlaceHolders.Add(LCurrImgSrc);
+                    LPlaceHolders.AddObject(LCurrImgSrc, Pointer(LcurrImgTintColor));
                   end
                   else begin
                     sk4d_paragraphbuilder_add_text(LParagraphBuilder, MarshaledAString(UTF8String(LCurrText)));
@@ -2470,6 +2495,7 @@ begin
               // Calculate the SurfaceRect
               var LSurfaceRect := ALGetShapeSurfaceRect(
                                     ARect, // const ARect: TRectF;
+                                    LOptions.AlignToPixel, // const AAlignToPixel: Boolean;
                                     LOptions.FillColor, // const AFillColor: TAlphaColor;
                                     LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                                     LOptions.FillResourceName, // const AFillResourceName: String;
@@ -2566,6 +2592,7 @@ begin
                       .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
                       .SetFillImageMarginsRect(LOptions.FillImageMargins)
                       .SetFillImageNoRadius(LOptions.FillImageNoRadius)
+                      .SetFillImageTintColor(LOptions.FillImageTintColor)
                       .SetFillWrapMode(LOptions.FillWrapMode)
                       .SetFillCropCenter(LOptions.FillCropCenter)
                       .SetFillBlurRadius(LOptions.FillBlurRadius)
@@ -2630,6 +2657,7 @@ begin
                                     LDstRect.Width, LDstRect.Height, // const W, H: single;
                                     TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                                     TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
                                     0, // const ABlurRadius: single;
                                     0, // const AXRadius: Single;
                                     0); // const AYRadius: Single);
@@ -2649,6 +2677,7 @@ begin
                                     LDstRect.Width, LDstRect.Height, // const W, H: single;
                                     TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                                     TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
                                     0, // const ABlurRadius: single;
                                     0, // const AXRadius: Single;
                                     0); // const AYRadius: Single);
@@ -2815,6 +2844,7 @@ begin
         var LCurrImgSrc: String;
         var LcurrImgWidth: Single;
         var LcurrImgHeight: Single;
+        var LcurrImgTintColor: TAlphaColor := TAlphaColors.null; // Warning bug
 
 
         /////////////////////////
@@ -2885,6 +2915,7 @@ begin
                     LCurrImgSrc := '';
                     LcurrImgWidth := 0;
                     LcurrImgHeight := 0;
+                    LcurrImgTintColor := TAlphaColors.Null;
                     P1 := -1;
                     //--
                     LFontFamilies.Add(LExtendedTextElement.FontFamily);
@@ -2929,6 +2960,7 @@ begin
               LCurrImgSrc := '';
               LcurrImgWidth := 0;
               LcurrImgHeight := 0;
+              LcurrImgTintColor := TAlphaColors.Null;
               P1 := Maxint;
               //--
               if not LOptions.EllipsisInheritSettings then begin
@@ -3040,6 +3072,7 @@ begin
               LCurrImgSrc := '';
               LcurrImgWidth := 0;
               LcurrImgHeight := 0;
+              LcurrImgTintColor := TAlphaColors.Null;
               P1 := -1;
               //--
               LFontFamilies.Add(LExtendedTextElement.FontFamily);
@@ -3102,6 +3135,7 @@ begin
           LCurrImgSrc := '';
           LcurrImgWidth := 0;
           LcurrImgHeight := 0;
+          LcurrImgTintColor := TAlphaColors.Null;
           P1 := P1 + 1;
 
         end
@@ -3123,6 +3157,7 @@ begin
             LCurrText := '';
             LcurrImgWidth := 0;
             LcurrImgHeight := 0;
+            LcurrImgTintColor := TAlphaColors.Null;
             var P2 := ALPosW('>', Ltext, P1+1); // blablabla <font color="#ffffff">blablabla</font> blablabla
                                                 //           ^P1                  ^P2
             if P2 <= 0 then break;
@@ -3155,7 +3190,18 @@ begin
             //-----
             else if (ALPosW('<img ', LTag) = 1) or
                     (LTag = '<img/>') then begin // <img src="xxx">
-              _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight);
+              var LcurrImgTintColorStr: String;
+              _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight, LcurrImgTintColorStr);
+              if LcurrImgTintColorStr = '' then LcurrImgTintColor := TAlphaColors.Null
+              else if ALSameTextW(LcurrImgTintColorStr, 'inherit') then begin
+                if LFontColors.Count > 0 then LcurrImgTintColor := LFontColors[LFontColors.Count - 1]
+                else LcurrImgTintColor := LOptions.FontColor;
+              end
+              else begin
+                var LcurrImgTintColorInt: Cardinal;
+                if _TryStrColorToInt(LcurrImgTintColorStr, LcurrImgTintColorInt) then LcurrImgTintColor := TalphaColor(LcurrImgTintColorInt)
+                else LcurrImgTintColor := TAlphaColors.Null;
+              end;
             end
 
             //-----
@@ -3198,6 +3244,7 @@ begin
             LCurrImgSrc := '';
             LcurrImgWidth := 0;
             LcurrImgHeight := 0;
+            LcurrImgTintColor := TAlphaColors.Null;
             var P2 := ALPosW('<', Ltext, P1);  // blablabla <font color="#ffffff">blablabla</font> blablabla
                                                //                                 ^P1      ^P2
             if P2 <= 0 then P2 := Maxint;
@@ -3223,6 +3270,7 @@ begin
           LCurrImgSrc := '';
           LcurrImgWidth := 0;
           LcurrImgHeight := 0;
+          LcurrImgTintColor := TAlphaColors.Null;
           var P2 := ALPosW(#10, Ltext, P1);  // blablabla #10blablabla#10 blablabla
                                              // ^P1       ^P2
           if P2 <= 0 then P2 := Maxint;
@@ -3417,6 +3465,7 @@ begin
                 LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
                 LExtendedTextElement.DecorationColor := LDecorationColor;
                 LExtendedTextElement.ImgSrc := '';
+                LExtendedTextElement.ImgTintColor := TAlphaColors.null;
                 LExtendedTextElements.add(LExtendedTextElement);
                 //--
                 if LCurrText = #10 then break // => break the loop => While LCurrText <> '' do begin => Go to the loop => while P1 <= high(Ltext) do begin
@@ -3464,6 +3513,7 @@ begin
               LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
               LExtendedTextElement.DecorationColor := LDecorationColor;
               LExtendedTextElement.ImgSrc := '';
+              LExtendedTextElement.ImgTintColor := TAlphaColors.null;
               LExtendedTextElements.add(LExtendedTextElement);
 
               // Increase the number of lines
@@ -3503,6 +3553,7 @@ begin
                 LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
                 LExtendedTextElement.DecorationColor := LDecorationColor;
                 LExtendedTextElement.ImgSrc := '';
+                LExtendedTextElement.ImgTintColor := TAlphaColors.null;
                 LExtendedTextElements.add(LExtendedTextElement);
               end;
 
@@ -3573,6 +3624,7 @@ begin
               LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
               LExtendedTextElement.DecorationColor := LDecorationColor;
               LExtendedTextElement.ImgSrc := '';
+              LExtendedTextElement.ImgTintColor := TAlphaColors.null;
               LExtendedTextElements.add(LExtendedTextElement);
             end;
 
@@ -3617,6 +3669,7 @@ begin
             LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
             LExtendedTextElement.DecorationColor := LDecorationColor;
             LExtendedTextElement.ImgSrc := LCurrImgSrc;
+            LExtendedTextElement.ImgTintColor := LcurrImgTintColor;
             LExtendedTextElements.add(LExtendedTextElement);
 
           end;
@@ -3774,6 +3827,7 @@ begin
       // Calculate the SurfaceRect
       var LSurfaceRect := ALGetShapeSurfaceRect(
                             ARect, // const ARect: TRectF;
+                            LOptions.AlignToPixel, // const AAlignToPixel: Boolean;
                             LOptions.FillColor, // const AFillColor: TAlphaColor;
                             LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LOptions.FillResourceName, // const AFillResourceName: String;
@@ -3894,6 +3948,7 @@ begin
               .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
               .SetFillImageMarginsRect(LOptions.FillImageMargins)
               .SetFillImageNoRadius(LOptions.FillImageNoRadius)
+              .SetFillImageTintColor(LOptions.FillImageTintColor)
               .SetFillWrapMode(LOptions.FillWrapMode)
               .SetFillCropCenter(LOptions.FillCropCenter)
               .SetFillBlurRadius(LOptions.FillBlurRadius)
@@ -3937,6 +3992,7 @@ begin
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                             TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;
                             0); // const AYRadius: Single);
@@ -4002,6 +4058,7 @@ begin
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                             TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;
                             0); // const AYRadius: Single);
@@ -4085,6 +4142,7 @@ begin
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                             TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;
                             0); // const AYRadius: Single);
@@ -4102,7 +4160,7 @@ begin
             else begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
-              ACanvas.Font.Family := _getFontFamily(LExtendedTextElement.FontFamily);
+              ACanvas.Font.Family := ALExtractPrimaryFontFamily(LExtendedTextElement.FontFamily);
               ACanvas.Font.Size := LExtendedTextElement.FontSize;
               ACanvas.Font.StyleExt := _getFontStyleExt(LExtendedTextElement.FontWeight, LExtendedTextElement.FontSlant, LExtendedTextElement.FontStretch, LExtendedTextElement.DecorationKinds);
               If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
@@ -4467,7 +4525,6 @@ begin
       inc(I);
     end;
   Setlength(Result, I);
-
 end;
 
 end.

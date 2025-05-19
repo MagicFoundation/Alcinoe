@@ -127,6 +127,26 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
+  {****************************************}
+  TALScrollBarEditor = class(TDefaultEditor)
+  protected
+    procedure ApplyStyleClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
+  {****************************************}
+  TALScrollBoxEditor = class(TDefaultEditor)
+  protected
+    procedure ApplyStyleClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
   {*******************************************}
   TALPageControllerEditor = class(TItemsEditor)
   private
@@ -194,6 +214,7 @@ uses
   Alcinoe.Common,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
+  Alcinoe.fmx.Layouts,
   Alcinoe.FMX.Styles,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Memo,
@@ -496,6 +517,68 @@ begin
     AItem.AddItem(LNames[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyStyleClick{AOnClick}, 0{hCtx}, ''{AName});
 end;
 
+{**********************************************************}
+function TALScrollBarEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Style';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{************************************************}
+function TALScrollBarEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{************************************************************}
+procedure TALScrollBarEditor.ApplyStyleClick(Sender: TObject);
+begin
+  var LStyleName := TmenuItem(Sender).Caption;
+  LStyleName := StringReplace(LStyleName, '&','',[rfReplaceALL]);
+  TALStyleManager.Instance.ApplyScrollBarStyle(LStyleName, TALScrollBar(Component));
+end;
+
+{*******************************************************************************}
+procedure TALScrollBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LNames := TALStyleManager.Instance.GetScrollBarStyleNames;
+  for var I := low(LNames) to high(LNames) do
+    AItem.AddItem(LNames[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyStyleClick{AOnClick}, 0{hCtx}, ''{AName});
+end;
+
+{**********************************************************}
+function TALScrollBoxEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Style';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{************************************************}
+function TALScrollBoxEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{************************************************************}
+procedure TALScrollBoxEditor.ApplyStyleClick(Sender: TObject);
+begin
+  var LStyleName := TmenuItem(Sender).Caption;
+  LStyleName := StringReplace(LStyleName, '&','',[rfReplaceALL]);
+  TALStyleManager.Instance.ApplyScrollBoxStyle(LStyleName, TALScrollBox(Component));
+end;
+
+{*******************************************************************************}
+procedure TALScrollBoxEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LNames := TALStyleManager.Instance.GetScrollBoxStyleNames;
+  for var I := low(LNames) to high(LNames) do
+    AItem.AddItem(LNames[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyStyleClick{AOnClick}, 0{hCtx}, ''{AName});
+end;
+
 {***************************************************************************************}
 constructor TALPageControllerEditor.Create(AComponent: TComponent; ADesigner: IDesigner);
 begin
@@ -740,6 +823,10 @@ begin
   RegisterComponentEditor(TALSwitch, TALSwitchEditor);
   RegisterComponentEditor(TALTrackBar, TALTrackBarEditor);
   RegisterComponentEditor(TALRangeTrackBar, TALRangeTrackBarEditor);
+  RegisterComponentEditor(TALScrollBar, TALScrollBarEditor);
+  RegisterComponentEditor(TALScrollBox, TALScrollBoxEditor);
+  RegisterComponentEditor(TALVertScrollBox, TALScrollBoxEditor);
+  RegisterComponentEditor(TALHorzScrollBox, TALScrollBoxEditor);
   RegisterComponentEditor(TALPageController, TALPageControllerEditor);
   RegisterComponentEditor(TALPageView, TALPageViewEditor);
   RegisterPropertyEditor(TypeInfo(string), TALText, 'Text', TALTextTextPropertyEditor);
@@ -748,6 +835,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TALFont, 'ColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALTextDecoration, 'ColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALBrush, 'ColorKey', TALColorKeyProperty);
+  RegisterPropertyEditor(TypeInfo(string), TALBrush, 'ImageTintColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALStrokeBrush, 'ColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALStateLayer, 'ColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALBaseEdit.TBaseStateStyle, 'PromptTextColorKey', TALColorKeyProperty);
@@ -758,6 +846,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TALCustomTrack.TTrack.TStopIndicatorBrush, 'ColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALImage, 'BackgroundColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALImage, 'LoadingColorKey', TALColorKeyProperty);
+  RegisterPropertyEditor(TypeInfo(string), TALImage, 'TintColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALVideoPlayerSurface, 'BackgroundColorKey', TALColorKeyProperty);
   RegisterPropertyEditor(TypeInfo(string), TALVideoPlayerSurface, 'LoadingColorKey', TALColorKeyProperty);
 end;

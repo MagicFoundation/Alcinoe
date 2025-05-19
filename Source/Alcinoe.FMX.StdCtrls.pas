@@ -672,6 +672,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -876,6 +877,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
   published
     property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
     property Mandatory: Boolean read fMandatory write fMandatory default false;
@@ -1713,11 +1715,10 @@ type
     function GetRenderTargetRect(const ARect: TrectF): TRectF; override;
     {$ENDIF}
     procedure Paint; override;
-    procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -2015,6 +2016,7 @@ type
       public
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
+        procedure Assign(Source: TPersistent{TALControl}); override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
         procedure MakeBufDrawable; override;
@@ -2271,6 +2273,7 @@ type
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
         procedure BeforeDestruction; override;
+        procedure Assign(Source: TPersistent{TALControl}); override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
         function GetValue: Double;
@@ -2406,6 +2409,7 @@ type
       public
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
+        procedure Assign(Source: TPersistent{TALControl}); override;
         procedure Refresh(const AThumb: TThumb);
         property DefaultFormat: String read GetDefaultFormat;
         property Visible default false;
@@ -2560,6 +2564,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure AfterConstruction; override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -3168,6 +3173,7 @@ begin
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
                       TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
                       TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                      TalphaColors.Null, // const ATintColor: TalphaColor;
                       0, // const ABlurRadius: single;
                       0, // const AXRadius: Single;
                       0); // const AYRadius: Single);
@@ -3621,6 +3627,22 @@ begin
   inherited;
 end;
 
+{**********************************************************************}
+procedure TALCustomTrack.TThumb.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TThumb then begin
+      StateStyles.Assign(TThumb(Source).StateStyles);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {**********************************************************}
 function TALCustomTrack.TThumb.CreateStroke: TALStrokeBrush;
 begin
@@ -4014,6 +4036,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -4023,6 +4046,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -4035,6 +4059,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -4043,6 +4068,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -4271,6 +4297,25 @@ destructor TALCustomTrack.TValueIndicator.Destroy;
 begin
   ALFreeAndNil(FFloatAnimation);
   inherited;
+end;
+
+{*******************************************************************************}
+procedure TALCustomTrack.TValueIndicator.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TValueIndicator then begin
+      Format := TValueIndicator(Source).Format;
+      OnCustomFormat := TValueIndicator(Source).OnCustomFormat;
+      Animation := TValueIndicator(Source).Animation;
+      ShowOnInteraction := TValueIndicator(Source).ShowOnInteraction;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {****************************************************************************}
@@ -5146,6 +5191,23 @@ begin
   inherited;
 end;
 
+{**********************************************************************}
+procedure TALCustomTrack.TTrack.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TTrack then begin
+      StateStyles.Assign(TTrack(Source).StateStyles);
+      StopIndicator.Assign(TTrack(Source).StopIndicator);
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {**************************************************}
 function TALCustomTrack.TTrack.CreateFill: TALBrush;
 begin
@@ -5389,6 +5451,7 @@ begin
     ABufDrawableRect.Height := FCustomTrack.GetTrackSize(true{AIncludeTrackPadding});
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
@@ -5652,6 +5715,28 @@ procedure TALCustomTrack.AfterConstruction;
 begin
   inherited;
   realign;
+end;
+
+{***************************************************************}
+procedure TALCustomTrack.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TALCustomTrack then begin
+      TabStop := TALCustomTrack(Source).TabStop;
+      if InactiveTrack <> nil then InactiveTrack.assign(TALCustomTrack(Source).InactiveTrack);
+      if ActiveTrack <> nil then ActiveTrack.assign(TALCustomTrack(Source).ActiveTrack);
+      if Thumb <> nil then Thumb.assign(TALCustomTrack(Source).Thumb);
+      if ValueIndicator <> nil then ValueIndicator.assign(TALCustomTrack(Source).ValueIndicator);
+      Orientation := TALCustomTrack(Source).Orientation;
+      OnChange := TALCustomTrack(Source).OnChange;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {******************************}
@@ -8109,6 +8194,30 @@ begin
   inherited;
 end;
 
+{****************************************************************}
+procedure TALBaseCheckBox.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TALBaseCheckBox then begin
+      StateStyles.Assign(TALBaseCheckBox(Source).StateStyles);
+      CheckMark.Assign(TALBaseCheckBox(Source).CheckMark);
+      Checked := TALBaseCheckBox(Source).Checked;
+      DoubleBuffered := TALBaseCheckBox(Source).DoubleBuffered;
+      XRadius := TALBaseCheckBox(Source).XRadius;
+      YRadius := TALBaseCheckBox(Source).YRadius;
+      CacheIndex := TALBaseCheckBox(Source).CacheIndex;
+      CacheEngine := TALBaseCheckBox(Source).CacheEngine;
+      OnChange := TALBaseCheckBox(Source).OnChange;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {********************************************************}
 function TALBaseCheckBox.CreateCheckMark: TCheckMarkBrush;
 begin
@@ -8651,13 +8760,16 @@ begin
   ABufDrawableRect := LocalRect;
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   if ACheckMark.HasCheckMark then begin
+    var LCheckMarkMarginsRect := ACheckMark.margins.Rect;
+    if AutoAlignToPixel then LCheckMarkMarginsRect := ALAlignEdgesToPixelRound(LCheckMarkMarginsRect, ALGetScreenScale, TEpsilon.Position);
     var LCheckMarkRect := ABufDrawableRect;
-    LCheckMarkRect.Inflate(-ACheckMark.margins.Left, -ACheckMark.margins.top, -ACheckMark.margins.right, -ACheckMark.margins.Bottom);
+    LCheckMarkRect.Inflate(-LCheckMarkMarginsRect.Left, -LCheckMarkMarginsRect.top, -LCheckMarkMarginsRect.right, -LCheckMarkMarginsRect.Bottom);
     LSurfaceRect := TRectF.Union(LCheckMarkRect, LSurfaceRect);
   end;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -8721,6 +8833,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -8730,6 +8843,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -8742,6 +8856,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -8750,6 +8865,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -8864,6 +8980,7 @@ begin
       if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then begin
         var LLayerRect := ALGetShapeSurfaceRect(
                             LRect, // const ARect: TrectF;
+                            AutoAlignToPixel, // const AAlignToPixel: Boolean;
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
@@ -9137,6 +9254,23 @@ begin
   inherited;
 end;
 
+{***************************************************************}
+procedure TALRadioButton.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TALRadioButton then begin
+      GroupName := TALRadioButton(Source).GroupName;
+      Mandatory := TALRadioButton(Source).Mandatory;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
 {***********************************************************************}
 function TALRadioButton.CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush;
 begin
@@ -9226,16 +9360,27 @@ procedure TALRadioButton.DrawCheckMark(
             const ACheckMark: TALBaseCheckBox.TCheckMarkBrush);
 begin
 
+  var LCanvasMatrix: TMatrix;
+  var LCanvasScale: Single;
+  if AutoAlignToPixel then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
+  else begin
+    LCanvasMatrix := TMatrix.Identity;
+    LCanvasScale := 1;
+  end;
   var LRect := ADstRect;
   LRect.Top := LRect.Top * AScale;
   LRect.right := LRect.right * AScale;
   LRect.left := LRect.left * AScale;
   LRect.bottom := LRect.bottom * AScale;
+  if AutoAlignToPixel then
+    LRect := ALAlignToPixelRound(LRect, LCanvasMatrix, LCanvasScale, TEpsilon.Position);
   var LScaledMarginsRect := ACheckMark.Margins.Rect;
   LScaledMarginsRect.Left := LScaledMarginsRect.Left * AScale;
   LScaledMarginsRect.right := LScaledMarginsRect.right * AScale;
   LScaledMarginsRect.top := LScaledMarginsRect.top * AScale;
   LScaledMarginsRect.bottom := LScaledMarginsRect.bottom * AScale;
+  if AutoAlignToPixel then
+    LScaledMarginsRect := ALAlignEdgesToPixelRound(LScaledMarginsRect, LCanvasScale, TEpsilon.Position);
   LRect.Top := LRect.Top + LScaledMarginsRect.top;
   LRect.right := LRect.right - LScaledMarginsRect.right;
   LRect.left := LRect.left + LScaledMarginsRect.left;
@@ -10129,6 +10274,7 @@ begin
   ABufDrawableRect := LocalRect;
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
+                        AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
                         nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
@@ -10187,6 +10333,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -10196,6 +10343,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -10208,6 +10356,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -10216,6 +10365,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
@@ -10330,6 +10480,7 @@ begin
       if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then begin
         var LLayerRect := ALGetShapeSurfaceRect(
                             LRect, // const ARect: TrectF;
+                            AutoAlignToPixel, // const AAlignToPixel: Boolean;
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
@@ -11682,27 +11833,8 @@ begin
   inherited Destroy;
 end;
 
-{*************************}
-procedure TALButton.Loaded;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _ConvertFontFamily(const AStateStyle: TBaseStateStyle);
-  begin
-    if (AStateStyle.TextSettings.Font.Family <> '') and
-       (not (csDesigning in ComponentState)) then
-      AStateStyle.TextSettings.Font.Family := ALConvertFontFamily(AStateStyle.TextSettings.Font.Family);
-  end;
-
-begin
-  _ConvertFontFamily(StateStyles.Disabled);
-  _ConvertFontFamily(StateStyles.Hovered);
-  _ConvertFontFamily(StateStyles.Pressed);
-  _ConvertFontFamily(StateStyles.Focused);
-  inherited;
-end;
-
-{**********************************************}
-procedure TALButton.Assign(Source: TPersistent);
+{**********************************************************}
+procedure TALButton.Assign(Source: TPersistent{TALControl});
 begin
   BeginUpdate;
   Try
@@ -12066,6 +12198,7 @@ begin
     if StateStyles.TransitionFrom <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
+                                AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
                                 _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
@@ -12075,6 +12208,7 @@ begin
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
+                              AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
                               _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
@@ -12087,6 +12221,7 @@ begin
     if LStateStyle <> nil then begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
@@ -12095,6 +12230,7 @@ begin
     else begin
       Result := ALGetShapeSurfaceRect(
                   ARect, // const ARect: TRectF;
+                  AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
                   nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;

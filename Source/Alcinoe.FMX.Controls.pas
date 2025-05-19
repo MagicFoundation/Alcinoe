@@ -30,7 +30,7 @@ type
     MostLeft,
     MostRight,
     Client,
-    //Contents,       // Removed from TAlignLayout
+    Contents,
     Center,
     VertCenter,
     HorzCenter,
@@ -92,6 +92,7 @@ type
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
     procedure MarginsChangedHandler(Sender: TObject);
+    procedure ScaleChangedHandler(Sender: TObject);
   protected
     FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
@@ -142,7 +143,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
-    procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; virtual;
@@ -281,7 +282,7 @@ begin
   FALParentControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
   FScale := TPosition.Create(TPointF.Create(1, 1));
-  FScale.OnChange := DoMatrixChanged;
+  FScale.OnChange := ScaleChangedHandler;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
@@ -321,8 +322,8 @@ begin
   inherited;
 end;
 
-{***********************************************}
-procedure TALControl.Assign(Source: TPersistent);
+{***********************************************************}
+procedure TALControl.Assign(Source: TPersistent{TALControl});
 begin
   BeginUpdate;
   Try
@@ -344,7 +345,7 @@ begin
       DisabledOpacity := TALControl(Source).DisabledOpacity;
       DragMode := TALControl(Source).DragMode;
       EnableDragHighlight := TALControl(Source).EnableDragHighlight;
-      Enabled := TALControl(Source).Enabled ;
+      Enabled := TALControl(Source).Enabled;
       Hint := TALControl(Source).Hint;
       HitTest := TALControl(Source).HitTest;
       Locked := TALControl(Source).Locked;
@@ -354,7 +355,6 @@ begin
       ParentShowHint := TALControl(Source).ParentShowHint;
       Position.Assign(TALControl(Source).Position);
       RotationAngle := TALControl(Source).RotationAngle;
-      RotationCenter.Assign(TALControl(Source).RotationCenter);
       ShowHint := TALControl(Source).ShowHint;
       Size.Assign(TALControl(Source).Size);
       StyleName := TALControl(Source).StyleName;
@@ -490,7 +490,7 @@ begin
       TALAlignLayout.MostLeft: LLegacyAlign := TAlignLayout.MostLeft;
       TALAlignLayout.MostRight: LLegacyAlign := TAlignLayout.MostRight;
       TALAlignLayout.Client: LLegacyAlign := TAlignLayout.Client;
-      //TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
+      TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
       TALAlignLayout.Center: LLegacyAlign := TAlignLayout.Center;
       TALAlignLayout.VertCenter: LLegacyAlign := TAlignLayout.VertCenter;
       TALAlignLayout.HorzCenter: LLegacyAlign := TAlignLayout.HorzCenter;
@@ -976,7 +976,7 @@ begin
           end;
 
           //--
-          //TALAlignLayout.Contents,
+          TALAlignLayout.Contents,
           //TALAlignLayout.Scale,
           //TALAlignLayout.Fit,
           //TALAlignLayout.FitLeft,
@@ -1092,7 +1092,7 @@ begin
         TALAlignLayout.HorzCenter:
           Size.Width := ALAlignDimensionToPixelRound(Size.Width, ALGetScreenScale, TEpsilon.Position);
         //--
-        //TALAlignLayout.Contents,
+        TALAlignLayout.Contents,
         //TALAlignLayout.Scale,
         //TALAlignLayout.Fit,
         //TALAlignLayout.FitLeft,
@@ -1182,7 +1182,7 @@ begin
   Result := GetAutoSize;
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
-                             //TALAlignLayout.Contents,
+                             TALAlignLayout.Contents,
                              TALAlignLayout.Top,
                              TALAlignLayout.Bottom,
                              TALAlignLayout.MostTop,
@@ -1200,7 +1200,7 @@ begin
   Result := GetAutoSize;
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
-                             //TALAlignLayout.Contents,
+                             TALAlignLayout.Contents,
                              TALAlignLayout.Left,
                              TALAlignLayout.Right,
                              TALAlignLayout.MostLeft,
@@ -1596,6 +1596,12 @@ begin
   if Assigned(FFormerMarginsChangedHandler) then
     FFormerMarginsChangedHandler(Sender);
   MarginsChanged;
+end;
+
+{********************************************************}
+procedure TALControl.ScaleChangedHandler(Sender: TObject);
+begin
+  DoMatrixChanged(Sender);
 end;
 
 {*************************************}

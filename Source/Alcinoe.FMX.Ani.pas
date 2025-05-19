@@ -240,6 +240,21 @@ type
     Elastic,
     Back,
     Bounce,
+    MaterialExpressiveFastSpatial, // Duration =  350ms
+    MaterialExpressiveDefaultSpatial, // Duration =  500ms
+    MaterialExpressiveSlowSpatial, // Duration =  650ms
+    MaterialExpressiveFastEffects, // Duration =  150ms
+    MaterialExpressiveDefaultEffects, // Duration =  200ms
+    MaterialExpressiveSlowEffects, // Duration =  300ms
+    MaterialStandardFastSpatial, // Duration =  350ms
+    MaterialStandardDefaultSpatial, // Duration =  500ms
+    MaterialStandardSlowSpatial, // Duration =  750ms
+    MaterialStandardFastEffects, // Duration =  150ms
+    MaterialStandardDefaultEffects, // Duration =  200ms
+    MaterialStandardSlowEffects, // Duration =  300ms
+    MaterialEmphasized,
+    MaterialEmphasizedDecelerate,
+    MaterialEmphasizedAccelerate,
     Custom);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -248,7 +263,6 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInterpolatedAnimation = class(TALAnimation)
   private
-    FOvershoot: Single;
     FDuration: Single;
     FOnCustomInterpolation: TALCustomInterpolationEvent;
     FInterpolation: TALInterpolationType;
@@ -266,7 +280,6 @@ type
     property Duration: Single read FDuration write FDuration;
     property Interpolation: TALInterpolationType read FInterpolation write FInterpolation;
     property OnCustomInterpolation: TALCustomInterpolationEvent read FOnCustomInterpolation write FOnCustomInterpolation;
-    property Overshoot: Single read fOvershoot write fOvershoot;
     // Given the current time, NormalizedTime returns a number in the range from
     // 0 through 1, indicating how far the controlled property value has changed
     // from the StartValue to the StopValue
@@ -348,13 +361,11 @@ type
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
-    function getOvershoot: Single;
     function getPause: Boolean;
     function getRunning: Boolean;
     function GetStartValue: Single;
     function GetStopValue: Single;
     function GetCurrentValue: Single;
-    function OvershootStored: Boolean;
     procedure setAnimationType(const Value: TAnimationType);
     procedure setAutoReverse(const Value: Boolean);
     procedure setDelay(const Value: Single);
@@ -362,7 +373,6 @@ type
     procedure setInterpolation(const Value: TALInterpolationType);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
-    procedure setOvershoot(const Value: Single);
     procedure setPause(const Value: Boolean);
     procedure SetStartValue(const Value: Single);
     procedure setStopValue(const Value: Single);
@@ -399,7 +409,6 @@ type
     property StartValue: Single read GetStartValue write SetStartValue stored True nodefault;
     property StartFromCurrent: Boolean read FStartFromCurrent write FStartFromCurrent default False;
     property StopValue: Single read GetStopValue write setStopValue stored True nodefault;
-    property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored nodefault;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -421,13 +430,11 @@ type
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
-    function getOvershoot: Single;
     function getPause: Boolean;
     function getRunning: Boolean;
     function GetStartValue: TAlphaColor;
     function GetStopValue: TAlphaColor;
     function GetCurrentValue: TAlphaColor;
-    function OvershootStored: Boolean;
     procedure setAnimationType(const Value: TAnimationType);
     procedure setAutoReverse(const Value: Boolean);
     procedure setDelay(const Value: Single);
@@ -435,7 +442,6 @@ type
     procedure setInterpolation(const Value: TALInterpolationType);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
-    procedure setOvershoot(const Value: Single);
     procedure setPause(const Value: Boolean);
     procedure SetStartValue(const Value: TAlphaColor);
     procedure setStopValue(const Value: TAlphaColor);
@@ -472,7 +478,6 @@ type
     property StartValue: TAlphaColor read GetStartValue write SetStartValue stored True nodefault;
     property StartFromCurrent: Boolean read FStartFromCurrent write FStartFromCurrent default False;
     property StopValue: TAlphaColor read GetStopValue write setStopValue stored True nodefault;
-    property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored nodefault;
   end;
 
 //function ALInterpolateLinear(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single): Single; => function FMX.Ani.InterpolateLinear(t, B, C, D: Single): Single;
@@ -486,6 +491,21 @@ type
 //function ALInterpolateCircular(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateCirc(t, B, C, D: Single; AType: TAnimationType): Single;
 //function ALInterpolateBack(AElapsedTime, AStartOfRange, ARangeSpan, ADuration, AOvershoot: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateBack(t, B, C, D, S: Single; AType: TAnimationType): Single;
 function ALInterpolateBounce(AElapsedTime, ADuration: Single; AType: TAnimationType): Single;
+function ALInterpolateMaterialExpressiveFastSpatial(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialExpressiveDefaultSpatial(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialExpressiveSlowSpatial(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialExpressiveFastEffects(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialExpressiveDefaultEffects(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialExpressiveSlowEffects(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialStandardFastSpatial(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialStandardDefaultSpatial(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialStandardSlowSpatial(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialStandardFastEffects(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialStandardDefaultEffects(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialStandardSlowEffects(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialEmphasized(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialEmphasizedDecelerate(AElapsedTime, ADuration: Single): Single;
+function ALInterpolateMaterialEmphasizedAccelerate(AElapsedTime, ADuration: Single): Single;
 function ALInterpolateDecelerate(input: Single; const factor: Single = 1.0): Single;
 function ALInterpolateViscousFluid(input: Single): Single;
 function ALInterpolateColor(Start, Stop: TAlphaColor; T: Single): TAlphaColor;
@@ -813,6 +833,142 @@ begin
   else
     Result := 0;
   end;
+end;
+
+var
+  ALCubicBezierMaterialExpressiveFastSpatial: TALCubicBezier;
+  ALCubicBezierMaterialExpressiveDefaultSpatial: TALCubicBezier;
+  ALCubicBezierMaterialExpressiveSlowSpatial: TALCubicBezier;
+  ALCubicBezierMaterialExpressiveFastEffects: TALCubicBezier;
+  ALCubicBezierMaterialExpressiveDefaultEffects: TALCubicBezier;
+  ALCubicBezierMaterialExpressiveSlowEffects: TALCubicBezier;
+  ALCubicBezierMaterialStandardFastSpatial: TALCubicBezier;
+  ALCubicBezierMaterialStandardDefaultSpatial: TALCubicBezier;
+  ALCubicBezierMaterialStandardSlowSpatial: TALCubicBezier;
+  ALCubicBezierMaterialStandardFastEffects: TALCubicBezier;
+  ALCubicBezierMaterialStandardDefaultEffects: TALCubicBezier;
+  ALCubicBezierMaterialStandardSlowEffects: TALCubicBezier;
+  ALCubicBezierMaterialEmphasizedSegment1: TALCubicBezier;
+  ALCubicBezierMaterialEmphasizedSegment2: TALCubicBezier;
+  ALCubicBezierMaterialEmphasizedDecelerate: TALCubicBezier;
+  ALCubicBezierMaterialEmphasizedAccelerate: TALCubicBezier;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialExpressiveFastSpatial(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialExpressiveFastSpatial.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialExpressiveDefaultSpatial(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialExpressiveDefaultSpatial.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialExpressiveSlowSpatial(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialExpressiveSlowSpatial.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialExpressiveFastEffects(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialExpressiveFastEffects.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialExpressiveDefaultEffects(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialExpressiveDefaultEffects.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialExpressiveSlowEffects(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialExpressiveSlowEffects.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialStandardFastSpatial(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialStandardFastSpatial.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialStandardDefaultSpatial(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialStandardDefaultSpatial.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialStandardSlowSpatial(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialStandardSlowSpatial.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialStandardFastEffects(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialStandardFastEffects.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialStandardDefaultEffects(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialStandardDefaultEffects.SolveForY(AElapsedTime / ADuration);
+end;
+
+{****************************************************************************************}
+//https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+function ALInterpolateMaterialStandardSlowEffects(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialStandardSlowEffects.SolveForY(AElapsedTime / ADuration);
+end;
+
+{**********************************************************************************************************}
+//https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#ed7ab8eb-9b9a-40a3-806f-a4485558f3df
+function ALInterpolateMaterialEmphasized(AElapsedTime, ADuration: Single): Single;
+begin
+
+  // Implements exact pathInterpolator(M 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4 C 0.208333, 0.82, 0.25, 1, 1, 1)
+  // using two cubic Bezier segments
+
+  var t: Single := AElapsedTime / ADuration; // Normalized time [0..1]
+  if t <= 0.166666 then
+    // First segment: M 0,0 C 0.05, 0, 0.133333, 0.06, 0.166666, 0.4
+    // Maps t from [0..0.166666] to [0..1] for this segment
+    Result := ALCubicBezierMaterialEmphasizedSegment1.SolveForY(t / 0.166666) * 0.4
+  else
+    // Second segment: C 0.208333, 0.82, 0.25, 1, 1, 1
+    // Maps t from [0.166666..1] to [0..1] for this segment
+    Result := 0.4 + ALCubicBezierMaterialEmphasizedSegment2.SolveForY((t - 0.166666) / (1 - 0.166666)) * (1 - 0.4);
+
+end;
+
+{**********************************************************************************************************}
+//https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#ed7ab8eb-9b9a-40a3-806f-a4485558f3df
+function ALInterpolateMaterialEmphasizedDecelerate(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialEmphasizedDecelerate.SolveForY(AElapsedTime / ADuration);
+end;
+
+{**********************************************************************************************************}
+//https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#ed7ab8eb-9b9a-40a3-806f-a4485558f3df
+function ALInterpolateMaterialEmphasizedAccelerate(AElapsedTime, ADuration: Single): Single;
+begin
+  result := ALCubicBezierMaterialEmphasizedAccelerate.SolveForY(AElapsedTime / ADuration);
 end;
 
 {*********************************************************************************************}
@@ -1321,7 +1477,6 @@ constructor TALInterpolatedAnimation.Create;
 begin
   inherited Create;
   FDuration := 0.2;
-  FOvershoot := 0.0;
 end;
 
 {******************************************************************************}
@@ -1460,32 +1615,35 @@ begin
   if (FDuration > 0) and (FDelayTimeLeft <= 0) then
   begin
     case FInterpolation of
-      TALInterpolationType.Linear:
-        Result := InterpolateLinear(FTime, 0, 1, FDuration);
-      TALInterpolationType.Quadratic:
-        Result := InterpolateQuad(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Cubic:
-        Result := InterpolateCubic(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Quartic:
-        Result := InterpolateQuart(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Quintic:
-        Result := InterpolateQuint(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Sinusoidal:
-        Result := InterpolateSine(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Exponential:
-        Result := InterpolateExpo(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Circular:
-        Result := InterpolateCirc(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Elastic:
-        Result := InterpolateElastic(FTime, 0, 1, FDuration, 0, 0, FAnimationType);
-      TALInterpolationType.Back:
-        Result := InterpolateBack(FTime, 0, 1, FDuration, fOvershoot, FAnimationType);
-      TALInterpolationType.Bounce:
-        //the InterpolateBounce is a little buggy
-        //Result := InterpolateBounce(FTime, 0, 1, FDuration, FAnimationType);
-        Result := ALInterpolateBounce(FTime, FDuration, FAnimationType);
-      TALInterpolationType.Custom:
-        Result := DoCustomInterpolation;
+      TALInterpolationType.Linear: Result := InterpolateLinear(FTime, 0, 1, FDuration);
+      TALInterpolationType.Quadratic: Result := InterpolateQuad(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Cubic: Result := InterpolateCubic(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Quartic: Result := InterpolateQuart(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Quintic: Result := InterpolateQuint(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Sinusoidal: Result := InterpolateSine(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Exponential: Result := InterpolateExpo(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Circular: Result := InterpolateCirc(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Elastic: Result := InterpolateElastic(FTime, 0, 1, FDuration, 0, 0, FAnimationType);
+      TALInterpolationType.Back: Result := InterpolateBack(FTime, 0, 1, FDuration, 0{Overshoot}, FAnimationType);
+      //the InterpolateBounce is a little buggy
+      //Result := InterpolateBounce(FTime, 0, 1, FDuration, FAnimationType);
+      TALInterpolationType.Bounce: Result := ALInterpolateBounce(FTime, FDuration, FAnimationType);
+      TALInterpolationType.MaterialExpressiveFastSpatial: Result := ALInterpolateMaterialExpressiveFastSpatial(FTime, FDuration);
+      TALInterpolationType.MaterialExpressiveDefaultSpatial: Result := ALInterpolateMaterialExpressiveDefaultSpatial(FTime, FDuration);
+      TALInterpolationType.MaterialExpressiveSlowSpatial: Result := ALInterpolateMaterialExpressiveSlowSpatial(FTime, FDuration);
+      TALInterpolationType.MaterialExpressiveFastEffects: Result := ALInterpolateMaterialExpressiveFastEffects(FTime, FDuration);
+      TALInterpolationType.MaterialExpressiveDefaultEffects: Result := ALInterpolateMaterialExpressiveDefaultEffects(FTime, FDuration);
+      TALInterpolationType.MaterialExpressiveSlowEffects: Result := ALInterpolateMaterialExpressiveSlowEffects(FTime, FDuration);
+      TALInterpolationType.MaterialStandardFastSpatial: Result := ALInterpolateMaterialStandardFastSpatial(FTime, FDuration);
+      TALInterpolationType.MaterialStandardDefaultSpatial: Result := ALInterpolateMaterialStandardDefaultSpatial(FTime, FDuration);
+      TALInterpolationType.MaterialStandardSlowSpatial: Result := ALInterpolateMaterialStandardSlowSpatial(FTime, FDuration);
+      TALInterpolationType.MaterialStandardFastEffects: Result := ALInterpolateMaterialStandardFastEffects(FTime, FDuration);
+      TALInterpolationType.MaterialStandardDefaultEffects: Result := ALInterpolateMaterialStandardDefaultEffects(FTime, FDuration);
+      TALInterpolationType.MaterialStandardSlowEffects: Result := ALInterpolateMaterialStandardSlowEffects(FTime, FDuration);
+      TALInterpolationType.MaterialEmphasized: Result := ALInterpolateMaterialEmphasized(FTime, FDuration);
+      TALInterpolationType.MaterialEmphasizedDecelerate: Result := ALInterpolateMaterialEmphasizedDecelerate(FTime, FDuration);
+      TALInterpolationType.MaterialEmphasizedAccelerate: Result := ALInterpolateMaterialEmphasizedAccelerate(FTime, FDuration);
+      TALInterpolationType.Custom: Result := DoCustomInterpolation;
     end;
   end;
 end;
@@ -1797,12 +1955,6 @@ begin
   result := fFloatAnimation.CurrentTime;
 end;
 
-{******************************************************}
-function TALFloatPropertyAnimation.getOvershoot: Single;
-begin
-  result := fFloatAnimation.Overshoot;
-end;
-
 {***************************************************}
 function TALFloatPropertyAnimation.getPause: Boolean;
 begin
@@ -1831,12 +1983,6 @@ end;
 function TALFloatPropertyAnimation.GetCurrentValue: Single;
 begin
   result := fFloatAnimation.CurrentValue;
-end;
-
-{**********************************************************}
-function TALFloatPropertyAnimation.OvershootStored: Boolean;
-begin
-  result := not sameValue(fFloatAnimation.Overshoot, 0);
 end;
 
 {********************************************************************************}
@@ -1890,12 +2036,6 @@ end;
 procedure TALFloatPropertyAnimation.setLoop(const Value: Boolean);
 begin
   fFloatAnimation.Loop := Value;
-end;
-
-{********************************************************************}
-procedure TALFloatPropertyAnimation.setOvershoot(const Value: Single);
-begin
-  fFloatAnimation.Overshoot := Value;
 end;
 
 {*****************************************************************}
@@ -2069,12 +2209,6 @@ begin
   result := fColorAnimation.CurrentTime;
 end;
 
-{******************************************************}
-function TALColorPropertyAnimation.getOvershoot: Single;
-begin
-  result := fColorAnimation.Overshoot;
-end;
-
 {***************************************************}
 function TALColorPropertyAnimation.getPause: Boolean;
 begin
@@ -2103,12 +2237,6 @@ end;
 function TALColorPropertyAnimation.GetCurrentValue: TAlphaColor;
 begin
   result := fColorAnimation.CurrentValue;
-end;
-
-{**********************************************************}
-function TALColorPropertyAnimation.OvershootStored: Boolean;
-begin
-  result := not sameValue(fColorAnimation.Overshoot, 0);
 end;
 
 {********************************************************************************}
@@ -2162,12 +2290,6 @@ end;
 procedure TALColorPropertyAnimation.setLoop(const Value: Boolean);
 begin
   fColorAnimation.Loop := Value;
-end;
-
-{********************************************************************}
-procedure TALColorPropertyAnimation.setOvershoot(const Value: Single);
-begin
-  fColorAnimation.Overshoot := Value;
 end;
 
 {*****************************************************************}
@@ -3043,6 +3165,30 @@ initialization
   RegisterFmxClasses([TALSpringForcePropertyAnimation]);
   TALAnimation.AniFrameRate := TALAnimation.DefaultAniFrameRate;
   ALInitViscousFluid;
+  ALCubicBezierMaterialExpressiveFastSpatial := TALCubicBezier.Create(0.42, 1.67, 0.21, 0.90);
+  ALCubicBezierMaterialExpressiveDefaultSpatial := TALCubicBezier.Create(0.38, 1.21, 0.22, 1.00);
+  ALCubicBezierMaterialExpressiveSlowSpatial := TALCubicBezier.Create(0.39, 1.29, 0.35, 0.98);
+  ALCubicBezierMaterialExpressiveFastEffects := TALCubicBezier.Create(0.31, 0.94, 0.34, 1.00);
+  ALCubicBezierMaterialExpressiveDefaultEffects := TALCubicBezier.Create(0.34, 0.80, 0.34, 1.00);
+  ALCubicBezierMaterialExpressiveSlowEffects := TALCubicBezier.Create(0.34, 0.88, 0.34, 1.00);
+  ALCubicBezierMaterialStandardFastSpatial := TALCubicBezier.Create(0.27, 1.06, 0.18, 1.00);
+  ALCubicBezierMaterialStandardDefaultSpatial := TALCubicBezier.Create(0.27, 1.06, 0.18, 1.00);
+  ALCubicBezierMaterialStandardSlowSpatial := TALCubicBezier.Create(0.27, 1.06, 0.18, 1.00);
+  ALCubicBezierMaterialStandardFastEffects := TALCubicBezier.Create(0.31, 0.94, 0.34, 1.00);
+  ALCubicBezierMaterialStandardDefaultEffects := TALCubicBezier.Create(0.34, 0.80, 0.34, 1.00);
+  ALCubicBezierMaterialStandardSlowEffects := TALCubicBezier.Create(0.34, 0.88, 0.34, 1.00);
+  ALCubicBezierMaterialEmphasizedSegment1 := TALCubicBezier.Create(
+                                               0.05/0.166666,
+                                               0.0,
+                                               0.133333/0.166666,
+                                               0.06/0.4);
+  ALCubicBezierMaterialEmphasizedSegment2 := TALCubicBezier.Create(
+                                               (0.208333 - 0.166666)/(1 - 0.166666),
+                                               (0.82 - 0.4)/(1 - 0.4),
+                                               (0.25 - 0.166666)/(1 - 0.166666),
+                                               (1 - 0.4)/(1 - 0.4));
+  ALCubicBezierMaterialEmphasizedDecelerate := TALCubicBezier.Create(0.05, 0.7, 0.1, 1.0);
+  ALCubicBezierMaterialEmphasizedAccelerate := TALCubicBezier.Create(0.3, 0.0, 0.8, 0.15);
 
 {**********}
 finalization
@@ -3050,5 +3196,21 @@ finalization
   ALLog('Alcinoe.FMX.Ani','finalization');
   {$ENDIF}
   TALAnimation.Uninitialize;
+  ALFreeAndNil(ALCubicBezierMaterialExpressiveFastSpatial);
+  ALFreeAndNil(ALCubicBezierMaterialExpressiveDefaultSpatial);
+  ALFreeAndNil(ALCubicBezierMaterialExpressiveSlowSpatial);
+  ALFreeAndNil(ALCubicBezierMaterialExpressiveFastEffects);
+  ALFreeAndNil(ALCubicBezierMaterialExpressiveDefaultEffects);
+  ALFreeAndNil(ALCubicBezierMaterialExpressiveSlowEffects);
+  ALFreeAndNil(ALCubicBezierMaterialStandardFastSpatial);
+  ALFreeAndNil(ALCubicBezierMaterialStandardDefaultSpatial);
+  ALFreeAndNil(ALCubicBezierMaterialStandardSlowSpatial);
+  ALFreeAndNil(ALCubicBezierMaterialStandardFastEffects);
+  ALFreeAndNil(ALCubicBezierMaterialStandardDefaultEffects);
+  ALFreeAndNil(ALCubicBezierMaterialStandardSlowEffects);
+  ALFreeAndNil(ALCubicBezierMaterialEmphasizedSegment1);
+  ALFreeAndNil(ALCubicBezierMaterialEmphasizedSegment2);
+  ALFreeAndNil(ALCubicBezierMaterialEmphasizedDecelerate);
+  ALFreeAndNil(ALCubicBezierMaterialEmphasizedAccelerate);
 
 end.

@@ -223,6 +223,7 @@ function ALGetShadowWidth(const AShadowBlur: Single): Single;
 procedure ALGetLinearGradientCoordinates(const ASize: TSizeF; const AAngle: Single; out AStartPoint: TPointF; out AEndPoint: TPointF; const ACssAngleConvention: Boolean = True);
 function ALGetShapeSurfaceRect(
            const ARect: TRectF;
+           const AAlignToPixel: Boolean;
            const AFillColor: TAlphaColor;
            const AFillGradientColors: TArray<TAlphaColor>;
            const AFillResourceName: String;
@@ -239,6 +240,7 @@ function ALGetShapeSurfaceRect(
            const AShadowOffsetY: Single): TRectF; overload;
 function ALGetShapeSurfaceRect(
            const ARect: TrectF;
+           const AAlignToPixel: Boolean;
            const AFill: TALBrush;
            const AFillResourceStream: TStream;
            const AStateLayer: TALStateLayer;
@@ -264,6 +266,7 @@ procedure ALDrawSkImage(
             const AOpacity: Single;
             const AMaskImage: sk_image_t;
             const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -276,6 +279,7 @@ function ALCreateSkSurfaceFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): sk_surface_t;
@@ -288,6 +292,7 @@ function ALCreateSkImageFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): sk_image_t;
@@ -304,6 +309,7 @@ procedure ALDrawJBitmap(
             const AOpacity: Single;
             const AMaskBitmap: JBitmap;
             const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -316,6 +322,7 @@ function ALCreateJBitmapFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): JBitmap;
@@ -332,6 +339,7 @@ procedure ALDrawCGImageRef(
             const AOpacity: Single;
             const AMaskImage: CGImageRef;
             const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -344,6 +352,7 @@ function ALCreateCGContextRefFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): CGContextRef;
@@ -356,6 +365,7 @@ function ALCreateCGImageRefFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): CGImageRef;
@@ -372,6 +382,7 @@ procedure ALDrawTBitmap(
             const AOpacity: Single;
             const AMaskBitmap: TBitmap;
             const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -384,6 +395,7 @@ function ALCreateTBitmapFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TBitmap;
@@ -399,6 +411,7 @@ procedure ALDrawBitmap(
             const AOpacity: Single;
             const AMaskBitmap: TALBitmap;
             const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single); inline;
@@ -411,6 +424,7 @@ function ALCreateBitmapFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TALBitmap; inline;
@@ -441,6 +455,7 @@ function ALCreateDrawableFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TALDrawable;
@@ -469,6 +484,7 @@ Type
     FFillMaskBitmap: TALBitmap;
     FFillBackgroundMarginsRect: TRectF;
     FFillImageMarginsRect: TRectF;
+    FFillImageTintColor: TAlphaColor;
     FFillImageNoRadius: Boolean;
     FFillWrapMode: TALImageWrapMode;
     FFillCropCenter: TpointF;
@@ -516,6 +532,7 @@ Type
     function SetFillMaskBitmap(const AValue: TALBitmap): PALDrawRectangleHelper;
     function SetFillBackgroundMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
     function SetFillImageMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
+    function SetFillImageTintColor(const AValue: TAlphaColor): PALDrawRectangleHelper;
     function SetFillImageNoRadius(const AValue: Boolean): PALDrawRectangleHelper;
     function SetFillWrapMode(const AValue: TALImageWrapMode): PALDrawRectangleHelper;
     function SetFillCropCenter(const AValue: TpointF): PALDrawRectangleHelper;
@@ -1465,6 +1482,7 @@ end;
 {*****************************}
 function ALGetShapeSurfaceRect(
            const ARect: TRectF;
+           const AAlignToPixel: Boolean;
            const AFillColor: TAlphaColor;
            const AFillGradientColors: TArray<TAlphaColor>;
            const AFillResourceName: String;
@@ -1480,34 +1498,69 @@ function ALGetShapeSurfaceRect(
            const AShadowOffsetX: Single;
            const AShadowOffsetY: Single): TRectF; overload;
 begin
+
+  // AAlignToPixel is important here because ALDrawDrawable aligns
+  // the final image before drawing it on the form.
+  //
+  // Example: suppose a radio button has a bounding rect of (0,0,10,10) in its normal state,
+  // and (-15.7,-15.7,25.7,25.7) in its hovered state.
+  //
+  // In the hovered state, there will be -15.7 pixels (rounded to -16 by TALDrawRectangleHelper.Draw)
+  // between the edge of the image and the stroke of the radio button.
+  //
+  // When ALDrawDrawable draws at position (0,0), it may align to (-0.5, -0.5) depending on the matrix.
+  // But when drawing at -15.7, it may align to -15.5 instead of -16.5.
+  //
+  // As a result, visually:
+  // - In the normal state, there's a 16-pixel gap from the image edge to the stroke.
+  // - In the hovered state, only a 15-pixel gap appears.
+  //
+  // This causes a subtle visual shift, making the radio button appear to move slightly to the right.
+
   Result := ARect;
+  //if AAlignToPixel then Result := ALAlignEdgesToPixelRound(Result, ALGetScreenScale, TEpsilon.Position);
   //--
   if (AFillColor <> TalphaColorRec.Null) or
      (length(AFillGradientColors) > 0) then begin
+    var LFillBackgroundMarginsRect := AFillBackgroundMarginsRect;
+    if AAlignToPixel then LFillBackgroundMarginsRect := ALAlignEdgesToPixelRound(LFillBackgroundMarginsRect, ALGetScreenScale, TEpsilon.Position);
     var LBackgroundRect := ARect;
-    LBackgroundRect.Inflate(-AFillBackgroundMarginsRect.Left, -AFillBackgroundMarginsRect.Top, -AFillBackgroundMarginsRect.Right, -AFillBackgroundMarginsRect.Bottom);
+    LBackgroundRect.Inflate(-LFillBackgroundMarginsRect.Left, -LFillBackgroundMarginsRect.Top, -LFillBackgroundMarginsRect.Right, -LFillBackgroundMarginsRect.Bottom);
     Result := TRectF.Union(LBackgroundRect, Result);
   end;
   //--
   if (AStateLayerColor <> TalphaColorRec.Null) or (AStateLayerUseContentColor) and
      (CompareValue(AStateLayerOpacity, 0, TEpsilon.Scale) > 0) then begin
+    var LStateLayerMarginsRect := AStateLayerMarginsRect;
+    if AAlignToPixel then LStateLayerMarginsRect := ALAlignEdgesToPixelRound(LStateLayerMarginsRect, ALGetScreenScale, TEpsilon.Position);
     var LStateLayerRect := ARect;
-    LStateLayerRect.Inflate(-AStateLayerMarginsRect.Left, -AStateLayerMarginsRect.Top, -AStateLayerMarginsRect.Right, -AStateLayerMarginsRect.Bottom);
+    LStateLayerRect.Inflate(-LStateLayerMarginsRect.Left, -LStateLayerMarginsRect.Top, -LStateLayerMarginsRect.Right, -LStateLayerMarginsRect.Bottom);
     Result := TRectF.Union(LStateLayerRect, Result);
   end;
   //--
   if (AFillResourceName <> '') or (AFillResourceStream <> nil) then begin
+    var LFillImageMarginsRect := AFillImageMarginsRect;
+    if AAlignToPixel then LFillImageMarginsRect := ALAlignEdgesToPixelRound(LFillImageMarginsRect, ALGetScreenScale, TEpsilon.Position);
     var LImageRect := ARect;
-    LImageRect.Inflate(-AFillImageMarginsRect.Left, -AFillImageMarginsRect.Top, -AFillImageMarginsRect.Right, -AFillImageMarginsRect.Bottom);
+    LImageRect.Inflate(-LFillImageMarginsRect.Left, -LFillImageMarginsRect.Top, -LFillImageMarginsRect.Right, -LFillImageMarginsRect.Bottom);
     Result := TRectF.Union(LImageRect, Result);
   end;
   //--
   if (AShadowColor <> TalphaColorRec.Null) and
      (CompareValue(AShadowBlur, 0, TEpsilon.position) > 0) then begin
     var LShadowRect := Result;
-    var LShadowWidth := ALGetShadowWidth(AShadowBlur);
-    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
-    LShadowRect.Offset(AShadowOffsetX, AShadowOffsetY);
+    if AAlignToPixel then begin
+      var LShadowWidth: Single := ALAlignDimensionToPixelRound(ALGetShadowWidth(AShadowBlur), ALGetScreenScale, TEpsilon.Position);
+      LShadowRect.Inflate(LShadowWidth, LShadowWidth);
+      LShadowRect.Offset(
+        ALAlignDimensionToPixelRound(AShadowOffsetX, ALGetScreenScale, TEpsilon.Position),
+        ALAlignDimensionToPixelRound(AShadowOffsetY, ALGetScreenScale, TEpsilon.Position));
+    end
+    else begin
+      var LShadowWidth: Single := ALGetShadowWidth(AShadowBlur);
+      LShadowRect.Inflate(LShadowWidth, LShadowWidth);
+      LShadowRect.Offset(AShadowOffsetX, AShadowOffsetY);
+    end;
     Result := TRectF.Union(LShadowRect, Result);
   end;
 end;
@@ -1515,6 +1568,7 @@ end;
 {*****************************}
 function ALGetShapeSurfaceRect(
            const ARect: TrectF;
+           const AAlignToPixel: Boolean;
            const AFill: TALBrush;
            const AFillResourceStream: TStream;
            const AStateLayer: TALStateLayer;
@@ -1579,6 +1633,7 @@ begin
 
   Result := ALGetShapeSurfaceRect(
               ARect, // const ARect: TrectF;
+              AAlignToPixel, // const AAlignToPixel: Boolean;
               LFillColor, // const AFillColor: TAlphaColor;
               LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
               LFillResourceName, // const AFillResourceName: String;
@@ -1669,6 +1724,7 @@ procedure ALDrawSkImage(
             const AOpacity: Single;
             const AMaskImage: sk_image_t;
             const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -1706,129 +1762,158 @@ begin
     sk4d_paint_set_antialias(LPaint, true);
     sk4d_paint_set_dither(LPaint, true);
 
-    // Init LRRect
-    var LRRect: sk_rrect_t := 0;
+    // Save State
+    sk4d_canvas_save(ACanvas);
     try
 
-      // Init LBlender
-      var LBlender: sk_blender_t := 0;
+      // Init LRRect
+      var LRRect: sk_rrect_t := 0;
       try
 
-        // Mask
-        if AMaskImage <> 0 then begin
-          var LMaskScrRect := TrectF.Create(0, 0, sk4d_image_get_width(AMaskImage), sk4d_image_get_Height(AMaskImage));
-          var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
-          sk4d_canvas_draw_image_rect(
-            ACanvas, // self: sk_canvas_t;
-            AMaskImage, // const image: sk_image_t;
-            @LMaskScrRect, // const src: psk_rect_t;
-            @LScaledDstRect,  // const dest: psk_rect_t;
-            @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-            LPaint, // const paint: sk_paint_t;
-            FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
-          LBlender := ALSkCheckHandle(
-                        sk4d_blender_make_mode(
-                          sk_blendmode_t.SRC_IN_SK_BLENDMODE));
-          sk4d_paint_set_blender(LPaint, LBlender);
-        end
-
-        // Oval
-        else if SameValue(LScaledXRadius, LScaledDstRect.Width / 2, TEpsilon.position) and
-                SameValue(LScaledYRadius, LScaledDstRect.Height / 2, TEpsilon.position) then begin
-          LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
-          sk4d_rrect_set_oval(
-            LRRect, // self: sk_rrect_t;
-            @LScaledDstRect); // const rect: psk_rect_t;
-          sk4d_canvas_clip_rrect(
-            ACanvas, // self: sk_canvas_t;
-            LRRect, // const rrect: sk_rrect_t;
-            sk_clipop_t.INTERSECT_SK_CLIPOP, // op: sk_clipop_t;
-            true); // anti_alias: _bool);
-        end
-
-        // RoundRect
-        else if (compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
-                (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0) then begin
-          LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
-          sk4d_rrect_set_rect3(
-            LRRect, // self: sk_rrect_t;
-            @LScaledDstRect, // const rect: psk_rect_t;
-            LScaledXRadius, // radius_x,
-            LScaledYRadius); // radius_y: float)
-          sk4d_canvas_clip_rrect(
-            ACanvas, // self: sk_canvas_t;
-            LRRect, // const rrect: sk_rrect_t;
-            sk_clipop_t.INTERSECT_SK_CLIPOP, // op: sk_clipop_t;
-            true); // anti_alias: _bool);
-        end
-
-        // Rect
-        else if (compareValue(LScaledBlurRadius, 0, Tepsilon.Vector) > 0) then begin
-          // The issue with the blur effect is that at the edges, it uses transparent
-          // pixels to calculate the color. To prevent this, we clip the rect and
-          // later draw a slightly larger version of the image. This ensures that
-          // the algorithm doesn't sample transparent pixels at the edges when
-          // calculating the blur effect.
-          LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
-          sk4d_rrect_set_rect(
-            LRRect, // self: sk_rrect_t;
-            @LScaledDstRect); // const rect: psk_rect_t;
-          sk4d_canvas_clip_rrect(
-            ACanvas, // self: sk_canvas_t;
-            LRRect, // const rrect: sk_rrect_t;
-            sk_clipop_t.INTERSECT_SK_CLIPOP, // op: sk_clipop_t;
-            true); // anti_alias: _bool);
-        end;
-
-        // Init LImageFilter
-        var LImageFilter: sk_imagefilter_t := 0;
+        // Init LBlender
+        var LBlender: sk_blender_t := 0;
         try
 
-          // Blur
-          if compareValue(LScaledBlurRadius, 0, Tepsilon.Vector) > 0 then begin
-            // The issue with the blur effect is that it samples transparent pixels at the edges,
-            // which affects the color calculation. To mitigate this, we clip the rect and draw
-            // a slightly enlarged version of the image. This helps ensure that the algorithm
-            // avoids sampling transparent pixels at the edges when applying the blur effect.
-            // However, this is not an ideal method to dilate the image; I would prefer to use
-            // a mirroring approach, but I haven't found a way to implement it yet.
-            var LDelta: Single := ALConvertRadiusToSigma(LScaledBlurRadius) * 2;
-            LScaledDstRect.Inflate(LDelta,LDelta,LDelta,LDelta);
-            LImageFilter := ALSkCheckHandle(
-                              sk4d_imagefilter_make_blur(
-                                ALConvertRadiusToSigma(LScaledBlurRadius), //sigma_x,
-                                ALConvertRadiusToSigma(LScaledBlurRadius), //sigma_y: float;
-                                sk_tilemode_t.CLAMP_SK_TILEMODE, //tile_mode: sk_tilemode_t;
-                                0, //input: sk_imagefilter_t;
-                                @LScaledDstRect));//const crop_rect: psk_rect_t
-            sk4d_paint_set_Image_filter(LPaint, LImageFilter);
+          // Mask
+          if AMaskImage <> 0 then begin
+            var LMaskScrRect := TrectF.Create(0, 0, sk4d_image_get_width(AMaskImage), sk4d_image_get_Height(AMaskImage));
+            var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
+            sk4d_canvas_draw_image_rect(
+              ACanvas, // self: sk_canvas_t;
+              AMaskImage, // const image: sk_image_t;
+              @LMaskScrRect, // const src: psk_rect_t;
+              @LScaledDstRect,  // const dest: psk_rect_t;
+              @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+              LPaint, // const paint: sk_paint_t;
+              FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+            LBlender := ALSkCheckHandle(
+                          sk4d_blender_make_mode(
+                            sk_blendmode_t.SRC_IN_SK_BLENDMODE));
+            sk4d_paint_set_blender(LPaint, LBlender);
+          end
+
+          // Oval
+          else if SameValue(LScaledXRadius, LScaledDstRect.Width / 2, TEpsilon.position) and
+                  SameValue(LScaledYRadius, LScaledDstRect.Height / 2, TEpsilon.position) then begin
+            LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+            sk4d_rrect_set_oval(
+              LRRect, // self: sk_rrect_t;
+              @LScaledDstRect); // const rect: psk_rect_t;
+            sk4d_canvas_clip_rrect(
+              ACanvas, // self: sk_canvas_t;
+              LRRect, // const rrect: sk_rrect_t;
+              sk_clipop_t.INTERSECT_SK_CLIPOP, // op: sk_clipop_t;
+              true); // anti_alias: _bool);
+          end
+
+          // RoundRect
+          else if (compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
+                  (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0) then begin
+            LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+            sk4d_rrect_set_rect3(
+              LRRect, // self: sk_rrect_t;
+              @LScaledDstRect, // const rect: psk_rect_t;
+              LScaledXRadius, // radius_x,
+              LScaledYRadius); // radius_y: float)
+            sk4d_canvas_clip_rrect(
+              ACanvas, // self: sk_canvas_t;
+              LRRect, // const rrect: sk_rrect_t;
+              sk_clipop_t.INTERSECT_SK_CLIPOP, // op: sk_clipop_t;
+              true); // anti_alias: _bool);
+          end
+
+          // Rect
+          else if (compareValue(LScaledBlurRadius, 0, Tepsilon.Vector) > 0) then begin
+            // The issue with the blur effect is that at the edges, it uses transparent
+            // pixels to calculate the color. To prevent this, we clip the rect and
+            // later draw a slightly larger version of the image. This ensures that
+            // the algorithm doesn't sample transparent pixels at the edges when
+            // calculating the blur effect.
+            LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
+            sk4d_rrect_set_rect(
+              LRRect, // self: sk_rrect_t;
+              @LScaledDstRect); // const rect: psk_rect_t;
+            sk4d_canvas_clip_rrect(
+              ACanvas, // self: sk_canvas_t;
+              LRRect, // const rrect: sk_rrect_t;
+              sk_clipop_t.INTERSECT_SK_CLIPOP, // op: sk_clipop_t;
+              true); // anti_alias: _bool);
           end;
 
-          var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
-          sk4d_canvas_draw_image_rect(
-            ACanvas, // self: sk_canvas_t;
-            AImage, // const image: sk_image_t;
-            @ASrcRect, // const src: psk_rect_t;
-            @LScaledDstRect,  // const dest: psk_rect_t;
-            @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-            LPaint, // const paint: sk_paint_t;
-            FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+          // Init LImageFilter
+          var LImageFilter: sk_imagefilter_t := 0;
+          try
+
+            // Blur
+            if compareValue(LScaledBlurRadius, 0, Tepsilon.Vector) > 0 then begin
+              // The issue with the blur effect is that it samples transparent pixels at the edges,
+              // which affects the color calculation. To mitigate this, we clip the rect and draw
+              // a slightly enlarged version of the image. This helps ensure that the algorithm
+              // avoids sampling transparent pixels at the edges when applying the blur effect.
+              // However, this is not an ideal method to dilate the image; I would prefer to use
+              // a mirroring approach, but I haven't found a way to implement it yet.
+              var LDelta: Single := ALConvertRadiusToSigma(LScaledBlurRadius) * 2;
+              LScaledDstRect.Inflate(LDelta,LDelta,LDelta,LDelta);
+              LImageFilter := ALSkCheckHandle(
+                                sk4d_imagefilter_make_blur(
+                                  ALConvertRadiusToSigma(LScaledBlurRadius), //sigma_x,
+                                  ALConvertRadiusToSigma(LScaledBlurRadius), //sigma_y: float;
+                                  sk_tilemode_t.CLAMP_SK_TILEMODE, //tile_mode: sk_tilemode_t;
+                                  0, //input: sk_imagefilter_t;
+                                  @LScaledDstRect));//const crop_rect: psk_rect_t
+              sk4d_paint_set_Image_filter(LPaint, LImageFilter);
+            end;
+
+            // Init LColorfilter
+            var LColorfilter: sk_colorfilter_t := 0;
+            try
+
+              // Tint Color
+              if ATintColor <> TAlphaColors.Null then begin
+                LColorfilter := ALSkCheckHandle(
+                                  sk4d_colorfilter_make_blend(
+                                    ATintColor, // color: sk_color_t;
+                                    sk_blendmode_t.SRC_IN_SK_BLENDMODE)); // mode: sk_blendmode_t): sk_colorfilter_t
+                sk4d_paint_set_color_filter(LPaint, LColorfilter);
+              end;
+
+              // AOpacity
+              if CompareValue(AOpacity, 1, TEpsilon.Scale) <> 1 then
+                sk4d_paint_set_alpha(LPaint, Round(AOpacity * 255));
+
+              // Draw the image
+              var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
+              sk4d_canvas_draw_image_rect(
+                ACanvas, // self: sk_canvas_t;
+                AImage, // const image: sk_image_t;
+                @ASrcRect, // const src: psk_rect_t;
+                @LScaledDstRect,  // const dest: psk_rect_t;
+                @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+                LPaint, // const paint: sk_paint_t;
+                FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+
+            finally
+              if LColorfilter <> 0 then
+                sk4d_refcnt_unref(LColorfilter);
+            end;
+
+          finally
+            if LImageFilter <> 0 then
+              sk4d_refcnt_unref(LImageFilter);
+          end;
 
         finally
-          if LImageFilter <> 0 then
-            sk4d_refcnt_unref(LImageFilter);
+          If LBlender <> 0 then
+            sk4d_refcnt_unref(LBlender)
         end;
 
       finally
-        If LBlender <> 0 then
-          sk4d_refcnt_unref(LBlender)
+        if LRRect <> 0 then
+          sk4d_rrect_destroy(LRRect);
       end;
 
     finally
-      if LRRect <> 0 then begin
-        sk4d_canvas_restore(ACanvas);
-        sk4d_rrect_destroy(LRRect);
-      end;
+      sk4d_canvas_restore(ACanvas);
     end;
 
   finally
@@ -1849,6 +1934,7 @@ function ALCreateSkSurfaceFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): sk_surface_t;
@@ -1901,6 +1987,7 @@ begin
                         W, H, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                        TalphaColors.Null, // const ATintColor: TalphaColor;
                         0, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
                         AYRadius); // const AYRadius: Single)
@@ -1976,6 +2063,7 @@ begin
           1, // const AOpacity: Single;
           LMaskImage, // const AMaskImage: sk_image_t;
           ACropCenter, // const ACropCenter: TpointF;
+          ATintColor, // const ATintColor: TalphaColor;
           ABlurRadius, // const ABlurRadius: single;
           AXRadius, // const AXRadius: Single;
           AYRadius); // const AYRadius: Single)
@@ -2008,6 +2096,7 @@ function ALCreateSkImageFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): sk_image_t;
@@ -2021,6 +2110,7 @@ begin
                     W, H, // const W, H: single;
                     AWrapMode, // const AWrapMode: TALImageWrapMode;
                     ACropCenter, // const ACropCenter: TpointF;
+                    ATintColor, // const ATintColor: TalphaColor;
                     ABlurRadius, // const ABlurRadius: single;
                     AXRadius, // const AXRadius: Single;
                     AYRadius); // const AYRadius: Single)
@@ -2044,6 +2134,7 @@ procedure ALDrawJBitmap(
             const AOpacity: Single;
             const AMaskBitmap: JBitmap;
             const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -2247,6 +2338,17 @@ begin
       LPaint.setXfermode(LPorterDuffXfermode);
     end;
 
+    // Tint Color
+    var LColorFilter: JPorterDuffColorFilter := nil;
+    if ATintColor <> TAlphaColors.Null then begin
+      LColorFilter := TJPorterDuffColorFilter.JavaClass.init(integer(ATintColor), TJPorterDuff_Mode.JavaClass.SRC_IN);
+      LPaint.setColorFilter(LColorFilter);
+    end;
+
+    // AOpacity
+    if CompareValue(AOpacity, 1, TEpsilon.Scale) <> 1 then
+      LPaint.setAlpha(Round(AOpacity * 255));
+
     // Draw the bitmap
     if LBlurredBitmap <> nil then begin
       var LJScaledDestRect := TJRectF.JavaClass.init(LScaledDstRect.left, LScaledDstRect.top, LScaledDstRect.right, LScaledDstRect.bottom);
@@ -2263,6 +2365,7 @@ begin
       LJSrcRect := nil;
     end;
 
+    LColorFilter := nil;
     LPorterDuffXfermode := nil;
     LPaint := nil;
 
@@ -2287,6 +2390,7 @@ function ALCreateJBitmapFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): JBitmap;
@@ -2355,6 +2459,7 @@ begin
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
                          TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         TalphaColors.Null, // const ATintColor: TalphaColor;
                          0, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
                          AYRadius); // const AYRadius: Single)
@@ -2415,6 +2520,7 @@ begin
       LDstRect.bottom := LDstRect.bottom / AScale;
 
       If (LMaskBitmap = nil) and
+         (ATintColor = TAlphaColors.Null) and
          (SameValue(ABlurRadius, 0, TEpsilon.Vector)) and
          (SameValue(AXRadius, 0, TEpsilon.Vector)) and
          (SameValue(AYRadius, 0, TEpsilon.Vector)) then begin
@@ -2449,6 +2555,7 @@ begin
             1, // const AOpacity: Single;
             LMaskBitmap, // const AMaskBitmap: JBitmap;
             ACropCenter, // const ACropCenter: TpointF;
+            ATintColor, // const ATintColor: TalphaColor;
             ABlurRadius, // const ABlurRadius: single;
             AXRadius, // const AXRadius: Single;
             AYRadius); // const AYRadius: Single)
@@ -2489,6 +2596,7 @@ procedure ALDrawCGImageRef(
             const AOpacity: Single;
             const AMaskImage: CGImageRef;
             const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -2674,6 +2782,10 @@ begin
         CGContextClip(ACanvas);
       end;
 
+      // AOpacity
+      if CompareValue(AOpacity, 1, TEpsilon.Scale) <> 1 then
+        CGContextSetAlpha(ACanvas, AOpacity);
+
       // Draw the bitmap
       if LBlurredImage <> nil then begin
         CGContextDrawImage(
@@ -2700,6 +2812,26 @@ begin
           AImage);
       end;
 
+      if ATintColor <> TAlphaColors.Null then begin
+        if CompareValue(AOpacity, 1, TEpsilon.Scale) <> 1 then
+          CGContextSetAlpha(ACanvas, 1{AOpacity});
+        CGContextSetBlendMode(ACanvas, kCGBlendModeSourceIn);
+        var LTintColorF := TAlphaColorCGFloat.Create(ATintColor);
+        var LTintColorCG := CGColorCreate(ALGetGlobalCGColorSpace, @LTintColorF);
+        try
+          CGContextSetFillColorWithColor(ACanvas, LTintColorCG);
+          CGContextFillRect(
+            ACanvas,
+            ALLowerLeftCGRect(
+              LScaledDstRect.TopLeft,
+              LScaledDstRect.Width,
+              LScaledDstRect.Height,
+              LGridHeight));
+        finally
+          CGColorRelease(LTintColorCG);
+        end;
+      end;
+
     finally
       CGContextRestoreGState(ACanvas);
     end;
@@ -2723,6 +2855,7 @@ function ALCreateCGContextRefFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): CGContextRef;
@@ -2808,6 +2941,7 @@ begin
                         W, H, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                        TalphaColors.Null, // const ATintColor: TalphaColor;
                         0, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
                         AYRadius); // const AYRadius: Single)
@@ -2882,6 +3016,7 @@ begin
           1, // const AOpacity: Single;
           LMaskImage, // const AMaskImage: CGImageRef;
           ACropCenter, // const ACropCenter: TpointF;
+          ATintColor, // const ATintColor: TalphaColor;
           ABlurRadius, // const ABlurRadius: single;
           AXRadius, // const AXRadius: Single;
           AYRadius); // const AYRadius: Single)
@@ -2914,6 +3049,7 @@ function ALCreateCGImageRefFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): CGImageRef;
@@ -2927,6 +3063,7 @@ begin
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
                          ACropCenter, // const ACropCenter: TpointF;
+                         ATintColor, // const ATintColor: TalphaColor;
                          ABlurRadius, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
                          AYRadius); // const AYRadius: Single)
@@ -2956,6 +3093,7 @@ procedure ALDrawTBitmap(
             const AOpacity: Single;
             const AMaskBitmap: TBitmap;
             const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -3106,6 +3244,7 @@ function ALCreateTBitmapFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TBitmap;
@@ -3146,6 +3285,7 @@ begin
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
                          TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         TalphaColors.Null, // const ATintColor: TalphaColor;
                          0, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
                          AYRadius); // const AYRadius: Single)
@@ -3221,6 +3361,7 @@ begin
           1, // const AOpacity: Single;
           LMaskBitmap, // const AMaskBitmap: TBitmap;
           ACropCenter, // const ACropCenter: TpointF;
+          ATintColor, // const ATintColor: TalphaColor;
           ABlurRadius, // const ABlurRadius: single;
           AXRadius, // const AXRadius: Single;
           AYRadius); // const AYRadius: Single)
@@ -3252,6 +3393,7 @@ procedure ALDrawBitmap(
             const AOpacity: Single;
             const AMaskBitmap: TALBitmap;
             const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ATintColor: TalphaColor;
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
@@ -3267,6 +3409,7 @@ begin
     AOpacity, // const AOpacity: Single;
     AMaskBitmap, // const AMaskImage: sk_image_t;
     ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+    ATintColor, // const ATintColor: TalphaColor;
     ABlurRadius, // const ABlurRadius: single;
     AXRadius, // const AXRadius: Single;
     AYRadius); // const AYRadius: Single);
@@ -3281,6 +3424,7 @@ begin
     AOpacity, // const AOpacity: Single;
     AMaskBitmap, // const AMaskBitmap: JBitmap;
     ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+    ATintColor, // const ATintColor: TalphaColor;
     ABlurRadius, // const ABlurRadius: single;
     AXRadius, // const AXRadius: Single;
     AYRadius); // const AYRadius: Single);
@@ -3295,6 +3439,7 @@ begin
     AOpacity, // const AOpacity: Single;
     AMaskBitmap, // const AMaskImage: CGImageRef;
     ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+    ATintColor, // const ATintColor: TalphaColor;
     ABlurRadius, // const ABlurRadius: single;
     AXRadius, // const AXRadius: Single;
     AYRadius); // const AYRadius: Single);
@@ -3309,6 +3454,7 @@ begin
     AOpacity, // const AOpacity: Single;
     AMaskBitmap, // const AMaskBitmap: TBitmap;
     ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+    ATintColor, // const ATintColor: TalphaColor;
     ABlurRadius, // const ABlurRadius: single;
     AXRadius, // const AXRadius: Single;
     AYRadius); // const AYRadius: Single);
@@ -3325,6 +3471,7 @@ function ALCreateBitmapFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TALBitmap;
@@ -3339,6 +3486,7 @@ begin
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
               ACropCenter, // const ACropCenter: TpointF;
+              ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
               AYRadius); // const AYRadius: Single);
@@ -3352,6 +3500,7 @@ begin
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
               ACropCenter, // const ACropCenter: TpointF;
+              ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
               AYRadius); // const AYRadius: Single);
@@ -3365,6 +3514,7 @@ begin
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
               ACropCenter, // const ACropCenter: TpointF;
+              ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
               AYRadius); // const AYRadius: Single);
@@ -3378,6 +3528,7 @@ begin
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
               ACropCenter, // const ACropCenter: TpointF;
+              ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
               AYRadius); // const AYRadius: Single);;
@@ -3530,6 +3681,7 @@ function ALCreateDrawableFromResource(
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
            const ACropCenter: TpointF;
+           const ATintColor: TalphaColor;
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TALDrawable;
@@ -3545,6 +3697,7 @@ begin
                 W, H, // const W, H: single;
                 AWrapMode, // const AWrapMode: TALImageWrapMode;
                 ACropCenter, // const ACropCenter: TpointF;
+                ATintColor, // const ATintColor: TalphaColor;
                 ABlurRadius, // const ABlurRadius: single;
                 AXRadius, // const AXRadius: Single;
                 AYRadius); // const AYRadius: Single);
@@ -3558,6 +3711,7 @@ begin
                       W, H, // const W, H: single;
                       AWrapMode, // const AWrapMode: TALImageWrapMode;
                       ACropCenter, // const ACropCenter: TpointF;
+                      ATintColor, // const ATintColor: TalphaColor;
                       ABlurRadius, // const ABlurRadius: single;
                       AXRadius, // const AXRadius: Single;
                       AYRadius); // const AYRadius: Single);
@@ -3581,6 +3735,7 @@ begin
                    W, H, // const W, H: single;
                    AWrapMode, // const AWrapMode: TALImageWrapMode;
                    ACropCenter, // const ACropCenter: TpointF;
+                   ATintColor, // const ATintColor: TalphaColor;
                    ABlurRadius, // const ABlurRadius: single;
                    AXRadius, // const AXRadius: Single;
                    AYRadius); // const AYRadius: Single);
@@ -3600,6 +3755,7 @@ begin
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
                          ACropCenter, // const ACropCenter: TpointF;
+                         ATintColor, // const ATintColor: TalphaColor;
                          ABlurRadius, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
                          AYRadius); // const AYRadius: Single);
@@ -3622,6 +3778,7 @@ begin
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
               ACropCenter, // const ACropCenter: TpointF;
+              ATintColor, // const ATintColor: TalphaColor;
               ABlurRadius, // const ABlurRadius: single;
               AXRadius, // const AXRadius: Single;
               AYRadius); // const AYRadius: Single);;
@@ -3656,6 +3813,7 @@ begin
   FFillMaskBitmap := ALNullBitmap;
   FFillBackgroundMarginsRect := TRectF.Empty;
   FFillImageMarginsRect := TRectF.Empty;
+  FFillImageTintColor := TAlphaColors.Null;
   FFillImageNoRadius := False;
   FFillWrapMode := TALImageWrapMode.Fit;
   FFillCropCenter := TpointF.Create(-50, -50);
@@ -3719,6 +3877,7 @@ begin
   FFillResourceName := AFill.ResourceName;
   FFillBackgroundMarginsRect := AFill.BackgroundMargins.Rect;
   FFillImageMarginsRect := AFill.ImageMargins.Rect;
+  FFillImageTintColor := AFill.ImageTintColor;
   FFillImageNoRadius := AFill.ImageNoRadius;
   FFillWrapMode := AFill.WrapMode;
 end;
@@ -3811,6 +3970,13 @@ end;
 function TALDrawRectangleHelper.SetFillImageMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
 begin
   FFillImageMarginsRect := AValue;
+  Result := @Self;
+end;
+
+{*******************************************************************************************************}
+function TALDrawRectangleHelper.SetFillImageTintColor(const AValue: TAlphaColor): PALDrawRectangleHelper;
+begin
+  FFillImageTintColor := AValue;
   Result := @Self;
 end;
 
@@ -5370,6 +5536,7 @@ begin
   if compareValue(FOpacity, 1, Tepsilon.Scale) < 0 then begin
     var LLayerRect := ALGetShapeSurfaceRect(
                         LScaledDstRect, // const ARect: TrectF;
+                        False, // const AAlignToPixel: Boolean;
                         LFillColor, // const AFillColor: TAlphaColor;
                         LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                         LFillResourceName, // const AFillResourceName: String;
@@ -5561,6 +5728,7 @@ begin
                         LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                         FFillWrapMode, // const AWrapMode: TALImageWrapMode;
                         FFillCropCenter, // const ACropCenter: TpointF;
+                        FFillImageTintColor, // const ATintColor: TalphaColor;
                         FFillBlurRadius * FScale, // const ABlurRadius: single;
                         0, // const AXRadius: Single;
                         0); // const AYRadius: Single);
@@ -5641,6 +5809,7 @@ begin
   if compareValue(FOpacity, 1, Tepsilon.Scale) < 0 then begin
     var LLayerRect := ALGetShapeSurfaceRect(
                         LScaledDstRect, // const ARect: TrectF;
+                        False, // const AAlignToPixel: Boolean;
                         LFillColor, // const AFillColor: TAlphaColor;
                         LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                         LFillResourceName, // const AFillResourceName: String;
@@ -5826,6 +5995,7 @@ begin
                                   LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                                   FFillWrapMode, // const AWrapMode: TALImageWrapMode;
                                   FFillCropCenter, // const ACropCenter: TpointF;
+                                  FFillImageTintColor, // const ATintColor: TalphaColor;
                                   FFillBlurRadius * FScale, // const ABlurRadius: single;
                                   0, // const AXRadius: Single;
                                   0); // const AYRadius: Single);
@@ -5946,6 +6116,7 @@ begin
   if compareValue(FOpacity, 1, Tepsilon.Scale) < 0 then begin
     var LLayerRect := ALGetShapeSurfaceRect(
                         LScaledDstRect, // const ARect: TrectF;
+                        False, // const AAlignToPixel: Boolean;
                         LFillColor, // const AFillColor: TAlphaColor;
                         LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                         LFillResourceName, // const AFillResourceName: String;
@@ -6138,6 +6309,7 @@ begin
                                     LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                                     FFillWrapMode, // const AWrapMode: TALImageWrapMode;
                                     FFillCropCenter, // const ACropCenter: TpointF;
+                                    FFillImageTintColor, // const ATintColor: TalphaColor;
                                     FFillBlurRadius * FScale, // const ABlurRadius: single;
                                     0, // const AXRadius: Single;
                                     0); // const AYRadius: Single);

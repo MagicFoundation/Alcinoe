@@ -689,6 +689,8 @@ type
     FBackgroundMargins: TALBounds;
     FImageMargins: TALBounds;
     FImageNoRadius: Boolean;
+    FImageTintColor: TAlphaColor;
+    FImageTintColorKey: String;
     FWrapMode: TALImageWrapMode;
     --- Memory Optimization ---}
     FResourceName: String; // 8 bytes
@@ -698,7 +700,9 @@ type
     FImageNoRadius: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 byte
     FColor: TAlphaColor; // 4 bytes
+    FImageTintColor: TAlphaColor; // 4 Bytes
     FColorKey: String; // 8 bytes
+    FImageTintColorKey: String; // 8 Bytes
     procedure SetColor(const Value: TAlphaColor);
     procedure SetColorKey(const Value: String);
     procedure SetGradient(const Value: TALGradient);
@@ -706,6 +710,8 @@ type
     procedure SetBackgroundMargins(const Value: TALBounds);
     procedure SetImageMargins(const Value: TALBounds);
     procedure SetImageNoRadius(const Value: Boolean);
+    procedure SetImageTintColor(const Value: TAlphaColor);
+    procedure SetImageTintColorKey(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure GradientChanged(Sender: TObject); virtual;
     procedure BackgroundMarginsChanged(Sender: TObject); virtual;
@@ -714,6 +720,8 @@ type
     function IsColorKeyStored: Boolean;
     function IsResourceNameStored: Boolean;
     function IsImageNoRadiusStored: Boolean;
+    function IsImageTintColorStored: Boolean;
+    function IsImageTintColorKeyStored: Boolean;
     function IsWrapModeStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
@@ -724,10 +732,14 @@ type
   protected
     function CreateBackgroundMargins: TALBounds; virtual;
     function CreateImageMargins: TALBounds; virtual;
+    procedure ApplyBackgroundColorScheme; virtual;
+    procedure ApplyImageTintColorScheme; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
     function GetDefaultColorKey: String; virtual;
     function GetDefaultResourceName: String; virtual;
     function GetDefaultImageNoRadius: Boolean; virtual;
+    function GetDefaultImageTintColor: TAlphaColor; virtual;
+    function GetDefaultImageTintColorKey: String; virtual;
     function GetDefaultWrapMode: TALImageWrapMode; virtual;
   public
     constructor Create; override;
@@ -745,6 +757,8 @@ type
     property DefaultColorKey: String read GetDefaultColorKey;
     property DefaultResourceName: String read GetDefaultResourceName;
     property DefaultImageNoRadius: Boolean read GetDefaultImageNoRadius;
+    property DefaultImageTintColor: TAlphaColor read GetDefaultImageTintColor;
+    property DefaultImageTintColorKey: String read GetDefaultImageTintColorKey;
     property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
   published
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
@@ -754,6 +768,8 @@ type
     property BackgroundMargins: TALBounds read FBackgroundMargins write SetBackgroundMargins;
     property ImageMargins: TALBounds read FImageMargins write SetImageMargins;
     property ImageNoRadius: Boolean read FImageNoRadius write SetImageNoRadius stored IsImageNoRadiusStored;
+    property ImageTintColor: TAlphaColor read FImageTintColor write SetImageTintColor stored IsImageTintColorStored;
+    property ImageTintColorKey: String read FImageTintColorKey write SetImageTintColorKey stored IsImageTintColorKeyStored;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
   end;
 
@@ -1114,22 +1130,22 @@ type
   private
     class var FCustomTypeFaces: TDictionary<String, JTypeFace>;
   public
+    /// <summary> AFamilyName must be resolved via ALResolveFontFamily prior to invoking GetCustomTypeFace </summary>
     class function GetCustomTypeFace(const AFamilyName: string): JTypeFace; static;
   {$ENDIF}
   public
+    /// <summary> AFamilyName must be resolved via ALResolveFontFamily prior to invoking RegisterTypefaceFromResource </summary>
     class procedure RegisterTypefaceFromResource(const AResourceName: string; const AFamilyName: string); static;
   end;
 
 type
-  TALCustomConvertFontFamilyProc = function(const AFontFamily: TFontName): TFontName;
   TALCustomGetResourceFilenameProc = function(const AResourceName: String): String;
 
 var
-  ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
   ALCustomGetResourceFilenameProc: TALCustomGetResourceFilenameProc;
 
-{*********************************************************************}
-function  ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
+{***************************************************************}
+function  ALResolveFontFamily(const AFontFamily: String): String;
 function  ALExtractPrimaryFontFamily(const AFontFamilies: String): String;
 {$IF defined(ALSkiaEngine)}
 Function ALGetSkFontStyle(
@@ -1137,6 +1153,7 @@ Function ALGetSkFontStyle(
            const AFontSlant: TFontSlant;
            const AFontStretch: TFontStretch): sk_fontstyle_t;
 {$ENDIF}
+/// <summary> AFontFamily must be resolved via ALResolveFontFamily prior to invoking ALGetFontMetrics <summary>
 function  ALGetFontMetrics(
             const AFontFamily: String;
             const AFontSize: single;
@@ -1171,6 +1188,7 @@ type
   end;
 
 function ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
+/// <summary> AFontFamily must be resolved via ALResolveFontFamily prior to invoking ALCreateCTFontRef <summary>
 function ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
 {$ENDIF}
 
@@ -2315,13 +2333,12 @@ end;
 {*****************************}
 procedure TALFont.AlignToPixel;
 begin
-  BeginUpdate;
-  try
-    // I'm not sure if doing this will impact anything
-    Size := ALAlignDimensionToPixelRound(Size, ALGetScreenScale, TEpsilon.FontSize);
-  finally
-    EndUpdate;
-  end;
+  //BeginUpdate;
+  //try
+  //  Size := ALAlignDimensionToPixelRound(Size, ALGetScreenScale, TEpsilon.FontSize);
+  //finally
+  //  EndUpdate;
+  //end;
 end;
 
 {*********************************}
@@ -2353,7 +2370,7 @@ begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
     end
     else begin
-      Family := ALConvertFontFamily(DefaultFamily);
+      Family := DefaultFamily;
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
       Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(DefaultWeight), ANormalizedTime)));
@@ -2832,13 +2849,12 @@ end;
 {*****************************************}
 procedure TALEllipsisSettings.AlignToPixel;
 begin
-  BeginUpdate;
-  try
-    // I'm not sure if doing this will impact anything
-    Font.AlignToPixel;
-  finally
-    EndUpdate;
-  end;
+  //BeginUpdate;
+  //try
+  //  Font.AlignToPixel;
+  //finally
+  //  EndUpdate;
+  //end;
 end;
 
 {*********************************************}
@@ -3147,15 +3163,14 @@ end;
 {*****************************************}
 procedure TALBaseTextSettings.AlignToPixel;
 begin
-  BeginUpdate;
-  try
-    // I'm not sure if doing this will impact anything
-    Font.AlignToPixel;
-    EllipsisSettings.AlignToPixel;
-    LetterSpacing := ALAlignDimensionToPixelRound(LetterSpacing, ALGetScreenScale, TEpsilon.FontSize);
-  finally
-    EndUpdate;
-  end;
+  //BeginUpdate;
+  //try
+  //  Font.AlignToPixel;
+  //  EllipsisSettings.AlignToPixel;
+  //  LetterSpacing := ALAlignDimensionToPixelRound(LetterSpacing, ALGetScreenScale, TEpsilon.Position);
+  //finally
+  //  EndUpdate;
+  //end;
 end;
 
 {*********************************************}
@@ -3281,7 +3296,7 @@ end;
 {**********************************************************}
 function TALBaseTextSettings.IsLetterSpacingStored: Boolean;
 begin
-  Result := not SameValue(FLetterSpacing, DefaultLetterSpacing, TEpsilon.FontSize);
+  Result := not SameValue(FLetterSpacing, DefaultLetterSpacing, TEpsilon.Position);
 end;
 
 {******************************************************}
@@ -3299,7 +3314,7 @@ end;
 {*****************************************************}
 function TALBaseTextSettings.GetDefaultIsHtml: Boolean;
 begin
-  Result := False;
+  Result := True;
 end;
 
 {***************************************************************}
@@ -3416,7 +3431,7 @@ end;
 {*******************************************************************}
 procedure TALBaseTextSettings.SetLetterSpacing(const AValue: Single);
 begin
-  if not SameValue(FLetterSpacing, AValue, TEpsilon.FontSize) then begin
+  if not SameValue(FLetterSpacing, AValue, TEpsilon.Position) then begin
     FLetterSpacing := AValue;
     Change;
   end;
@@ -4023,6 +4038,8 @@ begin
   FImageMargins := CreateImageMargins;
   FImageMargins.OnChanged := ImageMarginsChanged;
   FImageNoRadius := DefaultImageNoRadius;
+  FImageTintColor := DefaultImageTintColor;
+  FImageTintColorKey := DefaultImageTintColorKey;
   FWrapMode := DefaultWrapMode;
 end;
 
@@ -4078,6 +4095,8 @@ begin
       BackgroundMargins.Assign(TALBrush(Source).BackgroundMargins);
       ImageMargins.Assign(TALBrush(Source).ImageMargins);
       ImageNoRadius := TALBrush(Source).ImageNoRadius;
+      ImageTintColor := TALBrush(Source).ImageTintColor;
+      ImageTintColorKey := TALBrush(Source).ImageTintColorKey;
       WrapMode := TALBrush(Source).WrapMode;
     Finally
       EndUpdate;
@@ -4100,6 +4119,8 @@ begin
     BackgroundMargins.Rect := BackgroundMargins.DefaultValue;
     ImageMargins.Rect := ImageMargins.DefaultValue;
     ImageNoRadius := DefaultImageNoRadius;
+    ImageTintColor := DefaultImageTintColor;
+    ImageTintColorKey := DefaultImageTintColorKey;
     WrapMode := DefaultWrapMode;
   finally
     EndUpdate;
@@ -4118,8 +4139,8 @@ begin
   end;
 end;
 
-{**********************************}
-procedure TALBrush.ApplyColorScheme;
+{********************************************}
+procedure TALBrush.ApplyBackgroundColorScheme;
 begin
   if FColorKey <> '' then begin
     var LColor := TALStyleManager.Instance.GetColor(FColorKey);
@@ -4130,12 +4151,38 @@ begin
   end;
 end;
 
+{*******************************************}
+procedure TALBrush.ApplyImageTintColorScheme;
+begin
+  if FImageTintColorKey <> '' then begin
+    var LImageTintColor := TALStyleManager.Instance.GetColor(FImageTintColorKey);
+    if FImageTintColor <> LImageTintColor then begin
+      FImageTintColor := LImageTintColor;
+      Change;
+    end;
+  end;
+end;
+
+{**********************************}
+procedure TALBrush.ApplyColorScheme;
+begin
+  BeginUpdate;
+  try
+    Gradient.ApplyColorScheme;
+    ApplyBackgroundColorScheme;
+    ApplyImageTintColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {*********************************************************************************}
 procedure TALBrush.Interpolate(const ATo: TALBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
     var LPrevColorKey := FColorKey;
+    var LPrevImageTintColorKey := FImageTintColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
@@ -4149,6 +4196,7 @@ begin
       ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ATo.ImageMargins.Top{Stop}, ANormalizedTime);
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ATo.ImageMargins.Bottom{Stop}, ANormalizedTime);
       ImageNoRadius := ATo.ImageNoRadius;
+      ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, ATo.ImageTintColor{Stop}, ANormalizedTime);
       WrapMode := ATo.WrapMode;
     end
     else begin
@@ -4164,9 +4212,11 @@ begin
       ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ImageMargins.DefaultValue.Top{Stop}, ANormalizedTime);
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ImageMargins.DefaultValue.Bottom{Stop}, ANormalizedTime);
       ImageNoRadius := DefaultImageNoRadius;
+      ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, DefaultImageTintColor{Stop}, ANormalizedTime);
       WrapMode := DefaultWrapMode;
     end;
     FColorKey := LPrevColorKey;
+    FImageTintColorKey := LPrevImageTintColorKey;
   finally
     EndUpdate;
   end;
@@ -4228,6 +4278,18 @@ begin
   result := FImageNoRadius <> DefaultImageNoRadius;
 end;
 
+{************************************************}
+function TALBrush.IsImageTintColorStored: Boolean;
+begin
+  result := FImageTintColor <> DefaultImageTintColor;
+end;
+
+{***************************************************}
+function TALBrush.IsImageTintColorKeyStored: Boolean;
+begin
+  result := FImageTintColorKey <> DefaultImageTintColorKey;
+end;
+
 {******************************************}
 function TALBrush.IsWrapModeStored: Boolean;
 begin
@@ -4258,6 +4320,18 @@ begin
   Result := False;
 end;
 
+{******************************************************}
+function TALBrush.GetDefaultImageTintColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null;
+end;
+
+{****************************************************}
+function TALBrush.GetDefaultImageTintColorKey: String;
+begin
+  Result := '';
+end;
+
 {*****************************************************}
 function TALBrush.GetDefaultWrapMode: TALImageWrapMode;
 begin
@@ -4279,7 +4353,7 @@ procedure TALBrush.setColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
     FColorKey := Value;
-    ApplyColorScheme;
+    ApplyBackGroundColorScheme;
   end;
 end;
 
@@ -4316,6 +4390,25 @@ begin
   if fImageNoRadius <> Value then begin
     fImageNoRadius := Value;
     Change;
+  end;
+end;
+
+{*************************************************************}
+procedure TALBrush.SetImageTintColor(const Value: TAlphaColor);
+begin
+  if fImageTintColor <> Value then begin
+    fImageTintColor := Value;
+    FImageTintColorKey := '';
+    Change;
+  end;
+end;
+
+{***********************************************************}
+procedure TALBrush.setImageTintColorKey(const Value: String);
+begin
+  if FImageTintColorKey <> Value then begin
+    FImageTintColorKey := Value;
+    ApplyImageTintColorScheme;
   end;
 end;
 
@@ -5797,7 +5890,8 @@ begin
   Change;
 end;
 
-{******************************************************************************************************************}
+{****************************************************************************************************}
+// AFamilyName must be resolved via ALResolveFontFamily prior to invoking RegisterTypefaceFromResource
 class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName: string; const AFamilyName: string);
 begin
 
@@ -5860,7 +5954,8 @@ begin
 
 end;
 
-{******************************************************}
+{*****************************************************************************************}
+// AFamilyName must be resolved via ALResolveFontFamily prior to invoking GetCustomTypeFace
 {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
 class function TALFontManager.GetCustomTypeFace(const AFamilyName: string): JTypeFace;
 begin
@@ -5868,56 +5963,18 @@ begin
 end;
 {$ENDIF}
 
-{********************************************************************}
-function ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
+{**************************************************************}
+function ALResolveFontFamily(const AFontFamily: String): String;
 begin
-  var LFontFamily := ALTrim(AFontFamily);
-  If AlposW(',', LFontFamily) > 0 then begin
-    Result := '';
-    var LFontFamilies := LFontFamily.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
-    for var I := low(LFontFamilies) to high(LFontFamilies) do begin
-      LFontFamily := ALConvertFontFamily(ALTrim(LFontFamilies[I]));
-      if LFontFamily <> '' then Result := Result + ALIfthenW(Result <> '', ',') + LFontFamily;
-    end;
-  end
-  else if Assigned(ALCustomConvertFontFamilyProc) then begin
-    Result := ALCustomConvertFontFamilyProc(LFontFamily)
-  end
-  else begin
-    {$if defined(ANDROID)}
-    // In Android, when you want to use the default system font, you should
-    // specify "sans-serif" as the font name. Roboto has been the default font
-    // for Android since Android 4.0 (Ice Cream Sandwich), and specifying
-    // "sans-serif" in your Java/Kotlin code will use Roboto or whichever font
-    // is the system default on the user's device. This approach ensures that
-    // your application uses the default system font, which provides a consistent
-    // user experience across different devices and versions of Android.
-    //   sans-serif
-    //   sans-serif-thin
-    //   sans-serif-light
-    //   sans-serif-medium
-    //   sans-serif-black
-    //   sans-serif-condensed
-    //   sans-serif-smallcaps
-    result := LFontFamily;
-    {$ELSEif defined(ALAppleOS)}
-    // https://developer.apple.com/fonts/system-fonts/
-    if ALSametextW(LFontFamily, 'sans-serif') then result := 'Helvetica Neue'
-    //else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Helvetica Neue Thin'
-    //else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Helvetica Neue Light'
-    //else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Helvetica Neue Medium'
-    //else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Helvetica Neue Bold'
-    else result := LFontFamily;
-    {$ELSEIF defined(MSWINDOWS)}
-    if ALSametextW(LFontFamily, 'sans-serif') then result := 'Segoe UI'
-    //else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Segoe UI Light'
-    //else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Segoe UI Light'
-    //else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Segoe UI Semibold'
-    //else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Segoe UI Black'
-    else result := LFontFamily;
-    {$ELSE}
-    result := LFontFamily;
-    {$endif}
+  Result := '';
+  var LFontFamilies := AFontFamily.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+  for var I := low(LFontFamilies) to high(LFontFamilies) do begin
+    var LName := ALTrim(LFontFamilies[I]);
+    if LName = '' then continue;
+    var LFontFamily := TALStyleManager.Instance.GetFontFamily(LName);
+    if LFontFamily = '' then LFontFamily := LName;
+    if result = '' then Result := LFontFamily
+    else Result := Result + ', ' + LFontFamily;
   end;
 end;
 
@@ -6023,7 +6080,8 @@ var
   ALFontMetricsCache: TDictionary<TALFontMetricsKey, TALFontMetrics>;
   ALFontMetricsCacheLock: TLightweightMREW;
 
-{************************}
+{****************************************************************************************}
+// AFontFamily must be resolved via ALResolveFontFamily prior to invoking ALGetFontMetrics
 function ALGetFontMetrics(
            const AFontFamily: String;
            const AFontSize: single;
@@ -6459,6 +6517,7 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
+// AFontFamily must be resolved via ALResolveFontFamily prior to invoking ALCreateCTFontRef
 function  ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -6753,11 +6812,7 @@ function ALGetHasTouchScreen: Boolean;
 begin
   if not ALHasTouchScreenInitialized then
     ALInitHasTouchScreen;
-  {$IF defined(debug)}
-  Result := True;
-  {$ELSE}
   result := ALHasTouchScreen;
-  {$ENDIF}
 end;
 
 initialization
@@ -6770,7 +6825,6 @@ initialization
   ALScreenScale := 0;
   ALHasTouchScreen := False;
   ALHasTouchScreenInitialized := False;
-  ALCustomConvertFontFamilyProc := nil;
   ALCustomGetResourceFilenameProc := nil;
   {$IFDEF ANDROID}
   ALViewStackCount := 0;

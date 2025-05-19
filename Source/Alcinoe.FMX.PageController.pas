@@ -2094,7 +2094,6 @@ begin
 
   if AValue = nil then raise Exception.Create('AValue cannot be nil');
   if (FFadeAnimation <> nil) and (FFadeAnimation.Running) then Exit;
-  if HasActivePage then ActivePage.ResetFocus;
 
   {$REGION 'TPageTransition.Slide'}
   if (ATransition = TPageTransition.Slide) and
@@ -2148,6 +2147,7 @@ begin
       end;
       LDuration := Min(LDuration, MAX_SETTLE_DURATION);
 
+      if HasActivePage then ActivePage.ResetFocus;
       ScrollEngine.startScroll(sx, sy, dx, dy, LDuration);
 
     end
@@ -2196,6 +2196,7 @@ begin
       end;
       LDuration := Min(LDuration, MAX_SETTLE_DURATION);
 
+      if HasActivePage then ActivePage.ResetFocus;
       ScrollEngine.startScroll(sx, sy, dx, dy, LDuration);
 
     end;
@@ -2212,6 +2213,7 @@ begin
           (HasActivePage) then begin
 
     if ActivePage = AValue then exit;
+    ActivePage.ResetFocus;
     FScrollEngine.Stop(true{AAbruptly});
     If FViewPortFraction <> 1 then
       raise Exception.Create('The fade transition only works when the viewport fraction is set to 1.');
@@ -2293,6 +2295,7 @@ begin
 
   {$REGION 'TPageTransition.None'}
   else begin
+    ActivePage.ResetFocus;
     FScrollEngine.Stop;
     if Orientation = TOrientation.Horizontal then
       FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.x - GetEndPadding, AValue.Position.y))

@@ -664,6 +664,7 @@ begin
                               LIconSize.Width, LIconSize.Height, // const W, H: single;
                               TALImageWrapMode.fitAndCrop, // const AWrapMode: TALImageWrapMode;
                               TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                              TAlphaColors.Null, // const ATintColor: TalphaColor;
                               0, // const ABlurRadius: single;
                               0, // const AXRadius: Single;
                               0); // const AYRadius: Single);

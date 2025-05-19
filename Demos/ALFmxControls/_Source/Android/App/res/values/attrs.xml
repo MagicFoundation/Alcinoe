@@ -1,13 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="10" encoding="utf-8"?>
 <resources>
  
-  <attr name="Material3LightFilledEditTextStyle" format="reference"/>
-  <attr name="Material3LightOutlinedEditTextStyle" format="reference"/>
-  <attr name="Material3DarkFilledEditTextStyle" format="reference"/>
-  <attr name="Material3DarkOutlinedEditTextStyle" format="reference"/>  
-  <attr name="Material3LightFilledErrorEditTextStyle" format="reference"/>
-  <attr name="Material3LightOutlinedErrorEditTextStyle" format="reference"/>
-  <attr name="Material3DarkFilledErrorEditTextStyle" format="reference"/>
-  <attr name="Material3DarkOutlinedErrorEditTextStyle" format="reference"/>
+  <attr name="MaterialEditFilled" format="reference"/>
+  <attr name="MaterialEditOutlined" format="reference"/>
+  <attr name="MaterialEditFilledError" format="reference"/>
+  <attr name="MaterialEditOutlinedError" format="reference"/>
 
 </resources>

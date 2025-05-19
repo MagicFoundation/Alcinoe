@@ -13,6 +13,7 @@ set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-edittext:1.0.0
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-datepicker:1.0.0
 set Libraries=%Libraries%;androidx.media3:media3-exoplayer:1.5.1
 set Libraries=%Libraries%;androidx.media3:media3-exoplayer-hls:1.5.1
+set Libraries=%Libraries%;androidx.appcompat:appcompat:1.7.0
 
 REM Required by fmx.jar, else the app crash at startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Landroidx/activity/result/contract/ActivityResultContracts$OpenDocument;

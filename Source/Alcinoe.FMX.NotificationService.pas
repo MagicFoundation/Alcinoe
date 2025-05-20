@@ -240,8 +240,8 @@ uses
   iOSapi.UserNotifications,
   FMX.Helpers.iOS,
   {$ENDIF}
-  ALcinoe.FMX.Graphics,
-  ALcinoe.FMX.Common,
+  Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.Common,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.stringUtils,
   Alcinoe.Common;

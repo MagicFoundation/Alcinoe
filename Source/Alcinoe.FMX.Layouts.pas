@@ -21,7 +21,7 @@ uses
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Objects,
-  ALcinoe.FMX.Common,
+  Alcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.ScrollEngine;
 

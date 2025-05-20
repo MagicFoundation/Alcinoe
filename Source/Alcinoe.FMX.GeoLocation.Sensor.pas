@@ -792,7 +792,8 @@ begin
 
 end;
 
-{**********************************************************************}
+{*************}
+//[MultiThread]
 function TALGeoLocationSensor.GetIsListeningGeoLocationUpdates: boolean;
 begin
   result := FGeoLocationUpdatesDelayed or FGeoLocationUpdatesActive;

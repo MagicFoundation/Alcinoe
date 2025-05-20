@@ -8,7 +8,7 @@ uses
   system.classes,
   system.SyncObjs,
   system.Generics.Collections,
-  ALcinoe.fmx.Common;
+  Alcinoe.FMX.Common;
 
 type
 
@@ -105,8 +105,8 @@ uses
   Fmx.Types3D,
   Fmx.Graphics,
   Alcinoe.Common,
-  Alcinoe.fmx.Controls,
-  ALcinoe.fmx.Graphics,
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.Graphics,
   Alcinoe.FMX.DynamicListBox;
 
 {***********************************}

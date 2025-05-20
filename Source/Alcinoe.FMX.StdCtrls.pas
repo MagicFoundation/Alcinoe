@@ -3076,7 +3076,7 @@ uses
   fmx.consts,
   fmx.utils,
   Alcinoe.StringUtils,
-  Alcinoe.fmx.Styles,
+  Alcinoe.FMX.Styles,
   Alcinoe.Common;
 
 {**}

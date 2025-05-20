@@ -45,7 +45,7 @@ uses
   FMX.Effects,
   FMX.controls,
   Alcinoe.FMX.Ani,
-  ALcinoe.FMX.Controls,
+  Alcinoe.FMX.Controls,
   Alcinoe.FMX.ScrollEngine;
 
 var
@@ -1450,7 +1450,7 @@ uses
   Alcinoe.FMX.StdCtrls,
   Alcinoe.Common,
   Alcinoe.files,
-  Alcinoe.fmx.Styles,
+  Alcinoe.FMX.Styles,
   Alcinoe.HTTP.Client,
   Alcinoe.stringList,
   ALcinoe.StringUtils;

@@ -10,7 +10,7 @@ uses
   FMX.Controls,
   Fmx.forms,
   Alcinoe.FMX.Layouts,
-  Alcinoe.fmx.Dialogs,
+  Alcinoe.FMX.Dialogs,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.StdCtrls;

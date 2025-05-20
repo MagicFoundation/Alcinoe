@@ -36,7 +36,7 @@ uses
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.ScrollEngine,
-  Alcinoe.fmx.Common;
+  Alcinoe.FMX.Common;
 
 type
 
@@ -5877,7 +5877,7 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Cipher,
   Alcinoe.FMX.Layouts,
-  Alcinoe.fmx.Styles,
+  Alcinoe.FMX.Styles,
   Alcinoe.HTTP.Client.Net.Pool;
 
 {*}
@@ -25716,7 +25716,7 @@ begin
 
   {$REGION 'TPageTransition.None'}
   else begin
-    //ActivePage.ResetFocus;
+    //if HasActivePage then //ActivePage.ResetFocus;
     FScrollEngine.Stop;
     if Orientation = TOrientation.Horizontal then
       FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Left - GetEndPadding, AValue.Top))

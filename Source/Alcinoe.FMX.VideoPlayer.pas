@@ -46,7 +46,7 @@ uses
   {$ENDIF}
   FMX.Platform,
   Alcinoe.FMX.CacheEngines,
-  Alcinoe.fmx.Common,
+  Alcinoe.FMX.Common,
   Alcinoe.FMX.Types3D,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Controls,
@@ -824,7 +824,7 @@ uses
   Fmx.types,
   fmx.controls,
   fmx.Types3d,
-  Alcinoe.fmx.Styles,
+  Alcinoe.FMX.Styles,
   Alcinoe.StringUtils,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.Net.Pool,

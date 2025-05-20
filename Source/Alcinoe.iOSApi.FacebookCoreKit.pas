@@ -131,7 +131,6 @@ procedure libswiftQuartzCoreLoader; cdecl; external '/usr/lib/swift/libswiftQuar
 procedure libswiftUIKitLoader; cdecl; external '/usr/lib/swift/libswiftUIKit.dylib';
 procedure libswiftCoreAudioLoader; cdecl; external '/usr/lib/swift/libswiftCoreAudio.dylib';
 procedure libswiftosLoader; cdecl; external '/usr/lib/swift/libswiftos.dylib';
-procedure libswiftWebKitLoader; cdecl; external '/usr/lib/swift/libswiftWebKit.dylib';
 procedure libswiftCoreMIDILoader; cdecl; external '/usr/lib/swift/libswiftCoreMIDI.dylib';
 procedure libswiftPhotosLoader; cdecl; external '/usr/lib/swift/libswiftPhotos.dylib';
 procedure libswiftAVFoundationLoader; cdecl; external '/usr/lib/swift/libswiftAVFoundation.dylib';

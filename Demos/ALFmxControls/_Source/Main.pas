@@ -29,7 +29,7 @@ uses
   FMX.Effects,
   FMX.Filter.Effects,
   Alcinoe.Common,
-  Alcinoe.fmx.Materials.Canvas,
+  Alcinoe.FMX.Materials.Canvas,
   Alcinoe.FMX.Styles,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Layouts,
@@ -433,7 +433,7 @@ uses
   system.DateUtils,
   system.Math.Vectors,
   fmx.DialogService,
-  Alcinoe.fmx.Dialogs,
+  Alcinoe.FMX.Dialogs,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Stringutils,
   ScrollBoxDemo;

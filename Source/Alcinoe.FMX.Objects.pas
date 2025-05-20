@@ -1372,7 +1372,7 @@ uses
   DesignIntf,
   system.ioutils,
   {$ENDIF}
-  Alcinoe.fmx.Styles,
+  Alcinoe.FMX.Styles,
   Alcinoe.Http.Client,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.StringUtils,

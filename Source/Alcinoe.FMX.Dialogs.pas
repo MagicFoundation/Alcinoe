@@ -6,12 +6,12 @@ uses
   system.Classes,
   System.Generics.Collections,
   System.Messaging,
-  Alcinoe.fmx.Ani,
-  Alcinoe.fmx.Edit,
-  Alcinoe.fmx.Memo,
-  Alcinoe.fmx.Layouts,
-  Alcinoe.fmx.Objects,
-  Alcinoe.fmx.StdCtrls,
+  Alcinoe.FMX.Ani,
+  Alcinoe.FMX.Edit,
+  Alcinoe.FMX.Memo,
+  Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.Objects,
+  Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.Controls;
 
 type
@@ -222,7 +222,7 @@ uses
   Fmx.Controls,
   FMX.Forms,
   FMX.Types,
-  Alcinoe.fmx.Graphics,
+  Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
   Alcinoe.StringUtils,
   Alcinoe.Common;
@@ -1100,13 +1100,11 @@ begin
     // CustomDialogRefProc
     if assigned(ADialog.CustomDialogRefProc) then begin
       ADialog.Fill.Color := TALphaColors.Null;
-      ADialog.CustomDialogRefProc();
     end
 
     // CustomDialogObjProc
     else if assigned(ADialog.CustomDialogObjProc) then begin
       ADialog.Fill.Color := TALphaColors.Null;
-      ADialog.CustomDialogObjProc();
     end
 
     // CustomContainer
@@ -1302,8 +1300,9 @@ begin
 
   FCurrentDialog := ADialog;
 
-  if (not assigned(FCurrentDialog.CustomDialogRefProc)) and
-     (not assigned(FCurrentDialog.CustomDialogObjProc)) then begin
+  if assigned(FCurrentDialog.CustomDialogRefProc) then FCurrentDialog.CustomDialogRefProc()
+  else if assigned(FCurrentDialog.CustomDialogObjProc) then FCurrentDialog.CustomDialogObjProc()
+  else begin
 
     FCurrentDialog.FTouchBlocker := TALLayout.Create(FCurrentDialog);
     FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog;

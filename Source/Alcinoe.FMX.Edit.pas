@@ -1304,7 +1304,7 @@ uses
   {$ENDIF}
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.BreakText,
-  Alcinoe.fmx.Styles,
+  Alcinoe.FMX.Styles,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
@@ -2126,6 +2126,7 @@ end;
 procedure TALAndroidEditControl.SetText(const Value: String);
 begin
   NativeView.View.setText(StrToJCharSequence(Value), TJTextView_BufferType.javaClass.EDITABLE);
+  if Value <> '' then setSelection(length(Value));
 end;
 
 {*******************************************************************}

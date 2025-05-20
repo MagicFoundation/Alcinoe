@@ -2295,7 +2295,7 @@ begin
 
   {$REGION 'TPageTransition.None'}
   else begin
-    ActivePage.ResetFocus;
+    if HasActivePage then ActivePage.ResetFocus;
     FScrollEngine.Stop;
     if Orientation = TOrientation.Horizontal then
       FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.x - GetEndPadding, AValue.Position.y))

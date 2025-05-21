@@ -4141,30 +4141,6 @@
             <RemoteName>material_text_select_handle_right_error.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-night\material_text_cursor.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-night\material_text_cursor_error.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor_error.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor_error.xml</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-v21\abc_action_bar_item_background_material.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -11075,30 +11051,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-night-xxhdpi</RemoteDir>
             <RemoteName>material_text_select_handle_right_error.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-night\material_text_cursor.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-night\material_text_cursor_error.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor_error.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-night</RemoteDir>
-            <RemoteName>material_text_cursor_error.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-v21\abc_action_bar_item_background_material.xml">

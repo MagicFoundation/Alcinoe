@@ -18,7 +18,7 @@
   <queries>
     <%queries-child-elements%>
   </queries>
-
+  
   <!-- ============================================ -->
   <!-- AndroidMerger auto-generated section (BEGIN) -->
   <!-- ============================================ -->
@@ -87,7 +87,7 @@
     <%activity%>
 
     <%receivers%>
-
+    
     <!-- ============================================ -->
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->

@@ -139,6 +139,7 @@ uses
   FMX.Helpers.iOS,
   FMX.Platform.iOS,
   Alcinoe.FMX.Common,
+  Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.Common;
@@ -616,8 +617,10 @@ begin
                     //'&noparse='                            // (boolean) - if true is specified in this parameter , the VKontakte server will not make
                                                              //             an additional request to download the missing information from the published page. If
                                                              //             false , the request will always be sent.
-    if SharedApplication.canOpenURL(LURL) then SharedApplication.openUrl(LURL)
-    else result := false;
+    if SharedApplication.canOpenURL(LURL) then
+      TALUIApplication.Wrap(NSObjectToID(SharedApplication)).openURLOptionsCompletionHandler(LURL, nil{options}, nil{completionHandler})
+    else
+      result := false;
 
     //var LShareDialogController := TVKShareDialogController.Wrap(TVKShareDialogController.OCClass.alloc);
     //try

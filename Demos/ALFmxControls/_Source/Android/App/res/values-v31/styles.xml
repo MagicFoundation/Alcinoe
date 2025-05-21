@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
  
-  <style name="Theme.App" parent="Theme.AppCompat.DayNight"> 
+  <style name="Theme.App" parent="Theme.AppCompat.DayNight">
     <item name="android:windowSplashScreenBackground">@color/splashscreen_background</item>
     <item name="android:windowSplashScreenAnimatedIcon">@drawable/splashscreen_icon</item>
-    <item name="MaterialEditFilled">@style/Material.Edit.Filled</item>
-    <item name="MaterialEditOutlined">@style/Material.Edit.Outlined</item>
-    <item name="MaterialEditFilledError">@style/Material.Edit.Filled.Error</item>
-    <item name="MaterialEditOutlinedError">@style/Material.Edit.Outlined.Error</item>
+    <item name="android:statusBarColor">@color/material_surface</item>
+    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:navigationBarColor">@color/material_surface</item> 
+    <item name="android:windowLightNavigationBar">true</item>
+    <item name="MaterialEdit">@style/Material.Edit</item>
+    <item name="MaterialEditError">@style/Material.Edit.Error</item>
     <item name="android:datePickerDialogTheme">@style/Theme.App.Material.Dialog.Alert</item>
   </style>
                 

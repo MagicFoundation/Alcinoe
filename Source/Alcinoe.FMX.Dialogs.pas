@@ -6,6 +6,7 @@ uses
   system.Classes,
   System.Generics.Collections,
   System.Messaging,
+  System.UITypes,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Memo,
@@ -44,6 +45,8 @@ type
         constructor Create;
         destructor Destroy; override;
         function SetIconResourceName(const AValue: String): TBuilder;
+        function SetIconTintColor(const AValue: TAlphaColor): TBuilder;
+        function SetIconSize(const AWidth, AHeight: Single): TBuilder;
         function SetHeadlineText(const AValue: String): TBuilder;
         function SetHeadlineAlign(const AValue: TAlAlignLayout): TBuilder;
         function SetMessageText(const AValue: String): TBuilder;
@@ -217,14 +220,14 @@ implementation
 uses
   system.SysUtils,
   System.Math,
-  System.UITypes,
   System.Types,
   Fmx.Controls,
   FMX.Forms,
   FMX.Types,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
-  Alcinoe.StringUtils,
+  Alcinoe.FMX.Common,
   Alcinoe.Common;
 
 {************************************}
@@ -246,6 +249,20 @@ end;
 function TALDialog.TBuilder.SetIconResourceName(const AValue: String): TBuilder;
 begin
   FDialog.Icon.ResourceName := AValue;
+  Result := Self;
+end;
+
+{********************************************************************************}
+function TALDialog.TBuilder.SetIconTintColor(const AValue: TAlphaColor): TBuilder;
+begin
+  FDialog.Icon.TintColor := AValue;
+  Result := Self;
+end;
+
+{*******************************************************************************}
+function TALDialog.TBuilder.SetIconSize(const AWidth, AHeight: Single): TBuilder;
+begin
+  FDialog.Icon.Size.Size := TSizeF.Create(AWidth, AHeight);
   Result := Self;
 end;
 
@@ -1157,8 +1174,10 @@ begin
                                ADialog.Headline.Margins.Right +
                                ADialog.Headline.Margins.Left +
                                ADialog.Headline.Width);
-          if ADialog.HasIcon and ADialog.Icon.Visible then
+          if ADialog.HasIcon and ADialog.Icon.Visible then begin
             ADialog.Headline.Align := TALAlignLayout.TopCenter;
+            ADialog.Headline.TextSettings.HorzAlign := TALTextHorzAlign.Center;
+          end;
         end;
       end;
 

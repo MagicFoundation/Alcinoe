@@ -904,7 +904,7 @@ begin
       Sides := [TSide.Bottom];
       XRadius := RoundTo(4 * ARatio, -2);
       YRadius := RoundTo(4 * ARatio, -2);
-      DefStyleAttr := 'MaterialEditFilled';
+      DefStyleAttr := 'MaterialEdit';
       TintColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Fill.ColorKey := 'Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
       Stroke.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
@@ -971,7 +971,7 @@ begin
       padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
       XRadius := RoundTo(4 * ARatio, -2);
       YRadius := RoundTo(4 * ARatio, -2);
-      DefStyleAttr := 'MaterialEditOutlined';
+      DefStyleAttr := 'MaterialEdit';
       TintColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
       Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
@@ -1037,7 +1037,7 @@ begin
       padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
       XRadius := RoundTo(4 * ARatio, -2);
       YRadius := RoundTo(4 * ARatio, -2);
-      DefStyleAttr := 'MaterialEditOutlined';
+      DefStyleAttr := 'MaterialEdit';
       TintColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
       Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
@@ -1105,7 +1105,7 @@ begin
       Sides := [TSide.Bottom];
       XRadius := RoundTo(4 * ARatio, -2);
       YRadius := RoundTo(4 * ARatio, -2);
-      DefStyleAttr := 'MaterialEditFilledError';
+      DefStyleAttr := 'MaterialEditError';
       TintColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       Fill.ColorKey := 'Material.Color.SurfaceContainerHighest'; // md.sys.color.surface-container-highest / md.ref.palette.neutral90 / #E6E0E9
       Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
@@ -1172,7 +1172,7 @@ begin
       padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
       XRadius := RoundTo(4 * ARatio, -2);
       YRadius := RoundTo(4 * ARatio, -2);
-      DefStyleAttr := 'MaterialEditOutlinedError';
+      DefStyleAttr := 'MaterialEditError';
       TintColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
       Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
@@ -1234,7 +1234,7 @@ begin
       padding.Rect := TRectF.Create(16*ARatio{Left}, 16*ARatio{Top}, 16*ARatio{Right}, 16*ARatio{Bottom}).RoundTo(-2);
       XRadius := RoundTo(4 * ARatio, -2);
       YRadius := RoundTo(4 * ARatio, -2);
-      DefStyleAttr := 'MaterialEditOutlinedError';
+      DefStyleAttr := 'MaterialEditError';
       TintColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       Fill.ColorKey := 'Material.Color.Surface'; // md.sys.color.surface / md.ref.palette.neutral98 / #FEF7FF
       Stroke.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
@@ -2662,8 +2662,14 @@ begin
 
     // DefaultIcon
     ALResetImageStyle(DefaultIcon);
-    DefaultIcon.Width := RoundTo(24 * ARatio, -2);
-    DefaultIcon.Height := RoundTo(24 * ARatio, -2);
+    if CompareValue(ARatio, 1.10, TEpsilon.scale) > 0 then begin
+      DefaultIcon.Width := RoundTo(32, -2);
+      DefaultIcon.Height := RoundTo(32, -2);
+    end
+    else begin
+      DefaultIcon.Width := RoundTo(24 * ARatio, -2);
+      DefaultIcon.Height := RoundTo(24 * ARatio, -2);
+    end;
     DefaultIcon.Align := TALAlignLayout.TopCenter;
 
     // DefaultHeadline

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <attr name="MaterialEditFilled" format="reference"/>
-    <attr name="MaterialEditOutlined" format="reference"/>
-    <attr name="MaterialEditFilledError" format="reference"/>
-    <attr name="MaterialEditOutlinedError" format="reference"/>
+    <attr name="MaterialEdit" format="reference"/>
+    <attr name="MaterialEditError" format="reference"/>
 </resources>

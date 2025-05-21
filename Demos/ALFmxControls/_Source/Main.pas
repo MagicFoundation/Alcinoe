@@ -28,6 +28,7 @@ uses
   FMX.Edit,
   FMX.Effects,
   FMX.Filter.Effects,
+  FMX.Platform,
   Alcinoe.Common,
   Alcinoe.FMX.Materials.Canvas,
   Alcinoe.FMX.Styles,
@@ -417,6 +418,10 @@ type
     FPageViewAnimation: TALFloatAnimation;
     FCanvasColorAdjustTextureMaterialGallery2: TALCanvasColorAdjustTextureMaterial;
     procedure PageViewAnimationProcess(Sender: TObject);
+    {$IF defined(android)}
+    procedure UpdateSystemBarsAppearance;
+    function ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
+    {$ENDIF}
   public
     procedure InitializeNewForm; override;
   end;
@@ -432,6 +437,11 @@ uses
   system.Math,
   system.DateUtils,
   system.Math.Vectors,
+  {$IF defined(ANDROID)}
+  Androidapi.Helpers,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.App,
+  {$ENDIF}
   fmx.DialogService,
   Alcinoe.FMX.Dialogs,
   Alcinoe.FMX.ScrollEngine,
@@ -457,6 +467,19 @@ begin
   // already fully loaded.
   TALFontManager.RegisterTypefaceFromResource('GoodDogPlain', 'GoodDog Plain');
   TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular', 'Ma Shan Zheng');
+
+  {$IF defined(android)}
+
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+  {$ENDIF}
+  var LApplicationEventService: IFMXApplicationEventService;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXApplicationEventService, IInterface(LApplicationEventService)) then
+    LApplicationEventService.SetApplicationEventHandler(ApplicationEventHandler);
+  UpdateSystemBarsAppearance;
+
+  {$ENDIF}
+
   inherited;
   BeginUpdate;
   ALLog('TMainForm.InitializeNewForm', 'end | Form.size: ' + FloatToStr(width) + 'x' + FloatToStr(height));
@@ -680,6 +703,66 @@ begin
   ALFreeAndNil(FCurrentTextElements);
 end;
 
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+{$ENDIF}
+{$IF defined(android)}
+procedure TMainForm.UpdateSystemBarsAppearance;
+begin
+  if TOSVersion.Check(11{API level 30}) then begin
+    var LWindow := TAndroidHelper.Activity.getWindow;
+    LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
+    LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
+    var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
+    if LInsetsController <> nil then begin
+      if TALStyleManager.Instance.IsDarkMode then begin
+        LInsetsController.setSystemBarsAppearance(
+          0,
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);
+      end
+      else begin
+        LInsetsController.setSystemBarsAppearance(
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS,
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);
+      end;
+    end;
+  end
+  else begin
+    TThread.ForceQueue(nil,
+      procedure
+      begin
+        var LWindow := TAndroidHelper.Activity.getWindow;
+        LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
+        LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
+        if TALStyleManager.Instance.IsDarkMode then begin
+          LWindow.getDecorView.setSystemUiVisibility(0);
+        end
+        else begin
+          LWindow.getDecorView.setSystemUiVisibility(
+            TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+            TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        end;
+      end, 500);
+  end;
+end;
+{$ENDIF}
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+{$ENDIF}
+{$IF defined(android)}
+function TMainForm.ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
+begin
+  if AAppEvent = TApplicationEvent.BecameActive then UpdateSystemBarsAppearance;
+  Result := True;
+end;
+{$ENDIF}
+
 {***********************************************************}
 procedure TMainForm.ALRadioButtonThemeClick(Sender: TObject);
 begin
@@ -697,6 +780,7 @@ begin
       TThread.Synchronize(nil,
         procedure
         begin
+          UpdateSystemBarsAppearance;
           TALStyleManager.Instance.ApplyColorScheme(Self, 'Material.Color.Surface');
           fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
           fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');

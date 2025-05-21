@@ -74,6 +74,7 @@ type
     procedure SimulateInfiniteScroll;
     {$ENDIF}
     {$IF defined(android)}
+    procedure UpdateSystemBarsAppearance;
     function ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
     {$ENDIF}
     procedure TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
@@ -147,7 +148,21 @@ begin
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
   {$ENDIF}
+  var LApplicationEventService: IFMXApplicationEventService;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXApplicationEventService, IInterface(LApplicationEventService)) then
+    LApplicationEventService.SetApplicationEventHandler(ApplicationEventHandler);
+  UpdateSystemBarsAppearance;
 
+  {$ENDIF}
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+{$ENDIF}
+{$IF defined(android)}
+procedure TMainForm.UpdateSystemBarsAppearance;
+begin
   if TOSVersion.Check(11{API level 30}) then begin
     var LWindow := TAndroidHelper.Activity.getWindow;
     LWindow.setNavigationBarColor(integer(TAlphaColors.White));
@@ -159,33 +174,8 @@ begin
         TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS,
         TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
         TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);
-  end;
-
-  var LApplicationEventService: IFMXApplicationEventService;
-  if TPlatformServices.Current.SupportsPlatformService(IFMXApplicationEventService, IInterface(LApplicationEventService)) then
-    LApplicationEventService.SetApplicationEventHandler(ApplicationEventHandler);
-  TThread.ForceQueue(nil,
-    procedure
-    begin
-      var LWindow := TAndroidHelper.Activity.getWindow;
-      LWindow.setNavigationBarColor(integer(TAlphaColors.White));
-      LWindow.setStatusBarColor(integer(TAlphaColors.White));
-      LWindow.getDecorView.setSystemUiVisibility(
-        TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-        TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-    end, 500);
-
-  {$ENDIF}
-end;
-
-{*************************************}
-{$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
-{$ENDIF}
-{$IF defined(android)}
-function TMainForm.ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
-begin
-  if AAppEvent = TApplicationEvent.BecameActive then begin
+  end
+  else begin
     TThread.ForceQueue(nil,
       procedure
       begin
@@ -197,6 +187,17 @@ begin
           TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
       end, 500);
   end;
+end;
+{$ENDIF}
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
+{$ENDIF}
+{$IF defined(android)}
+function TMainForm.ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
+begin
+  if AAppEvent = TApplicationEvent.BecameActive then UpdateSystemBarsAppearance;
   Result := True;
 end;
 {$ENDIF}

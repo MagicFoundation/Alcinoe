@@ -303,6 +303,7 @@ uses
   Macapi.Helpers,
   iOSapi.UIKit,
   FMX.Helpers.iOS,
+  Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   Alcinoe.Cipher,
   Alcinoe.stringutils,
@@ -892,7 +893,7 @@ begin
         {$REGION ' IOS'}
         {$IF defined(IOS)}
         FApplicationEventHandlerEnabled:=true;
-        SharedApplication.openUrl(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString((UIApplicationOpenSettingsURLString))));
+        TALUIApplication.Wrap(NSObjectToID(SharedApplication)).openURLOptionsCompletionHandler(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString((UIApplicationOpenSettingsURLString))), nil{options}, nil{completionHandler});
         {$ENDIF}
         {$ENDREGION}
 
@@ -954,7 +955,7 @@ begin
             {$REGION ' IOS'}
             {$IF defined(IOS)}
             FApplicationEventHandlerEnabled:=true;
-            SharedApplication.openUrl(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString((UIApplicationOpenSettingsURLString))));
+            TALUIApplication.Wrap(NSObjectToID(SharedApplication)).openURLOptionsCompletionHandler(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString((UIApplicationOpenSettingsURLString))), nil{options}, nil{completionHandler});
             {$ENDIF}
             {$ENDREGION}
 

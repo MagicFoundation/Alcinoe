@@ -679,6 +679,7 @@ begin
     TALStyleManager.TDarkModeBehavior.FollowSystem: ALRadioButtonAutoTheme.Checked := True;
   end;
   Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.Surface');
+  SystemStatusBar.BackgroundColor := TALStyleManager.Instance.GetColor('Material.Color.Surface');
 
   if TALStyleManager.Instance.IsDarkMode then begin
     ALTrackBarCustomStyle.Thumb.Fill.Color := $FFe5e0e8;
@@ -781,7 +782,7 @@ begin
         procedure
         begin
           UpdateSystemBarsAppearance;
-          TALStyleManager.Instance.ApplyColorScheme(Self, 'Material.Color.Surface');
+          TALStyleManager.Instance.ApplyColorScheme(Self, 'Material.Color.Surface'{AFormFillColorKey}, 'Material.Color.Surface'{ASystemStatusBarBackgroundColorKey});
           fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
           fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');
           fCircle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');

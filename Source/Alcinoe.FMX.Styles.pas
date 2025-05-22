@@ -179,7 +179,7 @@ Type
     destructor Destroy; override;
     property DarkModeBehavior: TDarkModeBehavior read GetDarkModeBehavior write SetDarkModeBehavior;
     property IsDarkMode: Boolean read FIsDarkMode;
-    procedure ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorName: String); virtual;
+    procedure ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorKey: String; const ASystemStatusBarBackgroundColorKey: String); virtual;
     //--
     procedure AddOrSetColor(const AName: String; Const AValue: TAlphaColor; Const AIsForDarkMode: Boolean);
     procedure AddOrSetFontFamily(const AName: String; Const AValue: String);
@@ -3396,7 +3396,7 @@ begin
 end;
 
 {*****************************************************************************************************}
-procedure TALStyleManager.ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorName: String);
+procedure TALStyleManager.ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorKey: String; const ASystemStatusBarBackgroundColorKey: String);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure ApplyColorSchemeRecursive(const AControl: TControl);
@@ -3407,8 +3407,10 @@ procedure TALStyleManager.ApplyColorScheme(const AForm: TCustomForm; const AForm
   end;
 
 begin
-  if AFormFillColorName <> '' then
-    AForm.Fill.Color := GetColor(AFormFillColorName);
+  if AFormFillColorKey <> '' then
+    AForm.Fill.Color := GetColor(AFormFillColorKey);
+  if ASystemStatusBarBackgroundColorKey <> '' then
+    AForm.SystemStatusBar.BackgroundColor := GetColor(ASystemStatusBarBackgroundColorKey);
   For var I := 0 to AForm.ChildrenCount - 1 do begin
     if (AForm.Children[i] is TALControl) then TALControl(AForm.Children[i]).ApplyColorScheme
     else if (AForm.Children[i] is TControl) then ApplyColorSchemeRecursive(TControl(AForm.Children[i]));
@@ -4101,10 +4103,10 @@ begin
   var LArray := FLightColors.ToArray;
   TArray.Sort<TPair<string, TPair<TAlphaColor, integer{SortOrder}>>>(LArray,
     TComparer<TPair<string, TPair<TAlphaColor, integer{SortOrder}>>>.Construct(
-                                                                       function(const Left, Right: TPair<string, TPair<TAlphaColor, integer{SortOrder}>>): Integer
-                                                                       begin
-                                                                         Result := Left.value.value - Right.value.value;
-                                                                       end));
+      function(const Left, Right: TPair<string, TPair<TAlphaColor, integer{SortOrder}>>): Integer
+      begin
+        Result := Left.value.value - Right.value.value;
+      end));
   SetLength(Result, Length(LArray));
   for var I := low(LArray) to High(LArray) do
     Result[I] := LArray[I].Key;

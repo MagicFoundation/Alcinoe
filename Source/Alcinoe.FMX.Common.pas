@@ -1453,6 +1453,7 @@ uses
   Alcinoe.FMX.Styles,
   Alcinoe.HTTP.Client,
   Alcinoe.stringList,
+  Alcinoe.Localization,
   ALcinoe.StringUtils;
 
 {***********************************************************}

@@ -101,7 +101,7 @@ const
 
 initialization
   {$IF defined(DEBUG)}
-  ALLog('Alcinoe.TbbMM','initialization');
+  //ALLog('Alcinoe.TbbMM','initialization');
   {$ENDIF}
   SetMemoryManager(MemoryManager);
 

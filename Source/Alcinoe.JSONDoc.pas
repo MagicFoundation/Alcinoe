@@ -166,6 +166,7 @@ uses
   system.sysutils,
   system.types,
   Alcinoe.XMLDoc,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.StringList;
 

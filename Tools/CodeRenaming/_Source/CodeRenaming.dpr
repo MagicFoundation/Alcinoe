@@ -476,6 +476,7 @@ begin
       LOldToNewNames.add('ALGetCTFontRef=ALCreateCTFontRef');
       LOldToNewNames.add('ALAlignAbsolutePointToPixelRound=ALAlignToPixelRound');
       LOldToNewNames.add('ALGetImageSize=ALGetImageDimensions');
+      LOldToNewNames.add('ALIsDecimal','ALIsNumeric');
 
       //type names
       LOldToNewNames.add('pALFormatSettings=pALFormatSettingsA');

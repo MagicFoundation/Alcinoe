@@ -781,7 +781,9 @@ begin
       TThread.Synchronize(nil,
         procedure
         begin
+          {$IF defined(android)}
           UpdateSystemBarsAppearance;
+          {$ENDIF}
           TALStyleManager.Instance.ApplyColorScheme(Self, 'Material.Color.Surface'{AFormFillColorKey}, 'Material.Color.Surface'{ASystemStatusBarBackgroundColorKey});
           fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
           fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');

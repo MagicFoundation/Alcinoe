@@ -8,7 +8,6 @@ uses
   System.Types,
   Alcinoe.Common,
   Alcinoe.RTTI,
-  Alcinoe.StringUtils,
   DUnitX.TestFramework;
 
 {$RTTI EXPLICIT METHODS([vcPublic, vcPublished])
@@ -235,7 +234,9 @@ implementation
 uses
   system.SysUtils,
   system.DateUtils,
-  System.Math;
+  System.Math,
+  Alcinoe.Localization,
+  Alcinoe.StringUtils;
 
 {********************************}
 procedure TALDUnitXTestRtti.Setup;

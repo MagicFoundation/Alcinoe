@@ -5,7 +5,6 @@ interface
 uses
   System.Diagnostics,
   Alcinoe.Common,
-  Alcinoe.StringUtils,
   DUnitX.TestFramework;
 
 type
@@ -32,6 +31,8 @@ implementation
 uses
   IdHashCRC,
   IDGlobal,
+  Alcinoe.Localization,
+  Alcinoe.StringUtils,
   Alcinoe.Cipher;
 
 {*************************************}

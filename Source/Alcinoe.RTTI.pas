@@ -646,6 +646,7 @@ uses
   System.Diagnostics,
   Alcinoe.Common,
   Alcinoe.StringList,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {*}

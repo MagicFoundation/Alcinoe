@@ -260,6 +260,7 @@ uses
   Alcinoe.FMX.styles,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.ScrollEngine,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

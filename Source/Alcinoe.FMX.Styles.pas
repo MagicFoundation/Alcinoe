@@ -2740,6 +2740,9 @@ begin
     DefaultLabel.Margins.Left := RoundTo(12 * ARatio, -2);
     DefaultLabel.AutoSize := True;
     DefaultLabel.Align := TALAlignLayout.LeftCenter;
+    DefaultLabel.HitTest := true;
+    DefaultLabel.Cursor := crHandPoint;
+    DefaultLabel.TouchTargetExpansion.Rect := TRectF.Create(6*ARatio{Left}, 6*ARatio{Top}, 6*ARatio{Right}, 6*ARatio{Bottom}).RoundTo(-2);
 
     // DefaultFooterBar
     ALResetRectangleStyle(DefaultFooterBar, ARatio);

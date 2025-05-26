@@ -94,6 +94,7 @@ uses
   fmx.surfaces,
   FMX.Consts,
   Alcinoe.FMX.Materials.Canvas,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

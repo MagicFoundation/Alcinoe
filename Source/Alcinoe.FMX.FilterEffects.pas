@@ -975,6 +975,7 @@ uses
   system.sysutils,
   System.Math.Vectors,
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {***********************************************}

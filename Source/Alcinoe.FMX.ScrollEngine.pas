@@ -705,6 +705,7 @@ uses
   {$ENDIF}
   FMX.Platform,
   Alcinoe.FMX.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Ani;
 

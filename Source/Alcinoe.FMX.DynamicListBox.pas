@@ -5874,6 +5874,7 @@ uses
   FMX.Surfaces,
   Alcinoe.GuardianThread,
   Alcinoe.HTTP.Client,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Cipher,
   Alcinoe.FMX.Layouts,

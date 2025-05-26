@@ -1133,6 +1133,23 @@ undesired conversions.
 History
 =======
 
+#### 26/05/2025
+
+- Moved `TALFormatSettingsA` and `TALFormatSettingsW` to the 
+  `Alcinoe.Localization` unit for better organization of 
+  locale-specific utilities.
+- Added `ALIsAlphaString` and `ALIsAlphaNumeric` helper functions 
+  for string validation, and renamed `ALIsDecimal` to 
+  `ALIsNumeric` for improved clarity.
+- Introduced `TALPluralRules`, a new class for handling language-specific 
+  pluralization rules based on numeric values, enabling proper 
+  selection of plural forms in internationalized applications. 
+  This supports use cases such as correctly displaying localized 
+  strings for quantities (e.g., "1 item" vs "2 items") based on 
+  the user's language.
+- Added `TALDialog.GetButtons`, a method that returns the list of 
+  buttons currently attached to the dialog.
+
 #### 19/05/2025
 
 - Added the following easing types to TALInterpolationType, matching Material Design 3 motion system:

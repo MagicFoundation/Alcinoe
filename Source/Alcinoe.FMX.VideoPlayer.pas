@@ -825,6 +825,7 @@ uses
   fmx.controls,
   fmx.Types3d,
   Alcinoe.FMX.Styles,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.Net.Pool,

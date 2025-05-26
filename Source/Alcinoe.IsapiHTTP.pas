@@ -272,6 +272,7 @@ uses
   System.DateUtils,
   System.Ansistrings,
   System.math,
+  Alcinoe.Localization,
   Alcinoe.Common;
 
 const

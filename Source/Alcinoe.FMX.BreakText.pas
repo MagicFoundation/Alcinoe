@@ -322,6 +322,7 @@ uses
   {$ENDIF}
   Alcinoe.FMX.Styles,
   Alcinoe.StringList,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

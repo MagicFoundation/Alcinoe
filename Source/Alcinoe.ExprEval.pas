@@ -873,6 +873,7 @@ uses
   System.Math,
   System.Contnrs,
   System.AnsiStrings,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Cipher;
 

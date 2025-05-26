@@ -37,6 +37,7 @@ implementation
 
 uses
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {$R *.fmx}

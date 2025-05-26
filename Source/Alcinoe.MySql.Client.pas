@@ -16,7 +16,7 @@ uses
   Alcinoe.Common,
   Alcinoe.XMLDoc,
   Alcinoe.StringList,
-  Alcinoe.StringUtils,
+  Alcinoe.Localization,
   Alcinoe.MySql.Wrapper;
 
 Type
@@ -322,6 +322,7 @@ uses
   System.Diagnostics,
   System.AnsiStrings,
   Alcinoe.Cipher,
+  Alcinoe.StringUtils,
   Alcinoe.WinApi.Common;
 
 {******************************************************************}

@@ -118,6 +118,7 @@ Uses
   System.Classes,
   System.AnsiStrings,
   Alcinoe.WinSock,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {********************************************************************************}

@@ -3075,6 +3075,7 @@ uses
   FMX.Platform,
   fmx.consts,
   fmx.utils,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Styles,
   Alcinoe.Common;

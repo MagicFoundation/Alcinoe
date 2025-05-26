@@ -556,6 +556,7 @@ uses
   System.Math,
   system.AnsiStrings,
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {************************************************************************************}

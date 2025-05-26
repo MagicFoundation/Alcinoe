@@ -100,6 +100,7 @@ type
     procedure VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage); virtual;
   protected
     procedure ButtonClick(Sender: TObject); virtual;
+    procedure LabelClick(Sender: TObject); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -113,10 +114,12 @@ type
     function GetRadioButtons: TArray<TALRadioButton>;
     function GetCheckBoxes: TArray<TALCheckBox>;
     function GetEdits: TArray<TALBaseEdit>;
+    function GetButtons: TArray<TALbutton>;
     function GetRadioButton(const ATag: NativeInt): TALRadioButton;
     function GetCheckedRadioButton: TALRadioButton;
     function GetCheckBox(const ATag: NativeInt): TALCheckBox;
     function GetEdit(const ATag: NativeInt): TALBaseEdit;
+    function GetButton(const ATag: NativeInt): TALButton;
     procedure AddRadioButton(const ALabel: String; const ATag: NativeInt; const AChecked: Boolean; const AMandatory: Boolean = True);
     procedure AddCheckBox(const ALabel: String; const ATag: NativeInt; const AChecked: Boolean);
     procedure AddEdit(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt);
@@ -554,6 +557,8 @@ begin
   var LLabel := TALText.Create(LLayout);
   LLabel.Parent := LLayout;
   LLabel.Assign(TALDialogManager.Instance.DefaultLabel);
+  LLabel.OnClick := LabelClick;
+  LLAbel.TagObject := LRadioButton;
   LLAbel.Text := ALabel;
 end;
 
@@ -572,6 +577,8 @@ begin
   var LLabel := TALText.Create(LLayout);
   LLabel.Parent := LLayout;
   LLabel.Assign(TALDialogManager.Instance.DefaultLabel);
+  LLabel.OnClick := LabelClick;
+  LLAbel.TagObject := LCheckBox;
   LLAbel.Text := ALabel;
 end;
 
@@ -693,6 +700,29 @@ begin
     _GetEdits(CustomContainer);
 end;
 
+{***********************************************}
+function TALDialog.Getbuttons: TArray<TALbutton>;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _Getbuttons(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      if AControl.Controls[i] is TALbutton then begin
+        setlength(Result, Length(Result) + 1);
+        Result[High(Result)] := TALbutton(AControl.Controls[i]);
+      end
+      else _Getbuttons(AControl.Controls[i]);
+    end;
+  end;
+
+begin
+  SetLength(Result, 0);
+  If HasContainer then
+    _Getbuttons(Container)
+  else if HasCustomContainer then
+    _Getbuttons(CustomContainer);
+end;
+
 {***********************************************************************}
 function TALDialog.GetRadioButton(const ATag: NativeInt): TALRadioButton;
 
@@ -789,7 +819,10 @@ function TALDialog.GetEdit(const ATag: NativeInt): TALBaseEdit;
         Result := TALEdit(AControl.Controls[i]);
         exit;
       end
-      else Result := _GetEdit(AControl.Controls[i]);
+      else begin
+        Result := _GetEdit(AControl.Controls[i]);
+        if Result <> nil then exit;
+      end;
     end;
   end;
 
@@ -798,6 +831,34 @@ begin
     Result := _GetEdit(Container)
   else if HasCustomContainer then
     Result := _GetEdit(CustomContainer)
+  else
+    Result := nil;
+end;
+
+{*************************************************************}
+function TALDialog.Getbutton(const ATag: NativeInt): TALbutton;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _Getbutton(const AControl: TControl): TALbutton;
+  begin
+    Result := nil;
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      if (AControl.Controls[i].Tag = ATag) and (AControl.Controls[i] is TALbutton) then begin
+        Result := TALbutton(AControl.Controls[i]);
+        exit;
+      end
+      else begin
+        Result := _Getbutton(AControl.Controls[i]);
+        if Result <> nil then exit;
+      end;
+    end;
+  end;
+
+begin
+  If HasContainer then
+    Result := _Getbutton(Container)
+  else if HasCustomContainer then
+    Result := _Getbutton(CustomContainer)
   else
     Result := nil;
 end;
@@ -818,6 +879,13 @@ begin
        (TALDialogManager.Instance.CurrentDialog = self) then
       TALDialogManager.Instance.CloseCurrentDialog;
   end;
+end;
+
+{**********************************************}
+procedure TALDialog.LabelClick(Sender: TObject);
+begin
+  if TALText(Sender).TagObject is TALBaseCheckBox then
+    TALBaseCheckBox(TALText(Sender).TagObject).Checked := not TALBaseCheckBox(TALText(Sender).TagObject).Checked;
 end;
 
 {**********************************}

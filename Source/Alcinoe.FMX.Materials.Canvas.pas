@@ -106,6 +106,7 @@ uses
   System.Classes,
   system.sysutils,
   Alcinoe.FMX.Types3D,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

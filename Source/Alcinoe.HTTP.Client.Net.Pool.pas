@@ -215,6 +215,7 @@ uses
   Alcinoe.HTTP.Client.Net,
   Alcinoe.HTTP.Client,
   Alcinoe.Cipher,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {*********************************************}

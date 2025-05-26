@@ -15,7 +15,7 @@ Uses
   Alcinoe.XMLDoc,
   Alcinoe.JSONDoc,
   Alcinoe.Sqlite3.Wrapper,
-  Alcinoe.StringUtils,
+  Alcinoe.Localization,
   Alcinoe.StringList;
 
 Type
@@ -362,6 +362,7 @@ Uses
   System.AnsiStrings,
   Alcinoe.Common,
   Alcinoe.Cipher,
+  Alcinoe.StringUtils,
   Alcinoe.WinApi.Common;
 
 {***********************************************************************************}

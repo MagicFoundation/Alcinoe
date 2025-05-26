@@ -1,4 +1,4 @@
-unit ALDUnitXTestStrings;
+﻿unit ALDUnitXTestStrings;
 
 interface
 
@@ -9,7 +9,6 @@ uses
   Winapi.Windows,
   Alcinoe.Common,
   Alcinoe.Cipher,
-  Alcinoe.StringUtils,
   DUnitX.TestFramework;
 
 type
@@ -91,6 +90,8 @@ uses
   System.DateUtils,
   System.Character,
   System.StrUtils,
+  Alcinoe.StringUtils,
+  Alcinoe.Localization,
   Alcinoe.StringList;
 
 {**************************************}

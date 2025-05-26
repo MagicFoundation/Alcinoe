@@ -393,6 +393,7 @@ Uses
   System.SysUtils,
   System.Types, // to expand the inline function
   System.AnsiStrings,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Mime;
 

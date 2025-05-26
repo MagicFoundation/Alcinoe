@@ -17,7 +17,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.IniFiles,
-  Alcinoe.StringUtils,
+  Alcinoe.Localization,
   Alcinoe.StringList;
 
 type
@@ -84,6 +84,7 @@ uses
   System.RTLConsts,
   System.Ansistrings,
   System.IOUtils,
+  Alcinoe.StringUtils,
   Alcinoe.Files;
 
 {***************************************************************}

@@ -782,6 +782,7 @@ uses
   system.DateUtils,
   System.UIConsts,
   System.Diagnostics,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {****************************************}

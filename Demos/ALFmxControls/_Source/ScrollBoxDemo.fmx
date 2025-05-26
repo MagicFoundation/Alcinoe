@@ -42,7 +42,6 @@ object ScrollBoxDemoForm: TScrollBoxDemoForm
     StateStyles.Disabled.Fill.Color = x1F1D1B20
     StateStyles.Disabled.Fill.Inherit = False
     StateStyles.Disabled.TextSettings.Inherit = False
-    StateStyles.Disabled.TextSettings.Font.Weight = Medium
     StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
     StateStyles.Disabled.Opacity = 1.000000000000000000
     StateStyles.Hovered.Shadow.blur = 2.000000000000000000
@@ -61,7 +60,6 @@ object ScrollBoxDemoForm: TScrollBoxDemoForm
     Text = 'Close'
     TextSettings.Font.Color = claWhite
     TextSettings.LetterSpacing = 0.100000001490116100
-    TextSettings.IsHtml = True
     XRadius = -50.000000000000000000
     YRadius = -50.000000000000000000
     OnClick = ButtonCloseClick

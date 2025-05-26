@@ -145,6 +145,20 @@ begin
   LOutputImplementationPart2 := '';
   _ParseRulesFile('..\..\References\cldr-json\plurals.json', 'Cardinal');
   _ParseRulesFile('..\..\References\cldr-json\ordinals.json', 'Ordinal');
+  //-----
+  Var LtempDir := ALgetModulePathW + '\Temp\';
+  If (TDirectory.Exists(LtempDir)) and (not AlEmptyDirectoryW(LtempDir, true)) then
+    Raise Exception.create('Temporary directory "' + LtempDir + '" exists but could not be cleared');
+  TDirectory.CreateDirectory(LtempDir);
+  ALSaveStringToFile(LOutputInterface, LtempDir + 'Interface.pas');
+  ALSaveStringToFile(LOutputImplementationPart2, LtempDir + 'implementationPart2.pas');
+  ExecuteCmdLine('"'+ALgetModulePathW+'\..\UnitNormalizer\UnitNormalizer.exe" -Dir="'+LtempDir+'" -NoInteraction=true -CreateBackup=false');
+  LOutputInterface := ALGetStringFromFile(LtempDir + 'Interface.pas');
+  LOutputImplementationPart2 := ALGetStringFromFile(LtempDir + 'implementationPart2.pas');
+  If (not AlEmptyDirectoryW(LtempDir, true)) then
+    Raise Exception.create('Failed to clean up temporary directory "' + LtempDir + '"');
+  TDirectory.Delete(LtempDir);
+  //-----
   var LAlcinoeLocalizationPas: AnsiString := ALGetStringFromFile(ALgetModulePathW + '\..\..\Source\Alcinoe.Localization.pas');
   Var LCodeBelowSignature: AnsiString := '    //////////////////////////////////////////////'#13#10+
                                          '    /// THE CODE BELOW WAS AUTO-GENERATED FROM ///'#13#10+

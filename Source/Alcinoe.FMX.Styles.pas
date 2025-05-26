@@ -3398,7 +3398,7 @@ begin
     InitColors;
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************************************************************}
 procedure TALStyleManager.ApplyColorScheme(const AForm: TCustomForm; const AFormFillColorKey: String; const ASystemStatusBarBackgroundColorKey: String);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3428,9 +3428,9 @@ begin
     if not fDarkColors.TryGetValue(AName, LPair) then begin
       fDarkColors.Add(
         AName,
-        TPair<TAlphaColor, integer{SortOrder}>.Create(
-                                                 AValue,
-                                                 TALStyleManager.GetNextSortOrder))
+        TPair<TAlphaColor, integer>.Create(
+          AValue,
+          TALStyleManager.GetNextSortOrder))
     end
     else begin
       LPair.Key := AValue;
@@ -3441,9 +3441,9 @@ begin
     if not fLightColors.TryGetValue(AName, LPair) then begin
       fLightColors.Add(
         AName,
-        TPair<TAlphaColor, integer{SortOrder}>.Create(
-                                                 AValue,
-                                                 TALStyleManager.GetNextSortOrder))
+        TPair<TAlphaColor, integer>.Create(
+          AValue,
+          TALStyleManager.GetNextSortOrder))
     end
     else begin
       LPair.Key := AValue;
@@ -4104,9 +4104,9 @@ end;
 function TALStyleManager.GetColorNames: TArray<String>;
 begin
   var LArray := FLightColors.ToArray;
-  TArray.Sort<TPair<string, TPair<TAlphaColor, integer{SortOrder}>>>(LArray,
-    TComparer<TPair<string, TPair<TAlphaColor, integer{SortOrder}>>>.Construct(
-      function(const Left, Right: TPair<string, TPair<TAlphaColor, integer{SortOrder}>>): Integer
+  TArray.Sort<TPair<string, TPair<TAlphaColor, integer>>>(LArray,
+    TComparer<TPair<string, TPair<TAlphaColor, integer>>>.Construct(
+      function(const Left, Right: TPair<string, TPair<TAlphaColor, integer>>): Integer
       begin
         Result := Left.value.value - Right.value.value;
       end));

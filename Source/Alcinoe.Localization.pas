@@ -763,6 +763,8 @@ type
                const ANumber: Int64;
                const AType: TPluralType = TPluralType.Cardinal;
                const AExponent: Integer = 0): TPluralCategory; overload;
+    class function PluralCategoryToStringW(const ACategory: TPluralCategory): String;
+    class function PluralCategoryToStringA(const ACategory: TPluralCategory): AnsiString;
   end;
 
 function ALGetPreferredLanguages: TArray<String>;
@@ -2284,6 +2286,34 @@ begin
               ANumber, // const ANumber: Integer;
               AType, // const AType: TPluralType = TPluralType.Cardinal;
               AExponent) // const AExponent: Integer = 0);
+end;
+
+{**********************************************************************************************}
+class function TALPluralRules.PluralCategoryToStringW(const ACategory: TPluralCategory): String;
+begin
+  case ACategory of
+    TPluralCategory.Zero: Result := 'zero';
+    TPluralCategory.One: Result := 'one';
+    TPluralCategory.Two: Result := 'two';
+    TPluralCategory.Few: Result := 'few';
+    TPluralCategory.Many: Result := 'many';
+    TPluralCategory.Other: Result := 'other';
+    else Raise Exception.Create('Error 393D6BEC-BC6A-4C1E-BCF4-D104BC7A4C4E')
+  end;
+end;
+
+{**************************************************************************************************}
+class function TALPluralRules.PluralCategoryToStringA(const ACategory: TPluralCategory): AnsiString;
+begin
+  case ACategory of
+    TPluralCategory.Zero: Result := 'zero';
+    TPluralCategory.One: Result := 'one';
+    TPluralCategory.Two: Result := 'two';
+    TPluralCategory.Few: Result := 'few';
+    TPluralCategory.Many: Result := 'many';
+    TPluralCategory.Other: Result := 'other';
+    else Raise Exception.Create('Error 393D6BEC-BC6A-4C1E-BCF4-D104BC7A4C4E')
+  end;
 end;
 
 //////////////////////////////////////////////

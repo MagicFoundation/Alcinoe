@@ -2052,20 +2052,20 @@ begin
     aContentStream.position := 0;
     // 15 is the default mode.
     // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
-    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16);
+    var LTmpStream := TmemoryStream.Create;
     try
-      var LTmpStream := TmemoryStream.Create;
+      var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16);
       try
         LTmpStream.CopyFrom(LDecompressionStream, 0{Count});
-        ALFreeAndNil(aContentStream);
-        aContentStream := LTmpStream;
-        LTmpStream := nil;
-      except
-        AlFreeAndNil(LTmpStream);
-        raise;
+      finally
+        alFreeAndNil(LDecompressionStream);
       end;
-    finally
-      alFreeAndNil(LDecompressionStream);
+      ALFreeAndNil(aContentStream);
+      aContentStream := LTmpStream;
+      LTmpStream := nil;
+    except
+      AlFreeAndNil(LTmpStream);
+      raise;
     end;
   end;
   {$ENDIF}
@@ -2080,20 +2080,20 @@ begin
     aContentStream.position := 0;
     // 15 is the default mode.
     // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
-    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16);
-    Try
-      var LTmpStream := TmemoryStream.Create;
-      try
+    var LTmpStream := TmemoryStream.Create;
+    try
+      var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16);
+      Try
         LTmpStream.CopyFrom(LDecompressionStream, 0{Count});
-        ALFreeAndNil(aContentStream);
-        aContentStream := LTmpStream;
-        LTmpStream := nil;
-      except
-        AlFreeAndNil(LTmpStream);
-        raise;
+      finally
+        alFreeAndNil(LDecompressionStream);
       end;
-    finally
-      alFreeAndNil(LDecompressionStream);
+      ALFreeAndNil(aContentStream);
+      aContentStream := LTmpStream;
+      LTmpStream := nil;
+    except
+      AlFreeAndNil(LTmpStream);
+      raise;
     end;
   end;
   {$ENDIF}

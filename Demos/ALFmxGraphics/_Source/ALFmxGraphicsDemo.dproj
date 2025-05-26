@@ -276,7 +276,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;fmx;FireDACIBDriver;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;ibmonitor;ibxpress;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=44;versionName=2.0.44;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=45;versionName=2.0.45;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
@@ -295,14 +295,14 @@
     <Android_NotificationIcon72>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png</Android_NotificationIcon72>
     <Android_NotificationIcon96>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png</Android_NotificationIcon96>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;fmx;FireDACIBDriver;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;ibmonitor;ibxpress;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=44;versionName=2.0.44;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=45;versionName=2.0.45;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
@@ -321,14 +321,14 @@
     <Android_NotificationIcon72>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png</Android_NotificationIcon72>
     <Android_NotificationIcon96>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png</Android_NotificationIcon96>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_iOSDevice64)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;fmx;FireDACIBDriver;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;ibmonitor;ibxpress;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.44;CFBundleShortVersionString=2.0.44;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.45;CFBundleShortVersionString=2.0.45;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <BT_BuildType>Debug</BT_BuildType>
@@ -354,10 +354,10 @@
     <iPad_Setting58>$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png</iPad_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_iOSSimARM64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.44;CFBundleShortVersionString=2.0.44;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.45;CFBundleShortVersionString=2.0.45;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;fmx;FireDACIBDriver;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;ibmonitor;ibxpress;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
@@ -382,21 +382,21 @@
     <iPad_Setting58>$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png</iPad_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_OSX64)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACMSSQLDriver;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;FireDACMySQLDriver;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;rtl;DbxClientDriver;DBXSybaseASADriver;IndyIPClient;FireDACODBCDriver;DataSnapIndy10ServerTransport;DataSnapProviderClient;FireDACMongoDBDriver;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;DBXOracleDriver;inetdb;FmxTeeUI;fmx;FireDACIBDriver;fmxdae;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACOracleDriver;DBXMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;ibxpress;DataSnapServer;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;DBXInformixDriver;dbxcds;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=2.0.44;CFBundleShortVersionString=2.0.44;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=2.0.45;CFBundleShortVersionString=2.0.45;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Debugger_Launcher>/usr/X11/bin/xterm -e &#34;%debuggee%&#34;</Debugger_Launcher>
     <Manifest_File>(None)</Manifest_File>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_OSXARM64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=2.0.44;CFBundleShortVersionString=2.0.44;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=2.0.45;CFBundleShortVersionString=2.0.45;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACMSSQLDriver;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;FireDACMySQLDriver;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;rtl;DbxClientDriver;DBXSybaseASADriver;IndyIPClient;FireDACODBCDriver;DataSnapIndy10ServerTransport;DataSnapProviderClient;FireDACMongoDBDriver;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;DBXOracleDriver;inetdb;FmxTeeUI;fmx;FireDACIBDriver;fmxdae;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACOracleDriver;DBXMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;ibxpress;DataSnapServer;ibxbindings;FireDACDSDriver;CustomIPTransport;bindcomp;DBXInformixDriver;dbxcds;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
@@ -404,37 +404,37 @@
     <Manifest_File>(None)</Manifest_File>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Win32)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;DBXDb2Driver;vclactnband;vclFireDAC;tethering;FireDACADSDriver;cxLibraryRS27;dxRibbonCustomizationFormRS27;FireDACMSSQLDriver;vcltouch;vcldb;svn;dxPScxExtCommonRS27;cxTreeListRS27;dxPScxSchedulerLnkRS27;vclib;dxRichEditDocumentModelRS27;dxPsPrVwAdvRS27;FireDACDBXDriver;vclx;dxPSdxFCLnkRS27;dxSpellCheckerRS27;dxPDFViewerRS27;RESTBackendComponents;VCLRESTComponents;dxWizardControlRS27;cxSchedulerTreeBrowserRS27;vclie;bindengine;CloudService;dxBarExtDBItemsRS27;FireDACMySQLDriver;cxExportRS27;DataSnapClient;cxSchedulerWebServiceStorageRS27;bindcompdbx;IndyIPServer;DBXSybaseASEDriver;dxPScxPCProdRS27;IndySystem;dxHttpIndyRequestRS27;bindcompvclwinx;dxFlowChartRS27;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;dxmdsRS27;dxPSPrVwRibbonRS27;dxCoreRS27;emshosting;DBXOdbcDriver;FireDACTDataDriver;FMXTee;cxSchedulerRibbonStyleEventEditorRS27;soaprtl;DbxCommonDriver;dxRichEditCoreRS27;dxCloudServiceLibraryRS27;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;rtl;emsserverresource;DbxClientDriver;dxdbtrRS27;DBXSybaseASADriver;dxdborRS27;appanalytics;dxSpreadSheetCoreRS27;dxRichEditControlCoreRS27;dxGDIPlusRS27;IndyIPClient;dxFireDACServerModeRS27;dxFlowChartAdvancedCustomizeFormRS27;bindcompvcl;dxServerModeRS27;TeeUI;dxPSLnksRS27;dxorgcRS27;VclSmp;dxDBXServerModeRS27;FireDACODBCDriver;DataSnapIndy10ServerTransport;cxGridRS27;DataSnapProviderClient;FireDACMongoDBDriver;dxFireDACEMFRS27;dxtrmdRS27;dxSpreadSheetCoreConditionalFormattingDialogsRS27;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;dxSpreadSheetConditionalFormattingDialogsRS27;dxGaugeControlRS27;dxSpreadSheetReportDesignerRS27;dxSpreadSheetRS27;bindcompvclsmp;emsclientfiredac;DataSnapFireDAC;svnui;cxPivotGridOLAPRS27;dxPSRichEditControlLnkRS27;dxBarDBNavRS27;DBXMSSQLDriver;cxPivotGridRS27;dxADOServerModeRS27;DatasnapConnectorsFreePascal;bindcompfmx;DBXOracleDriver;inetdb;dxFlowChartDesignerRS27;FmxTeeUI;emsedge;fmx;FireDACIBDriver;fmxdae;vcledge;dbexpress;IndyCore;dxRibbonRS27;dxOrgChartAdvancedCustomizeFormRS27;dsnap;emsclient;DataSnapCommon;FireDACCommon;dxTileControlRS27;dxBarExtItemsRS27;DataSnapConnectors;cxSchedulerRS27;cxGridEMFRS27;soapserver;dxRichEditControlRS27;dxPScxTLLnkRS27;FireDACOracleDriver;DBXMySQLDriver;dxFlowChartLayoutsRS27;dxPSCoreRS27;dxADOEMFRS27;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;dxPScxPivotGridLnkRS27;inet;cxPivotGridChartRS27;IndyIPCommon;dxPSdxOCLnkRS27;vcl;FireDACDb2Driver;dxMapControlRS27;dxPSdxDBOCLnkRS27;dxComnRS27;dxPSdxGaugeControlLnkRS27;dxEMFRS27;TeeDB;FireDAC;cxTreeListdxBarPopupMenuRS27;dxPScxVGridLnkRS27;dxPSdxPDFViewerLnkRS27;dxPSdxSpreadSheetLnkRS27;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;dxTabbedMDIRS27;dxGanttControlRS27;ibxpress;Tee;DataSnapServer;ibxbindings;vclwinx;FireDACDSDriver;dxPScxCommonRS27;CustomIPTransport;vcldsnap;dxSkinsCoreRS27;dxPScxGridLnkRS27;bindcomp;DBXInformixDriver;cxVerticalGridRS27;cxSchedulerGridRS27;dxDockingRS27;dxNavBarRS27;dbxcds;adortl;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;dxBarRS27;dxPSdxLCLnkRS27;dxPSdxMapControlLnkRS27;dxPSdxDBTVLnkRS27;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.44.44;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.44.44;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.45.45;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.45.45;Comments=</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>44</VerInfo_Release>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Release>45</VerInfo_Release>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Win64)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;DBXDb2Driver;vclactnband;vclFireDAC;tethering;FireDACADSDriver;cxLibraryRS27;dxRibbonCustomizationFormRS27;FireDACMSSQLDriver;vcltouch;vcldb;dxPScxExtCommonRS27;cxTreeListRS27;dxPScxSchedulerLnkRS27;vclib;dxRichEditDocumentModelRS27;dxPsPrVwAdvRS27;FireDACDBXDriver;vclx;dxPSdxFCLnkRS27;dxSpellCheckerRS27;dxPDFViewerRS27;RESTBackendComponents;VCLRESTComponents;dxWizardControlRS27;cxSchedulerTreeBrowserRS27;vclie;bindengine;CloudService;dxBarExtDBItemsRS27;FireDACMySQLDriver;cxExportRS27;DataSnapClient;cxSchedulerWebServiceStorageRS27;bindcompdbx;IndyIPServer;DBXSybaseASEDriver;dxPScxPCProdRS27;IndySystem;dxHttpIndyRequestRS27;bindcompvclwinx;dxFlowChartRS27;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;dxmdsRS27;dxPSPrVwRibbonRS27;dxCoreRS27;emshosting;DBXOdbcDriver;FireDACTDataDriver;FMXTee;cxSchedulerRibbonStyleEventEditorRS27;soaprtl;DbxCommonDriver;dxRichEditCoreRS27;dxCloudServiceLibraryRS27;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;rtl;emsserverresource;DbxClientDriver;dxdbtrRS27;DBXSybaseASADriver;dxdborRS27;appanalytics;dxSpreadSheetCoreRS27;dxRichEditControlCoreRS27;dxGDIPlusRS27;IndyIPClient;dxFireDACServerModeRS27;dxFlowChartAdvancedCustomizeFormRS27;bindcompvcl;dxServerModeRS27;TeeUI;dxPSLnksRS27;dxorgcRS27;VclSmp;dxDBXServerModeRS27;FireDACODBCDriver;DataSnapIndy10ServerTransport;cxGridRS27;DataSnapProviderClient;FireDACMongoDBDriver;dxFireDACEMFRS27;dxtrmdRS27;dxSpreadSheetCoreConditionalFormattingDialogsRS27;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;dxSpreadSheetConditionalFormattingDialogsRS27;dxGaugeControlRS27;dxSpreadSheetReportDesignerRS27;dxSpreadSheetRS27;bindcompvclsmp;emsclientfiredac;DataSnapFireDAC;cxPivotGridOLAPRS27;dxPSRichEditControlLnkRS27;dxBarDBNavRS27;DBXMSSQLDriver;cxPivotGridRS27;dxADOServerModeRS27;DatasnapConnectorsFreePascal;bindcompfmx;DBXOracleDriver;inetdb;dxFlowChartDesignerRS27;FmxTeeUI;emsedge;fmx;FireDACIBDriver;fmxdae;vcledge;dbexpress;IndyCore;dxRibbonRS27;dxOrgChartAdvancedCustomizeFormRS27;dsnap;emsclient;DataSnapCommon;FireDACCommon;dxTileControlRS27;dxBarExtItemsRS27;DataSnapConnectors;cxSchedulerRS27;cxGridEMFRS27;soapserver;dxRichEditControlRS27;dxPScxTLLnkRS27;FireDACOracleDriver;DBXMySQLDriver;dxFlowChartLayoutsRS27;dxPSCoreRS27;dxADOEMFRS27;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;dxPScxPivotGridLnkRS27;inet;cxPivotGridChartRS27;IndyIPCommon;dxPSdxOCLnkRS27;vcl;FireDACDb2Driver;dxMapControlRS27;dxPSdxDBOCLnkRS27;dxComnRS27;dxPSdxGaugeControlLnkRS27;dxEMFRS27;TeeDB;FireDAC;cxTreeListdxBarPopupMenuRS27;dxPScxVGridLnkRS27;dxPSdxPDFViewerLnkRS27;dxPSdxSpreadSheetLnkRS27;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;dxTabbedMDIRS27;dxGanttControlRS27;ibxpress;Tee;DataSnapServer;ibxbindings;vclwinx;FireDACDSDriver;dxPScxCommonRS27;CustomIPTransport;vcldsnap;dxSkinsCoreRS27;dxPScxGridLnkRS27;bindcomp;DBXInformixDriver;cxVerticalGridRS27;cxSchedulerGridRS27;dxDockingRS27;dxNavBarRS27;dbxcds;adortl;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;dxBarRS27;dxPSdxLCLnkRS27;dxPSdxMapControlLnkRS27;dxPSdxDBTVLnkRS27;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.44.44;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.44.44;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.45.45;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.45.45;Comments=</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>44</VerInfo_Release>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Release>45</VerInfo_Release>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -445,12 +445,12 @@
     <DCC_RemoteDebug>true</DCC_RemoteDebug>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android)&#39;!=&#39;&#39;">
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -460,23 +460,23 @@
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Athens\fmx\;C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSXARM64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -484,16 +484,16 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>44</VerInfo_Release>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Release>45</VerInfo_Release>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
     <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>44</VerInfo_Release>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Release>45</VerInfo_Release>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_3)&#39;!=&#39;&#39;">
     <DCC_Define>SKIA;$(DCC_Define)</DCC_Define>
@@ -523,52 +523,52 @@
     <DCC_DebugInformation>0</DCC_DebugInformation>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSSimARM64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_OSX64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_OSXARM64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Build>45</VerInfo_Build>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
     <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>44</VerInfo_Release>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Release>45</VerInfo_Release>
+    <VerInfo_Build>45</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
     <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>44</VerInfo_Release>
-    <VerInfo_Build>44</VerInfo_Build>
+    <VerInfo_Release>45</VerInfo_Release>
+    <VerInfo_Build>45</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_10)&#39;!=&#39;&#39;">

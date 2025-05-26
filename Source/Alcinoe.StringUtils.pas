@@ -5313,7 +5313,7 @@ begin
   end;
 end;
 
-{***************************}
+{*****************************************************************************************}
 function ALIsNumeric(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
 var I: integer;
 begin
@@ -5390,7 +5390,7 @@ begin
   result := ALTryStrToFloat(s,LDouble,AFormatSettings);
 end;
 
-{***************************}
+{***************************************************************************************}
 Function  ALIsFloat(const S: String; const AFormatSettings: TALFormatSettingsW): Boolean;
 var I: integer;
     LDouble: Double;

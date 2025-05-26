@@ -1682,7 +1682,7 @@ begin
 
 end;
 
-{*****************************}
+{********************************}
 Constructor TALPluralRules.Create;
 begin
 
@@ -2030,7 +2030,7 @@ begin
 
 end;
 
-{*****************************}
+{********************************}
 Destructor TALPluralRules.Destroy;
 begin
   inherited;
@@ -2293,35 +2293,35 @@ end;
 
 {$REGION 'AUTO-GENERATED'}
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AF(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -2332,7 +2332,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ARS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -2343,42 +2343,42 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ASA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AST(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_AZ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BAL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 1) and (n mod 100 <> 11) then Result := TPluralCategory.one
@@ -2387,35 +2387,35 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BEM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BEZ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BHO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BLO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -2423,26 +2423,26 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 1) and (not (n mod 100 in [11,71,91])) then Result := TPluralCategory.one
@@ -2452,14 +2452,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BRX(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_BS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) or (f mod 10 = 1) and (f mod 100 <> 11) then Result := TPluralCategory.one
@@ -2467,7 +2467,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -2475,42 +2475,42 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CEB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i in [1,2,3]) or (v = 0) and (not (i mod 10 in [4,6,9])) or (v <> 0) and (not (f mod 10 in [4,6,9])) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CGG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CHR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CKB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -2519,14 +2519,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CSW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_CY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -2537,28 +2537,28 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_DA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) or (t <> 0) and (i in [0,1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_DE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_DOI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_DSB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 100 = 1) or (f mod 100 = 1) then Result := TPluralCategory.one
@@ -2567,48 +2567,48 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_DV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_DZ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_EE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_EL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_EN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_EO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ES(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -2616,56 +2616,56 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ET(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_EU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FF(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i in [0,1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FIL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i in [1,2,3]) or (v = 0) and (not (i mod 10 in [4,6,9])) or (v <> 0) and (not (f mod 10 in [4,6,9])) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i in [0,1]) then Result := TPluralCategory.one
@@ -2673,21 +2673,21 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FUR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_FY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -2697,7 +2697,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GD(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,11]) then Result := TPluralCategory.one
@@ -2706,35 +2706,35 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GSW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GUW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_GV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) then Result := TPluralCategory.one
@@ -2744,21 +2744,21 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HAW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) or (i = 0) and (v <> 0) then Result := TPluralCategory.one
@@ -2766,20 +2766,20 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HNJ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) or (f mod 10 = 1) and (f mod 100 <> 11) then Result := TPluralCategory.one
@@ -2787,7 +2787,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HSB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 100 = 1) or (f mod 100 = 1) then Result := TPluralCategory.one
@@ -2796,60 +2796,60 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_HY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i in [0,1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_IA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ID(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_IG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_II(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_IO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_IS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (t = 0) and (i mod 10 = 1) and (i mod 100 <> 11) or (t mod 10 = 1) and (t mod 100 <> 11) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_IT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -2857,7 +2857,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_IU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -2865,139 +2865,139 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_JA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_JBO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_JGO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_JMC(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_JV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_JW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KAB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i in [0,1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KAJ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KCG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KDE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KEA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KKJ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KSB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KSH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -3005,14 +3005,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -3023,14 +3023,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_KY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LAG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 0) then Result := TPluralCategory.zero
@@ -3038,34 +3038,34 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LIJ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LKT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LLD(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3073,20 +3073,20 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 1) and (not (n mod 100 in [11..19])) then Result := TPluralCategory.one
@@ -3095,7 +3095,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_LV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 0) or (n mod 100 in [11..19]) or (v = 2) and (f mod 100 in [11..19]) then Result := TPluralCategory.zero
@@ -3103,49 +3103,49 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MAS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MGO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) or (f mod 10 = 1) and (f mod 100 <> 11) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ML(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3153,20 +3153,20 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3176,20 +3176,20 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_MY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NAH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NAQ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3197,138 +3197,138 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ND(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NNH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NQO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NSO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_NYN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_OM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_OR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_OS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_OSA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PAP(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PCM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3337,7 +3337,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PRG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 0) or (n mod 100 in [11..19]) or (v = 2) and (f mod 100 in [11..19]) then Result := TPluralCategory.zero
@@ -3345,14 +3345,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i in [0..1]) then Result := TPluralCategory.one
@@ -3360,7 +3360,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*************************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_PT_PT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3368,14 +3368,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_RM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_RO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3383,14 +3383,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ROF(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_RU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) then Result := TPluralCategory.one
@@ -3399,27 +3399,27 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_RWK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SAH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SAQ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SAT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3427,14 +3427,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SC(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SCN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3442,21 +3442,21 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SD(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SDH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3464,26 +3464,26 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SEH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SES(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) or (f mod 10 = 1) and (f mod 100 <> 11) then Result := TPluralCategory.one
@@ -3491,7 +3491,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SHI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
@@ -3499,14 +3499,14 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0,1]) or (i = 0) and (f = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3515,7 +3515,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 100 = 1) then Result := TPluralCategory.one
@@ -3524,7 +3524,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SMA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3532,7 +3532,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SMI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3540,7 +3540,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SMJ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3548,7 +3548,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SMN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3556,7 +3556,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SMS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -3564,28 +3564,28 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SQ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) or (f mod 10 = 1) and (f mod 100 <> 11) then Result := TPluralCategory.one
@@ -3593,157 +3593,157 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SSY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ST(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_SYR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TEO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TIG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i in [1,2,3]) or (v = 0) and (not (i mod 10 in [4,6,9])) or (v <> 0) and (not (f mod 10 in [4,6,9])) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TPI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_TZM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) or (n in [11..99]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_UG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_UK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (v = 0) and (i mod 10 = 1) and (i mod 100 <> 11) then Result := TPluralCategory.one
@@ -3752,34 +3752,34 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_UND(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_UR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_UZ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_VE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_VEC(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
@@ -3787,117 +3787,117 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_VI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_VO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_VUN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_WA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0..1]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_WAE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_WO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_XH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_XOG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_YI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) and (v = 0) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_YO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_YUE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ZH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetCardinalPluralCategory_ZU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) or (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AF(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,5,7,8,9,10]) then Result := TPluralCategory.one
@@ -3907,13 +3907,13 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AST(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_AZ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i mod 10 in [1,2,5,7,8]) or (i mod 100 in [20,50,70,80]) then Result := TPluralCategory.one
@@ -3922,27 +3922,27 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_BAL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_BE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 in [2,3]) and (not (n mod 100 in [12,13])) then Result := TPluralCategory.few
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_BG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_BLO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 0) then Result := TPluralCategory.zero
@@ -3951,7 +3951,7 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_BN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,5,7,8,9,10]) then Result := TPluralCategory.one
@@ -3961,13 +3961,13 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_BS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_CA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,3]) then Result := TPluralCategory.one
@@ -3976,19 +3976,19 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_CE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_CS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_CY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [0,7,8,9]) then Result := TPluralCategory.zero
@@ -3999,31 +3999,31 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_DA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_DE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_DSB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_EL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_EN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 1) and (n mod 100 <> 11) then Result := TPluralCategory.one
@@ -4032,64 +4032,64 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_ES(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_ET(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_EU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_FA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_FI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_FIL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_FR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_FY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_GA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_GD(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,11]) then Result := TPluralCategory.one
@@ -4098,19 +4098,19 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_GL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_GSW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_GU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -4120,13 +4120,13 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_HE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_HI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -4136,64 +4136,64 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_HR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_HSB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_HU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,5]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_HY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_IA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_ID(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_IS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_IT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if {(n in [11,8,80,800])}((n=11) or (n=8) or (n=80) or (n=800)) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_JA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i = 1) then Result := TPluralCategory.one
@@ -4201,32 +4201,32 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 6) or (n mod 10 = 9) or (n mod 10 = 0) and (n <> 0) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KM(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1..4]) or (n mod 100 in [1..4,21..24,41..44,61..64,81..84]) then Result := TPluralCategory.one
@@ -4234,46 +4234,46 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_KY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_LIJ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if {(n in [11,8,80..89,800..899])}((n=11) or (n=8) or ((n >= 80) and (n <= 89)) or ((n >= 800) and (n <= 899))) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_LLD(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if {(n in [11,8,80,800])}((n=11) or (n=8) or (n=80) or (n=800)) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_LO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_LT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_LV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_MK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (i mod 10 = 1) and (i mod 100 <> 11) then Result := TPluralCategory.one
@@ -4282,26 +4282,26 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_ML(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_MN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_MO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_MR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -4310,45 +4310,45 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_MS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_MY(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_NB(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_NE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1..4]) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_NL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_NO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_OR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n in [1,5,7..9]) then Result := TPluralCategory.one
@@ -4358,94 +4358,94 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_PA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_PL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_PRG(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_PS(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_PT(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_RO(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_RU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SC(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if {(n in [11,8,80,800])}((n=11) or (n=8) or (n=80) or (n=800)) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SCN(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if {(n in [11,8,80,800])}((n=11) or (n=8) or (n=80) or (n=800)) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SD(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SQ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
@@ -4453,121 +4453,121 @@ begin
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SV(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 in [1,2]) and (not (n mod 100 in [11,12])) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_SW(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TA(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 in [6,9]) or (n = 10) then Result := TPluralCategory.few
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TL(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TPI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_TR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_UK(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n mod 10 = 3) and (n mod 100 <> 13) then Result := TPluralCategory.few
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_UND(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_UR(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_UZ(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_VEC(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if {(n in [11,8,80,800])}((n=11) or (n=8) or (n=80) or (n=800)) then Result := TPluralCategory.many
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_VI(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   if (n = 1) then Result := TPluralCategory.one
   else Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_YUE(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_ZH(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************}
 function TALPluralRules.GetOrdinalPluralCategory_ZU(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;
 begin
   Result := TPluralCategory.other;
@@ -4648,7 +4648,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{******************************************************************************}
 function ALLanguageCodeToID(const ALanguageCode: Ansistring): Integer; overload;
 begin
   case Length(ALanguageCode) of
@@ -4666,7 +4666,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{**********************************************************************}
 function ALScriptCodeToID(const AScriptCode: string): Integer; overload;
 begin
   if Length(AScriptCode) = 4 then
@@ -4680,7 +4680,7 @@ begin
     Result := 0;
 end;
 
-{*******************************************}
+{**************************************************************************}
 function ALScriptCodeToID(const AScriptCode: Ansistring): Integer; overload;
 begin
   if Length(AScriptCode) = 4 then
@@ -4694,7 +4694,7 @@ begin
     Result := 0;
 end;
 
-{*******************************************}
+{**********************************************************************}
 function ALRegionCodeToID(const ARegionCode: string): Integer; overload;
 begin
   case Length(ARegionCode) of
@@ -4712,7 +4712,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{**************************************************************************}
 function ALRegionCodeToID(const ARegionCode: Ansistring): Integer; overload;
 begin
   case Length(ARegionCode) of

@@ -1874,24 +1874,6 @@
       <RemoteDir>ALFmxControlsDemo\res\drawable-night-xxhdpi\</RemoteDir>
       <RemoteName>material_text_select_handle_right_error.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor_error.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor_error.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-v21\abc_action_bar_item_background_material.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7094,24 +7076,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControlsDemo\res\drawable-night-xxhdpi\</RemoteDir>
       <RemoteName>material_text_select_handle_right_error.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor_error.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor_error.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-v21\abc_action_bar_item_background_material.xml">
       <DeployClass>File</DeployClass>
@@ -12317,24 +12281,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControlsDemo\res\drawable-night-xxhdpi\</RemoteDir>
       <RemoteName>material_text_select_handle_right_error.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor_error.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor_error.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-v21\abc_action_bar_item_background_material.xml">
       <DeployClass>File</DeployClass>
@@ -17547,24 +17493,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControlsDemo\res\drawable-night-xxhdpi\</RemoteDir>
       <RemoteName>material_text_select_handle_right_error.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-night\material_text_cursor_error.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo\res\drawable-night\</RemoteDir>
-      <RemoteName>material_text_cursor_error.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-v21\abc_action_bar_item_background_material.xml">
       <DeployClass>File</DeployClass>

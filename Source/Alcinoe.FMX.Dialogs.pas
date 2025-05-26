@@ -703,7 +703,7 @@ end;
 {***********************************************}
 function TALDialog.Getbuttons: TArray<TALbutton>;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _Getbuttons(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do begin
@@ -838,7 +838,7 @@ end;
 {*************************************************************}
 function TALDialog.Getbutton(const ATag: NativeInt): TALbutton;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _Getbutton(const AControl: TControl): TALbutton;
   begin
     Result := nil;

@@ -143,8 +143,8 @@ var
 begin
   LOutputInterface := '';
   LOutputImplementationPart2 := '';
-  _ParseRulesFile('..\..\References\cldr-json\plurals.json', 'Cardinal');
-  _ParseRulesFile('..\..\References\cldr-json\ordinals.json', 'Ordinal');
+  _ParseRulesFile(ALgetModulePathW+'\..\..\References\cldr-json\plurals.json', 'Cardinal');
+  _ParseRulesFile(ALgetModulePathW+'\..\..\References\cldr-json\ordinals.json', 'Ordinal');
   //-----
   Var LtempDir := ALgetModulePathW + '\Temp\';
   If (TDirectory.Exists(LtempDir)) and (not AlEmptyDirectoryW(LtempDir, true)) then

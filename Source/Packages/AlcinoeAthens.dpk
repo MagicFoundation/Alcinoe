@@ -75,6 +75,7 @@ contains
   Alcinoe.HTTP.Client.Net.Pool in 'Alcinoe.HTTP.Client.Net.Pool.pas',
   Alcinoe.HTTP.Client.WinHTTP in 'Alcinoe.HTTP.Client.WinHTTP.pas',
   Alcinoe.JSONDoc in 'Alcinoe.JSONDoc.pas',
+  Alcinoe.Localization in 'Alcinoe.Localization.pas',
   Alcinoe.Mime in 'Alcinoe.Mime.pas',
   Alcinoe.MultiPartParser in 'Alcinoe.MultiPartParser.pas',
   Alcinoe.QuickSortList in 'Alcinoe.QuickSortList.pas',

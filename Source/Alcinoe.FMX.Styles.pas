@@ -275,6 +275,7 @@ uses
   Vcl.Dialogs,
   {$ENDIF}
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,

@@ -16,6 +16,7 @@ uses
   Alcinoe.Common,
   Alcinoe.StringList,
   Alcinoe.Files,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 //

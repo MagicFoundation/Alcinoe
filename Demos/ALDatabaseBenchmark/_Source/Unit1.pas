@@ -395,6 +395,7 @@ uses
   Alcinoe.Common,
   Alcinoe.XMLDoc,
   Alcinoe.StringList,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {$R *.dfm}

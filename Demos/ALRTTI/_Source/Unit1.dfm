@@ -44,8 +44,8 @@ object Form1: TForm1
       AlignWithMargins = True
       Left = 9
       Top = 9
-      Width = 511
-      Height = 23
+      Width = 464
+      Height = 20
       Margins.Left = 8
       Margins.Top = 8
       Margins.Right = 8
@@ -61,8 +61,6 @@ object Form1: TForm1
       ParentColor = False
       ParentFont = False
       WordWrap = True
-      ExplicitWidth = 464
-      ExplicitHeight = 20
     end
   end
   object ButtonBenchTALRttiTypeGetFields: TButton
@@ -159,7 +157,7 @@ object Form1: TForm1
       AlignWithMargins = True
       Left = 9
       Top = 9
-      Width = 468
+      Width = 467
       Height = 80
       Margins.Left = 8
       Margins.Top = 8
@@ -180,7 +178,6 @@ object Form1: TForm1
       ParentColor = False
       ParentFont = False
       WordWrap = True
-      ExplicitWidth = 467
     end
   end
 end

@@ -20,8 +20,8 @@ object Form1: TForm1
     Size.Height = 496.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
-    Viewport.Width = 459.000000000000000000
-    Viewport.Height = 492.000000000000000000
+    Viewport.Width = 463.000000000000000000
+    Viewport.Height = 496.000000000000000000
   end
   object Button1: TButton
     Align = Top

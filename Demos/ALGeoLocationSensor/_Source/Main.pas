@@ -26,6 +26,7 @@ uses
   Alcinoe.FMX.GeoLocation.Sensor,
   Alcinoe.FMX.Objects,
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.StringList;
 

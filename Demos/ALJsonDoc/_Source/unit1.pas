@@ -10,7 +10,7 @@ uses
   dwsJSON, system.Generics.collections,
   system.UITypes, system.JSON, Vcl.ComCtrls, VclTee.TeeGDIPlus,
   Vcl.Samples.Spin, VCLTee.TeEngine, VCLTee.Series, VCLTee.TeeProcs,
-  VCLTee.Chart, System.AnsiStrings;
+  VCLTee.Chart, System.AnsiStrings, alcinoe.Localization;
 
 type
 

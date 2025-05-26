@@ -122,6 +122,7 @@ uses
   Alcinoe.FMX.ErrorReporting,
   Alcinoe.Common,
   Alcinoe.FMX.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {$R *.fmx}

@@ -37,6 +37,7 @@ uses
   Alcinoe.Execute,
   Alcinoe.Common,
   Alcinoe.XMLDoc,
+  Alcinoe.Localization,
   Alcinoe.StringList;
 
 const

@@ -249,6 +249,7 @@ uses
   System.TypInfo,
   system.rtti,
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {$R *.dfm}

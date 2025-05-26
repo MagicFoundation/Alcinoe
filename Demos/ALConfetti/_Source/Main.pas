@@ -52,6 +52,7 @@ implementation
 uses
   system.Math,
   Alcinoe.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {$R *.fmx}

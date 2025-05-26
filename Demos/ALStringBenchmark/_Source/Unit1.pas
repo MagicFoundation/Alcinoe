@@ -112,6 +112,7 @@ implementation
 uses {$IFDEF UNICODE}
      ansiStrings,
      {$ENDIF}
+     Alcinoe.Localization,
      Alcinoe.StringUtils;
 
 {$R *.dfm}

@@ -412,7 +412,7 @@ object Form1: TForm1
       AlignWithMargins = True
       Left = 9
       Top = 9
-      Width = 745
+      Width = 737
       Height = 80
       Margins.Left = 8
       Margins.Top = 8
@@ -435,7 +435,6 @@ object Form1: TForm1
       ParentColor = False
       ParentFont = False
       WordWrap = True
-      ExplicitWidth = 737
     end
   end
 end

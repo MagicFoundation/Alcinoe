@@ -5,10 +5,11 @@
     <FrameworkType>FMX</FrameworkType>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release_ALSkiaEngine</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
     <MainSource>ALFmxGraphicsDemo.dpr</MainSource>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">ALFmxGraphicsDemo</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>

@@ -183,12 +183,16 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = MySQL
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 324
-    ClientRectLeft = 5
-    ClientRectRight = 998
-    ClientRectTop = 27
+    ClientRectBottom = 325
+    ClientRectLeft = 4
+    ClientRectRight = 999
+    ClientRectTop = 24
     object MySQL: TcxTabSheet
       Caption = 'MySQL'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TcxLabel
         Left = 45
         Top = 74

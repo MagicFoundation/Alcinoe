@@ -59,7 +59,8 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.Diagnostics,
-  System.IOUtils;
+  System.IOUtils,
+  Alcinoe.Common;
 
 {**}
 Type

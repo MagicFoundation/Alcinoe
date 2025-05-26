@@ -52,6 +52,7 @@ uses
   Alcinoe.HTML,
   Alcinoe.XMLDoc,
   Alcinoe.WinApi.Common,
+  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {$R *.dfm}

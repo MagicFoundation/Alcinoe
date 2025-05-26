@@ -11,8 +11,10 @@ uses
   System.IOUtils,
   Alcinoe.Execute,
   Alcinoe.files,
+  Alcinoe.JSONDoc,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
+  Alcinoe.Localization,
   Alcinoe.common;
 
 {***********************************************}
@@ -31,6 +33,190 @@ begin
     ALFreeandNil(LInputStream);
     ALFreeandNil(LOutputStream);
   end;
+end;
+
+{*********************************}
+procedure BuildAlcinoeLocalization;
+
+var
+  LOutputInterface: AnsiString;
+  LOutputImplementationPart1: AnsiString;
+  LOutputImplementationPart2: AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _ParseRulesFile(const aFilename: String; const APluralType: AnsiString);
+  begin
+    Var LJsonDoc := TALJsonDocumentA.CreateFromJSONFile(aFilename);
+    try
+      var LPluralsTypeNode: TalJsonNodeA;
+      if APluralType = 'Cardinal' then LPluralsTypeNode := LJsonDoc.getchildnode(['supplemental','plurals-type-cardinal'])
+      else LPluralsTypeNode := LJsonDoc.getchildnode(['supplemental','plurals-type-ordinal']);
+      if LPluralsTypeNode = nil then Raise Exception.Create('Error B02062CE-82DA-44AF-A712-82CD42E0371C');
+      For var I := 0 to LPluralsTypeNode.ChildNodes.Count - 1 do begin
+        //"gd": {
+        //  "pluralRule-count-one": "n = 1,11 @integer 1, 11 @decimal 1.0, 11.0, 1.00, 11.00, 1.000, 11.000, 1.0000",
+        //  "pluralRule-count-two": "n = 2,12 @integer 2, 12 @decimal 2.0, 12.0, 2.00, 12.00, 2.000, 12.000, 2.0000",
+        //  "pluralRule-count-few": "n = 3..10,13..19 @integer 3~10, 13~19 @decimal 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 3.00",
+        //  "pluralRule-count-other": " @integer 0, 20~34, 100, 1000, 10000, 100000, 1000000, … @decimal 0.0~0.9, 1.1~1.6, 10.1, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, …"
+        //},
+        var LRules := LPluralsTypeNode.ChildNodes[I];
+        LOutputInterface := LOutputInterface + '    function Get'+APluralType+'PluralCategory_'+ALUpperCase(ALStringReplaceA(LRules.NodeName, '-', '_',[]))+'(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;'#13#10;
+        if alposA('-',LRules.NodeName) <= 0  then
+          LOutputImplementationPart1 := LOutputImplementationPart1 + '  F'+APluralType+'PluralCategoryFuncByLanguages.add('+ALIntToStrA(ALLanguageCodeToID(LRules.NodeName))+',Get'+APluralType+'PluralCategory_'+ALUpperCase(ALStringReplaceA(LRules.NodeName, '-', '_',[]))+');'#13#10
+        else if (LRules.NodeName <> 'pt-PT') and (APluralType <> 'Cardinal') then
+          // Need to update TALPluralRules.select(
+          Raise Exception.Create('Error 3EE3BAC9-398D-476D-9831-D0BF62A03ACA');
+        LOutputImplementationPart2 := LOutputImplementationPart2 +
+                                      '{******************************************************************************************}'#13#10+
+                                      'function TALPluralRules.Get'+APluralType+'PluralCategory_'+ALUpperCase(ALStringReplaceA(LRules.NodeName, '-', '_',[]))+'(const n, i: Int64; v, f, t, e: Int32): TPluralCategory;'#13#10+
+                                      'begin'#13#10;
+        for var J := 0 to LRules.ChildNodes.Count - 1 do begin
+          var LRule := LRules.ChildNodes[j];
+          var LText := LRule.Text;
+          Var P1 := AlposA('@', LText);
+          if P1 > 0 then delete(Ltext, P1, MaxInt);
+          LText := ALTrim(Ltext); // n % 10 = 3..4,9 and n % 100 != 10..19,70..79,90..99
+          if (J = LRules.ChildNodes.Count - 1) then begin
+            if (LRule.NodeName <> 'pluralRule-count-other') then raise Exception.Create('Error F6589D71-6066-4F15-B395-BE5BE56D8FE6');
+            if (LText <> '') then raise Exception.Create('Error F6589D71-6066-4F15-B395-BE5BE56D8FE6');
+            if J > 0 then LOutputImplementationPart2 := LOutputImplementationPart2 + '  else '
+            else LOutputImplementationPart2 := LOutputImplementationPart2 + '  ';
+            LOutputImplementationPart2 := LOutputImplementationPart2 + 'Result := TPluralCategory.other;'#13#10;
+          end
+          else begin
+            if (LText = '') then raise Exception.Create('Error A2EB9C7A-8106-4F8B-9C76-0E00421284CA');
+            LText := AlStringReplaceA(LText, ' and ', #13#10'and=',[rfreplaceALL]); // n % 10 = 3..4,9#1310and=n % 100 != 10..19,70..79,90..99
+            LText := AlStringReplaceA(LText, ' or ', #13#10'or=',[rfreplaceALL]); // n % 10 = 3..4,9#1310and=n % 100 != 10..19,70..79,90..99
+            LText := '='+LText;
+            Var LLst := TalStringListA.create;
+            try
+              LLst.Text := LText;
+              for var k := 0 to LLst.Count - 1 do begin
+                LText := ALTrim(LLst.ValueFromIndex[K]); // n % 10 = 3..4,9
+                P1 := alposA('..', LText);
+                if P1 <= 0 then P1 := alposA(',', LText);
+                if P1 > 0 then begin
+                  while (P1 > 0) and (LText[P1] <> ' ') do dec(P1);
+                  if P1 = 0 then Raise Exception.Create('Error 5E8B9769-C43F-48D1-A42B-BACAE8FB73E9');
+                  inc(P1);
+                  insert('[',LText,P1); // n % 10 = [3..4,9
+                  LText := LText + ']'; // n % 10 = [3..4,9]
+                  if alposA(' != ',LText) > 0 then begin
+                    LText := ALStringReplaceA(LText,' != ', ' in ', []);
+                    LText := 'not (' + LText + ')';
+                  end
+                  else if alposA(' = ',LText) > 0 then LText := ALStringReplaceA(LText,' = ', ' in ', [])
+                  else raise Exception.Create('Error DAEA449D-1D24-436B-B6A0-415D2EF2125F');
+                end;
+                LText := '(' + LText + ')';
+                LLst.ValueFromIndex[K] := LText
+              end;
+              LText := '';
+              for var k := 0 to LLst.Count - 1 do
+                LText := LText + ' ' + LLst.Names[K] + ' ' + LLst.ValueFromIndex[k];
+              LText := ALTrim(LText);
+            finally
+              ALFreeAndNil(LLst);
+            end;
+            LText := ALStringReplaceA(LText,' % ', ' mod ', [rfreplaceALL]);
+            LText := ALStringReplaceA(LText,' != ', ' <> ', [rfreplaceALL]);
+            LText := ALStringReplaceA(LText,'(n mod 100000 in [1000..20000,40000,60000,80000])', '{(n mod 100000 in [1000..20000,40000,60000,80000])}(((n mod 100000 >= 1000) and (n mod 100000 <= 20000)) or (n mod 100000 = 40000) or (n mod 100000 = 60000) or (n mod 100000 = 80000))', [rfreplaceALL]);
+            LText := ALStringReplaceA(LText, '(i mod 1000 in [100,200,300,400,500,600,700,800,900])', '{(i mod 1000 in [100,200,300,400,500,600,700,800,900])}((i mod 1000=100) or (i mod 1000=200) or (i mod 1000=300) or (i mod 1000=400) or (i mod 1000=500) or (i mod 1000=600) or (i mod 1000=700) or (i mod 1000=800) or (i mod 1000=900))', [rfreplaceALL]);
+            LText := ALStringReplaceA(LText, '(n in [11,8,80,800])', '{(n in [11,8,80,800])}((n=11) or (n=8) or (n=80) or (n=800))', [rfreplaceALL]);
+            LText := ALStringReplaceA(LText, '(n in [11,8,80..89,800..899])', '{(n in [11,8,80..89,800..899])}((n=11) or (n=8) or ((n >= 80) and (n <= 89)) or ((n >= 800) and (n <= 899)))', [rfreplaceALL]);
+            var LTmpText := ALStringReplaceA(LText,'..', '', [rfreplaceALL]);
+            if ALposA('.',LTmpText) > 0  then
+              Raise Exception.Create('Error A3C331D0-F780-4CB4-92FD-51B8CEA68E62');
+            If J = 0 then LOutputImplementationPart2 := LOutputImplementationPart2 + '  if '
+            else LOutputImplementationPart2 := LOutputImplementationPart2 + '  else if ';
+            LOutputImplementationPart2 := LOutputImplementationPart2 + LText + ' then Result := TPluralCategory.' + ALStringReplaceA(LRule.NodeName, 'pluralRule-count-', '', [rfIgnoreCase]) + #13#10;
+          end
+        end;
+        LOutputImplementationPart2 := LOutputImplementationPart2 + 'end;'#13#10+
+                                                                   #13#10;
+      end;
+    finally
+      ALFreeAndNil(LJsonDoc);
+    end;
+  end;
+
+begin
+  LOutputInterface := '';
+  LOutputImplementationPart2 := '';
+  _ParseRulesFile('..\..\References\cldr-json\plurals.json', 'Cardinal');
+  _ParseRulesFile('..\..\References\cldr-json\ordinals.json', 'Ordinal');
+  var LAlcinoeLocalizationPas: AnsiString := ALGetStringFromFile(ALgetModulePathW + '\..\..\Source\Alcinoe.Localization.pas');
+  Var LCodeBelowSignature: AnsiString := '    //////////////////////////////////////////////'#13#10+
+                                         '    /// THE CODE BELOW WAS AUTO-GENERATED FROM ///'#13#10+
+                                         '    /// <ALCINOE>\Tools\CodeBuilder.           ///'#13#10+
+                                         '    //////////////////////////////////////////////'#13#10;
+  Var LCodeAboveSignature: AnsiString := '    //////////////////////////////////////////////'#13#10+
+                                         '    /// THE CODE ABOVE WAS AUTO-GENERATED FROM ///'#13#10+
+                                         '    /// <ALCINOE>\Tools\CodeBuilder.           ///'#13#10+
+                                         '    //////////////////////////////////////////////'#13#10;
+  var P1 := ALposA(LCodeBelowSignature, LAlcinoeLocalizationPas);
+  if P1 <= 0 then Raise Exception.Create('Error 5506BEA8-A77C-4BA5-870C-AC21A263D8C7');
+  inc(P1, Length(LCodeBelowSignature));
+  Var P2 := ALposA(LCodeAboveSignature, LAlcinoeLocalizationPas, P1);
+  if P2 <= 0 then Raise Exception.Create('Error 120310CE-AD81-4891-AF5C-A7D80E9D57F3');
+  Delete(LAlcinoeLocalizationPas,P1,P2-P1);
+  Insert(
+    #13#10+
+    '    {$REGION ''AUTO-GENERATED''}'#13#10+
+    #13#10'    '+ALTrim(LOutputInterface)+#13#10+
+    #13#10+
+    '    {$ENDREGION}'#13#10+
+    #13#10,
+    LAlcinoeLocalizationPas,
+    P1);
+  //--
+  LCodeBelowSignature:= '  //////////////////////////////////////////////'#13#10+
+                        '  /// THE CODE BELOW WAS AUTO-GENERATED FROM ///'#13#10+
+                        '  /// <ALCINOE>\Tools\CodeBuilder.           ///'#13#10+
+                        '  //////////////////////////////////////////////'#13#10;
+  LCodeAboveSignature := '  //////////////////////////////////////////////'#13#10+
+                         '  /// THE CODE ABOVE WAS AUTO-GENERATED FROM ///'#13#10+
+                         '  /// <ALCINOE>\Tools\CodeBuilder.           ///'#13#10+
+                         '  //////////////////////////////////////////////'#13#10;
+  P1 := ALposA(LCodeBelowSignature, LAlcinoeLocalizationPas,P2);
+  if P1 <= 0 then Raise Exception.Create('Error 2D79278C-D1C9-46A2-AFE9-B7928AAD1AB8');
+  inc(P1, Length(LCodeBelowSignature));
+  P2 := ALposA(LCodeAboveSignature, LAlcinoeLocalizationPas, P1);
+  if P2 <= 0 then Raise Exception.Create('Error CEAF989E-8A93-482C-A404-31F588729BA4');
+  Delete(LAlcinoeLocalizationPas,P1,P2-P1);
+  Insert(
+    #13#10+
+    '  {$REGION ''AUTO-GENERATED''}'#13#10+
+    #13#10+'  ' + ALTrim(LOutputImplementationPart1)+#13#10+
+    #13#10+
+    '  {$ENDREGION}'#13#10+
+    #13#10,
+    LAlcinoeLocalizationPas, P1);
+  //--
+  LCodeBelowSignature:= '//////////////////////////////////////////////'#13#10+
+                        '/// THE CODE BELOW WAS AUTO-GENERATED FROM ///'#13#10+
+                        '/// <ALCINOE>\Tools\CodeBuilder.           ///'#13#10+
+                        '//////////////////////////////////////////////'#13#10;
+  LCodeAboveSignature := '//////////////////////////////////////////////'#13#10+
+                         '/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///'#13#10+
+                         '/// <ALCINOE>\Tools\CodeBuilder.           ///'#13#10+
+                         '//////////////////////////////////////////////'#13#10;
+  P1 := ALposA(LCodeBelowSignature, LAlcinoeLocalizationPas,P2);
+  if P1 <= 0 then Raise Exception.Create('Error 5506BEA8-A77C-4BA5-870C-AC21A263D8C7');
+  inc(P1, Length(LCodeBelowSignature));
+  P2 := ALposA(LCodeAboveSignature, LAlcinoeLocalizationPas, P1);
+  if P2 <= 0 then Raise Exception.Create('Error 120310CE-AD81-4891-AF5C-A7D80E9D57F3');
+  Delete(LAlcinoeLocalizationPas,P1,P2-P1);
+  Insert(
+    #13#10+
+    '{$REGION ''AUTO-GENERATED''}'#13#10+
+    #13#10+ALTrim(LOutputImplementationPart2)+#13#10+
+    #13#10+
+    '{$ENDREGION}'#13#10+
+    #13#10,
+    LAlcinoeLocalizationPas, P1);
+  //--
+  ALSaveStringToFile(LAlcinoeLocalizationPas, ALgetModulePathW + '\..\..\Source\Alcinoe.Localization.pas');
 end;
 
 {***************************************}
@@ -1243,6 +1429,10 @@ begin
       // Build Alcinoe.FMX.DynamicListbox.pas
       BuildAlcinoeFMXDynamicControls;
       Writeln('The code for Alcinoe.FMX.DynamicListbox.pas was auto-generated successfully');
+
+      // BuildAlcinoeLocalization
+      BuildAlcinoeLocalization;
+      Writeln('The code for Alcinoe.Localization.pas was auto-generated successfully');
 
       // Finished
       if not LNoInteraction then begin

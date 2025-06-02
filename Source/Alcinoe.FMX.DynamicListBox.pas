@@ -13,6 +13,9 @@ uses
   System.Generics.Collections,
   System.Diagnostics,
   System.Net.HttpClient,
+  {$IF defined(ALSkiaAvailable)}
+  System.Skia.API,
+  {$ENDIF}
   {$IF defined(ANDROID)}
   FMX.types3D,
   {$ENDIF}
@@ -24,6 +27,7 @@ uses
   FMX.types,
   FMX.StdActns,
   Fmx.Forms,
+  Alcinoe.FMX.Types3D,
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.JSONDoc,
   Alcinoe.FMX.Ani,
@@ -72,6 +76,7 @@ type
     FHeight: Double; // 8 bytes | [TControl] FSize: TControlSize;
     FTouchTargetExpansion: TRectF; // 16 bytes | [TControl] FTouchTargetExpansion: TBounds;
     FPivot: TPointF; // 8 Bytes | [TControl] FRotationCenter: TPosition;
+    FScale: TPointF; // 8 bytes | [TControl] FScale: TPosition;
     FPadding: TALBounds; // 8 bytes | [TControl] FPadding: TBounds;
     FMargins: TALBounds; // 8 bytes | [TControl] FMargins: TBounds;
     FPressedPosition: TPointF; // 8 bytes | [TControl] FPressedPosition: TPointF;
@@ -88,6 +93,7 @@ type
     FIsMouseOver: Boolean; // 1 byte | [TControl] FIsMouseOver: Boolean;
     FPressed: Boolean; // 1 byte | [TControl] FPressed: Boolean;
     FAutoCapture: Boolean; // 1 byte | [TControl] FAutoCapture: Boolean;
+    FRotationAngle: Single; // 4 bytes | [TControl] FRotationAngle: Single;
     FOpacity: Single; // 4 bytes | [TControl] FOpacity: Single;
     FDisabledOpacity: Single; // 4 bytes | [TControl] FDisabledOpacity: Single;
     FAbsoluteOpacity: Single; // 4 bytes | [TControl] FAbsoluteOpacity: Single;
@@ -103,9 +109,12 @@ type
     FOnMouseMove: TMouseMoveEvent; // 16 bytes | [TControl] FOnMouseMove: TMouseMoveEvent;
     FOnMouseUp: TMouseEvent; // 16 bytes | [TControl] FOnMouseUp: TMouseEvent;
     FOnClick: TNotifyEvent; // 16 bytes | [TControl] FOnClick: TNotifyEvent;
+    FOnDblClick: TNotifyEvent; // 16 bytes | [TControl] FOnDblClick: TNotifyEvent;
     FOnPaint: TOnPaintEvent; // 16 bytes | [TControl] FOnPaint: TOnPaintEvent;
     FOnPainting: TOnPaintEvent; // 16 bytes | [TControl] FOnPainting: TOnPaintEvent;
     FOnResized: TNotifyEvent; // 16 bytes | [TControl] FOnResized: TNotifyEvent;
+    function GetTagFloat: Double;
+    procedure SetTagFloat(const AValue: Double);
     procedure SetIndex(const AValue: Integer); // [TFmxObject] procedure SetIndex(NewIndex: Integer);
     function GetRight: Double;
     function GetBottom: Double;
@@ -127,7 +136,9 @@ type
   protected
     function CreateMargins: TALBounds; virtual;
     function CreatePadding: TALBounds; virtual;
-    procedure SetBounds(X, Y, AWidth, AHeight: Double); virtual; // [TControl] procedure SetBounds(X, Y, AWidth, AHeight: Single); virtual;
+    procedure SetPivot(const AValue: TPointF);
+    procedure SetRotationAngle(const AValue: Single);
+    procedure SetScale(const AValue: TPointF);
     function GetBoundsRect: TALRectD; // [TControl] function GetBoundsRect: TRectF; virtual;
     procedure SetBoundsRect(const Value: TALRectD); // [TControl] procedure SetBoundsRect(const Value: TRectF); virtual;
     function GetLocalRect: TALRectD; virtual; // [TControl] function GetLocalRect: TRectF; virtual;
@@ -138,9 +149,6 @@ type
     function GetPosition: TALPointD;
     procedure SetPosition(const AValue: TALPointD); overload;
     procedure SetPosition(const AValue: TPointf); overload;
-    procedure SetSize(const ASize: TALSizeD); overload;
-    procedure SetSize(const ASize: TSizeF); overload;
-    procedure SetSize(const AWidth, AHeight: Double); overload;
     procedure SetLeft(const Value: Double);
     procedure SetTop(const Value: Double);
     procedure SetWidth(const Value: Double); // [TControl] procedure SetWidth(const Value: Single); virtual;
@@ -185,6 +193,7 @@ type
     procedure ChildrenMouseEnter(const AObject: TALDynamicListBoxControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
     procedure ChildrenMouseLeave(const AObject: TALDynamicListBoxControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
     procedure Click; virtual; // [TControl] procedure Click; virtual;
+    procedure DblClick; virtual; // [TControl] procedure DblClick; virtual;
     procedure Capture; // [TControl] procedure Capture;
     procedure ReleaseCapture; // [TControl] procedure ReleaseCapture;
     procedure PaintInternal(const ACanvas: TCanvas); virtual; // [TControl] procedure PaintInternal;
@@ -242,6 +251,7 @@ type
     function IsDisplayed: Boolean; virtual; abstract;
     property Name: String read FName write FName; // [TComponent:published] property Name: TComponentName read FName write SetName stored False;
     property Tag: Int64 read FTag write FTag; // [TComponent:published] property Tag: NativeInt read FTag write FTag default 0;
+    property TagFloat: Double read GetTagFloat write SetTagFloat; // [TComponent:published] property TagFloat: Single read FTagFloat write FTagFloat;
     property TagString: string read FTagString write FTagString; // [TFmxObject] property TagString: string read FTagString write FTagString;
     property Enabled: Boolean read FEnabled write SetEnabled; // [TControl] property Enabled: Boolean read FEnabled write SetEnabled stored EnabledStored default True;
     property AbsoluteEnabled: Boolean read FAbsoluteEnabled; // [TControl] property AbsoluteEnabled: Boolean read GetAbsoluteEnabled;
@@ -262,7 +272,9 @@ type
     property ExpandedBoundsRect: TALRectD read GetExpandedBoundsRect;
     property ExpandedLocalRect: TALRectD read GetExpandedLocalRect;
     property TouchTargetExpansion: TRectF read FTouchTargetExpansion write SetTouchTargetExpansion; // [TControl] property TouchTargetExpansion: TBounds read FTouchTargetExpansion write SetTouchTargetExpansion;
-    property Pivot: TPointF read FPivot write FPivot; // [TControl] property RotationCenter: TPosition read GetRotationCenter write SetRotationCenter;
+    property Pivot: TPointF read FPivot write SetPivot; // [TControl] property RotationCenter: TPosition read GetRotationCenter write SetRotationCenter;
+    property RotationAngle: Single read FRotationAngle write SetRotationAngle; // [TControl] property RotationAngle: Single read GetRotationAngle write SetRotationAngle;
+    property Scale: TPointF read FScale write SetScale; // [TControl] property Scale: TPosition read GetScale write SetScale;
     property Position: TALPointD read GetPosition write SetPosition; // [TControl] property Position: TPosition read FPosition write SetPosition stored IsPositionStored;
     property Left: Double read FLeft write SetLeft; // [TControl] property Position: TPosition read FPosition write SetPosition stored IsPositionStored;
     property Top: Double read FTop write SetTop; // [TControl] property Position: TPosition read FPosition write SetPosition stored IsPositionStored;
@@ -273,6 +285,11 @@ type
     property Padding: TALBounds read FPadding write SetPadding; // [TControl] property Padding: TBounds read GetPadding write SetPadding;
     property Margins: TALBounds read FMargins write SetMargins; // [TControl] property Margins: TBounds read GetMargins write SetMargins;
     property Align: TALAlignLayout read FAlign write SetAlign; // [TControl] property Align: TAlignLayout read FAlign write SetAlign default TAlignLayout.None;
+    procedure SetBounds(X, Y, AWidth, AHeight: Double); virtual; // [TControl] procedure SetBounds(X, Y, AWidth, AHeight: Single); virtual;
+    procedure SetSize(const ASize: TALSizeD); overload;
+    procedure SetSize(const ASize: TSizeF); overload;
+    procedure SetSize(const AWidth, AHeight: Double); overload;
+    property DefaultSize: TSizeF read GetDefaultSize; // [TControl] property DefaultSize: TSizeF read GetDefaultSize;
     property HitTest: Boolean read FHitTest write FHitTest; // [TControl] property HitTest: Boolean read FHitTest write SetHitTest default True;
     property Cursor: TCursor read GetCursor write SetCursor; // [TControl] property Cursor: TCursor read GetCursor write SetCursor default crDefault;
     property AbsoluteCursor: TCursor read GetAbsoluteCursor; // [TControl] property InheritedCursor: TCursor read GetInheritedCursor default crDefault;
@@ -288,6 +305,7 @@ type
     property OnMouseMove: TMouseMoveEvent read FOnMouseMove write FOnMouseMove;// [TControl] property OnMouseMove: TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
     property OnMouseUp: TMouseEvent read FOnMouseUp write FOnMouseUp;// [TControl] property OnMouseUp: TMouseEvent read FOnMouseUp write FOnMouseUp;
     property OnClick: TNotifyEvent read FOnClick write FOnClick; // [TControl] property OnClick: TNotifyEvent read FOnClick write SetOnClick stored OnClickStored;
+    property OnDblClick: TNotifyEvent read FOnDblClick write FOnDblClick; // [TControl] property OnDblClick: TNotifyEvent read FOnDblClick write FOnDblClick;
     property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;// [TControl] property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
     property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;// [TControl] property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
     property OnPaint: TOnPaintEvent read FOnPaint write FOnPaint; // [TControl] property OnPaint: TOnPaintEvent read FOnPaint write FOnPaint;
@@ -309,16 +327,16 @@ type
     //FOwnerControl: TALDynamicListBoxControl; // 8 bytes
     //FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TALPointD; // 8 bytes
-    FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
+    //FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     //FFocusOnMouseDown: Boolean; // 1 byte
     //FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
-    //FDisableDoubleClickHandling: Boolean; // 1 byte
+    FDoubleClick: Boolean; // 1 byte
     FAutoAlignToPixel: Boolean; // 1 byte
     //FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
-    procedure SetScale(const AValue: TPosition);
+    //procedure SetScale(const AValue: TPosition);
     //function GetPivot: TPosition;
     //procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
@@ -326,7 +344,7 @@ type
     //procedure DelayOnResize(Sender: TObject);
     //procedure DelayOnResized(Sender: TObject);
     //procedure MarginsChangedHandler(Sender: TObject);
-    procedure ScaleChangedHandler(Sender: TObject);
+    //procedure ScaleChangedHandler(Sender: TObject);
   protected
     FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
@@ -335,7 +353,7 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    property Scale: TPosition read FScale write SetScale;
+    //property Scale: TPosition read FScale write SetScale;
     //property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
@@ -353,6 +371,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure Click; override;
     //function GetParentedVisible: Boolean; override;
     //procedure DoMatrixChanged(Sender: TObject); override;
     //procedure DoRootChanged; override;
@@ -384,7 +403,6 @@ type
     function IsDisplayed: Boolean; override;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     //property Form: TCommonCustomForm read FForm;
-    //property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
     {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
@@ -472,7 +490,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -793,7 +811,171 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    //property OnResized;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicListBoxAnimatedImage = class(TALDynamicListBoxExtendedControl)
+  Public
+    type
+      TAnimation = class(TALPersistentObserver)
+      private
+        fOwner: TALDynamicListBoxAnimatedImage;
+        FFloatAnimation: TALFloatAnimation;
+        FSpeed: Single;
+        FDuration: Single;
+        function GetAutoReverse: Boolean;
+        function GetEnabled: Boolean; virtual;
+        function GetDelay: Single;
+        function GetDuration: Single;
+        function GetInverse: Boolean;
+        function GetLoop: Boolean;
+        function GetCurrentTime: Single;
+        function GetPause: Boolean;
+        function GetRunning: Boolean;
+        function GetStartProgress: Single;
+        function GetStopProgress: Single;
+        function GetCurrentProgress: Single;
+        function GetSpeed: Single;
+        procedure SetEnabled(const Value: Boolean); virtual;
+        procedure SetAutoReverse(const Value: Boolean);
+        procedure SetDelay(const Value: Single);
+        procedure SetInverse(const Value: Boolean);
+        procedure SetLoop(const Value: Boolean);
+        procedure SetPause(const Value: Boolean);
+        procedure SetStartProgress(const Value: Single);
+        procedure SetStopProgress(const Value: Single);
+        procedure SetSpeed(const Value: Single);
+        function IsStopProgressStored: Boolean;
+        function IsSpeedStored: Boolean;
+        procedure UpdateFloatAnimationDuration;
+        procedure repaint;
+      protected
+        procedure SetDuration(const Value: Single);
+        procedure doFirstFrame(Sender: TObject);
+        procedure doProcess(Sender: TObject);
+        procedure doFinish(Sender: TObject);
+      public
+        constructor Create(const AOwner: TALDynamicListBoxAnimatedImage); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Start; virtual;
+        procedure Stop; virtual;
+        procedure StopAtCurrent; virtual;
+        property Running: Boolean read getRunning;
+        property Pause: Boolean read getPause write setPause;
+        property CurrentProgress: Single read GetCurrentProgress;
+        property CurrentTime: Single read GetCurrentTime;
+      public
+        property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
+        property Delay: Single read getDelay write setDelay;
+        property Duration: Single read getDuration;
+        property Enabled: Boolean read getEnabled write SetEnabled default False;
+        property Inverse: Boolean read getInverse write setInverse default False;
+        property Loop: Boolean read getLoop write setLoop default True;
+        property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
+        property StartProgress: Single read GetStartProgress write SetStartProgress;
+        property StopProgress: Single read GetStopProgress write setStopProgress stored IsStopProgressStored nodefault;
+      end;
+  private
+    fAnimation: TAnimation;
+    {$IF defined(ALSkiaAvailable)}
+      fSkottieAnimation: sk_skottieanimation_t;
+      fAnimcodecplayer: sk_animcodecplayer_t;
+      FRenderRect: TRectF;
+      {$IF not defined(ALSkiaCanvas)}
+        FBufSurface: sk_surface_t;
+        FBufCanvas: sk_canvas_t;
+        {$IF defined(ALGPUCanvas)}
+        FbufTexture: TALTexture;
+        {$ELSE}
+        FBufBitmap: Tbitmap;
+        {$ENDIF}
+      {$ENDIF}
+    {$ENDIF}
+    FResourceName: String;
+    FWrapMode: TALImageWrapMode;
+    FOnAnimationFirstFrame: TNotifyEvent;
+    FOnAnimationProcess: TNotifyEvent;
+    FOnAnimationFinish: TNotifyEvent;
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure setResourceName(const Value: String);
+    procedure SetAnimation(const Value: TAnimation);
+  protected
+    procedure Paint; override;
+    procedure DoResized; override;
+  public
+    constructor Create(const AOwner: TObject); override;
+    destructor Destroy; override;
+    procedure CreateCodec; virtual;
+    procedure ReleaseCodec; virtual;
+  public
+    //property Action;
+    property Align;
+    //property Anchors;
+    property Animation: TAnimation read fAnimation write SetAnimation;
+    //property AutoSize;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    //property DoubleBuffered;
+    //property DragMode;
+    //property EnableDragHighlight;
+    property Enabled;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    //property Locked;
+    property Margins;
+    property Opacity;
+    property Padding;
+    //property PopupMenu;
+    //property Position;
+    // If a file extension (e.g., .xxx) is detected in ResourceName, the image is loaded from the
+    // specified file (With the full path of the file obtained using ALGetResourceFilename).
+    // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
+    // project directory (with the extensions .png or .jpg).
+    property ResourceName: String read FResourceName write setResourceName;
+    //property RotationAngle;
+    //property RotationCenter;
+    property Pivot;
+    property Scale;
+    //property Size;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
+    //property OnCanFocus;
+    //property OnDragEnter;
+    //property OnDragLeave;
+    //property OnDragOver;
+    //property OnDragDrop;
+    //property OnDragEnd;
+    property OnAnimationFirstFrame: TNotifyEvent read FOnAnimationFirstFrame write FOnAnimationFirstFrame;
+    property OnAnimationProcess: TNotifyEvent read FOnAnimationProcess write FOnAnimationProcess;
+    property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
+    //property OnEnter;
+    //property OnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    //property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -947,7 +1129,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -1063,7 +1245,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -1154,7 +1336,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -1453,7 +1635,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -2004,7 +2186,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -2738,7 +2920,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -3037,7 +3219,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -3918,7 +4100,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -4094,7 +4276,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -4305,7 +4487,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -4519,7 +4701,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -4589,7 +4771,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -4843,7 +5025,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -4937,7 +5119,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -5179,7 +5361,7 @@ type
     property OnMouseMove;
     //property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -5591,6 +5773,7 @@ type
     FOnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent; // 16 bytes
     FOnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent; // 16 bytes
     FOnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent; // 16 bytes
+    function GetItemByIndex(Const AIndex: Integer): TALDynamicListBoxItem;
     function GetOnCreateMainContent: TCreateMainContentEvent;
     procedure SetOnCreateMainContent(const AValue: TCreateMainContentEvent);
     procedure SetOrientation(const AValue: TOrientation);
@@ -5641,8 +5824,6 @@ type
     function FindFirstVisibleItemIndex: integer; virtual;
     function FindLastVisibleItemIndex: integer; virtual;
     function FindLastActiveItem: TALDynamicListBoxItem; virtual;
-    property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
-    property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
     property FirstPreloadedItemIndex: integer read FFirstPreloadedItemIndex;
     property LastPreloadedItemIndex: integer read FLastPreloadedItemIndex;
     property ScrollDirection: TScrollDirection read FScrollDirection;
@@ -5655,6 +5836,9 @@ type
     function IsReadyToDisplay: Boolean; override;
     procedure Prepare; override;
     procedure Unprepare; override;
+    property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
+    property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
+    property Items[const Index: Integer]: TALDynamicListBoxItem read GetItemByIndex;
     property ScrollEngine: TALScrollEngine read fScrollEngine;
     property ViewportPosition: TALPointD read GetViewportPosition;
     property ItemIdNodeName: String read FItemIdNodeName write FItemIdNodeName;
@@ -5861,8 +6045,8 @@ uses
   Winapi.Windows,
   FMX.Platform.Win,
   {$ENDIF}
-  {$IF defined(ALSkiaEngine)}
-  System.Skia.API,
+  {$IF defined(ALSkiaAvailable)}
+  FMX.Skia,
   FMX.Skia.Canvas,
   {$ENDIF}
   {$IFDEF ALDPK}
@@ -5922,6 +6106,9 @@ begin
   FWidth := LDefaultSize.Width;
   FHeight := LDefaultSize.Height;
   FTouchTargetExpansion := TRectF.Empty;
+  FPivot := TPointF.Zero;
+  FRotationAngle := 0;
+  FScale := TPointF.Create(1,1);
   FPadding := CreatePadding;
   FPadding.OnChanged := PaddingChangedHandler;
   FMargins := CreateMargins;
@@ -5955,6 +6142,7 @@ begin
   FOnMouseMove := nil;
   FOnMouseUp := nil;
   FOnClick := nil;
+  FOnDblClick := nil;
   FOnPaint := nil;
   FOnPainting := nil;
   FOnResized := nil;
@@ -6278,6 +6466,18 @@ begin
     OwnerListBox.Repaint;
 end;
 
+{****************************************************}
+function TALDynamicListBoxControl.GetTagFloat: Double;
+begin
+  ALMove(FTag, Result, SizeOf(Double));
+end;
+
+{*****************************************************************}
+procedure TALDynamicListBoxControl.SetTagFloat(const AValue: Double);
+begin
+  ALMove(AValue, FTag, SizeOf(Double));
+end;
+
 {*****************************************************************}
 procedure TALDynamicListBoxControl.SetIndex(const AValue: Integer);
 begin
@@ -6297,6 +6497,33 @@ procedure TALDynamicListBoxControl.SendToBack;
 begin
   If ownerControl <> nil then
     ownerControl.MoveControl(Self,0);
+end;
+
+{****************************************}
+procedure TALDynamicListBoxControl.SetPivot(const AValue: TPointF);
+begin
+  if not FPivot.EqualsTo(AValue, TEpsilon.Scale) then begin
+    FPivot := AValue;
+    Repaint;
+  end;
+end;
+
+{****************************************}
+procedure TALDynamicListBoxControl.SetRotationAngle(const AValue: Single);
+begin
+  if not SameValue(FRotationAngle, AValue, TEpsilon.Scale) then begin
+    FRotationAngle := AValue;
+    Repaint;
+  end;
+end;
+
+{****************************************}
+procedure TALDynamicListBoxControl.SetScale(const AValue: TPointF);
+begin
+  if not FScale.EqualsTo(AValue, TEpsilon.Scale) then begin
+    FScale := AValue;
+    Repaint;
+  end;
 end;
 
 {**************************************************************************}
@@ -7681,6 +7908,13 @@ begin
     FOnClick(Self)
 end;
 
+{******************************************}
+procedure TALDynamicListBoxControl.DblClick;
+begin
+  if Assigned(FOnDblClick) then
+    FOnDblClick(Self)
+end;
+
 {*****************************************}
 procedure TALDynamicListBoxControl.Capture;
 begin
@@ -7742,14 +7976,33 @@ begin
         // the precision limits of Single. To avoid this, we skip painting the ViewMainContent
         // itself and only paint its visible children.
         If not LControl.PaintChildrenOnly then begin
+
+          var LPosX: Single;
+          var LPosY: Single;
           if PaintChildrenOnly then begin
-            var LMatrix := LSavedMatrix * TMatrix.CreateTranslation(Left + LControl.left, Top + LControl.Top);
+            LPosX := Left + LControl.left;
+            LPosY := Top + LControl.Top;
+          end
+          else begin
+            LPosX := LControl.left;
+            LPosY := LControl.Top;
+          end;
+
+          if SameValue(LControl.Scale.X, 1.0, TEpsilon.Scale) and SameValue(LControl.Scale.Y, 1.0, TEpsilon.Scale) and SameValue(LControl.RotationAngle, 0.0, TEpsilon.Scale) then begin
+            var LMatrix := LSavedMatrix * TMatrix.CreateTranslation(LPosX, LPosY);
             Canvas.SetMatrix(LMatrix);
           end
           else begin
-            var LMatrix := LSavedMatrix * TMatrix.CreateTranslation(LControl.left, LControl.Top);
-            Canvas.SetMatrix(LMatrix);
+            var LPivotOffsetX := LControl.Pivot.X * LControl.Width;
+            var LPivotOffsetY := LControl.Pivot.Y * LControl.Height;
+            var LMatrix := TMatrix.CreateTranslation(-LPivotOffsetX, -LPivotOffsetY) *
+                           TMatrix.CreateScaling(LControl.Scale.X, LControl.Scale.Y);
+            if not SameValue(LControl.RotationAngle, 0.0, TEpsilon.Scale) then
+              LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(LControl.RotationAngle));
+            LMatrix := LMatrix * TMatrix.CreateTranslation(LPosX + LPivotOffsetX, LPosY + LPivotOffsetY);
+            Canvas.SetMatrix(LMatrix * LSavedMatrix);
           end;
+
         end;
         LControl.PaintInternal(Canvas);
       end;
@@ -7786,19 +8039,10 @@ begin
   //FForm := nil;
   //FOwnerControl := nil;
   FControlAbsolutePosAtMouseDown := TALPointD.zero;
-  FScale := TPosition.Create(TPointF.Create(1, 1));
-  FScale.OnChange := ScaleChangedHandler;
   //FFocusOnMouseDown := False;
   //FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
-  // Double-clicks, or double-taps, are rarely used in mobile design due to
-  // touch screen challenges and user experience considerations. Mobile devices
-  // favor simpler, more intuitive gestures like swiping and pinching, which are
-  // better suited to smaller screens and prevent confusion with similar
-  // actions. Consequently, functionalities often tied to double-clicks on
-  // desktops are handled by different gestures or interface elements in
-  // mobile apps, leading to a more user-friendly experience.
-  //FDisableDoubleClickHandling := True;
+  FDoubleClick := False;
   FAutoAlignToPixel := True;
   //FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
@@ -7813,7 +8057,6 @@ end;
 destructor TALDynamicListBoxExtendedControl.Destroy;
 begin
   ClearBufDrawable;
-  ALFreeAndNil(FScale);
   inherited;
 end;
 
@@ -8661,12 +8904,6 @@ begin
   // Not supported
 end;
 
-{***************************************************************************}
-procedure TALDynamicListBoxExtendedControl.SetScale(const AValue: TPosition);
-begin
-  FScale.Assign(AValue);
-end;
-
 {*************************************************************}
 function TALDynamicListBoxExtendedControl.GetAutoSize: Boolean;
 begin
@@ -8887,7 +9124,8 @@ begin
   FControlAbsolutePosAtMouseDown := LocalToAbsolute(TPointF.Zero);
   FMouseDownAtLowVelocity := True;
   //--
-  //if FDisableDoubleClickHandling then Shift := Shift - [ssDouble];
+  FDoubleClick := ssDouble in Shift;
+  if FDoubleClick then Shift := Shift - [ssDouble];
   //--
   var LScrollableControl: IALScrollableControl;
   var LOwnerControl := OwnerControl;
@@ -8926,6 +9164,7 @@ begin
   var LPrevPressed := Pressed;
   inherited;
   if LPrevPressed <> Pressed then PressedChanged;
+  FDoubleClick := False;
   //var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
   //if (FFocusOnMouseUp) and
   //   (FMouseDownAtLowVelocity) and
@@ -8961,6 +9200,16 @@ begin
   var LPrevPressed := Pressed;
   inherited;
   if LPrevPressed <> Pressed then PressedChanged;
+end;
+
+{***********************************************}
+procedure TALDynamicListBoxExtendedControl.Click;
+begin
+  inherited;
+  if FDoubleClick then begin
+    DblClick;
+    FDoubleClick := False;
+  end;
 end;
 
 {*************************************}
@@ -9105,12 +9354,6 @@ end;
 //    FFormerMarginsChangedHandler(Sender);
 //  MarginsChanged;
 //end;
-
-{******************************************************************************}
-procedure TALDynamicListBoxExtendedControl.ScaleChangedHandler(Sender: TObject);
-begin
-  Repaint; // DoMatrixChanged(Sender);
-end;
 
 {*****************************************************************}
 constructor TALDynamicListBoxContent.Create(const AOwner: TObject);
@@ -10724,6 +10967,614 @@ begin
     LDrawableRect.TopLeft, // const ATopLeft: TpointF;
     LOpacity); // const AOpacity: Single);
 
+end;
+
+{*********************************************************************************************************}
+constructor TALDynamicListBoxAnimatedImage.TAnimation.Create(const AOwner: TALDynamicListBoxAnimatedImage);
+begin
+  inherited create;
+  fOwner := AOwner;
+  fFloatAnimation := TALFloatAnimation.Create;
+  fFloatAnimation.Loop := True;
+  fFloatAnimation.StopValue := 1.0;
+  fFloatAnimation.Duration := MaxSingle;
+  fFloatAnimation.OnFirstFrame := DoFirstFrame;
+  fFloatAnimation.OnProcess := DoProcess;
+  fFloatAnimation.OnFinish := DoFinish;
+  FSpeed := 1.0;
+  FDuration := 0.0;
+end;
+
+{***********************************************************}
+destructor TALDynamicListBoxAnimatedImage.TAnimation.Destroy;
+begin
+  ALFreeAndNil(fFloatAnimation);
+  inherited;
+end;
+
+{*******************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.UpdateFloatAnimationDuration;
+begin
+  if not SameValue(FSpeed, 0.0, Single.Epsilon) then
+    FFloatAnimation.Duration := (FDuration / FSpeed) * abs(FFloatAnimation.StopValue - FFloatAnimation.StartValue)
+  else
+    FFloatAnimation.Duration := maxSingle;
+end;
+
+{**********************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.repaint;
+begin
+  if Fowner.IsDisplayed then
+    Fowner.Repaint;
+end;
+
+{*************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetAutoReverse: Boolean;
+begin
+  Result := FFloatAnimation.AutoReverse;
+end;
+
+{******************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetDelay: Single;
+begin
+  Result := FFloatAnimation.Delay;
+end;
+
+{*********************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetDuration: Single;
+begin
+  Result := FDuration;
+end;
+
+{*********************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetInverse: Boolean;
+begin
+  Result := FFloatAnimation.Inverse;
+end;
+
+{******************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetLoop: Boolean;
+begin
+  Result := FFloatAnimation.Loop;
+end;
+
+{************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetCurrentTime: Single;
+begin
+  if not Enabled then begin
+    if Inverse then Result := StopProgress * Duration
+    else Result := StartProgress * Duration;
+  end
+  else begin
+    {$IFDEF ALDPK}
+    Result := StartProgress * Duration;
+    {$ELSE}
+    Result := CurrentProgress * Duration;
+    {$ENDIF}
+  end;
+end;
+
+{*******************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetPause: Boolean;
+begin
+  Result := FFloatAnimation.Pause;
+end;
+
+{*********************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetRunning: Boolean;
+begin
+  Result := FFloatAnimation.Running;
+end;
+
+{**************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetStartProgress: Single;
+begin
+  Result := FFloatAnimation.StartValue;
+end;
+
+{*************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetStopProgress: Single;
+begin
+  Result := FFloatAnimation.StopValue;
+end;
+
+{****************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetCurrentProgress: Single;
+begin
+  Result := FFloatAnimation.CurrentValue;
+end;
+
+{******************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.GetSpeed: Single;
+begin
+  Result := FSpeed;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetAutoReverse(const Value: Boolean);
+begin
+  FFloatAnimation.AutoReverse := Value;
+end;
+
+{********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetDelay(const Value: Single);
+begin
+  FFloatAnimation.Delay := Value;
+end;
+
+{***********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetDuration(const Value: Single);
+begin
+  FDuration := Value;
+  UpdateFloatAnimationDuration;
+end;
+
+{***********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetInverse(const Value: Boolean);
+begin
+  FFloatAnimation.Inverse := Value;
+  Repaint;
+end;
+
+{********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetLoop(const Value: Boolean);
+begin
+  FFloatAnimation.Loop := Value;
+end;
+
+{*********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetPause(const Value: Boolean);
+begin
+  FFloatAnimation.Pause := Value;
+end;
+
+{****************************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetStartProgress(const Value: Single);
+begin
+  FFloatAnimation.StartValue := Min(Max(Value, 0), 1);
+  UpdateFloatAnimationDuration;
+  Repaint;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetStopProgress(const Value: Single);
+begin
+  FFloatAnimation.StopValue := Min(Max(Value, 0), 1);
+  UpdateFloatAnimationDuration;
+  Repaint;
+end;
+
+{********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetSpeed(const Value: Single);
+begin
+  if not SameValue(FSpeed, Value, Single.Epsilon) then begin
+    FSpeed := Value;
+    UpdateFloatAnimationDuration;
+  end;
+end;
+
+{*******************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.IsStopProgressStored: Boolean;
+begin
+  Result := Not SameValue(FFloatAnimation.StopValue, 1.0, Single.Epsilon);
+end;
+
+{************************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.IsSpeedStored: Boolean;
+begin
+  Result := Not SameValue(FSpeed, 1.0, Single.Epsilon);
+end;
+
+{*********************************************************************}
+function TALDynamicListBoxAnimatedImage.TAnimation.getEnabled: Boolean;
+begin
+  Result := FFloatAnimation.Enabled;
+end;
+
+{***********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
+begin
+  FFloatAnimation.Enabled := Value;
+end;
+
+{********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.doFirstFrame(Sender: TObject);
+begin
+  if assigned(FOwner.FOnAnimationFirstFrame) then
+    FOwner.FOnAnimationFirstFrame(FOwner);
+  Repaint;
+end;
+
+{*****************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.doProcess(Sender: TObject);
+begin
+  if assigned(FOwner.FOnAnimationProcess) then
+    FOwner.FOnAnimationProcess(FOwner);
+  Repaint;
+end;
+
+{****************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.doFinish(Sender: TObject);
+begin
+  if assigned(FOwner.FOnAnimationFinish) then
+    FOwner.FOnAnimationFinish(FOwner);
+  Repaint;
+end;
+
+{********************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.Start;
+begin
+  FFloatAnimation.Start;
+end;
+
+{*******************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.Stop;
+begin
+  FFloatAnimation.Stop;
+end;
+
+{****************************************************************}
+procedure TALDynamicListBoxAnimatedImage.TAnimation.StopAtCurrent;
+begin
+  FFloatAnimation.StopAtCurrent;
+end;
+
+{***********************************************************************}
+constructor TALDynamicListBoxAnimatedImage.Create(const AOwner: TObject);
+begin
+  inherited Create(AOwner);
+  fAnimation := TAnimation.create(Self);
+  {$IF defined(ALSkiaAvailable)}
+    fSkottieAnimation := 0;
+    fAnimcodecplayer := 0;
+    //FRenderRect := TrectF.Empty;
+    {$IF not defined(ALSkiaCanvas)}
+      FBufSurface := 0;
+      FBufCanvas := 0;
+      {$IF defined(ALGPUCanvas)}
+      FbufTexture := nil;
+      {$ELSE}
+      FBufBitmap := nil;
+      {$ENDIF}
+    {$ENDIF}
+  {$ENDIF}
+  FResourceName := '';
+  FWrapMode := TALImageWrapMode.Fit;
+  FOnAnimationFirstFrame := nil;
+  FOnAnimationProcess := nil;
+  FOnAnimationFinish := nil;
+  //SetAcceptsControls(False);
+end;
+
+{************************************************}
+destructor TALDynamicListBoxAnimatedImage.Destroy;
+begin
+  ReleaseCodec;
+  AlFreeAndNil(FAnimation);
+  inherited;
+end;
+
+{***************************************************}
+procedure TALDynamicListBoxAnimatedImage.CreateCodec;
+begin
+  {$IF defined(ALSkiaAvailable)}
+
+  if //--- Do not create Codec if the size is 0
+     (BoundsRect.IsEmpty) or
+     //--- Do not create Codec if FResourceName is empty
+     (FResourceName = '')
+  then begin
+    ReleaseCodec;
+    exit;
+  end;
+
+  if (fSkottieAnimation <> 0) or (fAnimcodecplayer <> 0) then exit;
+
+  var LFileName := ALGetResourceFilename(FResourceName);
+
+  if LFileName <> '' then begin
+    fSkottieAnimation := sk4d_skottieanimation_make_from_file(MarshaledAString(UTF8String(LFileName)), TSkDefaultProviders.TypefaceFont.Handle)
+  end
+  else begin
+    {$IFDEF ALDPK}
+    fSkottieAnimation := 0
+    {$ELSE}
+    var LResourceStream := ALCreateResourceStream(FResourceName);
+    try
+      var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
+      try
+        var LStreamadapterProcs: sk_streamadapter_procs_t;
+        LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+        LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+        LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+        LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+        sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+        fSkottieAnimation := sk4d_skottieanimation_make_from_stream(
+                               LSkStream, // stream: sk_stream_t
+                               0{TSkDefaultProviders.Resource.Handle}, // resource_provider: sk_resourceprovider_t;
+                               TSkDefaultProviders.TypefaceFont.Handle);  // font_provider: sk_fontmgr_t
+      finally
+        sk4d_streamadapter_destroy(LSKStream);
+      end;
+    finally
+      ALfreeandNil(LResourceStream);
+    end;
+    {$ENDIF}
+  end;
+
+  if fSkottieAnimation = 0 then begin
+    if LFileName <> '' then begin
+      fAnimCodecPlayer := sk4d_animcodecplayer_make_from_file(MarshaledAString(UTF8String(LFileName)))
+    end
+    else begin
+      {$IFDEF ALDPK}
+      fAnimCodecPlayer := 0
+      {$ELSE}
+      var LResourceStream := ALCreateResourceStream(FResourceName);
+      try
+        var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
+        try
+          var LStreamadapterProcs: sk_streamadapter_procs_t;
+          LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+          LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+          LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+          LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+          sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+          fAnimCodecPlayer := sk4d_animcodecplayer_make_from_stream(LSkStream);
+        finally
+          sk4d_streamadapter_destroy(LSKStream);
+        end;
+      finally
+        ALfreeandNil(LResourceStream);
+      end;
+      {$ENDIF}
+    end;
+  end;
+
+  if (fSkottieAnimation = 0) and (fAnimCodecPlayer = 0) then
+    {$IF not defined(ALDPK)}
+    Raise Exception.CreateFmt('Failed to create the animation codec for resource "%s". Please ensure the resource exists and is in a valid format', [FResourceName]);
+    {$ELSE}
+    Exit;
+    {$ENDIF}
+
+  var LSize: TSizeF;
+  if fSkottieAnimation <> 0 then begin
+    var LSizeT: sk_size_t;
+    sk4d_skottieanimation_get_size(fSkottieAnimation, LSizeT);
+    LSize.Width := LSizeT.width;
+    LSize.Height := LSizeT.height;
+  end
+  else begin
+    var LIsizeT: sk_isize_t;
+    sk4d_animcodecplayer_get_dimensions(fAnimCodecPlayer, LIsizeT);
+    LSize.Width := LIsizeT.width;
+    LSize.Height := LIsizeT.height;
+  end;
+  if SameValue(LSize.width, 0, Tepsilon.Position) or
+     SameValue(LSize.Height, 0, Tepsilon.Position) then begin
+    {$IF not defined(ALDPK)}
+    Raise Exception.CreateFmt('The animation "%s" has invalid dimensions (width or height is zero)', [FResourceName]);
+    {$ELSE}
+    ReleaseCodec;
+    Exit;
+    {$ENDIF}
+  end;
+  FRenderRect := TRectF.Create(0,0,LSize.width, LSize.height);
+
+  case FWrapMode of
+    //TALImageWrapMode.Original: FRenderRect := FRenderRect.PlaceInto(LocalRect.ReducePrecision);
+    TALImageWrapMode.Fit: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision);
+    TALImageWrapMode.Stretch: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision); // TALImageWrapMode.Stretch not yet supported, use TALImageWrapMode.Fit instead
+    TALImageWrapMode.Place: FRenderRect := FRenderRect.PlaceInto(LocalRect.ReducePrecision);
+    TALImageWrapMode.FitAndCrop: FRenderRect := FRenderRect.FitInto(LocalRect.ReducePrecision); // TALImageWrapMode.FitAndCrop not yet supported, use TALImageWrapMode.Fit instead
+    else
+      Raise Exception.Create('Error 822CE359-8404-40CE-91B9-1CFC3DBA259F')
+  end;
+  FRenderRect := ALAlignDimensionToPixelRound(FRenderRect, ALGetScreenScale); // to have the pixel aligned width and height
+
+  {$IF not defined(ALSkiaCanvas)}
+  var LBufRect: Trect;
+  if fSkottieAnimation <> 0 then LBufRect := TRectf.Create(0,0,FRenderRect.width * ALGetScreenScale, FRenderRect.height * ALGetScreenScale).Round
+  else LBufRect := TRect.Create(0,0,Round(LSize.width), round(LSize.height));
+  FBufSurface := ALCreateSkSurface(
+                   ALCeil(LBufRect.width, TEpsilon.Position),
+                   ALCeil(LBufRect.height, TEpsilon.Position));
+  FbufCanvas := ALSkCheckHandle(sk4d_surface_get_canvas(FBufSurface));
+  {$IF defined(ALGPUCanvas)}
+  FbufTexture := TALTexture.Create;
+  FbufTexture.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+  FbufTexture.SetSize(LBufRect.width, LBufRect.height);
+  FbufTexture.PixelFormat := ALGetDefaultPixelFormat;
+  {$ELSE}
+  FBufBitmap := Tbitmap.create(LBufRect.width, LBufRect.height);
+  {$ENDIF}
+  {$ENDIF}
+
+  var LDuration: Single;
+  if fSkottieAnimation <> 0 then
+    LDuration := Single(sk4d_skottieanimation_get_duration(fSkottieAnimation))
+  else
+    LDuration := Single(sk4d_animcodecplayer_get_duration(fAnimCodecPlayer) / 1000);
+  FAnimation.SetDuration(LDuration);
+
+  {$IFDEF debug}
+  ALLog(
+    'TALDynamicListBoxAnimatedImage.CreateCodec',
+    'ResourceName: '+ FResourceName + ' | '+
+    'Duration: '+ALFloatTostrW(LDuration, ALDefaultFormatSettingsW) + ' | '+
+    'Width: ' + ALFloatTostrW(LSize.Width, ALDefaultFormatSettingsW) + ' | '+
+    'Height: ' + ALFloatTostrW(LSize.Height, ALDefaultFormatSettingsW),
+    TalLogType.debug);
+  {$ENDIF}
+
+  {$ENDIF}
+end;
+
+{****************************************************}
+procedure TALDynamicListBoxAnimatedImage.ReleaseCodec;
+begin
+  {$IF defined(ALSkiaAvailable)}
+    if fSkottieAnimation <> 0 then begin
+      sk4d_skottieanimation_unref(fSkottieAnimation);
+      fSkottieAnimation := 0;
+    end;
+    if fAnimCodecPlayer <> 0 then begin
+      sk4d_animcodecplayer_destroy(fAnimCodecPlayer);
+      fAnimCodecPlayer := 0;
+    end;
+    FAnimation.SetDuration(0.0);
+    {$IF (not defined(ALSkiaCanvas))}
+      FBufCanvas := 0; // ACanvas is linked inside ASurface
+      if FBufSurface <> 0 then begin
+        sk4d_refcnt_unref(FBufSurface);
+        FBufSurface := 0;
+      end;
+      {$IF defined(ALGPUCanvas)}
+      ALFreeAndNil(FbufTexture);
+      {$ELSE}
+      ALFreeAndNil(FBufBitmap);
+      {$ENDIF}
+    {$ENDIF}
+  {$ENDIF}
+end;
+
+{*************************************************}
+procedure TALDynamicListBoxAnimatedImage.DoResized;
+begin
+  releaseCodec;
+  inherited;
+end;
+
+{*********************************************}
+procedure TALDynamicListBoxAnimatedImage.Paint;
+begin
+
+  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  //begin
+  //  var R := LocalRect.ReducePrecision;
+  //  system.types.InflateRect(R, -0.5, -0.5);
+  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  //end;
+
+  CreateCodec;
+
+  {$IF defined(ALSkiaAvailable)}
+  if fSkottieAnimation <> 0 then begin
+    sk4d_skottieanimation_seek_frame_time(fSkottieAnimation, fAnimation.CurrentTime);
+    {$IF defined(ALSkiaCanvas)}
+    var LNeedSaveLayer := not SameValue(AbsoluteOpacity, 1, TEpsilon.Position);
+    if LNeedSaveLayer then
+      sk4d_canvas_save_layer_alpha(TSkCanvasCustom(Canvas).Canvas.Handle, nil, Round(AbsoluteOpacity * 255));
+    try
+      sk4d_skottieanimation_render(
+        fSkottieAnimation, // const self: sk_skottieanimation_t;
+        TSkCanvasCustom(Canvas).Canvas.Handle, // canvas: sk_canvas_t;
+        @FRenderRect, // const dest: psk_rect_t;
+        0); // render_flags: uint32_t); cdecl;
+    finally
+      if LNeedSaveLayer then
+        sk4d_canvas_restore(TSkCanvasCustom(Canvas).Canvas.Handle);
+    end;
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LRect := FRenderRect;
+    Lrect.Width := Lrect.Width * ALGetScreenScale;
+    Lrect.Height := Lrect.Height * ALGetScreenScale;
+    LRect.Offset(-LRect.Left,-LRect.Top);
+    sk4d_canvas_clear(FBufCanvas, TAlphaColors.Null);
+    sk4d_skottieanimation_render(
+      fSkottieAnimation, // const self: sk_skottieanimation_t;
+      FBufCanvas, // canvas: sk_canvas_t;
+      @LRect, // const dest: psk_rect_t;
+      0); // render_flags: uint32_t); cdecl;
+    ALUpdateTextureFromSkSurface(FBufSurface, FBufTexture);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufTexture, // const ADrawable: TALDrawable;
+      FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
+    {$ELSE}
+    var LRect := FRenderRect;
+    Lrect.Width := Lrect.Width * ALGetScreenScale;
+    Lrect.Height := Lrect.Height * ALGetScreenScale;
+    LRect.Offset(-LRect.Left,-LRect.Top);
+    sk4d_canvas_clear(FBufCanvas, TAlphaColors.Null);
+    sk4d_skottieanimation_render(
+      fSkottieAnimation, // const self: sk_skottieanimation_t;
+      FBufCanvas, // canvas: sk_canvas_t;
+      @LRect, // const dest: psk_rect_t;
+      0); // render_flags: uint32_t); cdecl;
+    ALUpdateTBitmapFromSkSurface(FBufSurface, FBufBitmap);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufBitmap, // const ADrawable: TALDrawable;
+      FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
+    {$ENDIF}
+  end
+  else if fAnimcodecplayer <> 0 then Begin
+    sk4d_animcodecplayer_seek(fAnimcodecplayer, round(fAnimation.CurrentTime * 1000));
+    {$IF defined(ALSkiaCanvas)}
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      sk4d_animcodecplayer_get_frame(fAnimcodecplayer), // const ADrawable: TALDrawable;
+      FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
+    {$ELSEIF defined(ALGPUCanvas)}
+    ALUpdateTextureFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer), FBufTexture);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufTexture, // const ADrawable: TALDrawable;
+      FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
+    {$ELSE}
+    ALUpdateTBitmapFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer), FBufBitmap);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufBitmap, // const ADrawable: TALDrawable;
+      FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
+    {$ENDIF}
+  end;
+  {$ELSE}
+  ALLog(
+    'TALDynamicListBoxAnimatedImage.Paint',
+    '''
+      The Skia Engine is required to use AnimatedImage.
+      First, enable Skia for the project. Then, if you prefer not to
+      use a Skia canvas for the main form, go to the project options
+      and replace the "SKIA" definition with "ALSkiaAvailable." Additionally,
+      add the line "GlobalUseSkia := False" to the DPR file.
+    ''',
+    TALLogType.ERROR);
+  {$ENDIF}
+
+end;
+
+{**********************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if FWrapMode <> Value then begin
+    releaseCodec;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{****************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.setResourceName(const Value: String);
+begin
+  if FResourceName <> Value then begin
+    releaseCodec;
+    FResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALDynamicListBoxAnimatedImage.SetAnimation(const Value: TAnimation);
+begin
+  FAnimation.Assign(Value);
 end;
 
 {***********************************************************************}
@@ -20179,12 +21030,12 @@ begin
         TAnimation.ScaleInOut: begin
           AdjustPosition(AThumb);
           Opacity := 1;
-          Scale.Point := TPointF.Create(0, 0);
+          Scale := TPointF.Create(0, 0);
         end;
         TAnimation.Opacity: begin
           AdjustPosition(AThumb);
           Opacity := 0;
-          Scale.Point := TPointF.Create(1, 1);
+          Scale := TPointF.Create(1, 1);
         end
         else
           Raise Exception.Create('Error A2F4F658-97FC-4F92-AFA4-3BB8192003A8')
@@ -20224,7 +21075,7 @@ end;
 procedure TALDynamicListBoxCustomTrack.TValueIndicator.AnimationProcess(Sender: TObject);
 begin
   case FAnimation of
-    TAnimation.ScaleInOut: Scale.Point := TPointF.Create(FFloatAnimation.CurrentValue, FFloatAnimation.CurrentValue);
+    TAnimation.ScaleInOut: Scale := TPointF.Create(FFloatAnimation.CurrentValue, FFloatAnimation.CurrentValue);
     TAnimation.Opacity: Opacity := FFloatAnimation.CurrentValue
     else Raise Exception.Create('Error D6F17D76-E47E-4144-8FBA-5CAD3EBF84F3')
   end;
@@ -24574,7 +25425,7 @@ begin
       // Reset visibility/scale/color of all controls
       for var I := 0 to ControlsCount - 1 do begin
         Controls[I].Visible := True;
-        TIndicatorControl(Controls[I]).Scale.Point := TPointF.Create(1, 1);
+        TIndicatorControl(Controls[I]).Scale := TPointF.Create(1, 1);
         if (Controls[I] = FactiveIndicatorControl) then
           TIndicatorControl(Controls[I]).Fill.Color := FActiveIndicator.Fill.Color
         else
@@ -24664,9 +25515,9 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else begin
             FActiveIndicatorControl.Left := Controls[FActivePageIndex].Left + (LDistanceBetweenIndicators * LAnimationValue);
-            FActiveIndicatorControl.Scale.Point := TPointF.Create(
-                                                     1 + abs(LAnimationValue * 1.2),
-                                                     1 + abs(LAnimationValue * 1.2));
+            FActiveIndicatorControl.Scale := TPointF.Create(
+                                               1 + abs(LAnimationValue * 1.2),
+                                               1 + abs(LAnimationValue * 1.2));
           end;
         end;
 
@@ -24704,25 +25555,25 @@ begin
         TAnimationType.Scale: begin
           const LMaxDeltaScale = 0.5;
           if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
-            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale.Point := TPointF.Create(
-                                                                               1 + (LAnimationValue * LMaxDeltaScale),
-                                                                               1 + (LAnimationValue * LMaxDeltaScale));
-            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
-                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale),
-                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale := TPointF.Create(
+                                                                         1 + (LAnimationValue * LMaxDeltaScale),
+                                                                         1 + (LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale := TPointF.Create(
+                                                                     1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale),
+                                                                     1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale));
           end
           else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
-            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale.Point := TPointF.Create(
-                                                                               1 + (-LAnimationValue * LMaxDeltaScale),
-                                                                               1 + (-LAnimationValue * LMaxDeltaScale));
-            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
-                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale),
-                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale := TPointF.Create(
+                                                                         1 + (-LAnimationValue * LMaxDeltaScale),
+                                                                         1 + (-LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale := TPointF.Create(
+                                                                     1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale),
+                                                                     1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale));
           end
           else
-            TIndicatorControl(Controls[FActivePageIndex ]).Scale.Point := TPointF.Create(
-                                                                            1 + LMaxDeltaScale,
-                                                                            1 + LMaxDeltaScale);
+            TIndicatorControl(Controls[FActivePageIndex ]).Scale := TPointF.Create(
+                                                                      1 + LMaxDeltaScale,
+                                                                      1 + LMaxDeltaScale);
           FActiveIndicatorControl.Visible := False;
         end;
 
@@ -26288,8 +27139,6 @@ Begin
   FOwner := AOwner;
   FAnimation := TALFloatAnimation.Create;
   FAnimation.Loop := True;
-  FAnimation.AnimationType := TAnimationType.InOut;
-  FAnimation.Interpolation := TALInterpolationType.Sinusoidal;
   FAnimation.OnProcess := AnimationProcess;
   FAnimation.OnFinish := AnimationFinish;
   FKind := TSkeletonAnimationKind.None;
@@ -26314,6 +27163,8 @@ begin
     FKind := AValue;
     case FKind of
       TALDynamicListBoxItemLoadingContent.TSkeletonAnimationKind.None: begin
+        FAnimation.AnimationType := TAnimationType.InOut;
+        FAnimation.Interpolation := TALInterpolationType.Linear;
         FAnimation.Delay := 0;
         FAnimation.StartValue := 0;
         FAnimation.StopValue := 1;
@@ -26321,13 +27172,28 @@ begin
         FAnimation.AutoReverse := False;
       end;
       TALDynamicListBoxItemLoadingContent.TSkeletonAnimationKind.Pulse: begin
+        // https://mui.com/material-ui/react-skeleton/
+        // animation: animation-c7515d 2s ease-in-out 0.5s infinite;
+        // 0% {
+        //   opacity: 1;
+        // }
+        // 50% {
+        //   opacity: 0.4;
+        // }
+        // 100% {
+        //   opacity: 1;
+        // }
+        FAnimation.AnimationType := TAnimationType.InOut;
+        FAnimation.Interpolation := TALInterpolationType.Quadratic; // similar to ease-in-out
         FAnimation.Delay := 0.5;
-        FAnimation.StartValue := 1.0;
-        FAnimation.StopValue := 0.4;
-        FAnimation.Duration := 1;
+        FAnimation.StartValue := 0;
+        FAnimation.StopValue := 1;
+        FAnimation.Duration := 2;
         FAnimation.AutoReverse := True;
       end;
       TALDynamicListBoxItemLoadingContent.TSkeletonAnimationKind.Wave: begin
+        FAnimation.AnimationType := TAnimationType.InOut;
+        FAnimation.Interpolation := TALInterpolationType.Quadratic;
         FAnimation.Delay := 0;
         FAnimation.StartValue := -0.5;
         FAnimation.StopValue := 1.5;
@@ -26373,16 +27239,44 @@ begin
   if not Animation.Loop then exit;
 
   Case Kind of
+
     TSkeletonAnimationKind.None:;
+
     TSkeletonAnimationKind.Pulse: Begin
+
+      // https://mui.com/material-ui/react-skeleton/
+      // animation: animation-c7515d 2s ease-in-out 0.5s infinite;
+      // 0% {
+      //   opacity: 1;
+      // }
+      // 50% {
+      //   opacity: 0.4;
+      // }
+      // 100% {
+      //   opacity: 1;
+      // }
+
+      var LOpacity: Single;
+      var P: Single := TALFloatAnimation(Sender).CurrentValue;
+      if P <= 0.5 then
+        // First half: opacity from 1 → 0.4
+        LOpacity := 1 - (P / 0.5) * (1 - 0.4)
+      else
+        // Second half: opacity from 0.4 → 1
+        LOpacity := 0.4 + ((P - 0.5) / 0.5) * (1 - 0.4);
+
       for var I := 0 to FOwner.ControlsCount - 1 do
-        FOwner.Controls[i].Opacity := TALFloatAnimation(Sender).CurrentValue;
+        FOwner.Controls[i].Opacity := LOpacity;
+
     End;
+
     TSkeletonAnimationKind.Wave: Begin
       UpdateGradient(FOwner);
     End;
+
     else
       Raise Exception.Create('Error 3E43ABAE-7A19-41F7-A2A0-332020C068D8')
+
   end;
 
   if (FOwner.OwnerControl.IsReadyToDisplay) then begin
@@ -26793,13 +27687,17 @@ begin
     if AContext.FOwner = nil then exit;
     if not assigned(AContext.FOnDownloadData) then
       Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
-    var LMethod: TMethod;
-    LMethod.Code := TMethod(AContext.FOnDownloadData).Code;
+    //var LMethod: TMethod;
+    //LMethod.Code := TMethod(AContext.FOnDownloadData).Code;
     // Set Self to nil to prevent accidental access to instance members,
     // as we are in a multithreaded context where most members are not thread-safe.
     // Self can still be accessed via AContext.Owner, but this should be done with caution.
-    LMethod.Data := nil;
-    TDownloadDataEvent(LMethod)(
+    //LMethod.Data := nil;
+    //TDownloadDataEvent(LMethod)(
+    //  AContext, // const AContext: TDownloadDataContext;
+    //  AData, // Const AData: TALJSONNodeW;
+    //  AErrorCode); // var AErrorCode: Integer
+    AContext.FOnDownloadData(
       AContext, // const AContext: TDownloadDataContext;
       AData, // Const AData: TALJSONNodeW;
       AErrorCode); // var AErrorCode: Integer
@@ -26931,7 +27829,7 @@ begin
   // Set Self to nil to prevent accidental access to instance members,
   // as we are in a multithreaded context where most members are not thread-safe.
   // Self can still be accessed via LContext.Owner, but this should be done with caution.
-  LMethod.Data := nil;
+  //LMethod.Data := nil;
   //--
   Tmonitor.Enter(AContext.FLock);
   Try
@@ -27726,6 +28624,15 @@ begin
   if Fitems <> nil then
     for Var I := FFirstPreloadedItemIndex to FLastPreloadedItemIndex do
       FItems^[i].Unprepare;
+end;
+
+{*******************************************************************************************}
+function TALDynamicListBoxView.GetItemByIndex(Const AIndex: Integer): TALDynamicListBoxItem;
+begin
+  if Fitems <> nil then
+    result := Fitems^[AIndex]
+  else
+    raise Exception.Create('Index is out of bounds');
 end;
 
 {*****************************************************************************}
@@ -28524,15 +29431,20 @@ begin
     if AContext.FOwner = nil then exit;
     if not assigned(AContext.FOnDownloadItems) then
       Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
-    var LMethod: TMethod;
-    LMethod.Code := TMethod(AContext.FOnDownloadItems).Code;
+    //var LMethod: TMethod;
+    //LMethod.Code := TMethod(AContext.FOnDownloadItems).Code;
     // Set Self to nil to prevent accidental access to instance members,
     // as we are in a multithreaded context where most members are not thread-safe.
     // Self can still be accessed via AContext.Owner, but this should be done with caution.
-    LMethod.Data := nil;
+    //LMethod.Data := nil;
     if AContext.PaginationToken = #0 then
       AContext.PaginationToken := '';
-    TDownloadItemsEvent(LMethod)(
+    //TDownloadItemsEvent(LMethod)(
+    //  AContext, // const AContext: TDownloadItemsContext;
+    //  AData, // Const AData: TALJSONNodeW;
+    //  AContext.PaginationToken, // var APaginationToken: String;
+    //  AErrorCode); // var AErrorCode: Integer
+    AContext.FOnDownloadItems(
       AContext, // const AContext: TDownloadItemsContext;
       AData, // Const AData: TALJSONNodeW;
       AContext.PaginationToken, // var APaginationToken: String;
@@ -28609,13 +29521,16 @@ begin
       LData.MultiThreadPrepare(true{aOnlyChildList});
       var LItem: TALDynamicListBoxItem;
       If assigned(AContext.FOnCreateItem) then begin
-        var LMethod: TMethod;
-        LMethod.Code := TMethod(AContext.FOnCreateItem).Code;
+        //var LMethod: TMethod;
+        //LMethod.Code := TMethod(AContext.FOnCreateItem).Code;
         // Set Self to nil to prevent accidental access to instance members,
         // as we are in a multithreaded context where most members are not thread-safe.
         // Self can still be accessed via AContext.Owner, but this should be done with caution.
-        LMethod.Data := nil;
-        LItem := TCreateItemEvent(LMethod)(
+        //LMethod.Data := nil;
+        //LItem := TCreateItemEvent(LMethod)(
+        //           AContext, // const AContext: TDownloadItemsContext;
+        //           LData); // Const AData: TALJSONNodeW;
+        LItem := AContext.FOnCreateItem(
                    AContext, // const AContext: TDownloadItemsContext;
                    LData); // Const AData: TALJSONNodeW;
       end

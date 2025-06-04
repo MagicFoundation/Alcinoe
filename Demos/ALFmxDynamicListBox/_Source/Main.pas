@@ -1109,7 +1109,7 @@ end;
 {$IF defined(ALUIAutomationEnabled)}
 
 type
-  TALControlAccessor=class(TControl);
+  TALControlProtectedAccess=class(TControl);
 
 {*****************************************}
 procedure TMainForm.SimulateInfiniteScroll;
@@ -1117,7 +1117,7 @@ begin
   TThread.ForceQueue(nil,
     procedure
     begin
-      var LControl := TALControlAccessor(MainDynamicListBox);
+      var LControl := TALControlProtectedAccess(MainDynamicListBox);
       FSimulateInfiniteScrollCurrentPoint.X := 10;
       FSimulateInfiniteScrollCurrentPoint.Y := LControl.Height - 10;
       LControl.MouseDown(TMouseButton.mbLeft, [TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);
@@ -1129,7 +1129,7 @@ begin
     TThread.ForceQueue(nil,
       procedure
       begin
-        var LControl := TALControlAccessor(MainDynamicListBox);
+        var LControl := TALControlProtectedAccess(MainDynamicListBox);
         FSimulateInfiniteScrollCurrentPoint.X := max(LControl.Width, FSimulateInfiniteScrollCurrentPoint.X + (Random * 5));
         FSimulateInfiniteScrollCurrentPoint.Y := max(0, FSimulateInfiniteScrollCurrentPoint.Y - (Random * 75));
         LControl.MouseMove([TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);
@@ -1140,7 +1140,7 @@ begin
   TThread.ForceQueue(nil,
     procedure
     begin
-      var LControl := TALControlAccessor(MainDynamicListBox);
+      var LControl := TALControlProtectedAccess(MainDynamicListBox);
       FSimulateInfiniteScrollCurrentPoint.X := max(LControl.Width, FSimulateInfiniteScrollCurrentPoint.X + (Random * 5));
       FSimulateInfiniteScrollCurrentPoint.Y := max(0, FSimulateInfiniteScrollCurrentPoint.Y - (Random * 75));
       LControl.MouseUp(TMouseButton.mbLeft, [TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);

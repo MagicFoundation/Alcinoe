@@ -156,7 +156,7 @@ uses
   Alcinoe.Common,
   Alcinoe.fmx.Dynamic.Objects;
 
-
+{**}
 Type
   _TALDynamicControlProtectedAccess = class(TALDynamicControl);
 

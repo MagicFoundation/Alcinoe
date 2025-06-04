@@ -624,7 +624,7 @@ uses
   System.Math.Vectors,
   FMX.Utils;
 
-
+{**}
 Type
   _TALDynamicControlProtectedAccess = class(TALDynamicControl);
 

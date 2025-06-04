@@ -6740,8 +6740,8 @@ begin
   //**Locked := True;
   HitTest := False;
   //--
-  //Margins.DefaultValue := TRectF.Create(4,4,4,4);
-  //Margins.Rect := Margins.DefaultValue;
+  //**Margins.DefaultValue := TRectF.Create(4,4,4,4);
+  //**Margins.Rect := Margins.DefaultValue;
 end;
 
 {********************************************************}
@@ -7757,11 +7757,11 @@ begin
   AutoSize := True;
   Cursor := crHandPoint;
   //--
-  //var LPaddingChange: TNotifyEvent := Padding.OnChange;
-  //Padding.OnChange := nil;
-  //Padding.DefaultValue := TRectF.create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
-  //Padding.Rect := Padding.DefaultValue;
-  //padding.OnChange := LPaddingChange;
+  //**var LPaddingChange: TNotifyEvent := Padding.OnChange;
+  //**Padding.OnChange := nil;
+  //**Padding.DefaultValue := TRectF.create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
+  //**Padding.Rect := Padding.DefaultValue;
+  //**padding.OnChange := LPaddingChange;
   //--
   {$IF defined(ALDPK)}
   FPrevStateStyles := TStateStyles.Create(nil);
@@ -9392,17 +9392,17 @@ begin
   FFloatAnimation.OnProcess := AnimationProcess;
   FFloatAnimation.OnFinish := AnimationFinish;
   //--
-  //var LMarginsChange: TNotifyEvent := Margins.OnChange;
-  //Margins.OnChange := nil;
-  //Margins.DefaultValue := TRectF.create(6{Left}, 4{Top}, 6{Right}, 4{Bottom});
-  //Margins.Rect := Margins.DefaultValue;
-  //Margins.OnChange := LMarginsChange;
+  //**var LMarginsChange: TNotifyEvent := Margins.OnChange;
+  //**Margins.OnChange := nil;
+  //**Margins.DefaultValue := TRectF.create(6{Left}, 4{Top}, 6{Right}, 4{Bottom});
+  //**Margins.Rect := Margins.DefaultValue;
+  //**Margins.OnChange := LMarginsChange;
   //--
-  //var LPaddingChange: TNotifyEvent := Padding.OnChange;
-  //Padding.OnChange := nil;
-  //Padding.DefaultValue := TRectF.create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
-  //Padding.Rect := Padding.DefaultValue;
-  //padding.OnChange := LPaddingChange;
+  //**var LPaddingChange: TNotifyEvent := Padding.OnChange;
+  //**Padding.OnChange := nil;
+  //**Padding.DefaultValue := TRectF.create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
+  //**Padding.Rect := Padding.DefaultValue;
+  //**padding.OnChange := LPaddingChange;
 end;
 
 {**********************************************************************}

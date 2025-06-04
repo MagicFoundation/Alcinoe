@@ -31,7 +31,7 @@ type
   TALDynamicListBoxItem = class;
   TALDynamicListBoxView = class;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxItemContent = class(TALDynamicRectangle)
   public
     type
@@ -91,7 +91,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxItemErrorContent = class(TALDynamicListBoxItemContent);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicListBoxItem = class(TALDynamicExtendedControl)
   public
     type
@@ -696,7 +696,7 @@ uses
 type
   _TALDynamicControlProtectedAccess = class(TALDynamicControl);
 
-{********************************************************************************************************************************}
+{*************************************************************************************************************************}
 Procedure ALDynamicListBoxMakeBufDrawables(const AControl: TALDynamicControl; const AEnsureDoubleBuffered: Boolean = True);
 begin
   if AEnsureDoubleBuffered then
@@ -815,7 +815,7 @@ end;
 {*************************************************************************************************}
 procedure TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.AnimationProcess(Sender: TObject);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure UpdateGradient(const AControl: TALDynamicControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do begin
@@ -1100,7 +1100,7 @@ begin
   Result := ((FMainContent <> nil) or (FErrorContent <> nil)) and Inherited;
 end;
 
-{****************************************************************************************}
+{*********************************************************************************}
 procedure TALDynamicListBoxItem.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   if Acontrol = FMainContent then FMainContent := nil
@@ -1748,13 +1748,13 @@ begin
   Result := TALDynamicListBoxView(inherited Owner);
 end;
 
-{***************************************************************************************}
+{**************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.SetOwner(const Value: TALDynamicListBoxView);
 begin
   inherited Owner := Value;
 end;
 
-{**************************************************************************************************************************}
+{*******************************************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   inherited;
@@ -1765,7 +1765,7 @@ begin
   Realign(AControl.Index);
 end;
 
-{***************************************************************************************************}
+{********************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   inherited;
@@ -1776,7 +1776,7 @@ begin
   Realign(AControl.Index);
 end;
 
-{***************************************************************************************************************************}
+{********************************************************************************************************************}
 procedure TALDynamicListBoxViewMainContent.DoMoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer);
 begin
   inherited;
@@ -2236,7 +2236,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{*********************************************************************************}
 procedure TALDynamicListBoxView.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   if Acontrol = FNoItemsContent then FNoItemsContent := nil
@@ -2273,7 +2273,7 @@ begin
       FItems^[i].Unprepare;
 end;
 
-{*******************************************************************************************}
+{******************************************************************************************}
 function TALDynamicListBoxView.GetItemByIndex(Const AIndex: Integer): TALDynamicListBoxItem;
 begin
   if Fitems <> nil then
@@ -2466,7 +2466,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALDynamicListBoxView.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then _TALDynamicControlProtectedAccess(AObject).capture;
@@ -2475,7 +2475,7 @@ begin
   inherited;
 end;
 
-{***************************************************************************************************************************}
+{********************************************************************************************************************}
 procedure TALDynamicListBoxView.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
 begin
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
@@ -2483,7 +2483,7 @@ begin
   inherited;
 end;
 
-{***********************************************************************************************************************************************}
+{****************************************************************************************************************************************}
 procedure TALDynamicListBoxView.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then _TALDynamicControlProtectedAccess(aObject).releasecapture;
@@ -2492,7 +2492,7 @@ begin
   inherited;
 end;
 
-{******************************************************************************************}
+{***********************************************************************************}
 procedure TALDynamicListBoxView.ChildrenMouseLeave(const AObject: TALDynamicControl);
 begin
   InternalMouseLeave;

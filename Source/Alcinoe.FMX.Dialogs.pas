@@ -284,7 +284,7 @@ begin
   Result := Self;
 end;
 
-{*************************************************************************}
+{*********************************************************************************************}
 function TALDialog.TBuilder.SetHeadlineTextHorzAlign(const AValue: TALTextHorzAlign): TBuilder;
 begin
   FDialog.Headline.TextSettings.HorzAlign := AValue;

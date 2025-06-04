@@ -143,7 +143,7 @@ begin
   inherited;
 end;
 
-{***************************************************************}
+{*****************************************************}
 class function TALConfetti.CreateInstance: TALConfetti;
 begin
   Var LForm := Screen.ActiveForm;

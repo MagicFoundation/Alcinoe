@@ -1133,6 +1133,22 @@ undesired conversions.
 History
 =======
 
+#### 04/05/2025
+
+- `Fill.ImageNoRadius` is now `True` by default.
+- Added `ALVibrateDevice`.
+- Reactivated `OnDblClick` event.
+- Split the unit `Alcinoe.FMX.DynamicListBox.pas` into several smaller units:
+  - `Alcinoe.FMX.Dynamic.Common.pas`
+  - `Alcinoe.FMX.Dynamic.Controls.pas`
+  - `Alcinoe.FMX.Dynamic.Layouts.pas`
+  - `Alcinoe.FMX.Dynamic.ListBox.pas`
+  - `Alcinoe.FMX.Dynamic.Objects.pas`
+  - `Alcinoe.FMX.Dynamic.PageController.pas`
+  - `Alcinoe.FMX.Dynamic.StdCtrls.pas`
+  - `Alcinoe.FMX.Dynamic.VideoPlayer.pas`
+- Added `IsPreciseGeoLocationAccessGranted` to `TALGeoLocationSensor`.
+
 #### 26/05/2025
 
 - Moved `TALFormatSettingsA` and `TALFormatSettingsW` to the 

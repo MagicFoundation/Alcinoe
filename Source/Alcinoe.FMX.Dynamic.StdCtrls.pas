@@ -2866,11 +2866,16 @@ uses
   System.Skia.API,
   FMX.Skia.Canvas,
   {$ENDIF}
-  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+  {$IF DEFINED(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
   FMX.types3D,
   {$ENDIF}
   {$IF DEFINED(IOS)}
   iOSapi.CoreGraphics,
+  FMX.types3D,
+  {$ENDIF}
+  {$IF DEFINED(ALMacOS)}
+  Macapi.CoreGraphics,
   {$ENDIF}
   fmx.utils,
   FMX.StdCtrls,

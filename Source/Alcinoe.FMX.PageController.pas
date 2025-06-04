@@ -1574,7 +1574,7 @@ begin
   FPageController := _FindPageController;
 end;
 
-{**********************}
+{***************}
 {## Dynamic:Begin
 function TALPageView.DoGetDownloadPriority: Int64;
 begin

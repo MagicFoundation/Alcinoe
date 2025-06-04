@@ -94,7 +94,6 @@ type
     procedure MarginsChangedHandler(Sender: TObject);
     procedure ScaleChangedHandler(Sender: TObject);
   protected
-    FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
@@ -295,7 +294,6 @@ begin
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
   FBeforeDestructionExecuted := False;
-  FTextUpdating := False;
   FAutoSize := False;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;

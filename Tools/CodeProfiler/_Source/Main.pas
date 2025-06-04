@@ -439,11 +439,11 @@ begin
 
       // Add procedure like:
       //
-      // Procedure ALDynamicListBoxMakeBufDrawables(const AControl: TALDynamicListBoxControl; const AEnsureDoubleBuffered: Boolean = True);
+      // Procedure ALDynamicListBoxMakeBufDrawables(const AControl: TALDynamicControl; const AEnsureDoubleBuffered: Boolean = True);
       // begin
       // end
       //
-      // constructor TALDynamicListBoxControl.Create(const AOwner: TObject);
+      // constructor TALDynamicControl.Create(const AOwner: TObject);
       // begin
       // end
       //

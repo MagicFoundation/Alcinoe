@@ -13,6 +13,8 @@ uses
   System.Classes,
   System.Variants,
   System.ImageList,
+  System.Rtti,
+  System.Math.Vectors,
   FMX.Platform,
   FMX.Types,
   FMX.Controls,
@@ -40,16 +42,14 @@ uses
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.FMX.DatePickerDialog,
   Alcinoe.FMX.ErrorReporting,
-  Alcinoe.FMX.DynamicListBox,
+  Alcinoe.FMX.Dynamic.ListBox,
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.Controls,
   Alcinoe.JSONDoc,
-  Alcinoe.GuardianThread,
-  System.Rtti,
-  System.Math.Vectors;
+  Alcinoe.GuardianThread;
 
 type
 
@@ -120,6 +120,12 @@ uses
   system.DateUtils,
   System.Character,
   fmx.DialogService,
+  Alcinoe.FMX.Dynamic.Controls,
+  Alcinoe.fmx.Dynamic.Objects,
+  Alcinoe.fmx.Dynamic.PageController,
+  Alcinoe.fmx.Dynamic.Layouts,
+  Alcinoe.fmx.Dynamic.StdCtrls,
+  Alcinoe.fmx.Dynamic.VideoPlayer,
   Alcinoe.Cipher,
   Alcinoe.StringUtils,
   Alcinoe.FMX.ScrollEngine,
@@ -206,28 +212,28 @@ end;
 procedure TMainForm.TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
 begin
   If Element.Id = 'ellipsis' then
-    TALDynamicListBoxText(Sender).TextSettings.MaxLines := 65535;
+    TALDynamicText(Sender).TextSettings.MaxLines := 65535;
 end;
 
 {************************************************************************************************}
 procedure TMainForm.TextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
 begin
   If Element.Id = 'ellipsis' then
-    TALDynamicListBoxText(Sender).Cursor := crHandPoint;
+    TALDynamicText(Sender).Cursor := crHandPoint;
 end;
 
 {************************************************************************************************}
 procedure TMainForm.TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
 begin
   If Element.Id = 'ellipsis' then
-    TALDynamicListBoxText(Sender).Cursor := crDefault;
+    TALDynamicText(Sender).Cursor := crDefault;
 end;
 
 {*******************************************************************}
 procedure TMainForm.PageControllerActivePageChanged(Sender: TObject);
 begin
-  Var LPageController := TALDynamicListBoxPageController(Sender);
-  TALDynamicListBoxText(LPageController['PageCountText']).Text := AlIntToStrW(LPageController.ActivePageIndex+1)+'/'+AlIntToStrW(LPageController.PageCount);
+  Var LPageController := TALDynamicPageController(Sender);
+  TALDynamicText(LPageController['PageCountText']).Text := AlIntToStrW(LPageController.ActivePageIndex+1)+'/'+AlIntToStrW(LPageController.PageCount);
 end;
 
 {****************************************************}
@@ -291,31 +297,31 @@ begin
     While True do begin
 
       if LCurrHeight > Result.Height then break;
-      var LLayout1 := TALDynamicListBoxLayout.Create(Result);
+      var LLayout1 := TALDynamicLayout.Create(Result);
       LLayout1.Align := TALAlignLayout.Top;
       LLayout1.Height := 30;
       LLayout1.Margins.Top := 12;
       LLayout1.Margins.left := 16;
       LCurrHeight := LCurrHeight + LLayout1.Height;
 
-      var LCircle1 := TALDynamicListBoxCircle.Create(LLayout1);
+      var LCircle1 := TALDynamicCircle.Create(LLayout1);
       LCircle1.Fill.Color := $1C000000;
       LCircle1.Stroke.Color := TAlphaColors.Null;
       LCircle1.Align := TALAlignLayout.left;
       LCircle1.Width := 30;
 
-      var LLayout2 := TALDynamicListBoxLayout.Create(LLayout1);
+      var LLayout2 := TALDynamicLayout.Create(LLayout1);
       LLayout2.Align := TALAlignLayout.client;
       LLayout2.Margins.left := 12;
 
-      var LRectangle1 := TALDynamicListBoxRectangle.Create(LLayout2);
+      var LRectangle1 := TALDynamicRectangle.Create(LLayout2);
       LRectangle1.Fill.Color := $1C000000;
       LRectangle1.Stroke.Color := TAlphaColors.Null;
       LRectangle1.Align := TALAlignLayout.topleft;
       LRectangle1.Height := 12;
       LRectangle1.Width := 100;
 
-      var LRectangle2 := TALDynamicListBoxRectangle.Create(LLayout2);
+      var LRectangle2 := TALDynamicRectangle.Create(LLayout2);
       LRectangle2.Fill.Color := $1C000000;
       LRectangle2.Stroke.Color := TAlphaColors.Null;
       LRectangle2.Align := TALAlignLayout.topleft;
@@ -324,7 +330,7 @@ begin
       LRectangle2.Width := 180;
 
       if LCurrHeight > Result.Height then break;
-      var LRectangle3 := TALDynamicListBoxRectangle.Create(Result);
+      var LRectangle3 := TALDynamicRectangle.Create(Result);
       LRectangle3.Fill.Color := $1C000000;
       LRectangle3.Stroke.Color := TAlphaColors.Null;
       LRectangle3.Align := TALAlignLayout.top;
@@ -333,7 +339,7 @@ begin
       LCurrHeight := LCurrHeight + LRectangle3.Height;
 
       if LCurrHeight > Result.Height then break;
-      var LRectangle4 := TALDynamicListBoxRectangle.Create(Result);
+      var LRectangle4 := TALDynamicRectangle.Create(Result);
       LRectangle4.Fill.Color := $1C000000;
       LRectangle4.Stroke.Color := TAlphaColors.Null;
       LRectangle4.Align := TALAlignLayout.top;
@@ -344,7 +350,7 @@ begin
       LCurrHeight := LCurrHeight + LRectangle4.Height;
 
       if LCurrHeight > Result.Height then break;
-      var LRectangle5 := TALDynamicListBoxRectangle.Create(Result);
+      var LRectangle5 := TALDynamicRectangle.Create(Result);
       LRectangle5.Fill.Color := $1C000000;
       LRectangle5.Stroke.Color := TAlphaColors.Null;
       LRectangle5.Align := TALAlignLayout.top;
@@ -355,7 +361,7 @@ begin
       LCurrHeight := LCurrHeight + LRectangle5.Height;
 
       if LCurrHeight > Result.Height then break;
-      var LRectangle6 := TALDynamicListBoxRectangle.Create(Result);
+      var LRectangle6 := TALDynamicRectangle.Create(Result);
       LRectangle6.Fill.Color := $1C000000;
       LRectangle6.Stroke.Color := TAlphaColors.Null;
       LRectangle6.Align := TALAlignLayout.topleft;
@@ -384,7 +390,7 @@ begin
     Result.Height := 56;
     Result.Fill.Color := TalphaColors.White;
 
-    var LTitle := TALDynamicListBoxText.Create(Result);
+    var LTitle := TALDynamicText.Create(Result);
     LTitle.Align := TALAlignLayout.LeftCenter;
     LTitle.TextSettings.Font.Size := 22;
     LTitle.TextSettings.Font.weight := TFontWeight.Bold;
@@ -393,7 +399,7 @@ begin
     LTitle.Margins.left := 18;
     LTitle.Text := 'For you';
 
-    var LMessageBtn := TALDynamicListBoxButton.Create(Result);
+    var LMessageBtn := TALDynamicButton.Create(Result);
     LMessageBtn.Fill.Color := TalphaColors.Null;
     LMessageBtn.Fill.ResourceName := 'message';
     LMessageBtn.Stroke.Color := TalphaColors.Null;
@@ -402,7 +408,7 @@ begin
     LMessageBtn.Height := 20;
     LMessageBtn.Width := 23;
 
-    var LActivityBtn := TALDynamicListBoxButton.Create(Result);
+    var LActivityBtn := TALDynamicButton.Create(Result);
     LActivityBtn.Fill.Color := TalphaColors.Null;
     LActivityBtn.Fill.ResourceName := 'activity';
     LActivityBtn.Stroke.Color := TalphaColors.Null;
@@ -437,7 +443,7 @@ begin
     {$ENDIF}
     Result.Fill.Color := TalphaColors.white;
 
-    var LButton1 := TALDynamicListBoxButton.Create(Result);
+    var LButton1 := TALDynamicButton.Create(Result);
     LButton1.Align := TALAlignLayout.LeftCenter;
     LButton1.Fill.Color := TalphaColors.Null;
     LButton1.Fill.ResourceName := 'home';
@@ -445,7 +451,7 @@ begin
     LButton1.Height := 22;
     LButton1.Stroke.Color := TalphaColors.Null;
 
-    var LButton2 := TALDynamicListBoxButton.Create(Result);
+    var LButton2 := TALDynamicButton.Create(Result);
     LButton2.Align := TALAlignLayout.LeftCenter;
     LButton2.Fill.Color := TalphaColors.Null;
     LButton2.Fill.ResourceName := 'search';
@@ -453,7 +459,7 @@ begin
     LButton2.Height := 22;
     LButton2.Stroke.Color := TalphaColors.Null;
 
-    var LButton3 := TALDynamicListBoxButton.Create(Result);
+    var LButton3 := TALDynamicButton.Create(Result);
     LButton3.Align := TALAlignLayout.LeftCenter;
     LButton3.Fill.Color := TalphaColors.Null;
     LButton3.Fill.ResourceName := 'add';
@@ -461,7 +467,7 @@ begin
     LButton3.Height := 22;
     LButton3.Stroke.Color := TalphaColors.Null;
 
-    var LButton4 := TALDynamicListBoxButton.Create(Result);
+    var LButton4 := TALDynamicButton.Create(Result);
     LButton4.Align := TALAlignLayout.LeftCenter;
     LButton4.Fill.Color := TalphaColors.Null;
     LButton4.Fill.ResourceName := 'video';
@@ -469,7 +475,7 @@ begin
     LButton4.Height := 22;
     LButton4.Stroke.Color := TalphaColors.Null;
 
-    var LButton5 := TALDynamicListBoxButton.Create(Result);
+    var LButton5 := TALDynamicButton.Create(Result);
     LButton5.Align := TALAlignLayout.LeftCenter;
     LButton5.Fill.Color := TalphaColors.Null;
     LButton5.Fill.ResourceName := 'profile';
@@ -494,11 +500,11 @@ begin
 
     Result.BoundsRect := AContext.TargetRect;
 
-    Var LLayout1 := TALDynamicListBoxLayout.Create(Result);
+    Var LLayout1 := TALDynamicLayout.Create(Result);
     LLayout1.Align := TALAlignLayout.Top;
     LLayout1.Height := 38;
 
-    var LRainbowCircle := TALDynamicListBoxImage.Create(LLayout1);
+    var LRainbowCircle := TALDynamicImage.Create(LLayout1);
     LRainbowCircle.WrapMode := TALImageWrapMode.Fit;
     LRainbowCircle.ResourceName := 'rainbowcircle';
     LRainbowCircle.Align := TALAlignLayout.LeftCenter;
@@ -508,7 +514,7 @@ begin
     LRainbowCircle.CacheIndex := 1;
     LRainbowCircle.CacheEngine := AContext.CacheEngine;
 
-    var LAvatar := TALDynamicListBoxImage.Create(LRainbowCircle);
+    var LAvatar := TALDynamicImage.Create(LRainbowCircle);
     LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
     {$IF defined(debug)}
@@ -520,7 +526,7 @@ begin
     LAvatar.XRadius := -50;
     LAvatar.yRadius := -50;
 
-    var LMenuBtn := TALDynamicListBoxButton.Create(LLayout1);
+    var LMenuBtn := TALDynamicButton.Create(LLayout1);
     LMenuBtn.Fill.Color := TalphaColors.Null;
     LMenuBtn.Fill.ResourceName := 'menu';
     LMenuBtn.Stroke.Color := TalphaColors.Null;
@@ -531,12 +537,12 @@ begin
     LMenuBtn.CacheIndex := 2;
     LMenuBtn.CacheEngine := AContext.CacheEngine;
 
-    Var LLayout2 := TALDynamicListBoxLayout.Create(LLayout1);
+    Var LLayout2 := TALDynamicLayout.Create(LLayout1);
     LLayout2.Align := TALAlignLayout.LeftCenter;
     LLayout2.Margins.Left := 13;
     LLayout2.AutoSize := True;
 
-    var LUsername := TALDynamicListBoxText.Create(LLayout2);
+    var LUsername := TALDynamicText.Create(LLayout2);
     LUsername.Align := TALAlignLayout.topLeft;
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.Medium;
@@ -544,7 +550,7 @@ begin
     LUsername.AutoSize := True;
     LUsername.Text := {$IF defined(debug)}'['+ALIntToStrW(AContext.Owner.index)+']'+{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
-    var LGeotag := TALDynamicListBoxText.Create(LLayout2);
+    var LGeotag := TALDynamicText.Create(LLayout2);
     LGeotag.Align := TALAlignLayout.topLeft;
     LGeotag.Margins.Top := 4;
     LGeotag.TextSettings.Font.Size := 12;
@@ -555,7 +561,7 @@ begin
 
     var LmediaNode := AContext.Owner.Data.GetChildNode('media');
     If LmediaNode.ChildNodes.Count > 1 then begin
-      var LPageController := TALDynamicListBoxPageController.Create(Result);
+      var LPageController := TALDynamicPageController.Create(Result);
       LPageController.Align := TALAlignLayout.Top;
       LPageController.Height := (Result.Width / LmediaNode.ChildNodes[0].GetChildNodeValueInt32('width', 0)) * LmediaNode.ChildNodes[0].GetChildNodeValueInt32('height', 0);
       LPageController.Margins.Top := 11;
@@ -564,18 +570,18 @@ begin
         var LPageView := LPageController.AddPage;
         var LMediumNode := LmediaNode.ChildNodes[I];
         if LMediumNode.GetChildNodeValueBool('is_video', false) then begin
-          var LVideoPlayerSurface1 := TALDynamicListBoxVideoPlayerSurface.Create(LPageView);
+          var LVideoPlayerSurface1 := TALDynamicVideoPlayerSurface.Create(LPageView);
           LVideoPlayerSurface1.Align := TALAlignLayout.Client;
           LVideoPlayerSurface1.PreviewResourceName := LMediumNode.GetChildNodeValueText('preview_url', '');
           {$IF defined(debug)}
           LVideoPlayerSurface1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index) + '_' + ALIntToStrW(I);
           {$ENDIF}
           LVideoPlayerSurface1.Looping := true;
-          LVideoPlayerSurface1.AutoStartMode := TALDynamicListBoxVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
+          LVideoPlayerSurface1.AutoStartMode := TALDynamicVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
           LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
         end
         else begin
-          var LMedia1 := TALDynamicListBoxImage.Create(LPageView);
+          var LMedia1 := TALDynamicImage.Create(LPageView);
           LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
           LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
           {$IF defined(debug)}
@@ -584,7 +590,7 @@ begin
           LMedia1.Align := TALAlignLayout.client;
         end;
       end;
-      var LPageIndicator := TALDynamicListBoxPageIndicator.Create(Result);
+      var LPageIndicator := TALDynamicPageIndicator.Create(Result);
       LPageIndicator.Align := TALAlignLayout.Top;
       LPageIndicator.Margins.Top := 10;
       LPageIndicator.InactiveIndicator.Width := 6;
@@ -592,11 +598,11 @@ begin
       LpageIndicator.InactiveIndicator.Margins.Rect := TRectF.Create(1.5,1.5,1.5,1.5);
       LpageIndicator.InactiveIndicator.Fill.Color := $FFdcdfe3;
       LpageIndicator.ActiveIndicator.Fill.Color := $FF4193ef;
-      LPageIndicator.AnimationType := TALDynamicListBoxPageIndicator.TAnimationType.Slide;
+      LPageIndicator.AnimationType := TALDynamicPageIndicator.TAnimationType.Slide;
       LPageIndicator.CacheIndex := 8;
       LPageIndicator.CacheEngine := AContext.CacheEngine;
       LPageController.PageIndicator := LPageIndicator;
-      var LPageCountText := TALDynamicListBoxText.Create(LPageController);
+      var LPageCountText := TALDynamicText.Create(LPageController);
       LPageCountText.Name := 'PageCountText';
       LPageCountText.Align := TALAlignLayout.TopRight;
       LPageCountText.Margins.top := 14;
@@ -614,7 +620,7 @@ begin
     else If LmediaNode.ChildNodes.Count = 1 then begin
       var LMediumNode := LmediaNode.ChildNodes[0];
       if LMediumNode.GetChildNodeValueBool('is_video', false) then begin
-        var LVideoPlayerSurface1 := TALDynamicListBoxVideoPlayerSurface.Create(Result);
+        var LVideoPlayerSurface1 := TALDynamicVideoPlayerSurface.Create(Result);
         LVideoPlayerSurface1.Margins.Top := 11;
         LVideoPlayerSurface1.Align := TALAlignLayout.top;
         LVideoPlayerSurface1.Height := (Result.Width / LMediumNode.GetChildNodeValueInt32('width', 0)) * LMediumNode.GetChildNodeValueInt32('height', 0);
@@ -623,11 +629,11 @@ begin
         LVideoPlayerSurface1.TagString := 'Media_'+ALIntToStrW(AContext.Owner.index);
         {$ENDIF}
         LVideoPlayerSurface1.Looping := true;
-        LVideoPlayerSurface1.AutoStartMode := TALDynamicListBoxVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
+        LVideoPlayerSurface1.AutoStartMode := TALDynamicVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
         LVideoPlayerSurface1.DataSource := LMediumNode.GetChildNodeValueText('url', '');
       end
       else begin
-        var LMedia1 := TALDynamicListBoxImage.Create(Result);
+        var LMedia1 := TALDynamicImage.Create(Result);
         LMedia1.WrapMode := TALImageWrapMode.FitAndCrop;
         LMedia1.ResourceName := LMediumNode.GetChildNodeValueText('url', '');
         {$IF defined(debug)}
@@ -648,13 +654,13 @@ begin
       end;
     end;
 
-    Var LLayout3 := TALDynamicListBoxLayout.Create(Result);
+    Var LLayout3 := TALDynamicLayout.Create(Result);
     LLayout3.Align := TALAlignLayout.Top;
     LLayout3.Height := 23;
     LLayout3.Margins.Top := 12;
     LLayout3.Margins.bottom := 10;
 
-    var LLikeCountBtn := TALDynamicListBoxButton.Create(LLayout3);
+    var LLikeCountBtn := TALDynamicButton.Create(LLayout3);
     LLikeCountBtn.Fill.Color := TalphaColors.Null;
     LLikeCountBtn.Fill.ResourceName := 'like';
     LLikeCountBtn.Stroke.Color := TalphaColors.Null;
@@ -665,7 +671,7 @@ begin
     LLikeCountBtn.CacheIndex := 4;
     LLikeCountBtn.CacheEngine := AContext.CacheEngine;
 
-    var LLikeCountText := TALDynamicListBoxText.Create(LLayout3);
+    var LLikeCountText := TALDynamicText.Create(LLayout3);
     LLikeCountText.Align := TALAlignLayout.LeftCenter;
     LLikeCountText.Margins.Left := 5;
     LLikeCountText.TextSettings.Font.Size := 14;
@@ -674,7 +680,7 @@ begin
     LLikeCountText.AutoSize := True;
     LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
 
-    var LCommentCountBtn := TALDynamicListBoxButton.Create(LLayout3);
+    var LCommentCountBtn := TALDynamicButton.Create(LLayout3);
     LCommentCountBtn.Fill.Color := TalphaColors.Null;
     LCommentCountBtn.Fill.ResourceName := 'comments';
     LCommentCountBtn.Stroke.Color := TalphaColors.Null;
@@ -685,7 +691,7 @@ begin
     LCommentCountBtn.CacheIndex := 5;
     LCommentCountBtn.CacheEngine := AContext.CacheEngine;
 
-    var LCommentCountText := TALDynamicListBoxText.Create(LLayout3);
+    var LCommentCountText := TALDynamicText.Create(LLayout3);
     LCommentCountText.Align := TALAlignLayout.LeftCenter;
     LCommentCountText.Margins.Left := 5;
     LCommentCountText.TextSettings.Font.Size := 14;
@@ -694,7 +700,7 @@ begin
     LCommentCountText.AutoSize := True;
     LCommentCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('comment_count', 0));
 
-    var LReshareCountsBtn := TALDynamicListBoxButton.Create(LLayout3);
+    var LReshareCountsBtn := TALDynamicButton.Create(LLayout3);
     LReshareCountsBtn.Fill.Color := TalphaColors.Null;
     LReshareCountsBtn.Fill.ResourceName := 'message';
     LReshareCountsBtn.Stroke.Color := TalphaColors.Null;
@@ -705,7 +711,7 @@ begin
     LReshareCountsBtn.CacheIndex := 6;
     LReshareCountsBtn.CacheEngine := AContext.CacheEngine;
 
-    var LReshareCountText := TALDynamicListBoxText.Create(LLayout3);
+    var LReshareCountText := TALDynamicText.Create(LLayout3);
     LReshareCountText.Align := TALAlignLayout.LeftCenter;
     LReshareCountText.Margins.Left := 5;
     LReshareCountText.TextSettings.Font.Size := 14;
@@ -714,7 +720,7 @@ begin
     LReshareCountText.AutoSize := True;
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
 
-    var LBookmarkBtn := TALDynamicListBoxButton.Create(LLayout3);
+    var LBookmarkBtn := TALDynamicButton.Create(LLayout3);
     LBookmarkBtn.Fill.Color := TalphaColors.Null;
     LBookmarkBtn.Fill.ResourceName := 'bookmark';
     LBookmarkBtn.Stroke.Color := TalphaColors.Null;
@@ -725,7 +731,7 @@ begin
     LBookmarkBtn.CacheIndex := 7;
     LBookmarkBtn.CacheEngine := AContext.CacheEngine;
 
-    var LCaption := TALDynamicListBoxText.Create(Result);
+    var LCaption := TALDynamicText.Create(Result);
     LCaption.Align := TALAlignLayout.Top;
     LCaption.Margins.Left := 14;
     LCaption.Margins.Right := 14;
@@ -764,7 +770,7 @@ begin
     LCaption.OnElementMouseEnter := TextEllipsisElementMouseEnter;
     LCaption.OnElementMouseLeave := TextEllipsisElementMouseLeave;
 
-    var LDate := TALDynamicListBoxText.Create(Result);
+    var LDate := TALDynamicText.Create(Result);
     LDate.Align := TALAlignLayout.TopLeft;
     LDate.Margins.top := 7;
     LDate.Margins.Left := 14;
@@ -792,13 +798,13 @@ begin
 
     Result.BoundsRect := AContext.TargetRect;
 
-    Var LLayout1 := TALDynamicListBoxLayout.Create(Result);
+    Var LLayout1 := TALDynamicLayout.Create(Result);
     LLayout1.Align := TALAlignLayout.left;
     LLayout1.width := 100;
     LLayout1.Margins.Left := 6;
     LLayout1.Margins.Left := 6;
 
-    var LRainbowCircle := TALDynamicListBoxImage.Create(LLayout1);
+    var LRainbowCircle := TALDynamicImage.Create(LLayout1);
     LRainbowCircle.WrapMode := TALImageWrapMode.Fit;
     LRainbowCircle.ResourceName := 'bigrainbowcircle';
     LRainbowCircle.Align := TALAlignLayout.TopCenter;
@@ -809,7 +815,7 @@ begin
     LRainbowCircle.CacheIndex := 20;
     LRainbowCircle.CacheEngine := AContext.CacheEngine;
 
-    var LAvatar := TALDynamicListBoxImage.Create(LRainbowCircle);
+    var LAvatar := TALDynamicImage.Create(LRainbowCircle);
     LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
     {$IF defined(debug)}
@@ -821,7 +827,7 @@ begin
     LAvatar.XRadius := -50;
     LAvatar.yRadius := -50;
 
-    var LUsername := TALDynamicListBoxText.Create(LLayout1);
+    var LUsername := TALDynamicText.Create(LLayout1);
     LUsername.Align := TALAlignLayout.topcenter;
     LUsername.TextSettings.Font.Size := 12;
     LUsername.TextSettings.Font.weight := TFontWeight.Regular;
@@ -845,7 +851,7 @@ begin
 
     Result.BoundsRect := AContext.TargetRect;
 
-    Var LBackground := TALDynamicListBoxRectangle.Create(Result);
+    Var LBackground := TALDynamicRectangle.Create(Result);
     LBackground.Align := TALAlignLayout.left;
     LBackground.width := 220;
     LBackground.Margins.Left := 6;
@@ -858,7 +864,7 @@ begin
     LBackground.CacheIndex := 10;
     LBackground.CacheEngine := AContext.CacheEngine;
 
-    var LAvatar := TALDynamicListBoxImage.Create(LBackground);
+    var LAvatar := TALDynamicImage.Create(LBackground);
     LAvatar.WrapMode := TALImageWrapMode.FitAndCrop;
     LAvatar.ResourceName := AContext.Owner.Data.GetChildNodeValueText('profile_pic_url', '');
     {$IF defined(debug)}
@@ -871,7 +877,7 @@ begin
     LAvatar.yRadius := -50;
     LAvatar.Margins.top := 16;
 
-    var LUsername := TALDynamicListBoxText.Create(LBackground);
+    var LUsername := TALDynamicText.Create(LBackground);
     LUsername.Align := TALAlignLayout.topcenter;
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.medium;
@@ -881,7 +887,7 @@ begin
     LUsername.Text := {$IF defined(debug)}'['+ALIntToStrW(AContext.Owner.index)+']'+{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
     LUsername.Margins.top := 12;
 
-    var LFollowBtn := TALDynamicListBoxButton.Create(LBackground);
+    var LFollowBtn := TALDynamicButton.Create(LBackground);
     LFollowBtn.Fill.Color := $FF4193ef;
     LFollowBtn.Stroke.Color := TalphaColors.Null;
     LFollowBtn.TextSettings.font.Color := $FFffffff;
@@ -898,7 +904,7 @@ begin
     LFollowBtn.CacheIndex := 11;
     LFollowBtn.CacheEngine := AContext.CacheEngine;
 
-    var LCloseBtn := TALDynamicListBoxButton.Create(LBackground);
+    var LCloseBtn := TALDynamicButton.Create(LBackground);
     LCloseBtn.Fill.Color := TalphaColors.Null;
     LCloseBtn.Fill.ResourceName := 'cross';
     LCloseBtn.Stroke.Color := TalphaColors.Null;
@@ -1103,7 +1109,7 @@ end;
 {$IF defined(ALUIAutomationEnabled)}
 
 type
-  TALControlAccessProtected=class(TControl);
+  TALControlAccessor=class(TControl);
 
 {*****************************************}
 procedure TMainForm.SimulateInfiniteScroll;
@@ -1111,7 +1117,7 @@ begin
   TThread.ForceQueue(nil,
     procedure
     begin
-      var LControl := TALControlAccessProtected(MainDynamicListBox);
+      var LControl := TALControlAccessor(MainDynamicListBox);
       FSimulateInfiniteScrollCurrentPoint.X := 10;
       FSimulateInfiniteScrollCurrentPoint.Y := LControl.Height - 10;
       LControl.MouseDown(TMouseButton.mbLeft, [TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);
@@ -1123,7 +1129,7 @@ begin
     TThread.ForceQueue(nil,
       procedure
       begin
-        var LControl := TALControlAccessProtected(MainDynamicListBox);
+        var LControl := TALControlAccessor(MainDynamicListBox);
         FSimulateInfiniteScrollCurrentPoint.X := max(LControl.Width, FSimulateInfiniteScrollCurrentPoint.X + (Random * 5));
         FSimulateInfiniteScrollCurrentPoint.Y := max(0, FSimulateInfiniteScrollCurrentPoint.Y - (Random * 75));
         LControl.MouseMove([TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);
@@ -1134,7 +1140,7 @@ begin
   TThread.ForceQueue(nil,
     procedure
     begin
-      var LControl := TALControlAccessProtected(MainDynamicListBox);
+      var LControl := TALControlAccessor(MainDynamicListBox);
       FSimulateInfiniteScrollCurrentPoint.X := max(LControl.Width, FSimulateInfiniteScrollCurrentPoint.X + (Random * 5));
       FSimulateInfiniteScrollCurrentPoint.Y := max(0, FSimulateInfiniteScrollCurrentPoint.Y - (Random * 75));
       LControl.MouseUp(TMouseButton.mbLeft, [TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);

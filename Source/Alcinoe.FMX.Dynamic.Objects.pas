@@ -1196,6 +1196,9 @@ uses
   FMX.Skia,
   FMX.Skia.Canvas,
   {$ENDIF}
+  {$IF DEFINED(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
+  {$ENDIF}
   {$IF defined(IOS)}
   iOSapi.CoreGraphics,
   {$ENDIF}

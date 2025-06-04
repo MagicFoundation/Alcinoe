@@ -6515,7 +6515,7 @@ begin
   end;
 end;
 
-{**********************}
+{**********************************************************}
 procedure ALVibrateDevice(const ADurationMs: Integer = 500);
 begin
   {$IF defined(ANDROID)}

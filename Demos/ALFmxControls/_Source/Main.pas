@@ -451,7 +451,7 @@ uses
 {$R *.fmx}
 
 type
-  TALImageProtectedAccess = class(TALImage);
+  TALImageAccessor = class(TALImage);
 
 {************************************}
 procedure TMainForm.InitializeNewForm;
@@ -1525,12 +1525,12 @@ begin
   FPageViewAnimation.Duration := 0.2;
   FPageViewAnimation.Start;
   {$IF defined(ALGpuCanvas)}
-  if TALImageProtectedAccess(ALImageGallery2_1).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_1).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
-  if TALImageProtectedAccess(ALImageGallery2_2).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_2).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
-  if TALImageProtectedAccess(ALImageGallery2_3).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_3).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
-  if TALImageProtectedAccess(ALImageGallery2_4).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_4).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
-  if TALImageProtectedAccess(ALImageGallery2_5).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_5).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
-  if TALImageProtectedAccess(ALImageGallery2_6).fBufDrawable <> nil then TALImageProtectedAccess(ALImageGallery2_6).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageAccessor(ALImageGallery2_1).fBufDrawable <> nil then TALImageAccessor(ALImageGallery2_1).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageAccessor(ALImageGallery2_2).fBufDrawable <> nil then TALImageAccessor(ALImageGallery2_2).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageAccessor(ALImageGallery2_3).fBufDrawable <> nil then TALImageAccessor(ALImageGallery2_3).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageAccessor(ALImageGallery2_4).fBufDrawable <> nil then TALImageAccessor(ALImageGallery2_4).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageAccessor(ALImageGallery2_5).fBufDrawable <> nil then TALImageAccessor(ALImageGallery2_5).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
+  if TALImageAccessor(ALImageGallery2_6).fBufDrawable <> nil then TALImageAccessor(ALImageGallery2_6).fBufDrawable.Material := FCanvasColorAdjustTextureMaterialGallery2;
   {$ENDIF}
 end;
 

@@ -4891,7 +4891,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{****************************************************************************************************************************}
+{******************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicTextStyleInfo.create(const AApplyStyleProc: TDynamicTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -4899,7 +4899,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{**************************************************************************************************************************************************************}
+{****************************************************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicButtonStyleInfo.create(const AApplyStyleProc: TDynamicButtonApplyStyleProc; const ADefaultFontSize: Single; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -4908,7 +4908,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{**********************************************************************************************************************************}
+{************************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicCheckBoxStyleInfo.create(const AApplyStyleProc: TDynamicCheckBoxApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -4916,7 +4916,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{****************************************************************************************************************************************}
+{******************************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicRadioButtonStyleInfo.create(const AApplyStyleProc: TDynamicRadioButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -4924,7 +4924,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{******************************************************************************************************************************}
+{********************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicSwitchStyleInfo.create(const AApplyStyleProc: TDynamicSwitchApplyStyleProc; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -4932,7 +4932,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{********************************************************************************************************************************}
+{**********************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicTrackBarStyleInfo.create(const AApplyStyleProc: TDynamicTrackBarApplyStyleProc; const ADefaultSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -4940,7 +4940,7 @@ begin
   DefaultSize := ADefaultSize;
 end;
 
-{**********************************************************************************************************************************}
+{************************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicScrollBarStyleInfo.create(const AApplyStyleProc: TDynamicScrollBarApplyStyleProc; const ADefaultSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -5612,55 +5612,55 @@ begin
   FDialogStyles.AddOrSetValue(AName, TDialogStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{*******************************************************************************************************************************************}
+{*********************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicTextStyle(const AName: String; const AApplyStyleProc: TDynamicTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FDynamicTextStyles.AddOrSetValue(AName, TDynamicTextStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{***********************************************************************************************************************************************}
+{*************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicButtonStyle(const AName: String; const AApplyStyleProc: TDynamicButtonApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FDynamicButtonStyles.AddOrSetValue(AName, TDynamicButtonStyleInfo.create(AApplyStyleProc, ADefaultFontSize, 0{ADefaultHeight}));
 end;
 
-{*************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicButtonIconStyle(const AName: String; const AApplyStyleProc: TDynamicButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   FDynamicButtonStyles.AddOrSetValue(AName, TDynamicButtonStyleInfo.create(AApplyStyleProc, 0{ADefaultFontSize}, ADefaultHeight));
 end;
 
-{*************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicCheckBoxStyle(const AName: String; const AApplyStyleProc: TDynamicCheckBoxApplyStyleProc; const ADefaultHeight: Single);
 begin
   FDynamicCheckBoxStyles.AddOrSetValue(AName, TDynamicCheckBoxStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{*******************************************************************************************************************************************************}
+{*********************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicRadioButtonStyle(const AName: String; const AApplyStyleProc: TDynamicRadioButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   FDynamicRadioButtonStyles.AddOrSetValue(AName, TDynamicRadioButtonStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{*********************************************************************************************************************************************}
+{***********************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicSwitchStyle(const AName: String; const AApplyStyleProc: TDynamicSwitchApplyStyleProc; const ADefaultHeight: Single);
 begin
   FDynamicSwitchStyles.AddOrSetValue(AName, TDynamicSwitchStyleInfo.create(AApplyStyleProc, ADefaultHeight));
 end;
 
-{***********************************************************************************************************************************************}
+{*************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicTrackBarStyle(const AName: String; const AApplyStyleProc: TDynamicTrackBarApplyStyleProc; const ADefaultSize: Single);
 begin
   FDynamicTrackBarStyles.AddOrSetValue(AName, TDynamicTrackBarStyleInfo.create(AApplyStyleProc, ADefaultSize));
 end;
 
-{****************************************************************************************************************************************************}
+{******************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicRangeTrackBarStyle(const AName: String; const AApplyStyleProc: TDynamicTrackBarApplyStyleProc; const ADefaultSize: Single);
 begin
   FDynamicRangeTrackBarStyles.AddOrSetValue(AName, TDynamicTrackBarStyleInfo.create(AApplyStyleProc, ADefaultSize));
 end;
 
-{*************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicScrollBarStyle(const AName: String; const AApplyStyleProc: TDynamicScrollBarApplyStyleProc; const ADefaultSize: Single);
 begin
   FDynamicScrollBarStyles.AddOrSetValue(AName, TDynamicScrollBarStyleInfo.create(AApplyStyleProc, ADefaultSize));
@@ -6225,7 +6225,7 @@ begin
 end;
 
 
-{***********************************************************************************************************}
+{*************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText; const AFontSize: Single);
 begin
   Var LApplyDynamicTextStyleInfo: TDynamicTextStyleInfo;
@@ -6247,7 +6247,7 @@ begin
   end;
 end;
 
-{**********************************************************************************}
+{************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText);
 begin
   {$IF defined(ALDPK)}
@@ -6260,7 +6260,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************************************************************************************}
+{*******************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicButtonStyle(const AName: String; const AButton: TALDynamicButton; const AFontSize: Single);
 begin
   Var LApplyDynamicButtonStyleInfo: TDynamicButtonStyleInfo;
@@ -6282,7 +6282,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************}
+{*********************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicButtonIconStyle(const AName: String; const AButton: TALDynamicButton; const AHeight: Single);
 begin
   Var LApplyDynamicButtonStyleInfo: TDynamicButtonStyleInfo;
@@ -6304,7 +6304,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{******************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicButtonStyle(const AName: String; const AButton: TALDynamicButton);
 begin
   Var LApplyDynamicButtonStyleInfo: TDynamicButtonStyleInfo;
@@ -6332,7 +6332,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************************************}
+{***********************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicCheckBoxStyle(const AName: String; const ACheckBox: TALDynamicCheckBox; const AHeight: Single);
 begin
   Var LApplyDynamicCheckBoxStyleInfo: TDynamicCheckBoxStyleInfo;
@@ -6354,7 +6354,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicCheckBoxStyle(const AName: String; const ACheckBox: TALDynamicCheckBox);
 begin
   {$IF defined(ALDPK)}
@@ -6367,7 +6367,7 @@ begin
   {$ENDIF}
 end;
 
-{******************************************************************************************************************************}
+{********************************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicRadioButtonStyle(const AName: String; const ARadioButton: TALDynamicRadioButton; const AHeight: Single);
 begin
   Var LApplyDynamicRadioButtonStyleInfo: TDynamicRadioButtonStyleInfo;
@@ -6389,7 +6389,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************}
+{*********************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicRadioButtonStyle(const AName: String; const ARadioButton: TALDynamicRadioButton);
 begin
   {$IF defined(ALDPK)}
@@ -6402,7 +6402,7 @@ begin
   {$ENDIF}
 end;
 
-{***************************************************************************************************************}
+{*****************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicSwitchStyle(const AName: String; const ASwitch: TALDynamicSwitch; const AHeight: Single);
 begin
   Var LApplyDynamicSwitchStyleInfo: TDynamicSwitchStyleInfo;
@@ -6424,7 +6424,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{******************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicSwitchStyle(const AName: String; const ASwitch: TALDynamicSwitch);
 begin
   {$IF defined(ALDPK)}
@@ -6437,7 +6437,7 @@ begin
   {$ENDIF}
 end;
 
-{**********************************************************************************************************************}
+{************************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicTrackBarStyle(const AName: String; const ATrackBar: TALDynamicCustomTrack; const ASize: Single);
 begin
   Var LApplyDynamicTrackBarStyleInfo: TDynamicTrackBarStyleInfo;
@@ -6459,7 +6459,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
+{***************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicTrackBarStyle(const AName: String; const ATrackBar: TALDynamicCustomTrack);
 begin
   {$IF defined(ALDPK)}
@@ -6479,7 +6479,7 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************************************************************}
+{**********************************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALDynamicCustomTrack; const ASize: Single);
 begin
   Var LApplyDynamicRangeTrackBarStyleInfo: TDynamicTrackBarStyleInfo;
@@ -6501,7 +6501,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************}
+{*************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicRangeTrackBarStyle(const AName: String; const ARangeTrackBar: TALDynamicCustomTrack);
 begin
   {$IF defined(ALDPK)}
@@ -6521,7 +6521,7 @@ begin
   {$ENDIF}
 end;
 
-{****************************************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicScrollBarStyle(const AName: String; const AScrollBar: TALDynamicCustomScrollBar; const ASize: Single);
 begin
   Var LApplyDynamicScrollBarStyleInfo: TDynamicScrollBarStyleInfo;
@@ -6543,7 +6543,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************}
+{*********************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicScrollBarStyle(const AName: String; const AScrollBar: TALDynamicCustomScrollBar);
 begin
   {$IF defined(ALDPK)}

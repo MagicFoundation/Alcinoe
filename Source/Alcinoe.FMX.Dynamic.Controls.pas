@@ -462,7 +462,7 @@ type
     property Padding;
     //property PopupMenu;
     //property Position;
-    //property RotationAngle;
+    property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
@@ -510,11 +510,11 @@ uses
   Alcinoe.Localization,
   Alcinoe.StringUtils;
 
-{**}
+
 type
   _TALDownloadContextProtectedAccess = class(TALDownloadContext);
 
-{***********************************************************}
+
 constructor TALDynamicControlHost.Create(aOwner: TComponent);
 begin
   inherited create(AOwner);
@@ -524,14 +524,14 @@ begin
   FCacheEngine := TALBufDrawableCacheEngine.Create;
 end;
 
-{***************************************}
+
 destructor TALDynamicControlHost.Destroy;
 begin
   FCacheEngine.DecreaseRefCount;
   inherited Destroy;
 end;
 
-{*********************************************}
+
 function TALDynamicControlHost.GetControlAtPos(
            const APos: TALPointD; // APos is local to the control
            const ACheckHitTest: Boolean = true): TALDynamicControl;
@@ -540,13 +540,13 @@ begin
   result := GetControlAtPos(APos, LControlPos, ACheckHitTest);
 end;
 
-{**************************************************************************}
+
 procedure TALDynamicControlHost.SetCaptured(const Value: TALDynamicControl);
 begin
   FCaptured := Value;
 end;
 
-{*************************************************************************}
+
 procedure TALDynamicControlHost.SetHovered(const Value: TALDynamicControl);
 begin
   if (Value <> FHovered) then begin
@@ -556,7 +556,7 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+
 procedure TALDynamicControlHost.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   var LControlMousePos: TALPointD;
@@ -568,7 +568,7 @@ begin
   inherited;
 end;
 
-{**********************************************************************}
+
 procedure TALDynamicControlHost.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   if FCaptured <> nil then begin
@@ -594,7 +594,7 @@ begin
   inherited;
 end;
 
-{******************************************************************************************}
+
 procedure TALDynamicControlHost.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if FCaptured <> nil then begin
@@ -613,7 +613,7 @@ begin
   inherited;
 end;
 
-{*********************************************************************************************}
+
 procedure TALDynamicControlHost.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if FCaptured <> nil then begin
@@ -631,7 +631,7 @@ begin
   inherited;
 end;
 
-{***************************************}
+
 procedure TALDynamicControlHost.DoMouseLeave;
 begin
   SetCaptured(Nil);
@@ -640,7 +640,7 @@ begin
   inherited;
 end;
 
-{**************}
+
 // [MultiThread]
 constructor TALDynamicControl.Create(const AOwner: TObject);
 begin
@@ -712,7 +712,7 @@ begin
   end;
 end;
 
-{******************************************}
+
 destructor TALDynamicControl.Destroy;
 begin
   SetOwner(nil);
@@ -723,7 +723,7 @@ begin
   inherited;
 end;
 
-{***************************************************}
+
 procedure TALDynamicControl.BeforeDestruction;
 begin
   fIsDestroying := True;
@@ -745,24 +745,24 @@ begin
   inherited;
 end;
 
-{*********************************************************}
+
 function TALDynamicControl.CreateMargins: TALBounds;
 begin
   result := TALBounds.Create;
 end;
 
-{*********************************************************}
+
 function TALDynamicControl.CreatePadding: TALBounds;
 begin
   result := TALBounds.Create;
 end;
 
-{***********************************************}
+
 procedure TALDynamicControl.DoBeginUpdate;
 begin
 end;
 
-{*********************************************}
+
 procedure TALDynamicControl.DoEndUpdate;
 begin
   Realign;
@@ -770,7 +770,7 @@ begin
   Repaint;
 end;
 
-{*********************************************}
+
 procedure TALDynamicControl.BeginUpdate;
 begin
   if FUpdating = 0 then
@@ -780,13 +780,13 @@ begin
     FControls[I].BeginUpdate;
 end;
 
-{****************************************************}
+
 function TALDynamicControl.IsUpdating: Boolean;
 begin
   Result := FUpdating > 0;
 end;
 
-{****************************************************************************************}
+
 procedure TALDynamicControl.SetOwner(const Value: TALDynamicControl);
 begin
   if Value <> fOwner then begin
@@ -799,13 +799,13 @@ begin
   end;
 end;
 
-{**************************************************************************************}
+
 procedure TALDynamicControl.AddControl(const AControl: TALDynamicControl);
 begin
   InsertControl(AControl, Maxint);
 end;
 
-{****************************************************************************************************************}
+
 procedure TALDynamicControl.InsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   if (AControl <> nil) and (AControl.Owner <> Self) then begin
@@ -814,7 +814,7 @@ begin
   end;
 end;
 
-{******************************************************************************************************************}
+
 procedure TALDynamicControl.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   for var I := AControl.FUpdating downto FUpdating + 1 do AControl.EndUpdate;
@@ -838,21 +838,21 @@ begin
   Repaint;
 end;
 
-{*****************************************************************************************}
+
 procedure TALDynamicControl.RemoveControl(const AControl: TALDynamicControl);
 begin
   if (not FIsDestroying) and (AControl <> nil) and (AControl.Owner = Self) then
     DoRemoveControl(AControl);
 end;
 
-{**********************************************************************}
+
 procedure TALDynamicControl.RemoveControl(const AIndex: Integer);
 begin
   if (not FIsDestroying) and (InRange(AIndex, 0, FControlsCount - 1)) then
     DoRemoveControl(FControls[AIndex]);
 end;
 
-{*******************************************************************************************}
+
 procedure TALDynamicControl.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   if Host <> nil then begin
@@ -892,7 +892,7 @@ begin
   Repaint;
 end;
 
-{*****************************************************************************************************************}
+
 procedure TALDynamicControl.MoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer);
 begin
   IF AControl.Owner <> self then
@@ -902,7 +902,7 @@ begin
   DoMoveControl(AControl, LNewIndex);
 end;
 
-{*******************************************************************************************************************}
+
 procedure TALDynamicControl.DoMoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer);
 begin
   var LOldIndex := AControl.Index;
@@ -923,7 +923,7 @@ begin
   Repaint;
 end;
 
-{***************************************************************************************************}
+
 function TALDynamicControl.GetControlByIndex(Const AIndex: Integer): TALDynamicControl;
 begin
   {$IF defined(debug)}
@@ -932,7 +932,7 @@ begin
   result := FControls[AIndex];
 end;
 
-{************************************************************************************************}
+
 function TALDynamicControl.GetControlByName(Const AName: String): TALDynamicControl;
 begin
   Result := nil;
@@ -941,7 +941,7 @@ begin
       exit(FControls[I]);
 end;
 
-{************************************************}
+
 function TALDynamicControl.GetControlAtPos(
            const APos: TALPointD; // APos is local to the control
            out AControlPos: TALPointD; // AControlPos is local to the founded control
@@ -981,7 +981,7 @@ begin
   end;
 end;
 
-{************************************************}
+
 function TALDynamicControl.GetControlAtPos(
            const APos: TALPointD;
            const ACheckHitTest: Boolean = true): TALDynamicControl;
@@ -990,7 +990,7 @@ begin
   result := GetControlAtPos(aPos, LControlPos, ACheckHitTest);
 end;
 
-{*****************************************************************************************}
+
 procedure TALDynamicControl.AddFreeNotify(const AControl: TALDynamicControl);
 begin
   if AControl <> nil then begin
@@ -999,60 +999,60 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+
 procedure TALDynamicControl.RemoveFreeNotify(const AControl: TALDynamicControl);
 begin
   if FNotifyList <> nil then
     FNotifyList.Remove(AControl);
 end;
 
-{*******************************************************************************************}
+
 procedure TALDynamicControl.FreeNotification(const AObject: TALDynamicControl);
 begin
   // Virtual;
 end;
 
-{*****************************************}
+
 procedure TALDynamicControl.Repaint;
 begin
   If Host <> nil then
     Host.Repaint;
 end;
 
-{****************************************************}
+
 function TALDynamicControl.GetTagFloat: Double;
 begin
   ALMove(FTag, Result, SizeOf(Double));
 end;
 
-{*****************************************************************}
+
 procedure TALDynamicControl.SetTagFloat(const AValue: Double);
 begin
   ALMove(AValue, FTag, SizeOf(Double));
 end;
 
-{*****************************************************************}
+
 procedure TALDynamicControl.SetIndex(const AValue: Integer);
 begin
   if (Owner <> nil) then
     Owner.MoveControl(Self,AValue);
 end;
 
-{**********************************************}
+
 procedure TALDynamicControl.BringToFront;
 begin
   If Owner <> nil then
     Owner.MoveControl(Self,MaxInt);
 end;
 
-{********************************************}
+
 procedure TALDynamicControl.SendToBack;
 begin
   If Owner <> nil then
     Owner.MoveControl(Self,0);
 end;
 
-{****************************************}
+
 procedure TALDynamicControl.SetPivot(const AValue: TPointF);
 begin
   if not FPivot.EqualsTo(AValue, TEpsilon.Scale) then begin
@@ -1061,7 +1061,7 @@ begin
   end;
 end;
 
-{****************************************}
+
 procedure TALDynamicControl.SetRotationAngle(const AValue: Single);
 begin
   if not SameValue(FRotationAngle, AValue, TEpsilon.Scale) then begin
@@ -1070,7 +1070,7 @@ begin
   end;
 end;
 
-{****************************************}
+
 procedure TALDynamicControl.SetScale(const AValue: TPointF);
 begin
   if not FScale.EqualsTo(AValue, TEpsilon.Scale) then begin
@@ -1079,7 +1079,7 @@ begin
   end;
 end;
 
-{**************************************************************************}
+
 procedure TALDynamicControl.SetBounds(X, Y, AWidth, AHeight: Double);
 begin
   AWidth := System.Math.Max(0, AWidth);
@@ -1096,25 +1096,25 @@ begin
   end;
 end;
 
-{********************************************************}
+
 function TALDynamicControl.GetBoundsRect: TALRectD;
 begin
   Result := TALRectD.Create(Left, Top, Left + Width, Top + Height);
 end;
 
-{**********************************************************************}
+
 procedure TALDynamicControl.SetBoundsRect(const Value: TALRectD);
 begin
   SetBounds(Value.Left, Value.Top, Value.Width, Value.Height);
 end;
 
-{*******************************************************}
+
 function TALDynamicControl.GetLocalRect: TALRectD;
 begin
   Result := TALRectD.Create(0, 0, Width, Height);
 end;
 
-{***************************************************************}
+
 function TALDynamicControl.GetExpandedLocalRect: TALRectD;
 begin
   result := TALRectD.Create(
@@ -1124,13 +1124,13 @@ begin
               Height+TouchTargetExpansion.bottom);
 end;
 
-{**********************************************************}
+
 function TALDynamicControl.GetAbsoluteRect: TALRectD;
 begin
   Result := TALRectD.Create(LocalToAbsolute(LocalRect));
 end;
 
-{*****************************************************************}
+
 function TALDynamicControl.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (FIsDestroying) or (not AbsoluteVisible) or (Host = nil) then Exit(TRectF.Empty);
@@ -1139,7 +1139,7 @@ begin
   Result := TRectF.Intersect(Host.LocalToAbsolute(Host.DisplayedRect), AbsoluteRect.ReducePrecision);
 end;
 
-{****************************************************************}
+
 function TALDynamicControl.GetExpandedBoundsRect: TALRectD;
 begin
   result := TALRectD.Create(
@@ -1149,79 +1149,79 @@ begin
               Bottom+TouchTargetExpansion.bottom);
 end;
 
-{*******************************************************}
+
 function TALDynamicControl.GetPosition: TALPointD;
 begin
   Result := TALPointD.Create(FLeft, FTop);
 end;
 
-{**********************************************************************}
+
 procedure TALDynamicControl.SetPosition(const AValue: TALPointD);
 begin
   SetBounds(AValue.X, AValue.Y, FWidth, FHeight);
 end;
 
-{********************************************************************}
+
 procedure TALDynamicControl.SetPosition(const AValue: TPointf);
 begin
   SetBounds(AValue.X, AValue.Y, FWidth, FHeight);
 end;
 
-{****************************************************************}
+
 procedure TALDynamicControl.SetSize(const ASize: TALSizeD);
 begin
   SetBounds(Fleft, FTop, ASize.Width, ASize.Height);
 end;
 
-{**************************************************************}
+
 procedure TALDynamicControl.SetSize(const ASize: TSizeF);
 begin
   SetBounds(Fleft, FTop, ASize.Width, ASize.Height);
 end;
 
-{************************************************************************}
+
 procedure TALDynamicControl.SetSize(const AWidth, AHeight: Double);
 begin
   SetBounds(Fleft, FTop, AWidth, AHeight);
 end;
 
-{**************************************************************}
+
 procedure TALDynamicControl.SetLeft(const Value: Double);
 begin
   SetBounds(Value, FTop, FWidth, FHeight);
 end;
 
-{*************************************************************}
+
 procedure TALDynamicControl.SetTop(const Value: Double);
 begin
   SetBounds(FLeft, Value, FWidth, FHeight);
 end;
 
-{***************************************************************}
+
 procedure TALDynamicControl.SetWidth(const Value: Double);
 begin
   SetBounds(FLeft, FTop, Value, FHeight);
 end;
 
-{****************************************************************}
+
 procedure TALDynamicControl.SetHeight(const Value: Double);
 begin
   SetBounds(FLeft, FTop, FWidth, Value);
 end;
 
-{*************************************************}
+
 function TALDynamicControl.GetRight: Double;
 begin
   Result := Left + Width;
 end;
 
-{**************************************************}
+
 function TALDynamicControl.GetBottom: Double;
 begin
   Result := Top + Height;
 end;
 
-{************************************************************************************}
+
 function TALDynamicControl.AbsoluteToLocal(const APoint: TALPointD): TALPointD;
 begin
   if Owner <> nil then Result := Owner.AbsoluteToLocal(APoint)
@@ -1233,7 +1233,7 @@ begin
   Result.Offset(-Left, -Top);
 end;
 
-{*********************************************************************************}
+
 function TALDynamicControl.AbsoluteToLocal(const ARect: TALRectD): TALRectD;
 begin
   if Owner <> nil then Result := Owner.AbsoluteToLocal(ARect)
@@ -1245,19 +1245,19 @@ begin
   Result.Offset(-Left, -Top);
 end;
 
-{**********************************************************************************}
+
 function TALDynamicControl.AbsoluteToLocal(const APoint: TPointF): TALPointD;
 begin
   Result := AbsoluteToLocal(TALPointD.Create(APoint));
 end;
 
-{*******************************************************************************}
+
 function TALDynamicControl.AbsoluteToLocal(const ARect: TRectF): TALRectD;
 begin
   Result := AbsoluteToLocal(TALRectD.Create(ARect));
 end;
 
-{************************************************************************************}
+
 function TALDynamicControl.LocalToAbsolute(const APoint: TALPointD): TALPointD;
 begin
   Result := APoint;
@@ -1266,7 +1266,7 @@ begin
   else if Host <> nil then Result.Offset(Host.LocalToAbsolute(TPointF.Zero));
 end;
 
-{*********************************************************************************}
+
 function TALDynamicControl.LocalToAbsolute(const ARect: TALRectD): TALRectD;
 begin
   Result := ARect;
@@ -1275,19 +1275,19 @@ begin
   else if Host <> nil then Result.Offset(Host.LocalToAbsolute(TPointF.Zero));
 end;
 
-{**********************************************************************************}
+
 function TALDynamicControl.LocalToAbsolute(const APoint: TPointF): TALPointD;
 begin
   result := LocalToAbsolute(TALPointD.Create(APoint));
 end;
 
-{*******************************************************************************}
+
 function TALDynamicControl.LocalToAbsolute(const ARect: TRectF): TALRectD;
 begin
   result := LocalToAbsolute(TALRectD.Create(ARect));
 end;
 
-{**************************************************************************}
+
 function TALDynamicControl.PointInObjectLocal(X, Y: Double): Boolean;
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -1299,19 +1299,19 @@ begin
             (Y <= (Height + TouchTargetExpansion.Bottom));
 end;
 
-{*******************************************************}
+
 function TALDynamicControl.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(50, 50);
 end;
 
-{*******************************************************************************}
+
 procedure TALDynamicControl.SetTouchTargetExpansion(const AValue: TRectF);
 begin
   FTouchTargetExpansion := AValue;
 end;
 
-{******************************************************************}
+
 procedure TALDynamicControl.SetEnabled(const Value: Boolean);
 begin
   if FEnabled <> Value then begin
@@ -1320,7 +1320,7 @@ begin
   end;
 end;
 
-{********************************************************}
+
 procedure TALDynamicControl.refreshAbsoluteEnabled;
 begin
   var LNewAbsoluteEnabled: Boolean;
@@ -1334,7 +1334,7 @@ begin
   end;
 end;
 
-{******************************************************************}
+
 procedure TALDynamicControl.SetVisible(const Value: Boolean);
 begin
   if FVisible <> Value then begin
@@ -1343,19 +1343,19 @@ begin
   end;
 end;
 
-{********************************************************************}
+
 function TALDynamicControl.GetFirstVisibleObjectIndex: Integer;
 begin
   Result := 0;
 end;
 
-{*******************************************************************}
+
 function TALDynamicControl.GetLastVisibleObjectIndex: Integer;
 begin
   Result := FControlsCount - 1;
 end;
 
-{********************************************************}
+
 procedure TALDynamicControl.RefreshAbsoluteVisible;
 begin
   var LNewAbsoluteVisible: Boolean;
@@ -1369,7 +1369,7 @@ begin
   end;
 end;
 
-{*****************************************************************}
+
 procedure TALDynamicControl.SetOpacity(const Value: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -1381,7 +1381,7 @@ begin
   end;
 end;
 
-{*************************************************************************}
+
 procedure TALDynamicControl.SetDisabledOpacity(const Value: Single);
 begin
   if not SameValue(FDisabledOpacity, Value, TEpsilon.Scale) then begin
@@ -1393,7 +1393,7 @@ begin
   end;
 end;
 
-{********************************************************}
+
 procedure TALDynamicControl.RefreshAbsoluteOpacity;
 begin
   var LNewAbsoluteOpacity: Single;
@@ -1409,7 +1409,7 @@ begin
   end;
 end;
 
-{***************************************************}
+
 function TALDynamicControl.GetCursor: TCursor;
 begin
   {$IF defined(MSWINDOWS) or defined(ALMacOS)}
@@ -1419,7 +1419,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************************************}
+
 procedure TALDynamicControl.SetCursor(const Value: TCursor);
 begin
   {$IF defined(MSWINDOWS) or defined(ALMacOS)}
@@ -1430,7 +1430,7 @@ begin
   {$ENDIF}
 end;
 
-{***********************************************************}
+
 function TALDynamicControl.GetAbsoluteCursor: TCursor;
 begin
   {$IF defined(MSWINDOWS) or defined(ALMacOS)}
@@ -1440,7 +1440,7 @@ begin
   {$ENDIF}
 end;
 
-{*******************************************************}
+
 procedure TALDynamicControl.RefreshAbsoluteCursor;
 begin
   {$IF defined(MSWINDOWS) or defined(ALMacOS)}
@@ -1457,7 +1457,7 @@ begin
   {$ENDIF}
 end;
 
-{***********************************************************************}
+
 procedure TALDynamicControl.SetAlign(const Value: TALAlignLayout);
 begin
   {$IF defined(DEBUG)}
@@ -1475,7 +1475,7 @@ begin
   end;
 end;
 
-{***********************************************************}
+
 function TALDynamicControl.GetForm: TCommonCustomForm;
 begin
   if Host <> nil then
@@ -1484,7 +1484,7 @@ begin
     result := nil;
 end;
 
-{*************}
+
 //[MultiThread]
 function TALDynamicControl.DoGetDownloadPriority: Int64;
 begin
@@ -1496,7 +1496,7 @@ begin
   else Result := 0;
 end;
 
-{*************}
+
 //[MultiThread]
 class function TALDynamicControl.GetDownloadPriority(const AContext: Tobject): Int64;
 
@@ -1543,7 +1543,7 @@ begin
 
 end;
 
-{**************************************************************}
+
 function TALDynamicControl.FillTextFlags: TFillTextFlags;
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -1555,51 +1555,51 @@ begin
     Result := [];
 end;
 
-{*********************************************************************}
+
 procedure TALDynamicControl.SetPadding(const AValue: TALBounds);
 begin
   FPadding.Assign(AValue);
 end;
 
-{*********************************************************************}
+
 procedure TALDynamicControl.SetMargins(const AValue: TALBounds);
 begin
   FMargins.Assign(AValue);
 end;
 
-{************************************************************************}
+
 procedure TALDynamicControl.PaddingChangedHandler(Sender: TObject);
 begin
   PaddingChanged;
 end;
 
-{************************************************************************}
+
 procedure TALDynamicControl.MarginsChangedHandler(Sender: TObject);
 begin
   MarginsChanged;
 end;
 
-{************************************************}
+
 procedure TALDynamicControl.PaddingChanged;
 begin
   Realign;
 end;
 
-{************************************************}
+
 procedure TALDynamicControl.MarginsChanged;
 begin
   if Owner <> nil then
     Owner.Realign;
 end;
 
-{************************************************}
+
 procedure TALDynamicControl.EnabledChanged;
 begin
   RefreshAbsoluteEnabled;
   RefreshAbsoluteOpacity;
 end;
 
-{************************************************}
+
 procedure TALDynamicControl.VisibleChanged;
 begin
   RefreshAbsoluteVisible;
@@ -1607,7 +1607,7 @@ begin
     Owner.Realign;
 end;
 
-{***********************************************}
+
 procedure TALDynamicControl.ParentChanged;
 begin
   RefreshAbsoluteCursor;
@@ -1617,7 +1617,7 @@ begin
   AncestorParentChanged;
 end;
 
-{*******************************************************}
+
 procedure TALDynamicControl.AncestorParentChanged;
 begin
   If FOwner = nil then FHost := nil
@@ -1626,7 +1626,7 @@ begin
     FControls[I].AncestorParentChanged;
 end;
 
-{*************************************************}
+
 procedure TALDynamicControl.PositionChanged;
 begin
   if (Align <> TALAlignLayout.None) and (Owner <> nil) then
@@ -1634,7 +1634,7 @@ begin
   Repaint;
 end;
 
-{*********************************************}
+
 procedure TALDynamicControl.SizeChanged;
 begin
   if (Align <> TALAlignLayout.None) and (Owner <> nil) then
@@ -1644,14 +1644,14 @@ begin
   DoResized
 end;
 
-{*******************************************}
+
 procedure TALDynamicControl.DoResized;
 begin
   if Assigned(FOnResized) then
     FOnResized(Self);
 end;
 
-{*****************************************}
+
 procedure TALDynamicControl.Realign;
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -1666,7 +1666,7 @@ begin
   DoRealign;
 end;
 
-{*******************************************}
+
 procedure TALDynamicControl.DoRealign;
 begin
 
@@ -2314,7 +2314,7 @@ begin
 
 end;
 
-{********************************************}
+
 procedure TALDynamicControl.MouseEnter;
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2326,7 +2326,7 @@ begin
   if fOwner <> nil then fOwner.ChildrenMouseEnter(Self); // https://quality.embarcadero.com/browse/RSP-24397
 end;
 
-{********************************************}
+
 procedure TALDynamicControl.MouseLeave;
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2338,7 +2338,7 @@ begin
   if fOwner <> nil then fOwner.ChildrenMouseLeave(Self); // https://quality.embarcadero.com/browse/RSP-24397
 end;
 
-{***************************************************************************************************}
+
 procedure TALDynamicControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2355,7 +2355,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+
 procedure TALDynamicControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2366,7 +2366,7 @@ begin
   if fOwner <> nil then fOwner.ChildrenMouseMove(Self, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
 end;
 
-{*************************************************************************************************}
+
 procedure TALDynamicControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2379,7 +2379,7 @@ begin
   FPressed := False;
 end;
 
-{****************************************************************************************************}
+
 procedure TALDynamicControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2391,7 +2391,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************}
+
 procedure TALDynamicControl.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2401,7 +2401,7 @@ begin
   //  FOnMouseWheel(Self, Shift, WheelDelta, Handled)
 end;
 
-{*************************************************}
+
 // https://quality.embarcadero.com/browse/RSP-24397
 procedure TALDynamicControl.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -2409,7 +2409,7 @@ begin
     fOwner.ChildrenMouseDown(AObject, Button, Shift, X, Y);
 end;
 
-{*************************************************}
+
 // https://quality.embarcadero.com/browse/RSP-24397
 procedure TALDynamicControl.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
 begin
@@ -2417,7 +2417,7 @@ begin
     fOwner.ChildrenMouseMove(AObject, Shift, X, Y);
 end;
 
-{*************************************************}
+
 // https://quality.embarcadero.com/browse/RSP-24397
 procedure TALDynamicControl.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -2425,7 +2425,7 @@ begin
     fOwner.ChildrenMouseUp(AObject, Button, Shift, X, Y);
 end;
 
-{*************************************************}
+
 // https://quality.embarcadero.com/browse/RSP-24397
 procedure TALDynamicControl.ChildrenMouseEnter(const AObject: TALDynamicControl);
 begin
@@ -2433,7 +2433,7 @@ begin
     fOwner.ChildrenMouseEnter(AObject);
 end;
 
-{*************************************************}
+
 // https://quality.embarcadero.com/browse/RSP-24397
 procedure TALDynamicControl.ChildrenMouseLeave(const AObject: TALDynamicControl);
 begin
@@ -2441,35 +2441,35 @@ begin
     fOwner.ChildrenMouseLeave(AObject);
 end;
 
-{***************************************}
+
 procedure TALDynamicControl.Click;
 begin
   if Assigned(FOnClick) then
     FOnClick(Self)
 end;
 
-{******************************************}
+
 procedure TALDynamicControl.DblClick;
 begin
   if Assigned(FOnDblClick) then
     FOnDblClick(Self)
 end;
 
-{*****************************************}
+
 procedure TALDynamicControl.Capture;
 begin
   if Host <> nil then
     Host.SetCaptured(Self);
 end;
 
-{************************************************}
+
 procedure TALDynamicControl.ReleaseCapture;
 begin
   if (Host <> nil) and (Host.Captured = Self) then
     Host.SetCaptured(nil);
 end;
 
-{***********************************************************************}
+
 procedure TALDynamicControl.PaintInternal(const ACanvas: TCanvas);
 begin
   FCanvas := ACanvas;
@@ -2484,25 +2484,25 @@ begin
   FCanvas := Nil;
 end;
 
-{******************************************}
+
 procedure TALDynamicControl.Painting;
 begin
   if Assigned(FOnPainting) then
     FOnPainting(Self, Canvas);
 end;
 
-{***************************************}
+
 procedure TALDynamicControl.Paint;
 begin
 end;
 
-{***********************************************************}
+
 function TALDynamicControl.PaintChildrenOnly: Boolean;
 begin
   result := False;
 end;
 
-{***********************************************}
+
 procedure TALDynamicControl.PaintChildren;
 begin
   if FControlsCount > 0 then begin
@@ -2552,7 +2552,7 @@ begin
   end;
 end;
 
-{********************************************}
+
 procedure TALDynamicControl.AfterPaint;
 begin
   if Assigned(FOnPaint) then
@@ -2561,7 +2561,7 @@ end;
 
 {$REGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (2)'}
 
-{*************************************************************************}
+
 constructor TALDynamicExtendedControl.Create(const AOwner: TObject);
 begin
   inherited;
@@ -2574,6 +2574,8 @@ begin
   //FForm := nil;
   //FOwner := nil;
   FControlAbsolutePosAtMouseDown := TALPointD.zero;
+  //FScale := TPosition.Create(TPointF.Create(1, 1));
+  //FScale.OnChange := ScaleChangedHandler;
   //FFocusOnMouseDown := False;
   //FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
@@ -2588,14 +2590,15 @@ begin
   FAdjustSizeOnEndUpdate := False;
 end;
 
-{**************************************************}
+
 destructor TALDynamicExtendedControl.Destroy;
 begin
   ClearBufDrawable;
+  //ALFreeAndNil(FScale);
   inherited;
 end;
 
-{***********************************************************}
+
 procedure TALDynamicExtendedControl.BeforeDestruction;
 begin
   if FBeforeDestructionExecuted then exit;
@@ -2605,7 +2608,7 @@ begin
   inherited;
 end;
 
-{**********************************************************************************}
+
 procedure TALDynamicExtendedControl.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -2637,7 +2640,7 @@ begin
       Padding.Assign(TALDynamicControl(Source).Padding);
       //ParentShowHint := TALDynamicControl(Source).ParentShowHint;
       //Position.Assign(TALDynamicControl(Source).Position);
-      //RotationAngle := TALDynamicControl(Source).RotationAngle;
+      RotationAngle := TALDynamicControl(Source).RotationAngle;
       //ShowHint := TALDynamicControl(Source).ShowHint;
       //Size.Assign(TALDynamicControl(Source).Size);
       //StyleName := TALDynamicControl(Source).StyleName;
@@ -2681,7 +2684,7 @@ begin
   End;
 end;
 
-{***************************************************************}
+
 // The current implementation of TControl's BeginUpdate/EndUpdate
 // and Realign methods is inefficient—particularly for TALDynamicText,
 // which must rebuild its internal buffer every time its size
@@ -2724,7 +2727,7 @@ begin
   end;
 end;
 
-{**************************************************}
+
 //procedure TALDynamicExtendedControl.Loaded;
 //begin
 //  {$IF not defined(ALDPK)}
@@ -2735,14 +2738,14 @@ end;
 //  AdjustSize;
 //end;
 
-{******************************************************************}
+
 //function TALDynamicExtendedControl.IsOwnerLoading: Boolean;
 //begin
 //  result := (Owner <> nil) and
 //            (csloading in Owner.ComponentState);
 //end;
 
-{****************************************************************}
+
 //function TALDynamicExtendedControl.IsSizeStored: Boolean;
 //begin
 //  var LDefaultSize := GetDefaultSize;
@@ -2750,13 +2753,13 @@ end;
 //            (not SameValue(LDefaultSize.cy, Size.Size.cy, TEpsilon.Position));
 //end;
 
-{*******************************************************************}
+
 //function TALDynamicExtendedControl.GetAlign: TALAlignLayout;
 //begin
 //  Result := FAlign;
 //end;
 
-{*********************************************************************************}
+
 //procedure TALDynamicExtendedControl.SetAlign(const Value: TALAlignLayout);
 //begin
 //  If FAlign <> Value then begin
@@ -2813,7 +2816,7 @@ end;
 //  end;
 //end;
 
-{*****************************************************}
+
 procedure TALDynamicExtendedControl.DoEndUpdate;
 begin
   inherited DoEndUpdate;
@@ -2821,7 +2824,7 @@ begin
     AdjustSize;
 end;
 
-{***************************************************}
+
 procedure TALDynamicExtendedControl.DoResized;
 begin
   {$IF defined(debug)}
@@ -2831,7 +2834,7 @@ begin
   AdjustSize;
 end;
 
-{***************************************************}
+
 procedure TALDynamicExtendedControl.DoRealign;
 begin
   {$IF defined(debug)}
@@ -2857,7 +2860,7 @@ begin
   AdjustSize;
 end;
 
-{*******************************************************************************************}
+
 procedure TALDynamicExtendedControl.SetFixedSizeBounds(X, Y, AWidth, AHeight: Single);
 begin
   if TNonReentrantHelper.EnterSection(FIsSetBoundsLocked) then begin
@@ -2893,7 +2896,7 @@ begin
       //If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
       //   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
       //   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-      //   (Owner.FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+      //   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
       //then begin
       //  case FAlign of
       //    TALAlignLayout.TopCenter,
@@ -2955,7 +2958,7 @@ begin
     SetBounds(X, Y, AWidth, AHeight);
 end;
 
-{**********************************************************************************}
+
 procedure TALDynamicExtendedControl.SetBounds(X, Y, AWidth, AHeight: Double);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2988,7 +2991,7 @@ begin
   //If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
   //   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
   //   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-  //   (Owner.FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+  //   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
   //then begin
   //  case FAlign of
   //    TALAlignLayout.TopCenter,
@@ -3051,7 +3054,7 @@ begin
   inherited;
 end;
 
-{****************************************************}
+
 procedure TALDynamicExtendedControl.AdjustSize;
 begin
   if //(not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
@@ -3315,7 +3318,7 @@ begin
   end;
 end;
 
-{******************************************************}
+
 procedure TALDynamicExtendedControl.AlignToPixel;
 begin
   // Note: We do not align the position here. The position is aligned during
@@ -3396,10 +3399,10 @@ begin
   end;
 end;
 
-{**********************************************************}
+
 procedure TALDynamicExtendedControl.ApplyColorScheme;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure ApplyColorSchemeRecursive(const AControl: TALDynamicControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do
@@ -3415,37 +3418,43 @@ begin
   ApplyColorSchemeRecursive(self);
 end;
 
-{**************************************************************************}
+
 //procedure TALDynamicExtendedControl.DelayOnResize(Sender: TObject);
 //begin
 //  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resize);
 //end;
 
-{***************************************************************************}
+
 //procedure TALDynamicExtendedControl.DelayOnResized(Sender: TObject);
 //begin
 //  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resized);
 //end;
 
-{*******************************************************************}
+
 function TALDynamicExtendedControl.GetDoubleBuffered: boolean;
 begin
   result := False;
 end;
 
-{**********************************************************************************}
+
 procedure TALDynamicExtendedControl.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not supported
 end;
 
-{*************************************************************}
+
+//procedure TALDynamicExtendedControl.SetScale(const AValue: TPosition);
+//begin
+//  FScale.Assign(AValue);
+//end;
+
+
 function TALDynamicExtendedControl.GetAutoSize: Boolean;
 begin
   result := FAutoSize;
 end;
 
-{***************************************************************************}
+
 procedure TALDynamicExtendedControl.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
@@ -3455,7 +3464,7 @@ begin
   end;
 end;
 
-{***************************************************************************}
+
 function TALDynamicExtendedControl.HasUnconstrainedAutosizeX: Boolean;
 begin
   Result := GetAutoSize;
@@ -3473,7 +3482,7 @@ begin
   end;
 end;
 
-{***************************************************************************}
+
 function TALDynamicExtendedControl.HasUnconstrainedAutosizeY: Boolean;
 begin
   Result := GetAutoSize;
@@ -3491,34 +3500,34 @@ begin
   end;
 end;
 
-{*********************************************************}
+
 procedure TALDynamicExtendedControl.MakeBufDrawable;
 begin
  // Virtual;
 end;
 
-{**********************************************************}
+
 procedure TALDynamicExtendedControl.ClearBufDrawable;
 begin
  // Virtual;
 end;
 
-{*********************************************************************}
+
 function TALDynamicExtendedControl.GetAutoAlignToPixel: Boolean;
 begin
   Result := FAutoAlignToPixel;
 end;
 
-{************************************************************************************}
+
 procedure TALDynamicExtendedControl.SetAutoAlignToPixel(const AValue: Boolean);
 begin
   FAutoAlignToPixel := AValue;
 end;
 
-{******************************************************************}
+
 function TALDynamicExtendedControl.IsReadyToDisplay: Boolean;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function CheckAllChildrenAreReadyToDisplay(const AControl: TALDynamicControl): boolean;
   begin
     Result := True;
@@ -3535,13 +3544,13 @@ begin
   Result := CheckAllChildrenAreReadyToDisplay(Self);
 end;
 
-{*************************************************************}
+
 function TALDynamicExtendedControl.IsDisplayed: Boolean;
 begin
   Result := not GetAbsoluteDisplayedRect.IsEmpty;
 end;
 
-{***************************************************************************}
+
 //function TALDynamicExtendedControl.GetAbsoluteDisplayedRect: TRectF;
 //begin
 //  if (not Visible) or (form = nil) then Exit(TRectF.Empty);
@@ -3560,7 +3569,7 @@ end;
 //  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
 //end;
 
-{***********************************************************************}
+
 //procedure TALDynamicExtendedControl.SetNewScene(AScene: IScene);
 //begin
 //  {$IFNDEF ALCompilerVersionSupported123}
@@ -3581,25 +3590,25 @@ end;
 //  if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 //end;
 
-{**************************************************************}
+
 //function TALDynamicExtendedControl.GetPivot: TPosition;
 //begin
 //  Result := Inherited RotationCenter;
 //end;
 
-{****************************************************************************}
+
 //procedure TALDynamicExtendedControl.SetPivot(const Value: TPosition);
 //begin
 //  Inherited RotationCenter := Value;
 //end;
 
-{************************************************************}
+
 function TALDynamicExtendedControl.GetPressed: Boolean;
 begin
   result := inherited Pressed;
 end;
 
-{***************************************************************************}
+
 procedure TALDynamicExtendedControl.SetPressed(const AValue: Boolean);
 begin
   if AValue <> GetPressed then begin
@@ -3608,7 +3617,7 @@ begin
   end;
 end;
 
-{***************************************************}
+
 //procedure TALDynamicExtendedControl.DoEnter;
 //begin
 //  var LPrevIsFocused := IsFocused;
@@ -3616,7 +3625,7 @@ end;
 //  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
 //end;
 
-{**************************************************}
+
 //procedure TALDynamicExtendedControl.DoExit;
 //begin
 //  var LPrevIsFocused := IsFocused;
@@ -3624,7 +3633,7 @@ end;
 //  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
 //end;
 
-{****************************************************}
+
 procedure TALDynamicExtendedControl.MouseEnter;
 begin
   var LPrevIsMouseOver := IsMouseOver;
@@ -3635,7 +3644,7 @@ begin
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
-{****************************************************}
+
 procedure TALDynamicExtendedControl.MouseLeave;
 begin
   var LPrevIsMouseOver := IsMouseOver;
@@ -3648,7 +3657,7 @@ begin
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
-{***********************************************************************************************************}
+
 procedure TALDynamicExtendedControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -3660,7 +3669,13 @@ begin
   FMouseDownAtLowVelocity := True;
   //--
   FDoubleClick := ssDouble in Shift;
-  if FDoubleClick then Shift := Shift - [ssDouble];
+  if FDoubleClick then begin
+    {$IF defined(IOS)}
+    if FForm <> nil then
+      TALFMXViewBaseAccessPrivate(WindowHandleToPlatform(FForm.Handle).Handle).FShouldIgnoreNextClick := False;
+    {$ENDIF}
+    Shift := Shift - [ssDouble];
+  end;
   //--
   var LScrollableControl: IALScrollableControl;
   var LOwner := Owner;
@@ -3690,7 +3705,7 @@ begin
   if LPrevPressed <> Pressed then PressedChanged;
 end;
 
-{*********************************************************************************************************}
+
 procedure TALDynamicExtendedControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -3710,7 +3725,7 @@ begin
   //  SetFocus;
 end;
 
-{************************************************************************************************************}
+
 procedure TALDynamicExtendedControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
@@ -3737,7 +3752,7 @@ begin
   if LPrevPressed <> Pressed then PressedChanged;
 end;
 
-{***********************************************}
+
 procedure TALDynamicExtendedControl.Click;
 begin
   inherited;
@@ -3747,7 +3762,7 @@ begin
   end;
 end;
 
-{*************************************}
+
 // Optimized GetParentedVisible to work
 // exclusively with Owner.
 //function TALDynamicExtendedControl.GetParentedVisible: Boolean;
@@ -3768,7 +3783,7 @@ end;
 //  {$ENDIF}
 //end;
 
-{****************************************************************************}
+
 //procedure TALDynamicExtendedControl.DoMatrixChanged(Sender: TObject);
 //begin
 //  {$IFNDEF ALCompilerVersionSupported123}
@@ -3829,7 +3844,7 @@ end;
 //    Repaint;
 //end;
 
-{*********************************************************}
+
 //procedure TALDynamicExtendedControl.DoRootChanged;
 //begin
 //  inherited;
@@ -3837,38 +3852,38 @@ end;
 //  else FForm := nil;
 //end;
 
-{************************************************************}
+
 procedure TALDynamicExtendedControl.IsMouseOverChanged;
 begin
   // virtual
 end;
 
-{************************************************************}
+
 //procedure TALDynamicExtendedControl.IsFocusedChanged;
 //begin
 //  // virtual
 //end;
 
-{********************************************************}
+
 procedure TALDynamicExtendedControl.PressedChanged;
 begin
   // virtual
 end;
 
-{**********************************************************}
+
 //Procedure TALDynamicExtendedControl.MarginsChanged;
 //begin
 //  // virtual
 //end;
 
-{********************************************************}
+
 procedure TALDynamicExtendedControl.PaddingChanged;
 begin
   Inherited;
   AdjustSize;
 end;
 
-{*******************************************************}
+
 procedure TALDynamicExtendedControl.ParentChanged;
 begin
   inherited;
@@ -3882,7 +3897,7 @@ begin
   //  FOwner := nil;
 end;
 
-{**********************************************************************************}
+
 //procedure TALDynamicExtendedControl.MarginsChangedHandler(Sender: TObject);
 //begin
 //  if Assigned(FFormerMarginsChangedHandler) then
@@ -3890,35 +3905,41 @@ end;
 //  MarginsChanged;
 //end;
 
-{*****************************************************************}
+
+//procedure TALDynamicExtendedControl.ScaleChangedHandler(Sender: TObject);
+//begin
+//  Repaint; // DoMatrixChanged(Sender);
+//end;
+
+
 constructor TALDynamicContent.Create(const AOwner: TObject);
 begin
   inherited;
   //SetAcceptsControls(False);
 end;
 
-{******************************************************************************************************************}
+
 procedure TALDynamicContent.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   inherited;
   ContentChanged;
 end;
 
-{*******************************************************************************************}
+
 procedure TALDynamicContent.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   inherited;
   ContentChanged;
 end;
 
-{****************************************************}
+
 //procedure TALDynamicContent.DoDeleteChildren;
 //begin
 //  inherited;
 //  ContentChanged;
 //end;
 
-{*******************************************}
+
 procedure TALDynamicContent.DoRealign;
 //var
 //  AlignRoot: IAlignRoot;
@@ -3929,7 +3950,7 @@ begin
 //  begin
 //    FParentAligning := True;
 //    if Owner <> nil then
-//      Owner.Realign
+//      _TALDynamicControlProtectedAccess(Owner).Realign
 //    else
 //      if not(csLoading in ComponentState) and Supports(Parent, IAlignRoot, AlignRoot) then
 //        AlignRoot.Realign;
@@ -3948,13 +3969,13 @@ begin
 
 end;
 
-{**************************************************}
+
 procedure TALDynamicContent.DoContentChanged;
 begin
   // Virtual
 end;
 
-{************************************************}
+
 procedure TALDynamicContent.ContentChanged;
 begin
 
@@ -3982,13 +4003,13 @@ begin
 
 end;
 
-{*****************************************************************}
+
 //function TALDynamicContent.GetTabListClass: TTabListClass;
 //begin
 //  Result := TALDynamicContentTabList;
 //end;
 
-{***************************************************************************}
+
 //function TALDynamicContent.GetTabStopController: ITabStopController;
 //var
 //  Control: IControl;

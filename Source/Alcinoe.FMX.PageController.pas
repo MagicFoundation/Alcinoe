@@ -1,4 +1,4 @@
-unit Alcinoe.FMX.PageController;
+ï»¿unit Alcinoe.FMX.PageController;
 
 interface
 
@@ -2136,9 +2136,9 @@ begin
         LDuration := Trunc((LPageDelta + 1) * 100);
         //
         // If the scroll distance equals one full page (including margin), then:
-        //   pageDelta would be 1, so duration would be (1+1)×100=200 milliseconds.
+        //   pageDelta would be 1, so duration would be (1+1)x100=200 milliseconds.
         // If the scroll distance is half of that, then:
-        //   pageDelta would be 0.5, and duration would be (0.5+1)×100=150 milliseconds.
+        //   pageDelta would be 0.5, and duration would be (0.5+1)x100=150 milliseconds.
         //
         // In general, this calculation produces a duration between 100 and 150 ms, which is too fast.
         // To mitigate this, I multiply the computed duration by 2.
@@ -2185,9 +2185,9 @@ begin
         LDuration := Trunc((LPageDelta + 1) * 100);
         //
         // If the scroll distance equals one full page (including margin), then:
-        //   pageDelta would be 1, so duration would be (1+1)×100=200 milliseconds.
+        //   pageDelta would be 1, so duration would be (1+1)x100=200 milliseconds.
         // If the scroll distance is half of that, then:
-        //   pageDelta would be 0.5, and duration would be (0.5+1)×100=150 milliseconds.
+        //   pageDelta would be 0.5, and duration would be (0.5+1)x100=150 milliseconds.
         //
         // In general, this calculation produces a duration between 100 and 150 ms, which is too fast.
         // To mitigate this, I multiply the computed duration by 2.

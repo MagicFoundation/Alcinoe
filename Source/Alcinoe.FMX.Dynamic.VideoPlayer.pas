@@ -1,0 +1,1331 @@
+﻿unit Alcinoe.FMX.Dynamic.VideoPlayer;
+
+interface
+
+{$I Alcinoe.inc}
+
+uses
+  system.Classes,
+  system.UITypes,
+  System.Types,
+  System.Messaging,
+  System.Net.HttpClient,
+  Alcinoe.FMX.CacheEngines,
+  Alcinoe.FMX.Common,
+  alcinoe.FMX.VideoPlayer,
+  Alcinoe.FMX.Dynamic.Controls;
+
+//////////////////////////////////////////////
+/// THE CODE BELOW WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
+
+{$REGION 'AUTO-GENERATED'}
+
+type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicVideoPlayerSurface = class(TALDynamicExtendedControl)
+  public
+    type
+      TAutoStartMode = (None, WhenPrepared, WhenDisplayed);
+  protected
+    type
+      TPreviewDownloadContext = Class(TALDownloadContext)
+      private
+        function GetOwner: TALDynamicVideoPlayerSurface;
+      public
+        Rect: TRectF;
+        Scale: Single;
+        AlignToPixel: Boolean;
+        ResourceName: String;
+        ResourceStream: TStream;
+        WrapMode: TALImageWrapMode;
+        constructor Create(const AOwner: TALDynamicVideoPlayerSurface); reintroduce; virtual;
+        destructor Destroy; override;
+        Property Owner: TALDynamicVideoPlayerSurface read GetOwner;
+      End;
+  private
+    class var AutoStartedVideoPlayerSurface: TALDynamicVideoPlayerSurface;
+  private
+    fVideoPlayerEngine: TALBaseVideoPlayer; // 8 bytes
+    FDataSource: String; // 8 bytes
+    fPreviewResourceName: String; // 8 bytes
+    FBackgroundColor: TAlphaColor; // 4 bytes
+    FBackgroundColorKey: String; // 8 bytes
+    FLoadingColor: TAlphaColor; // 4 bytes
+    FLoadingColorKey: String; // 4 bytes
+    FInternalState: Integer; // 4 Bytes
+    FIsFirstFrame: Boolean; // 1 Byte
+    FAutoStartMode: TAutoStartMode; // 1 Byte
+    FWrapMode: TALImageWrapMode; // 1 byte
+    FReadyAfterResourcesLoaded: Boolean; // 1 byte
+    FCacheIndex: Integer; // 4 bytes
+    FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
+    FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
+    FFadeInDuration: Single; // 4 bytes
+    FFadeInStartTimeNano: Int64; // 8 bytes
+    procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
+    procedure DoOnFrameAvailable(Sender: Tobject);
+    procedure setPreviewResourceName(const Value: String);
+    procedure SetDataSource(const Value: String);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    function GetState: Integer;
+    procedure SetAutoStartMode(const Value: TAutoStartMode);
+    function GetIsPlaying: boolean;
+    function GetLooping: Boolean;
+    procedure SetLooping(const Value: Boolean);
+    function GetVolume: Single;
+    procedure SetVolume(const Value: Single);
+    function GetPlaybackSpeed: single;
+    procedure SetPlaybackSpeed(const Value: single);
+    function GetOnErrorEvent: TNotifyEvent;
+    procedure SetOnErrorEvent(const Value: TNotifyEvent);
+    function GetOnPreparedEvent: TNotifyEvent;
+    procedure SetOnPreparedEvent(const Value: TNotifyEvent);
+    function GetOnCompletionEvent: TNotifyEvent;
+    procedure SetOnCompletionEvent(const Value: TNotifyEvent);
+    function GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
+    procedure SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
+    procedure setBackgroundColor(const Value: TAlphaColor);
+    procedure setBackgroundColorKey(const Value: String);
+    procedure setLoadingColor(const Value: TAlphaColor);
+    procedure setLoadingColorKey(const Value: String);
+    function IsBackgroundColorStored: Boolean;
+    function IsBackgroundColorKeyStored: Boolean;
+    function IsLoadingColorStored: Boolean;
+    function IsLoadingColorKeyStored: Boolean;
+    function IsFadeInDurationStored: Boolean;
+    function IsDataSourceStored: Boolean;
+    function IsPlaybackSpeedStored: Boolean;
+    function IsVolumeStored: Boolean;
+  protected
+    fBufDrawable: TALDrawable; // 8 bytes
+    fBufDrawableRect: TRectF; // 16 bytes
+    procedure ApplyLoadingColorScheme; virtual;
+    procedure ApplyBackgroundColorScheme; virtual;
+    function GetCacheSubIndex: Integer; virtual;
+    function GetDoubleBuffered: boolean; override;
+    function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultBackgroundColorKey: String; virtual;
+    function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultLoadingColorKey: String; virtual;
+    function GetDefaultFadeInDuration: Single; virtual;
+    procedure CancelPreviewDownload;
+    class function CanStartPreviewDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
+    class procedure HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject); virtual; // [MultiThread]
+    class procedure HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
+    class function GetPreviewDownloadPriority(const AContext: Tobject): Int64; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(var AContext: TObject); overload; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(
+                      var ABufDrawable: TALDrawable;
+                      out ABufDrawableRect: TRectF;
+                      const ARect: TRectF;
+                      const AScale: Single;
+                      const AAlignToPixel: Boolean;
+                      const AResourceName: String;
+                      const AResourceStream: TStream;
+                      const AWrapMode: TALImageWrapMode); overload; virtual; // [MultiThread]
+    procedure Paint; override;
+    //procedure Loaded; override;
+    procedure DoResized; override;
+    property VideoPlayerEngine: TALBaseVideoPlayer read fVideoPlayerEngine;
+  public
+    constructor Create(const AOwner: TObject); override;
+    destructor Destroy; override;
+    procedure BeforeDestruction; override;
+    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
+    function IsReadyToDisplay: Boolean; override;
+    procedure ApplyColorScheme; override;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
+    property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultBackgroundColorKey: String read GetDefaultBackgroundColorKey;
+    property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultLoadingColorKey: String read GetDefaultLoadingColorKey;
+    property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
+    function GetCurrentPosition: Int64;
+    function GetDuration: Int64;
+    function GetVideoHeight: Integer;
+    function GetVideoWidth: Integer;
+    procedure Start;
+    procedure Pause;
+    procedure Stop;
+    procedure SeekTo(const msec: Int64);
+    property State: Integer read GetState;
+    property IsPlaying: boolean read GetIsPlaying;
+    // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
+    // prevent duplicate drawables across multiple identical controls.
+    // CacheIndex specifies the slot in the cache engine where an existing
+    // drawable can be retrieved.
+    property CacheIndex: Integer read FCacheIndex write FCacheIndex;
+    // CacheEngine is not owned by the current control.
+    property CacheEngine: TALBufDrawableCacheEngine read FCacheEngine write FCacheEngine;
+  public
+    //property Action;
+    property Align;
+    //property Anchors;
+    //property AutoSize;
+    property AutoStartMode: TAutoStartMode read FAutoStartMode write SetAutoStartMode default TAutoStartMode.None;
+    property BackgroundColor: TAlphaColor read fBackgroundColor write SetBackgroundColor Stored IsBackgroundColorStored;
+    property BackgroundColorKey: String read fBackgroundColorKey write SetBackgroundColorKey Stored IsBackgroundColorKeyStored;
+    property LoadingColor: TAlphaColor read FLoadingColor write SetLoadingColor Stored IsLoadingColorStored;
+    property LoadingColorKey: String read FLoadingColorKey write SetLoadingColorKey Stored IsLoadingColorKeyStored;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DataSource: String read FDataSource Write SetDataSource stored IsDataSourceStored nodefault;
+    //property DoubleBuffered;
+    //property DragMode;
+    //property EnableDragHighlight;
+    property Enabled;
+    property FadeInDuration: Single read FFadeInDuration write FFadeInDuration stored IsFadeInDurationStored nodefault;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    //property Locked;
+    Property Looping: Boolean read GetLooping Write SetLooping default false;
+    property Margins;
+    property Opacity;
+    property Padding;
+    Property PlaybackSpeed: Single read GetPlaybackSpeed Write SetPlaybackSpeed stored IsPlaybackSpeedStored nodefault;
+    //property PopupMenu;
+    //property Position;
+    // If a file extension (e.g., .png) is detected in ResourceName, the image is loaded from the
+    // specified file (With the full path of the file obtained using ALGetResourceFilename).
+    // If ResourceName is a URL, the image is downloaded in the background from the internet.
+    // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
+    // project directory (with the extensions .png or .jpg).
+    property PreviewResourceName: String read fPreviewResourceName write setPreviewResourceName;
+    //property RotationAngle;
+    //property RotationCenter;
+    property Pivot;
+    property Scale;
+    //property Size;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    Property Volume: Single read GetVolume Write SetVolume stored IsVolumeStored nodefault;
+    property Width;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
+    //property OnCanFocus;
+    //property OnDragEnter;
+    //property OnDragLeave;
+    //property OnDragOver;
+    //property OnDragDrop;
+    //property OnDragEnd;
+    //property OnEnter;
+    //property OnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    //property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    //property OnResized;
+    property OnError: TNotifyEvent read GetOnErrorEvent write SetOnErrorEvent;
+    property OnPrepared: TNotifyEvent read GetOnPreparedEvent write SetOnPreparedEvent;
+    property OnCompletion: TNotifyEvent read GetOnCompletionEvent write SetOnCompletionEvent;
+    property OnVideoSizeChanged: TALVideoSizeChangedEvent read GetOnVideoSizeChangedEvent write SetOnVideoSizeChangedEvent;
+  end;
+
+{$ENDREGION}
+
+//////////////////////////////////////////////
+/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
+
+implementation
+
+uses
+  system.SysUtils,
+  system.Math,
+  system.Math.Vectors,
+  {$IF defined(ALSkiaCanvas)}
+  System.Skia.API,
+  FMX.Skia.Canvas,
+  {$ENDIF}
+  {$IF defined(MSWindows)}
+  Winapi.Windows,
+  FMX.Platform.Win,
+  {$ENDIF}
+  FMX.Platform,
+  FMX.Graphics,
+  FMX.types,
+  FMX.Types3D,
+  Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.Styles,
+  Alcinoe.Localization,
+  Alcinoe.StringUtils,
+  Alcinoe.HTTP.Client,
+  Alcinoe.HTTP.Client.Net.Pool,
+  Alcinoe.Common;
+
+//////////////////////////////////////////////
+/// THE CODE BELOW WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
+
+{$REGION 'AUTO-GENERATED'}
+
+{********************************************************************************************************************************}
+constructor TALDynamicVideoPlayerSurface.TPreviewDownloadContext.Create(const AOwner: TALDynamicVideoPlayerSurface);
+begin
+  inherited Create(AOwner);
+  Rect := AOwner.LocalRect.ReducePrecision;
+  Scale := ALGetScreenScale;
+  AlignToPixel := AOwner.AutoAlignToPixel;
+  ResourceName := AOwner.PreviewResourceName;
+  ResourceStream := nil;
+  WrapMode := AOwner.WrapMode;
+end;
+
+{*****************************************************************************}
+destructor TALDynamicVideoPlayerSurface.TPreviewDownloadContext.Destroy;
+begin
+  ALFreeAndNil(ResourceStream);
+  inherited
+end;
+
+{*****************************************************************************************************************}
+function TALDynamicVideoPlayerSurface.TPreviewDownloadContext.GetOwner: TALDynamicVideoPlayerSurface;
+begin
+  Result := TALDynamicVideoPlayerSurface(FOwner);
+end;
+
+{****************************************************************************}
+constructor TALDynamicVideoPlayerSurface.Create(const AOwner: TObject);
+begin
+  inherited Create(AOwner);
+  {$IF defined(ALDPK)}
+  fVideoPlayerEngine := TALDummyVideoPlayer.create;
+  {$ELSE}
+  fVideoPlayerEngine := TALAsyncVideoPlayer.create;
+  {$ENDIF}
+  fVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
+  FDataSource := '';
+  fPreviewResourceName := '';
+  FBackgroundColor := DefaultBackgroundColor;
+  FBackgroundColorKey := DefaultBackgroundColorKey;
+  FLoadingColor := DefaultLoadingColor;
+  FLoadingColorKey := DefaultLoadingColorKey;
+  FInternalState := VPSIdle;
+  FIsFirstFrame := true;
+  FAutoStartMode := TAutoStartMode.None;
+  FWrapMode := TALImageWrapMode.Fit;
+  FReadyAfterResourcesLoaded := False;
+  FCacheIndex := 0;
+  FCacheEngine := nil;
+  FPreviewDownloadContext := nil;
+  FFadeInDuration := DefaultFadeInDuration;
+  FFadeInStartTimeNano := 0;
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+  fBufDrawable := ALNullDrawable;
+end;
+
+{*****************************************************}
+destructor TALDynamicVideoPlayerSurface.Destroy;
+begin
+  ALFreeAndNil(fVideoPlayerEngine);
+  inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{**************************************************************}
+procedure TALDynamicVideoPlayerSurface.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  Stop;
+  inherited;
+end;
+
+{*********************************************************************}
+function TALDynamicVideoPlayerSurface.IsReadyToDisplay: Boolean;
+begin
+  Result := Inherited and
+            ((not FReadyAfterResourcesLoaded) or (FPreviewDownloadContext = nil)) and
+            ((FFadeInStartTimeNano <= 0) or
+             ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
+end;
+
+{*****************************************************}
+//procedure TALDynamicVideoPlayerSurface.Loaded;
+//begin
+//  inherited;
+//  If FDataSource <> '' then begin
+//    FVideoPlayerEngine.Prepare(FDataSource);
+//    if FAutoStartMode = TAutoStartMode.WhenPrepared then start;
+//  end;
+//end;
+
+{***********************************************************************}
+procedure TALDynamicVideoPlayerSurface.ApplyBackgroundColorScheme;
+begin
+  if FBackgroundColorKey <> '' then begin
+    var LBackgroundColor := TALStyleManager.Instance.GetColor(FBackgroundColorKey);
+    if FBackgroundColor <> LBackgroundColor then begin
+      FBackgroundColor := LBackgroundColor;
+      Repaint;
+    end;
+  end;
+end;
+
+{********************************************************************}
+procedure TALDynamicVideoPlayerSurface.ApplyLoadingColorScheme;
+begin
+  if FLoadingColorKey <> '' then begin
+    var LLoadingColor := TALStyleManager.Instance.GetColor(FLoadingColorKey);
+    if FLoadingColor <> LLoadingColor then begin
+      FLoadingColor := LLoadingColor;
+      Repaint;
+    end;
+  end;
+end;
+
+{*************************************************************}
+procedure TALDynamicVideoPlayerSurface.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    ApplyBackgroundColorScheme;
+    ApplyLoadingColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************}
+function TALDynamicVideoPlayerSurface.GetCacheSubIndex: Integer;
+begin
+  Result := 0;
+end;
+
+{**********************************************************************}
+function TALDynamicVideoPlayerSurface.GetDoubleBuffered: boolean;
+begin
+  result := True;
+end;
+
+{**********************************************************************************}
+function TALDynamicVideoPlayerSurface.GetDefaultBackgroundColor: TalphaColor;
+begin
+  Result := TalphaColors.Null;
+end;
+
+{********************************************************************************}
+function TALDynamicVideoPlayerSurface.GetDefaultBackgroundColorKey: String;
+begin
+  Result := '';
+end;
+
+{*******************************************************************************}
+function TALDynamicVideoPlayerSurface.GetDefaultLoadingColor: TalphaColor;
+begin
+  Result := $FFe0e4e9;
+end;
+
+{*****************************************************************************}
+function TALDynamicVideoPlayerSurface.GetDefaultLoadingColorKey: String;
+begin
+  Result := '';
+end;
+
+{****************************************************************************}
+function TALDynamicVideoPlayerSurface.GetDefaultFadeInDuration: Single;
+begin
+  Result := 0.250;
+end;
+
+{****************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.setPreviewResourceName(const Value: String);
+begin
+  if FPreviewResourceName <> Value then begin
+    ClearBufDrawable;
+    FPreviewResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{*******************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetDataSource(const Value: String);
+begin
+  if Value <> FDataSource then begin
+    FDataSource := Value;
+    {$IF not defined(ALDPK)}
+    //if not (csLoading in ComponentState) then begin
+      if FInternalState <> vpsIdle then begin
+        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;
+        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;
+        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;
+        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;
+        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;
+        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;
+        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
+        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
+        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
+        //--
+        ALFreeAndNil(fVideoPlayerEngine);
+        fVideoPlayerEngine := LVideoPlayerEngine;
+      end;
+      if FDataSource <> '' then begin
+        FVideoPlayerEngine.Prepare(FDataSource);
+        if AutoStartMode = TAutoStartMode.WhenPrepared then
+          FVideoPlayerEngine.Start;
+      end;
+    //end;
+    {$ENDIF}
+  end;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if FWrapMode <> Value then begin
+    ClearBufDrawable;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{*************************************************************}
+function TALDynamicVideoPlayerSurface.GetState: Integer;
+begin
+  Result := fVideoPlayerEngine.State;
+end;
+
+{******************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetAutoStartMode(const Value: TAutoStartMode);
+begin
+  if value <> FAutoStartMode then begin
+    FAutoStartMode := Value;
+    {$IF not defined(ALDPK)}
+    If //(not (csLoading in ComponentState)) and
+       (FAutoStartMode = TAutoStartMode.WhenPrepared) and
+       (DataSource <> '') and
+       (FInternalState = VPSIdle) then Start;
+    {$ENDIF}
+  end;
+end;
+
+{*****************************************************************}
+function TALDynamicVideoPlayerSurface.GetIsPlaying: boolean;
+begin
+  Result := fVideoPlayerEngine.IsPlaying;
+end;
+
+{***************************************************************}
+function TALDynamicVideoPlayerSurface.GetLooping: Boolean;
+begin
+  Result := fVideoPlayerEngine.Looping;
+end;
+
+{*****************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetLooping(const Value: Boolean);
+begin
+  fVideoPlayerEngine.Looping := Value;
+end;
+
+{*************************************************************}
+function TALDynamicVideoPlayerSurface.GetVolume: Single;
+begin
+  Result := fVideoPlayerEngine.Volume;
+end;
+
+{***************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetVolume(const Value: Single);
+begin
+  fVideoPlayerEngine.Volume := Value;
+end;
+
+{********************************************************************}
+function TALDynamicVideoPlayerSurface.GetPlaybackSpeed: single;
+begin
+  Result := fVideoPlayerEngine.PlaybackSpeed;
+end;
+
+{**********************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetPlaybackSpeed(const Value: single);
+begin
+  fVideoPlayerEngine.PlaybackSpeed := Value;
+end;
+
+{*********************************************************************}
+function TALDynamicVideoPlayerSurface.GetCurrentPosition: Int64;
+begin
+  Result := fVideoPlayerEngine.GetCurrentPosition;
+end;
+
+{**************************************************************}
+function TALDynamicVideoPlayerSurface.GetDuration: Int64;
+begin
+  Result := fVideoPlayerEngine.GetDuration;
+end;
+
+{*******************************************************************}
+function TALDynamicVideoPlayerSurface.GetVideoHeight: Integer;
+begin
+  Result := fVideoPlayerEngine.GetVideoHeight;
+end;
+
+{******************************************************************}
+function TALDynamicVideoPlayerSurface.GetVideoWidth: Integer;
+begin
+  Result := fVideoPlayerEngine.GetVideoWidth;
+end;
+
+{**************************************************}
+procedure TALDynamicVideoPlayerSurface.Start;
+begin
+  if FInternalState = VPSStarted then exit;
+  FInternalState := VPSStarted;
+  fVideoPlayerEngine.Start;
+end;
+
+{**************************************************}
+procedure TALDynamicVideoPlayerSurface.Pause;
+begin
+  if FInternalState = VPSPaused then exit;
+  FInternalState := VPSPaused;
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  fVideoPlayerEngine.Pause;
+end;
+
+{*************************************************}
+procedure TALDynamicVideoPlayerSurface.Stop;
+begin
+  if FInternalState = VPSStopped then exit;
+  FInternalState := VPSStopped;
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  fVideoPlayerEngine.Stop;
+end;
+
+{**********************************************************************}
+procedure TALDynamicVideoPlayerSurface.SeekTo(const msec: Int64);
+begin
+  fVideoPlayerEngine.SeekTo(msec);
+end;
+
+{*************************************************************************}
+function TALDynamicVideoPlayerSurface.GetOnErrorEvent: TNotifyEvent;
+begin
+  result := fVideoPlayerEngine.OnError;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetOnErrorEvent(const Value: TNotifyEvent);
+begin
+  fVideoPlayerEngine.OnError := Value;
+end;
+
+{****************************************************************************}
+function TALDynamicVideoPlayerSurface.GetOnPreparedEvent: TNotifyEvent;
+begin
+  result := fVideoPlayerEngine.OnPrepared;
+end;
+
+{******************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetOnPreparedEvent(const Value: TNotifyEvent);
+begin
+  fVideoPlayerEngine.OnPrepared := Value;
+end;
+
+{******************************************************************************}
+function TALDynamicVideoPlayerSurface.GetOnCompletionEvent: TNotifyEvent;
+begin
+  result := fVideoPlayerEngine.OnCompletion;
+end;
+
+{********************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetOnCompletionEvent(const Value: TNotifyEvent);
+begin
+  fVideoPlayerEngine.OnCompletion := Value;
+end;
+
+{************************************************************************************************}
+function TALDynamicVideoPlayerSurface.GetOnVideoSizeChangedEvent: TALVideoSizeChangedEvent;
+begin
+  result := fVideoPlayerEngine.OnVideoSizeChanged;
+end;
+
+{**************************************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetOnVideoSizeChangedEvent(const Value: TALVideoSizeChangedEvent);
+begin
+  fVideoPlayerEngine.OnVideoSizeChanged := Value;
+end;
+
+{*****************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.setBackgroundColor(const Value: TAlphaColor);
+begin
+  if FBackgroundColor <> Value then begin
+    FBackgroundColor := Value;
+    FBackgroundColorKey := '';
+    Repaint;
+  end;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.setBackgroundColorKey(const Value: String);
+begin
+  if FBackgroundColorKey <> Value then begin
+    FBackgroundColorKey := Value;
+    ApplyBackgroundColorScheme;
+  end;
+end;
+
+{**************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.setLoadingColor(const Value: TAlphaColor);
+begin
+  if FLoadingColor <> Value then begin
+    FLoadingColor := Value;
+    FLoadingColorKey := '';
+    Repaint;
+  end;
+end;
+
+{************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.setLoadingColorKey(const Value: String);
+begin
+  if FLoadingColorKey <> Value then begin
+    FLoadingColorKey := Value;
+    ApplyLoadingColorScheme;
+  end;
+end;
+
+{****************************************************************************}
+function TALDynamicVideoPlayerSurface.IsBackgroundColorStored: Boolean;
+begin
+  Result := FBackgroundColor <> DefaultBackgroundColor;
+end;
+
+{*******************************************************************************}
+function TALDynamicVideoPlayerSurface.IsBackgroundColorKeyStored: Boolean;
+begin
+  Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
+end;
+
+{*************************************************************************}
+function TALDynamicVideoPlayerSurface.IsLoadingColorStored: Boolean;
+begin
+  Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{****************************************************************************}
+function TALDynamicVideoPlayerSurface.IsLoadingColorKeyStored: Boolean;
+begin
+  Result := FLoadingColorKey <> DefaultLoadingColorKey;
+end;
+
+{***************************************************************************}
+function TALDynamicVideoPlayerSurface.IsFadeInDurationStored: Boolean;
+begin
+  Result := not SameValue(FFadeInDuration, DefaultFadeInDuration, TEpsilon.Vector);
+end;
+
+{***********************************************************************}
+function TALDynamicVideoPlayerSurface.IsDataSourceStored: Boolean;
+begin
+  result := FDataSource <> '';
+end;
+
+{**************************************************************************}
+function TALDynamicVideoPlayerSurface.IsPlaybackSpeedStored: Boolean;
+begin
+  Result := not SameValue(PlaybackSpeed, 1);
+end;
+
+{*******************************************************************}
+function TALDynamicVideoPlayerSurface.IsVolumeStored: Boolean;
+begin
+  Result := not SameValue(Volume, 1);
+end;
+
+{******************************************************}
+procedure TALDynamicVideoPlayerSurface.DoResized;
+begin
+  ClearBufDrawable;
+  inherited;
+end;
+
+{*************************************************************}
+procedure TALDynamicVideoPlayerSurface.ClearBufDrawable;
+begin
+  {$IFDEF debug}
+  if (not IsDestroying) and
+     (not ALIsDrawableNull(fBufDrawable)) then
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+  {$endif}
+  CancelPreviewDownload;
+  FFadeInStartTimeNano := 0;
+  ALFreeAndNilDrawable(fBufDrawable);
+end;
+
+{******************************************************************}
+procedure TALDynamicVideoPlayerSurface.CancelPreviewDownload;
+begin
+  // The FPreviewDownloadContext pointer can only be
+  // updated in the main thread, so there is no need
+  // to lock its access for reading or updating.
+  if FPreviewDownloadContext <> nil then begin
+    var LContextToFree: TPreviewDownloadContext;
+    var LLock := FPreviewDownloadContext.FLock;
+    TMonitor.Enter(LLock);
+    try
+      if not FPreviewDownloadContext.FFreeByThread then LContextToFree := FPreviewDownloadContext
+      else LContextToFree := nil;
+      FPreviewDownloadContext.FOwner := nil;
+      FPreviewDownloadContext := nil;
+    Finally
+      TMonitor.Exit(LLock);
+    End;
+    ALFreeAndNil(LContextToFree);
+  end;
+end;
+
+{*************}
+//[MultiThread]
+class function TALDynamicVideoPlayerSurface.CanStartPreviewDownload(var AContext: Tobject): boolean;
+begin
+  result := TPreviewDownloadContext(AContext).FOwner <> nil;
+end;
+
+{*************}
+//[MultiThread]
+class procedure TALDynamicVideoPlayerSurface.HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
+begin
+  var LContext := TPreviewDownloadContext(AContext);
+  if LContext.FOwner = nil then exit;
+  LContext.ResourceStream := AContentStream;
+  TALGraphicThreadPool.Instance.ExecuteProc(
+    CreateBufDrawable, // const AProc: TALWorkerThreadProc;
+    LContext, // const AContext: Tobject; TALGraphicThreadPool.Instance will own and release the Context object
+    GetPreviewDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+  AContentStream := nil; // AContentStream Will be free by AContext
+  AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
+end;
+
+{*************}
+//[MultiThread]
+class procedure TALDynamicVideoPlayerSurface.HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject);
+begin
+  var LContext := TPreviewDownloadContext(AContext);
+  if LContext.FOwner = nil then exit;
+  {$IFDEF ALDPK}
+  TMonitor.Enter(LContext.FLock);
+  try
+    if LContext.Owner <> nil then begin
+      LContext.FFreeByThread := False;
+      AContext := nil; // AContext will be free by CancelResourceDownload
+    end;
+  finally
+    TMonitor.Exit(LContext.FLock);
+  end;
+  exit;
+  {$ENDIF}
+  if LContext.ResourceName = ALBrokenImageResourceName then begin
+    ALLog(
+      'TALDynamicVideoPlayerSurface.HandlePreviewDownloadError',
+      'BrokenImage resource is missing or incorrect | ' +
+      AErrMessage,
+      TalLogType.error);
+    TMonitor.Enter(LContext.FLock);
+    try
+      if LContext.FOwner <> nil then begin
+        LContext.FFreeByThread := False;
+        AContext := nil; // AContext will be free by CancelResourceDownload
+      end;
+    finally
+      TMonitor.Exit(LContext.FLock);
+    end;
+    exit;
+  end;
+  ALLog(
+    'TALDynamicVideoPlayerSurface.HandlePreviewDownloadError',
+    'Url: ' + LContext.ResourceName + ' | ' +
+    AErrMessage,
+    TalLogType.warn);
+  LContext.Rect := TRectF.Create(
+                     LContext.Rect.TopLeft,
+                     ALBrokenImageWidth,
+                     ALBrokenImageHeight);
+  //LContext.Scale: Single;
+  //LContext.AlignToPixel: Boolean;
+  LContext.ResourceName := ALBrokenImageResourceName;
+  ALFreeAndNil(LContext.ResourceStream);
+  LContext.WrapMode := TALImageWrapMode.Fit;
+  TALGraphicThreadPool.Instance.ExecuteProc(
+    CreateBufDrawable, // const AProc: TALWorkerThreadProc;
+    LContext, // const AContext: Tobject; TALGraphicThreadPool.Instance will own and release the Context object
+    GetPreviewDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+  AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
+end;
+
+{*************}
+//[MultiThread]
+class function TALDynamicVideoPlayerSurface.GetPreviewDownloadPriority(const AContext: Tobject): Int64;
+begin
+  result := GetDownloadPriority(AContext)
+end;
+
+{*************}
+//[MultiThread]
+class Procedure TALDynamicVideoPlayerSurface.CreateBufDrawable(var AContext: TObject);
+begin
+  var LContext := TPreviewDownloadContext(AContext);
+  if LContext.FOwner = nil then exit;
+  var LBufDrawable: TALDrawable := ALNullDrawable;
+  var LBufDrawableRect: TRectF;
+  Try
+    CreateBufDrawable(
+      LBufDrawable, // var ABufDrawable: TALDrawable;
+      LBufDrawableRect, // out ABufDrawableRect: TRectF;
+      LContext.Rect, // const ARect: TRectF;
+      LContext.Scale, // const AScale: Single;
+      LContext.AlignToPixel, // const AAlignToPixel: Boolean;
+      LContext.ResourceName, // const AResourceName: String;
+      LContext.ResourceStream, // const AResourceStream: TStream;
+      LContext.WrapMode); // const AWrapMode: TALImageWrapMode;
+  except
+    On E: Exception do begin
+      HandlePreviewDownloadError(E.Message, AContext);
+      exit;
+    end;
+  End;
+  TThread.queue(nil,
+    procedure
+    begin
+      if LContext.FOwner <> nil then begin
+        var LOwner := LContext.Owner;
+        if (LOwner.FFadeInDuration > 0) and
+           (LContext.ResourceName <> ALBrokenImageResourceName) and
+           (not ALIsDrawableNull(LBufDrawable)) and
+           (ALIsDrawableNull(LOwner.fVideoPlayerEngine.Drawable)) then
+          LOwner.FFadeInStartTimeNano := ALElapsedTimeNano
+        else
+          LOwner.FFadeInStartTimeNano := 0;
+        ALFreeAndNilDrawable(LOwner.fBufDrawable);
+        LOwner.fBufDrawable := LBufDrawable;
+        LOwner.FBufDrawableRect := LBufDrawableRect;
+        LOwner.FPreviewDownloadContext := nil;
+        LOwner.Repaint;
+      end;
+      ALFreeAndNil(LContext);
+    end);
+  AContext := nil; // AContext will be free by TThread.queue
+end;
+
+{*************}
+//[MultiThread]
+class Procedure TALDynamicVideoPlayerSurface.CreateBufDrawable(
+                  var ABufDrawable: TALDrawable;
+                  out ABufDrawableRect: TRectF;
+                  const ARect: TRectF;
+                  const AScale: Single;
+                  const AAlignToPixel: Boolean;
+                  const AResourceName: String;
+                  const AResourceStream: TStream;
+                  const AWrapMode: TALImageWrapMode);
+begin
+
+  if (not ALIsDrawableNull(ABufDrawable)) then exit;
+
+  var lResourceName: String;
+  if ALIsHttpOrHttpsUrl(AResourceName) then lResourceName := ''
+  else lResourceName := AResourceName;
+  var LFileName := ALGetResourceFilename(lResourceName);
+
+  ABufDrawableRect := ARect;
+
+  if (AResourceStream <> nil) or (LFileName <> '') or (LResourceName <> '') then begin
+
+    {$IFDEF ALDPK}
+    try
+    {$ENDIF}
+
+      ABufDrawable := ALCreateDrawableFromResource(
+                        AResourceName, // const AResourceName: String;
+                        AResourceStream, // const AResourceStream: TStream;
+                        '', // AMaskResourceName, // const AMaskResourceName: String;
+                        ALNullBitmap, // AMaskBitmap, // const AMaskBitmap: TALBitmap;
+                        AScale, // const AScale: Single;
+                        ARect.Width, ARect.Height, // const W, H: single;
+                        AWrapMode, // const AWrapMode: TALImageWrapMode;
+                        TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                        TalphaColors.Null, // const ATintColor: TalphaColor;
+                        0, // const ABlurRadius: single;
+                        0, // const AXRadius: Single;
+                        0); // const AYRadius: Single);
+
+    {$IFDEF ALDPK}
+    except
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      Exit;
+    end;
+    {$ENDIF}
+
+  end;
+
+  if not ALIsDrawableNull(ABufDrawable) then
+    ABufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(ABufDrawable)/AScale, ALGetDrawableHeight(ABufDrawable)/AScale).CenterAt(ARect);
+
+end;
+
+{************************************************************}
+procedure TALDynamicVideoPlayerSurface.MakeBufDrawable;
+begin
+
+  if //--- Do not create BufDrawable if the size is 0
+     (BoundsRect.IsEmpty) or
+     //--- Do not create BufDrawable if fResourceName is empty
+     (fPreviewResourceName = '')
+  then begin
+    ClearBufDrawable;
+    exit;
+  end;
+
+  if (not ALIsDrawableNull(FBufDrawable)) or
+     (FPreviewDownloadContext <> nil) or
+     (not ALIsDrawableNull(fVideoPlayerEngine.Drawable)) then exit;
+
+  if (CacheIndex > 0) and
+     (CacheEngine <> nil) and
+     (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
+
+  if (FPreviewDownloadContext = nil) and
+     (ALIsHttpOrHttpsUrl(PreviewResourceName)) then begin
+
+    {$IFDEF debug}
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    {$endif}
+
+    FPreviewDownloadContext := TPreviewDownloadContext.Create(Self);
+    Try
+      TALNetHttpClientPool.Instance.Get(
+        PreviewResourceName, // const AUrl: String;
+        CanStartPreviewDownload, // const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
+        HandlePreviewDownloadSuccess, // const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
+        HandlePreviewDownloadError, // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+        FPreviewDownloadContext, // const AContext: Tobject; // Context will be free by the worker thread
+        true, // const AUseCache: Boolean = True;
+        GetPreviewDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+    except
+      ALFreeAndNil(FPreviewDownloadContext);
+      Raise;
+    End;
+
+    exit;
+
+  end;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
+
+  CreateBufDrawable(
+    FBufDrawable, // var ABufDrawable: TALDrawable;
+    FBufDrawableRect, // out ABufDrawableRect: TRectF;
+    LocalRect.ReducePrecision, // const ARect: TRectF;
+    ALGetScreenScale, // const AScale: Single;
+    AutoAlignToPixel, // const AAlignToPixel: Boolean;
+    PreviewResourceName, // const AResourceName: String;
+    nil, // const AResourceStream: TStream;
+    WrapMode); // const AWrapMode: TALImageWrapMode;
+
+end;
+
+{***************************************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.ApplicationEventHandler(const Sender: TObject; const M : TMessage);
+begin
+  if FAutoStartMode = TAutoStartMode.WhenDisplayed then begin
+    if (M is TApplicationEventMessage) then begin
+      case (M as TApplicationEventMessage).Value.Event of
+        TApplicationEvent.EnteredBackground,
+        TApplicationEvent.WillTerminate: Pause;
+      end;
+    end;
+  end;
+end;
+
+{********************************************************************************}
+procedure TALDynamicVideoPlayerSurface.DoOnFrameAvailable(Sender: Tobject);
+begin
+  var LAbsoluteDisplayedRect := GetAbsoluteDisplayedRect;
+  If FAutoStartMode = TAutoStartMode.WhenDisplayed then begin
+    // If less than 20% of the surface is visible, then pause this video.
+    If (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.2, TEpsilon.position) <= 0) then
+      Pause;
+  end;
+
+  if not LAbsoluteDisplayedRect.IsEmpty then
+    repaint;
+end;
+
+{**************************************************}
+procedure TALDynamicVideoPlayerSurface.Paint;
+begin
+
+  If (FAutoStartMode = TAutoStartMode.WhenDisplayed) and (FInternalState <> VPSStarted) then begin
+    var LAbsoluteDisplayedRect := GetAbsoluteDisplayedRect;
+    // If 80% of the surface is visible and another video is currently playing,
+    // pause the other video and start this one.
+    If (AutoStartedVideoPlayerSurface <> nil) and
+       (AutoStartedVideoPlayerSurface <> self) and
+       (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.8, TEpsilon.position) > 0) then begin
+      AutoStartedVideoPlayerSurface.Pause;
+      Start;
+      AutoStartedVideoPlayerSurface := Self;
+    end
+    // If 20% of the surface is visible and no other video is currently playing,
+    // then start this video.
+    else if (AutoStartedVideoPlayerSurface = nil) and
+            (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.2, TEpsilon.position) > 0) then begin
+      Start;
+      AutoStartedVideoPlayerSurface := Self;
+    end
+  end;
+
+  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  //begin
+  //  var R := LocalRect.ReducePrecision;
+  //  system.types.InflateRect(R, -0.5, -0.5);
+  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  //end;
+
+  // Calculate the opacity based on FFadeInStartTimeNano.
+  var LOpacity: Single := AbsoluteOpacity;
+  if FFadeInStartTimeNano > 0 then begin
+    {$IF defined(DEBUG)}
+    // Not possible; we are initiating a FadeIn
+    // effect while still downloading the image.
+    if (FPreviewDownloadContext <> nil) then
+      Raise Exception.Create('Error 821554A1-5E7D-4920-BA1A-CECA32A9D967');
+    {$ENDIF}
+    var LElapsedTime := (ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec;
+    if LElapsedTime > FFadeInDuration then FFadeInStartTimeNano := 0
+    else begin
+      LOpacity := LOpacity * (LElapsedTime / FFadeInDuration);
+      // We cannot call Repaint from within a paint method,
+      // but we can call Form.Invalidate. We use Form.Invalidate
+      // to avoid using any TALFloatAnimation object
+      {$IF defined(MSWindows)}
+      If Form <> nil then begin
+        var LWnd := FormToHWND(Form);
+        TThread.ForceQueue(nil,
+          procedure
+          begin
+            Winapi.Windows.InvalidateRect(LWnd, nil, False);
+          end);
+      end;
+      {$ELSE}
+      If Form <> nil then
+        Form.Invalidate;
+      {$ENDIF}
+    end;
+  end;
+
+  if ALIsDrawableNull(fVideoPlayerEngine.Drawable) then begin
+
+    var LDrawable: TALDrawable;
+    var LDrawableRect: TRectF;
+    if (CacheIndex <= 0) or
+       (CacheEngine = nil) or
+       (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+      MakeBufDrawable;
+      if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
+        if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+        else fBufDrawable := ALNullDrawable;
+        if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+          raise Exception.Create('Error 6FFD96FE-A985-4F3B-AF0A-2A5C03615E27');
+      end
+      else begin
+        LDrawable := FBufDrawable;
+        LDrawableRect := FBufDrawableRect;
+      end;
+    end;
+
+    if ((ALIsDrawableNull(LDrawable) and (FPreviewDownloadContext <> nil)) or
+        (FFadeInStartTimeNano > 0)) and
+       (LoadingColor <> TAlphaColors.Null) then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(AutoAlignToPixel)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFillColor(FloadingColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := FloadingColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, AllCorners, AbsoluteOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    if BackgroundColor <> TAlphaColors.Null then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(AutoAlignToPixel)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(LOpacity)
+        .SetFillColor(FBackgroundColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := BackGroundColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, LOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LDrawable, // const ADrawable: TALDrawable;
+      LDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      LOpacity); // const AOpacity: Single);
+
+    if FIsFirstFrame then
+      FIsFirstFrame := ALIsDrawableNull(LDrawable);
+
+  end
+
+  else begin
+
+    if FIsFirstFrame then begin
+      CancelPreviewDownload;
+      ALFreeAndNilDrawable(fBufDrawable);
+      if (FFadeInDuration > 0) and (FFadeInStartTimeNano <= 0) then begin
+        FFadeInStartTimeNano := ALElapsedTimeNano;
+        LOpacity := 0;
+        // We cannot call Repaint from within a paint method,
+        // but we can call Form.Invalidate. We use Form.Invalidate
+        // to avoid using any TALFloatAnimation object
+        {$IF defined(MSWindows)}
+        If Form <> nil then begin
+          var LWnd := FormToHWND(Form);
+          TThread.ForceQueue(nil,
+            procedure
+            begin
+              Winapi.Windows.InvalidateRect(LWnd, nil, False);
+            end);
+        end;
+        {$ELSE}
+        If Form <> nil then
+          Form.Invalidate;
+        {$ENDIF}
+      end;
+      FIsFirstFrame := false;
+    end;
+
+    if (FFadeInStartTimeNano > 0) and
+       (LoadingColor <> TAlphaColors.Null) then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(AutoAlignToPixel)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFillColor(FloadingColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := FloadingColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, AllCorners, AbsoluteOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    if BackgroundColor <> TAlphaColors.Null then begin
+      {$IF DEFINED(ALSkiaCanvas)}
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(AutoAlignToPixel)
+        .SetDstRect(LocalRect.ReducePrecision)
+        .SetOpacity(LOpacity)
+        .SetFillColor(FBackgroundColor)
+        .Draw;
+      {$ELSE}
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := BackGroundColor;
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect.ReducePrecision, Canvas.Matrix, Canvas.Scale, TEpsilon.position), 0, 0, ALLCorners, LOpacity, TCornerType.Round);
+      {$ENDIF}
+    end;
+
+    var LSrcRect: TrectF;
+    var LDstRect: TrectF;
+    case WrapMode of
+
+      TALImageWrapMode.Fit: begin
+        LSrcRect := Trectf.Create(
+                      0, 0,
+                      ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
+                      ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
+        LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
+                      FitInto(LocalRect.ReducePrecision);
+      end;
+
+      TALImageWrapMode.Stretch: begin
+        LSrcRect := Trectf.Create(
+                      0, 0,
+                      ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
+                      ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
+        LDstRect := LocalRect.ReducePrecision;
+      end;
+
+      TALImageWrapMode.Place: begin
+        LSrcRect := Trectf.Create(
+                      0, 0,
+                      ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
+                      ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
+        LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
+                      PlaceInto(LocalRect.ReducePrecision);
+      end;
+
+      TALImageWrapMode.FitAndCrop: begin
+        LDstRect := TRectF.Create(0, 0, Width, Height);
+        LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
+        LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)));
+      end;
+
+      else
+        Raise Exception.Create('Error B0DE069F-2CFD-4719-9130-0D69A647EE2D')
+
+    end;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      fVideoPlayerEngine.Drawable, // const ADrawable: TALDrawable;
+      LSrcRect, // const ASrcRect: TrectF; // IN REAL PIXEL !
+      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      LOpacity); // const AOpacity: Single);
+
+  end;
+
+end;
+
+{$ENDREGION}
+
+//////////////////////////////////////////////
+/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
+
+initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Dynamic.VideoPlayer','initialization');
+  {$ENDIF}
+  TALDynamicVideoPlayerSurface.AutoStartedVideoPlayerSurface := Nil;
+
+end.

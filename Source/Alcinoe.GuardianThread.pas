@@ -107,7 +107,7 @@ uses
   Alcinoe.Common,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Graphics,
-  Alcinoe.FMX.DynamicListBox;
+  Alcinoe.FMX.Dynamic.Controls;
 
 {***********************************}
 constructor TALRefCountObject.Create;
@@ -406,9 +406,9 @@ begin
       if assigned(TComponent(aObject).Owner) then TComponent(aObject).Owner.RemoveComponent(TComponent(aObject));
       If aObject is TALControl then aObject.BeforeDestruction;
     end
-    else if (aObject is TALDynamicListBoxControl) then begin
+    else if (aObject is TALDynamicControl) then begin
       aObject.BeforeDestruction;
-      TALDynamicListBoxControl(aObject).OwnerControl := nil;
+      TALDynamicControl(aObject).Owner := nil;
     end;
 
     // Add the object to the queue

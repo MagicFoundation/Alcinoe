@@ -85,7 +85,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -240,7 +240,7 @@ type
         property OnMouseMove;
         property OnMouseWheel;
         property OnClick;
-        //property OnDblClick;
+        property OnDblClick;
         property OnKeyDown;
         property OnKeyUp;
         property OnPainting;
@@ -386,7 +386,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -464,7 +464,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -542,7 +542,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -576,7 +576,7 @@ uses
 
 {**}
 Type
-  _TControlAccessProtected = class(Tcontrol);
+  _TControlProtectedAccess = class(Tcontrol);
 
 {***********************************************}
 constructor TALLayout.Create(AOwner: TComponent);
@@ -622,21 +622,21 @@ begin
 
     If Height > ScrollBox.Height then
       Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
-                (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > -Position.Y)
+                (AObject.Position.Y + (AObject.Height * _TControlProtectedAccess(AObject).scale.y) > -Position.Y)
     else
       // Handle the maxContentHeight
       Result := (AObject.Position.Y < Height) and
-                (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > 0);
+                (AObject.Position.Y + (AObject.Height * _TControlProtectedAccess(AObject).scale.y) > 0);
 
     If Width > ScrollBox.Width then
       Result := Result and
                 (AObject.Position.X < -Position.X + FscrollBox.Width) and
-                (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > -Position.X)
+                (AObject.Position.X + (AObject.Width * _TControlProtectedAccess(AObject).scale.x) > -Position.X)
     else
       // Handle the maxContentWidth
       Result := Result and
                 (AObject.Position.X < Width) and
-                (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > 0);
+                (AObject.Position.X + (AObject.Width * _TControlProtectedAccess(AObject).scale.x) > 0);
 
   end
   else
@@ -1309,7 +1309,7 @@ begin
     // This action deactivates some functionalities in the native control, such as the right-click menu.
     if not Supports(aObject, IALNativeControl) then
     {$ENDIF}
-      _TControlAccessProtected(aObject).capture;
+      _TControlProtectedAccess(aObject).capture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   InternalMouseDown(Button, Shift, P.X, P.Y);
@@ -1337,7 +1337,7 @@ begin
     // This action deactivates some functionalities in the native control, such as the right-click menu.
     if not Supports(aObject, IALNativeControl) then
     {$ENDIF}
-      _TControlAccessProtected(aObject).releasecapture;
+      _TControlProtectedAccess(aObject).releasecapture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   InternalMouseUp(Button, Shift, P.X, P.Y);

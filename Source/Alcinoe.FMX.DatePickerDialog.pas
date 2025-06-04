@@ -159,6 +159,7 @@ uses
   FMX.Helpers.iOS,
   FMX.Forms,
   {$ENDIF}
+  Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 

@@ -7,6 +7,7 @@ uses
   System.Generics.Collections,
   System.Messaging,
   System.UITypes,
+  Alcinoe.FMX.Common,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Memo,
@@ -49,6 +50,7 @@ type
         function SetIconSize(const AWidth, AHeight: Single): TBuilder;
         function SetHeadlineText(const AValue: String): TBuilder;
         function SetHeadlineAlign(const AValue: TAlAlignLayout): TBuilder;
+        function SetHeadlineTextHorzAlign(const AValue: TALTextHorzAlign): TBuilder;
         function SetMessageText(const AValue: String): TBuilder;
         function AddRadioButton(const ALabel: String; const ATag: NativeInt; const AChecked: Boolean; const AMandatory: Boolean = True): TBuilder;
         function AddCheckBox(const ALabel: String; const ATag: NativeInt; const AChecked: Boolean): TBuilder;
@@ -230,7 +232,6 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
-  Alcinoe.FMX.Common,
   Alcinoe.Common;
 
 {************************************}
@@ -280,6 +281,13 @@ end;
 function TALDialog.TBuilder.SetHeadlineAlign(const AValue: TAlAlignLayout): TBuilder;
 begin
   FDialog.Headline.Align := AValue;
+  Result := Self;
+end;
+
+{*************************************************************************}
+function TALDialog.TBuilder.SetHeadlineTextHorzAlign(const AValue: TALTextHorzAlign): TBuilder;
+begin
+  FDialog.Headline.TextSettings.HorzAlign := AValue;
   Result := Self;
 end;
 
@@ -1082,8 +1090,12 @@ begin
   ProcessPendingDialogs;
   if not IsShowingDialog then
     ReactivateEdits
-  else
+  else begin
     FScrimAnimation.Stop;
+    if assigned(FCurrentDialog.CustomDialogRefProc) or
+       assigned(FCurrentDialog.CustomDialogObjProc) then
+      FCurrentDialog.Fill.Color := LCurrentDialog.Fill.Color;
+  end;
   TThread.ForceQueue(nil,
     procedure
     begin
@@ -1458,16 +1470,15 @@ end;
 
 initialization
   {$IF defined(DEBUG)}
-  ALLog('AL.Dialogs','initialization');
+  ALLog('Alcinoe.FMX.Dialogs','initialization');
   {$ENDIF}
   TALDialogManager.FInstance := nil;
   TALDialogManager.CreateInstanceFunc := @TALDialogManager.CreateInstance;
 
 finalization
   {$IF defined(DEBUG)}
-  ALLog('AL.Dialogs','finalization');
+  ALLog('Alcinoe.FMX.Dialogs','finalization');
   {$ENDIF}
-  ALFreeAndNil(TALDialogManager.FInstance);
   ALFreeAndNil(TALDialogManager.FInstance);
 
 end.

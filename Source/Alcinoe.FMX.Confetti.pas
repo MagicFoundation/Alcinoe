@@ -23,6 +23,17 @@ Type
   {*************************}
   [ComponentPlatforms($FFFF)]
   TALConfetti = Class(TFmxObject)
+  private
+    class function CreateInstance: TALConfetti;
+    class function GetInstance: TALConfetti; static;
+  protected
+    class var FInstance: TALConfetti;
+  public
+    type
+      TCreateInstanceFunc = function: TALConfetti;
+    class var CreateInstanceFunc: TCreateInstanceFunc;
+    class property Instance: TALConfetti read GetInstance;
+    class function HasInstance: Boolean; inline;
   public
     type
       TParticule = record
@@ -52,6 +63,8 @@ Type
         ovalScalar: Single;
         scalar: Single;
       end;
+  private
+    class var FDefaultColors: TArray<TalphaColor>;
   private
     FOriginalOnPaint: TOnPaintEvent;
     FOnFinish: TNotifyEvent;
@@ -93,6 +106,7 @@ Type
                 const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
                 const AScalar: Single = 1); // Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
     Property ParticuleCount: integer read GetParticuleCount;
+    class property DefaultColors: TArray<TalphaColor> read FDefaultColors write FDefaultColors;
   published
     property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
   End;
@@ -102,6 +116,7 @@ procedure Register;
 implementation
 
 uses
+  System.SysUtils,
   system.Math,
   FMX.Forms,
   Alcinoe.Common;
@@ -121,9 +136,39 @@ end;
 {*****************************}
 destructor TALConfetti.Destroy;
 begin
+  if self = TALConfetti.FInstance then
+    TALConfetti.FInstance := nil;
   AlFreeAndNil(FParticules);
   AlFreeAndNil(FDisplayAnimation);
   inherited;
+end;
+
+{***************************************************************}
+class function TALConfetti.CreateInstance: TALConfetti;
+begin
+  Var LForm := Screen.ActiveForm;
+  if LForm = nil then LForm := Application.MainForm;
+  if LForm = nil then Raise Exception.Create('Error B0E64381-A55E-4EF3-AC6B-08482C533D65');
+  result := TALConfetti.Create(LForm);
+  result.Parent := LForm;
+end;
+
+{*************}
+//[MultiThread]
+class function TALConfetti.GetInstance: TALConfetti;
+begin
+  if FInstance = nil then begin
+    var LInstance := CreateInstanceFunc;
+    if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
+  end;
+  Result := FInstance;
+end;
+
+{*************}
+//[MultiThread]
+class function TALConfetti.HasInstance: Boolean;
+begin
+  result := FInstance <> nil;
 end;
 
 {*********************************************************************************************************************}
@@ -309,16 +354,7 @@ begin
     LShapes[1] := TALConfetti.TParticule.TShape.circle;
   end;
   var LColors := AColors;
-  if length(LColors) = 0 then begin
-    setlength(LColors, 7);
-    LColors[0] := $ff26ccff;
-    LColors[1] := $ffa25afd;
-    LColors[2] := $ffff5e7e;
-    LColors[3] := $ff88ff5a;
-    LColors[4] := $fffcff42;
-    LColors[5] := $ffffa62d;
-    LColors[6] := $ffff36ff;
-  end;
+  if length(LColors) = 0 then LColors := DefaultColors;
 
   for Var I := 1 to AParticleCount do
     FParticules.Add(
@@ -363,5 +399,21 @@ initialization
   ALLog('Alcinoe.FMX.Confetti','initialization');
   {$ENDIF}
   RegisterFmxClasses([TALConfetti]);
+  setlength(TALConfetti.FDefaultColors, 7);
+  TALConfetti.FDefaultColors[0] := $ff26ccff;
+  TALConfetti.FDefaultColors[1] := $ffa25afd;
+  TALConfetti.FDefaultColors[2] := $ffff5e7e;
+  TALConfetti.FDefaultColors[3] := $ff88ff5a;
+  TALConfetti.FDefaultColors[4] := $fffcff42;
+  TALConfetti.FDefaultColors[5] := $ffffa62d;
+  TALConfetti.FDefaultColors[6] := $ffff36ff;
+  TALConfetti.FInstance := nil;
+  TALConfetti.CreateInstanceFunc := @TALConfetti.CreateInstance;
+
+finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Confetti','finalization');
+  {$ENDIF}
+  ALFreeAndNil(TALConfetti.FInstance);
 
 end.

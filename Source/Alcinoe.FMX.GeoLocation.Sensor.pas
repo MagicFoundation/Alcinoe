@@ -262,6 +262,7 @@ type
                    out APreciseGeoLocation: boolean; // If you have granted the app access to your precise geolocation
                    out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time
       function  IsGeoLocationAccessGranted: Boolean; // If you have granted the app access to your geolocation
+      function  IsPreciseGeoLocationAccessGranted: Boolean; // If you have granted the app access to your precise geolocation
       function  IsGpsEnabledAndGeoLocationAccessGranted: Boolean; overload; // If your device GPS is on and if your have granted the app access to your geolocation
       function  IsGpsEnabledAndGeoLocationAccessGranted(out ARestricted: boolean): Boolean; overload; // If your device GPS is on and if your have granted the app access to your geolocation
       function  IsRestricted: Boolean; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
@@ -306,6 +307,7 @@ uses
   Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   Alcinoe.Cipher,
+  Alcinoe.Localization,
   Alcinoe.stringutils,
   ALcinoe.common;
 
@@ -578,6 +580,21 @@ begin
     LPreciseGeoLocation,
     LAuthorizedAlways);
   result := LCoarseGeoLocation or LPreciseGeoLocation;
+end;
+
+{************************************************************************}
+function  TALGeoLocationSensor.IsPreciseGeoLocationAccessGranted: Boolean;
+begin
+  var LRestricted: boolean;
+  var LCoarseGeoLocation: Boolean;
+  var LPreciseGeoLocation: boolean;
+  var LAuthorizedAlways: Boolean;
+  GetPermissionsGranted(
+    LRestricted,
+    LCoarseGeoLocation,
+    LPreciseGeoLocation,
+    LAuthorizedAlways);
+  result := LPreciseGeoLocation;
 end;
 
 {*****************************************************************************}

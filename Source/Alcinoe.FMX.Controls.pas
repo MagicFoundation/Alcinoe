@@ -79,7 +79,7 @@ type
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
-    FDisableDoubleClickHandling: Boolean; // 1 byte
+    FDoubleClick: Boolean; // 1 byte
     FAutoAlignToPixel: Boolean; // 1 byte
     FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
@@ -119,6 +119,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure Click; override;
     function GetParentedVisible: Boolean; override;
     procedure DoMatrixChanged(Sender: TObject); override;
     procedure DoRootChanged; override;
@@ -150,7 +151,6 @@ type
     function IsDisplayed: Boolean; virtual;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
-    property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
     {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
@@ -241,7 +241,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -256,6 +256,9 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
+  {$IF defined(IOS)}
+  FMX.Platform.iOS,
+  {$ENDIF}
   Fmx.utils,
   Alcinoe.FMX.styles,
   Alcinoe.FMX.Common,
@@ -266,8 +269,8 @@ uses
 
 {**}
 Type
-  _TControlAccessProtected = class(Tcontrol);
-  _TStyledControlAccessProtected = class(TStyledControl);
+  _TControlProtectedAccess = class(Tcontrol);
+  _TStyledControlProtectedAccess = class(TStyledControl);
 
 {************************************************}
 constructor TALControl.Create(AOwner: TComponent);
@@ -287,14 +290,7 @@ begin
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
-  // Double-clicks, or double-taps, are rarely used in mobile design due to
-  // touch screen challenges and user experience considerations. Mobile devices
-  // favor simpler, more intuitive gestures like swiping and pinching, which are
-  // better suited to smaller screens and prevent confusion with similar
-  // actions. Consequently, functionalities often tied to double-clicks on
-  // desktops are handled by different gestures or interface elements in
-  // mobile apps, leading to a more user-friendly experience.
-  FDisableDoubleClickHandling := True;
+  FDoubleClick := False;
   FAutoAlignToPixel := True;
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
@@ -611,7 +607,7 @@ begin
       If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
          (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
          (ParentControl <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-         (_TControlAccessProtected(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+         (_TControlProtectedAccess(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
       then begin
         case FAlign of
           TALAlignLayout.TopCenter,
@@ -706,7 +702,7 @@ begin
   If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
      (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
      (ParentControl <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-     (_TControlAccessProtected(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+     (_TControlProtectedAccess(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
   then begin
     case FAlign of
       TALAlignLayout.TopCenter,
@@ -1380,7 +1376,14 @@ begin
   FControlAbsolutePosAtMouseDown := LocalToAbsolute(TPointF.Zero);
   FMouseDownAtLowVelocity := True;
   //--
-  if FDisableDoubleClickHandling then Shift := Shift - [ssDouble];
+  FDoubleClick := ssDouble in Shift;
+  if FDoubleClick then begin
+    {$IF defined(IOS)}
+    if FForm <> nil then
+      TALFMXViewBaseAccessPrivate(WindowHandleToPlatform(FForm.Handle).Handle).FShouldIgnoreNextClick := False;
+    {$ENDIF}
+    Shift := Shift - [ssDouble];
+  end;
   //--
   var LScrollableControl: IALScrollableControl;
   var LParentControl := ParentControl;
@@ -1419,6 +1422,7 @@ begin
   var LPrevPressed := Pressed;
   inherited;
   if LPrevPressed <> Pressed then PressedChanged;
+  FDoubleClick := False;
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
   if (FFocusOnMouseUp) and
      (FMouseDownAtLowVelocity) and
@@ -1454,6 +1458,16 @@ begin
   var LPrevPressed := Pressed;
   inherited;
   if LPrevPressed <> Pressed then PressedChanged;
+end;
+
+{*************************}
+procedure TALControl.Click;
+begin
+  inherited;
+  if FDoubleClick then begin
+    DblClick;
+    FDoubleClick := False;
+  end;
 end;
 
 {*************************************}
@@ -1626,7 +1640,7 @@ begin
   begin
     Parent := Content.GetObject.Parent;
     if (Parent <> nil) and (Parent is TStyledControl) then
-      Result := not TabStop.GetObject.Equals(_TStyledControlAccessProtected(Parent).ResourceLink);
+      Result := not TabStop.GetObject.Equals(_TStyledControlProtectedAccess(Parent).ResourceLink);
   end;
 
   Result := Result and inherited IsAddable(TabStop);
@@ -1671,7 +1685,7 @@ begin
 //  begin
 //    FParentAligning := True;
 //    if ParentControl <> nil then
-//      _TControlAccessProtected(ParentControl).Realign
+//      _TControlProtectedAccess(ParentControl).Realign
 //    else
 //      if not(csLoading in ComponentState) and Supports(Parent, IAlignRoot, AlignRoot) then
 //        AlignRoot.Realign;

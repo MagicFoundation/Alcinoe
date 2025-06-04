@@ -1223,7 +1223,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown; // Not work under android - it's like this with their @{[^# virtual keyboard :(
     //property OnKeyUp; // Not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnPainting;
@@ -1310,7 +1310,7 @@ uses
 
 {**}
 Type
-  _TALBaseStateStyleAccessProtected = class(TALBaseStateStyle);
+  _TALBaseStateStyleProtectedAccess = class(TALBaseStateStyle);
 
 {********************************************************}
 constructor TALBaseEditControl.Create(AOwner: TComponent);
@@ -6779,20 +6779,20 @@ begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end

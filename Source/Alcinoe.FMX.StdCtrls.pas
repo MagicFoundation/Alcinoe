@@ -276,6 +276,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
@@ -340,7 +341,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -769,7 +770,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -1497,7 +1498,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -1789,7 +1790,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -2647,7 +2648,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -2824,7 +2825,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -3036,7 +3037,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    //property OnDblClick;
+    property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -3082,7 +3083,7 @@ uses
 
 {**}
 Type
-  _TALBaseStateStyleAccessProtected = class(TALBaseStateStyle);
+  _TALBaseStateStyleProtectedAccess = class(TALBaseStateStyle);
 
 {*****************************************************}
 constructor TALAniIndicator.Create(AOwner: TComponent);
@@ -3107,6 +3108,16 @@ end;
 destructor TALAniIndicator.Destroy;
 begin
   ALFreeAndNil(FTimer);
+  inherited;
+end;
+
+{******************************************}
+procedure TALAniIndicator.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  // Necessary if the control is destroyed using
+  // AlFreeAndNil with the delayed flag
+  FTimer.Enabled := False;
   inherited;
 end;
 
@@ -4038,20 +4049,20 @@ begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -8835,20 +8846,20 @@ begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -10335,20 +10346,20 @@ begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -12200,20 +12211,20 @@ begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALBaseStateStyleAccessProtected(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
     if StateStyles.TransitionTo <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALBaseStateStyleAccessProtected(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end

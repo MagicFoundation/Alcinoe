@@ -1,4 +1,4 @@
-unit Alcinoe.FMX.PageController;
+ï»¿unit Alcinoe.FMX.Dynamic.PageController;
 
 interface
 
@@ -14,27 +14,30 @@ uses
   ALcinoe.Common,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Ani,
-  Alcinoe.FMX.Layouts,
-  Alcinoe.FMX.Controls,
-  Alcinoe.FMX.Objects,
-  Alcinoe.FMX.ScrollEngine;
+  Alcinoe.FMX.ScrollEngine,
+  Alcinoe.Fmx.Dynamic.Layouts,
+  Alcinoe.FMX.Dynamic.Controls,
+  Alcinoe.FMX.Dynamic.Objects;
+
+//////////////////////////////////////////////
+/// THE CODE BELOW WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
+
+{$REGION 'AUTO-GENERATED'}
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALPageController = class;
-
-  {********************************************}
-  TALBasePageIndicator = class(TALBaseRectangle)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicBasePageIndicator = class(TALDynamicBaseRectangle)
   public
     procedure AnimationProcess(Const AValue: Single); virtual; abstract;
     procedure ActivePageChanged(Const ANewActivePageIndex: Integer); virtual; abstract;
     procedure PageCountChanged(Const ANewPageCount: Integer; const ANewActivePageIndex: Integer); virtual; abstract;
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
-  TALPageIndicator = class(TALBasePageIndicator)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicPageIndicator = class(TALDynamicBasePageIndicator)
   public
     type
       //---------------
@@ -127,7 +130,7 @@ type
         property DefaultYRadius: Single read GetDefaultYRadius;
         property DefaultCorners: TCorners read GetDefaultCorners;
         property DefaultSides: TSides read GetDefaultSides;
-      published
+      public
         property Fill: TALBrush read FFill write setFill;
         property Stroke: TALStrokeBrush read FStroke write setStroke;
         property Shadow: TALShadow read FShadow write setShadow;
@@ -151,14 +154,14 @@ type
       //-------------------
       // TInactiveIndicator
       TInactiveIndicator = Class(TIndicator)
-      Published
+      public
         property Margins;
         property Width;
         property Height;
       end;
       //------------------
       // TIndicatorControl
-      TIndicatorControl = Class(TALRectangle);
+      TIndicatorControl = Class(TALDynamicRectangle);
       //------------------------
       // TActiveIndicatorControl
       TActiveIndicatorControl = Class(TIndicatorControl)
@@ -179,7 +182,7 @@ type
     FActiveIndicatorControl: TActiveIndicatorControl; // 8 bytes
     FActiveIndicator: TActiveIndicator;  // 8 bytes
     FInactiveIndicator: TInactiveIndicator; // 8 bytes
-    procedure SetAnimationType(const AValue: TALPageIndicator.TAnimationType);
+    procedure SetAnimationType(const AValue: TALDynamicPageIndicator.TAnimationType);
     procedure SetActiveIndicator(const AValue: TActiveIndicator);
     procedure SetInactiveIndicator(const AValue: TInactiveIndicator);
     procedure ActiveIndicatorChanged(ASender: TObject);
@@ -189,14 +192,14 @@ type
     function CreateFill: TALBrush; override;
     function CreateStroke: TALStrokeBrush; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    procedure Loaded; override;
+    //procedure Loaded; override;
     procedure DoRealign; override;
     procedure AdjustSize; override;
     Procedure UpdateActiveIndicator; Virtual;
     procedure RebuildIndicatorControls; virtual;
     procedure Paint; override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
@@ -209,12 +212,12 @@ type
     property PageCount: integer read FPageCount;
     property CacheEngine;
     property CacheIndex;
-  published
+  public
     //property Action;
     property ActiveIndicator: TActiveIndicator read FActiveIndicator write SetActiveIndicator;
     property InactiveIndicator: TInactiveIndicator read FInactiveIndicator write SetInactiveIndicator;
     property Align;
-    property Anchors;
+    //property Anchors;
     property AnimationType: TAnimationType read FAnimationType write SetAnimationType default TanimationType.None;
     //property AutoSize;
     //property CanFocus;
@@ -225,8 +228,8 @@ type
     property Corners;
     property Cursor;
     property DoubleBuffered;
-    property DragMode;
-    property EnableDragHighlight;
+    //property DragMode;
+    //property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -234,19 +237,19 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    property Locked;
+    //property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    property PopupMenu;
-    property Position;
-    property RotationAngle;
+    //property PopupMenu;
+    //property Position;
+    //property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property Shadow;
     property Sides;
-    property Size;
+    //property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
@@ -256,11 +259,11 @@ type
     property XRadius;
     property YRadius;
     //property OnCanFocus;
-    property OnDragEnter;
-    property OnDragLeave;
-    property OnDragOver;
-    property OnDragDrop;
-    property OnDragEnd;
+    //property OnDragEnter;
+    //property OnDragLeave;
+    //property OnDragOver;
+    //property OnDragDrop;
+    //property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -268,7 +271,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    property OnMouseWheel;
+    //property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -276,11 +279,14 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    property OnResized;
+    //property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALPageView = class(TALBaseRectangle)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicPageController = class;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicPageView = class(TALDynamicBaseRectangle)
   public
     type
       TFill = class(TALBrush)
@@ -292,22 +298,22 @@ type
         function GetDefaultColor: TAlphaColor; override;
       end;
   private
-    FPageController: TALPageController;
+    FPageController: TALDynamicPageController;
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
   protected
     function CreateFill: TALBrush; override;
     function CreateStroke: TALStrokeBrush; override;
     procedure ParentChanged; override;
-    {## Dynamic:Begin
+    // Dynamic:Begin
     function DoGetDownloadPriority: Int64; override;
-    Dynamic:End ##}
+    // Dynamic:End
   public
-    constructor Create(AOwner: TComponent); override;
-    property PageController: TALPageController read FPageController;
+    constructor Create(const AOwner: TObject); override;
+    property PageController: TALDynamicPageController read FPageController;
     property CacheEngine;
     property CacheIndex;
-  published
+  public
     //property Action;
     property Active: Boolean read GetActive write SetActive stored False;
     //property Align;
@@ -330,11 +336,11 @@ type
     //property ShowHint;
     property HitTest default false;
     property &Index stored False;
-    property Locked default true;
+    //property Locked default true;
     //property Margins;
     property Opacity;
     property Padding;
-    property PopupMenu;
+    //property PopupMenu;
     //property Position;
     //property RotationAngle;
     //property RotationCenter;
@@ -359,23 +365,22 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    property OnMouseWheel;
+    //property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    property OnKeyDown;
-    property OnKeyUp;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    property OnResized;
+    //property OnResized;
   end;
-  TALPageViewClass = class of TALPageView;
 
-  {***********************************************}
-  // IItemsContainer is required because it is used
-  // in FMX.Editor.Items / FMX.Design.Items
-  [ComponentPlatforms($FFFF)]
-  TALPageController = class(TALBaseRectangle, IALScrollableControl, IItemsContainer)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicPageViewClass = class of TALDynamicPageView;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicPageController = class(TALDynamicBaseRectangle)
   public
     const
       MAXIMUM_FLING_VELOCITY = 8000; // From android ViewConfiguration.MAXIMUM_FLING_VELOCITY
@@ -396,30 +401,30 @@ type
       TViewportPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TALPointD) of object;
       // --------
       // TContent
-      // Inherits from TALContent instead of TALControl
+      // Inherits from TALDynamicContent instead of TALDynamicControl
       // because, at design time in the IDE, child components added to
-      // TContent (i.e., the TALPageView) are properly assigned as children
+      // TContent (i.e., the TALDynamicPageView) are properly assigned as children
       // of the PageView controller.
-      TContent = class(TALContent)
+      TContent = class(TALDynamicContent)
       private
-        FPageController: TALPageController;
+        FPageController: TALDynamicPageController;
       protected
-        procedure DoAddObject(const AObject: TFmxObject); override;
-        procedure DoRemoveObject(const AObject: TFmxObject); override;
-        procedure DoDeleteChildren; override;
+        procedure DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer); override;
+        procedure DoRemoveControl(const AControl: TALDynamicControl); override;
+        //procedure DoDeleteChildren; override;
         procedure DoContentChanged; override;
         {$IFNDEF ALDPK}
-        function IsVisibleObject(const AObject: TControl): Boolean; override;
+        //function IsVisibleObject(const AObject: TControl): Boolean; override;
         {$ENDIF}
       public
-        constructor Create(AOwner: TComponent); override;
-        property PageControl: TALPageController read FPageController;
+        constructor Create(const AOwner: TObject); override;
+        property PageControl: TALDynamicPageController read FPageController;
       end;
       // -------------
       // TScrollEngine
       TScrollEngine = class(TALScrollEngine)
       private
-        FPageController: TALPageController; // 8 bytes;
+        FPageController: TALDynamicPageController; // 8 bytes;
         fLastViewportPosition: TALPointD; // 16 bytes;
         FDownPageIndex: integer; // 4 bytes
       protected
@@ -429,20 +434,20 @@ type
         procedure DoStop; override;
         procedure DoChanged; override;
       public
-        constructor Create(const APageControl: TALPageController); reintroduce;
-        property PageControl: TALPageController read FPageController;
+        constructor Create(const APageControl: TALDynamicPageController); reintroduce;
+        property PageControl: TALDynamicPageController read FPageController;
       end;
   private
     FViewportFraction: Single; // 4 bytes
     FActivePageIndex: Integer; // 4 bytes
     FScrollEngine: TALScrollEngine; // 8 bytes
     FContent: TContent; // 8 bytes
-    FPageIndicator: TALBasePageIndicator; // 8 bytes
+    FPageIndicator: TALDynamicBasePageIndicator; // 8 bytes
     fMouseDownPos: TPointF; // 8 bytes
     FFadeAnimation: TALFloatAnimation; // 8 bytes
     FFadeFromPageIndex: Integer; // 4 bytes
     FFadeToPageIndex: Integer; // 4 bytes
-    FFadeOverlay: TALLayout; // 8 bytes
+    FFadeOverlay: TALDynamicLayout; // 8 bytes
     FFadeTouchMode: TALScrollEngine.TTouchMode; // 1 byte
     FPageSnapping: Boolean;  // 1 byte
     FPadEnds: Boolean; // 1 byte
@@ -455,12 +460,12 @@ type
     fOnAniStop: TnotifyEvent; // 16 bytes
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure RefreshActivePageIndex;
-    procedure SetPageIndicator(const AValue: TALBasePageIndicator);
+    procedure SetPageIndicator(const AValue: TALDynamicBasePageIndicator);
     function GetPageSize: Single;
     function GetEndPadding: Single;
     function GetPageCount: integer;
-    function GetPage(AIndex: Integer): TALPageView;
-    function GetActivePage: TALPageView;
+    function GetPage(AIndex: Integer): TALDynamicPageView;
+    function GetActivePage: TALDynamicPageView;
     procedure SetOrientation(const AValue: TOrientation);
     procedure SetViewportFraction(const AValue: Single);
     function IsViewportFractionStored: Boolean;
@@ -471,8 +476,8 @@ type
     procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure internalMouseLeave;
     { IItemContainer }
-    function GetItemsCount: Integer;
-    function GetItem(const AIndex: Integer): TFmxObject;
+    //function GetItemsCount: Integer;
+    //function GetItem(const AIndex: Integer): TFmxObject;
     { IALScrollableControl }
     function GetScrollEngine: TALScrollEngine;
     procedure SetScrollEngine(const Value: TALScrollEngine);
@@ -480,51 +485,51 @@ type
     function CreateStroke: TALStrokeBrush; override;
     function CreateContent: TContent; virtual;
     function CreateScrollEngine: TScrollEngine; virtual;
-    procedure FreeNotification(AObject: TObject); override;
-    procedure Loaded; override;
+    procedure FreeNotification(const AObject: TALDynamicControl); override;
+    //procedure Loaded; override;
     function GetDefaultSize: TSizeF; override;
-    procedure DoAddObject(const AObject: TFmxObject); override;
+    procedure DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer); override;
     procedure Paint; override;
     procedure DoActivePageChanged; virtual;
     procedure DoRealign; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure DoMouseLeave; override;
+    procedure MouseLeave; override;
     {$IFNDEF ALDPK}
-    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseLeave(const AObject: TControl); override;
+    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); override;
     {$ENDIF}
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
-    procedure SetActivePage(const AValue: TALPageView; const ATransition: TPageTransition; const AVelocity: Single = 0); overload; virtual;
-    procedure SetActivePage(const AValue: TALPageView); overload; virtual;
+    procedure SetActivePage(const AValue: TALDynamicPageView; const ATransition: TPageTransition; const AVelocity: Single = 0); overload; virtual;
+    procedure SetActivePage(const AValue: TALDynamicPageView); overload; virtual;
     procedure SetActivePageIndex(const AValue: integer; const ATransition: TPageTransition; const AVelocity: Single = 0); overload; virtual;
     procedure SetActivePageIndex(const AValue: Integer); overload; virtual;
     function NextPage(ATransition: TPageTransition): Boolean;
     function PreviousPage(ATransition: TPageTransition): Boolean;
     function FirstPage(ATransition: TPageTransition): Boolean;
     function LastPage(ATransition: TPageTransition): Boolean;
-    function AddPage(const APageViewClass: TALPageViewClass = nil): TALPageView;
-    function InsertPage(const AIndex: Integer; const APageViewClass: TALPageViewClass = nil): TALPageView;
+    function AddPage(const APageViewClass: TALDynamicPageViewClass = nil): TALDynamicPageView;
+    function InsertPage(const AIndex: Integer; const APageViewClass: TALDynamicPageViewClass = nil): TALDynamicPageView;
     procedure DeletePage(const AIndex: Integer);
     property PageCount: Integer read GetPageCount;
     function HasActivePage: Boolean;
-    property Pages[AIndex: Integer]: TALPageView read GetPage;
-    property ActivePage: TALPageView read GetActivePage write SetActivePage stored False;
+    property Pages[AIndex: Integer]: TALDynamicPageView read GetPage;
+    property ActivePage: TALDynamicPageView read GetActivePage write SetActivePage stored False;
     property Content: TContent read FContent;
-    property ClipChildren default True;
+    //property ClipChildren default True;
     property CacheEngine;
     property CacheIndex;
-  published
+  public
     //property Action;
     property ActivePageIndex: Integer read FActivePageIndex write SetActivePageIndex default -1;
     property Align;
-    property Anchors;
+    //property Anchors;
     //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
@@ -533,8 +538,8 @@ type
     //property ClipParent;
     property Cursor;
     property DoubleBuffered;
-    property DragMode;
-    property EnableDragHighlight;
+    //property DragMode;
+    //property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -542,7 +547,7 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    property Locked;
+    //property Locked;
     property Margins;
     property Opacity;
     property Orientation: TOrientation read FOrientation write SetOrientation default TOrientation.Horizontal;
@@ -555,7 +560,7 @@ type
     ///   If PageController.viewportFraction >= 1.0, this property has no effect.
     /// </summary>
     property PadEnds: Boolean read FPadEnds write FPadEnds default true;
-    property PageIndicator: TALBasePageIndicator read FPageIndicator write SetPageIndicator;
+    property PageIndicator: TALDynamicBasePageIndicator read FPageIndicator write SetPageIndicator;
     /// <summary>
     ///   Set to false to disable page snapping, useful for custom scroll behavior.
     ///   If the padEnds is false and PageController.viewportFraction < 1.0, the page
@@ -563,15 +568,15 @@ type
     ///   to the center of the viewport.
     /// </summary>
     property PageSnapping: Boolean read FPageSnapping write FPageSnapping default true;
-    property PopupMenu;
-    property Position;
-    property RotationAngle;
+    //property PopupMenu;
+    //property Position;
+    //property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property ScrollEngine: TALScrollEngine read GetScrollEngine write SetScrollEngine;
     property Sides;
-    property Size;
+    //property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
@@ -590,11 +595,11 @@ type
     ///   Called whenever the active page changes.
     /// </summary>
     property OnActivePageChanged: TNotifyEvent read FOnActivePageChanged write FOnActivePageChanged;
-    property OnDragEnter;
-    property OnDragLeave;
-    property OnDragOver;
-    property OnDragDrop;
-    property OnDragEnd;
+    //property OnDragEnter;
+    //property OnDragLeave;
+    //property OnDragOver;
+    //property OnDragDrop;
+    //property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -602,7 +607,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    property OnMouseWheel;
+    //property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -610,11 +615,16 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    property OnResized;
+    //property OnResized;
     property OnViewportPositionChange: TViewportPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
   end;
 
-procedure Register;
+{$ENDREGION}
+
+//////////////////////////////////////////////
+/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
 
 implementation
 
@@ -622,43 +632,51 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
-  {$IFDEF ALDPK}
-  DesignIntf,
-  {$ENDIF}
   FMX.Utils;
 
-{***********************************************************}
-function TALPageIndicator.TFill.GetDefaultColor: TAlphaColor;
+{**}
+Type
+  _TALDynamicControlProtectedAccess = class(TALDynamicControl);
+
+//////////////////////////////////////////////
+/// THE CODE BELOW WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
+
+{$REGION 'AUTO-GENERATED'}
+
+{*************************************************************************}
+function TALDynamicPageIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TALphaColors.Null;
 end;
 
-{*************************************************************}
-function TALPageIndicator.TStroke.GetDefaultColor: TAlphaColor;
+{***************************************************************************}
+function TALDynamicPageIndicator.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TALphaColors.Null;
 end;
 
-{********************************************************************}
-function TALPageIndicator.TIndicator.TMargins.GetDefaultValue: TRectF;
+{**********************************************************************************}
+function TALDynamicPageIndicator.TIndicator.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(3,3,3,3);
 end;
 
-{**********************************************************************}
-function TALPageIndicator.TIndicator.TFill.GetDefaultColor: TAlphaColor;
+{************************************************************************************}
+function TALDynamicPageIndicator.TIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $FFadadad;
 end;
 
-{************************************************************************}
-function TALPageIndicator.TIndicator.TStroke.GetDefaultColor: TAlphaColor;
+{**************************************************************************************}
+function TALDynamicPageIndicator.TIndicator.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{*********************************************}
-constructor TALPageIndicator.TIndicator.Create;
+{***********************************************************}
+constructor TALDynamicPageIndicator.TIndicator.Create;
 begin
   inherited;
   FWidth := DefaultWidth;
@@ -677,8 +695,8 @@ begin
   FSides := DefaultSides;
 end;
 
-{*********************************************}
-destructor TALPageIndicator.TIndicator.Destroy;
+{***********************************************************}
+destructor TALDynamicPageIndicator.TIndicator.Destroy;
 begin
   ALFreeAndNil(FMargins);
   ALFreeAndNil(FFill);
@@ -687,32 +705,32 @@ begin
   inherited;
 end;
 
-{************************************************************}
-function TALPageIndicator.TIndicator.CreateMargins: TALBounds;
+{**************************************************************************}
+function TALDynamicPageIndicator.TIndicator.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-{********************************************************}
-function TALPageIndicator.TIndicator.CreateFill: TALBrush;
+{**********************************************************************}
+function TALDynamicPageIndicator.TIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{****************************************************************}
-function TALPageIndicator.TIndicator.CreateStroke: TALStrokeBrush;
+{******************************************************************************}
+function TALDynamicPageIndicator.TIndicator.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-{***********************************************************}
-function TALPageIndicator.TIndicator.CreateShadow: TALShadow;
+{*************************************************************************}
+function TALDynamicPageIndicator.TIndicator.CreateShadow: TALShadow;
 begin
   Result := TALShadow.Create;
 end;
 
-{****************************************************************}
-procedure TALPageIndicator.TIndicator.Assign(Source: TPersistent);
+{******************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.Assign(Source: TPersistent);
 begin
   if Source is TIndicator then begin
     BeginUpdate;
@@ -735,8 +753,8 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{******************************************}
-procedure TALPageIndicator.TIndicator.Reset;
+{********************************************************}
+procedure TALDynamicPageIndicator.TIndicator.Reset;
 begin
   BeginUpdate;
   Try
@@ -756,8 +774,8 @@ begin
   end;
 end;
 
-{*************************************************}
-procedure TALPageIndicator.TIndicator.AlignToPixel;
+{***************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.AlignToPixel;
 begin
   BeginUpdate;
   try
@@ -772,8 +790,8 @@ begin
   end;
 end;
 
-{*****************************************************}
-procedure TALPageIndicator.TIndicator.ApplyColorScheme;
+{*******************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.ApplyColorScheme;
 begin
   BeginUpdate;
   try
@@ -785,44 +803,44 @@ begin
   end;
 end;
 
-{***********************************************************}
-function TALPageIndicator.TIndicator.GetDefaultWidth: Single;
+{*************************************************************************}
+function TALDynamicPageIndicator.TIndicator.GetDefaultWidth: Single;
 begin
   Result := 8;
 end;
 
-{************************************************************}
-function TALPageIndicator.TIndicator.GetDefaultHeight: Single;
+{**************************************************************************}
+function TALDynamicPageIndicator.TIndicator.GetDefaultHeight: Single;
 begin
   Result := 8;
 end;
 
-{*************************************************************}
-function TALPageIndicator.TIndicator.GetDefaultXRadius: Single;
+{***************************************************************************}
+function TALDynamicPageIndicator.TIndicator.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-{*************************************************************}
-function TALPageIndicator.TIndicator.GetDefaultYRadius: Single;
+{***************************************************************************}
+function TALDynamicPageIndicator.TIndicator.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-{***************************************************************}
-function TALPageIndicator.TIndicator.GetDefaultCorners: TCorners;
+{*****************************************************************************}
+function TALDynamicPageIndicator.TIndicator.GetDefaultCorners: TCorners;
 begin
   Result := AllCorners
 end;
 
-{***********************************************************}
-function TALPageIndicator.TIndicator.GetDefaultSides: TSides;
+{*************************************************************************}
+function TALDynamicPageIndicator.TIndicator.GetDefaultSides: TSides;
 begin
   Result := AllSides;
 end;
 
-{******************************************************************}
-procedure TALPageIndicator.TIndicator.SetWidth(const Value: Single);
+{********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetWidth(const Value: Single);
 begin
   if not SameValue(FWidth, Value, TEpsilon.Position) then begin
     FWidth := Value;
@@ -830,8 +848,8 @@ begin
   end;
 end;
 
-{*******************************************************************}
-procedure TALPageIndicator.TIndicator.SetHeight(const Value: Single);
+{*********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetHeight(const Value: Single);
 begin
   if not SameValue(FHeight, Value, TEpsilon.Position) then begin
     FHeight := Value;
@@ -839,32 +857,32 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALPageIndicator.TIndicator.SetMargins(const Value: TALBounds);
+{*************************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;
 
-{*******************************************************************}
-procedure TALPageIndicator.TIndicator.SetFill(const Value: TALBrush);
+{*********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetFill(const Value: TALBrush);
 begin
   FFill.Assign(Value);
 end;
 
-{***************************************************************************}
-procedure TALPageIndicator.TIndicator.SetStroke(const Value: TALStrokeBrush);
+{*****************************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
 end;
 
-{**********************************************************************}
-procedure TALPageIndicator.TIndicator.SetShadow(const Value: TALShadow);
+{************************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetShadow(const Value: TALShadow);
 begin
   FShadow.Assign(Value);
 end;
 
-{********************************************************************}
-procedure TALPageIndicator.TIndicator.SetXRadius(const Value: Single);
+{**********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     FXRadius := Value;
@@ -872,8 +890,8 @@ begin
   end;
 end;
 
-{********************************************************************}
-procedure TALPageIndicator.TIndicator.SetYRadius(const Value: Single);
+{**********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     FYRadius := Value;
@@ -881,8 +899,8 @@ begin
   end;
 end;
 
-{**********************************************************************}
-procedure TALPageIndicator.TIndicator.SetCorners(const Value: TCorners);
+{************************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then begin
     FCorners := Value;
@@ -890,8 +908,8 @@ begin
   end;
 end;
 
-{******************************************************************}
-procedure TALPageIndicator.TIndicator.SetSides(const Value: TSides);
+{********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.SetSides(const Value: TSides);
 begin
   if FSides <> Value then begin
     FSides := Value;
@@ -899,92 +917,92 @@ begin
   end;
 end;
 
-{*********************************************************************}
-procedure TALPageIndicator.TIndicator.MarginsChanged(ASender: TObject);
+{***********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.MarginsChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{******************************************************************}
-procedure TALPageIndicator.TIndicator.FillChanged(ASender: TObject);
+{********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.FillChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{********************************************************************}
-procedure TALPageIndicator.TIndicator.StrokeChanged(ASender: TObject);
+{**********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.StrokeChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{********************************************************************}
-procedure TALPageIndicator.TIndicator.ShadowChanged(ASender: TObject);
+{**********************************************************************************}
+procedure TALDynamicPageIndicator.TIndicator.ShadowChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{**********************************************************}
-function TALPageIndicator.TIndicator.IsWidthStored: Boolean;
+{************************************************************************}
+function TALDynamicPageIndicator.TIndicator.IsWidthStored: Boolean;
 begin
   result := not SameValue(fWidth, DefaultWidth, Tepsilon.Position);
 end;
 
-{***********************************************************}
-function TALPageIndicator.TIndicator.IsHeightStored: Boolean;
+{*************************************************************************}
+function TALDynamicPageIndicator.TIndicator.IsHeightStored: Boolean;
 begin
   result := not SameValue(fHeight, DefaultHeight, Tepsilon.Position);
 end;
 
-{************************************************************}
-function TALPageIndicator.TIndicator.IsXRadiusStored: Boolean;
+{**************************************************************************}
+function TALDynamicPageIndicator.TIndicator.IsXRadiusStored: Boolean;
 begin
   result := not SameValue(fXRadius, DefaultXRadius, Tepsilon.Vector);
 end;
 
-{************************************************************}
-function TALPageIndicator.TIndicator.IsYRadiusStored: Boolean;
+{**************************************************************************}
+function TALDynamicPageIndicator.TIndicator.IsYRadiusStored: Boolean;
 begin
   result := not SameValue(fYRadius, DefaultYRadius, Tepsilon.Vector);
 end;
 
-{************************************************************}
-function TALPageIndicator.TIndicator.IsCornersStored: Boolean;
+{**************************************************************************}
+function TALDynamicPageIndicator.TIndicator.IsCornersStored: Boolean;
 begin
   Result := FCorners <> DefaultCorners;
 end;
 
-{**********************************************************}
-function TALPageIndicator.TIndicator.IsSidesStored: Boolean;
+{************************************************************************}
+function TALDynamicPageIndicator.TIndicator.IsSidesStored: Boolean;
 begin
   Result := FSides <> Defaultsides;
 end;
 
-{****************************************************************************}
-function TALPageIndicator.TActiveIndicator.TFill.GetDefaultColor: TAlphaColor;
+{******************************************************************************************}
+function TALDynamicPageIndicator.TActiveIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $FF5e6ec1;
 end;
 
-{**************************************************************}
-function TALPageIndicator.TActiveIndicator.CreateFill: TALBrush;
+{****************************************************************************}
+function TALDynamicPageIndicator.TActiveIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{**************************************************************************}
-function TALPageIndicator.TActiveIndicatorControl.GetCacheSubIndex: Integer;
+{****************************************************************************************}
+function TALDynamicPageIndicator.TActiveIndicatorControl.GetCacheSubIndex: Integer;
 begin
   Result := 1;
 end;
 
-{****************************************************************************}
-function TALPageIndicator.TInactiveIndicatorControl.GetCacheSubIndex: Integer;
+{******************************************************************************************}
+function TALDynamicPageIndicator.TInactiveIndicatorControl.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-{******************************************************}
-constructor TALPageIndicator.Create(AOwner: TComponent);
+{***********************************************************************}
+constructor TALDynamicPageIndicator.Create(const AOwner: TObject);
 begin
   inherited;
   FAnimationType := TanimationType.None;
@@ -999,16 +1017,16 @@ begin
   AutoSize := True;
 end;
 
-{**********************************}
-destructor TALPageIndicator.Destroy;
+{************************************************}
+destructor TALDynamicPageIndicator.Destroy;
 begin
   ALFreeAndNil(FActiveIndicator);
   ALFreeAndNil(FInactiveIndicator);
   inherited;
 end;
 
-{**************************************}
-procedure TALPageIndicator.AlignToPixel;
+{****************************************************}
+procedure TALDynamicPageIndicator.AlignToPixel;
 begin
   BeginUpdate;
   Try
@@ -1020,8 +1038,8 @@ begin
   end;
 end;
 
-{******************************************}
-procedure TALPageIndicator.ApplyColorScheme;
+{********************************************************}
+procedure TALDynamicPageIndicator.ApplyColorScheme;
 begin
   BeginUpdate;
   Try
@@ -1033,35 +1051,35 @@ begin
   end;
 end;
 
-{*********************************************}
-function TALPageIndicator.CreateFill: TALBrush;
+{***********************************************************}
+function TALDynamicPageIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{*****************************************************}
-function TALPageIndicator.CreateStroke: TALStrokeBrush;
+{*******************************************************************}
+function TALDynamicPageIndicator.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-{******************************************************************}
-procedure TALPageIndicator.SetDoubleBuffered(const AValue: Boolean);
+{********************************************************************************}
+procedure TALDynamicPageIndicator.SetDoubleBuffered(const AValue: Boolean);
 begin
   inherited;
   for var I := 0 to ControlsCount - 1 do
     TIndicatorControl(Controls[i]).DoubleBuffered := AValue;
 end;
 
-{********************************}
-procedure TALPageIndicator.Loaded;
-begin
-  inherited;
-  RebuildIndicatorControls;
-end;
+{************************************************}
+//procedure TALDynamicPageIndicator.Loaded;
+//begin
+//  inherited;
+//  RebuildIndicatorControls;
+//end;
 
-{*******************************************}
-procedure TALPageIndicator.InternalDoRealign;
+{*********************************************************}
+procedure TALDynamicPageIndicator.InternalDoRealign;
 begin
   var LWidth := Padding.Left + Padding.Right +
                 ((FInactiveIndicator.Margins.Left + FInactiveIndicator.Margins.Right + FInactiveIndicator.Width) * FPageCount);
@@ -1080,19 +1098,19 @@ begin
   end;
 end;
 
-{***********************************}
-procedure TALPageIndicator.DoRealign;
+{*************************************************}
+procedure TALDynamicPageIndicator.DoRealign;
 begin
   AdjustSize;
   // UpdateActiveIndicator will call InternalDoRealign
   UpdateActiveIndicator;
 end;
 
-{************************************}
-procedure TALPageIndicator.AdjustSize;
+{**************************************************}
+procedure TALDynamicPageIndicator.AdjustSize;
 begin
-  if (not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
-     (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
+  if //(not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
+     (not IsDestroying) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
@@ -1118,7 +1136,7 @@ begin
         LWidth := Width;
       if (not HasUnconstrainedAutosizeY) or (SameValue(LHeight, 0, Tepsilon.Position)) then
         LHeight := Height;
-      SetFixedSizeBounds(Position.X, Position.Y, LWidth, LHeight);
+      SetFixedSizeBounds(Left, Top, LWidth, LHeight);
 
     finally
       TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
@@ -1126,16 +1144,16 @@ begin
   end;
 end;
 
-{***********************************************}
-Procedure TALPageIndicator.UpdateActiveIndicator;
+{*************************************************************}
+Procedure TALDynamicPageIndicator.UpdateActiveIndicator;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _UpdateWithoutAnimation;
   begin
     if FActiveIndicatorControl <> nil then
       FActiveIndicatorControl.SetBounds(
-        Controls[FActivePageIndex].Position.x,
-        Controls[FActivePageIndex].Position.y,
+        Controls[FActivePageIndex].Left,
+        Controls[FActivePageIndex].Top,
         Controls[FActivePageIndex].Width,
         Controls[FActivePageIndex].Height);
   end;
@@ -1143,8 +1161,8 @@ Procedure TALPageIndicator.UpdateActiveIndicator;
 begin
 
   // Exit if csDestroying or csLoading
-  If (csLoading in componentState) or
-     (csDestroying in componentState) then exit;
+  If //(csLoading in componentState) or
+     IsDestroying then exit;
 
   // Deactivate Align
   if TNonReentrantHelper.EnterSection(FDisableAlign) then begin
@@ -1153,7 +1171,7 @@ begin
       // Reset visibility/scale/color of all controls
       for var I := 0 to ControlsCount - 1 do begin
         Controls[I].Visible := True;
-        TIndicatorControl(Controls[I]).Scale.Point := TPointF.Create(1, 1);
+        TIndicatorControl(Controls[I]).Scale := TPointF.Create(1, 1);
         if (Controls[I] = FactiveIndicatorControl) then
           TIndicatorControl(Controls[I]).Fill.Color := FActiveIndicator.Fill.Color
         else
@@ -1177,7 +1195,7 @@ begin
       end;
 
       // Init LDistanceBetweenIndicators
-      var LDistanceBetweenIndicators := abs(Controls[1].Position.x - Controls[0].Position.x);
+      var LDistanceBetweenIndicators := abs(Controls[1].Left - Controls[0].Left);
 
       // Init LAnimationValue
       var LAnimationValue: Single := FAnimationValue;
@@ -1199,16 +1217,16 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else if LAnimationValue > 0 then begin
             FActiveIndicatorControl.SetBounds(
-              Controls[FActivePageIndex].Position.x,
-              Controls[FActivePageIndex].Position.y,
+              Controls[FActivePageIndex].Left,
+              Controls[FActivePageIndex].Top,
               Controls[FActivePageIndex].Width + (LDistanceBetweenIndicators * LAnimationValue * 2),
               Controls[FActivePageIndex].Height);
           end
           else begin
             var LWidth := Controls[FActivePageIndex].Width + (LDistanceBetweenIndicators * -LAnimationValue * 2);
             FActiveIndicatorControl.SetBounds(
-              Controls[FActivePageIndex].Position.x + Controls[FActivePageIndex].Width - LWidth,
-              Controls[FActivePageIndex].Position.y,
+              Controls[FActivePageIndex].Left + Controls[FActivePageIndex].Width - LWidth,
+              Controls[FActivePageIndex].Top,
               LWidth,
               Controls[FActivePageIndex].Height);
           end;
@@ -1221,8 +1239,8 @@ begin
           else if LAnimationValue > 0 then begin
             var LHeight := Controls[FActivePageIndex].Height - (Controls[FActivePageIndex].Height * LAnimationValue);
             FActiveIndicatorControl.SetBounds(
-              Controls[FActivePageIndex].Position.x,
-              Controls[FActivePageIndex].Position.y + ((Controls[FActivePageIndex].height - LHeight) / 2),
+              Controls[FActivePageIndex].Left,
+              Controls[FActivePageIndex].Top + ((Controls[FActivePageIndex].height - LHeight) / 2),
               Controls[FActivePageIndex].Width + (LDistanceBetweenIndicators * LAnimationValue * 2),
               LHeight);
           end
@@ -1230,8 +1248,8 @@ begin
             var LWidth := Controls[FActivePageIndex].Width + (LDistanceBetweenIndicators * -LAnimationValue * 2);
             var LHeight := Controls[FActivePageIndex].Height - (Controls[FActivePageIndex].Height * -LAnimationValue);
             FActiveIndicatorControl.SetBounds(
-              Controls[FActivePageIndex].Position.x + Controls[FActivePageIndex].Width - LWidth,
-              Controls[FActivePageIndex].Position.y + ((Controls[FActivePageIndex].height - LHeight) / 2),
+              Controls[FActivePageIndex].Left + Controls[FActivePageIndex].Width - LWidth,
+              Controls[FActivePageIndex].Top + ((Controls[FActivePageIndex].height - LHeight) / 2),
               LWidth,
               LHeight);
           end;
@@ -1242,10 +1260,10 @@ begin
         TAnimationType.JumpingDotTopView: begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else begin
-            FActiveIndicatorControl.Position.x := Controls[FActivePageIndex].Position.x + (LDistanceBetweenIndicators * LAnimationValue);
-            FActiveIndicatorControl.Scale.Point := TPointF.Create(
-                                                     1 + abs(LAnimationValue * 1.2),
-                                                     1 + abs(LAnimationValue * 1.2));
+            FActiveIndicatorControl.Left := Controls[FActivePageIndex].Left + (LDistanceBetweenIndicators * LAnimationValue);
+            FActiveIndicatorControl.Scale := TPointF.Create(
+                                               1 + abs(LAnimationValue * 1.2),
+                                               1 + abs(LAnimationValue * 1.2));
           end;
         end;
 
@@ -1255,19 +1273,19 @@ begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else if LAnimationValue > 0 then begin
             var LRadius := LDistanceBetweenIndicators / 2.0;
-            var LCenterX := Controls[FActivePageIndex].Position.x + LRadius;
+            var LCenterX := Controls[FActivePageIndex].Left + LRadius;
             var LTheta := pi * (1 - LAnimationValue);
-            FActiveIndicatorControl.Position.Point := TPointF.Create(
-                                                        LCenterX + LRadius * Cos(LTheta),
-                                                        Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta));
+            FActiveIndicatorControl.Position := TALPointD.Create(
+                                                  LCenterX + LRadius * Cos(LTheta),
+                                                  Controls[FActivePageIndex].Top - LRadius * Sin(LTheta));
           end
           else begin
             var LRadius := LDistanceBetweenIndicators / 2.0;
-            var LCenterX := Controls[FActivePageIndex].Position.x - LRadius;
+            var LCenterX := Controls[FActivePageIndex].Left - LRadius;
             var LTheta := pi * -LAnimationValue;
-            FActiveIndicatorControl.Position.Point := TPointF.Create(
-                                                        LCenterX + LRadius * Cos(LTheta),
-                                                        Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta));
+            FActiveIndicatorControl.Position := TALPointD.Create(
+                                                  LCenterX + LRadius * Cos(LTheta),
+                                                  Controls[FActivePageIndex].Top - LRadius * Sin(LTheta));
           end;
         end;
 
@@ -1275,7 +1293,7 @@ begin
         //TAnimationType.Slide
         TAnimationType.Slide: begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
-          else FActiveIndicatorControl.Position.x := Controls[FActivePageIndex].Position.x + (LDistanceBetweenIndicators * LAnimationValue);
+          else FActiveIndicatorControl.Left := Controls[FActivePageIndex].Left + (LDistanceBetweenIndicators * LAnimationValue);
         end;
 
         //--------------------
@@ -1283,25 +1301,25 @@ begin
         TAnimationType.Scale: begin
           const LMaxDeltaScale = 0.5;
           if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
-            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale.Point := TPointF.Create(
-                                                                               1 + (LAnimationValue * LMaxDeltaScale),
-                                                                               1 + (LAnimationValue * LMaxDeltaScale));
-            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
-                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale),
-                                                                           1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex + 1]).Scale := TPointF.Create(
+                                                                         1 + (LAnimationValue * LMaxDeltaScale),
+                                                                         1 + (LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale := TPointF.Create(
+                                                                     1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale),
+                                                                     1 + LMaxDeltaScale - (LAnimationValue * LMaxDeltaScale));
           end
           else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
-            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale.Point := TPointF.Create(
-                                                                               1 + (-LAnimationValue * LMaxDeltaScale),
-                                                                               1 + (-LAnimationValue * LMaxDeltaScale));
-            TIndicatorControl(Controls[FActivePageIndex]).Scale.Point := TPointF.Create(
-                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale),
-                                                                           1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex - 1]).Scale := TPointF.Create(
+                                                                         1 + (-LAnimationValue * LMaxDeltaScale),
+                                                                         1 + (-LAnimationValue * LMaxDeltaScale));
+            TIndicatorControl(Controls[FActivePageIndex]).Scale := TPointF.Create(
+                                                                     1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale),
+                                                                     1 + LMaxDeltaScale - (-LAnimationValue * LMaxDeltaScale));
           end
           else
-            TIndicatorControl(Controls[FActivePageIndex ]).Scale.Point := TPointF.Create(
-                                                                            1 + LMaxDeltaScale,
-                                                                            1 + LMaxDeltaScale);
+            TIndicatorControl(Controls[FActivePageIndex ]).Scale := TPointF.Create(
+                                                                      1 + LMaxDeltaScale,
+                                                                      1 + LMaxDeltaScale);
           FActiveIndicatorControl.Visible := False;
         end;
 
@@ -1313,27 +1331,27 @@ begin
             Controls[FActivePageIndex].Visible := False;
             if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then begin
               var LRadius := LDistanceBetweenIndicators / 2.0;
-              var LCenterX := Controls[FActivePageIndex].Position.x + LRadius;
+              var LCenterX := Controls[FActivePageIndex].Left + LRadius;
               var LTheta1 := pi * (1 - LAnimationValue);
               var LTheta2 := pi * (LAnimationValue);
-              FActiveIndicatorControl.Position.Point := TPointF.Create(
-                                                          LCenterX + LRadius * Cos(LTheta1),
-                                                          Controls[FActivePageIndex].Position.y + LRadius * Sin(LTheta1));
-              Controls[FActivePageIndex+1].Position.Point := TPointF.Create(
-                                                               LCenterX + LRadius * Cos(LTheta2),
-                                                               Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta2));
+              FActiveIndicatorControl.Position := TALPointD.Create(
+                                                    LCenterX + LRadius * Cos(LTheta1),
+                                                    Controls[FActivePageIndex].Top + LRadius * Sin(LTheta1));
+              Controls[FActivePageIndex+1].Position := TALPointD.Create(
+                                                         LCenterX + LRadius * Cos(LTheta2),
+                                                         Controls[FActivePageIndex].Top - LRadius * Sin(LTheta2));
             end
             else if (LAnimationValue < 0) and (FActivePageIndex > 0) then begin
               var LRadius := LDistanceBetweenIndicators / 2.0;
-              var LCenterX := Controls[FActivePageIndex].Position.x - LRadius;
+              var LCenterX := Controls[FActivePageIndex].Left - LRadius;
               var LTheta2 := pi * (1 + LAnimationValue);
               var LTheta1 := pi * (-LAnimationValue);
-              FActiveIndicatorControl.Position.Point := TPointF.Create(
-                                                          LCenterX + LRadius * Cos(LTheta1),
-                                                          Controls[FActivePageIndex].Position.y + LRadius * Sin(LTheta1));
-              Controls[FActivePageIndex-1].Position.Point := TPointF.Create(
-                                                               LCenterX + LRadius * Cos(LTheta2),
-                                                               Controls[FActivePageIndex].Position.y - LRadius * Sin(LTheta2));
+              FActiveIndicatorControl.Position := TALPointD.Create(
+                                                    LCenterX + LRadius * Cos(LTheta1),
+                                                    Controls[FActivePageIndex].Top + LRadius * Sin(LTheta1));
+              Controls[FActivePageIndex-1].Position := TALPointD.Create(
+                                                         LCenterX + LRadius * Cos(LTheta2),
+                                                         Controls[FActivePageIndex].Top - LRadius * Sin(LTheta2));
             end;
           end;
         end;
@@ -1343,12 +1361,12 @@ begin
         TAnimationType.LinearSwap: begin
           If SameValue(LAnimationValue, 0, TEpsilon.Scale) then _UpdateWithoutAnimation
           else begin
-            FActiveIndicatorControl.Position.X := Controls[FActivePageIndex].Position.x + (LDistanceBetweenIndicators * LAnimationValue);
+            FActiveIndicatorControl.Left := Controls[FActivePageIndex].Left + (LDistanceBetweenIndicators * LAnimationValue);
             Controls[FActivePageIndex].Visible := False;
             if (LAnimationValue > 0) and (FActivePageIndex < FPageCount - 1) then
-              Controls[FActivePageIndex + 1].Position.x := Controls[FActivePageIndex + 1].Position.x - (LDistanceBetweenIndicators * LAnimationValue)
+              Controls[FActivePageIndex + 1].Left := Controls[FActivePageIndex + 1].Left - (LDistanceBetweenIndicators * LAnimationValue)
             else if (LAnimationValue < 0) and (FActivePageIndex > 0) then
-              Controls[FActivePageIndex - 1].Position.x := Controls[FActivePageIndex - 1].Position.x + (LDistanceBetweenIndicators * -LAnimationValue);
+              Controls[FActivePageIndex - 1].Left := Controls[FActivePageIndex - 1].Left + (LDistanceBetweenIndicators * -LAnimationValue);
           end;
         end;
 
@@ -1382,11 +1400,11 @@ begin
 
 end;
 
-{**************************************************}
-procedure TALPageIndicator.RebuildIndicatorControls;
+{****************************************************************}
+procedure TALDynamicPageIndicator.RebuildIndicatorControls;
 begin
-  If (csloading in componentState) or
-     (csDestroying in componentState) then exit;
+  If //(csLoading in componentState) or
+     IsDestroying then exit;
   BeginUpdate;
   try
 
@@ -1397,10 +1415,10 @@ begin
 
     For var I := 0 to FPageCount - 1 do begin
       var LIndicator := TInactiveIndicatorControl.Create(self);
-      LIndicator.Parent := Self;
-      LIndicator.Stored := False;
-      LIndicator.Locked := True;
-      LIndicator.HitTest := False;
+      //LIndicator.Parent := Self;
+      //LIndicator.Stored := False;
+      //LIndicator.Locked := True;
+      //LIndicator.HitTest := False;
       LIndicator.Fill.Assign(FInactiveIndicator.Fill);
       LIndicator.Stroke.Assign(FInactiveIndicator.Stroke);
       LIndicator.Shadow.Assign(FInactiveIndicator.Shadow);
@@ -1414,10 +1432,10 @@ begin
     end;
 
     FActiveIndicatorControl := TActiveIndicatorControl.Create(self);
-    FActiveIndicatorControl.Parent := Self;
-    FActiveIndicatorControl.Stored := False;
-    FActiveIndicatorControl.Locked := True;
-    FActiveIndicatorControl.HitTest := False;
+    //FActiveIndicatorControl.Parent := Self;
+    //FActiveIndicatorControl.Stored := False;
+    //FActiveIndicatorControl.Locked := True;
+    //FActiveIndicatorControl.HitTest := False;
     FActiveIndicatorControl.Fill.Assign(FActiveIndicator.Fill);
     FActiveIndicatorControl.Stroke.Assign(FActiveIndicator.Stroke);
     FActiveIndicatorControl.Shadow.Assign(FActiveIndicator.Shadow);
@@ -1435,16 +1453,16 @@ begin
   end;
 end;
 
-{*******************************}
-procedure TALPageIndicator.Paint;
+{*********************************************}
+procedure TALDynamicPageIndicator.Paint;
 begin
   inherited;
-  if (csDesigning in ComponentState) and not Locked then
-    DrawDesignBorder;
+  //if (csDesigning in ComponentState) and not Locked then
+  //  DrawDesignBorder;
 end;
 
-{****************************************************************}
-procedure TALPageIndicator.AnimationProcess(Const AValue: Single);
+{******************************************************************************}
+procedure TALDynamicPageIndicator.AnimationProcess(Const AValue: Single);
 begin
   if not SameValue(FAnimationValue, AValue, TEpsilon.Scale) then begin
     FAnimationValue := AValue;
@@ -1452,8 +1470,8 @@ begin
   end;
 end;
 
-{*******************************************************************************}
-procedure TALPageIndicator.ActivePageChanged(const ANewActivePageIndex: Integer);
+{*********************************************************************************************}
+procedure TALDynamicPageIndicator.ActivePageChanged(const ANewActivePageIndex: Integer);
 begin
   if ANewActivePageIndex <> FActivePageIndex then begin
     FActivePageIndex := ANewActivePageIndex;
@@ -1462,8 +1480,8 @@ begin
   end;
 end;
 
-{************************************************************************************************************}
-procedure TALPageIndicator.PageCountChanged(Const ANewPageCount: Integer; const ANewActivePageIndex: Integer);
+{**************************************************************************************************************************}
+procedure TALDynamicPageIndicator.PageCountChanged(Const ANewPageCount: Integer; const ANewActivePageIndex: Integer);
 begin
   if ANewPageCount <> FPageCount then begin
     FPageCount := ANewPageCount;
@@ -1472,8 +1490,8 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
-procedure TALPageIndicator.SetAnimationType(const AValue: TALPageIndicator.TAnimationType);
+{*********************************************************************************************************************}
+procedure TALDynamicPageIndicator.SetAnimationType(const AValue: TALDynamicPageIndicator.TAnimationType);
 begin
   If FAnimationType <> AValue then begin
     FAnimationType := AValue;
@@ -1481,90 +1499,90 @@ begin
   end;
 end;
 
-{****************************************************************************}
-procedure TALPageIndicator.SetActiveIndicator(const AValue: TActiveIndicator);
+{******************************************************************************************}
+procedure TALDynamicPageIndicator.SetActiveIndicator(const AValue: TActiveIndicator);
 begin
   FActiveIndicator.Assign(AValue);
 end;
 
-{********************************************************************************}
-procedure TALPageIndicator.SetInactiveIndicator(const AValue: TInActiveIndicator);
+{**********************************************************************************************}
+procedure TALDynamicPageIndicator.SetInactiveIndicator(const AValue: TInActiveIndicator);
 begin
   FInactiveIndicator.Assign(AValue);
 end;
 
-{******************************************************************}
-procedure TALPageIndicator.ActiveIndicatorChanged(ASender: TObject);
+{********************************************************************************}
+procedure TALDynamicPageIndicator.ActiveIndicatorChanged(ASender: TObject);
+begin
+  RebuildIndicatorControls;
+end;
+
+{**********************************************************************************}
+procedure TALDynamicPageIndicator.InactiveIndicatorChanged(ASender: TObject);
 begin
   RebuildIndicatorControls;
 end;
 
 {********************************************************************}
-procedure TALPageIndicator.InactiveIndicatorChanged(ASender: TObject);
-begin
-  RebuildIndicatorControls;
-end;
-
-{******************************************************}
-function TALPageView.TFill.GetDefaultColor: TAlphaColor;
+function TALDynamicPageView.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{********************************************************}
-function TALPageView.TStroke.GetDefaultColor: TAlphaColor;
+{**********************************************************************}
+function TALDynamicPageView.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{*************************************************}
-constructor TALPageView.Create(AOwner: TComponent);
+{******************************************************************}
+constructor TALDynamicPageView.Create(const AOwner: TObject);
 begin
   inherited;
   FPageController := nil;
   HitTest := False;
-  Locked := True;
+  //Locked := True;
 end;
 
-{****************************************}
-function TALPageView.CreateFill: TALBrush;
+{******************************************************}
+function TALDynamicPageView.CreateFill: TALBrush;
 begin
   result := TFill.Create;
 end;
 
-{************************************************}
-function TALPageView.CreateStroke: TALStrokeBrush;
+{**************************************************************}
+function TALDynamicPageView.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
 end;
 
-{**************************************}
-function TALPageView.GetActive: Boolean;
+{****************************************************}
+function TALDynamicPageView.GetActive: Boolean;
 begin
   Result := (FPageController <> nil) and
             (FPageController.ActivePage = Self);
 end;
 
-{****************************************************}
-procedure TALPageView.SetActive(const Value: Boolean);
+{******************************************************************}
+procedure TALDynamicPageView.SetActive(const Value: Boolean);
 begin
   if (FPageController <> nil) and (Value) then
     FPageController.SetActivePage(Self)
 end;
 
-{**********************************}
-procedure TALPageView.ParentChanged;
+{************************************************}
+procedure TALDynamicPageView.ParentChanged;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _FindPageController: TALPageController;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _FindPageController: TALDynamicPageController;
   begin
-    var P := ParentControl;
+    var P := Owner;
     while P <> nil do begin
-      if P is TALPageController then begin
-        Result := TALPageController(P);
+      if P is TALDynamicPageController then begin
+        Result := TALDynamicPageController(P);
         Exit;
       end;
-      P := P.ParentControl;
+      P := P.Owner;
     end;
     Result := nil;
   end;
@@ -1574,91 +1592,91 @@ begin
   FPageController := _FindPageController;
 end;
 
-{**********************}
-{## Dynamic:Begin
-function TALPageView.DoGetDownloadPriority: Int64;
+{*********************}
+// Dynamic:Begin
+function TALDynamicPageView.DoGetDownloadPriority: Int64;
 begin
   Result := inherited;
   if FPageController <> nil then
     Result := Result + abs(index - FPageController.ActivePageIndex);
 end;
-Dynamic:End ##}
+// Dynamic:End
 
-{**************************************************************}
-function TALPageController.TStroke.GetDefaultColor: TAlphaColor;
+{****************************************************************************}
+function TALDynamicPageController.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{****************************************************************}
-constructor TALPageController.TContent.Create(AOwner: TComponent);
+{*********************************************************************************}
+constructor TALDynamicPageController.TContent.Create(const AOwner: TObject);
 begin
-  ValidateInheritance(AOwner, TALPageController, False{CanBeNil});
+  //ValidateInheritance(AOwner, TALDynamicPageController, False{CanBeNil});
   inherited Create(AOwner);
-  FPageController := TALPageController(AOwner);
+  FPageController := TALDynamicPageController(AOwner);
 end;
 
 {*************}
 {$IFNDEF ALDPK}
-function TALPageController.TContent.IsVisibleObject(const AObject: TControl): Boolean;
-begin
-
-  if AObject.Visible then begin
-
-    if FPageController.Orientation = TOrientation.Horizontal then begin
-      Result := (AObject.Position.X < -Position.X + FPageController.Width) and
-                (AObject.Position.X + AObject.Width > -Position.X);
-    end
-    else begin
-      Result := (AObject.Position.Y < -Position.Y + FPageController.Height) and
-                (AObject.Position.Y + AObject.Height > -Position.Y);
-    end;
-
-  end
-  else
-    result := False;
-
-end;
+//function TALDynamicPageController.TContent.IsVisibleObject(const AObject: TControl): Boolean;
+//begin
+//
+//  if AObject.Visible then begin
+//
+//    if FPageController.Orientation = TOrientation.Horizontal then begin
+//      Result := (AObject.Left < -Left + FPageController.Width) and
+//                (AObject.Left + AObject.Width > -Left);
+//    end
+//    else begin
+//      Result := (AObject.Top < -Top + FPageController.Height) and
+//                (AObject.Top + AObject.Height > -Top);
+//    end;
+//
+//  end
+//  else
+//    result := False;
+//
+//end;
 {$ENDIF}
 
-{**************************************************************************}
-procedure TALPageController.TContent.DoAddObject(const AObject: TFmxObject);
+{**********************************************************************************************************************************}
+procedure TALDynamicPageController.TContent.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   // At design time, the Delphi IDE may add children such as
   // TGrabHandle.TGrabHandleRectangle. We want to prevent these from
   // being added to TContent.
-  If not (AObject is TALPageView) then FPageController.AddObject(AObject)
-  else begin
+  //If not (AObject is TALDynamicPageView) then FPageController.AddObject(AObject)
+  //else begin
     inherited;
     if FPageController.PageIndicator <> nil then
       FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);
-  end;
+  //end;
 end;
 
-{*****************************************************************************}
-procedure TALPageController.TContent.DoRemoveObject(const AObject: TFmxObject);
+{***********************************************************************************************************}
+procedure TALDynamicPageController.TContent.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   inherited;
   if FPageController.PageIndicator <> nil then
     FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);
 end;
 
-{****************************************************}
-procedure TALPageController.TContent.DoDeleteChildren;
-begin
-  inherited;
-  if FPageController.PageIndicator <> nil then
-    FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);
-end;
+{********************************************************************}
+//procedure TALDynamicPageController.TContent.DoDeleteChildren;
+//begin
+//  inherited;
+//  if FPageController.PageIndicator <> nil then
+//    FPageController.PageIndicator.PageCountChanged(ControlsCount, FPageController.ActivePageIndex);
+//end;
 
-{****************************************************}
-procedure TALPageController.TContent.DoContentChanged;
+{******************************************************************}
+procedure TALDynamicPageController.TContent.DoContentChanged;
 begin
   FPageController.Realign;
 end;
 
-{****************************************************************************************}
-constructor TALPageController.TScrollEngine.Create(const APageControl: TALPageController);
+{********************************************************************************************************************}
+constructor TALDynamicPageController.TScrollEngine.Create(const APageControl: TALDynamicPageController);
 begin
   inherited Create;
   FPageController := APageControl;
@@ -1666,15 +1684,15 @@ begin
   FDownPageIndex := -1;
 End;
 
-{****************************************************}
-procedure TALPageController.TScrollEngine.DoMouseDown;
+{******************************************************************}
+procedure TALDynamicPageController.TScrollEngine.DoMouseDown;
 begin
   Inherited;
   FDownPageIndex := FPageController.ActivePageIndex;
 end;
 
-{**************************************************}
-procedure TALPageController.TScrollEngine.DoMouseUp;
+{****************************************************************}
+procedure TALDynamicPageController.TScrollEngine.DoMouseUp;
 begin
 
   // Record whether the control was in
@@ -1696,7 +1714,7 @@ begin
   if not FPageController.HasActivePage then exit;
 
   {$IFDEF DEBUG}
-  //ALLog('TALPageController.TScrollEngine.DoMouseUp', 'ScrollCapturedByMe:'+ALBooltoStrW(FPageController.fScrollCapturedByMe, 'True', 'False'));
+  //ALLog('TALDynamicPageController.TScrollEngine.DoMouseUp', 'ScrollCapturedByMe:'+ALBooltoStrW(FPageController.fScrollCapturedByMe, 'True', 'False'));
   {$ENDIF}
 
   // Initialize the target page index with the current active page.
@@ -1731,53 +1749,53 @@ begin
   // a slide transition with the computed velocity.
   FPageController.SetActivePage(
     FPageController.Pages[LTargetPageIndex],
-    TALPageController.TPageTransition.Slide,
+    TALDynamicPageController.TPageTransition.Slide,
     LVelocity);
 
 end;
 
-{************************************************}
-procedure TALPageController.TScrollEngine.DoStart;
+{**************************************************************}
+procedure TALDynamicPageController.TScrollEngine.DoStart;
 begin
   inherited DoStart;
 
-  if (FPageController.Scene <> nil) and
-     (not (csDestroying in FPageController.ComponentState)) then
-    FPageController.Scene.ChangeScrollingState(FPageController, True);
+  //if (FPageController.Scene <> nil) and
+  //   (not (FPageController.IsDestroying)) then
+  //  FPageController.Scene.ChangeScrollingState(FPageController, True);
 
   if (assigned(FPageController.fOnAniStart)) and
-     (not (csDestroying in FPageController.ComponentState)) then
+     (not (FPageController.IsDestroying)) then
     FPageController.fOnAniStart(FPageController);
 end;
 
-{***********************************************}
-procedure TALPageController.TScrollEngine.DoStop;
+{*************************************************************}
+procedure TALDynamicPageController.TScrollEngine.DoStop;
 begin
   inherited DoStop;
 
-  if (FPageController.Scene <> nil) and
-     (not (csDestroying in FPageController.ComponentState)) then
-    FPageController.Scene.ChangeScrollingState(nil, False);
+  //if (FPageController.Scene <> nil) and
+  //   (not (FPageController.IsDestroying)) then
+  //  FPageController.Scene.ChangeScrollingState(nil, False);
 
   if (assigned(FPageController.fOnAniStop)) and
-     (not (csDestroying in FPageController.ComponentState)) then
+     (not (FPageController.IsDestroying)) then
     FPageController.fOnAniStop(FPageController);
 end;
 
-{**************************************************}
-procedure TALPageController.TScrollEngine.DoChanged;
+{****************************************************************}
+procedure TALDynamicPageController.TScrollEngine.DoChanged;
 begin
   {$IF defined(debug)}
-  //ALLog(ClassName + '.TALPageController.TScrollEngine.DoChanged');
+  //ALLog(ClassName + '.TALDynamicPageController.TScrollEngine.DoChanged');
   {$ENDIF}
-  if (not (csDestroying in FPageController.ComponentState)) then begin
+  if (not (FPageController.IsDestroying)) then begin
 
     var LSaveDisableAlign := FPageController.FDisableAlign;
     FPageController.FDisableAlign := True;
     try
-      FPageController.Content.Position.Point := -TPointF.Create(
-                                                   ViewportPosition.X,
-                                                   ViewportPosition.Y);
+      FPageController.Content.Position := -TALPointD.Create(
+                                             ViewportPosition.X,
+                                             ViewportPosition.Y);
     finally
       FPageController.FDisableAlign := LSaveDisableAlign;
     end;
@@ -1794,17 +1812,17 @@ begin
       if not FPageController.HasActivePage then
         FPageController.PageIndicator.AnimationProcess(0)
       else if FPageController.Orientation = TOrientation.Horizontal then
-        FPageController.PageIndicator.AnimationProcess((FPageController.GetEndPadding - FPageController.Content.Position.X - FPageController.ActivePage.Position.X) / FPageController.GetPageSize)
+        FPageController.PageIndicator.AnimationProcess((FPageController.GetEndPadding - FPageController.Content.Left - FPageController.ActivePage.Left) / FPageController.GetPageSize)
       else
-        FPageController.PageIndicator.AnimationProcess((FPageController.GetEndPadding - FPageController.Content.Position.Y - FPageController.ActivePage.Position.Y) / FPageController.GetPageSize);
+        FPageController.PageIndicator.AnimationProcess((FPageController.GetEndPadding - FPageController.Content.Top - FPageController.ActivePage.Top) / FPageController.GetPageSize);
     end;
 
   end;
   inherited DoChanged;
 end;
 
-{*******************************************************}
-constructor TALPageController.Create(AOwner: TComponent);
+{************************************************************************}
+constructor TALDynamicPageController.Create(const AOwner: TObject);
 begin
   inherited;
   //--
@@ -1829,14 +1847,14 @@ begin
   fOnAniStart := nil;
   fOnAniStop := nil;
   //--
-  ClipChildren := true;
+  //ClipChildren := true;
   AutoCapture := True;
-  SetAcceptsControls(True);
+  //SetAcceptsControls(True);
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
-{***********************************}
-destructor TALPageController.Destroy;
+{*************************************************}
+destructor TALDynamicPageController.Destroy;
 begin
   SetPageIndicator(nil);
   ALFreeAndNil(FScrollEngine);
@@ -1844,8 +1862,8 @@ begin
   inherited;
 end;
 
-{********************************************}
-procedure TALPageController.BeforeDestruction;
+{**********************************************************}
+procedure TALDynamicPageController.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
@@ -1858,65 +1876,66 @@ begin
   inherited;
 end;
 
-{******************************************************}
-function TALPageController.CreateStroke: TALStrokeBrush;
+{********************************************************************}
+function TALDynamicPageController.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
 end;
 
-{*************************************************}
-function TALPageController.CreateContent: TContent;
+{***************************************************************}
+function TALDynamicPageController.CreateContent: TContent;
 begin
   Result := TContent.Create(Self);
-  Result.parent := self;
-  Result.Stored := False;
-  Result.Locked := True;
-  Result.HitTest := False;
+  //Result.Parent := self;
+  //Result.Stored := False;
+  //Result.Locked := True;
+  //Result.HitTest := False;
 end;
 
-{***********************************************************}
-function TALPageController.CreateScrollEngine: TScrollEngine;
+{*************************************************************************}
+function TALDynamicPageController.CreateScrollEngine: TScrollEngine;
 begin
   Result := TScrollEngine.Create(Self);
   Result.TouchTracking := [ttHorizontal];
 end;
 
-{*************************************************************}
-procedure TALPageController.FreeNotification(AObject: TObject);
+{**************************************************************************************************}
+procedure TALDynamicPageController.FreeNotification(const AObject: TALDynamicControl);
 begin
   inherited;
   if AObject = FPageIndicator then
     FPageIndicator := nil;
 end;
 
-{*********************************}
-procedure TALPageController.Loaded;
-begin
-  var FOldDisableAlign := fDisableAlign;
-  fDisableAlign := True;
-  try
-    inherited;
-  finally
-    fDisableAlign := FOldDisableAlign;
-  end;
-  DoRealign;
-end;
+{*************************************************}
+//procedure TALDynamicPageController.Loaded;
+//begin
+//  var FOldDisableAlign := fDisableAlign;
+//  fDisableAlign := True;
+//  try
+//    inherited;
+//  finally
+//    fDisableAlign := FOldDisableAlign;
+//  end;
+//  DoRealign;
+//end;
 
-{************************************************}
-function TALPageController.GetDefaultSize: TSizeF;
+{**************************************************************}
+function TALDynamicPageController.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(200, 200);
 end;
 
-{*****************************************************************}
-procedure TALPageController.DoAddObject(const AObject: TFmxObject);
+{*************************************************************************************************************************}
+procedure TALDynamicPageController.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
-  if (AObject is TALPageView) then FContent.AddObject(AObject)
-  else inherited;
+  //if (AObject is TALDynamicPageView) then FContent.AddObject(AObject)
+  //else inherited;
+  inherited;
 end;
 
-{*************************************************}
-procedure TALPageController.RefreshActivePageIndex;
+{***************************************************************}
+procedure TALDynamicPageController.RefreshActivePageIndex;
 begin
   var LOldActivePageIndex := FActivePageIndex;
   var LActivePageIndex := Max(0, ActivePageIndex);
@@ -1925,11 +1944,11 @@ begin
     For var I := LActivePageIndex to LActivePageIndex + PageCount - 1 do begin
       var LPageIndex := I mod PageCount;
       var LPageView := Pages[LPageIndex];
-      If (compareValue(LPageView.position.X + Content.Position.X, LCenterLine, TEpsilon.Position) <= 0) and
-         (compareValue(LPageView.position.X + Content.Position.X + LPageView.Width, LCenterLine, TEpsilon.Position) > 0) then begin
+      If (compareValue(LPageView.Left + Content.Left, LCenterLine, TEpsilon.Position) <= 0) and
+         (compareValue(LPageView.Left + Content.Left + LPageView.Width, LCenterLine, TEpsilon.Position) > 0) then begin
         {$IF defined(debug)}
         //if FActivePageIndex <> LPageIndex then
-        //  Allog('TALPageController.RefreshActivePageIndex', AlInttostrW(I));
+        //  Allog('TALDynamicPageController.RefreshActivePageIndex', AlInttostrW(I));
         {$ENDIF}
         FActivePageIndex := LPageIndex;
         Break;
@@ -1940,11 +1959,11 @@ begin
     For var I := LActivePageIndex to LActivePageIndex + PageCount - 1 do begin
       var LPageIndex := I mod PageCount;
       var LPageView := Pages[LPageIndex];
-      If (compareValue(LPageView.position.Y + Content.Position.Y, LCenterLine, TEpsilon.Position) <= 0) and
-         (compareValue(LPageView.position.Y + Content.Position.Y + LPageView.Height, LCenterLine, TEpsilon.Position) > 0) then begin
+      If (compareValue(LPageView.Top + Content.Top, LCenterLine, TEpsilon.Position) <= 0) and
+         (compareValue(LPageView.Top + Content.Top + LPageView.Height, LCenterLine, TEpsilon.Position) > 0) then begin
         {$IF defined(debug)}
         //if FActivePageIndex <> LPageIndex then
-        //  Allog('TALPageController.RefreshActivePageIndex', AlInttostrW(I));
+        //  Allog('TALDynamicPageController.RefreshActivePageIndex', AlInttostrW(I));
         {$ENDIF}
         FActivePageIndex := LPageIndex;
         Break;
@@ -1955,8 +1974,8 @@ begin
     DoActivePageChanged;
 end;
 
-{*******************************************************************************}
-procedure TALPageController.SetPageIndicator(const AValue: TALBasePageIndicator);
+{***********************************************************************************************************}
+procedure TALDynamicPageController.SetPageIndicator(const AValue: TALDynamicBasePageIndicator);
 begin
   if FPageIndicator <> AValue then begin
     if FPageIndicator <> nil then begin
@@ -1971,8 +1990,8 @@ begin
   end;
 end;
 
-{*********************************************}
-function TALPageController.GetPageSize: Single;
+{***********************************************************}
+function TALDynamicPageController.GetPageSize: Single;
 begin
   if Orientation = TOrientation.Horizontal then
     result := Width * viewportFraction
@@ -1980,8 +1999,8 @@ begin
     result := Height * viewportFraction;
 end;
 
-{***********************************************}
-function TALPageController.GetEndPadding: Single;
+{*************************************************************}
+function TALDynamicPageController.GetEndPadding: Single;
 begin
   if not FPadEnds then result := 0
   else if Orientation = TOrientation.Horizontal then
@@ -1990,92 +2009,92 @@ begin
     result := (Height * (1 - viewportFraction)) / 2;
 end;
 
-{***********************************************}
-function TALPageController.GetPageCount: integer;
+{*************************************************************}
+function TALDynamicPageController.GetPageCount: integer;
 begin
   Result := Content.ControlsCount;
 end;
 
-{***************************************************************}
-function TALPageController.GetPage(AIndex: Integer): TALPageView;
+{*******************************************************************************************}
+function TALDynamicPageController.GetPage(AIndex: Integer): TALDynamicPageView;
 begin
   if InRange(AIndex, 0, PageCount - 1) then begin
     {$IF defined(debug) or defined(ALDPK)}
     // At design time, the Delphi IDE may add children such as
     // TGrabHandle.TGrabHandleRectangle. We want to be certain
-    // that Content.Controls[AIndex] is a TALPageView
-    if not (Content.Controls[AIndex] is TALPageView) then
+    // that Content.Controls[AIndex] is a TALDynamicPageView
+    if not (Content.Controls[AIndex] is TALDynamicPageView) then
       Raise Exception.Create('Error AAA0A344-0B61-4280-8CD6-98E787A86844');
     {$ENDIF}
-    Result := TALPageView(Content.Controls[AIndex])
+    Result := TALDynamicPageView(Content.Controls[AIndex])
   end
   else raise Exception.Createfmt('Invalid page index (%d)', [AIndex]);
 end;
 
-{************************************************}
-function TALPageController.GetItemsCount: Integer;
-begin
-  Result := GetPageCount;
-end;
+{****************************************************************}
+//function TALDynamicPageController.GetItemsCount: Integer;
+//begin
+//  Result := GetPageCount;
+//end;
 
-{********************************************************************}
-function TALPageController.GetItem(const AIndex: Integer): TFmxObject;
-begin
-  Result := GetPage(AIndex);
-end;
+{************************************************************************************}
+//function TALDynamicPageController.GetItem(const AIndex: Integer): TFmxObject;
+//begin
+//  Result := GetPage(AIndex);
+//end;
 
-{**********************************************************}
-function TALPageController.GetScrollEngine: TALScrollEngine;
+{************************************************************************}
+function TALDynamicPageController.GetScrollEngine: TALScrollEngine;
 begin
   result := FScrollEngine;
 end;
 
-{************************************************************************}
-procedure TALPageController.SetScrollEngine(const Value: TALScrollEngine);
+{**************************************************************************************}
+procedure TALDynamicPageController.SetScrollEngine(const Value: TALScrollEngine);
 begin
   FScrollEngine.Assign(Value);
 end;
 
-{************************************************}
-function TALPageController.HasActivePage: Boolean;
+{**************************************************************}
+function TALDynamicPageController.HasActivePage: Boolean;
 begin
   Result := ActivePageIndex >= 0;
 end;
 
-{*************************************************************************************************************************************}
-procedure TALPageController.SetActivePageIndex(const AValue: integer; const ATransition: TPageTransition; const AVelocity: Single = 0);
+{***************************************************************************************************************************************************}
+procedure TALDynamicPageController.SetActivePageIndex(const AValue: integer; const ATransition: TPageTransition; const AVelocity: Single = 0);
 begin
   SetActivePage(Pages[AValue], ATransition, AVelocity);
 end;
 
-{********************************************************************}
-procedure TALPageController.SetActivePageIndex(const AValue: Integer);
+{**********************************************************************************}
+procedure TALDynamicPageController.SetActivePageIndex(const AValue: Integer);
 begin
-  if not (csLoading in componentState) then
+  //if not (csLoading in componentState) then
     SetActivePageIndex(AValue, TPageTransition.None)
-  else
-    FActivePageIndex := AValue;
+  //else
+  //  FActivePageIndex := AValue;
 end;
 
-{****************************************************}
-function TALPageController.GetActivePage: TALPageView;
+{********************************************************************************}
+function TALDynamicPageController.GetActivePage: TALDynamicPageView;
 begin
   if ActivePageIndex >= 0 then Result := Pages[ActivePageIndex]
   else Result := nil;
 end;
 
-{*******************************************************************}
-procedure TALPageController.SetActivePage(const AValue: TALPageView);
+{***********************************************************************************************}
+procedure TALDynamicPageController.SetActivePage(const AValue: TALDynamicPageView);
 begin
   if AValue = nil then raise Exception.Create('AValue cannot be nil');
   {$IF defined(debug)}
-  if not IsChild(AValue) then raise Exception.Create('AValue is not a child of this controller');
+  //if not IsChild(AValue) then raise Exception.Create('AValue is not a child of this controller');
   {$ENDIF}
   SetActivePage(AValue, TPageTransition.None);
 end;
 
-{************************************************************************************************************************************}
-procedure TALPageController.SetActivePage(const AValue: TALPageView; const ATransition: TPageTransition; const AVelocity: Single = 0);
+{****************************************************************************************************************************************************************}
+procedure TALDynamicPageController.SetActivePage(const AValue: TALDynamicPageView; const ATransition: TPageTransition; const AVelocity: Single = 0);
 
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     // Extracted from the distanceInfluenceForSnapDuration method in ViewPager.java.
@@ -2104,10 +2123,10 @@ begin
 
     if Orientation = TOrientation.Horizontal then begin
 
-      var sx: Single := -Content.Position.X;
-      var sy: Single := -Content.Position.Y;
-      var dx: Single := AValue.Position.X - GetEndPadding - sx;
-      var dy: Single := AValue.Position.y - sy;
+      var sx: Single := -Content.Left;
+      var sy: Single := -Content.Top;
+      var dx: Single := AValue.Left - GetEndPadding - sx;
+      var dy: Single := AValue.Top - sy;
       if SameValue(dx, 0, TEpsilon.Position) and
          SameValue(dy, 0, TEpsilon.Position) then exit;
 
@@ -2136,9 +2155,9 @@ begin
         LDuration := Trunc((LPageDelta + 1) * 100);
         //
         // If the scroll distance equals one full page (including margin), then:
-        //   pageDelta would be 1, so duration would be (1+1)×100=200 milliseconds.
+        //   pageDelta would be 1, so duration would be (1+1)ï¿½100=200 milliseconds.
         // If the scroll distance is half of that, then:
-        //   pageDelta would be 0.5, and duration would be (0.5+1)×100=150 milliseconds.
+        //   pageDelta would be 0.5, and duration would be (0.5+1)ï¿½100=150 milliseconds.
         //
         // In general, this calculation produces a duration between 100 and 150 ms, which is too fast.
         // To mitigate this, I multiply the computed duration by 2.
@@ -2147,16 +2166,16 @@ begin
       end;
       LDuration := Min(LDuration, MAX_SETTLE_DURATION);
 
-      if HasActivePage then ActivePage.ResetFocus;
+      //if HasActivePage then //ActivePage.ResetFocus;
       ScrollEngine.startScroll(sx, sy, dx, dy, LDuration);
 
     end
     else begin
 
-      var sx: Single := -Content.Position.X;
-      var sy: Single := -Content.Position.Y;
-      var dx: Single := AValue.Position.X - sx;
-      var dy: Single := AValue.Position.y - GetEndPadding - sy;
+      var sx: Single := -Content.Left;
+      var sy: Single := -Content.Top;
+      var dx: Single := AValue.Left - sx;
+      var dy: Single := AValue.Top - GetEndPadding - sy;
       if SameValue(dx, 0, TEpsilon.Position) and
          SameValue(dy, 0, TEpsilon.Position) then exit;
 
@@ -2185,9 +2204,9 @@ begin
         LDuration := Trunc((LPageDelta + 1) * 100);
         //
         // If the scroll distance equals one full page (including margin), then:
-        //   pageDelta would be 1, so duration would be (1+1)×100=200 milliseconds.
+        //   pageDelta would be 1, so duration would be (1+1)ï¿½100=200 milliseconds.
         // If the scroll distance is half of that, then:
-        //   pageDelta would be 0.5, and duration would be (0.5+1)×100=150 milliseconds.
+        //   pageDelta would be 0.5, and duration would be (0.5+1)ï¿½100=150 milliseconds.
         //
         // In general, this calculation produces a duration between 100 and 150 ms, which is too fast.
         // To mitigate this, I multiply the computed duration by 2.
@@ -2196,7 +2215,7 @@ begin
       end;
       LDuration := Min(LDuration, MAX_SETTLE_DURATION);
 
-      if HasActivePage then ActivePage.ResetFocus;
+      //if HasActivePage then //ActivePage.ResetFocus;
       ScrollEngine.startScroll(sx, sy, dx, dy, LDuration);
 
     end;
@@ -2213,18 +2232,18 @@ begin
           (HasActivePage) then begin
 
     if ActivePage = AValue then exit;
-    ActivePage.ResetFocus;
+    //ActivePage.ResetFocus;
     FScrollEngine.Stop(true{AAbruptly});
     If FViewPortFraction <> 1 then
       raise Exception.Create('The fade transition only works when the viewport fraction is set to 1.');
 
     // FFadeOverlay is to deactivate all mouse / touch event
     ALFreeAndNil(FFadeOverlay);
-    FFadeOverlay := TalLayout.Create(self);
-    FFadeOverlay.Parent := self;
-    FFadeOverlay.Position.Point := TpointF.Create(0,0);
-    FFadeOverlay.Size.Size := TpointF.Create(Width, Height);
-    FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
+    FFadeOverlay := TALDynamicLayout.Create(self);
+    //FFadeOverlay.Parent := self;
+    FFadeOverlay.Position := TALPointD.Create(0,0);
+    FFadeOverlay.SetSize(TSizeF.Create(Width, Height));
+    //FFadeOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
     FFadeOverlay.HitTest := True;
     FFadeOverlay.Visible := True;
     FFadeOverlay.BringToFront;
@@ -2256,7 +2275,7 @@ begin
       //--
       TPageTransition.OverlayFadeIn: begin
         FDisableAlign := True;
-        AValue.Position.Point := ActivePage.Position.Point;
+        AValue.Position := ActivePage.Position;
         ActivePage.Index := 0; // FromPageIndex
         Avalue.Index := 1; // ToPageIndex
         FFadeAnimation.StartValue := 0;
@@ -2265,7 +2284,7 @@ begin
       //--
       TPageTransition.RevealFadeOut: begin
         FDisableAlign := True;
-        AValue.Position.Point := ActivePage.Position.Point;
+        AValue.Position := ActivePage.Position;
         var LActivePage := ActivePage;
         Avalue.Index := 0; // ToPageIndex
         LActivePage.Index := 1; // FromPageIndex
@@ -2275,7 +2294,7 @@ begin
       //--
       TPageTransition.CrossFade: begin
         FDisableAlign := True;
-        AValue.Position.Point := ActivePage.Position.Point;
+        AValue.Position := ActivePage.Position;
         ActivePage.Index := 0; // FromPageIndex
         Avalue.Index := 1; // ToPageIndex
         FFadeAnimation.StartValue := 0;
@@ -2295,12 +2314,12 @@ begin
 
   {$REGION 'TPageTransition.None'}
   else begin
-    if HasActivePage then ActivePage.ResetFocus;
+    //if HasActivePage then //ActivePage.ResetFocus;
     FScrollEngine.Stop;
     if Orientation = TOrientation.Horizontal then
-      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.x - GetEndPadding, AValue.Position.y))
+      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Left - GetEndPadding, AValue.Top))
     else
-      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Position.x, AValue.Position.y - GetEndPadding));
+      FScrollEngine.SetViewportPosition(TALPointD.Create(AValue.Left, AValue.Top - GetEndPadding));
   end;
   {$ENDREGION}
 
@@ -2312,8 +2331,8 @@ begin
 
 end;
 
-{****************************************************************}
-procedure TALPageController.FadeAnimationProcess(Sender: TObject);
+{******************************************************************************}
+procedure TALDynamicPageController.FadeAnimationProcess(Sender: TObject);
 begin
   case TPageTransition(FFadeAnimation.Tag) of
     TPageTransition.DirectFadeIn: begin
@@ -2331,7 +2350,7 @@ begin
     //--
     TPageTransition.OverlayFadeIn: begin
       //FDisableAlign := True;
-      //AValue.Position.Point := ActivePage.Position.Point;
+      //AValue.Position := ActivePage.Position;
       //ActivePage.Index := 0; // FromPageIndex
       //Avalue.Index := 1; // ToPageIndex
       //FFadeAnimation.StartValue := 0;
@@ -2341,7 +2360,7 @@ begin
     //--
     TPageTransition.RevealFadeOut: begin
       //FDisableAlign := True;
-      //AValue.Position.Point := ActivePage.Position.Point;
+      //AValue.Position := ActivePage.Position;
       //var LActivePage := ActivePage;
       //Avalue.Index := 0; // ToPageIndex
       //LActivePage.Index := 1; // FromPageIndex
@@ -2352,7 +2371,7 @@ begin
     //--
     TPageTransition.CrossFade: begin
       //FDisableAlign := True;
-      //AValue.Position.Point := ActivePage.Position.Point;
+      //AValue.Position := ActivePage.Position;
       //ActivePage.Index := 0; // FromPageIndex
       //Avalue.Index := 1; // ToPageIndex
       //FFadeAnimation.StartValue := 0;
@@ -2367,8 +2386,8 @@ begin
     FOnViewportPositionChange(self, FScrollEngine.ViewportPosition, FScrollEngine.ViewportPosition);
 end;
 
-{***************************************************************}
-procedure TALPageController.FadeAnimationFinish(Sender: TObject);
+{*****************************************************************************}
+procedure TALDynamicPageController.FadeAnimationFinish(Sender: TObject);
 begin
   case TPageTransition(FFadeAnimation.Tag) of
     TPageTransition.DirectFadeIn: begin
@@ -2386,7 +2405,7 @@ begin
     //--
     TPageTransition.OverlayFadeIn: begin
       //FDisableAlign := True;
-      //AValue.Position.Point := ActivePage.Position.Point;
+      //AValue.Position := ActivePage.Position;
       //ActivePage.Index := 0; // FromPageIndex
       //Avalue.Index := 1; // ToPageIndex
       //FFadeAnimation.StartValue := 0;
@@ -2409,7 +2428,7 @@ begin
     //--
     TPageTransition.RevealFadeOut: begin
       //FDisableAlign := True;
-      //AValue.Position.Point := ActivePage.Position.Point;
+      //AValue.Position := ActivePage.Position;
       //var LActivePage := ActivePage;
       //Avalue.Index := 0; // ToPageIndex
       //LActivePage.Index := 1; // FromPageIndex
@@ -2433,7 +2452,7 @@ begin
     //--
     TPageTransition.CrossFade: begin
       //FDisableAlign := True;
-      //AValue.Position.Point := ActivePage.Position.Point;
+      //AValue.Position := ActivePage.Position;
       //ActivePage.Index := 0; // FromPageIndex
       //Avalue.Index := 1; // ToPageIndex
       //FFadeAnimation.StartValue := 0;
@@ -2466,8 +2485,8 @@ begin
     fOnAniStop(Self);
 end;
 
-{*********************************************************************}
-procedure TALPageController.SetOrientation(const AValue: TOrientation);
+{***********************************************************************************}
+procedure TALDynamicPageController.SetOrientation(const AValue: TOrientation);
 begin
   if FOrientation <> AValue then begin
     FOrientation := AValue;
@@ -2477,8 +2496,8 @@ begin
   end;
 end;
 
-{********************************************************************}
-procedure TALPageController.SetViewportFraction(const AValue: Single);
+{**********************************************************************************}
+procedure TALDynamicPageController.SetViewportFraction(const AValue: Single);
 begin
   If not sameValue(fViewportFraction, AValue, Tepsilon.Scale) then begin
     fViewportFraction := AValue;
@@ -2486,22 +2505,22 @@ begin
   end;
 end;
 
-{***********************************************************}
-function TALPageController.IsViewportFractionStored: Boolean;
+{*************************************************************************}
+function TALDynamicPageController.IsViewportFractionStored: Boolean;
 begin
   result := not sameValue(fViewportFraction, 1, Tepsilon.Scale);
 end;
 
-{********************************}
-procedure TALPageController.Paint;
+{**********************************************}
+procedure TALDynamicPageController.Paint;
 begin
   inherited;
-  if (csDesigning in ComponentState) and not Locked then
-    DrawDesignBorder;
+  //if (csDesigning in ComponentState) and not Locked then
+  //  DrawDesignBorder;
 end;
 
-{**********************************************}
-procedure TALPageController.DoActivePageChanged;
+{************************************************************}
+procedure TALDynamicPageController.DoActivePageChanged;
 begin
   if Assigned(FOnActivePageChanged) then
     FOnActivePageChanged(Self);
@@ -2509,10 +2528,10 @@ begin
     FPageIndicator.ActivePageChanged(FActivePageIndex);
 end;
 
-{************************************}
-procedure TALPageController.DoRealign;
+{**************************************************}
+procedure TALDynamicPageController.DoRealign;
 begin
-  if CSLoading in componentState then exit;
+  //if csLoading in ComponentState then exit;
   Inherited;
   if fDisableAlign then exit;
   fDisableAlign := True;
@@ -2525,7 +2544,7 @@ begin
         LPageView.SetBounds(LCurrX{X}, 0{Y}, LPageSize{AWidth}, Height{AHeight});
         LCurrX := LCurrX + LPageSize;
       end;
-      Content.SetBounds(Content.Position.X{X}, Content.Position.Y{Y}, LCurrX{AWidth}, Height{AHeight});
+      Content.SetBounds(Content.Left{X}, Content.Top{Y}, LCurrX{AWidth}, Height{AHeight});
       ScrollEngine.SetScrollLimits(
         TALPointD.Create(-GetEndPadding,0),
         TALPointD.Create(Content.Width - Width + GetEndPadding, 0),
@@ -2539,7 +2558,7 @@ begin
         LPageView.SetBounds(0{X}, LCurrY{Y}, Width{AWidth}, LPageSize{AHeight});
         LCurrY := LCurrY + LPageSize;
       end;
-      Content.SetBounds(Content.Position.X{X}, Content.Position.Y{Y}, Width{AWidth}, LCurrY{AHeight});
+      Content.SetBounds(Content.Left{X}, Content.Top{Y}, Width{AWidth}, LCurrY{AHeight});
       ScrollEngine.SetScrollLimits(
         TALPointD.Create(0,-GetEndPadding),
         TALPointD.Create(0, Content.Height - Height + GetEndPadding),
@@ -2558,8 +2577,8 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
-procedure TALPageController.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
+{***************************************************************************************************************}
+procedure TALDynamicPageController.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
@@ -2580,8 +2599,8 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
-procedure TALPageController.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{******************************************************************************************************************}
+procedure TALDynamicPageController.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
@@ -2600,8 +2619,8 @@ begin
   end;
 end;
 
-{******************************************************************************}
-procedure TALPageController.internalMouseMove(Shift: TShiftState; X, Y: Single);
+{********************************************************************************************}
+procedure TALDynamicPageController.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
@@ -2634,8 +2653,8 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
-procedure TALPageController.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{****************************************************************************************************************}
+procedure TALDynamicPageController.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
@@ -2654,8 +2673,8 @@ begin
   end;
 end;
 
-{*********************************************}
-procedure TALPageController.internalMouseLeave;
+{***********************************************************}
+procedure TALDynamicPageController.internalMouseLeave;
 begin
   {$IFDEF DEBUG}
   //ALLog(ClassName + '.internalMouseLeave');
@@ -2667,15 +2686,15 @@ begin
   end;
 end;
 
-{********************************************************************************************}
-procedure TALPageController.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{**********************************************************************************************************}
+procedure TALDynamicPageController.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   internalMouseDown(Button, Shift, X, Y);
 end;
 
-{**********************************************************************}
-procedure TALPageController.MouseMove(Shift: TShiftState; X, Y: Single);
+{************************************************************************************}
+procedure TALDynamicPageController.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   // Inherited at the end because of
   // https://github.com/MagicFoundation/Alcinoe/issues/381
@@ -2683,35 +2702,31 @@ begin
   inherited;
 end;
 
-{******************************************************************************************}
-procedure TALPageController.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{********************************************************************************************************}
+procedure TALDynamicPageController.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   internalMouseUp(Button, Shift, X, Y);
 end;
 
-{***************************************}
-procedure TALPageController.DoMouseLeave;
+{***************************************************}
+procedure TALDynamicPageController.MouseLeave;
 begin
   inherited;
   internalMouseLeave;
 end;
 
-{**}
-Type
-  _TControlProtectedAccess = class(Tcontrol);
-
 {*************}
 {$IFNDEF ALDPK}
-procedure TALPageController.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+procedure TALDynamicPageController.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then begin
     {$IF defined(MSWindows)}
     // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
     // This action deactivates some functionalities in the native control, such as the right-click menu.
-    if not Supports(aObject, IALNativeControl) then
+    //if not Supports(aObject, IALNativeControl) then
     {$ENDIF}
-      _TControlProtectedAccess(aObject).capture;
+      _TALDynamicControlProtectedAccess(aObject).capture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   InternalMouseDown(Button, Shift, P.X, P.Y);
@@ -2721,7 +2736,7 @@ end;
 
 {*************}
 {$IFNDEF ALDPK}
-procedure TALPageController.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
+procedure TALDynamicPageController.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
 begin
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseMove(Shift, P.X, P.Y);
@@ -2731,15 +2746,15 @@ end;
 
 {*************}
 {$IFNDEF ALDPK}
-procedure TALPageController.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+procedure TALDynamicPageController.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then begin
     {$IF defined(MSWindows)}
     // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
     // This action deactivates some functionalities in the native control, such as the right-click menu.
-    if not Supports(aObject, IALNativeControl) then
+    //if not Supports(aObject, IALNativeControl) then
     {$ENDIF}
-      _TControlProtectedAccess(aObject).releasecapture;
+      _TALDynamicControlProtectedAccess(aObject).releasecapture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   InternalMouseUp(Button, Shift, P.X, P.Y);
@@ -2749,59 +2764,59 @@ end;
 
 {*************}
 {$IFNDEF ALDPK}
-procedure TALPageController.ChildrenMouseLeave(const AObject: TControl);
+procedure TALDynamicPageController.ChildrenMouseLeave(const AObject: TALDynamicControl);
 begin
   internalMouseLeave;
   inherited;
 end;
 {$ENDIF}
 
-{*************************************************************************}
-function TALPageController.NextPage(ATransition: TPageTransition): Boolean;
+{***************************************************************************************}
+function TALDynamicPageController.NextPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex < PageCount - 1);
   if Result then SetActivePageIndex(ActivePageIndex + 1, ATransition);
 end;
 
-{*****************************************************************************}
-function TALPageController.PreviousPage(ATransition: TPageTransition): Boolean;
+{*******************************************************************************************}
+function TALDynamicPageController.PreviousPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex > 0);
   if Result then SetActivePageIndex(ActivePageIndex - 1, ATransition);
 end;
 
-{**************************************************************************}
-function TALPageController.FirstPage(ATransition: TPageTransition): Boolean;
+{****************************************************************************************}
+function TALDynamicPageController.FirstPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex > 0);
   if Result then SetActivePageIndex(0, ATransition);
 end;
 
-{*************************************************************************}
-function TALPageController.LastPage(ATransition: TPageTransition): Boolean;
+{***************************************************************************************}
+function TALDynamicPageController.LastPage(ATransition: TPageTransition): Boolean;
 begin
   Result := (PageCount > 0) and (ActivePageIndex < PageCount - 1);
   if Result then SetActivePageIndex(PageCount - 1, ATransition);
 end;
 
-{**************************************************************************************}
-function TALPageController.AddPage(const APageViewClass: TALPageViewClass): TALPageView;
+{********************************************************************************************************************************}
+function TALDynamicPageController.AddPage(const APageViewClass: TALDynamicPageViewClass): TALDynamicPageView;
 begin
   Result := InsertPage(MaxInt, APageViewClass);
 end;
 
-{**********************************************************************************************************************}
-function TALPageController.InsertPage(const AIndex: Integer; const APageViewClass: TALPageViewClass = nil): TALPageView;
+{****************************************************************************************************************************************************************}
+function TALDynamicPageController.InsertPage(const AIndex: Integer; const APageViewClass: TALDynamicPageViewClass = nil): TALDynamicPageView;
 begin
   var LIndex := EnsureRange(AIndex, 0, PageCount);
-  var LPageViewClass: TALPageViewClass;
-  if APageViewClass = nil then LPageViewClass := TALPageView
+  var LPageViewClass: TALDynamicPageViewClass;
+  if APageViewClass = nil then LPageViewClass := TALDynamicPageView
   else LPageViewClass := APageViewClass;
-  Result := LPageViewClass.Create(Self);
+  Result := LPageViewClass.Create(nil);
   try
     var LActivePageIndex := ActivePageIndex;
     if LActivePageIndex >= LIndex then Inc(LActivePageIndex);
-    FContent.InsertObject(Lindex, Result);
+    FContent.InsertControl(Result, Lindex);
     if LActivePageIndex >= 0 then ActivePageIndex := LActivePageIndex
     else ActivePageIndex := 0;
   except
@@ -2810,40 +2825,24 @@ begin
   end;
 end;
 
-{************************************************************}
-procedure TALPageController.DeletePage(const AIndex: Integer);
+{**************************************************************************}
+procedure TALDynamicPageController.DeletePage(const AIndex: Integer);
 begin
   if (AIndex >= 0) and (AIndex <= PageCount - 1) then begin
     var LActivePageIndex := ActivePageIndex;
     if LActivePageIndex >= AIndex then Dec(LActivePageIndex);
     var LPage := Pages[AIndex];
-    FContent.RemoveObject(AIndex);
+    FContent.RemoveControl(AIndex);
     ALFreeAndNil(LPage);
     if LActivePageIndex >= 0 then ActivePageIndex := LActivePageIndex;
   end;
 end;
 
-{*****************}
-procedure Register;
-begin
-  RegisterComponents('Alcinoe', [TALPageController, TALPageIndicator]);
-  {$IFDEF ALDPK}
-  UnlistPublishedProperty(TALPageController, 'Size');
-  UnlistPublishedProperty(TALPageController, 'StyleName');
-  UnlistPublishedProperty(TALPageController, 'OnTap');
-  UnlistPublishedProperty(TALPageView, 'Size');
-  UnlistPublishedProperty(TALPageView, 'StyleName');
-  UnlistPublishedProperty(TALPageView, 'OnTap');
-  UnlistPublishedProperty(TALPageIndicator, 'Size');
-  UnlistPublishedProperty(TALPageIndicator, 'StyleName');
-  UnlistPublishedProperty(TALPageIndicator, 'OnTap');
-  {$ENDIF}
-end;
+{$ENDREGION}
 
-initialization
-  {$IF defined(DEBUG)}
-  ALLog('Alcinoe.FMX.PageController','initialization');
-  {$ENDIF}
-  RegisterFmxClasses([TALPageController, TALPageView]);
+//////////////////////////////////////////////
+/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
 
 end.

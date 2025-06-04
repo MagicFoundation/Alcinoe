@@ -2292,12 +2292,12 @@ end;
 class function TALPluralRules.PluralCategoryToStringW(const ACategory: TPluralCategory): String;
 begin
   case ACategory of
-    TPluralCategory.Zero: Result := 'zero';
-    TPluralCategory.One: Result := 'one';
-    TPluralCategory.Two: Result := 'two';
-    TPluralCategory.Few: Result := 'few';
-    TPluralCategory.Many: Result := 'many';
-    TPluralCategory.Other: Result := 'other';
+    TPluralCategory.Zero: Result := 'Zero';
+    TPluralCategory.One: Result := 'One';
+    TPluralCategory.Two: Result := 'Two';
+    TPluralCategory.Few: Result := 'Few';
+    TPluralCategory.Many: Result := 'Many';
+    TPluralCategory.Other: Result := 'Other';
     else Raise Exception.Create('Error 393D6BEC-BC6A-4C1E-BCF4-D104BC7A4C4E')
   end;
 end;
@@ -2306,12 +2306,12 @@ end;
 class function TALPluralRules.PluralCategoryToStringA(const ACategory: TPluralCategory): AnsiString;
 begin
   case ACategory of
-    TPluralCategory.Zero: Result := 'zero';
-    TPluralCategory.One: Result := 'one';
-    TPluralCategory.Two: Result := 'two';
-    TPluralCategory.Few: Result := 'few';
-    TPluralCategory.Many: Result := 'many';
-    TPluralCategory.Other: Result := 'other';
+    TPluralCategory.Zero: Result := 'Zero';
+    TPluralCategory.One: Result := 'One';
+    TPluralCategory.Two: Result := 'Two';
+    TPluralCategory.Few: Result := 'Few';
+    TPluralCategory.Many: Result := 'Many';
+    TPluralCategory.Other: Result := 'Other';
     else Raise Exception.Create('Error 393D6BEC-BC6A-4C1E-BCF4-D104BC7A4C4E')
   end;
 end;

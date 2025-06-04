@@ -23,6 +23,10 @@ uses
   iOSapi.CoreGraphics,
   iOSapi.CoreText,
   IOSApi.UIKit,
+  Macapi.ObjectiveC,
+  FMX.Forms,
+  FMX.Platform.iOS,
+  FMX.MultiTouch.iOS,
   Alcinoe.FMX.NativeView.iOS,
   {$ENDIF}
   {$IF defined(ANDROID)}
@@ -1175,6 +1179,7 @@ function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const
 function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 function  ALTextAlignToTextHorzAlign(const ATextAlign: TTextAlign): TALTextHorzAlign;
 function  ALTextAlignToTextVertAlign(const ATextAlign: TTextAlign): TALTextVertAlign;
+procedure ALVibrateDevice(const ADurationMs: Integer = 500);
 
 {$IF defined(ALAppleOS)}
 type
@@ -1230,7 +1235,7 @@ Type
     DefaultTouchTargetExpansion = 6;
     DefaultDisabledOpacity = 0.6;
     DesignBorderColor = $A0909090;
-  protected class var
+  public class var
     FPaintStage: TPaintStage;
   public
     FOnMouseUp: TMouseEvent;
@@ -1314,6 +1319,7 @@ Type
     {$IF CompilerVersion >= 34}  // Sydney
     FTabOrder: TTabOrder;
     {$ENDIF}
+  public
     FInflated: Boolean;
     {$IF CompilerVersion >= 36}  // Athens
     FOnApplyStyle: TNotifyEvent;
@@ -1337,6 +1343,7 @@ Type
     {$IF CompilerVersion >= 33}  // Rio
     FCustomSceneAddRect: TCustomSceneAddRectEvent;
     {$ENDIF}
+  public
     FScene: IScene;
     FLastHeight: Single;
     FLastWidth: Single;
@@ -1381,6 +1388,41 @@ Type
     FExplicitHeight: Single;
   end;
 
+{$IF defined(IOS)}
+type
+  {$IFNDEF ALCompilerVersionSupported123}
+    {$MESSAGE WARN 'Check if FMX.Platform.iOS.TFMXViewBase still has the exact same fields and adjust the IFDEF'}
+  {$ENDIF}
+  TALFMXViewBaseAccessPrivate = class(TOCLocal)
+  public const
+    DblTapDelay = 0.3; // Sec, Duration between first and second tap (Apple recommend use this value)
+  public
+    FGestureControl: TComponent;
+    FMultiTouchManager: TMultiTouchManagerIOS;
+    FNoOfTouches: NativeUInt;
+    [Weak] FTextService: TObject; // TTextServiceCocoa;
+  public
+    FContextMenu: TObject; // TFMXTextEditActionsMenu;
+    FIgnorePosition: Boolean;
+    FCarretPositionChanged: Boolean;
+    FLastCaretPosition: TPoint;
+    FLastContextMenuVisibility: Boolean;
+    FClickedAnotherControl: Boolean;
+    FChangedFocusedControl: Boolean;
+    [Weak]FForm: TCommonCustomForm;
+    FKeyboardType: TVirtualKeyboardType;
+    FReturnKeyType: TReturnKeyType;
+    FPassword: Boolean;
+    FDown: Boolean;
+    FTap: Boolean;
+    FResigned: Boolean;
+    FInputDelegate: UITextInputDelegate;
+    FShouldIgnoreNextClick: Boolean;
+    FAdditionalShift: TShiftState;
+    FSavedFocusedControl: TObject; // TDelegatedFreeNotify<IControl>;
+  end;
+{$ENDIF}
+
 {$IFDEF ANDROID}
 var ALViewStackCount: integer;
 {$ENDIF}
@@ -1415,6 +1457,7 @@ uses
   FMX.Skia,
   {$ENDIF}
   {$IF defined(ANDROID)}
+  Androidapi.JNI.Os,
   Androidapi.JNIBridge,
   Androidapi.Helpers,
   FMX.forms,
@@ -1427,9 +1470,9 @@ uses
   Alcinoe.Macapi.CoreText,
   {$ENDIF}
   {$IF defined(IOS)}
-  Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
+  Alcinoe.iOSApi.AudioToolbox,
   Alcinoe.iOSapi.CoreText,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
@@ -4318,7 +4361,7 @@ end;
 {*************************************************}
 function TALBrush.GetDefaultImageNoRadius: Boolean;
 begin
-  Result := False;
+  Result := True;
 end;
 
 {******************************************************}
@@ -5238,7 +5281,7 @@ end;
 
 {**}
 Type
-  _TControlAccessProtected = class(Tcontrol);
+  _TControlProtectedAccess = class(Tcontrol);
 
 {***********************************************************}
 constructor TALBaseStateStyle.Create(const AParent: TObject);
@@ -5742,7 +5785,7 @@ begin
     if FTransitionAnimation.Running then
       FTransitionClickDelayed := LPrevTransitionClickDelayed
     else if LPrevTransitionClickDelayed then
-      _TControlAccessProtected(FParent).click;
+      _TControlProtectedAccess(FParent).click;
   end;
 end;
 
@@ -5764,7 +5807,7 @@ begin
   FTransitionAnimation.Enabled := False;
   if FTransitionClickDelayed then begin
     FTransitionClickDelayed := False;
-    _TControlAccessProtected(FParent).Click;
+    _TControlProtectedAccess(FParent).Click;
   end;
   FParent.Repaint;
 end;
@@ -6470,6 +6513,18 @@ begin
     TTextAlign.Trailing: result := TALTextVertAlign.Trailing;
     else Raise Exception.Create('Error #9123711A-62FC-47E2-A041-1D7727198CD2')
   end;
+end;
+
+{**********************}
+procedure ALVibrateDevice(const ADurationMs: Integer = 500);
+begin
+  {$IF defined(ANDROID)}
+  var aVibratorServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.VIBRATOR_SERVICE);
+  var aVibrator := TJVibrator.Wrap((aVibratorServiceNative as ILocalObject).GetObjectID);
+  aVibrator.Vibrate(500);
+  {$ELSEIF defined(IOS)}
+  AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
+  {$ENDIF}
 end;
 
 {**********************}

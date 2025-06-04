@@ -306,12 +306,12 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
     procedure IsMouseOverChanged; override;
-    //procedure IsFocusedChanged; override;
+    //**procedure IsFocusedChanged; override;
     procedure PressedChanged; override;
     function GetDefaultSize: TSizeF; override;
     function GetChecked: Boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
-    //procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+    //**procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
     procedure Click; override;
     procedure DoChanged; virtual;
     procedure DoResized; override;
@@ -354,7 +354,7 @@ type
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
-    //property CanFocus default True;
+    //**property CanFocus default True;
     property Cursor default crHandPoint;
     property Checked: Boolean read GetChecked write SetChecked default False;
     property CheckMark: TCheckMarkBrush read FCheckMark write SetCheckMark;
@@ -388,19 +388,19 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
-    //property CanFocus;
+    //**property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property CheckMark;
     property Checked;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -408,50 +408,50 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property Shadow;
-    //property Size;
+    //**property Size;
     property StateStyles: TStateStyles read GetStateStyles write SetStateStyles;
     property Stroke;
-    //property TabOrder;
-    //property TabStop;
+    //**property TabOrder;
+    //**property TabStop;
     property TouchTargetExpansion;
     property Visible;
     property Width;
     property XRadius;
     property YRadius;
-    //property OnCanFocus;
+    //**property OnCanFocus;
     property OnChange;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    //property OnEnter;
-    //property OnExit;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
+    //**property OnEnter;
+    //**property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    //property OnKeyDown;
-    //property OnKeyUp;
+    //**property OnKeyDown;
+    //**property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -758,7 +758,7 @@ type
         procedure StrokeChanged(Sender: TObject); override;
         procedure ShadowChanged(Sender: TObject); override;
         procedure IsMouseOverChanged; override;
-        //procedure IsFocusedChanged; override;
+        //**procedure IsFocusedChanged; override;
         procedure PressedChanged; override;
         function GetChecked: Boolean; virtual;
         procedure SetChecked(const Value: Boolean); virtual;
@@ -794,7 +794,7 @@ type
         property DefaultXRadius: Single read GetDefaultXRadius;
         property DefaultYRadius: Single read GetDefaultYRadius;
         property DoubleBuffered default true;
-        //property Position stored false;
+        //**property Position stored false;
       public
         //property Action;
         //property Align;
@@ -1000,7 +1000,7 @@ type
         procedure Click; override;
       public
         constructor Create(const AOwner: TObject); override;
-        //property Position stored false;
+        //**property Position stored false;
       public
         //property Action;
         //property Align;
@@ -1035,7 +1035,7 @@ type
         //property Pivot;
         //property Scale;
         property Shadow;
-        //property Size;
+        //**property Size;
         property StateStyles;
         property Stroke;
         //property TabOrder;
@@ -1094,7 +1094,7 @@ type
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure StartTransition; virtual;
     procedure IsMouseOverChanged; override;
-    //procedure IsFocusedChanged; override;
+    //**procedure IsFocusedChanged; override;
     procedure PressedChanged; override;
     procedure EnabledChanged; override;
     procedure DoChange;
@@ -1105,7 +1105,7 @@ type
     procedure Click; override;
     function GetChecked: boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
-    //procedure Loaded; override;
+    //**procedure Loaded; override;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
@@ -1125,67 +1125,67 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
-    //property CanFocus default true;
+    //**property CanFocus default true;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered default true;
     property Checked: Boolean read GetChecked write SetChecked default false;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor default crHandPoint;
     //property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Height;
     //property Hint;
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
-    //property TabOrder;
-    //property TabStop;
+    //**property Size;
+    //**property TabOrder;
+    //**property TabStop;
     property Thumb: TThumb read FThumb;
     property TouchTargetExpansion;
     property Track: TTrack read FTrack;
     property Transition: TALStateTransition read FTransition write SetTransition;
     property Visible;
     property Width;
-    //property OnCanFocus;
+    //**property OnCanFocus;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    //property OnEnter;
-    //property OnExit;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
+    //**property OnEnter;
+    //**property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    //property OnKeyDown;
-    //property OnKeyUp;
+    //**property OnKeyDown;
+    //**property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1390,13 +1390,13 @@ type
     function CreateTextSettings: TALBaseTextSettings; override;
     function CreateStateStyles: TStateStyles; virtual;
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
-    //procedure SetName(const Value: TComponentName); override;
+    //**procedure SetName(const Value: TComponentName); override;
     procedure TextSettingsChanged(Sender: TObject); override;
     procedure SetXRadius(const Value: Single); override;
     procedure SetYRadius(const Value: Single); override;
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure IsMouseOverChanged; override;
-    //procedure IsFocusedChanged; override;
+    //**procedure IsFocusedChanged; override;
     procedure PressedChanged; override;
     procedure Click; override;
     Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); override;
@@ -1417,19 +1417,19 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     property AutoSize default True;
     property AutoTranslate;
-    //property CanFocus default true;
+    //**property CanFocus default true;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Corners;
     property Cursor default crHandPoint;
     property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -1437,25 +1437,25 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest default True;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property MaxWidth;
     property MaxHeight;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property Shadow;
     property Sides;
-    //property Size;
+    //**property Size;
     property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
     property Stroke;
-    //property TabOrder;
-    //property TabStop;
+    //**property TabOrder;
+    //**property TabStop;
     property Text;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property TouchTargetExpansion;
@@ -1464,11 +1464,11 @@ type
     property XRadius;
     property YRadius;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -1476,7 +1476,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -1484,7 +1484,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1719,8 +1719,8 @@ type
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
         property HitTest default false;
-        //property Locked default True;
-        //property Position stored false;
+        //**property Locked default True;
+        //**property Position stored false;
       public
         //property Action;
         //property Align;
@@ -1958,10 +1958,10 @@ type
         procedure SetYRadius(const Value: Single); override;
         procedure StateStylesChanged(Sender: TObject); virtual;
         procedure IsMouseOverChanged; override;
-        //procedure IsFocusedChanged; override;
+        //**procedure IsFocusedChanged; override;
         procedure PressedChanged; override;
         procedure ValueRangeChanged(Sender: TObject); Virtual;
-        //procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+        //**procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
         {$IF NOT DEFINED(ALSkiaCanvas)}
         function GetRenderTargetRect(const ARect: TrectF): TRectF; override;
         {$ENDIF}
@@ -1980,9 +1980,9 @@ type
         procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
         procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
         procedure MouseLeave; override;
-        //property Locked default True;
-        //property Position stored false;
-        //property CanFocus default true;
+        //**property Locked default True;
+        //**property Position stored false;
+        //**property CanFocus default true;
       public
         //property Action;
         //property Align;
@@ -2017,7 +2017,7 @@ type
         //property Scale;
         property Shadow;
         //property Sides;
-        //property Size;
+        //**property Size;
         property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
         property Stroke;
         //property TabOrder;
@@ -2166,7 +2166,7 @@ type
         property Shadow;
         property ShowOnInteraction: Boolean read FShowOnInteraction write FShowOnInteraction default false;
         property Sides;
-        //property Size;
+        //**property Size;
         property Stroke;
         //property TabOrder;
         //property TabStop;
@@ -2239,9 +2239,9 @@ type
     function GetTrackSize(Const AIncludeTrackPadding: Boolean = False): Single; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    //function _GetCanFocus: Boolean; virtual; virtual;
-    //procedure _SetCanFocus(const Value: Boolean); virtual; virtual;
-    //procedure _SetTabStop(const Value: Boolean); virtual; virtual;
+    //**function _GetCanFocus: Boolean; virtual; virtual;
+    //**procedure _SetCanFocus(const Value: Boolean); virtual; virtual;
+    //**procedure _SetTabStop(const Value: Boolean); virtual; virtual;
     procedure SetViewportSize(const Value: Double); virtual;
     function GetViewportSize: Double; virtual;
     function GetFrequency: Double; virtual;
@@ -2260,7 +2260,7 @@ type
     function GetThumbPos(const AValue: single): Single; virtual;
     procedure DoResized; override;
     procedure DoRealign; override;
-    //procedure Loaded; override;
+    //**procedure Loaded; override;
     procedure DoChanged; virtual;
     procedure EnabledChanged; override;
     property Value: Double read GetValue write SetValue stored ValueStored nodefault;
@@ -2283,8 +2283,8 @@ type
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     property DoubleBuffered default true;
-    //property CanFocus: Boolean read _GetCanFocus write _SetCanFocus default True;
-    //property TabStop: Boolean read FTabStop write _SetTabStop default True;
+    //**property CanFocus: Boolean read _GetCanFocus write _SetCanFocus default True;
+    //**property TabStop: Boolean read FTabStop write _SetTabStop default True;
     property Min: Double read GetMin write SetMin stored MinStored nodefault;
     property Max: Double read GetMax write SetMax stored MaxStored nodefault;
     property Frequency: Double read GetFrequency write SetFrequency stored FrequencyStored nodefault;
@@ -2301,18 +2301,18 @@ type
     //property Action;
     property ActiveTrack;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
-    //property CanFocus;
+    //**property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     //property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Frequency;
     property Height;
@@ -2321,51 +2321,51 @@ type
     //property ShowHint;
     property HitTest;
     property InactiveTrack;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Min;
     property Max;
     property Opacity;
     property Orientation;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
-    //property TabOrder;
-    //property TabStop;
+    //**property Size;
+    //**property TabOrder;
+    //**property TabStop;
     property Thumb;
     property TouchTargetExpansion;
     property Value;
     property ValueIndicator;
     property Visible;
     property Width;
-    //property OnCanFocus;
+    //**property OnCanFocus;
     property OnChange;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    //property OnEnter;
-    //property OnExit;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
+    //**property OnEnter;
+    //**property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    //property OnKeyDown;
-    //property OnKeyUp;
+    //**property OnKeyDown;
+    //**property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2408,7 +2408,7 @@ type
       // TMinThumb
       TMinThumb = class(TALDynamicCustomTrack.TThumb)
       private
-        //FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;
+        //**FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;
         function _GetOpacity: Single;
         procedure _SetOpacity(const AValue: Single);
         function _GetCursor: TCursor;
@@ -2444,8 +2444,8 @@ type
     function GetLeadingTrack: TALDynamicCustomTrack.TTrack; override;
     function GetTrailingTrack: TALDynamicCustomTrack.TTrack; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    //procedure _SetCanFocus(const Value: Boolean); virtual; override;
-    //procedure _SetTabStop(const Value: Boolean); virtual; override;
+    //**procedure _SetCanFocus(const Value: Boolean); virtual; override;
+    //**procedure _SetTabStop(const Value: Boolean); virtual; override;
     procedure SetViewportSize(const Value: Double); override;
     procedure SetFrequency(const Value: Double); override;
     procedure SetMax(const Value: Double); override;
@@ -2457,7 +2457,7 @@ type
     procedure SetMaxValue(Value: Double); virtual;
     procedure SetOrientation(const Value: TOrientation); override;
     procedure EnabledChanged; override;
-    //procedure Loaded; override;
+    //**procedure Loaded; override;
     function CreateInactiveTrack(const AInactiveTrackClass: TALDynamicCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALDynamicCustomTrack.TInactiveTrack; override;
     function CreateActiveTrack(const AActiveTrackClass: TALDynamicCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALDynamicCustomTrack.TActiveTrack; override;
     function CreateThumb(const AThumbClass: TALDynamicCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALDynamicCustomTrack.TThumb; override;
@@ -2475,18 +2475,18 @@ type
     //property Action;
     property ActiveTrack;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
-    //property CanFocus;
+    //**property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     //property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Frequency;
     property Height;
@@ -2495,7 +2495,7 @@ type
     //property ShowHint;
     property HitTest;
     property InactiveTrack;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Min;
     property Max;
@@ -2505,43 +2505,43 @@ type
     property Opacity;
     property Orientation;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
-    //property TabOrder;
-    //property TabStop;
+    //**property Size;
+    //**property TabOrder;
+    //**property TabStop;
     property TouchTargetExpansion;
     property Value;
     property ValueIndicator;
     property Visible;
     property Width;
-    //property OnCanFocus;
+    //**property OnCanFocus;
     property OnChange;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    //property OnEnter;
-    //property OnExit;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
+    //**property OnEnter;
+    //**property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    //property OnKeyDown;
-    //property OnKeyUp;
+    //**property OnKeyDown;
+    //**property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2682,7 +2682,7 @@ type
     function CreateThumb(const AThumbClass: TALDynamicCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALDynamicCustomTrack.TThumb; override;
   public
     constructor Create(const AOwner: TObject); override;
-    //property CanFocus default False;
+    //**property CanFocus default False;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2690,69 +2690,69 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
-    //property CanFocus;
+    //**property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     //property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Height;
     //property Hint;
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Min;
     property Max;
     property Opacity;
     property Orientation;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
-    //property TabOrder;
-    //property TabStop;
+    //**property Size;
+    //**property TabOrder;
+    //**property TabStop;
     property Thumb;
     property TouchTargetExpansion;
     property Value;
     property ViewportSize;
     property Visible;
     property Width;
-    //property OnCanFocus;
+    //**property OnCanFocus;
     property OnChange;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    //property OnEnter;
-    //property OnExit;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
+    //**property OnEnter;
+    //**property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    //property OnKeyDown;
-    //property OnKeyUp;
+    //**property OnKeyDown;
+    //**property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
 {$ENDREGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (1)'}
@@ -2792,13 +2792,13 @@ Type
 
 {$REGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (2)'}
 
-
+{*******************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(3,3,3,3);
 end;
 
-
+{********************************************************}
 constructor TALDynamicBaseCheckBox.TCheckMarkBrush.Create;
 begin
   inherited Create;
@@ -2813,50 +2813,50 @@ begin
   FMargins.OnChanged := MarginsChanged;
 end;
 
-
+{********************************************************}
 destructor TALDynamicBaseCheckBox.TCheckMarkBrush.Destroy;
 begin
   ALFreeAndNil(FMargins);
   inherited;
 end;
 
-
+{***********************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{***************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Black;
 end;
 
-
+{*************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.GetDefaultColorKey: String;
 begin
   Result := '';
 end;
 
-
+{*****************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.GetDefaultResourceName: String;
 begin
   Result := '';
 end;
 
-
+{***********************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.GetDefaultWrapMode: TALImageWrapMode;
 begin
   Result := TALImageWrapMode.Fit;
 end;
 
-
+{**************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.GetDefaultThickness: Single;
 begin
   Result := 2;
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.Assign(Source: TPersistent);
 begin
   if Source is TCheckMarkBrush then begin
@@ -2876,7 +2876,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{*****************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.Reset;
 begin
   BeginUpdate;
@@ -2893,7 +2893,7 @@ begin
   end;
 end;
 
-
+{************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.AlignToPixel;
 begin
   BeginUpdate;
@@ -2905,7 +2905,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -2917,7 +2917,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2949,7 +2949,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2960,7 +2960,7 @@ begin
   end;
 end;
 
-
+{********************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.HasCheckMark: boolean;
 begin
   result := ((Color <> TalphaColors.Null) and
@@ -2968,37 +2968,37 @@ begin
             (ResourceName <> '');
 end;
 
-
+{*********************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.IsColorStored: Boolean;
 begin
   result := FColor <> DefaultColor;
 end;
 
-
+{************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
 end;
 
-
+{****************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.IsResourceNameStored: Boolean;
 begin
   result := FResourceName <> DefaultResourceName;
 end;
 
-
+{************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.IsWrapModeStored: Boolean;
 begin
   result := FWrapMode <> DefaultWrapMode;
 end;
 
-
+{*************************************************************************}
 function TALDynamicBaseCheckBox.TCheckMarkBrush.IsThicknessStored: Boolean;
 begin
   result := not SameValue(FThickness, DefaultThickness, TEpsilon.Vector);
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
@@ -3008,7 +3008,7 @@ begin
   end;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.SetColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -3017,7 +3017,7 @@ begin
   end;
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.SetResourceName(const Value: String);
 begin
   if fResourceName <> Value then begin
@@ -3026,7 +3026,7 @@ begin
   end;
 end;
 
-
+{******************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if fWrapMode <> Value then begin
@@ -3035,7 +3035,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.SetThickness(const Value: Single);
 begin
   if not SameValue(Value, FThickness, TEpsilon.Vector) then begin
@@ -3044,19 +3044,19 @@ begin
   end;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;
 
-
+{*******************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckMarkBrush.MarginsChanged(Sender: TObject);
 begin
   change;
 end;
 
-
+{***********************************************************************************************}
 constructor TALDynamicBaseCheckBox.TInheritCheckMarkBrush.Create(const AParent: TCheckMarkBrush);
 begin
   inherited create;
@@ -3065,7 +3065,7 @@ begin
   fSuperseded := False;
 end;
 
-
+{*********************************************************************************************}
 function TALDynamicBaseCheckBox.TInheritCheckMarkBrush.CreateSavedState: TALPersistentObserver;
 type
   TInheritCheckMarkBrushClass = class of TInheritCheckMarkBrush;
@@ -3073,7 +3073,7 @@ begin
   result := TInheritCheckMarkBrushClass(classtype).Create(nil{AParent});
 end;
 
-
+{****************************************************************************************}
 procedure TALDynamicBaseCheckBox.TInheritCheckMarkBrush.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
@@ -3082,7 +3082,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TInheritCheckMarkBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -3101,7 +3101,7 @@ begin
   End;
 end;
 
-
+{************************************************************}
 procedure TALDynamicBaseCheckBox.TInheritCheckMarkBrush.Reset;
 begin
   BeginUpdate;
@@ -3114,13 +3114,13 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicBaseCheckBox.TInheritCheckMarkBrush.DoSupersede;
 begin
   Assign(FParent);
 end;
 
-
+{***************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TInheritCheckMarkBrush.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -3147,7 +3147,7 @@ begin
   end;
 end;
 
-
+{************************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TInheritCheckMarkBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -3158,31 +3158,31 @@ begin
   end;
 end;
 
-
+{*******************************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.TStateLayer.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(-12,-12,-12,-12);
 end;
 
-
+{***********************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.TStateLayer.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{************************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{************************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{********************************************************************************}
 constructor TALDynamicBaseCheckBox.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
@@ -3192,26 +3192,26 @@ begin
   FCheckMark.OnChanged := CheckMarkChanged;
 end;
 
-
+{********************************************************}
 destructor TALDynamicBaseCheckBox.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FCheckMark);
   inherited Destroy;
 end;
 
-
+{******************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{**********************************************************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.Assign(Source: TPersistent);
 begin
   if Source is TBaseStateStyle then begin
@@ -3227,7 +3227,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{*****************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.Reset;
 begin
   BeginUpdate;
@@ -3239,7 +3239,7 @@ begin
   end;
 end;
 
-
+{************************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.AlignToPixel;
 begin
   BeginUpdate;
@@ -3251,7 +3251,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3263,7 +3263,7 @@ begin
   End;
 end;
 
-
+{*******************************************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single);
 begin
   {$IF defined(debug)}
@@ -3289,14 +3289,14 @@ begin
   End;
 end;
 
-
+{***********************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.DoSupersede;
 begin
   inherited;
   CheckMark.Supersede;
 end;
 
-
+{***********************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.GetStateStyleParent: TBaseStateStyle;
 begin
   {$IF defined(debug)}
@@ -3307,7 +3307,7 @@ begin
   result := TBaseStateStyle(inherited StateStyleParent);
 end;
 
-
+{***************************************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.GetControlParent: TALDynamicBaseCheckBox;
 begin
   {$IF defined(debug)}
@@ -3318,38 +3318,38 @@ begin
   result := TALDynamicBaseCheckBox(inherited ControlParent);
 end;
 
-
+{**************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.SetCheckMark(const AValue: TInheritCheckMarkBrush);
 begin
   FCheckMark.Assign(AValue);
 end;
 
-
+{******************************************************************}
 function TALDynamicBaseCheckBox.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
             CheckMark.Inherit;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TBaseStateStyle.CheckMarkChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***************************************************************************}
 function TALDynamicBaseCheckBox.TDefaultStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 1;
 end;
 
-
+{***************************************************************************}
 function TALDynamicBaseCheckBox.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicBaseCheckBox.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -3358,14 +3358,14 @@ begin
   end;
 end;
 
-
+{************************************************************************************}
 constructor TALDynamicBaseCheckBox.TDisabledStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
-
+{*******************************************************************************}
 procedure TALDynamicBaseCheckBox.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -3380,7 +3380,7 @@ begin
   End;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicBaseCheckBox.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
@@ -3392,7 +3392,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************}
 function TALDynamicBaseCheckBox.TDisabledStateStyle.GetInherit: Boolean;
 begin
   // Opacity is not part of the GetInherit function because it updates the
@@ -3401,31 +3401,31 @@ begin
   Result := inherited GetInherit;
 end;
 
-
+{****************************************************************************}
 function TALDynamicBaseCheckBox.TDisabledStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-
+{***************************************************************************}
 function TALDynamicBaseCheckBox.THoveredStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 3;
 end;
 
-
+{***************************************************************************}
 function TALDynamicBaseCheckBox.TPressedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 4;
 end;
 
-
+{***************************************************************************}
 function TALDynamicBaseCheckBox.TFocusedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 5;
 end;
 
-
+{********************************************************************************************}
 constructor TALDynamicBaseCheckBox.TCheckStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create;
@@ -3446,7 +3446,7 @@ begin
   FFocused.OnChanged := FocusedChanged;
 end;
 
-
+{**********************************************************}
 destructor TALDynamicBaseCheckBox.TCheckStateStyles.Destroy;
 begin
   ALFreeAndNil(FDefault);
@@ -3457,7 +3457,7 @@ begin
   inherited Destroy;
 end;
 
-
+{****************************************************************************************}
 function TALDynamicBaseCheckBox.TCheckStateStyles.CreateSavedState: TALPersistentObserver;
 type
   TCheckStateStylesClass = class of TCheckStateStyles;
@@ -3465,37 +3465,37 @@ begin
   result := TCheckStateStylesClass(classtype).Create(nil{AParent});
 end;
 
-
+{********************************************************************************************************************}
 function TALDynamicBaseCheckBox.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
 begin
   Result := TDefaultStateStyle.Create(AParent);
 end;
 
-
+{**********************************************************************************************************************}
 function TALDynamicBaseCheckBox.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************}
 function TALDynamicBaseCheckBox.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************}
 function TALDynamicBaseCheckBox.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************}
 function TALDynamicBaseCheckBox.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TCheckStateStyles then begin
@@ -3514,7 +3514,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{*******************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.Reset;
 begin
   BeginUpdate;
@@ -3530,7 +3530,7 @@ begin
   end;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -3545,7 +3545,7 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3560,7 +3560,7 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.ClearBufDrawable;
 begin
   Default.ClearBufDrawable;
@@ -3570,67 +3570,67 @@ begin
   Focused.ClearBufDrawable;
 end;
 
-
+{**********************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.SetDefault(const AValue: TDefaultStateStyle);
 begin
   FDefault.Assign(AValue);
 end;
 
-
+{************************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
-
+{**********************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.SetHovered(const AValue: THoveredStateStyle);
 begin
   FHovered.Assign(AValue);
 end;
 
-
+{**********************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.SetPressed(const AValue: TPressedStateStyle);
 begin
   FPressed.Assign(AValue);
 end;
 
-
+{**********************************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.SetFocused(const AValue: TFocusedStateStyle);
 begin
   FFocused.Assign(AValue);
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.DefaultChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.HoveredChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.PressedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicBaseCheckBox.TCheckStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***************************************************************************************}
 constructor TALDynamicBaseCheckBox.TStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create(AParent);
@@ -3642,7 +3642,7 @@ begin
   FUnchecked.OnChanged := UncheckedChanged;
 end;
 
-
+{*****************************************************}
 destructor TALDynamicBaseCheckBox.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FChecked);
@@ -3650,19 +3650,19 @@ begin
   inherited Destroy;
 end;
 
-
+{*************************************************************************************************************************}
 function TALDynamicBaseCheckBox.TStateStyles.CreateCheckedStateStyles(const AParent: TALDynamicControl): TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{***************************************************************************************************************************}
 function TALDynamicBaseCheckBox.TStateStyles.CreateUncheckedStateStyles(const AParent: TALDynamicControl): TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{************************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TStateStyles then begin
@@ -3679,7 +3679,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{**************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.Reset;
 begin
   BeginUpdate;
@@ -3692,7 +3692,7 @@ begin
   end;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -3705,7 +3705,7 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3718,7 +3718,7 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -3726,62 +3726,62 @@ begin
   Unchecked.ClearBufDrawable;
 end;
 
-
+{****************************************************************************************}
 function TALDynamicBaseCheckBox.TStateStyles.GetCurrentRawStyle: TALDynamicBaseStateStyle;
 begin
   if Parent.Checked then begin
     if Not Parent.Enabled then Result := Checked.Disabled
     else if Parent.Pressed then Result := Checked.Pressed
-    //else if Parent.IsFocused then Result := Checked.Focused
+    //**else if Parent.IsFocused then Result := Checked.Focused
     else if Parent.IsMouseOver then Result := Checked.Hovered
     else result := Checked.Default;
   end
   else begin
     if Not Parent.Enabled then Result := UnChecked.Disabled
     else if Parent.Pressed then Result := UnChecked.Pressed
-    //else if Parent.IsFocused then Result := UnChecked.Focused
+    //**else if Parent.IsFocused then Result := UnChecked.Focused
     else if Parent.IsMouseOver then Result := UnChecked.Hovered
     else result := UnChecked.Default;
   end;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicBaseCheckBox.TStateStyles.GetParent: TALDynamicBaseCheckBox;
 begin
   Result := TALDynamicBaseCheckBox(inherited Parent);
 end;
 
-
+{****************************************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.SetChecked(const AValue: TCheckStateStyles);
 begin
   FChecked.Assign(AValue);
 end;
 
-
+{******************************************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.SetUnchecked(const AValue: TCheckStateStyles);
 begin
   FUnchecked.Assign(AValue);
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.CheckedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{*******************************************************************************}
 procedure TALDynamicBaseCheckBox.TStateStyles.UncheckedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***************************************************************}
 constructor TALDynamicBaseCheckBox.Create(const AOwner: TObject);
 begin
   inherited;
   //--
-  //SetAcceptsControls(False);
-  //CanFocus := True;
+  //**SetAcceptsControls(False);
+  //**CanFocus := True;
   Cursor := crHandPoint;
   //--
   FCheckMark := CreateCheckMark;
@@ -3806,7 +3806,7 @@ begin
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
-
+{****************************************}
 destructor TALDynamicBaseCheckBox.Destroy;
 begin
   ALFreeAndNil(FStateStyles);
@@ -3817,7 +3817,7 @@ begin
   inherited;
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicBaseCheckBox.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -3841,19 +3841,19 @@ begin
   End;
 end;
 
-
+{***************************************************************}
 function TALDynamicBaseCheckBox.CreateCheckMark: TCheckMarkBrush;
 begin
   Result := TCheckMarkBrush.Create;
 end;
 
-
+{**************************************************************}
 function TALDynamicBaseCheckBox.CreateStateStyles: TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{********************************************}
 procedure TALDynamicBaseCheckBox.AlignToPixel;
 begin
   BeginUpdate;
@@ -3866,7 +3866,7 @@ begin
   end;
 end;
 
-
+{************************************************}
 procedure TALDynamicBaseCheckBox.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -3879,19 +3879,19 @@ begin
   end;
 end;
 
-
+{********************************************************}
 function TALDynamicBaseCheckBox.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{*********************************************************}
 function TALDynamicBaseCheckBox.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-
+{************************************************************************}
 procedure TALDynamicBaseCheckBox.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -3903,13 +3903,13 @@ begin
   end;
 end;
 
-
+{**************************************************}
 function TALDynamicBaseCheckBox.GetChecked: Boolean;
 begin
   Result := FChecked;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicBaseCheckBox.SetChecked(const Value: Boolean);
 begin
   if FChecked <> Value then begin
@@ -3920,43 +3920,43 @@ begin
   end;
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicBaseCheckBox.SetCheckMark(const Value: TCheckMarkBrush);
 begin
   FCheckMark.Assign(Value);
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicBaseCheckBox.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
 
-
+{*******************************************************}
 function TALDynamicBaseCheckBox.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-
+{*******************************************************}
 function TALDynamicBaseCheckBox.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
-
+{********************************************************}
 function TALDynamicBaseCheckBox.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{********************************************************}
 function TALDynamicBaseCheckBox.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicBaseCheckBox.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -3966,7 +3966,7 @@ begin
   end;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicBaseCheckBox.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -3976,35 +3976,35 @@ begin
   end;
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicBaseCheckBox.CheckMarkChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   Repaint;
 end;
 
-
+{************************************************************}
 procedure TALDynamicBaseCheckBox.FillChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicBaseCheckBox.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicBaseCheckBox.ShadowChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicBaseCheckBox.StateStylesChanged(Sender: TObject);
 begin
   ClearBufDrawable;
@@ -4013,7 +4013,7 @@ begin
   Repaint;
 end;
 
-
+{**************************************************}
 procedure TALDynamicBaseCheckBox.IsMouseOverChanged;
 begin
   inherited;
@@ -4021,15 +4021,15 @@ begin
   repaint;
 end;
 
+{****************************************************}
+//**procedure TALDynamicBaseCheckBox.IsFocusedChanged;
+//**begin
+//**  inherited;
+//**  StateStyles.startTransition;
+//**  repaint;
+//**end;
 
-//procedure TALDynamicBaseCheckBox.IsFocusedChanged;
-//begin
-//  inherited;
-//  StateStyles.startTransition;
-//  repaint;
-//end;
-
-
+{**********************************************}
 procedure TALDynamicBaseCheckBox.PressedChanged;
 begin
   inherited;
@@ -4037,30 +4037,30 @@ begin
   repaint;
 end;
 
+{************************************************************************************************************}
+//**procedure TALDynamicBaseCheckBox.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
+//**begin
+//**  inherited;
+//**  if (KeyChar = ' ') then begin
+//**    Click; // Emulate mouse click to perform Action.OnExecute
+//**    KeyChar := #0;
+//**  end;
+//**end;
 
-//procedure TALDynamicBaseCheckBox.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
-//begin
-//  inherited;
-//  if (KeyChar = ' ') then begin
-//    Click; // Emulate mouse click to perform Action.OnExecute
-//    KeyChar := #0;
-//  end;
-//end;
-
-
+{*************************************}
 procedure TALDynamicBaseCheckBox.Click;
 begin
   Checked := not Checked;
   inherited;
 end;
 
-
+{*****************************************************}
 function TALDynamicBaseCheckBox.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(18, 18);
 end;
 
-
+{*****************************************}
 procedure TALDynamicBaseCheckBox.DoChanged;
 begin
   if Assigned(FOnChange) then
@@ -4068,14 +4068,14 @@ begin
   Repaint;
 end;
 
-
+{*****************************************}
 procedure TALDynamicBaseCheckBox.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{************************************************}
 procedure TALDynamicBaseCheckBox.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -4097,7 +4097,7 @@ begin
     FStateStyles.ClearBufDrawable;
 end;
 
-
+{***********************************************}
 procedure TALDynamicBaseCheckBox.MakeBufDrawable;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -4173,7 +4173,7 @@ begin
   // because BufDrawableRect always has the width and height of the localRect.
 end;
 
-
+{*********************************************}
 procedure TALDynamicBaseCheckBox.DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
@@ -4366,7 +4366,7 @@ begin
 
 end;
 
-
+{*************************************************}
 Procedure TALDynamicBaseCheckBox.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -4447,7 +4447,7 @@ begin
 
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicBaseCheckBox.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -4498,7 +4498,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicBaseCheckBox.InitRenderTargets(var ARect: TrectF);
 begin
@@ -4512,7 +4512,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicBaseCheckBox.ClearRenderTargets;
 begin
@@ -4521,7 +4521,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*************************************}
 procedure TALDynamicBaseCheckBox.Paint;
 begin
 
@@ -4742,121 +4742,121 @@ begin
 
 end;
 
-
+{*******************************************************}
 function TALDynamicCheckBox.GetStateStyles: TStateStyles;
 begin
   Result := TStateStyles(inherited StateStyles);
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicCheckBox.SetStateStyles(const AValue: TStateStyles);
 begin
   inherited StateStyles := AValue;
 end;
 
-
+{*********************************************************************************}
 function TALDynamicCheckBox.CreateStateStyles: TALDynamicBaseCheckBox.TStateStyles;
 begin
   Result := TStateStyles.Create(Self);
 end;
 
-
+{******************************************************************************}
 function TALDynamicRadioButton.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(5,5,5,5);
 end;
 
-
+{**********************************************************************}
 function TALDynamicRadioButton.TCheckMarkBrush.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{*************************************************************************************}
 function TALDynamicRadioButton.TInheritCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(5,5,5,5);
 end;
 
-
+{*****************************************************************************}
 function TALDynamicRadioButton.TInheritCheckMarkBrush.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{**********************************************************************************************************************************************************************}
 function TALDynamicRadioButton.TDefaultStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{***********************************************************************************************************************************************************************}
 function TALDynamicRadioButton.TDisabledStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{**********************************************************************************************************************************************************************}
 function TALDynamicRadioButton.THoveredStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{**********************************************************************************************************************************************************************}
 function TALDynamicRadioButton.TPressedStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{**********************************************************************************************************************************************************************}
 function TALDynamicRadioButton.TFocusedStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************}
 function TALDynamicRadioButton.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TDefaultStateStyle;
 begin
   Result := TDefaultStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************************************}
 function TALDynamicRadioButton.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************}
 function TALDynamicRadioButton.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************}
 function TALDynamicRadioButton.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************}
 function TALDynamicRadioButton.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{***********************************************************************************************************************************************}
 function TALDynamicRadioButton.TStateStyles.CreateCheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{*************************************************************************************************************************************************}
 function TALDynamicRadioButton.TStateStyles.CreateUncheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{**************************************************************}
 constructor TALDynamicRadioButton.Create(const AOwner: TObject);
 begin
   inherited;
@@ -4865,7 +4865,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
-
+{************************************************}
 procedure TALDynamicRadioButton.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -4877,7 +4877,7 @@ begin
   inherited;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicRadioButton.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -4894,59 +4894,59 @@ begin
   End;
 end;
 
-
+{*************************************************************************************}
 function TALDynamicRadioButton.CreateCheckMark: TALDynamicBaseCheckBox.TCheckMarkBrush;
 begin
   Result := TCheckMarkBrush.Create;
 end;
 
-
+{************************************************************************************}
 function TALDynamicRadioButton.CreateStateStyles: TALDynamicBaseCheckBox.TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{***************************************************************}
 procedure TALDynamicRadioButton.SetChecked(const Value: Boolean);
 begin
   if FChecked <> Value then begin
-    //if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode
-    //else begin
+    //**if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode
+    //**else begin
       if (not value) and fMandatory then exit;
       inherited SetChecked(Value);
       if Value then begin
         var M := TRadioButtonGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
-    //end;
+    //**end;
   end;
 end;
 
-
+{*******************************************************}
 function TALDynamicRadioButton.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{*******************************************************}
 function TALDynamicRadioButton.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{****************************************************}
 function TALDynamicRadioButton.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(20, 20);
 end;
 
-
+{**************************************************}
 function TALDynamicRadioButton.GetGroupName: string;
 begin
   Result := FGroupName;
 end;
 
-
+{*****************************************************************************************}
 procedure TALDynamicRadioButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
 begin
   if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Host <> nil) and
@@ -4961,20 +4961,20 @@ begin
   end;
 end;
 
-
+{******************************************************}
 function TALDynamicRadioButton.GroupNameStored: Boolean;
 begin
   Result := FGroupName <> '';
 end;
 
-
+{****************************************************************}
 procedure TALDynamicRadioButton.SetGroupName(const Value: string);
 begin
   if FGroupName <> Value then
     FGroupName := Value;
 end;
 
-
+{********************************************}
 procedure TALDynamicRadioButton.DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
@@ -5044,67 +5044,67 @@ begin
 
 end;
 
-
+{******************************************************************}
 function TALDynamicSwitch.TTrack.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffc5c5c5;
 end;
 
-
+{********************************************************************}
 function TALDynamicSwitch.TTrack.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{**********************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffc5c5c5;
 end;
 
-
+{************************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{*************************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{*************************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{****************************************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{******************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{*******************************************************************************}
 function TALDynamicSwitch.TTrack.TBaseStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{****************************************************************************}
 function TALDynamicSwitch.TTrack.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -5113,20 +5113,20 @@ begin
   end;
 end;
 
-
+{****************************************************************************}
 function TALDynamicSwitch.TTrack.TDefaultStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 1;
 end;
 
-
+{*************************************************************************************}
 constructor TALDynamicSwitch.TTrack.TDisabledStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicSwitch.TTrack.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -5141,7 +5141,7 @@ begin
   End;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicSwitch.TTrack.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
@@ -5153,7 +5153,7 @@ begin
   end;
 end;
 
-
+{***********************************************************************}
 function TALDynamicSwitch.TTrack.TDisabledStateStyle.GetInherit: Boolean;
 begin
   // Opacity is not part of the GetInherit function because it updates the
@@ -5162,31 +5162,31 @@ begin
   Result := inherited GetInherit;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicSwitch.TTrack.TDisabledStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-
+{****************************************************************************}
 function TALDynamicSwitch.TTrack.THoveredStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 3;
 end;
 
-
+{****************************************************************************}
 function TALDynamicSwitch.TTrack.TPressedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 4;
 end;
 
-
+{****************************************************************************}
 function TALDynamicSwitch.TTrack.TFocusedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 5;
 end;
 
-
+{*********************************************************************************************}
 constructor TALDynamicSwitch.TTrack.TCheckStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create;
@@ -5207,7 +5207,7 @@ begin
   FFocused.OnChanged := FocusedChanged;
 end;
 
-
+{***********************************************************}
 destructor TALDynamicSwitch.TTrack.TCheckStateStyles.Destroy;
 begin
   ALFreeAndNil(FDefault);
@@ -5218,7 +5218,7 @@ begin
   inherited Destroy;
 end;
 
-
+{*****************************************************************************************}
 function TALDynamicSwitch.TTrack.TCheckStateStyles.CreateSavedState: TALPersistentObserver;
 type
   TCheckStateStylesClass = class of TCheckStateStyles;
@@ -5226,37 +5226,37 @@ begin
   result := TCheckStateStylesClass(classtype).Create(nil{AParent});
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
 begin
   Result := TDefaultStateStyle.Create(AParent);
 end;
 
-
+{***********************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TCheckStateStyles then begin
@@ -5275,7 +5275,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{********************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.Reset;
 begin
   BeginUpdate;
@@ -5291,7 +5291,7 @@ begin
   end;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -5306,7 +5306,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -5321,7 +5321,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.ClearBufDrawable;
 begin
   Default.ClearBufDrawable;
@@ -5331,67 +5331,67 @@ begin
   Focused.ClearBufDrawable;
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.SetDefault(const AValue: TDefaultStateStyle);
 begin
   FDefault.Assign(AValue);
 end;
 
-
+{*************************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.SetHovered(const AValue: THoveredStateStyle);
 begin
   FHovered.Assign(AValue);
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.SetPressed(const AValue: TPressedStateStyle);
 begin
   FPressed.Assign(AValue);
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.SetFocused(const AValue: TFocusedStateStyle);
 begin
   FFocused.Assign(AValue);
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.DefaultChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.HoveredChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.PressedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicSwitch.TTrack.TCheckStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{****************************************************************************************}
 constructor TALDynamicSwitch.TTrack.TStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create(AParent);
@@ -5403,7 +5403,7 @@ begin
   FUnchecked.OnChanged := UncheckedChanged;
 end;
 
-
+{******************************************************}
 destructor TALDynamicSwitch.TTrack.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FChecked);
@@ -5411,19 +5411,19 @@ begin
   inherited Destroy;
 end;
 
-
+{**************************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TStateStyles.CreateCheckedStateStyles(const AParent: TALDynamicControl): TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{****************************************************************************************************************************}
 function TALDynamicSwitch.TTrack.TStateStyles.CreateUncheckedStateStyles(const AParent: TALDynamicControl): TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TStateStyles then begin
@@ -5440,7 +5440,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{***************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.Reset;
 begin
   BeginUpdate;
@@ -5453,7 +5453,7 @@ begin
   end;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -5466,7 +5466,7 @@ begin
   end;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -5479,7 +5479,7 @@ begin
   end;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -5487,63 +5487,63 @@ begin
   Unchecked.ClearBufDrawable;
 end;
 
-
+{*****************************************************************************************}
 function TALDynamicSwitch.TTrack.TStateStyles.GetCurrentRawStyle: TALDynamicBaseStateStyle;
 begin
   if Parent.Checked then begin
     if Not Parent.Enabled then Result := Checked.Disabled
     else if Parent.Pressed then Result := Checked.Pressed
-    //else if Parent.IsFocused then Result := Checked.Focused
+    //**else if Parent.IsFocused then Result := Checked.Focused
     else if Parent.IsMouseOver then Result := Checked.Hovered
     else result := Checked.Default;
   end
   else begin
     if Not Parent.Enabled then Result := UnChecked.Disabled
     else if Parent.Pressed then Result := UnChecked.Pressed
-    //else if Parent.IsFocused then Result := UnChecked.Focused
+    //**else if Parent.IsFocused then Result := UnChecked.Focused
     else if Parent.IsMouseOver then Result := UnChecked.Hovered
     else result := UnChecked.Default;
   end;
 end;
 
-
+{*******************************************************************************}
 function TALDynamicSwitch.TTrack.TStateStyles.GetParent: TALDynamicSwitch.TTrack;
 begin
   Result := TALDynamicSwitch.TTrack(inherited Parent);
 end;
 
-
+{*****************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.SetChecked(const AValue: TCheckStateStyles);
 begin
   FChecked.Assign(AValue);
 end;
 
-
+{*******************************************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.SetUnchecked(const AValue: TCheckStateStyles);
 begin
   FUnchecked.Assign(AValue);
 end;
 
-
+{******************************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.CheckedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicSwitch.TTrack.TStateStyles.UncheckedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{****************************************************************}
 constructor TALDynamicSwitch.TTrack.Create(const AOwner: TObject);
 begin
   inherited;
   //--
-  //SetAcceptsControls(False);
-  //CanFocus := False;
-  //Locked := True;
+  //**SetAcceptsControls(False);
+  //**CanFocus := False;
+  //**Locked := True;
   HitTest := False;
   //--
   FChecked := False;
@@ -5564,7 +5564,7 @@ begin
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
-
+{*****************************************}
 destructor TALDynamicSwitch.TTrack.Destroy;
 begin
   ALFreeAndNil(FStateStyles);
@@ -5574,25 +5574,25 @@ begin
   inherited;
 end;
 
-
+{****************************************************}
 function TALDynamicSwitch.TTrack.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-
+{************************************************************}
 function TALDynamicSwitch.TTrack.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{***************************************************************}
 function TALDynamicSwitch.TTrack.CreateStateStyles: TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{*********************************************}
 procedure TALDynamicSwitch.TTrack.AlignToPixel;
 begin
   BeginUpdate;
@@ -5604,7 +5604,7 @@ begin
   end;
 end;
 
-
+{*************************************************}
 procedure TALDynamicSwitch.TTrack.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -5616,13 +5616,13 @@ begin
   end;
 end;
 
-
+{******************************************************}
 function TALDynamicSwitch.TTrack.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(52, 32);
 end;
 
-
+{*********************************************************}
 function TALDynamicSwitch.TTrack.GetCacheSubIndex: Integer;
 begin
   // The Thumb uses 11 slots:
@@ -5632,13 +5632,13 @@ begin
   Result := 11;
 end;
 
-
+{**********************************************************}
 function TALDynamicSwitch.TTrack.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicSwitch.TTrack.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -5650,13 +5650,13 @@ begin
   end;
 end;
 
-
+{***************************************************}
 function TALDynamicSwitch.TTrack.GetChecked: Boolean;
 begin
   Result := FChecked;
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicSwitch.TTrack.SetChecked(const Value: Boolean);
 begin
   if FChecked <> Value then begin
@@ -5667,37 +5667,37 @@ begin
   end;
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicSwitch.TTrack.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
 
-
+{********************************************************}
 function TALDynamicSwitch.TTrack.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-
+{********************************************************}
 function TALDynamicSwitch.TTrack.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
-
+{*********************************************************}
 function TALDynamicSwitch.TTrack.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{*********************************************************}
 function TALDynamicSwitch.TTrack.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicSwitch.TTrack.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -5707,7 +5707,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicSwitch.TTrack.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -5717,28 +5717,28 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicSwitch.TTrack.FillChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicSwitch.TTrack.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicSwitch.TTrack.ShadowChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{********************************************************************}
 procedure TALDynamicSwitch.TTrack.StateStylesChanged(Sender: TObject);
 begin
   ClearBufDrawable;
@@ -5747,7 +5747,7 @@ begin
   Repaint;
 end;
 
-
+{***************************************************}
 procedure TALDynamicSwitch.TTrack.IsMouseOverChanged;
 begin
   inherited;
@@ -5755,15 +5755,15 @@ begin
   repaint;
 end;
 
+{*****************************************************}
+//**procedure TALDynamicSwitch.TTrack.IsFocusedChanged;
+//**begin
+//**  inherited;
+//**  StateStyles.startTransition;
+//**  repaint;
+//**end;
 
-//procedure TALDynamicSwitch.TTrack.IsFocusedChanged;
-//begin
-//  inherited;
-//  StateStyles.startTransition;
-//  repaint;
-//end;
-
-
+{***********************************************}
 procedure TALDynamicSwitch.TTrack.PressedChanged;
 begin
   inherited;
@@ -5771,20 +5771,20 @@ begin
   repaint;
 end;
 
-
+{******************************************}
 procedure TALDynamicSwitch.TTrack.DoChanged;
 begin
   Repaint;
 end;
 
-
+{******************************************}
 procedure TALDynamicSwitch.TTrack.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*************************************************}
 procedure TALDynamicSwitch.TTrack.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -5806,7 +5806,7 @@ begin
     FStateStyles.ClearBufDrawable;
 end;
 
-
+{************************************************}
 procedure TALDynamicSwitch.TTrack.MakeBufDrawable;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -5881,7 +5881,7 @@ begin
   // because BufDrawableRect always has the width and height of the localRect.
 end;
 
-
+{**************************************************}
 Procedure TALDynamicSwitch.TTrack.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -5947,7 +5947,7 @@ begin
 
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicSwitch.TTrack.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -5998,7 +5998,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicSwitch.TTrack.InitRenderTargets(var ARect: TrectF);
 begin
@@ -6012,7 +6012,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicSwitch.TTrack.ClearRenderTargets;
 begin
@@ -6021,7 +6021,7 @@ begin
 end;
 {$ENDIF}
 
-
+{**************************************}
 procedure TALDynamicSwitch.TTrack.Paint;
 begin
 
@@ -6224,169 +6224,169 @@ begin
 
 end;
 
-
+{********************************************************************}
 function TALDynamicSwitch.TThumb.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{********************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(6,6,6,6);
 end;
 
-
+{************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckMarkBrush.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{***************************************************************************************}
 function TALDynamicSwitch.TThumb.TInheritCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(6,6,6,6);
 end;
 
-
+{*******************************************************************************}
 function TALDynamicSwitch.TThumb.TInheritCheckMarkBrush.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{***************************************************************************************}
 function TALDynamicSwitch.TThumb.TDefaultStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TDefaultStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{************************************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TDefaultStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{****************************************************************************************}
 function TALDynamicSwitch.TThumb.TDisabledStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{**********************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TDisabledStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{*************************************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TDisabledStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{***************************************************************************************}
 function TALDynamicSwitch.TThumb.THoveredStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TThumb.THoveredStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{************************************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.THoveredStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{***************************************************************************************}
 function TALDynamicSwitch.TThumb.TPressedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TPressedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{************************************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TPressedStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{***************************************************************************************}
 function TALDynamicSwitch.TThumb.TFocusedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TFocusedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{************************************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TFocusedStateStyle.CreateCheckMark(const AParent: TALDynamicBaseCheckBox.TCheckMarkBrush): TALDynamicBaseCheckBox.TInheritCheckMarkBrush;
 begin
   Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-
+{********************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TDefaultStateStyle;
 begin
   Result := TDefaultStateStyle.Create(AParent);
 end;
 
-
+{**********************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{********************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALDynamicBaseCheckBox.TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{*************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TStateStyles.CreateCheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{***************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TStateStyles.CreateUncheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-
+{*************************************************************}
 procedure TALDynamicSwitch.TThumb.TStateStyles.StartTransition;
 begin
   FStartPositionX := Parent{Thumb}.Left;
@@ -6395,7 +6395,7 @@ begin
     TALDynamicSwitch(Parent{Thumb}.Owner{Track}.Owner{Switch}).AlignThumb;
 end;
 
-
+{*****************************************************************************************}
 procedure TALDynamicSwitch.TThumb.TStateStyles.TransitionAnimationProcess(Sender: TObject);
 begin
   var LThumb := Parent;
@@ -6410,76 +6410,76 @@ begin
   inherited;
 end;
 
-
+{****************************************************************************************}
 procedure TALDynamicSwitch.TThumb.TStateStyles.TransitionAnimationFinish(Sender: TObject);
 begin
   TALDynamicSwitch(Parent{Thumb}.Owner{Track}.Owner{Switch}).AlignThumb;
   inherited;
 end;
 
-
+{****************************************************************}
 function TALDynamicSwitch.TThumb.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(4,4,4,4);
 end;
 
-
+{****************************************************************}
 constructor TALDynamicSwitch.TThumb.Create(const AOwner: TObject);
 begin
   inherited;
   //--
-  //SetAcceptsControls(False);
-  //CanFocus := False;
-  //Locked := True;
+  //**SetAcceptsControls(False);
+  //**CanFocus := False;
+  //**Locked := True;
   HitTest := False;
   //--
   //Margins.DefaultValue := TRectF.Create(4,4,4,4);
   //Margins.Rect := Margins.DefaultValue;
 end;
 
-
+{********************************************************}
 function TALDynamicSwitch.TThumb.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{************************************************************}
 function TALDynamicSwitch.TThumb.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{***************************************************************************************}
 function TALDynamicSwitch.TThumb.CreateCheckMark: TALDynamicBaseCheckBox.TCheckMarkBrush;
 begin
   Result := TCheckMarkBrush.Create;
 end;
 
-
+{**************************************************************************************}
 function TALDynamicSwitch.TThumb.CreateStateStyles: TALDynamicBaseCheckBox.TStateStyles;
 begin
   result := TStateStyles.Create(Self);
 end;
 
-
+{*********************************************************}
 function TALDynamicSwitch.TThumb.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{*********************************************************}
 function TALDynamicSwitch.TThumb.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{******************************************************}
 function TALDynamicSwitch.TThumb.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(24, 24);
 end;
 
-
+{**************************************}
 procedure TALDynamicSwitch.TThumb.Click;
 begin
   // Since TALDynamicSwitch.TThumb has HitTest set to false, this event
@@ -6488,12 +6488,12 @@ begin
   TALDynamicSwitch(Owner{Track}.Owner{Switch}).click;
 end;
 
-
+{*********************************************************}
 constructor TALDynamicSwitch.Create(const AOwner: TObject);
 begin
   inherited;
-  //CanFocus := True;
-  //SetAcceptsControls(False);
+  //**CanFocus := True;
+  //**SetAcceptsControls(False);
   AutoCapture := True;
   Cursor := crHandPoint;
   DisabledOpacity := 1;
@@ -6508,29 +6508,29 @@ begin
   FTransition.OnChanged := TransitionChanged;
   //--
   FTrack := CreateTrack;
-  //FTrack.Parent := self;
-  //FTrack.Stored := False;
-  //FTrack.SetSubComponent(True);
-  //FTrack.Name := 'Track'; // Useful at design time in the IDE
+  //**FTrack.Parent := self;
+  //**FTrack.Stored := False;
+  //**FTrack.SetSubComponent(True);
+  //**FTrack.Name := 'Track'; // Useful at design time in the IDE
   FTrack.Align := TALAlignLayout.Client;
   //--
   // Use 'self' instead of 'FTrack' to ensure that
   // 'Fthumb.loaded' is called.
   FThumb := CreateThumb;
-  //FThumb.Parent := FTrack;
-  //FThumb.Stored := False;
-  //FThumb.SetSubComponent(True);
-  //FThumb.Name := 'Thumb'; // Useful at design time in the IDE
+  //**FThumb.Parent := FTrack;
+  //**FThumb.Stored := False;
+  //**FThumb.SetSubComponent(True);
+  //**FThumb.Name := 'Thumb'; // Useful at design time in the IDE
 end;
 
-
+{**********************************}
 destructor TALDynamicSwitch.Destroy;
 begin
   ALFreeAndNil(FTransition);
   inherited;
 end;
 
-
+{*******************************************}
 procedure TALDynamicSwitch.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -6542,36 +6542,36 @@ begin
   inherited;
 end;
 
-
+{*******************************************}
 procedure TALDynamicSwitch.AfterConstruction;
 begin
   inherited;
-  //if not IsOwnerLoading then
+  //**if not IsOwnerLoading then
     AlignThumb;
 end;
 
-
+{********************************************}
 function TALDynamicSwitch.CreateTrack: TTrack;
 begin
   Result := TTrack.Create(self);
 end;
 
-
+{********************************************}
 function TALDynamicSwitch.CreateThumb: TThumb;
 begin
   Result := TThumb.Create(self);
 end;
 
+{************************************}
+//**procedure TALDynamicSwitch.Loaded;
+//**begin
+//**  inherited;
+//**  Thumb.StateStyles.Transition.Assign(Transition);
+//**  Track.StateStyles.Transition.Assign(Transition);
+//**  AlignThumb;
+//**end;
 
-//procedure TALDynamicSwitch.Loaded;
-//begin
-//  inherited;
-//  Thumb.StateStyles.Transition.Assign(Transition);
-//  Track.StateStyles.Transition.Assign(Transition);
-//  AlignThumb;
-//end;
-
-
+{**************************************}
 procedure TALDynamicSwitch.AlignToPixel;
 begin
   BeginUpdate;
@@ -6584,7 +6584,7 @@ begin
   end;
 end;
 
-
+{******************************************}
 procedure TALDynamicSwitch.ApplyColorScheme;
 begin
   //BeginUpdate;
@@ -6597,40 +6597,40 @@ begin
   //end;
 end;
 
-
+{*****************************************}
 procedure TALDynamicSwitch.MakeBufDrawable;
 begin
   Track.MakeBufDrawable;
   Thumb.MakeBufDrawable;
 end;
 
-
+{******************************************}
 procedure TALDynamicSwitch.ClearBufDrawable;
 begin
   Track.ClearBufDrawable;
   Thumb.ClearBufDrawable;
 end;
 
-
+{***********************************************}
 function TALDynamicSwitch.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(52, 32);
 end;
 
-
+{***************************************************}
 function TALDynamicSwitch.GetDoubleBuffered: boolean;
 begin
   result := Track.DoubleBuffered and Thumb.DoubleBuffered;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicSwitch.SetDoubleBuffered(const AValue: Boolean);
 begin
   Track.DoubleBuffered := AValue;
   Thumb.DoubleBuffered := AValue;
 end;
 
-
+{********************************************}
 procedure TALDynamicSwitch.IsMouseOverChanged;
 begin
   inherited;
@@ -6640,17 +6640,17 @@ begin
   Thumb.IsMouseOverChanged;
 end;
 
+{**********************************************}
+//**procedure TALDynamicSwitch.IsFocusedChanged;
+//**begin
+//**  inherited;
+//**  Track.FIsFocused := IsFocused;
+//**  Thumb.FIsFocused := IsFocused;
+//**  Track.IsFocusedChanged;
+//**  Thumb.IsFocusedChanged;
+//**end;
 
-//procedure TALDynamicSwitch.IsFocusedChanged;
-//begin
-//  inherited;
-//  Track.FIsFocused := IsFocused;
-//  Thumb.FIsFocused := IsFocused;
-//  Track.IsFocusedChanged;
-//  Thumb.IsFocusedChanged;
-//end;
-
-
+{****************************************}
 procedure TALDynamicSwitch.PressedChanged;
 begin
   inherited;
@@ -6658,7 +6658,7 @@ begin
   Thumb.Pressed := Pressed;
 end;
 
-
+{****************************************}
 procedure TALDynamicSwitch.EnabledChanged;
 begin
   inherited;
@@ -6666,34 +6666,34 @@ begin
   Thumb.enabled := enabled;
 end;
 
-
+{**********************************}
 procedure TALDynamicSwitch.DoChange;
 begin
   if Assigned(FOnChange) then FOnChange(Self);
 end;
 
-
+{************************************************************************}
 procedure TALDynamicSwitch.SetTransition(const Value: TALStateTransition);
 begin
   FTransition.Assign(Value);
 end;
 
-
+{*************************************************************}
 procedure TALDynamicSwitch.TransitionChanged(ASender: TObject);
 begin
-  //if csLoading in ComponentState then exit;
+  //**if csLoading in ComponentState then exit;
   Thumb.StateStyles.Transition.Assign(Transition);
   Track.StateStyles.Transition.Assign(Transition);
 end;
 
-
+{*****************************************}
 procedure TALDynamicSwitch.StartTransition;
 begin
   Thumb.StateStyles.StartTransition;
   Track.StateStyles.StartTransition;
 end;
 
-
+{*******************************************************************************************}
 procedure TALDynamicSwitch.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
@@ -6703,7 +6703,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicSwitch.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
@@ -6738,7 +6738,7 @@ begin
   inherited;
 end;
 
-
+{*****************************************************************************************}
 procedure TALDynamicSwitch.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
@@ -6761,7 +6761,7 @@ begin
   end;
 end;
 
-
+{************************************}
 procedure TALDynamicSwitch.MouseLeave;
 begin
   inherited;
@@ -6784,7 +6784,7 @@ begin
   end;
 end;
 
-
+{*******************************}
 procedure TALDynamicSwitch.Click;
 begin
   // If fScrollCapturedByMe is true, the MouseUp event will handle the task.
@@ -6820,7 +6820,7 @@ begin
   end;
 end;
 
-
+{************************************************************************************************}
 procedure TALDynamicSwitch.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
@@ -6839,60 +6839,60 @@ begin
   end;
 end;
 
-
+{***********************************************}
 function TALDynamicSwitch.GetCacheIndex: integer;
 begin
   Result := FThumb.CacheIndex;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicSwitch.SetCacheIndex(const AValue: Integer);
 begin
   FThumb.CacheIndex := AValue;
   FTrack.CacheIndex := AValue;
 end;
 
-
+{******************************************************************}
 function TALDynamicSwitch.GetCacheEngine: TALBufDrawableCacheEngine;
 begin
   Result := FThumb.CacheEngine;
 end;
 
-
+{*********************************************************************************}
 procedure TALDynamicSwitch.SetCacheEngine(const AValue: TALBufDrawableCacheEngine);
 begin
   FThumb.CacheEngine := AValue;
   FTrack.CacheEngine := AValue;
 end;
 
-
+{***********************************************}
 function TALDynamicSwitch.GetMinThumbPos: Single;
 begin
   result := Track.Padding.left + fThumb.Margins.left;
 end;
 
-
+{***********************************************}
 function TALDynamicSwitch.GetMaxThumbPos: Single;
 begin
   result := Track.Width - fThumb.Width - Track.Padding.Right - fThumb.Margins.Right;
 end;
 
-
+{************************************}
 procedure TALDynamicSwitch.AlignThumb;
 begin
-  //if csLoading in ComponentState then exit;
+  //**if csLoading in ComponentState then exit;
   if pressed or fScrollCapturedByMe then exit;
   If Checked then FThumb.Align := TALAlignLayout.right
   else FThumb.Align := TALAlignLayout.left;
 end;
 
-
+{********************************************}
 function TALDynamicSwitch.GetChecked: boolean;
 begin
   Result := FTrack.Checked and FThumb.Checked;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicSwitch.SetChecked(const Value: Boolean);
 begin
   if GetChecked <> Value then begin
@@ -6903,61 +6903,61 @@ begin
   end;
 end;
 
-
+{***********************************************************}
 function TALDynamicButton.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffe1e1e1;
 end;
 
-
+{*************************************************************}
 function TALDynamicButton.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffadadad;
 end;
 
-
+{**************************************************************************}
 function TALDynamicButton.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-
+{**********************************************************}
 function TALDynamicButton.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-
+{****************************************************************************}
 function TALDynamicButton.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
 begin
   Result := TALTextHorzAlign.center;
 end;
 
-
+{***************************************************************************}
 function TALDynamicButton.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $FFE1E1E1;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicButton.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := $FFADADAD;
 end;
 
-
+{******************************************************************************************}
 function TALDynamicButton.TBaseStateStyle.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-
+{**************************************************************************}
 function TALDynamicButton.TBaseStateStyle.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-
+{**************************************************************************}
 constructor TALDynamicButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
@@ -6968,32 +6968,32 @@ begin
   FTextSettings.OnChanged := TextSettingsChanged;
 end;
 
-
+{**************************************************}
 destructor TALDynamicButton.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
   inherited Destroy;
 end;
 
-
+{*********************************************************************************************}
 function TALDynamicButton.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{***********************************************************************************************************}
 function TALDynamicButton.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************}
 function TALDynamicButton.TBaseStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings;
 begin
   Result := TTextSettings.Create(AParent);
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicButton.TBaseStateStyle.Assign(Source: TPersistent);
 begin
   if Source is TBaseStateStyle then begin
@@ -7010,7 +7010,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{***********************************************}
 procedure TALDynamicButton.TBaseStateStyle.Reset;
 begin
   BeginUpdate;
@@ -7023,7 +7023,7 @@ begin
   end;
 end;
 
-
+{******************************************************}
 procedure TALDynamicButton.TBaseStateStyle.AlignToPixel;
 begin
   BeginUpdate;
@@ -7035,7 +7035,7 @@ begin
   end;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicButton.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -7047,7 +7047,7 @@ begin
   end;
 end;
 
-
+{*************************************************************************************************************************}
 procedure TALDynamicButton.TBaseStateStyle.Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single);
 begin
   {$IF defined(debug)}
@@ -7083,7 +7083,7 @@ begin
   end;
 end;
 
-
+{*****************************************************}
 procedure TALDynamicButton.TBaseStateStyle.DoSupersede;
 begin
   Inherited;
@@ -7094,7 +7094,7 @@ begin
   TextSettings.SuperSede;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicButton.TBaseStateStyle.GetStateStyleParent: TBaseStateStyle;
 begin
   {$IF defined(debug)}
@@ -7105,7 +7105,7 @@ begin
   Result := TBaseStateStyle(inherited StateStyleParent);
 end;
 
-
+{***************************************************************************}
 function TALDynamicButton.TBaseStateStyle.GetControlParent: TALDynamicButton;
 begin
   {$IF defined(debug)}
@@ -7116,7 +7116,7 @@ begin
   Result := TALDynamicButton(inherited ControlParent);
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicButton.TBaseStateStyle.SetText(const Value: string);
 begin
   if FText <> Value then begin
@@ -7125,19 +7125,19 @@ begin
   end;
 end;
 
-
+{******************************************************************************************************}
 procedure TALDynamicButton.TBaseStateStyle.SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
 begin
   FTextSettings.Assign(AValue);
 end;
 
-
+{***************************************************************}
 function TALDynamicButton.TBaseStateStyle.GetDefaultText: String;
 begin
   Result := '';
 end;
 
-
+{************************************************************}
 function TALDynamicButton.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
@@ -7145,25 +7145,25 @@ begin
             TextSettings.Inherit;
 end;
 
-
+{*******************************************************************************}
 procedure TALDynamicButton.TBaseStateStyle.TextSettingsChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{**************************************************************}
 function TALDynamicButton.TBaseStateStyle.IsTextStored: Boolean;
 begin
   Result := FText <> DefaultText;
 end;
 
-
+{*********************************************************************}
 function TALDynamicButton.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicButton.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -7172,14 +7172,14 @@ begin
   end;
 end;
 
-
+{******************************************************************************}
 constructor TALDynamicButton.TDisabledStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicButton.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -7194,7 +7194,7 @@ begin
   End;
 end;
 
-
+{***************************************************}
 procedure TALDynamicButton.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
@@ -7206,7 +7206,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 function TALDynamicButton.TDisabledStateStyle.GetInherit: Boolean;
 begin
   // Opacity is not part of the GetInherit function because it updates the
@@ -7215,31 +7215,31 @@ begin
   Result := inherited GetInherit;
 end;
 
-
+{**********************************************************************}
 function TALDynamicButton.TDisabledStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 1;
 end;
 
-
+{*********************************************************************}
 function TALDynamicButton.THoveredStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 2;
 end;
 
-
+{*********************************************************************}
 function TALDynamicButton.TPressedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 3;
 end;
 
-
+{*********************************************************************}
 function TALDynamicButton.TFocusedStateStyle.GetCacheSubIndex: Integer;
 begin
   Result := 4;
 end;
 
-
+{*********************************************************************************}
 constructor TALDynamicButton.TStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create(AParent);
@@ -7257,7 +7257,7 @@ begin
   FFocused.OnChanged := FocusedChanged;
 end;
 
-
+{***********************************************}
 destructor TALDynamicButton.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FDisabled);
@@ -7267,31 +7267,31 @@ begin
   inherited Destroy;
 end;
 
-
+{***********************************************************************************************************}
 function TALDynamicButton.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************}
 function TALDynamicButton.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************}
 function TALDynamicButton.TStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************}
 function TALDynamicButton.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************}
 procedure TALDynamicButton.TStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TStateStyles then begin
@@ -7310,7 +7310,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{********************************************}
 procedure TALDynamicButton.TStateStyles.Reset;
 begin
   BeginUpdate;
@@ -7325,7 +7325,7 @@ begin
   end;
 end;
 
-
+{***************************************************}
 procedure TALDynamicButton.TStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -7340,7 +7340,7 @@ begin
   end;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicButton.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -7355,7 +7355,7 @@ begin
   end;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicButton.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -7365,77 +7365,77 @@ begin
   Focused.ClearBufDrawable;
 end;
 
-
+{**********************************************************************************}
 function TALDynamicButton.TStateStyles.GetCurrentRawStyle: TALDynamicBaseStateStyle;
 begin
   if Not Parent.Enabled then Result := Disabled
   else if Parent.Pressed then Result := Pressed
-  //else if Parent.IsFocused then Result := Focused
+  //**else if Parent.IsFocused then Result := Focused
   else if Parent.IsMouseOver then Result := Hovered
   else result := nil;
 end;
 
-
+{*****************************************************************}
 function TALDynamicButton.TStateStyles.GetParent: TALDynamicButton;
 begin
   Result := TALDynamicButton(inherited Parent);
 end;
 
-
+{*************************************************************************************}
 procedure TALDynamicButton.TStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicButton.TStateStyles.SetHovered(const AValue: THoveredStateStyle);
 begin
   FHovered.Assign(AValue);
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicButton.TStateStyles.SetPressed(const AValue: TPressedStateStyle);
 begin
   FPressed.Assign(AValue);
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicButton.TStateStyles.SetFocused(const AValue: TFocusedStateStyle);
 begin
   FFocused.Assign(AValue);
 end;
 
-
+{************************************************************************}
 procedure TALDynamicButton.TStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicButton.TStateStyles.HoveredChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicButton.TStateStyles.PressedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicButton.TStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{*********************************************************}
 function TALDynamicButton.TPadding.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
 end;
 
-
+{*********************************************************}
 constructor TALDynamicButton.Create(const AOwner: TObject);
 begin
   {$IF defined(ALDPK)}
@@ -7445,7 +7445,7 @@ begin
   //--
   inherited Create(AOwner);
   //--
-  //CanFocus := True;
+  //**CanFocus := True;
   HitTest := True;
   AutoSize := True;
   Cursor := crHandPoint;
@@ -7464,13 +7464,13 @@ begin
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
-
+{*************************************************}
 function TALDynamicButton.CreatePadding: TALBounds;
 begin
   Result := TPadding.Create;
 end;
 
-
+{**********************************}
 destructor TALDynamicButton.Destroy;
 begin
   {$IF defined(ALDPK)}
@@ -7480,7 +7480,7 @@ begin
   inherited Destroy;
 end;
 
-
+{***********************************************************}
 procedure TALDynamicButton.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -7496,7 +7496,7 @@ begin
   End;
 end;
 
-
+{**************************************}
 procedure TALDynamicButton.AlignToPixel;
 begin
   BeginUpdate;
@@ -7508,7 +7508,7 @@ begin
   end;
 end;
 
-
+{******************************************}
 procedure TALDynamicButton.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -7520,59 +7520,59 @@ begin
   end;
 end;
 
-
+{*********************************************}
 function TALDynamicButton.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-
+{*****************************************************}
 function TALDynamicButton.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{****************************************************************}
 function TALDynamicButton.CreateTextSettings: TALBaseTextSettings;
 begin
   Result := TTextSettings.Create;
 end;
 
-
+{********************************************************}
 function TALDynamicButton.CreateStateStyles: TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{*******************************************************}
 function TALDynamicButton.GetTextSettings: TTextSettings;
 begin
   Result := TTextSettings(Inherited TextSettings);
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicButton.SetTextSettings(const Value: TTextSettings);
 begin
   Inherited SetTextSettings(Value);
 end;
 
+{******************************************************************}
+//**procedure TALDynamicButton.SetName(const Value: TComponentName);
+//**begin
+//**  var LChangeText := not (csLoading in ComponentState) and (Name = Text) and
+//**    ((Owner = nil) or not (csLoading in TComponent(Owner).ComponentState));
+//**  inherited SetName(Value);
+//**  if LChangeText then
+//**    Text := Value;
+//**end;
 
-//procedure TALDynamicButton.SetName(const Value: TComponentName);
-//begin
-//  var LChangeText := not (csLoading in ComponentState) and (Name = Text) and
-//    ((Owner = nil) or not (csLoading in TComponent(Owner).ComponentState));
-//  inherited SetName(Value);
-//  if LChangeText then
-//    Text := Value;
-//end;
-
-
+{********************************************************************}
 procedure TALDynamicButton.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
 
-
+{**************************************************************}
 procedure TALDynamicButton.TextSettingsChanged(Sender: TObject);
 
   {~~~~~~~~~~~~~~~~~~}
@@ -7580,7 +7580,7 @@ procedure TALDynamicButton.TextSettingsChanged(Sender: TObject);
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
 
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.TextSettings.inherit) then begin
 
       if APrevStateStyle.TextSettings.font.Family = AToStateStyle.TextSettings.font.Family then AToStateStyle.TextSettings.font.Family := TextSettings.font.Family;
@@ -7634,14 +7634,14 @@ begin
   inherited;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicButton.SetXRadius(const Value: Single);
 
   {~~~~~~~~~~~~~~~~~~}
   {$IF defined(ALDPK)}
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
     end;
@@ -7661,14 +7661,14 @@ begin
   {$ENDIF}
 end;
 
-
+{*********************************************************}
 procedure TALDynamicButton.SetYRadius(const Value: Single);
 
   {~~~~~~~~~~~~~~~~~~}
   {$IF defined(ALDPK)}
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
     end;
@@ -7688,7 +7688,7 @@ begin
   {$ENDIF}
 end;
 
-
+{*************************************************************}
 procedure TALDynamicButton.StateStylesChanged(Sender: TObject);
 begin
   ClearBufDrawable;
@@ -7696,7 +7696,7 @@ begin
   Repaint;
 end;
 
-
+{********************************************}
 procedure TALDynamicButton.IsMouseOverChanged;
 begin
   inherited;
@@ -7704,15 +7704,15 @@ begin
   repaint;
 end;
 
+{**********************************************}
+//**procedure TALDynamicButton.IsFocusedChanged;
+//**begin
+//**  inherited;
+//**  StateStyles.startTransition;
+//**  repaint;
+//**end;
 
-//procedure TALDynamicButton.IsFocusedChanged;
-//begin
-//  inherited;
-//  StateStyles.startTransition;
-//  repaint;
-//end;
-
-
+{****************************************}
 procedure TALDynamicButton.PressedChanged;
 begin
   inherited;
@@ -7720,7 +7720,7 @@ begin
   repaint;
 end;
 
-
+{*******************************}
 procedure TALDynamicButton.Click;
 begin
   if StateStyles.IsTransitionAnimationRunning and StateStyles.Transition.DelayClick then
@@ -7729,7 +7729,7 @@ begin
     inherited click;
 end;
 
-
+{******************************************}
 procedure TALDynamicButton.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -7747,7 +7747,7 @@ begin
   inherited ClearBufDrawable;
 end;
 
-
+{*****************************************}
 procedure TALDynamicButton.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
@@ -7818,7 +7818,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************************************************************************************************************}
 Procedure TALDynamicButton.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF);
 begin
 
@@ -7836,7 +7836,7 @@ begin
 
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicButton.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -7887,7 +7887,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*******************************}
 procedure TALDynamicButton.Paint;
 begin
 
@@ -8074,49 +8074,49 @@ begin
 
 end;
 
-
+{*************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffd5d5d5;
 end;
 
-
+{*****************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffd5d5d5;
 end;
 
-
+{******************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{******************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{***********************************************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TBaseStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{*********************************************************************************}
 function TALDynamicCustomTrack.TThumb.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
-
+{*****************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -8125,14 +8125,14 @@ begin
   end;
 end;
 
-
+{******************************************************************************************}
 constructor TALDynamicCustomTrack.TThumb.TDisabledStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
-
+{*************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -8147,7 +8147,7 @@ begin
   End;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
@@ -8159,7 +8159,7 @@ begin
   end;
 end;
 
-
+{****************************************************************************}
 function TALDynamicCustomTrack.TThumb.TDisabledStateStyle.GetInherit: Boolean;
 begin
   // Opacity is not part of the GetInherit function because it updates the
@@ -8168,7 +8168,7 @@ begin
   Result := inherited GetInherit;
 end;
 
-
+{*********************************************************************************************}
 constructor TALDynamicCustomTrack.TThumb.TStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create(AParent);
@@ -8186,7 +8186,7 @@ begin
   FFocused.OnChanged := FocusedChanged;
 end;
 
-
+{***********************************************************}
 destructor TALDynamicCustomTrack.TThumb.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FDisabled);
@@ -8196,31 +8196,31 @@ begin
   inherited Destroy;
 end;
 
-
+{***********************************************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{*********************************************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TStateStyles then begin
@@ -8239,7 +8239,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{********************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.Reset;
 begin
   BeginUpdate;
@@ -8254,7 +8254,7 @@ begin
   end;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -8269,7 +8269,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -8284,7 +8284,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.ClearBufDrawable;
 begin
   inherited;
@@ -8294,71 +8294,71 @@ begin
   Focused.ClearBufDrawable;
 end;
 
-
+{**********************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStateStyles.GetCurrentRawStyle: TALDynamicBaseStateStyle;
 begin
   if Not Parent.Enabled then Result := Disabled
   else if Parent.Pressed then Result := Pressed
-  //else if Parent.IsFocused then Result := Focused
+  //**else if Parent.IsFocused then Result := Focused
   else if Parent.IsMouseOver then Result := Hovered
   else result := nil;
 end;
 
-
+{*****************************************************************************************}
 function TALDynamicCustomTrack.TThumb.TStateStyles.GetParent: TALDynamicCustomTrack.TThumb;
 begin
   Result := TALDynamicCustomTrack.TThumb(inherited Parent);
 end;
 
-
+{*************************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.SetHovered(const AValue: THoveredStateStyle);
 begin
   FHovered.Assign(AValue);
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.SetPressed(const AValue: TPressedStateStyle);
 begin
   FPressed.Assign(AValue);
 end;
 
-
+{***********************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.SetFocused(const AValue: TFocusedStateStyle);
 begin
   FFocused.Assign(AValue);
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.HoveredChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.PressedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.TStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{*****************************************************************************************}
 constructor TALDynamicCustomTrack.TThumb.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   {$IF defined(ALDPK)}
@@ -8369,11 +8369,11 @@ begin
   inherited create(ACustomTrack);
   FCustomTrack := ACustomTrack;
   //--
-  //CanFocus := ACustomTrack.CanFocus;
-  //TabStop := ACustomTrack.TabStop;
+  //**CanFocus := ACustomTrack.CanFocus;
+  //**TabStop := ACustomTrack.TabStop;
   cursor := crHandPoint;
   AutoCapture := True;
-  //Locked := True;
+  //**Locked := True;
   //--
   FValueRange := TValueRange.create(_ALDummyComponent);
   {$IFDEF debug}
@@ -8398,7 +8398,7 @@ begin
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
-
+{**********************************************}
 destructor TALDynamicCustomTrack.TThumb.Destroy;
 begin
   {$IF defined(ALDPK)}
@@ -8409,7 +8409,7 @@ begin
   inherited;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicCustomTrack.TThumb.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -8421,7 +8421,7 @@ begin
   inherited;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicCustomTrack.TThumb.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -8437,33 +8437,33 @@ begin
   End;
 end;
 
-
+{*****************************************************************}
 function TALDynamicCustomTrack.TThumb.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{********************************************************************}
 function TALDynamicCustomTrack.TThumb.CreateStateStyles: TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{***************************************************}
 procedure TALDynamicCustomTrack.TThumb.DoBeginUpdate;
 begin
   fValueRange.BeginUpdate;
   inherited;
 end;
 
-
+{*************************************************}
 procedure TALDynamicCustomTrack.TThumb.DoEndUpdate;
 begin
   fValueRange.EndUpdate;
   inherited;
 end;
 
-
+{**************************************************}
 procedure TALDynamicCustomTrack.TThumb.AlignToPixel;
 begin
   BeginUpdate;
@@ -8475,7 +8475,7 @@ begin
   end;
 end;
 
-
+{******************************************************}
 procedure TALDynamicCustomTrack.TThumb.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -8487,38 +8487,38 @@ begin
   end;
 end;
 
-
+{*****************************************************}
 function TALDynamicCustomTrack.TThumb.GetValue: Double;
 begin
   Result := FValueRange.Value;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
 
-
+{**************************************************************}
 function TALDynamicCustomTrack.TThumb.GetDefaultXRadius: Single;
 begin
   result := -50;
 end;
 
-
+{**************************************************************}
 function TALDynamicCustomTrack.TThumb.GetDefaultYRadius: Single;
 begin
   result := -50;
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicCustomTrack.TThumb.SetXRadius(const Value: Single);
 
   {~~~~~~~~~~~~~~~~~~}
   {$IF defined(ALDPK)}
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
     end;
@@ -8538,14 +8538,14 @@ begin
   {$ENDIF}
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicCustomTrack.TThumb.SetYRadius(const Value: Single);
 
   {~~~~~~~~~~~~~~~~~~}
   {$IF defined(ALDPK)}
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
     end;
@@ -8565,7 +8565,7 @@ begin
   {$ENDIF}
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.StateStylesChanged(Sender: TObject);
 begin
   ClearBufDrawable;
@@ -8573,7 +8573,7 @@ begin
   Repaint;
 end;
 
-
+{********************************************************}
 procedure TALDynamicCustomTrack.TThumb.IsMouseOverChanged;
 begin
   inherited;
@@ -8583,17 +8583,17 @@ begin
   repaint;
 end;
 
+{**********************************************************}
+//**procedure TALDynamicCustomTrack.TThumb.IsFocusedChanged;
+//**begin
+//**  inherited;
+//**  StateStyles.startTransition;
+//**  if FcustomTrack.FValueIndicator <> nil then
+//**    FcustomTrack.FValueIndicator.Refresh(Self);
+//**  repaint;
+//**end;
 
-//procedure TALDynamicCustomTrack.TThumb.IsFocusedChanged;
-//begin
-//  inherited;
-//  StateStyles.startTransition;
-//  if FcustomTrack.FValueIndicator <> nil then
-//    FcustomTrack.FValueIndicator.Refresh(Self);
-//  repaint;
-//end;
-
-
+{****************************************************}
 procedure TALDynamicCustomTrack.TThumb.PressedChanged;
 begin
   inherited;
@@ -8603,7 +8603,7 @@ begin
   repaint;
 end;
 
-
+{************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.ValueRangeChanged(Sender: TObject);
 begin
   FcustomTrack.Realign;
@@ -8612,27 +8612,27 @@ begin
   FcustomTrack.DoChanged;
 end;
 
+{******************************************************************************************************************}
+//**procedure TALDynamicCustomTrack.TThumb.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
+//**begin
+//**  var LInc: Double := fValueRange.Frequency;
+//**  if LInc = 0 then LInc := 1;
+//**  inherited;
+//**  var LValue: Double;
+//**  case Key of
+//**    vkHome: LValue := fValueRange.Min;
+//**    vkEnd: LValue := fValueRange.Max;
+//**    vkUp: LValue := fValueRange.Value - LInc;
+//**    vkDown: LValue := fValueRange.Value + LInc;
+//**    vkLeft: LValue := fValueRange.Value - LInc;
+//**    vkRight: LValue := fValueRange.Value + LInc;
+//**    else Exit;
+//**  end;
+//**  Key := 0;
+//**  fValueRange.Value := LValue;
+//**end;
 
-//procedure TALDynamicCustomTrack.TThumb.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
-//begin
-//  var LInc: Double := fValueRange.Frequency;
-//  if LInc = 0 then LInc := 1;
-//  inherited;
-//  var LValue: Double;
-//  case Key of
-//    vkHome: LValue := fValueRange.Min;
-//    vkEnd: LValue := fValueRange.Max;
-//    vkUp: LValue := fValueRange.Value - LInc;
-//    vkDown: LValue := fValueRange.Value + LInc;
-//    vkLeft: LValue := fValueRange.Value - LInc;
-//    vkRight: LValue := fValueRange.Value + LInc;
-//    else Exit;
-//  end;
-//  Key := 0;
-//  fValueRange.Value := LValue;
-//end;
-
-
+{************************************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
@@ -8651,7 +8651,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
@@ -8661,7 +8661,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.MouseMove(Shift: TShiftState; X, Y: Single);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -8732,7 +8732,7 @@ begin
   inherited;
 end;
 
-
+{*****************************************************************************************************}
 procedure TALDynamicCustomTrack.TThumb.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
@@ -8740,7 +8740,7 @@ begin
     FScrollCapturedByMe := False;
 end;
 
-
+{************************************************}
 procedure TALDynamicCustomTrack.TThumb.MouseLeave;
 begin
   inherited;
@@ -8748,7 +8748,7 @@ begin
     FScrollCapturedByMe := False;
 end;
 
-
+{******************************************************}
 procedure TALDynamicCustomTrack.TThumb.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -8766,7 +8766,7 @@ begin
   inherited ClearBufDrawable;
 end;
 
-
+{*****************************************************}
 procedure TALDynamicCustomTrack.TThumb.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
@@ -8821,7 +8821,7 @@ begin
   end;
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicCustomTrack.TThumb.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -8872,7 +8872,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*******************************************}
 procedure TALDynamicCustomTrack.TThumb.Paint;
 begin
 
@@ -9021,49 +9021,49 @@ begin
 
 end;
 
-
+{********************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphacolors.Black;
 end;
 
-
+{***********************************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-
+{**********************************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TTextSettings.TFont.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.White;
 end;
 
-
+{*******************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
 begin
   Result := TALTextHorzAlign.center;
 end;
 
-
+{******************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(6{Left}, 4{Top}, 6{Right}, 4{Bottom});
 end;
 
-
+{******************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.TPadding.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
 end;
 
-
+{**************************************************************************************************}
 constructor TALDynamicCustomTrack.TValueIndicator.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   inherited create(ACustomTrack);
@@ -9098,26 +9098,26 @@ begin
   //padding.OnChange := LPaddingChange;
 end;
 
-
+{**********************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.CreatePadding: TALBounds;
 begin
   Result := TPadding.Create;
 end;
 
-
+{**********************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{*******************************************************}
 destructor TALDynamicCustomTrack.TValueIndicator.Destroy;
 begin
   ALFreeAndNil(FFloatAnimation);
   inherited;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -9136,7 +9136,7 @@ begin
   End;
 end;
 
-
+{***********************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.AdjustPosition(const AThumb: TThumb);
 begin
   if FCustomTrack.Orientation = TOrientation.Horizontal then begin
@@ -9151,7 +9151,7 @@ begin
   end;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.Refresh(const AThumb: TThumb);
 begin
   if not FShowOnInteraction then exit;
@@ -9219,7 +9219,7 @@ begin
   end;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.AnimationProcess(Sender: TObject);
 begin
   case FAnimation of
@@ -9229,7 +9229,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.AnimationFinish(Sender: TObject);
 begin
   FFloatAnimation.Enabled := False;
@@ -9247,49 +9247,49 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-
+{*************************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.CreateTextSettings: TALBaseTextSettings;
 begin
   Result := TTextSettings.Create;
 end;
 
-
+{******************************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.GetTextSettings: TALTextSettings;
 begin
   Result := TALTextSettings(Inherited TextSettings);
 end;
 
-
+{********************************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.SetTextSettings(const Value: TALTextSettings);
 begin
   Inherited SetTextSettings(Value);
 end;
 
-
+{***********************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{***********************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{**********************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.GetDefaultFormat: String;
 begin
   Result := Format0;
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicCustomTrack.TValueIndicator.SetFormat(const Value: string);
 begin
   if FFormat <> Value then
@@ -9299,25 +9299,25 @@ begin
   end;
 end;
 
-
+{*********************************************************************}
 function TALDynamicCustomTrack.TValueIndicator.IsFormatStored: Boolean;
 begin
   Result := FFormat <> DefaultFormat;
 end;
 
-
+{***********************************************************************}
 function TALDynamicCustomTrack.TTrack.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffc5c5c5;
 end;
 
-
+{*************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-
+{******************************************************************}
 constructor TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.Create;
 begin
   inherited Create;
@@ -9328,37 +9328,37 @@ begin
   FSize := DefaultSize;
 end;
 
-
+{*************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-
+{***********************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColorKey: String;
 begin
   Result := '';
 end;
 
-
+{***************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultResourceName: String;
 begin
   Result := '';
 end;
 
-
+{*********************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultWrapMode: TALImageWrapMode;
 begin
   Result := TALImageWrapMode.Fit;
 end;
 
-
+{*******************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultSize: Single;
 begin
   Result := 4;
 end;
 
-
+{*************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.Assign(Source: TPersistent);
 begin
   if Source is TStopIndicatorBrush then begin
@@ -9377,7 +9377,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{***************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.Reset;
 begin
   BeginUpdate;
@@ -9393,7 +9393,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.AlignToPixel;
 begin
   BeginUpdate;
@@ -9404,7 +9404,7 @@ begin
   end;
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.ApplyColorScheme;
 begin
   if FColorKey <> '' then begin
@@ -9416,7 +9416,7 @@ begin
   end;
 end;
 
-
+{************************************************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -9440,7 +9440,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -9451,7 +9451,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.hasStopIndicator: Boolean;
 begin
   Result := (CompareValue(FSize, 0, TEpsilon.Position) > 0) and
@@ -9459,37 +9459,37 @@ begin
              (ResourceName <> ''));
 end;
 
-
+{*******************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.IsColorStored: Boolean;
 begin
   result := FColor <> DefaultColor;
 end;
 
-
+{**********************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.IsColorKeyStored: Boolean;
 begin
   result := FColorKey <> DefaultColorKey;
 end;
 
-
+{**************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.IsResourceNameStored: Boolean;
 begin
   result := FResourceName <> DefaultResourceName;
 end;
 
-
+{**********************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.IsWrapModeStored: Boolean;
 begin
   result := FWrapMode <> DefaultWrapMode;
 end;
 
-
+{******************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.IsSizeStored: Boolean;
 begin
   result := not SameValue(fSize, DefaultSize, Tepsilon.Position);
 end;
 
-
+{********************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
@@ -9499,7 +9499,7 @@ begin
   end;
 end;
 
-
+{******************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.SetColorKey(const Value: String);
 begin
   if FColorKey <> Value then begin
@@ -9508,7 +9508,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.SetResourceName(const Value: String);
 begin
   if fResourceName <> Value then begin
@@ -9517,7 +9517,7 @@ begin
   end;
 end;
 
-
+{****************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if fWrapMode <> Value then begin
@@ -9526,7 +9526,7 @@ begin
   end;
 end;
 
-
+{**************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStopIndicatorBrush.SetSize(const Value: Single);
 begin
   if not SameValue(FSize, Value, TEpsilon.Position) then begin
@@ -9535,7 +9535,7 @@ begin
   end;
 end;
 
-
+{*************************************************************************************************************}
 constructor TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.Create(const AParent: TStopIndicatorBrush);
 begin
   inherited create;
@@ -9544,7 +9544,7 @@ begin
   fSuperseded := False;
 end;
 
-
+{*******************************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.CreateSavedState: TALPersistentObserver;
 type
   TInheritStopIndicatorBrushClass = class of TInheritStopIndicatorBrush;
@@ -9552,7 +9552,7 @@ begin
   result := TInheritStopIndicatorBrushClass(classtype).Create(nil{AParent});
 end;
 
-
+{**************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
@@ -9561,7 +9561,7 @@ begin
   end;
 end;
 
-
+{********************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -9580,7 +9580,7 @@ begin
   End;
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.Reset;
 begin
   BeginUpdate;
@@ -9593,13 +9593,13 @@ begin
   end;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.DoSupersede;
 begin
   Assign(FParent);
 end;
 
-
+{*************************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -9626,7 +9626,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TInheritStopIndicatorBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -9637,31 +9637,31 @@ begin
   end;
 end;
 
-
+{***************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffc5c5c5;
 end;
 
-
+{*****************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TalphaColors.Null;
 end;
 
-
+{******************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{******************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := -50;
 end;
 
-
+{**************************************************************************************}
 constructor TALDynamicCustomTrack.TTrack.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
@@ -9671,38 +9671,38 @@ begin
   FStopIndicator.OnChanged := StopIndicatorChanged;
 end;
 
-
+{**************************************************************}
 destructor TALDynamicCustomTrack.TTrack.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FStopIndicator);
   inherited Destroy;
 end;
 
-
+{*********************************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{***********************************************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{****************************************************************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.CreateStopIndicator(const AParent: TStopIndicatorBrush): TInheritStopIndicatorBrush;
 begin
   Result := TInheritStopIndicatorBrush.Create(AParent);
 end;
 
-
+{*********************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.Assign(Source: TPersistent);
 begin
   if Source is TBaseStateStyle then begin
@@ -9718,7 +9718,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{***********************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.Reset;
 begin
   BeginUpdate;
@@ -9730,7 +9730,7 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.AlignToPixel;
 begin
   BeginUpdate;
@@ -9742,7 +9742,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -9754,7 +9754,7 @@ begin
   end;
 end;
 
-
+{*************************************************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single);
 begin
   {$IF defined(debug)}
@@ -9775,7 +9775,7 @@ begin
   End;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.GetControlParent: TTrack;
 begin
   {$IF defined(debug)}
@@ -9786,39 +9786,39 @@ begin
   result := TTrack(inherited ControlParent);
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.DoSupersede;
 begin
   inherited;
   StopIndicator.Supersede;
 end;
 
-
+{****************************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.SetStopIndicator(const AValue: TInheritStopIndicatorBrush);
 begin
   FStopIndicator.Assign(AValue);
 end;
 
-
+{************************************************************************}
 function TALDynamicCustomTrack.TTrack.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
             StopIndicator.Inherit;
 end;
 
-
+{********************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TBaseStateStyle.StopIndicatorChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{*********************************************************************************}
 function TALDynamicCustomTrack.TTrack.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
-
+{*****************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -9827,14 +9827,14 @@ begin
   end;
 end;
 
-
+{******************************************************************************************}
 constructor TALDynamicCustomTrack.TTrack.TDisabledStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
-
+{*************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -9849,7 +9849,7 @@ begin
   End;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
@@ -9861,7 +9861,7 @@ begin
   end;
 end;
 
-
+{****************************************************************************}
 function TALDynamicCustomTrack.TTrack.TDisabledStateStyle.GetInherit: Boolean;
 begin
   // Opacity is not part of the GetInherit function because it updates the
@@ -9870,7 +9870,7 @@ begin
   Result := inherited GetInherit;
 end;
 
-
+{*********************************************************************************************}
 constructor TALDynamicCustomTrack.TTrack.TStateStyles.Create(const AParent: TALDynamicControl);
 begin
   inherited Create(AParent);
@@ -9878,20 +9878,20 @@ begin
   FDisabled.OnChanged := DisabledChanged;
 end;
 
-
+{***********************************************************}
 destructor TALDynamicCustomTrack.TTrack.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FDisabled);
   inherited Destroy;
 end;
 
-
+{***********************************************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TStateStyles then begin
@@ -9907,7 +9907,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-
+{********************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.Reset;
 begin
   BeginUpdate;
@@ -9919,7 +9919,7 @@ begin
   end;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.AlignToPixel;
 begin
   BeginUpdate;
@@ -9931,7 +9931,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -9943,45 +9943,45 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.ClearBufDrawable;
 begin
   inherited;
   Disabled.ClearBufDrawable;
 end;
 
-
+{**********************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStateStyles.GetCurrentRawStyle: TALDynamicBaseStateStyle;
 begin
   if Not Parent.Enabled then Result := Disabled
   else result := nil;
 end;
 
-
+{*****************************************************************************************}
 function TALDynamicCustomTrack.TTrack.TStateStyles.GetParent: TALDynamicCustomTrack.TTrack;
 begin
   Result := TALDynamicCustomTrack.TTrack(inherited Parent);
 end;
 
-
+{*************************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.TStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
-
+{*********************************************************************}
 function TALDynamicCustomTrack.TTrack.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(0{Left}, 15{Top}, 0{Right}, 15{Bottom});
 end;
 
-
+{*****************************************************************************************}
 constructor TALDynamicCustomTrack.TTrack.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   {$IF defined(ALDPK)}
@@ -9993,7 +9993,7 @@ begin
   FCustomTrack := ACustomTrack;
   FStopIndicator := CreateStopIndicator;
   FStopIndicator.OnChanged := StopIndicatorChanged;
-  //Locked := True;
+  //**Locked := True;
   HitTest := False;
   //--
   {$IF defined(ALDPK)}
@@ -10004,13 +10004,13 @@ begin
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
-
+{*************************************************************}
 function TALDynamicCustomTrack.TTrack.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-
+{**********************************************}
 destructor TALDynamicCustomTrack.TTrack.Destroy;
 begin
   {$IF defined(ALDPK)}
@@ -10021,7 +10021,7 @@ begin
   inherited;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicCustomTrack.TTrack.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -10038,31 +10038,31 @@ begin
   End;
 end;
 
-
+{*********************************************************}
 function TALDynamicCustomTrack.TTrack.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-
+{*****************************************************************}
 function TALDynamicCustomTrack.TTrack.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicCustomTrack.TTrack.CreateStopIndicator: TStopIndicatorBrush;
 begin
   Result := TStopIndicatorBrush.Create;
 end;
 
-
+{********************************************************************}
 function TALDynamicCustomTrack.TTrack.CreateStateStyles: TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{**************************************************}
 procedure TALDynamicCustomTrack.TTrack.AlignToPixel;
 begin
   beginUpdate;
@@ -10075,7 +10075,7 @@ begin
   end;
 end;
 
-
+{******************************************************}
 procedure TALDynamicCustomTrack.TTrack.ApplyColorScheme;
 begin
   beginUpdate;
@@ -10088,32 +10088,32 @@ begin
   end;
 end;
 
-
+{***********************************************************}
 function TALDynamicCustomTrack.TTrack.HasCustomDraw: Boolean;
 begin
   Result := StopIndicator.hasStopIndicator;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
 
-
+{****************************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.SetStopIndicator(const Value: TStopIndicatorBrush);
 begin
   FStopIndicator.Assign(Value);
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicCustomTrack.TTrack.SetXRadius(const Value: Single);
 
   {~~~~~~~~~~~~~~~~~~}
   {$IF defined(ALDPK)}
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
     end;
@@ -10130,14 +10130,14 @@ begin
   {$ENDIF}
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicCustomTrack.TTrack.SetYRadius(const Value: Single);
 
   {~~~~~~~~~~~~~~~~~~}
   {$IF defined(ALDPK)}
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
-    if //(not (csLoading in ComponentState)) and
+    if //**(not (csLoading in ComponentState)) and
        (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
     end;
@@ -10154,7 +10154,7 @@ begin
   {$ENDIF}
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.StateStylesChanged(Sender: TObject);
 begin
   ClearBufDrawable;
@@ -10162,14 +10162,14 @@ begin
   Repaint;
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicCustomTrack.TTrack.StopIndicatorChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   Repaint;
 end;
 
-
+{****************************************************}
 procedure TALDynamicCustomTrack.TTrack.PaddingChanged;
 begin
   inherited;
@@ -10177,7 +10177,7 @@ begin
   Repaint;
 end;
 
-
+{******************************************************}
 procedure TALDynamicCustomTrack.TTrack.ClearBufDrawable;
 begin
   if FcustomTrack.FIsAligningTracks then exit;
@@ -10193,7 +10193,7 @@ begin
   inherited ClearBufDrawable;
 end;
 
-
+{*****************************************************}
 procedure TALDynamicCustomTrack.TTrack.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
@@ -10233,7 +10233,7 @@ begin
   end;
 end;
 
-
+{*******************************************************}
 Procedure TALDynamicCustomTrack.TTrack.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -10258,7 +10258,7 @@ begin
     StopIndicator); // const AStopIndicator: TStopIndicator);
 end;
 
-
+{*******************************************************}
 Procedure TALDynamicCustomTrack.TTrack.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -10372,7 +10372,7 @@ begin
 
 end;
 
-
+{*******************************************}
 procedure TALDynamicCustomTrack.TTrack.Paint;
 begin
 
@@ -10447,7 +10447,7 @@ begin
 
 end;
 
-
+{**************************************************************************}
 function TALDynamicCustomTrack.TInactiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(FBufDrawable) then Exit(TRectF.Empty);
@@ -10467,43 +10467,43 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-
+{*****************************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ff167efc;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.TDisabledStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ff167efc;
 end;
 
-
+{*******************************************************************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.TDisabledStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{************************************************************************************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TTrack.TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{***************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-
+{*********************************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.CreateStateStyles: TTrack.TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{************************************************************************}
 function TALDynamicCustomTrack.TActiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(FBufDrawable) then Exit(TRectF.Empty);
@@ -10515,7 +10515,7 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-
+{**************************************************************}
 constructor TALDynamicCustomTrack.Create(const AOwner: TObject);
 begin
   FThumb := nil;
@@ -10525,10 +10525,10 @@ begin
   //--
   inherited;
   //--
-  //SetAcceptsControls(False);
+  //**SetAcceptsControls(False);
   DisabledOpacity := 1;
-  //CanFocus := True;
-  //inherited TabStop := False;
+  //**CanFocus := True;
+  //**inherited TabStop := False;
   FTabStop := True;
   FIsAligningTracks := False;
   FOrientation := TOrientation.Horizontal;
@@ -10540,20 +10540,20 @@ begin
   FValueIndicator := CreateValueIndicator;
 end;
 
-
+{************************************************}
 procedure TALDynamicCustomTrack.AfterConstruction;
 begin
   inherited;
   realign;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicCustomTrack.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
   Try
     if Source is TALDynamicCustomTrack then begin
-      //TabStop := TALDynamicCustomTrack(Source).TabStop;
+      //**TabStop := TALDynamicCustomTrack(Source).TabStop;
       if InactiveTrack <> nil then InactiveTrack.assign(TALDynamicCustomTrack(Source).InactiveTrack);
       if ActiveTrack <> nil then ActiveTrack.assign(TALDynamicCustomTrack(Source).ActiveTrack);
       if Thumb <> nil then Thumb.assign(TALDynamicCustomTrack(Source).Thumb);
@@ -10569,67 +10569,67 @@ begin
   End;
 end;
 
+{*****************************************}
+//**procedure TALDynamicCustomTrack.Loaded;
+//**begin
+//**  if FThumb.FValueRange.IsChanged then
+//**    FThumb.FValueRange.Changed(True);
+//**  inherited;
+//**end;
 
-//procedure TALDynamicCustomTrack.Loaded;
-//begin
-//  if FThumb.FValueRange.IsChanged then
-//    FThumb.FValueRange.Changed(True);
-//  inherited;
-//end;
-
-
+{**************************************************************************************************************************************************************}
 function TALDynamicCustomTrack.CreateInactiveTrack(const AInactiveTrackClass: TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TInactiveTrack;
 begin
   if AInactiveTrackClass = nil then Exit(CreateInactiveTrack(TInactiveTrack, AName));
   //--
   Result := AInactiveTrackClass.Create(self);
-  //Result.Parent := self;
-  //Result.Stored := False;
-  //Result.SetSubComponent(True);
+  //**Result.Parent := self;
+  //**Result.Stored := False;
+  //**Result.SetSubComponent(True);
   Result.Name := AName; // Useful at design time in the IDE
   //--
-  //var LHalfHeight := GetDefaultSize.Height / 2;
-  //var LMarginsChange := Result.Margins.OnChange;
-  //Result.Margins.OnChange := nil;
-  //Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1); // 2px height
-  //Result.Margins.Rect := Result.Margins.DefaultValue;
-  //Result.Margins.OnChange := LMarginsChange;
+  //**var LHalfHeight := GetDefaultSize.Height / 2;
+  //**var LMarginsChange := Result.Margins.OnChange;
+  //**Result.Margins.OnChange := nil;
+  //**Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1); // 2px height
+  //**Result.Margins.Rect := Result.Margins.DefaultValue;
+  //**Result.Margins.OnChange := LMarginsChange;
   //--
   if Orientation = TOrientation.Horizontal then Result.Align := TALAlignLayout.vertical
   else Result.Align := TALAlignLayout.horizontal;
 end;
 
-
+{****************************************************************************************************************************************************}
 function TALDynamicCustomTrack.CreateActiveTrack(const AActiveTrackClass: TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TActiveTrack;
 begin
   if AActiveTrackClass = nil then Exit(CreateActiveTrack(TActiveTrack, AName));
   //--
   Result := AActiveTrackClass.Create(self);
-  //Result.Parent := self;
-  //Result.Stored := False;
-  //Result.SetSubComponent(True);
+  //**Result.Parent := self;
+  //**Result.Stored := False;
+  //**Result.SetSubComponent(True);
   Result.Name := AName; // Useful at design time in the IDE
   //--
-  //var LHalfHeight := GetDefaultSize.Height / 2;
-  //var LMarginsChange := Result.Margins.OnChange;
-  //Result.Margins.OnChange := nil;
-  //Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1); // 2px height
-  //Result.Margins.Rect := Result.Margins.DefaultValue;
-  //Result.Margins.OnChange := LMarginsChange;
+  //**var LHalfHeight := GetDefaultSize.Height / 2;
+  //**var LMarginsChange := Result.Margins.OnChange;
+  //**Result.Margins.OnChange := nil;
+  //**Result.Margins.DefaultValue := TrectF.Create(0,LHalfHeight-1,0,LHalfHeight-1); // 2px height
+  //**Result.Margins.Rect := Result.Margins.DefaultValue;
+  //**Result.Margins.OnChange := LMarginsChange;
   //--
   if Orientation = TOrientation.Horizontal then Result.Align := TALAlignLayout.vertical
   else Result.Align := TALAlignLayout.horizontal;
 end;
 
-
+{**********************************************************************************************************************}
 function TALDynamicCustomTrack.CreateThumb(const AThumbClass: TThumbClass = nil; Const AName: String = 'Thumb'): TThumb;
 begin
   if AThumbClass = nil then Exit(CreateThumb(TThumb, AName));
   //--
   Result := AThumbClass.Create(self);
-  //Result.Parent := self;
-  //Result.Stored := False;
-  //Result.SetSubComponent(True);
+  //**Result.Parent := self;
+  //**Result.Stored := False;
+  //**Result.SetSubComponent(True);
   Result.Name := AName; // Useful at design time in the IDE
   Result.Width := GetDefaultSize.Height; // 32 px width
   //--
@@ -10637,19 +10637,19 @@ begin
   else Result.Align := TALAlignLayout.horizontal;
 end;
 
-
+{*******************************************************************************************************************************************************************}
 function TALDynamicCustomTrack.CreateValueIndicator(const AValueIndicatorClass: TValueIndicatorClass = nil; Const AName: String = 'ValueIndicator'): TValueIndicator;
 begin
   if AValueIndicatorClass = nil then Exit(CreateValueIndicator(TValueIndicator, AName));
   //--
   Result := AValueIndicatorClass.Create(self);
-  //Result.Parent := self;
-  //Result.Stored := False;
-  //Result.SetSubComponent(True);
+  //**Result.Parent := self;
+  //**Result.Stored := False;
+  //**Result.SetSubComponent(True);
   Result.Name := AName; // Useful at design time in the IDE
 end;
 
-
+{*******************************************}
 procedure TALDynamicCustomTrack.AlignToPixel;
 begin
   BeginUpdate;
@@ -10664,7 +10664,7 @@ begin
   end;
 end;
 
-
+{***********************************************}
 procedure TALDynamicCustomTrack.ApplyColorScheme;
 begin
   //BeginUpdate;
@@ -10679,7 +10679,7 @@ begin
   //end;
 end;
 
-
+{**********************************************}
 procedure TALDynamicCustomTrack.MakeBufDrawable;
 begin
   if FInactiveTrack <> nil then FInactiveTrack.MakeBufDrawable;
@@ -10688,7 +10688,7 @@ begin
   //if FValueIndicator <> nil then FValueIndicator.MakeBufDrawable;
 end;
 
-
+{***********************************************}
 procedure TALDynamicCustomTrack.ClearBufDrawable;
 begin
   if FInactiveTrack <> nil then FInactiveTrack.ClearBufDrawable;
@@ -10697,43 +10697,43 @@ begin
   if FValueIndicator <> nil then FValueIndicator.ClearBufDrawable;
 end;
 
-
+{**************************************************}
 function TALDynamicCustomTrack.ValueStored: Boolean;
 begin
   Result := not SameValue(Value, 0, Tepsilon.Vector);
 end;
 
-
+{*********************************************************}
 function TALDynamicCustomTrack.ViewportSizeStored: Boolean;
 begin
   Result := not SameValue(ViewportSize, 0, Tepsilon.Vector);
 end;
 
-
+{******************************************************}
 function TALDynamicCustomTrack.FrequencyStored: Boolean;
 begin
   Result := not SameValue(Frequency, 0, Tepsilon.Vector);
 end;
 
-
+{************************************************}
 function TALDynamicCustomTrack.MaxStored: Boolean;
 begin
   Result := not SameValue(Max, FMX.StdActns.DefaultMaxValue, Tepsilon.Vector);
 end;
 
-
+{************************************************}
 function TALDynamicCustomTrack.MinStored: Boolean;
 begin
   Result := not SameValue(Min, 0, Tepsilon.Vector);
 end;
 
-
+{********************************************}
 function TALDynamicCustomTrack.GetMax: Double;
 begin
   Result := FThumb.FValueRange.Max;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicCustomTrack.SetMax(const Value: Double);
 begin
   if not SameValue(GetMax, Value) then begin
@@ -10743,13 +10743,13 @@ begin
   end;
 end;
 
-
+{********************************************}
 function TALDynamicCustomTrack.GetMin: Double;
 begin
   Result := FThumb.FValueRange.Min;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicCustomTrack.SetMin(const Value: Double);
 begin
   if not SameValue(GetMin, Value) then begin
@@ -10759,13 +10759,13 @@ begin
   end;
 end;
 
-
+{**************************************************}
 function TALDynamicCustomTrack.GetFrequency: Double;
 begin
   Result := FThumb.FValueRange.Frequency;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicCustomTrack.SetFrequency(const Value: Double);
 begin
   if not SameValue(GetFrequency, Value) then begin
@@ -10774,39 +10774,39 @@ begin
   end;
 end;
 
-
+{**********************************************}
 function TALDynamicCustomTrack.GetValue: Double;
 begin
   Result := FThumb.FValueRange.Value;
 end;
 
-
+{******************************************************}
 procedure TALDynamicCustomTrack.SetValue(Value: Double);
 begin
   if not SameValue(GetValue, Value) then
     FThumb.FValueRange.Value := Value;
 end;
 
-
+{*****************************************************}
 function TALDynamicCustomTrack.GetViewportSize: Double;
 begin
   Result := FThumb.FValueRange.ViewportSize;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicCustomTrack.SetViewportSize(const Value: Double);
 begin
   if not SameValue(GetViewportSize, Value) then
     FThumb.FValueRange.ViewportSize := Value;
 end;
 
-
+{********************************************************}
 function TALDynamicCustomTrack.GetDoubleBuffered: boolean;
 begin
   result := FThumb.DoubleBuffered;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicCustomTrack.SetDoubleBuffered(const AValue: Boolean);
 begin
   FThumb.DoubleBuffered := AValue;
@@ -10815,39 +10815,39 @@ begin
   if FValueIndicator <> nil then FValueIndicator.DoubleBuffered := AValue;
 end;
 
+{*******************************************************}
+//**function TALDynamicCustomTrack._GetCanFocus: Boolean;
+//**begin
+//**  Result := inherited CanFocus;
+//**end;
 
-//function TALDynamicCustomTrack._GetCanFocus: Boolean;
-//begin
-//  Result := inherited CanFocus;
-//end;
+{*********************************************************************}
+//**procedure TALDynamicCustomTrack._SetCanFocus(const Value: Boolean);
+//**begin
+//**  Inherited CanFocus := Value;
+//**  if FThumb <> nil then FThumb.CanFocus := Value;
+//**end;
 
+{********************************************************************}
+//**procedure TALDynamicCustomTrack._SetTabStop(const Value: Boolean);
+//**begin
+//**  FTabStop := Value;
+//**  if FThumb <> nil then FThumb.TabStop := Value;
+//**end;
 
-//procedure TALDynamicCustomTrack._SetCanFocus(const Value: Boolean);
-//begin
-//  Inherited CanFocus := Value;
-//  if FThumb <> nil then FThumb.CanFocus := Value;
-//end;
-
-
-//procedure TALDynamicCustomTrack._SetTabStop(const Value: Boolean);
-//begin
-//  FTabStop := Value;
-//  if FThumb <> nil then FThumb.TabStop := Value;
-//end;
-
-
+{*****************************************************}
 function TALDynamicCustomTrack.GetLeadingTrack: TTrack;
 begin
   Result := FActiveTrack;
 end;
 
-
+{******************************************************}
 function TALDynamicCustomTrack.GetTrailingTrack: TTrack;
 begin
   Result := FInactiveTrack;
 end;
 
-
+{*****************************************************************}
 function TALDynamicCustomTrack.GetLeadingTrackStartPadding: Single;
 begin
   var LLeadingTrack := GetLeadingTrack;
@@ -10859,7 +10859,7 @@ begin
     Result := 0;
 end;
 
-
+{****************************************************************}
 function TALDynamicCustomTrack.GetTrailingTrackEndPadding: Single;
 begin
   var LTrailingTrack := GetTrailingTrack;
@@ -10871,7 +10871,7 @@ begin
     Result := 0;
 end;
 
-
+{***********************************************************************************************}
 function TALDynamicCustomTrack.GetTrackSize(Const AIncludeTrackPadding: Boolean = False): Single;
 begin
   if Orientation = TOrientation.Horizontal then begin
@@ -10888,7 +10888,7 @@ begin
     Result := Result - GetLeadingTrackStartPadding - GetTrailingTrackEndPadding;
 end;
 
-
+{****************************************}
 procedure TALDynamicCustomTrack.DoResized;
 begin
   inherited;
@@ -10898,7 +10898,7 @@ begin
     FInactiveTrack.ClearBufDrawable;
 end;
 
-
+{****************************************}
 procedure TALDynamicCustomTrack.DoRealign;
 begin
   inherited;
@@ -10917,7 +10917,7 @@ begin
   End;
 end;
 
-
+{***********************************************************************}
 function TALDynamicCustomTrack.GetThumbPos(const AValue: single): Single;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -10945,7 +10945,7 @@ begin
   Result := ALAlignDimensionToPixelRound(Result, ALGetScreenScale, TEpsilon.Position);
 end;
 
-
+{*****************************************}
 procedure TALDynamicCustomTrack.AlignThumb;
 begin
   if FThumb = nil then exit;
@@ -10956,7 +10956,7 @@ begin
     FThumb.Top := LThumbPos
 end;
 
-
+{******************************************}
 procedure TALDynamicCustomTrack.AlignTracks;
 begin
   if FThumb = nil then exit;
@@ -10982,14 +10982,14 @@ begin
   end;
 end;
 
-
+{****************************************}
 procedure TALDynamicCustomTrack.DoChanged;
 begin
-  //if {not (csLoading in ComponentState) and} Assigned(FOnChange) then
+  //**if {not (csLoading in ComponentState) and} Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
-
+{*********************************************}
 procedure TALDynamicCustomTrack.EnabledChanged;
 begin
   inherited;
@@ -10999,7 +10999,7 @@ begin
   if FValueIndicator <> nil then FValueIndicator.enabled := enabled;
 end;
 
-
+{************************************************************************}
 procedure TALDynamicCustomTrack.SetOrientation(const Value: TOrientation);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11022,7 +11022,7 @@ procedure TALDynamicCustomTrack.SetOrientation(const Value: TOrientation);
 begin
   if FOrientation <> Value then begin
     FOrientation := Value;
-    //if not (csLoading in ComponentState) then begin
+    //**if not (csLoading in ComponentState) then begin
       BeginUpdate;
       Try
         SetBounds(Left, Top, Height, Width);
@@ -11050,25 +11050,25 @@ begin
       Finally
         EndUpdate;
       End;
-    //end
-    //else begin
-    //  if FActiveTrack <> nil then
-    //    FActiveTrack.Align := SwapAlign(FActiveTrack.Align);
-    //  if FInactiveTrack <> nil then
-    //    FInactiveTrack.Align := SwapAlign(FInactiveTrack.Align);
-    //  if FThumb <> nil then
-    //    FThumb.Align := SwapAlign(FThumb.Align);
-    //end;
+    //**end
+    //**else begin
+    //**  if FActiveTrack <> nil then
+    //**    FActiveTrack.Align := SwapAlign(FActiveTrack.Align);
+    //**  if FInactiveTrack <> nil then
+    //**    FInactiveTrack.Align := SwapAlign(FInactiveTrack.Align);
+    //**  if FThumb <> nil then
+    //**    FThumb.Align := SwapAlign(FThumb.Align);
+    //**end;
   end;
 end;
 
-
+{*************************************************}
 function TALDynamicTrackBar.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(150, 32);
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.SetXRadius(const Value: Single);
 begin
   Inherited;
@@ -11077,7 +11077,7 @@ begin
     LMaxInactiveTrack.SetXRadius(Value);
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.SetYRadius(const Value: Single);
 begin
   Inherited;
@@ -11086,7 +11086,7 @@ begin
     LMaxInactiveTrack.SetYRadius(Value);
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.SetCorners(const Value: TCorners);
 begin
   Inherited;
@@ -11095,7 +11095,7 @@ begin
     LMaxInactiveTrack.SetCorners(Value);
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.MarginsChanged;
 begin
   Inherited;
@@ -11104,7 +11104,7 @@ begin
     LMaxInactiveTrack.Margins.Rect := Margins.Rect;
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.PaddingChanged;
 begin
   Inherited;
@@ -11113,7 +11113,7 @@ begin
     LMaxInactiveTrack.Padding.Rect := Padding.Rect;
 end;
 
-
+{****************************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.StopIndicatorChanged(Sender: TObject);
 begin
   Inherited;
@@ -11122,7 +11122,7 @@ begin
     LMaxInactiveTrack.StopIndicator.Assign(StopIndicator);
 end;
 
-
+{*******************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.FillChanged(Sender: TObject);
 begin
   Inherited;
@@ -11131,7 +11131,7 @@ begin
     LMaxInactiveTrack.Fill.Assign(Fill);
 end;
 
-
+{*********************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack.StrokeChanged(Sender: TObject);
 begin
   Inherited;
@@ -11140,13 +11140,13 @@ begin
     LMaxInactiveTrack.Stroke.Assign(Stroke);
 end;
 
-
+{*********************************************************************}
 function TALDynamicRangeTrackBar.TMinInactiveTrack._GetOpacity: Single;
 begin
   Result := Inherited Opacity;
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinInactiveTrack._SetOpacity(const AValue: Single);
 begin
   Inherited Opacity := AValue;
@@ -11155,13 +11155,13 @@ begin
     LMaxInactiveTrack.Opacity := AValue;
 end;
 
-
+{***************************************************************************}
 function TALDynamicRangeTrackBar.TMinInactiveTrack._IsOpacityStored: boolean;
 begin
   Result := not SameValue(FOpacity, 1);
 end;
 
-
+{*******************************************************************************}
 function TALDynamicRangeTrackBar.TMinInactiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(FBufDrawable) then Exit(TRectF.Empty);
@@ -11173,7 +11173,7 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-
+{*******************************************************************************}
 function TALDynamicRangeTrackBar.TMaxInactiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(FBufDrawable) then Exit(TRectF.Empty);
@@ -11193,7 +11193,7 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-
+{**************************************************************************}
 function TALDynamicRangeTrackBar.TActiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(FBufDrawable) then Exit(TRectF.Empty);
@@ -11219,21 +11219,21 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-
+{**********************************************************************************************}
 constructor TALDynamicRangeTrackBar.TMinThumb.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   inherited;
-  //FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;
-  //TouchTargetExpansion.OnChange := TouchTargetExpansionChanged;
+  //**FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;
+  //**TouchTargetExpansion.OnChange := TouchTargetExpansionChanged;
 end;
 
-
+{*************************************************************}
 function TALDynamicRangeTrackBar.TMinThumb._GetOpacity: Single;
 begin
   Result := Inherited Opacity;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb._SetOpacity(const AValue: Single);
 begin
   Inherited Opacity := AValue;
@@ -11242,13 +11242,13 @@ begin
     LMaxThumb.Opacity := AValue;
 end;
 
-
+{*************************************************************}
 function TALDynamicRangeTrackBar.TMinThumb._GetCursor: TCursor;
 begin
   Result := Inherited Cursor;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb._SetCursor(const AValue: TCursor);
 begin
   Inherited;
@@ -11257,13 +11257,13 @@ begin
     LMaxThumb.Cursor := AValue;
 end;
 
-
+{*******************************************************************}
 function TALDynamicRangeTrackBar.TMinThumb._IsOpacityStored: boolean;
 begin
   Result := not SameValue(FOpacity, 1);
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.SetXRadius(const Value: Single);
 begin
   Inherited;
@@ -11272,7 +11272,7 @@ begin
     LMaxThumb.XRadius := Value;
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.SetYRadius(const Value: Single);
 begin
   Inherited;
@@ -11281,7 +11281,7 @@ begin
     LMaxThumb.YRadius := Value;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.SetCorners(const Value: TCorners);
 begin
   Inherited;
@@ -11290,7 +11290,7 @@ begin
     LMaxThumb.Corners := Value;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.MarginsChanged;
 begin
   Inherited;
@@ -11299,7 +11299,7 @@ begin
     LMaxThumb.Margins.rect := Margins.rect;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.PaddingChanged;
 begin
   Inherited;
@@ -11308,7 +11308,7 @@ begin
     LMaxThumb.Padding.rect := Padding.rect;
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.FillChanged(Sender: TObject);
 begin
   Inherited;
@@ -11317,7 +11317,7 @@ begin
     LMaxThumb.Fill.Assign(Fill);
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.StrokeChanged(Sender: TObject);
 begin
   Inherited;
@@ -11326,7 +11326,7 @@ begin
     LMaxThumb.Stroke.Assign(Stroke);
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.ShadowChanged(Sender: TObject);
 begin
   Inherited;
@@ -11335,7 +11335,7 @@ begin
     LMaxThumb.Shadow.Assign(Shadow);
 end;
 
-
+{******************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.StateStylesChanged(Sender: TObject);
 begin
   Inherited;
@@ -11344,7 +11344,7 @@ begin
     LMaxThumb.StateStyles.Assign(StateStyles);
 end;
 
-
+{****************************************************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.SetTouchTargetExpansion(const AValue: TRectF);
 begin
   Inherited;
@@ -11353,7 +11353,7 @@ begin
     LMaxThumb.TouchTargetExpansion := TouchTargetExpansion;
 end;
 
-
+{****************************************************}
 procedure TALDynamicRangeTrackBar.TMinThumb.DoResized;
 begin
   Inherited;
@@ -11362,7 +11362,7 @@ begin
     LMaxThumb.SetSize(TSizeF.Create(Width, Height));
 end;
 
-
+{**********************************************************************************************}
 constructor TALDynamicRangeTrackBar.TMaxThumb.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   inherited;
@@ -11372,7 +11372,7 @@ begin
   FValueRange.OnChanged := LValueRangeChanged;
 end;
 
-
+{****************************************************************}
 constructor TALDynamicRangeTrackBar.Create(const AOwner: TObject);
 begin
   //--
@@ -11384,19 +11384,19 @@ begin
   FMaxInactiveTrack := CreateInactiveTrack(TMaxInactiveTrack, 'MaxInactiveTrack');
   FMaxThumb := CreateThumb(TMaxThumb, 'MaxThumb');
   //--
-  //FThumb.TabOrder := 0;
-  //FMaxThumb.TabOrder := 1;
+  //**FThumb.TabOrder := 0;
+  //**FMaxThumb.TabOrder := 1;
 end;
 
+{*******************************************}
+//**procedure TALDynamicRangeTrackBar.Loaded;
+//**begin
+//**  if FMaxThumb.FValueRange.IsChanged then
+//**    FMaxThumb.FValueRange.Changed(True);
+//**  inherited;
+//**end;
 
-//procedure TALDynamicRangeTrackBar.Loaded;
-//begin
-//  if FMaxThumb.FValueRange.IsChanged then
-//    FMaxThumb.FValueRange.Changed(True);
-//  inherited;
-//end;
-
-
+{*********************************************}
 procedure TALDynamicRangeTrackBar.AlignToPixel;
 begin
   BeginUpdate;
@@ -11409,7 +11409,7 @@ begin
   end;
 end;
 
-
+{*************************************************}
 procedure TALDynamicRangeTrackBar.ApplyColorScheme;
 begin
   //BeginUpdate;
@@ -11422,7 +11422,7 @@ begin
   //end;
 end;
 
-
+{***********************************************}
 procedure TALDynamicRangeTrackBar.EnabledChanged;
 begin
   inherited;
@@ -11430,7 +11430,7 @@ begin
   if FMaxThumb <> nil then FMaxThumb.enabled := enabled;
 end;
 
-
+{************************************************}
 procedure TALDynamicRangeTrackBar.MakeBufDrawable;
 begin
   inherited;
@@ -11438,7 +11438,7 @@ begin
   if FMaxThumb <> nil then FMaxThumb.MakeBufDrawable;
 end;
 
-
+{*************************************************}
 procedure TALDynamicRangeTrackBar.ClearBufDrawable;
 begin
   inherited;
@@ -11446,31 +11446,31 @@ begin
   if FMaxThumb <> nil then FMaxThumb.ClearBufDrawable;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicRangeTrackBar.GetLeadingTrack: TALDynamicCustomTrack.TTrack;
 begin
   Result := FInactiveTrack;
 end;
 
-
+{******************************************************************************}
 function TALDynamicRangeTrackBar.GetTrailingTrack: TALDynamicCustomTrack.TTrack;
 begin
   Result := FMaxInactiveTrack;
 end;
 
-
+{******************************************************}
 function TALDynamicRangeTrackBar.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(200, 32);
 end;
 
-
+{*******************************************************}
 function TALDynamicRangeTrackBar.MaxValueStored: Boolean;
 begin
   Result := not SameValue(MaxValue, FMX.StdActns.DefaultMaxValue, Tepsilon.Vector);
 end;
 
-
+{************************************************************}
 procedure TALDynamicRangeTrackBar.SetMax(const Value: Double);
 begin
   if not SameValue(GetMax, Value) then begin
@@ -11479,7 +11479,7 @@ begin
   end;
 end;
 
-
+{************************************************************}
 procedure TALDynamicRangeTrackBar.SetMin(const Value: Double);
 begin
   if not SameValue(GetMin, Value) then begin
@@ -11488,7 +11488,7 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicRangeTrackBar.SetFrequency(const Value: Double);
 begin
   if not SameValue(GetFrequency, Value) then begin
@@ -11497,7 +11497,7 @@ begin
   end;
 end;
 
-
+{********************************************************}
 procedure TALDynamicRangeTrackBar.SetValue(Value: Double);
 begin
   if not SameValue(GetValue, Value) then begin
@@ -11507,13 +11507,13 @@ begin
   end;
 end;
 
-
+{***************************************************}
 function TALDynamicRangeTrackBar.GetMaxValue: Double;
 begin
   Result := FMaxThumb.FValueRange.Value;
 end;
 
-
+{***********************************************************}
 procedure TALDynamicRangeTrackBar.SetMaxValue(Value: Double);
 begin
   if not SameValue(GetMaxValue, Value) then begin
@@ -11523,7 +11523,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicRangeTrackBar.SetViewportSize(const Value: Double);
 begin
   if not SameValue(GetViewportSize, Value) then begin
@@ -11532,49 +11532,49 @@ begin
   end;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicRangeTrackBar.SetDoubleBuffered(const AValue: Boolean);
 begin
   Inherited;
   if FMaxThumb <> nil then FMaxThumb.DoubleBuffered := AValue;
 end;
 
+{***********************************************************************}
+//**procedure TALDynamicRangeTrackBar._SetCanFocus(const Value: Boolean);
+//**begin
+//**  Inherited;
+//**  if FMaxThumb <> nil then FMaxThumb.CanFocus := Value;
+//**end;
 
-//procedure TALDynamicRangeTrackBar._SetCanFocus(const Value: Boolean);
-//begin
-//  Inherited;
-//  if FMaxThumb <> nil then FMaxThumb.CanFocus := Value;
-//end;
+{**********************************************************************}
+//**procedure TALDynamicRangeTrackBar._SetTabStop(const Value: Boolean);
+//**begin
+//**  Inherited;
+//**  if FMaxThumb <> nil then FMaxThumb.TabStop := Value;
+//**end;
 
-
-//procedure TALDynamicRangeTrackBar._SetTabStop(const Value: Boolean);
-//begin
-//  Inherited;
-//  if FMaxThumb <> nil then FMaxThumb.TabStop := Value;
-//end;
-
-
+{************************************************************************************************************************************************************************************************************}
 function TALDynamicRangeTrackBar.CreateInactiveTrack(const AInactiveTrackClass: TALDynamicCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALDynamicCustomTrack.TInactiveTrack;
 begin
   if AInactiveTrackClass = nil then Exit(CreateInactiveTrack(TMinInactiveTrack, AName));
   result := Inherited;
 end;
 
-
+{**************************************************************************************************************************************************************************************************}
 function TALDynamicRangeTrackBar.CreateActiveTrack(const AActiveTrackClass: TALDynamicCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALDynamicCustomTrack.TActiveTrack;
 begin
   if AActiveTrackClass = nil then Exit(CreateActiveTrack(TActiveTrack, AName));
   result := Inherited;
 end;
 
-
+{********************************************************************************************************************************************************************}
 function TALDynamicRangeTrackBar.CreateThumb(const AThumbClass: TALDynamicCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALDynamicCustomTrack.TThumb;
 begin
   if AThumbClass = nil then Exit(CreateThumb(TMinThumb, AName));
   result := Inherited;
 end;
 
-
+{******************************************}
 procedure TALDynamicRangeTrackBar.DoResized;
 begin
   inherited;
@@ -11582,7 +11582,7 @@ begin
     FMaxInactiveTrack.ClearBufDrawable;
 end;
 
-
+{******************************************}
 procedure TALDynamicRangeTrackBar.DoRealign;
 begin
   // Realign is called by TALValueRangeTrack.DoChanged,
@@ -11595,7 +11595,7 @@ begin
   inherited DoRealign;
 end;
 
-
+{*******************************************}
 procedure TALDynamicRangeTrackBar.AlignThumb;
 begin
   Inherited;
@@ -11607,7 +11607,7 @@ begin
     FMaxThumb.Top := LMaxThumbPos
 end;
 
-
+{********************************************}
 procedure TALDynamicRangeTrackBar.AlignTracks;
 begin
   if (FThumb = nil) or (FMaxThumb = nil) then exit;
@@ -11641,7 +11641,7 @@ begin
   end;
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicRangeTrackBar.SetOrientation(const Value: TOrientation);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11663,7 +11663,7 @@ procedure TALDynamicRangeTrackBar.SetOrientation(const Value: TOrientation);
 
 begin
   if FOrientation <> Value then begin
-    //if not (csLoading in ComponentState) then begin
+    //**if not (csLoading in ComponentState) then begin
       BeginUpdate;
       Try
         inherited;
@@ -11684,265 +11684,265 @@ begin
       Finally
         EndUpdate;
       End;
-    //end
-    //else begin
-    //  inherited;
-    //  if FMaxInactiveTrack <> nil then
-    //    FMaxInactiveTrack.Align := SwapAlign(FMaxInactiveTrack.Align);
-    //  if FMaxThumb <> nil then
-    //    FMaxThumb.Align := SwapAlign(FMaxThumb.Align);
-    //end;
+    //**end
+    //**else begin
+    //**  inherited;
+    //**  if FMaxInactiveTrack <> nil then
+    //**    FMaxInactiveTrack.Align := SwapAlign(FMaxInactiveTrack.Align);
+    //**  if FMaxThumb <> nil then
+    //**    FMaxThumb.Align := SwapAlign(FMaxThumb.Align);
+    //**end;
   end;
 end;
 
-
+{***************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $47000000;
 end;
 
-
+{*****************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.Null;
 end;
 
-
+{***********************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $47000000;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.Null;
 end;
 
-
+{**************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{**************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{*****************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{*******************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{********************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TDisabledStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{**********************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $47000000;
 end;
 
-
+{************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.Null;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{****************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{*******************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.THoveredStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{**********************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $47000000;
 end;
 
-
+{************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.Null;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{****************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{*******************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TPressedStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{**********************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $47000000;
 end;
 
-
+{************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.Null;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.TStateLayer.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{*************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.TStateLayer.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{****************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-
+{*******************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TFocusedStateStyle.CreateStateLayer: TALStateLayer;
 begin
   Result := TStateLayer.Create;
 end;
 
-
+{********************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALDynamicCustomTrack.TThumb.TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALDynamicCustomTrack.TThumb.THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TStateStyles.CreatePressedStateStyle(const AParent: TObject): TALDynamicCustomTrack.TThumb.TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-
+{******************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALDynamicCustomTrack.TThumb.TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
-
+{*************************************************************}
 function TALDynamicCustomScrollBar.TThumb.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-
+{*********************************************************************}
 function TALDynamicCustomScrollBar.TThumb.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{*****************************************************************************************************}
 function TALDynamicCustomScrollBar.TThumb.CreateStateStyles: TALDynamicCustomTrack.TThumb.TStateStyles;
 begin
   Result := TStateStyles.Create(self);
 end;
 
-
+{******************************************************************}
 function TALDynamicCustomScrollBar.TThumb.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{******************************************************************}
 function TALDynamicCustomScrollBar.TThumb.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{******************************************************************}
 constructor TALDynamicCustomScrollBar.Create(const AOwner: TObject);
 begin
   inherited;
-  //CanFocus := False;
+  //**CanFocus := False;
 end;
 
-
+{********************************************************}
 function TALDynamicCustomScrollBar.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(150, 18);
 end;
 
-
+{*********************************************}
 procedure TALDynamicCustomScrollBar.AlignThumb;
 begin
   if FThumb = nil then exit;
@@ -11973,26 +11973,26 @@ begin
   inherited;
 end;
 
-
+{**********************************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.CreateThumb(const AThumbClass: TALDynamicCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALDynamicCustomTrack.TThumb;
 begin
   if AThumbClass = nil then Exit(CreateThumb(TThumb, AName));
   result := Inherited;
 end;
 
-
+{**************************************************************************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.CreateInactiveTrack(const AInactiveTrackClass: TALDynamicCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALDynamicCustomTrack.TInactiveTrack;
 begin
   Result := Nil;
 end;
 
-
+{****************************************************************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.CreateActiveTrack(const AActiveTrackClass: TALDynamicCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALDynamicCustomTrack.TActiveTrack;
 begin
   Result := Nil;
 end;
 
-
+{*******************************************************************************************************************************************************************************************************************}
 function TALDynamicCustomScrollBar.CreateValueIndicator(const AValueIndicatorClass: TALDynamicCustomTrack.TValueIndicatorClass = nil; Const AName: String = 'ValueIndicator'): TALDynamicCustomTrack.TValueIndicator;
 begin
   Result := Nil;

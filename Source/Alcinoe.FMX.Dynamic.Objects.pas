@@ -272,7 +272,7 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
     property BackgroundColor: TAlphaColor read fBackgroundColor write setBackgroundColor Stored IsBackgroundColorStored;
     property BackgroundColorKey: String read fBackgroundColorKey write setBackgroundColorKey Stored IsBackgroundColorKeyStored;
@@ -284,7 +284,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
     // CropCenter is use when wrapmode = FitIntoAndCrop. It's define the center of
@@ -294,8 +294,8 @@ type
     property CropCenter: TALPosition read GetCropCenter write SetCropCenter;
     property Cursor;
     //property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property FadeInDuration: Single read FFadeInDuration write FFadeInDuration stored IsFadeInDurationStored nodefault;
     property Height;
@@ -303,13 +303,13 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property MaskResourceName: String read fMaskResourceName write setMaskResourceName;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     // If a file extension (e.g., .png) is detected in ResourceName, the image is loaded from the
     // specified file (With the full path of the file obtained using ALGetResourceFilename).
     // If ResourceName is a URL, the image is downloaded in the background from the internet.
@@ -323,7 +323,7 @@ type
     property Scale;
     property Shadow: TALShadow read GetShadow write SetShadow;
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
-    //property Size;
+    //**property Size;
     property Stroke: TALStrokeBrush read GetStroke write SetStroke;
     //property TabOrder;
     //property TabStop;
@@ -334,11 +334,11 @@ type
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -346,7 +346,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -354,7 +354,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -455,30 +455,30 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     property Animation: TAnimation read fAnimation write SetAnimation;
     //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     //property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Height;
     //property Hint;
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     // If a file extension (e.g., .xxx) is detected in ResourceName, the image is loaded from the
     // specified file (With the full path of the file obtained using ALGetResourceFilename).
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
@@ -488,7 +488,7 @@ type
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
+    //**property Size;
     //property TabOrder;
     //property TabStop;
     property TouchTargetExpansion;
@@ -496,11 +496,11 @@ type
     property Width;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     property OnAnimationFirstFrame: TNotifyEvent read FOnAnimationFirstFrame write FOnAnimationFirstFrame;
     property OnAnimationProcess: TNotifyEvent read FOnAnimationProcess write FOnAnimationProcess;
     property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
@@ -511,7 +511,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -519,7 +519,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -612,18 +612,18 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Corners;
     property Cursor;
     property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -631,19 +631,19 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property Shadow;
     property Sides;
-    //property Size;
+    //**property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
@@ -653,11 +653,11 @@ type
     property XRadius;
     property YRadius;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -665,7 +665,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -673,7 +673,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -732,17 +732,17 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     property DoubleBuffered default true;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -750,18 +750,18 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property Shadow;
-    //property Size;
+    //**property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
@@ -769,11 +769,11 @@ type
     property Visible;
     property Width;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -781,7 +781,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -789,7 +789,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -824,17 +824,17 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Cursor;
     property DoubleBuffered default true;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Height;
     //property Hint;
@@ -842,17 +842,17 @@ type
     //property ShowHint;
     property HitTest;
     property LineType: TALLineType read FLineType write SetLineType;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
+    //**property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
@@ -860,11 +860,11 @@ type
     property Visible;
     property Width;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -872,7 +872,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -880,7 +880,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -972,7 +972,7 @@ type
     function CreateFill: TALBrush; override;
     function CreateStroke: TALStrokeBrush; override;
     procedure Paint; override;
-    //procedure Loaded; override;
+    //**procedure Loaded; override;
     procedure DoResized; override;
     procedure AdjustSize; override;
     function GetMultiLineTextOptions(
@@ -1093,13 +1093,13 @@ type
   protected
     procedure SetTextSettings(const Value: TALTextSettings); reintroduce;
     function CreateTextSettings: TALBaseTextSettings; override;
-  //{$IF defined(ALBackwardCompatible)}
-  //private
-  //  procedure ReadTextIsHtml(Reader: TReader);
-  //  procedure ReadLineSpacing(Reader: TReader);
-  //protected
-  //  procedure DefineProperties(Filer: TFiler); override;
-  //{$ENDIF}
+  //**{$IF defined(ALBackwardCompatible)}
+  //**private
+  //**  procedure ReadTextIsHtml(Reader: TReader);
+  //**  procedure ReadLineSpacing(Reader: TReader);
+  //**protected
+  //**  procedure DefineProperties(Filer: TFiler); override;
+  //**{$ENDIF}
   public
     property CacheEngine;
     property CacheIndex;
@@ -1107,19 +1107,19 @@ type
   public
     //property Action;
     property Align;
-    //property Anchors;
+    //**property Anchors;
     property AutoSize;
     property AutoTranslate;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren;
+    //**property ClipChildren;
     //property ClipParent;
     property Corners;
     property Cursor;
     property DoubleBuffered;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Fill;
     property Height;
@@ -1127,21 +1127,21 @@ type
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property MaxWidth;
     property MaxHeight;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
     property Shadow;
     property Sides;
-    //property Size;
+    //**property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
@@ -1153,11 +1153,11 @@ type
     property XRadius;
     property YRadius;
     //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
     property OnElementClick;
     property OnElementMouseDown;
     property OnElementMouseMove;
@@ -1171,7 +1171,7 @@ type
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
     //property OnKeyDown;
@@ -1179,7 +1179,7 @@ type
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
 {$ENDREGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (1)'}
@@ -1211,7 +1211,7 @@ uses
 
 {$REGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (2)'}
 
-
+{********************************************************}
 constructor TALDynamicShape.Create(const AOwner: TObject);
 begin
   inherited;
@@ -1223,7 +1223,7 @@ begin
   FShadow.OnChanged := ShadowChanged;
 end;
 
-
+{*********************************}
 destructor TALDynamicShape.Destroy;
 begin
   ALFreeAndNil(FFill);
@@ -1232,7 +1232,7 @@ begin
   inherited;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicShape.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -1250,25 +1250,25 @@ begin
   End;
 end;
 
-
+{********************************************}
 function TALDynamicShape.CreateFill: TALBrush;
 begin
   Result := TALBrush.Create;
 end;
 
-
+{****************************************************}
 function TALDynamicShape.CreateStroke: TALStrokeBrush;
 begin
   Result := TALStrokeBrush.Create;
 end;
 
-
+{***********************************************}
 function TALDynamicShape.CreateShadow: TALShadow;
 begin
   Result := TALShadow.Create;
 end;
 
-
+{*************************************}
 procedure TALDynamicShape.AlignToPixel;
 begin
   beginUpdate;
@@ -1282,7 +1282,7 @@ begin
   end;
 end;
 
-
+{*****************************************}
 procedure TALDynamicShape.ApplyColorScheme;
 begin
   beginUpdate;
@@ -1296,73 +1296,73 @@ begin
   end;
 end;
 
-
+{*****************************************************}
 procedure TALDynamicShape.FillChanged(Sender: TObject);
 begin
   Repaint;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicShape.StrokeChanged(Sender: TObject);
 begin
   Repaint;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicShape.ShadowChanged(Sender: TObject);
 begin
   Repaint;
 end;
 
-
+{*****************************************}
 function TALDynamicShape.GetFill: TALBrush;
 begin
   Result := FFill;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicShape.SetFill(const Value: TALBrush);
 begin
   FFill.Assign(Value);
 end;
 
-
+{*************************************************}
 function TALDynamicShape.GetStroke: TALStrokeBrush;
 begin
   Result := FStroke;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicShape.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
 end;
 
-
+{********************************************}
 function TALDynamicShape.GetShadow: TALShadow;
 begin
   Result := FShadow;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicShape.SetShadow(const Value: TALShadow);
 begin
   FShadow.Assign(Value);
 end;
 
-
+{************************************************************}
 function TALDynamicImage.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-
+{************************************************************}
 function TALDynamicImage.TCropCenter.GetDefaultValue: TPointF;
 begin
   Result := TpointF.Create(-50,-50);
 end;
 
-
+{*****************************************************************************************}
 constructor TALDynamicImage.TResourceDownloadContext.Create(const AOwner: TALDynamicImage);
 begin
   inherited Create(AOwner);
@@ -1392,7 +1392,7 @@ begin
   BlurRadius := AOwner.BlurRadius;
 end;
 
-
+{**********************************************************}
 destructor TALDynamicImage.TResourceDownloadContext.Destroy;
 begin
   ALFreeAndNil(ResourceStream);
@@ -1403,13 +1403,13 @@ begin
   inherited
 end;
 
-
+{**************************************************************************}
 function TALDynamicImage.TResourceDownloadContext.GetOwner: TALDynamicImage;
 begin
   Result := TALDynamicImage(FOwner);
 end;
 
-
+{********************************************************}
 constructor TALDynamicImage.Create(const AOwner: TObject);
 begin
   inherited Create(AOwner);
@@ -1447,7 +1447,7 @@ begin
   fBufLoadingDrawable := ALNullDrawable;
 end;
 
-
+{*********************************}
 destructor TALDynamicImage.Destroy;
 begin
   ALFreeAndNil(fCropCenter);
@@ -1460,7 +1460,7 @@ begin
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
 
-
+{**********************************************************}
 procedure TALDynamicImage.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -1499,7 +1499,7 @@ begin
   End;
 end;
 
-
+{*************************************************}
 function TALDynamicImage.IsReadyToDisplay: Boolean;
 begin
   Result := Inherited and
@@ -1508,25 +1508,25 @@ begin
              ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
 
-
+{*****************************************************}
 function TALDynamicImage.CreateCropCenter: TALPosition;
 begin
   Result := TCropCenter.create;
 end;
 
-
+{****************************************************}
 function TALDynamicImage.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-
+{***********************************************}
 function TALDynamicImage.CreateShadow: TALShadow;
 begin
   Result := TALShadow.Create;
 end;
 
-
+{*************************************}
 procedure TALDynamicImage.AlignToPixel;
 begin
   beginUpdate;
@@ -1539,7 +1539,7 @@ begin
   end;
 end;
 
-
+{***************************************************}
 procedure TALDynamicImage.ApplyBackgroundColorScheme;
 begin
   if FBackgroundColorKey <> '' then begin
@@ -1552,7 +1552,7 @@ begin
   end;
 end;
 
-
+{************************************************}
 procedure TALDynamicImage.ApplyLoadingColorScheme;
 begin
   if FLoadingColorKey <> '' then begin
@@ -1565,7 +1565,7 @@ begin
   end;
 end;
 
-
+{*********************************************}
 procedure TALDynamicImage.ApplyTintColorScheme;
 begin
   if FTintColorKey <> '' then begin
@@ -1578,7 +1578,7 @@ begin
   end;
 end;
 
-
+{*****************************************}
 procedure TALDynamicImage.ApplyColorScheme;
 begin
   beginUpdate;
@@ -1594,133 +1594,133 @@ begin
   end;
 end;
 
-
+{*************************************************}
 function TALDynamicImage.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{********************************************************}
 function TALDynamicImage.GetLoadingCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{**************************************************}
 function TALDynamicImage.GetDoubleBuffered: boolean;
 begin
   result := True;
 end;
 
-
+{**************************************************************}
 function TALDynamicImage.GetDefaultBackgroundColor: TalphaColor;
 begin
   Result := TalphaColors.Null;
 end;
 
-
+{************************************************************}
 function TALDynamicImage.GetDefaultBackgroundColorKey: String;
 begin
   Result := '';
 end;
 
-
+{***********************************************************}
 function TALDynamicImage.GetDefaultLoadingColor: TalphaColor;
 begin
   Result := $FFe0e4e9;
 end;
 
-
+{*********************************************************}
 function TALDynamicImage.GetDefaultLoadingColorKey: String;
 begin
   Result := '';
 end;
 
-
+{********************************************************}
 function TALDynamicImage.GetDefaultTintColor: TAlphaColor;
 begin
   Result := 0;
 end;
 
-
+{******************************************************}
 function TALDynamicImage.GetDefaulttintColorKey: String;
 begin
   Result := '';
 end;
 
-
+{********************************************************}
 function TALDynamicImage.GetDefaultFadeInDuration: Single;
 begin
   Result := 0.250;
 end;
 
-
+{***************************************************}
 function TALDynamicImage.GetDefaultCorners: TCorners;
 begin
   Result := AllCorners;
 end;
 
-
+{***********************************************}
 function TALDynamicImage.GetDefaultSides: TSides;
 begin
   Result := AllSides;
 end;
 
-
+{*************************************************}
 function TALDynamicImage.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{*************************************************}
 function TALDynamicImage.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{****************************************************}
 function TALDynamicImage.GetDefaultBlurRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{**************************************************}
 function TALDynamicImage.GetCropCenter: TALPosition;
 begin
   Result := FCropCenter;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicImage.SetCropCenter(const Value: TALPosition);
 begin
   FCropCenter.Assign(Value);
 end;
 
-
+{*************************************************}
 function TALDynamicImage.GetStroke: TALStrokeBrush;
 begin
   Result := FStroke;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicImage.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
 end;
 
-
+{********************************************}
 function TALDynamicImage.GetShadow: TALShadow;
 begin
   Result := FShadow;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicImage.SetShadow(const Value: TALShadow);
 begin
   FShadow.Assign(Value);
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicImage.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if FWrapMode <> Value then begin
@@ -1730,7 +1730,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************************}
 procedure TALDynamicImage.SetRotateAccordingToExifOrientation(const Value: Boolean);
 begin
   if FRotateAccordingToExifOrientation <> Value then begin
@@ -1740,7 +1740,7 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicImage.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
@@ -1750,7 +1750,7 @@ begin
   end;
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicImage.setMaskResourceName(const Value: String);
 begin
   if FMaskResourceName <> Value then begin
@@ -1760,7 +1760,7 @@ begin
   end;
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicImage.setMaskBitmap(const Value: TALRefCountBitmap);
 begin
   if FMaskBitmap <> Value then begin
@@ -1772,7 +1772,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicImage.setBackgroundColor(const Value: TAlphaColor);
 begin
   if FBackgroundColor <> Value then begin
@@ -1783,7 +1783,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************}
 procedure TALDynamicImage.setBackgroundColorKey(const Value: String);
 begin
   if FBackgroundColorKey <> Value then begin
@@ -1792,7 +1792,7 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicImage.setLoadingColor(const Value: TAlphaColor);
 begin
   if FLoadingColor <> Value then begin
@@ -1803,7 +1803,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicImage.setLoadingColorKey(const Value: String);
 begin
   if FLoadingColorKey <> Value then begin
@@ -1812,7 +1812,7 @@ begin
   end;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicImage.setTintColor(const Value: TAlphaColor);
 begin
   if FTintColor <> Value then begin
@@ -1823,7 +1823,7 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicImage.setTintColorKey(const Value: String);
 begin
   if FTintColorKey <> Value then begin
@@ -1832,7 +1832,7 @@ begin
   end;
 end;
 
-
+{********************************************************}
 procedure TALDynamicImage.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -1842,7 +1842,7 @@ begin
   end;
 end;
 
-
+{********************************************************}
 procedure TALDynamicImage.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -1852,7 +1852,7 @@ begin
   end;
 end;
 
-
+{***********************************************************}
 procedure TALDynamicImage.SetBlurRadius(const Value: Single);
 begin
   if not SameValue(FBlurRadius, Value, TEpsilon.Vector) then begin
@@ -1862,7 +1862,7 @@ begin
   end;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicImage.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then
@@ -1873,7 +1873,7 @@ begin
   end;
 end;
 
-
+{******************************************************}
 procedure TALDynamicImage.SetSides(const Value: TSides);
 begin
   if FSides <> Value then
@@ -1884,107 +1884,107 @@ begin
   end;
 end;
 
-
+{********************************************************}
 function TALDynamicImage.IsBackgroundColorStored: Boolean;
 begin
   Result := FBackgroundColor <> DefaultBackgroundColor;
 end;
 
-
+{***********************************************************}
 function TALDynamicImage.IsBackgroundColorKeyStored: Boolean;
 begin
   Result := FBackgroundColorKey <> DefaultBackgroundColorKey;
 end;
 
-
+{*****************************************************}
 function TALDynamicImage.IsLoadingColorStored: Boolean;
 begin
   Result := FLoadingColor <> DefaultLoadingColor;
 end;
 
-
+{********************************************************}
 function TALDynamicImage.IsLoadingColorKeyStored: Boolean;
 begin
   Result := FLoadingColorKey <> DefaultLoadingColorKey;
 end;
 
-
+{**************************************************}
 function TALDynamicImage.IsTintColorStored: Boolean;
 begin
   Result := FTintColor <> DefaultTintColor;
 end;
 
-
+{*****************************************************}
 function TALDynamicImage.IsTintColorKeyStored: Boolean;
 begin
   Result := FTintColorKey <> DefaultTintColorKey;
 end;
 
-
+{*******************************************************}
 function TALDynamicImage.IsFadeInDurationStored: Boolean;
 begin
   Result := not SameValue(FFadeInDuration, DefaultFadeInDuration, TEpsilon.Vector);
 end;
 
-
+{************************************************}
 function TALDynamicImage.IsCornersStored: Boolean;
 begin
   Result := FCorners <> DefaultCorners;
 end;
 
-
+{**********************************************}
 function TALDynamicImage.IsSidesStored: Boolean;
 begin
   Result := FSides <> DefaultSides;
 end;
 
-
+{************************************************}
 function TALDynamicImage.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-
+{************************************************}
 function TALDynamicImage.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
-
+{***************************************************}
 function TALDynamicImage.IsBlurRadiusStored: Boolean;
 begin
   Result := not SameValue(FBlurRadius, DefaultBlurRadius, TEpsilon.Vector);
 end;
 
-
+{***********************************************************}
 procedure TALDynamicImage.CropCenterChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   Repaint;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicImage.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   Repaint;
 end;
 
-
+{*******************************************************}
 procedure TALDynamicImage.ShadowChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   Repaint;
 end;
 
-
+{**********************************}
 procedure TALDynamicImage.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*****************************************}
 procedure TALDynamicImage.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -1999,7 +1999,7 @@ begin
   ALFreeAndNilDrawable(fBufLoadingDrawable);
 end;
 
-
+{***********************************************}
 procedure TALDynamicImage.CancelResourceDownload;
 begin
   // The FResourceDownloadContext pointer can only be
@@ -2021,14 +2021,14 @@ begin
   end;
 end;
 
-
+{*************}
 //[MultiThread]
 class function TALDynamicImage.CanStartResourceDownload(var AContext: Tobject): boolean;
 begin
   result := TResourceDownloadContext(AContext).FOwner <> nil;
 end;
 
-
+{*************}
 //[MultiThread]
 class procedure TALDynamicImage.HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
 begin
@@ -2043,7 +2043,7 @@ begin
   AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
 end;
 
-
+{*************}
 //[MultiThread]
 class procedure TALDynamicImage.HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject);
 begin
@@ -2116,14 +2116,14 @@ begin
   AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
 end;
 
-
+{*************}
 //[MultiThread]
 class function TALDynamicImage.GetResourceDownloadPriority(const AContext: Tobject): Int64;
 begin
   result := GetDownloadPriority(AContext)
 end;
 
-
+{*************}
 //[MultiThread]
 class Procedure TALDynamicImage.CreateBufDrawable(var AContext: TObject);
 begin
@@ -2192,7 +2192,7 @@ begin
   AContext := nil; // AContext will be free by TThread.queue
 end;
 
-
+{*************}
 //[MultiThread]
 class Procedure TALDynamicImage.CreateBufDrawable(
                   var ABufDrawable: TALDrawable;
@@ -2386,7 +2386,7 @@ begin
 
 end;
 
-
+{****************************************}
 procedure TALDynamicImage.MakeBufDrawable;
 begin
 
@@ -2509,17 +2509,17 @@ begin
 
 end;
 
-
+{******************************}
 procedure TALDynamicImage.Paint;
 begin
 
   // Draw a dashed rectangle in design mode
-  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
-  //begin
-  //  var R := LocalRect.ReducePrecision;
-  //  system.types.InflateRect(R, -0.5, -0.5);
-  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
-  //end;
+  //**if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  //**begin
+  //**  var R := LocalRect.ReducePrecision;
+  //**  system.types.InflateRect(R, -0.5, -0.5);
+  //**  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  //**end;
 
   // Calculate the opacity based on FFadeInStartTimeNano.
   var LOpacity: Single := AbsoluteOpacity;
@@ -2716,7 +2716,7 @@ begin
 
 end;
 
-
+{*******************************************************************************************}
 constructor TALDynamicAnimatedImage.TAnimation.Create(const AOwner: TALDynamicAnimatedImage);
 begin
   inherited create;
@@ -2732,14 +2732,14 @@ begin
   FDuration := 0.0;
 end;
 
-
+{****************************************************}
 destructor TALDynamicAnimatedImage.TAnimation.Destroy;
 begin
   ALFreeAndNil(fFloatAnimation);
   inherited;
 end;
 
-
+{************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.UpdateFloatAnimationDuration;
 begin
   if not SameValue(FSpeed, 0.0, Single.Epsilon) then
@@ -2748,44 +2748,44 @@ begin
     FFloatAnimation.Duration := maxSingle;
 end;
 
-
+{***************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.repaint;
 begin
   if Fowner.IsDisplayed then
     Fowner.Repaint;
 end;
 
-
+{******************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetAutoReverse: Boolean;
 begin
   Result := FFloatAnimation.AutoReverse;
 end;
 
-
+{***********************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetDelay: Single;
 begin
   Result := FFloatAnimation.Delay;
 end;
 
-
+{**************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetDuration: Single;
 begin
   Result := FDuration;
 end;
 
-
+{**************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetInverse: Boolean;
 begin
   Result := FFloatAnimation.Inverse;
 end;
 
-
+{***********************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetLoop: Boolean;
 begin
   Result := FFloatAnimation.Loop;
 end;
 
-
+{*****************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetCurrentTime: Single;
 begin
   if not Enabled then begin
@@ -2801,81 +2801,81 @@ begin
   end;
 end;
 
-
+{************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetPause: Boolean;
 begin
   Result := FFloatAnimation.Pause;
 end;
 
-
+{**************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetRunning: Boolean;
 begin
   Result := FFloatAnimation.Running;
 end;
 
-
+{*******************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetStartProgress: Single;
 begin
   Result := FFloatAnimation.StartValue;
 end;
 
-
+{******************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetStopProgress: Single;
 begin
   Result := FFloatAnimation.StopValue;
 end;
 
-
+{*********************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetCurrentProgress: Single;
 begin
   Result := FFloatAnimation.CurrentValue;
 end;
 
-
+{***********************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetSpeed: Single;
 begin
   Result := FSpeed;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetAutoReverse(const Value: Boolean);
 begin
   FFloatAnimation.AutoReverse := Value;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetDelay(const Value: Single);
 begin
   FFloatAnimation.Delay := Value;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetDuration(const Value: Single);
 begin
   FDuration := Value;
   UpdateFloatAnimationDuration;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetInverse(const Value: Boolean);
 begin
   FFloatAnimation.Inverse := Value;
   Repaint;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetLoop(const Value: Boolean);
 begin
   FFloatAnimation.Loop := Value;
 end;
 
-
+{**************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetPause(const Value: Boolean);
 begin
   FFloatAnimation.Pause := Value;
 end;
 
-
+{*********************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetStartProgress(const Value: Single);
 begin
   FFloatAnimation.StartValue := Min(Max(Value, 0), 1);
@@ -2883,7 +2883,7 @@ begin
   Repaint;
 end;
 
-
+{********************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetStopProgress(const Value: Single);
 begin
   FFloatAnimation.StopValue := Min(Max(Value, 0), 1);
@@ -2891,7 +2891,7 @@ begin
   Repaint;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetSpeed(const Value: Single);
 begin
   if not SameValue(FSpeed, Value, Single.Epsilon) then begin
@@ -2900,31 +2900,31 @@ begin
   end;
 end;
 
-
+{************************************************************************}
 function TALDynamicAnimatedImage.TAnimation.IsStopProgressStored: Boolean;
 begin
   Result := Not SameValue(FFloatAnimation.StopValue, 1.0, Single.Epsilon);
 end;
 
-
+{*****************************************************************}
 function TALDynamicAnimatedImage.TAnimation.IsSpeedStored: Boolean;
 begin
   Result := Not SameValue(FSpeed, 1.0, Single.Epsilon);
 end;
 
-
+{**************************************************************}
 function TALDynamicAnimatedImage.TAnimation.getEnabled: Boolean;
 begin
   Result := FFloatAnimation.Enabled;
 end;
 
-
+{****************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
 begin
   FFloatAnimation.Enabled := Value;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.doFirstFrame(Sender: TObject);
 begin
   if assigned(FOwner.FOnAnimationFirstFrame) then
@@ -2932,7 +2932,7 @@ begin
   Repaint;
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.doProcess(Sender: TObject);
 begin
   if assigned(FOwner.FOnAnimationProcess) then
@@ -2940,7 +2940,7 @@ begin
   Repaint;
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.doFinish(Sender: TObject);
 begin
   if assigned(FOwner.FOnAnimationFinish) then
@@ -2948,25 +2948,25 @@ begin
   Repaint;
 end;
 
-
+{*************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.Start;
 begin
   FFloatAnimation.Start;
 end;
 
-
+{************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.Stop;
 begin
   FFloatAnimation.Stop;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicAnimatedImage.TAnimation.StopAtCurrent;
 begin
   FFloatAnimation.StopAtCurrent;
 end;
 
-
+{****************************************************************}
 constructor TALDynamicAnimatedImage.Create(const AOwner: TObject);
 begin
   inherited Create(AOwner);
@@ -2990,10 +2990,10 @@ begin
   FOnAnimationFirstFrame := nil;
   FOnAnimationProcess := nil;
   FOnAnimationFinish := nil;
-  //SetAcceptsControls(False);
+  //**SetAcceptsControls(False);
 end;
 
-
+{*****************************************}
 destructor TALDynamicAnimatedImage.Destroy;
 begin
   ReleaseCodec;
@@ -3001,7 +3001,7 @@ begin
   inherited;
 end;
 
-
+{**************************************************}
 procedure TALDynamicAnimatedImage.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -3011,7 +3011,7 @@ begin
   inherited;
 end;
 
-
+{********************************************}
 procedure TALDynamicAnimatedImage.CreateCodec;
 begin
   {$IF defined(ALSkiaAvailable)}
@@ -3168,7 +3168,7 @@ begin
   {$ENDIF}
 end;
 
-
+{*********************************************}
 procedure TALDynamicAnimatedImage.ReleaseCodec;
 begin
   {$IF defined(ALSkiaAvailable)}
@@ -3196,23 +3196,23 @@ begin
   {$ENDIF}
 end;
 
-
+{******************************************}
 procedure TALDynamicAnimatedImage.DoResized;
 begin
   releaseCodec;
   inherited;
 end;
 
-
+{**************************************}
 procedure TALDynamicAnimatedImage.Paint;
 begin
 
-  //if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
-  //begin
-  //  var R := LocalRect.ReducePrecision;
-  //  system.types.InflateRect(R, -0.5, -0.5);
-  //  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
-  //end;
+  //**if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  //**begin
+  //**  var R := LocalRect.ReducePrecision;
+  //**  system.types.InflateRect(R, -0.5, -0.5);
+  //**  Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  //**end;
 
   CreateCodec;
 
@@ -3308,7 +3308,7 @@ begin
 
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicAnimatedImage.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if FWrapMode <> Value then begin
@@ -3318,7 +3318,7 @@ begin
   end;
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicAnimatedImage.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
@@ -3328,13 +3328,13 @@ begin
   end;
 end;
 
-
+{**********************************************************************}
 procedure TALDynamicAnimatedImage.SetAnimation(const Value: TAnimation);
 begin
   FAnimation.Assign(Value);
 end;
 
-
+{****************************************************************}
 constructor TALDynamicBaseRectangle.Create(const AOwner: TObject);
 begin
   inherited;
@@ -3353,7 +3353,7 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-
+{*****************************************}
 destructor TALDynamicBaseRectangle.Destroy;
 begin
   {$IF NOT DEFINED(ALSkiaCanvas)}
@@ -3362,7 +3362,7 @@ begin
   inherited;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicBaseRectangle.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -3383,14 +3383,14 @@ begin
   End;
 end;
 
-
+{******************************************}
 procedure TALDynamicBaseRectangle.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*************************************************}
 procedure TALDynamicBaseRectangle.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -3401,49 +3401,49 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-
+{********************************************************}
 function TALDynamicBaseRectangle.IsCornersStored: Boolean;
 begin
   Result := FCorners <> DefaultCorners;
 end;
 
-
+{******************************************************}
 function TALDynamicBaseRectangle.IsSidesStored: Boolean;
 begin
   Result := FSides <> DefaultSides;
 end;
 
-
+{********************************************************}
 function TALDynamicBaseRectangle.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-
+{********************************************************}
 function TALDynamicBaseRectangle.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
-
+{******************************************************}
 function TALDynamicBaseRectangle.HasCustomDraw: Boolean;
 begin
   Result := False;
 end;
 
-
+{*********************************************************}
 function TALDynamicBaseRectangle.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{**********************************************************}
 function TALDynamicBaseRectangle.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-
+{*************************************************************************}
 procedure TALDynamicBaseRectangle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -3455,31 +3455,31 @@ begin
   end;
 end;
 
-
+{***********************************************************}
 function TALDynamicBaseRectangle.GetDefaultCorners: TCorners;
 begin
   Result := AllCorners;
 end;
 
-
+{*******************************************************}
 function TALDynamicBaseRectangle.GetDefaultSides: TSides;
 begin
   Result := AllSides;
 end;
 
-
+{*********************************************************}
 function TALDynamicBaseRectangle.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{*********************************************************}
 function TALDynamicBaseRectangle.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicBaseRectangle.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -3489,7 +3489,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicBaseRectangle.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -3499,7 +3499,7 @@ begin
   end;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicBaseRectangle.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then
@@ -3510,7 +3510,7 @@ begin
   end;
 end;
 
-
+{**************************************************************}
 procedure TALDynamicBaseRectangle.SetSides(const Value: TSides);
 begin
   if FSides <> Value then
@@ -3521,28 +3521,28 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicBaseRectangle.FillChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicBaseRectangle.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{***************************************************************}
 procedure TALDynamicBaseRectangle.ShadowChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{***************************************************************}
 function TALDynamicBaseRectangle.IsSimpleRenderPossible: Boolean;
 begin
   Result := (not HasCustomDraw)
@@ -3560,7 +3560,7 @@ begin
              (Fill.Styles = [TALBrushStyle.solid]));
 end;
 
-
+{**************************************************}
 Procedure TALDynamicBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -3628,7 +3628,7 @@ begin
 
 end;
 
-
+{************************************************}
 procedure TALDynamicBaseRectangle.MakeBufDrawable;
 begin
 
@@ -3665,7 +3665,7 @@ begin
 
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicBaseRectangle.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -3679,7 +3679,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicBaseRectangle.InitRenderTargets(var ARect: TrectF);
 begin
@@ -3693,7 +3693,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicBaseRectangle.ClearRenderTargets;
 begin
@@ -3702,7 +3702,7 @@ begin
 end;
 {$ENDIF}
 
-
+{**************************************}
 procedure TALDynamicBaseRectangle.Paint;
 begin
 
@@ -3789,7 +3789,7 @@ begin
 
 end;
 
-
+{*********************************************************}
 constructor TALDynamicCircle.Create(const AOwner: TObject);
 begin
   inherited;
@@ -3804,7 +3804,7 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-
+{**********************************}
 destructor TALDynamicCircle.Destroy;
 begin
   {$IF NOT DEFINED(ALSkiaCanvas)}
@@ -3813,7 +3813,7 @@ begin
   inherited;
 end;
 
-
+{******************************************}
 procedure TALDynamicCircle.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -3824,19 +3824,19 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-
+{**************************************************}
 function TALDynamicCircle.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{***************************************************}
 function TALDynamicCircle.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-
+{******************************************************************}
 procedure TALDynamicCircle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -3848,28 +3848,28 @@ begin
   end;
 end;
 
-
+{******************************************************}
 procedure TALDynamicCircle.FillChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{********************************************************}
 procedure TALDynamicCircle.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{********************************************************}
 procedure TALDynamicCircle.ShadowChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*******************************************}
 Procedure TALDynamicCircle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -3935,7 +3935,7 @@ begin
 
 end;
 
-
+{*****************************************}
 procedure TALDynamicCircle.MakeBufDrawable;
 begin
 
@@ -3970,7 +3970,7 @@ begin
 
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicCircle.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -3984,7 +3984,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicCircle.InitRenderTargets(var ARect: TrectF);
 begin
@@ -3998,7 +3998,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicCircle.ClearRenderTargets;
 begin
@@ -4007,7 +4007,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*******************************}
 procedure TALDynamicCircle.Paint;
 begin
 
@@ -4081,7 +4081,7 @@ begin
 
 end;
 
-
+{******************************************************************}
 function TALDynamicCircle.PointInObjectLocal(X, Y: Double): Boolean;
 begin
   Result := False;
@@ -4092,14 +4092,14 @@ begin
   Result := Sqr((X - LCenter.X) / LRadius.Width) + Sqr((Y - LCenter.Y) / LRadius.Height) <= 1;
 end;
 
-
+{***********************************}
 procedure TALDynamicCircle.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*******************************************************}
 constructor TALDynamicLine.Create(const AOwner: TObject);
 begin
   inherited;
@@ -4110,7 +4110,7 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-
+{****************************************}
 procedure TALDynamicLine.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -4121,19 +4121,19 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-
+{************************************************}
 function TALDynamicLine.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{*************************************************}
 function TALDynamicLine.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicLine.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -4142,21 +4142,21 @@ begin
   end;
 end;
 
-
+{****************************************************}
 procedure TALDynamicLine.FillChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{******************************************************}
 procedure TALDynamicLine.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{***************************************}
 procedure TALDynamicLine.MakeBufDrawable;
 begin
 
@@ -4418,7 +4418,7 @@ begin
 
 end;
 
-
+{*****************************}
 procedure TALDynamicLine.Paint;
 begin
 
@@ -4488,14 +4488,14 @@ begin
 
 end;
 
-
+{*********************************}
 procedure TALDynamicLine.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicLine.SetLineType(const Value: TALLineType);
 begin
   if FLineType <> Value then
@@ -4506,19 +4506,19 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 function TALDynamicBaseText.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-
+{***************************************************************}
 function TALDynamicBaseText.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-
+{***********************************************************}
 constructor TALDynamicBaseText.Create(const AOwner: TObject);
 begin
   inherited Create(AOwner);
@@ -4567,7 +4567,7 @@ begin
   FTextSettings.OnChanged := TextSettingsChanged;
 end;
 
-
+{************************************}
 destructor TALDynamicBaseText.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
@@ -4578,53 +4578,53 @@ begin
   inherited;
 end;
 
-
+{***********************************************}
 function TALDynamicBaseText.CreateFill: TALBrush;
 begin
   result := TFill.Create;
 end;
 
-
+{*******************************************************}
 function TALDynamicBaseText.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
 end;
 
+{**************************************}
+//**procedure TALDynamicBaseText.Loaded;
+//**begin
+//**  {$IF defined(ALBackwardCompatible)}
+//**  if ALSametextW(TextSettings.Font.Family, 'sans-serif-thin') then begin
+//**    TextSettings.Font.Family := 'sans-serif';
+//**    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.regular
+//**    else TextSettings.Font.Weight := TFontWeight.thin;
+//**  end
+//**  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-light') then begin
+//**    TextSettings.Font.Family := 'sans-serif';
+//**    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.Semibold
+//**    else TextSettings.Font.Weight := TFontWeight.light;
+//**  end
+//**  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-medium') then begin
+//**    TextSettings.Font.Family := 'sans-serif';
+//**    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.UltraBold
+//**    else TextSettings.Font.Weight := TFontWeight.medium;
+//**  end
+//**  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-black') then begin
+//**    TextSettings.Font.Family := 'sans-serif';
+//**    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.UltraBlack
+//**    else TextSettings.Font.Weight := TFontWeight.black;
+//**  end;
+//**  {$ENDIF}
+//**
+//**  if (AutoTranslate) and
+//**     (Text <> '') and
+//**     (not (csDesigning in ComponentState)) then
+//**    Text := ALTranslate(Text);
+//**
+//**  inherited Loaded;
+//**end;
 
-//procedure TALDynamicBaseText.Loaded;
-//begin
-//  {$IF defined(ALBackwardCompatible)}
-//  if ALSametextW(TextSettings.Font.Family, 'sans-serif-thin') then begin
-//    TextSettings.Font.Family := 'sans-serif';
-//    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.regular
-//    else TextSettings.Font.Weight := TFontWeight.thin;
-//  end
-//  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-light') then begin
-//    TextSettings.Font.Family := 'sans-serif';
-//    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.Semibold
-//    else TextSettings.Font.Weight := TFontWeight.light;
-//  end
-//  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-medium') then begin
-//    TextSettings.Font.Family := 'sans-serif';
-//    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.UltraBold
-//    else TextSettings.Font.Weight := TFontWeight.medium;
-//  end
-//  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-black') then begin
-//    TextSettings.Font.Family := 'sans-serif';
-//    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.UltraBlack
-//    else TextSettings.Font.Weight := TFontWeight.black;
-//  end;
-//  {$ENDIF}
-//
-//  if (AutoTranslate) and
-//     (Text <> '') and
-//     (not (csDesigning in ComponentState)) then
-//    Text := ALTranslate(Text);
-//
-//  inherited Loaded;
-//end;
-
-
+{*************************************************************}
 procedure TALDynamicBaseText.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -4656,7 +4656,7 @@ begin
   End;
 end;
 
-
+{****************************************}
 procedure TALDynamicBaseText.AlignToPixel;
 begin
   beginUpdate;
@@ -4670,7 +4670,7 @@ begin
   end;
 end;
 
-
+{********************************************}
 procedure TALDynamicBaseText.ApplyColorScheme;
 begin
   beginUpdate;
@@ -4682,7 +4682,7 @@ begin
   end;
 end;
 
-
+{*************************************}
 procedure TALDynamicBaseText.DoResized;
 begin
   if not FIsAdjustingSize then begin
@@ -4693,10 +4693,10 @@ begin
     inherited;
 end;
 
-
+{**************************************}
 procedure TALDynamicBaseText.AdjustSize;
 begin
-  if //(not (csLoading in ComponentState)) and // loaded will call again AdjustSize
+  if //**(not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not IsDestroying) and // if csDestroying do not do autosize
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // if AutoSize is false nothing to adjust
      (Text <> '') and // if Text is empty do not do autosize
@@ -4762,7 +4762,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************************}
 function TALDynamicBaseText.GetElementAtPos(const APos: TPointF): TALTextElement;
 begin
   for var I := Low(fElements) to High(fElements) do
@@ -4774,7 +4774,7 @@ begin
   Result.Rect := TrectF.Empty;
 end;
 
-
+{*********************************************************************************************}
 procedure TALDynamicBaseText.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if assigned(FOnElementMouseDown) or
@@ -4790,7 +4790,7 @@ begin
   inherited MouseDown(Button, Shift, X, Y);
 end;
 
-
+{***********************************************************************}
 procedure TALDynamicBaseText.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   inherited MouseMove(Shift, X, Y);
@@ -4813,7 +4813,7 @@ begin
   end;
 end;
 
-
+{*******************************************************************************************}
 procedure TALDynamicBaseText.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited MouseUp(Button, Shift, X, Y);
@@ -4822,14 +4822,14 @@ begin
   FPressedElement := TALTextElement.Empty;
 end;
 
-
+{**************************************}
 procedure TALDynamicBaseText.MouseEnter;
 begin
   FHoveredElement := TALTextElement.Empty;
   inherited MouseEnter;
 end;
 
-
+{**************************************}
 procedure TALDynamicBaseText.MouseLeave;
 begin
   inherited MouseLeave;
@@ -4838,7 +4838,7 @@ begin
   FHoveredElement := TALTextElement.Empty;
 end;
 
-
+{*********************************}
 procedure TALDynamicBaseText.Click;
 begin
   inherited Click;
@@ -4846,7 +4846,7 @@ begin
     FOnElementClick(Self, FPressedElement);
 end;
 
-
+{******************************************}
 procedure TALDynamicBaseText.PaddingChanged;
 begin
   ClearBufDrawable;
@@ -4854,52 +4854,52 @@ begin
   Repaint;
 end;
 
-
+{********************************************************}
 procedure TALDynamicBaseText.FillChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicBaseText.StrokeChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{**********************************************************}
 procedure TALDynamicBaseText.ShadowChanged(Sender: TObject);
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-
+{******************************************************}
 function TALDynamicBaseText.GetDefaultCorners: TCorners;
 begin
   Result := AllCorners;
 end;
 
-
+{**************************************************}
 function TALDynamicBaseText.GetDefaultSides: TSides;
 begin
   Result := AllSides;
 end;
 
-
+{***************************************************}
 function TALDynamicBaseText.IsCornersStored: Boolean;
 begin
   Result := FCorners <> DefaultCorners;
 end;
 
-
+{*************************************************}
 function TALDynamicBaseText.IsSidesStored: Boolean;
 begin
   Result := FSides <> DefaultSides;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicBaseText.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then begin
@@ -4909,19 +4909,19 @@ begin
   end;
 end;
 
-
+{****************************************************}
 function TALDynamicBaseText.GetDefaultXRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{****************************************************}
 function TALDynamicBaseText.GetDefaultYRadius: Single;
 begin
   Result := 0;
 end;
 
-
+{***********************************************************}
 procedure TALDynamicBaseText.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -4931,7 +4931,7 @@ begin
   end;
 end;
 
-
+{***********************************************************}
 procedure TALDynamicBaseText.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -4941,7 +4941,7 @@ begin
   end;
 end;
 
-
+{*********************************************************}
 procedure TALDynamicBaseText.SetSides(const Value: TSides);
 begin
   if FSides <> Value then begin
@@ -4951,7 +4951,7 @@ begin
   end;
 end;
 
-
+{****************************************************************}
 procedure TALDynamicBaseText.TextSettingsChanged(Sender: TObject);
 begin
   ClearBufDrawable;
@@ -4959,13 +4959,13 @@ begin
   Repaint;
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicBaseText.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicBaseText.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
@@ -4979,7 +4979,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicBaseText.InitRenderTargets(var ARect: TrectF);
 begin
@@ -4993,7 +4993,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*****************************}
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALDynamicBaseText.ClearRenderTargets;
 begin
@@ -5002,7 +5002,7 @@ begin
 end;
 {$ENDIF}
 
-
+{*********************************}
 procedure TALDynamicBaseText.Paint;
 begin
 
@@ -5089,24 +5089,24 @@ begin
     LDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
-  //if (csDesigning in ComponentState) and not Locked then
-  //  DrawDesignBorder;
+  //**if (csDesigning in ComponentState) and not Locked then
+  //**  DrawDesignBorder;
 
 end;
 
-
+{****************************************************}
 function TALDynamicBaseText.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-
+{*****************************************************}
 function TALDynamicBaseText.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-
+{********************************************************************}
 procedure TALDynamicBaseText.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -5118,14 +5118,14 @@ begin
   end;
 end;
 
-
+{*****************************************************************}
 procedure TALDynamicBaseText.SetAlign(const Value: TALAlignLayout);
 begin
   if Align <> Value then ClearBufDrawable;
   inherited SetAlign(Value);
 end;
 
-
+{*************************************************************}
 procedure TALDynamicBaseText.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
@@ -5136,7 +5136,7 @@ begin
   end;
 end;
 
-
+{********************************************************}
 procedure TALDynamicBaseText.SetText(const Value: string);
 begin
   if FText <> Value then begin
@@ -5147,7 +5147,7 @@ begin
   end;
 end;
 
-
+{********************************************}
 procedure TALDynamicBaseText.ClearBufDrawable;
 begin
   {$IFDEF debug}
@@ -5158,7 +5158,7 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-
+{**************************************************}
 function TALDynamicBaseText.GetMultiLineTextOptions(
            const AScale: Single;
            const AOpacity: Single;
@@ -5274,25 +5274,25 @@ begin
   Result.OnBeforeDrawParagraph := DrawMultilineTextBeforeDrawParagraph;
 end;
 
-
+{***********************************************************************************************************************************************************************}
 Procedure TALDynamicBaseText.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF);
 begin
   // Virtual
 end;
 
-
+{*********************************************************************************************************************************************************}
 Procedure TALDynamicBaseText.DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF);
 begin
   // Virtual
 end;
 
-
+{********************************************************************************************************************************************************}
 Procedure TALDynamicBaseText.DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF);
 begin
   // Virtual
 end;
 
-
+{*********************************************}
 Procedure TALDynamicBaseText.DrawMultilineText(
             const ACanvas: TALCanvas;
             var ARect: TRectF;
@@ -5393,7 +5393,7 @@ begin
 
 end;
 
-
+{************************************************}
 Procedure TALDynamicBaseText.MeasureMultilineText(
             out ARect: TRectF;
             out ATextBroken: Boolean;
@@ -5437,7 +5437,7 @@ begin
       AShadow));
 end;
 
-
+{*********************************************}
 Procedure TALDynamicBaseText.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -5577,7 +5577,7 @@ begin
 
 end;
 
-
+{*******************************************}
 procedure TALDynamicBaseText.MakeBufDrawable;
 begin
 
@@ -5616,13 +5616,13 @@ begin
 
 end;
 
-
+{**********************************************}
 function TALDynamicBaseText.TextBroken: Boolean;
 begin
   result := fTextBroken;
 end;
 
-
+{************************************************************}
 procedure TALDynamicBaseText.SetMaxWidth(const Value: Single);
 begin
   if compareValue(fMaxWidth, Value, Tepsilon.position) <> 0 then begin
@@ -5632,7 +5632,7 @@ begin
   end;
 end;
 
-
+{*************************************************************}
 procedure TALDynamicBaseText.SetMaxHeight(const Value: Single);
 begin
   if compareValue(fMaxHeight, Value, Tepsilon.position) <> 0 then begin
@@ -5642,109 +5642,109 @@ begin
   end;
 end;
 
-
+{****************************************************}
 function TALDynamicBaseText.IsMaxWidthStored: Boolean;
 begin
   result := compareValue(fMaxWidth, 65535, Tepsilon.position) <> 0;
 end;
 
-
+{*****************************************************}
 function TALDynamicBaseText.IsMaxHeightStored: Boolean;
 begin
   result := compareValue(fMaxHeight, 65535, Tepsilon.position) <> 0;
 end;
 
-
+{***************************************************}
 function TALDynamicBaseText.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-
+{***************************************************}
 function TALDynamicBaseText.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
+{*************************************}
+//**{$IF defined(ALBackwardCompatible)}
+//**procedure TALDynamicText.DefineProperties(Filer: TFiler);
+//**begin
+//**  inherited;
+//**  Filer.DefineProperty('TextIsHtml', ReadTextIsHtml{ReadData}, nil{WriteData}, false{hasdata});
+//**  Filer.DefineProperty('LineSpacing', ReadLineSpacing{ReadData}, nil{WriteData}, false{hasdata});
+//**end;
+//**{$ENDIF}
 
-//{$IF defined(ALBackwardCompatible)}
-//procedure TALDynamicText.DefineProperties(Filer: TFiler);
-//begin
-//  inherited;
-//  Filer.DefineProperty('TextIsHtml', ReadTextIsHtml{ReadData}, nil{WriteData}, false{hasdata});
-//  Filer.DefineProperty('LineSpacing', ReadLineSpacing{ReadData}, nil{WriteData}, false{hasdata});
-//end;
-//{$ENDIF}
+{*************************************}
+//**{$IF defined(ALBackwardCompatible)}
+//**procedure TALDynamicText.ReadTextIsHtml(Reader: TReader);
+//**begin
+//**  TextSettings.IsHtml := Reader.ReadBoolean;
+//**end;
+//**{$ENDIF}
 
+{*************************************}
+//**{$IF defined(ALBackwardCompatible)}
+//**procedure TALDynamicText.ReadLineSpacing(Reader: TReader);
+//**begin
+//**  var LLineSpacing: Extended := Reader.ReadFloat;
+//**  // Luckily, TextSettings was defined before LineSpacing,
+//**  // so its properties are already read.
+//**  var LFontFamily := TextSettings.Font.Family;
+//**  if LFontFamily = '' then LFontFamily := 'sans-serif';
+//**  var LFontWeight := TextSettings.Font.Weight;
+//**  // There is a slight discrepancy in line height between platforms: Windows (Segoe UI),
+//**  // iOS (Helvetica Neue), and Android (Roboto). However, the line spacing remains consistent
+//**  // across all operating systems. Given the need to choose a font, we prefer to use the
+//**  // Roboto (Android) font for consistency.
+//**  if ALSametextW(LFontFamily, 'sans-serif') then LFontFamily := 'Roboto'
+//**  else if ALSametextW(LFontFamily, 'sans-serif-thin') then begin
+//**    LFontFamily := 'Roboto';
+//**    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.regular
+//**    else LFontWeight := TFontWeight.thin;
+//**  end
+//**  else if ALSametextW(LFontFamily, 'sans-serif-light') then begin
+//**    LFontFamily := 'Roboto';
+//**    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.Semibold
+//**    else LFontWeight := TFontWeight.light;
+//**  end
+//**  else if ALSametextW(LFontFamily, 'sans-serif-medium') then begin
+//**    LFontFamily := 'Roboto';
+//**    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBold
+//**    else LFontWeight := TFontWeight.medium;
+//**  end
+//**  else if ALSametextW(LFontFamily, 'sans-serif-black') then begin
+//**    LFontFamily := 'Roboto';
+//**    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBlack
+//**    else LFontWeight := TFontWeight.black;
+//**  end
+//**  else LFontFamily := ALResolveFontFamily(LFontFamily);
+//**  var LFontMetrics := ALGetFontMetrics(
+//**                        LFontFamily, // TextSettings const AFontFamily: String;
+//**                        TextSettings.Font.Size, // const AFontSize: single;
+//**                        LFontWeight, // const AFontWeight: TFontWeight;
+//**                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
+//**  var LLineHeight := -LFontMetrics.Ascent + LFontMetrics.Descent;
+//**  // The LineHeightMultiplier property allows manual adjustment
+//**  // of the height of the line as a multiple of fontSize.
+//**  TextSettings.LineHeightMultiplier := RoundTo((LLineSpacing + LLineHeight) / TextSettings.Font.Size, -1);
+//**end;
+//**{$ENDIF}
 
-//{$IF defined(ALBackwardCompatible)}
-//procedure TALDynamicText.ReadTextIsHtml(Reader: TReader);
-//begin
-//  TextSettings.IsHtml := Reader.ReadBoolean;
-//end;
-//{$ENDIF}
-
-
-//{$IF defined(ALBackwardCompatible)}
-//procedure TALDynamicText.ReadLineSpacing(Reader: TReader);
-//begin
-//  var LLineSpacing: Extended := Reader.ReadFloat;
-//  // Luckily, TextSettings was defined before LineSpacing,
-//  // so its properties are already read.
-//  var LFontFamily := TextSettings.Font.Family;
-//  if LFontFamily = '' then LFontFamily := 'sans-serif';
-//  var LFontWeight := TextSettings.Font.Weight;
-//  // There is a slight discrepancy in line height between platforms: Windows (Segoe UI),
-//  // iOS (Helvetica Neue), and Android (Roboto). However, the line spacing remains consistent
-//  // across all operating systems. Given the need to choose a font, we prefer to use the
-//  // Roboto (Android) font for consistency.
-//  if ALSametextW(LFontFamily, 'sans-serif') then LFontFamily := 'Roboto'
-//  else if ALSametextW(LFontFamily, 'sans-serif-thin') then begin
-//    LFontFamily := 'Roboto';
-//    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.regular
-//    else LFontWeight := TFontWeight.thin;
-//  end
-//  else if ALSametextW(LFontFamily, 'sans-serif-light') then begin
-//    LFontFamily := 'Roboto';
-//    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.Semibold
-//    else LFontWeight := TFontWeight.light;
-//  end
-//  else if ALSametextW(LFontFamily, 'sans-serif-medium') then begin
-//    LFontFamily := 'Roboto';
-//    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBold
-//    else LFontWeight := TFontWeight.medium;
-//  end
-//  else if ALSametextW(LFontFamily, 'sans-serif-black') then begin
-//    LFontFamily := 'Roboto';
-//    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBlack
-//    else LFontWeight := TFontWeight.black;
-//  end
-//  else LFontFamily := ALResolveFontFamily(LFontFamily);
-//  var LFontMetrics := ALGetFontMetrics(
-//                        LFontFamily, // TextSettings const AFontFamily: String;
-//                        TextSettings.Font.Size, // const AFontSize: single;
-//                        LFontWeight, // const AFontWeight: TFontWeight;
-//                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
-//  var LLineHeight := -LFontMetrics.Ascent + LFontMetrics.Descent;
-//  // The LineHeightMultiplier property allows manual adjustment
-//  // of the height of the line as a multiple of fontSize.
-//  TextSettings.LineHeightMultiplier := RoundTo((LLineSpacing + LLineHeight) / TextSettings.Font.Size, -1);
-//end;
-//{$ENDIF}
-
-
+{**************************************************************}
 function TALDynamicText.CreateTextSettings: TALBaseTextSettings;
 begin
   Result := TALTextSettings.Create;
 end;
 
-
+{*******************************************************}
 function TALDynamicText.GetTextSettings: TALTextSettings;
 begin
   Result := TALTextSettings(Inherited TextSettings);
 end;
 
-
+{*********************************************************************}
 procedure TALDynamicText.SetTextSettings(const Value: TALTextSettings);
 begin
   Inherited SetTextSettings(Value);

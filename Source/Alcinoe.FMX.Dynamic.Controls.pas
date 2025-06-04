@@ -320,28 +320,28 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicExtendedControl = class(TALDynamicControl)
   private
-    //FForm: TCommonCustomForm; // 8 bytes
-    //FOwner: TALDynamicControl; // 8 bytes
-    //FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
+    //**FForm: TCommonCustomForm; // 8 bytes
+    //**FOwner: TALDynamicControl; // 8 bytes
+    //**FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
     FControlAbsolutePosAtMouseDown: TALPointD; // 8 bytes
-    //FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
-    //FFocusOnMouseDown: Boolean; // 1 byte
-    //FFocusOnMouseUp: Boolean; // 1 byte
+    //**FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
+    //**FFocusOnMouseDown: Boolean; // 1 byte
+    //**FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtLowVelocity: Boolean; // 1 byte
     FDoubleClick: Boolean; // 1 byte
     FAutoAlignToPixel: Boolean; // 1 byte
-    //FAlign: TALAlignLayout; // 1 byte
+    //**FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
-    //procedure SetScale(const AValue: TPosition);
-    //function GetPivot: TPosition;
-    //procedure SetPivot(const Value: TPosition);
+    //**procedure SetScale(const AValue: TPosition);
+    //**function GetPivot: TPosition;
+    //**procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
-    //procedure DelayOnResize(Sender: TObject);
-    //procedure DelayOnResized(Sender: TObject);
-    //procedure MarginsChangedHandler(Sender: TObject);
-    //procedure ScaleChangedHandler(Sender: TObject);
+    //**procedure DelayOnResize(Sender: TObject);
+    //**procedure DelayOnResized(Sender: TObject);
+    //**procedure MarginsChangedHandler(Sender: TObject);
+    //**procedure ScaleChangedHandler(Sender: TObject);
   protected
     FTextUpdating: Boolean; // 1 byte
     FAutoSize: Boolean; // 1 byte
@@ -350,8 +350,8 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    //property Scale: TPosition read FScale write SetScale;
-    //property Pivot: TPosition read GetPivot write SetPivot;
+    //**property Scale: TPosition read FScale write SetScale;
+    //**property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
     // Dynamically adjusts the dimensions to accommodate child controls,
@@ -359,47 +359,47 @@ type
     property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
     function GetAutoAlignToPixel: Boolean; virtual;
     procedure SetAutoAlignToPixel(const AValue: Boolean); Virtual;
-    //property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
-    //property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
-    //procedure DoEnter; override;
-    //procedure DoExit; override;
+    //**property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
+    //**property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
+    //**procedure DoEnter; override;
+    //**procedure DoExit; override;
     procedure MouseEnter; override;
     procedure MouseLeave; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure Click; override;
-    //function GetParentedVisible: Boolean; override;
-    //procedure DoMatrixChanged(Sender: TObject); override;
-    //procedure DoRootChanged; override;
+    //**function GetParentedVisible: Boolean; override;
+    //**procedure DoMatrixChanged(Sender: TObject); override;
+    //**procedure DoRootChanged; override;
     procedure IsMouseOverChanged; virtual;
-    //procedure IsFocusedChanged; virtual;
+    //**procedure IsFocusedChanged; virtual;
     procedure PressedChanged; virtual;
-    //Procedure MarginsChanged; virtual;
+    //**Procedure MarginsChanged; virtual;
     procedure PaddingChanged; override;
     procedure ParentChanged; override;
-    //procedure Loaded; override;
-    //function IsOwnerLoading: Boolean;
-    //function IsSizeStored: Boolean; override;
-    //function GetAlign: TALAlignLayout; Reintroduce;
-    //procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;
+    //**procedure Loaded; override;
+    //**function IsOwnerLoading: Boolean;
+    //**function IsSizeStored: Boolean; override;
+    //**function GetAlign: TALAlignLayout; Reintroduce;
+    //**procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;
     procedure DoEndUpdate; override;
     procedure DoResized; override;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
-    //function GetAbsoluteDisplayedRect: TRectF; virtual;
+    //**function GetAbsoluteDisplayedRect: TRectF; virtual;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
     procedure Assign(Source: TALDynamicControl); override;
     procedure EndUpdate; override;
-    //procedure SetNewScene(AScene: IScene); override;
+    //**procedure SetNewScene(AScene: IScene); override;
     function IsReadyToDisplay: Boolean; override;
     function IsDisplayed: Boolean; override;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
-    //property Form: TCommonCustomForm read FForm;
+    //**property Form: TCommonCustomForm read FForm;
     {$IFNDEF ALCompilerVersionSupported123}
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
@@ -411,7 +411,7 @@ type
     function HasUnconstrainedAutosizeY: Boolean; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
-    //property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
+    //**property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
     /// <summary>
     ///   When AutoAlignToPixel is true, all dimensions used to build the buffered drawable
     ///   are aligned to the pixel grid. Additionally, after the object is loaded, all properties
@@ -420,24 +420,24 @@ type
     ///   loading process.
     /// </summary>
     property AutoAlignToPixel: Boolean read GetAutoAlignToPixel write SetAutoAlignToPixel;
-    //property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
-    //property Owner: TALDynamicControl read FOwner;
+    //**property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
+    //**property Owner: TALDynamicControl read FOwner;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicContent = class(TALDynamicExtendedControl)
   protected
-    //function GetTabStopController: ITabStopController; override;
+    //**function GetTabStopController: ITabStopController; override;
     procedure DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer); override;
     procedure DoRemoveControl(const AControl: TALDynamicControl); override;
-    //procedure DoDeleteChildren; override;
+    //**procedure DoDeleteChildren; override;
     procedure DoRealign; override;
-    //procedure IContent.Changed = ContentChanged;
+    //**procedure IContent.Changed = ContentChanged;
     procedure DoContentChanged; Virtual;
     procedure ContentChanged;
   public
     constructor Create(const AOwner: TObject); override;
-    //function GetTabListClass: TTabListClass; override;
+    //**function GetTabListClass: TTabListClass; override;
   public
     //property Action;
     property Align;
@@ -445,55 +445,55 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    //property ClipChildren default False;
+    //**property ClipChildren default False;
     //property ClipParent;
     property Cursor;
-    //property DragMode;
-    //property EnableDragHighlight;
+    //**property DragMode;
+    //**property EnableDragHighlight;
     property Enabled;
     property Height;
     //property Hint;
     //property ParentShowHint;
     //property ShowHint;
     property HitTest;
-    //property Locked;
+    //**property Locked;
     property Margins;
     property Opacity;
     property Padding;
-    //property PopupMenu;
-    //property Position;
+    //**property PopupMenu;
+    //**property Position;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
     property Scale;
-    //property Size;
+    //**property Size;
     //property TabOrder;
     //property TabStop;
     //property TouchTargetExpansion;
     property Visible;
     property Width;
-    //property OnCanFocus;
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    //property OnEnter;
-    //property OnExit;
+    //**property OnCanFocus;
+    //**property OnDragEnter;
+    //**property OnDragLeave;
+    //**property OnDragOver;
+    //**property OnDragDrop;
+    //**property OnDragEnd;
+    //**property OnEnter;
+    //**property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
     property OnMouseUp;
     property OnMouseMove;
-    //property OnMouseWheel;
+    //**property OnMouseWheel;
     property OnClick;
     property OnDblClick;
-    //property OnKeyDown;
-    //property OnKeyUp;
+    //**property OnKeyDown;
+    //**property OnKeyUp;
     property OnPainting;
     property OnPaint;
     //property OnResize;
-    //property OnResized;
+    //**property OnResized;
   end;
 
 {$ENDREGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (1)'}
@@ -2561,27 +2561,27 @@ end;
 
 {$REGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (2)'}
 
-
+{******************************************************************}
 constructor TALDynamicExtendedControl.Create(const AOwner: TObject);
 begin
   inherited;
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if MarginsChanged is not implemented in FMX.Controls.TControl and adjust the IFDEF'}
   {$ENDIF}
-  //FFormerMarginsChangedHandler := Margins.OnChange;
-  //Margins.OnChange := MarginsChangedHandler;
-  //Size.SetPlatformDefaultWithoutNotification(False);
-  //FForm := nil;
-  //FOwner := nil;
+  //**FFormerMarginsChangedHandler := Margins.OnChange;
+  //**Margins.OnChange := MarginsChangedHandler;
+  //**Size.SetPlatformDefaultWithoutNotification(False);
+  //**FForm := nil;
+  //**FOwner := nil;
   FControlAbsolutePosAtMouseDown := TALPointD.zero;
-  //FScale := TPosition.Create(TPointF.Create(1, 1));
-  //FScale.OnChange := ScaleChangedHandler;
-  //FFocusOnMouseDown := False;
-  //FFocusOnMouseUp := False;
+  //**FScale := TPosition.Create(TPointF.Create(1, 1));
+  //**FScale.OnChange := ScaleChangedHandler;
+  //**FFocusOnMouseDown := False;
+  //**FFocusOnMouseUp := False;
   FMouseDownAtLowVelocity := True;
   FDoubleClick := False;
   FAutoAlignToPixel := True;
-  //FAlign := TALAlignLayout.None;
+  //**FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
   FBeforeDestructionExecuted := False;
   FTextUpdating := False;
@@ -2590,15 +2590,15 @@ begin
   FAdjustSizeOnEndUpdate := False;
 end;
 
-
+{*******************************************}
 destructor TALDynamicExtendedControl.Destroy;
 begin
   ClearBufDrawable;
-  //ALFreeAndNil(FScale);
+  //**ALFreeAndNil(FScale);
   inherited;
 end;
 
-
+{****************************************************}
 procedure TALDynamicExtendedControl.BeforeDestruction;
 begin
   if FBeforeDestructionExecuted then exit;
@@ -2608,7 +2608,7 @@ begin
   inherited;
 end;
 
-
+{********************************************************************}
 procedure TALDynamicExtendedControl.Assign(Source: TALDynamicControl);
 begin
   BeginUpdate;
@@ -2616,66 +2616,66 @@ begin
     if Source is TALDynamicControl then begin
       // --TALDynamicControl
       Align := TALDynamicControl(Source).Align;
-      //AutoAlignToPixel := TALDynamicControl(Source).AutoAlignToPixel;
-      //AutoSize := TALDynamicControl(Source).AutoSize;
-      //DoubleBuffered := TALDynamicControl(Source).DoubleBuffered;
-      //Pivot.Assign(TALDynamicControl(Source).Pivot);
-      //Scale.assign(TALDynamicControl(Source).Scale);
+      //**AutoAlignToPixel := TALDynamicControl(Source).AutoAlignToPixel;
+      //**AutoSize := TALDynamicControl(Source).AutoSize;
+      //**DoubleBuffered := TALDynamicControl(Source).DoubleBuffered;
+      //**Pivot.Assign(TALDynamicControl(Source).Pivot);
+      //**Scale.assign(TALDynamicControl(Source).Scale);
       // --TControl
-      //Anchors := TALDynamicControl(Source).Anchors;
-      //CanFocus := TALDynamicControl(Source).CanFocus;
-      //CanParentFocus := TALDynamicControl(Source).CanParentFocus;
-      //ClipChildren := TALDynamicControl(Source).ClipChildren;
-      //ClipParent := TALDynamicControl(Source).ClipParent;
+      //**Anchors := TALDynamicControl(Source).Anchors;
+      //**CanFocus := TALDynamicControl(Source).CanFocus;
+      //**CanParentFocus := TALDynamicControl(Source).CanParentFocus;
+      //**ClipChildren := TALDynamicControl(Source).ClipChildren;
+      //**ClipParent := TALDynamicControl(Source).ClipParent;
       Cursor := TALDynamicControl(Source).Cursor;
       DisabledOpacity := TALDynamicControl(Source).DisabledOpacity;
-      //DragMode := TALDynamicControl(Source).DragMode;
-      //EnableDragHighlight := TALDynamicControl(Source).EnableDragHighlight;
+      //**DragMode := TALDynamicControl(Source).DragMode;
+      //**EnableDragHighlight := TALDynamicControl(Source).EnableDragHighlight;
       Enabled := TALDynamicControl(Source).Enabled;
-      //Hint := TALDynamicControl(Source).Hint;
+      //**Hint := TALDynamicControl(Source).Hint;
       HitTest := TALDynamicControl(Source).HitTest;
-      //Locked := TALDynamicControl(Source).Locked;
+      //**Locked := TALDynamicControl(Source).Locked;
       Margins.Assign(TALDynamicControl(Source).Margins);
       Opacity := TALDynamicControl(Source).Opacity;
       Padding.Assign(TALDynamicControl(Source).Padding);
-      //ParentShowHint := TALDynamicControl(Source).ParentShowHint;
-      //Position.Assign(TALDynamicControl(Source).Position);
+      //**ParentShowHint := TALDynamicControl(Source).ParentShowHint;
+      //**Position.Assign(TALDynamicControl(Source).Position);
       RotationAngle := TALDynamicControl(Source).RotationAngle;
-      //ShowHint := TALDynamicControl(Source).ShowHint;
-      //Size.Assign(TALDynamicControl(Source).Size);
-      //StyleName := TALDynamicControl(Source).StyleName;
-      //TabOrder := TALDynamicControl(Source).TabOrder;
-      //TabStop := TALDynamicControl(Source).TabStop;
+      //**ShowHint := TALDynamicControl(Source).ShowHint;
+      //**Size.Assign(TALDynamicControl(Source).Size);
+      //**StyleName := TALDynamicControl(Source).StyleName;
+      //**TabOrder := TALDynamicControl(Source).TabOrder;
+      //**TabStop := TALDynamicControl(Source).TabStop;
       Tag := TALDynamicControl(Source).Tag;
-      //TagFloat := TALDynamicControl(Source).TagFloat;
-      //TagObject := TALDynamicControl(Source).TagObject;
+      //**TagFloat := TALDynamicControl(Source).TagFloat;
+      //**TagObject := TALDynamicControl(Source).TagObject;
       TagString := TALDynamicControl(Source).TagString;
-      //TouchTargetExpansion.Assign(TALDynamicControl(Source).TouchTargetExpansion);
+      //**TouchTargetExpansion.Assign(TALDynamicControl(Source).TouchTargetExpansion);
       Visible := TALDynamicControl(Source).Visible;
-      //OnDragEnter := TALDynamicControl(Source).OnDragEnter;
-      //OnDragLeave := TALDynamicControl(Source).OnDragLeave;
-      //OnDragOver := TALDynamicControl(Source).OnDragOver;
-      //OnDragDrop := TALDynamicControl(Source).OnDragDrop;
-      //OnDragEnd := TALDynamicControl(Source).OnDragEnd;
-      //OnKeyDown := TALDynamicControl(Source).OnKeyDown;
-      //OnKeyUp := TALDynamicControl(Source).OnKeyUp;
+      //**OnDragEnter := TALDynamicControl(Source).OnDragEnter;
+      //**OnDragLeave := TALDynamicControl(Source).OnDragLeave;
+      //**OnDragOver := TALDynamicControl(Source).OnDragOver;
+      //**OnDragDrop := TALDynamicControl(Source).OnDragDrop;
+      //**OnDragEnd := TALDynamicControl(Source).OnDragEnd;
+      //**OnKeyDown := TALDynamicControl(Source).OnKeyDown;
+      //**OnKeyUp := TALDynamicControl(Source).OnKeyUp;
       OnClick := TALDynamicControl(Source).OnClick;
-      //OnDblClick := TALDynamicControl(Source).OnDblClick;
-      //OnCanFocus := TALDynamicControl(Source).OnCanFocus;
-      //OnEnter := TALDynamicControl(Source).OnEnter;
-      //OnExit := TALDynamicControl(Source).OnExit;
+      //**OnDblClick := TALDynamicControl(Source).OnDblClick;
+      //**OnCanFocus := TALDynamicControl(Source).OnCanFocus;
+      //**OnEnter := TALDynamicControl(Source).OnEnter;
+      //**OnExit := TALDynamicControl(Source).OnExit;
       OnMouseDown := TALDynamicControl(Source).OnMouseDown;
       OnMouseMove := TALDynamicControl(Source).OnMouseMove;
       OnMouseUp := TALDynamicControl(Source).OnMouseUp;
-      //OnMouseWheel := TALDynamicControl(Source).OnMouseWheel;
+      //**OnMouseWheel := TALDynamicControl(Source).OnMouseWheel;
       OnMouseEnter := TALDynamicControl(Source).OnMouseEnter;
       OnMouseLeave := TALDynamicControl(Source).OnMouseLeave;
       OnPainting := TALDynamicControl(Source).OnPainting;
       OnPaint := TALDynamicControl(Source).OnPaint;
-      //OnResize := TALDynamicControl(Source).OnResize;
+      //**OnResize := TALDynamicControl(Source).OnResize;
       OnResized := TALDynamicControl(Source).OnResized;
-      //OnActivate := TALDynamicControl(Source).OnActivate;
-      //OnDeactivate := TALDynamicControl(Source).OnDeactivate;
+      //**OnActivate := TALDynamicControl(Source).OnActivate;
+      //**OnDeactivate := TALDynamicControl(Source).OnDeactivate;
     end
     else
       ALAssignError(Source{ASource}, Self{ADest});
@@ -2684,7 +2684,7 @@ begin
   End;
 end;
 
-
+{***************************************************************}
 // The current implementation of TControl's BeginUpdate/EndUpdate
 // and Realign methods is inefficient—particularly for TALDynamicText,
 // which must rebuild its internal buffer every time its size
@@ -2727,96 +2727,96 @@ begin
   end;
 end;
 
+{*********************************************}
+//**procedure TALDynamicExtendedControl.Loaded;
+//**begin
+//**  {$IF not defined(ALDPK)}
+//**  if AutoAlignToPixel then
+//**    AlignToPixel;
+//**  {$ENDIF}
+//**  Inherited;
+//**  AdjustSize;
+//**end;
 
-//procedure TALDynamicExtendedControl.Loaded;
-//begin
-//  {$IF not defined(ALDPK)}
-//  if AutoAlignToPixel then
-//    AlignToPixel;
-//  {$ENDIF}
-//  Inherited;
-//  AdjustSize;
-//end;
+{*************************************************************}
+//**function TALDynamicExtendedControl.IsOwnerLoading: Boolean;
+//**begin
+//**  result := (Owner <> nil) and
+//**            (csloading in Owner.ComponentState);
+//**end;
 
+{***********************************************************}
+//**function TALDynamicExtendedControl.IsSizeStored: Boolean;
+//**begin
+//**  var LDefaultSize := GetDefaultSize;
+//**  result := (not SameValue(LDefaultSize.cx, Size.Size.cx, TEpsilon.Position)) or
+//**            (not SameValue(LDefaultSize.cy, Size.Size.cy, TEpsilon.Position));
+//**end;
 
-//function TALDynamicExtendedControl.IsOwnerLoading: Boolean;
-//begin
-//  result := (Owner <> nil) and
-//            (csloading in Owner.ComponentState);
-//end;
+{**************************************************************}
+//**function TALDynamicExtendedControl.GetAlign: TALAlignLayout;
+//**begin
+//**  Result := FAlign;
+//**end;
 
+{****************************************************************************}
+//**procedure TALDynamicExtendedControl.SetAlign(const Value: TALAlignLayout);
+//**begin
+//**  If FAlign <> Value then begin
+//**    FAlign := Value;
+//**    var LLegacyAlign: TAlignLayout;
+//**    Case Value of
+//**      TALAlignLayout.None: LLegacyAlign := TAlignLayout.None;
+//**      TALAlignLayout.Top: LLegacyAlign := TAlignLayout.Top;
+//**      TALAlignLayout.Left: LLegacyAlign := TAlignLayout.Left;
+//**      TALAlignLayout.Right: LLegacyAlign := TAlignLayout.Right;
+//**      TALAlignLayout.Bottom: LLegacyAlign := TAlignLayout.Bottom;
+//**      TALAlignLayout.MostTop: LLegacyAlign := TAlignLayout.MostTop;
+//**      TALAlignLayout.MostBottom: LLegacyAlign := TAlignLayout.MostBottom;
+//**      TALAlignLayout.MostLeft: LLegacyAlign := TAlignLayout.MostLeft;
+//**      TALAlignLayout.MostRight: LLegacyAlign := TAlignLayout.MostRight;
+//**      TALAlignLayout.Client: LLegacyAlign := TAlignLayout.Client;
+//**      TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
+//**      TALAlignLayout.Center: LLegacyAlign := TAlignLayout.Center;
+//**      TALAlignLayout.VertCenter: LLegacyAlign := TAlignLayout.VertCenter;
+//**      TALAlignLayout.HorzCenter: LLegacyAlign := TAlignLayout.HorzCenter;
+//**      TALAlignLayout.Horizontal: LLegacyAlign := TAlignLayout.Horizontal;
+//**      TALAlignLayout.Vertical: LLegacyAlign := TAlignLayout.Vertical;
+//**      //TALAlignLayout.Scale: LLegacyAlign := TAlignLayout.Scale;
+//**      //TALAlignLayout.Fit: LLegacyAlign := TAlignLayout.Fit;
+//**      //TALAlignLayout.FitLeft: LLegacyAlign := TAlignLayout.FitLeft;
+//**      //TALAlignLayout.FitRight: LLegacyAlign := TAlignLayout.FitRight;
+//**      TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
+//**      TALAlignLayout.TopLeft: LLegacyAlign := TAlignLayout.Top;
+//**      TALAlignLayout.TopRight: LLegacyAlign := TAlignLayout.Top;
+//**      TALAlignLayout.LeftCenter: LLegacyAlign := TAlignLayout.Left;
+//**      TALAlignLayout.LeftTop: LLegacyAlign := TAlignLayout.Left;
+//**      TALAlignLayout.LeftBottom: LLegacyAlign := TAlignLayout.Left;
+//**      TALAlignLayout.RightCenter: LLegacyAlign := TAlignLayout.Right;
+//**      TALAlignLayout.RightTop: LLegacyAlign := TAlignLayout.Right;
+//**      TALAlignLayout.RightBottom: LLegacyAlign := TAlignLayout.Right;
+//**      TALAlignLayout.BottomCenter: LLegacyAlign := TAlignLayout.Bottom;
+//**      TALAlignLayout.BottomLeft: LLegacyAlign := TAlignLayout.Bottom;
+//**      TALAlignLayout.BottomRight: LLegacyAlign := TAlignLayout.Bottom;
+//**      TALAlignLayout.MostTopCenter: LLegacyAlign := TAlignLayout.MostTop;
+//**      TALAlignLayout.MostTopLeft: LLegacyAlign := TAlignLayout.MostTop;
+//**      TALAlignLayout.MostTopRight: LLegacyAlign := TAlignLayout.MostTop;
+//**      TALAlignLayout.MostLeftCenter: LLegacyAlign := TAlignLayout.MostLeft;
+//**      TALAlignLayout.MostLeftTop: LLegacyAlign := TAlignLayout.MostLeft;
+//**      TALAlignLayout.MostLeftBottom: LLegacyAlign := TAlignLayout.MostLeft;
+//**      TALAlignLayout.MostRightCenter: LLegacyAlign := TAlignLayout.MostRight;
+//**      TALAlignLayout.MostRightTop: LLegacyAlign := TAlignLayout.MostRight;
+//**      TALAlignLayout.MostRightBottom: LLegacyAlign := TAlignLayout.MostRight;
+//**      TALAlignLayout.MostBottomCenter: LLegacyAlign := TAlignLayout.MostBottom;
+//**      TALAlignLayout.MostBottomLeft: LLegacyAlign := TAlignLayout.MostBottom;
+//**      TALAlignLayout.MostBottomRight: LLegacyAlign := TAlignLayout.MostBottom;
+//**      else Raise Exception.Create('Error D527A470-23AC-4E3C-BCC5-4C2DB578A691');
+//**    end;
+//**    Inherited SetAlign(LLegacyAlign);
+//**  end;
+//**end;
 
-//function TALDynamicExtendedControl.IsSizeStored: Boolean;
-//begin
-//  var LDefaultSize := GetDefaultSize;
-//  result := (not SameValue(LDefaultSize.cx, Size.Size.cx, TEpsilon.Position)) or
-//            (not SameValue(LDefaultSize.cy, Size.Size.cy, TEpsilon.Position));
-//end;
-
-
-//function TALDynamicExtendedControl.GetAlign: TALAlignLayout;
-//begin
-//  Result := FAlign;
-//end;
-
-
-//procedure TALDynamicExtendedControl.SetAlign(const Value: TALAlignLayout);
-//begin
-//  If FAlign <> Value then begin
-//    FAlign := Value;
-//    var LLegacyAlign: TAlignLayout;
-//    Case Value of
-//      TALAlignLayout.None: LLegacyAlign := TAlignLayout.None;
-//      TALAlignLayout.Top: LLegacyAlign := TAlignLayout.Top;
-//      TALAlignLayout.Left: LLegacyAlign := TAlignLayout.Left;
-//      TALAlignLayout.Right: LLegacyAlign := TAlignLayout.Right;
-//      TALAlignLayout.Bottom: LLegacyAlign := TAlignLayout.Bottom;
-//      TALAlignLayout.MostTop: LLegacyAlign := TAlignLayout.MostTop;
-//      TALAlignLayout.MostBottom: LLegacyAlign := TAlignLayout.MostBottom;
-//      TALAlignLayout.MostLeft: LLegacyAlign := TAlignLayout.MostLeft;
-//      TALAlignLayout.MostRight: LLegacyAlign := TAlignLayout.MostRight;
-//      TALAlignLayout.Client: LLegacyAlign := TAlignLayout.Client;
-//      TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
-//      TALAlignLayout.Center: LLegacyAlign := TAlignLayout.Center;
-//      TALAlignLayout.VertCenter: LLegacyAlign := TAlignLayout.VertCenter;
-//      TALAlignLayout.HorzCenter: LLegacyAlign := TAlignLayout.HorzCenter;
-//      TALAlignLayout.Horizontal: LLegacyAlign := TAlignLayout.Horizontal;
-//      TALAlignLayout.Vertical: LLegacyAlign := TAlignLayout.Vertical;
-//      //TALAlignLayout.Scale: LLegacyAlign := TAlignLayout.Scale;
-//      //TALAlignLayout.Fit: LLegacyAlign := TAlignLayout.Fit;
-//      //TALAlignLayout.FitLeft: LLegacyAlign := TAlignLayout.FitLeft;
-//      //TALAlignLayout.FitRight: LLegacyAlign := TAlignLayout.FitRight;
-//      TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
-//      TALAlignLayout.TopLeft: LLegacyAlign := TAlignLayout.Top;
-//      TALAlignLayout.TopRight: LLegacyAlign := TAlignLayout.Top;
-//      TALAlignLayout.LeftCenter: LLegacyAlign := TAlignLayout.Left;
-//      TALAlignLayout.LeftTop: LLegacyAlign := TAlignLayout.Left;
-//      TALAlignLayout.LeftBottom: LLegacyAlign := TAlignLayout.Left;
-//      TALAlignLayout.RightCenter: LLegacyAlign := TAlignLayout.Right;
-//      TALAlignLayout.RightTop: LLegacyAlign := TAlignLayout.Right;
-//      TALAlignLayout.RightBottom: LLegacyAlign := TAlignLayout.Right;
-//      TALAlignLayout.BottomCenter: LLegacyAlign := TAlignLayout.Bottom;
-//      TALAlignLayout.BottomLeft: LLegacyAlign := TAlignLayout.Bottom;
-//      TALAlignLayout.BottomRight: LLegacyAlign := TAlignLayout.Bottom;
-//      TALAlignLayout.MostTopCenter: LLegacyAlign := TAlignLayout.MostTop;
-//      TALAlignLayout.MostTopLeft: LLegacyAlign := TAlignLayout.MostTop;
-//      TALAlignLayout.MostTopRight: LLegacyAlign := TAlignLayout.MostTop;
-//      TALAlignLayout.MostLeftCenter: LLegacyAlign := TAlignLayout.MostLeft;
-//      TALAlignLayout.MostLeftTop: LLegacyAlign := TAlignLayout.MostLeft;
-//      TALAlignLayout.MostLeftBottom: LLegacyAlign := TAlignLayout.MostLeft;
-//      TALAlignLayout.MostRightCenter: LLegacyAlign := TAlignLayout.MostRight;
-//      TALAlignLayout.MostRightTop: LLegacyAlign := TAlignLayout.MostRight;
-//      TALAlignLayout.MostRightBottom: LLegacyAlign := TAlignLayout.MostRight;
-//      TALAlignLayout.MostBottomCenter: LLegacyAlign := TAlignLayout.MostBottom;
-//      TALAlignLayout.MostBottomLeft: LLegacyAlign := TAlignLayout.MostBottom;
-//      TALAlignLayout.MostBottomRight: LLegacyAlign := TAlignLayout.MostBottom;
-//      else Raise Exception.Create('Error D527A470-23AC-4E3C-BCC5-4C2DB578A691');
-//    end;
-//    Inherited SetAlign(LLegacyAlign);
-//  end;
-//end;
-
-
+{**********************************************}
 procedure TALDynamicExtendedControl.DoEndUpdate;
 begin
   inherited DoEndUpdate;
@@ -2824,7 +2824,7 @@ begin
     AdjustSize;
 end;
 
-
+{********************************************}
 procedure TALDynamicExtendedControl.DoResized;
 begin
   {$IF defined(debug)}
@@ -2834,7 +2834,7 @@ begin
   AdjustSize;
 end;
 
-
+{********************************************}
 procedure TALDynamicExtendedControl.DoRealign;
 begin
   {$IF defined(debug)}
@@ -2860,7 +2860,7 @@ begin
   AdjustSize;
 end;
 
-
+{************************************************************************************}
 procedure TALDynamicExtendedControl.SetFixedSizeBounds(X, Y, AWidth, AHeight: Single);
 begin
   if TNonReentrantHelper.EnterSection(FIsSetBoundsLocked) then begin
@@ -2893,56 +2893,56 @@ begin
       //TALAlignLayout.MostBottomCenter
       //TALAlignLayout.MostBottomLeft
       //TALAlignLayout.MostBottomRight
-      //If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
-      //   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-      //   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-      //   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
-      //then begin
-      //  case FAlign of
-      //    TALAlignLayout.TopCenter,
-      //    TALAlignLayout.BottomCenter,
-      //    TALAlignLayout.MostTopCenter,
-      //    TALAlignLayout.MostBottomCenter: begin
-      //      X := X + ((AWidth - Width) / 2);
-      //      AWidth := Width;
-      //    end;
-      //    TALAlignLayout.TopLeft,
-      //    TALAlignLayout.BottomLeft,
-      //    TALAlignLayout.MostTopLeft,
-      //    TALAlignLayout.MostBottomLeft: begin
-      //      AWidth := Width;
-      //    end;
-      //    TALAlignLayout.TopRight,
-      //    TALAlignLayout.BottomRight,
-      //    TALAlignLayout.MostTopRight,
-      //    TALAlignLayout.MostBottomRight: begin
-      //      X := X + (AWidth - Width);
-      //      AWidth := Width;
-      //    end;
-      //    TALAlignLayout.LeftCenter,
-      //    TALAlignLayout.RightCenter,
-      //    TALAlignLayout.MostLeftCenter,
-      //    TALAlignLayout.MostRightCenter: begin
-      //      Y := Y + ((AHeight - Height) / 2);
-      //      AHeight := Height;
-      //    end;
-      //    TALAlignLayout.LeftTop,
-      //    TALAlignLayout.RightTop,
-      //    TALAlignLayout.MostLeftTop,
-      //    TALAlignLayout.MostRightTop: begin
-      //      AHeight := Height;
-      //    end;
-      //    TALAlignLayout.LeftBottom,
-      //    TALAlignLayout.RightBottom,
-      //    TALAlignLayout.MostLeftBottom,
-      //    TALAlignLayout.MostRightBottom: begin
-      //      Y := Y + (AHeight - Height);
-      //      AHeight := Height;
-      //    end;
-      //    else
-      //      raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
-      //  end;
-      //end;
+      //**If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
+      //**   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
+      //**   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
+      //**   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+      //**then begin
+      //**  case FAlign of
+      //**    TALAlignLayout.TopCenter,
+      //**    TALAlignLayout.BottomCenter,
+      //**    TALAlignLayout.MostTopCenter,
+      //**    TALAlignLayout.MostBottomCenter: begin
+      //**      X := X + ((AWidth - Width) / 2);
+      //**      AWidth := Width;
+      //**    end;
+      //**    TALAlignLayout.TopLeft,
+      //**    TALAlignLayout.BottomLeft,
+      //**    TALAlignLayout.MostTopLeft,
+      //**    TALAlignLayout.MostBottomLeft: begin
+      //**      AWidth := Width;
+      //**    end;
+      //**    TALAlignLayout.TopRight,
+      //**    TALAlignLayout.BottomRight,
+      //**    TALAlignLayout.MostTopRight,
+      //**    TALAlignLayout.MostBottomRight: begin
+      //**      X := X + (AWidth - Width);
+      //**      AWidth := Width;
+      //**    end;
+      //**    TALAlignLayout.LeftCenter,
+      //**    TALAlignLayout.RightCenter,
+      //**    TALAlignLayout.MostLeftCenter,
+      //**    TALAlignLayout.MostRightCenter: begin
+      //**      Y := Y + ((AHeight - Height) / 2);
+      //**      AHeight := Height;
+      //**    end;
+      //**    TALAlignLayout.LeftTop,
+      //**    TALAlignLayout.RightTop,
+      //**    TALAlignLayout.MostLeftTop,
+      //**    TALAlignLayout.MostRightTop: begin
+      //**      AHeight := Height;
+      //**    end;
+      //**    TALAlignLayout.LeftBottom,
+      //**    TALAlignLayout.RightBottom,
+      //**    TALAlignLayout.MostLeftBottom,
+      //**    TALAlignLayout.MostRightBottom: begin
+      //**      Y := Y + (AHeight - Height);
+      //**      AHeight := Height;
+      //**    end;
+      //**    else
+      //**      raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
+      //**  end;
+      //**end;
 
       {$IF defined(debug)}
       //ALLog(ClassName+'.SetFixedSizeBounds', 'Name: ' + Name + ' | X : '+ALFloatToStrW(X, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Left, ALDefaultFormatSettingsW)+') | Y : '+ALFloatToStrW(Y, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Top, ALDefaultFormatSettingsW)+') | AWidth : '+ALFloatToStrW(AWidth, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Width, ALDefaultFormatSettingsW)+') | AHeight : '+ALFloatToStrW(AHeight, ALDefaultFormatSettingsW)+'('+ALFloatToStrW(Height, ALDefaultFormatSettingsW)+')');
@@ -2958,7 +2958,7 @@ begin
     SetBounds(X, Y, AWidth, AHeight);
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicExtendedControl.SetBounds(X, Y, AWidth, AHeight: Double);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -2988,56 +2988,56 @@ begin
   //TALAlignLayout.MostBottomCenter
   //TALAlignLayout.MostBottomLeft
   //TALAlignLayout.MostBottomRight
-  //If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
-  //   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-  //   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-  //   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
-  //then begin
-  //  case FAlign of
-  //    TALAlignLayout.TopCenter,
-  //    TALAlignLayout.BottomCenter,
-  //    TALAlignLayout.MostTopCenter,
-  //    TALAlignLayout.MostBottomCenter: begin
-  //      X := X + ((AWidth - Width) / 2);
-  //      AWidth := Width;
-  //    end;
-  //    TALAlignLayout.TopLeft,
-  //    TALAlignLayout.BottomLeft,
-  //    TALAlignLayout.MostTopLeft,
-  //    TALAlignLayout.MostBottomLeft: begin
-  //      AWidth := Width;
-  //    end;
-  //    TALAlignLayout.TopRight,
-  //    TALAlignLayout.BottomRight,
-  //    TALAlignLayout.MostTopRight,
-  //    TALAlignLayout.MostBottomRight: begin
-  //      X := X + (AWidth - Width);
-  //      AWidth := Width;
-  //    end;
-  //    TALAlignLayout.LeftCenter,
-  //    TALAlignLayout.RightCenter,
-  //    TALAlignLayout.MostLeftCenter,
-  //    TALAlignLayout.MostRightCenter: begin
-  //      Y := Y + ((AHeight - Height) / 2);
-  //      AHeight := Height;
-  //    end;
-  //    TALAlignLayout.LeftTop,
-  //    TALAlignLayout.RightTop,
-  //    TALAlignLayout.MostLeftTop,
-  //    TALAlignLayout.MostRightTop: begin
-  //      AHeight := Height;
-  //    end;
-  //    TALAlignLayout.LeftBottom,
-  //    TALAlignLayout.RightBottom,
-  //    TALAlignLayout.MostLeftBottom,
-  //    TALAlignLayout.MostRightBottom: begin
-  //      Y := Y + (AHeight - Height);
-  //      AHeight := Height;
-  //    end;
-  //    else
-  //      raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
-  //  end;
-  //end;
+  //**If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
+  //**   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
+  //**   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
+  //**   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+  //**then begin
+  //**  case FAlign of
+  //**    TALAlignLayout.TopCenter,
+  //**    TALAlignLayout.BottomCenter,
+  //**    TALAlignLayout.MostTopCenter,
+  //**    TALAlignLayout.MostBottomCenter: begin
+  //**      X := X + ((AWidth - Width) / 2);
+  //**      AWidth := Width;
+  //**    end;
+  //**    TALAlignLayout.TopLeft,
+  //**    TALAlignLayout.BottomLeft,
+  //**    TALAlignLayout.MostTopLeft,
+  //**    TALAlignLayout.MostBottomLeft: begin
+  //**      AWidth := Width;
+  //**    end;
+  //**    TALAlignLayout.TopRight,
+  //**    TALAlignLayout.BottomRight,
+  //**    TALAlignLayout.MostTopRight,
+  //**    TALAlignLayout.MostBottomRight: begin
+  //**      X := X + (AWidth - Width);
+  //**      AWidth := Width;
+  //**    end;
+  //**    TALAlignLayout.LeftCenter,
+  //**    TALAlignLayout.RightCenter,
+  //**    TALAlignLayout.MostLeftCenter,
+  //**    TALAlignLayout.MostRightCenter: begin
+  //**      Y := Y + ((AHeight - Height) / 2);
+  //**      AHeight := Height;
+  //**    end;
+  //**    TALAlignLayout.LeftTop,
+  //**    TALAlignLayout.RightTop,
+  //**    TALAlignLayout.MostLeftTop,
+  //**    TALAlignLayout.MostRightTop: begin
+  //**      AHeight := Height;
+  //**    end;
+  //**    TALAlignLayout.LeftBottom,
+  //**    TALAlignLayout.RightBottom,
+  //**    TALAlignLayout.MostLeftBottom,
+  //**    TALAlignLayout.MostRightBottom: begin
+  //**      Y := Y + (AHeight - Height);
+  //**      AHeight := Height;
+  //**    end;
+  //**    else
+  //**      raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
+  //**  end;
+  //**end;
 
   if FIsSetBoundsLocked then begin
     AWidth := Width;
@@ -3054,10 +3054,10 @@ begin
   inherited;
 end;
 
-
+{*********************************************}
 procedure TALDynamicExtendedControl.AdjustSize;
 begin
-  if //(not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
+  if //**(not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
      (not IsDestroying) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
@@ -3082,20 +3082,20 @@ begin
         {$IF defined(ALDPK)}
         // At design time, the Delphi IDE may add children such as
         // TGrabHandle.TGrabHandleRectangle
-        //if (csDesigning in ComponentState) and Supports(LChildControl, IDesignerControl) then
-        //  Continue;
+        //**if (csDesigning in ComponentState) and Supports(LChildControl, IDesignerControl) then
+        //**  Continue;
         {$ENDIF}
 
-        //var LALChildControl: TALDynamicControl;
-        //var LALChildControlAlign: TALAlignLayout;
-        //If (LChildControl is TALDynamicControl) then begin
-        //  LALChildControl := TALDynamicControl(LChildControl);
-        //  LALChildControlAlign := LALChildControl.Align
-        //end
-        //else begin
-        //  LALChildControl := nil;
-        //  LALChildControlAlign := TALAlignLayout(LChildControl.Align);
-        //end;
+        //**var LALChildControl: TALDynamicControl;
+        //**var LALChildControlAlign: TALAlignLayout;
+        //**If (LChildControl is TALDynamicControl) then begin
+        //**  LALChildControl := TALDynamicControl(LChildControl);
+        //**  LALChildControlAlign := LALChildControl.Align
+        //**end
+        //**else begin
+        //**  LALChildControl := nil;
+        //**  LALChildControlAlign := TALAlignLayout(LChildControl.Align);
+        //**end;
         var LALChildControl := LChildControl;
         var LALChildControlAlign := LALChildControl.Align;
 
@@ -3318,7 +3318,7 @@ begin
   end;
 end;
 
-
+{***********************************************}
 procedure TALDynamicExtendedControl.AlignToPixel;
 begin
   // Note: We do not align the position here. The position is aligned during
@@ -3326,13 +3326,13 @@ begin
   BeginUpdate;
   Try
     // OnResize and OnResized will be called in loaded
-    //var LOldOnResize := OnResize;
-    //var LOldOnResized := OnResized;
-    //if CSLoading in componentState then begin
-    //  OnResize := DelayOnResize;
-    //  OnResized := DelayOnResized;
-    //end;
-    //try
+    //**var LOldOnResize := OnResize;
+    //**var LOldOnResized := OnResized;
+    //**if CSLoading in componentState then begin
+    //**  OnResize := DelayOnResize;
+    //**  OnResized := DelayOnResized;
+    //**end;
+    //**try
       Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
       Padding.Rect := ALAlignEdgesToPixelRound(Padding.Rect, ALGetScreenScale, TEpsilon.Position);
       case Align of
@@ -3390,16 +3390,16 @@ begin
         else
           Raise Exception.Create('Error AC54DF90-F880-4BD5-8474-E62BD8D099FB')
       end;
-    //finally
-    //  OnResize := LOldOnResize;
-    //  OnResized := LOldOnResized;
-    //end;
+    //**finally
+    //**  OnResize := LOldOnResize;
+    //**  OnResized := LOldOnResized;
+    //**end;
   finally
     EndUpdate;
   end;
 end;
 
-
+{***************************************************}
 procedure TALDynamicExtendedControl.ApplyColorScheme;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3418,43 +3418,43 @@ begin
   ApplyColorSchemeRecursive(self);
 end;
 
+{*********************************************************************}
+//**procedure TALDynamicExtendedControl.DelayOnResize(Sender: TObject);
+//**begin
+//**  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resize);
+//**end;
 
-//procedure TALDynamicExtendedControl.DelayOnResize(Sender: TObject);
-//begin
-//  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resize);
-//end;
+{**********************************************************************}
+//**procedure TALDynamicExtendedControl.DelayOnResized(Sender: TObject);
+//**begin
+//**  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resized);
+//**end;
 
-
-//procedure TALDynamicExtendedControl.DelayOnResized(Sender: TObject);
-//begin
-//  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resized);
-//end;
-
-
+{************************************************************}
 function TALDynamicExtendedControl.GetDoubleBuffered: boolean;
 begin
   result := False;
 end;
 
-
+{***************************************************************************}
 procedure TALDynamicExtendedControl.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not supported
 end;
 
+{************************************************************************}
+//**procedure TALDynamicExtendedControl.SetScale(const AValue: TPosition);
+//**begin
+//**  FScale.Assign(AValue);
+//**end;
 
-//procedure TALDynamicExtendedControl.SetScale(const AValue: TPosition);
-//begin
-//  FScale.Assign(AValue);
-//end;
-
-
+{******************************************************}
 function TALDynamicExtendedControl.GetAutoSize: Boolean;
 begin
   result := FAutoSize;
 end;
 
-
+{********************************************************************}
 procedure TALDynamicExtendedControl.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
@@ -3464,7 +3464,7 @@ begin
   end;
 end;
 
-
+{********************************************************************}
 function TALDynamicExtendedControl.HasUnconstrainedAutosizeX: Boolean;
 begin
   Result := GetAutoSize;
@@ -3482,7 +3482,7 @@ begin
   end;
 end;
 
-
+{********************************************************************}
 function TALDynamicExtendedControl.HasUnconstrainedAutosizeY: Boolean;
 begin
   Result := GetAutoSize;
@@ -3500,31 +3500,31 @@ begin
   end;
 end;
 
-
+{**************************************************}
 procedure TALDynamicExtendedControl.MakeBufDrawable;
 begin
  // Virtual;
 end;
 
-
+{***************************************************}
 procedure TALDynamicExtendedControl.ClearBufDrawable;
 begin
  // Virtual;
 end;
 
-
+{**************************************************************}
 function TALDynamicExtendedControl.GetAutoAlignToPixel: Boolean;
 begin
   Result := FAutoAlignToPixel;
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicExtendedControl.SetAutoAlignToPixel(const AValue: Boolean);
 begin
   FAutoAlignToPixel := AValue;
 end;
 
-
+{***********************************************************}
 function TALDynamicExtendedControl.IsReadyToDisplay: Boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3532,8 +3532,8 @@ function TALDynamicExtendedControl.IsReadyToDisplay: Boolean;
   begin
     Result := True;
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      //if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay
-      //else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);
+      //**if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay
+      //**else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);
       Result := AControl.Controls[i].IsReadyToDisplay;
       if not Result then exit;
     end;
@@ -3544,71 +3544,71 @@ begin
   Result := CheckAllChildrenAreReadyToDisplay(Self);
 end;
 
-
+{******************************************************}
 function TALDynamicExtendedControl.IsDisplayed: Boolean;
 begin
   Result := not GetAbsoluteDisplayedRect.IsEmpty;
 end;
 
+{**********************************************************************}
+//**function TALDynamicExtendedControl.GetAbsoluteDisplayedRect: TRectF;
+//**begin
+//**  if (not Visible) or (form = nil) then Exit(TRectF.Empty);
+//**  var LAbsoluteIntersectionRect := AbsoluteRect;
+//**  var LControlTmp := Tcontrol(Self);
+//**  while LControlTmp.Owner <> nil do begin
+//**    if not LControlTmp.Visible then Exit(TRectF.Empty);
+//**    if LControlTmp.ClipChildren then begin
+//**      var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
+//**      LAbsoluteIntersectionRect.Intersect(LAbsoluteClipRect);
+//**      if LAbsoluteIntersectionRect.IsEmpty then
+//**        Exit(TRectF.Empty);
+//**    end;
+//**    LControlTmp := LControlTmp.Owner;
+//**  end;
+//**  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
+//**end;
 
-//function TALDynamicExtendedControl.GetAbsoluteDisplayedRect: TRectF;
-//begin
-//  if (not Visible) or (form = nil) then Exit(TRectF.Empty);
-//  var LAbsoluteIntersectionRect := AbsoluteRect;
-//  var LControlTmp := Tcontrol(Self);
-//  while LControlTmp.Owner <> nil do begin
-//    if not LControlTmp.Visible then Exit(TRectF.Empty);
-//    if LControlTmp.ClipChildren then begin
-//      var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
-//      LAbsoluteIntersectionRect.Intersect(LAbsoluteClipRect);
-//      if LAbsoluteIntersectionRect.IsEmpty then
-//        Exit(TRectF.Empty);
-//    end;
-//    LControlTmp := LControlTmp.Owner;
-//  end;
-//  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
-//end;
+{******************************************************************}
+//**procedure TALDynamicExtendedControl.SetNewScene(AScene: IScene);
+//**begin
+//**  {$IFNDEF ALCompilerVersionSupported123}
+//**    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
+//**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseLeave/MouseDown/MouseUp/MouseClick'}
+//**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
+//**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsMouseOver is still changed only in SetNewScene/MouseEnter/MouseLeave'}
+//**  {$ENDIF}
+//**  var LPrevPressed := Pressed;
+//**  var LPrevIsFocused := IsFocused;
+//**  var LPrevIsMouseOver := IsMouseOver;
+//**  inherited;
+//**  {$IF defined(ANDROID) or defined(IOS)}
+//**  FIsMouseOver := False;
+//**  {$ENDIF}
+//**  if LPrevPressed <> Pressed then PressedChanged;
+//**  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
+//**  if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+//**end;
 
+{*********************************************************}
+//**function TALDynamicExtendedControl.GetPivot: TPosition;
+//**begin
+//**  Result := Inherited RotationCenter;
+//**end;
 
-//procedure TALDynamicExtendedControl.SetNewScene(AScene: IScene);
-//begin
-//  {$IFNDEF ALCompilerVersionSupported123}
-//    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
-//    {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/MouseLeave/MouseDown/MouseUp/MouseClick'}
-//    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
-//    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsMouseOver is still changed only in SetNewScene/MouseEnter/MouseLeave'}
-//  {$ENDIF}
-//  var LPrevPressed := Pressed;
-//  var LPrevIsFocused := IsFocused;
-//  var LPrevIsMouseOver := IsMouseOver;
-//  inherited;
-//  {$IF defined(ANDROID) or defined(IOS)}
-//  FIsMouseOver := False;
-//  {$ENDIF}
-//  if LPrevPressed <> Pressed then PressedChanged;
-//  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
-//  if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
-//end;
+{***********************************************************************}
+//**procedure TALDynamicExtendedControl.SetPivot(const Value: TPosition);
+//**begin
+//**  Inherited RotationCenter := Value;
+//**end;
 
-
-//function TALDynamicExtendedControl.GetPivot: TPosition;
-//begin
-//  Result := Inherited RotationCenter;
-//end;
-
-
-//procedure TALDynamicExtendedControl.SetPivot(const Value: TPosition);
-//begin
-//  Inherited RotationCenter := Value;
-//end;
-
-
+{*****************************************************}
 function TALDynamicExtendedControl.GetPressed: Boolean;
 begin
   result := inherited Pressed;
 end;
 
-
+{********************************************************************}
 procedure TALDynamicExtendedControl.SetPressed(const AValue: Boolean);
 begin
   if AValue <> GetPressed then begin
@@ -3617,23 +3617,23 @@ begin
   end;
 end;
 
+{**********************************************}
+//**procedure TALDynamicExtendedControl.DoEnter;
+//**begin
+//**  var LPrevIsFocused := IsFocused;
+//**  inherited;
+//**  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
+//**end;
 
-//procedure TALDynamicExtendedControl.DoEnter;
-//begin
-//  var LPrevIsFocused := IsFocused;
-//  inherited;
-//  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
-//end;
+{*********************************************}
+//**procedure TALDynamicExtendedControl.DoExit;
+//**begin
+//**  var LPrevIsFocused := IsFocused;
+//**  inherited;
+//**  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
+//**end;
 
-
-//procedure TALDynamicExtendedControl.DoExit;
-//begin
-//  var LPrevIsFocused := IsFocused;
-//  inherited;
-//  if LPrevIsFocused <> IsFocused then IsFocusedChanged;
-//end;
-
-
+{*********************************************}
 procedure TALDynamicExtendedControl.MouseEnter;
 begin
   var LPrevIsMouseOver := IsMouseOver;
@@ -3644,7 +3644,7 @@ begin
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
-
+{*********************************************}
 procedure TALDynamicExtendedControl.MouseLeave;
 begin
   var LPrevIsMouseOver := IsMouseOver;
@@ -3657,7 +3657,7 @@ begin
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
-
+{****************************************************************************************************}
 procedure TALDynamicExtendedControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -3690,22 +3690,22 @@ begin
     else LOwner := LOwner.Owner;
   end;
   //--
-  //if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin
-  //  Var LOldIsfocused := FIsfocused;
-  //  FIsfocused := True;
-  //  Try
-  //    inherited;
-  //  finally
-  //    FIsfocused := LOldIsfocused;
-  //  End;
-  //end
-  //else
+  //**if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin
+  //**  Var LOldIsfocused := FIsfocused;
+  //**  FIsfocused := True;
+  //**  Try
+  //**    inherited;
+  //**  finally
+  //**    FIsfocused := LOldIsfocused;
+  //**  End;
+  //**end
+  //**else
     inherited;
   //--
   if LPrevPressed <> Pressed then PressedChanged;
 end;
 
-
+{**************************************************************************************************}
 procedure TALDynamicExtendedControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFNDEF ALCompilerVersionSupported123}
@@ -3715,17 +3715,17 @@ begin
   inherited;
   if LPrevPressed <> Pressed then PressedChanged;
   FDoubleClick := False;
-  //var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
-  //if (FFocusOnMouseUp) and
-  //   (FMouseDownAtLowVelocity) and
-  //   (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and
-  //   (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and
-  //   (not (csDesigning in ComponentState)) and
-  //   (not FIsFocused) then
-  //  SetFocus;
+  //**var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
+  //**if (FFocusOnMouseUp) and
+  //**   (FMouseDownAtLowVelocity) and
+  //**   (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and
+  //**   (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and
+  //**   (not (csDesigning in ComponentState)) and
+  //**   (not FIsFocused) then
+  //**  SetFocus;
 end;
 
-
+{*****************************************************************************************************}
 procedure TALDynamicExtendedControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
@@ -3752,7 +3752,7 @@ begin
   if LPrevPressed <> Pressed then PressedChanged;
 end;
 
-
+{****************************************}
 procedure TALDynamicExtendedControl.Click;
 begin
   inherited;
@@ -3762,128 +3762,128 @@ begin
   end;
 end;
 
-
+{*************************************}
 // Optimized GetParentedVisible to work
 // exclusively with Owner.
-//function TALDynamicExtendedControl.GetParentedVisible: Boolean;
-//begin
-//  {$IF defined(ALDPK)}
-//  result := Inherited GetParentedVisible;
-//  {$ELSE}
-//  var P: TALDynamicControl := Self;
-//  Result := False;
-//  while P <> nil do begin
-//    if not p.Visible then Exit;
-//    P := P.Owner;
-//  end;
-//  // We do not care about FForm.visible like in
-//  // Inherited GetParentedVisible
-//  // Result := (FForm = nil) or (FForm.visible);
-//  Result := True;
-//  {$ENDIF}
-//end;
+//**function TALDynamicExtendedControl.GetParentedVisible: Boolean;
+//**begin
+//**  {$IF defined(ALDPK)}
+//**  result := Inherited GetParentedVisible;
+//**  {$ELSE}
+//**  var P: TALDynamicControl := Self;
+//**  Result := False;
+//**  while P <> nil do begin
+//**    if not p.Visible then Exit;
+//**    P := P.Owner;
+//**  end;
+//**  // We do not care about FForm.visible like in
+//**  // Inherited GetParentedVisible
+//**  // Result := (FForm = nil) or (FForm.visible);
+//**  Result := True;
+//**  {$ENDIF}
+//**end;
 
+{***********************************************************************}
+//**procedure TALDynamicExtendedControl.DoMatrixChanged(Sender: TObject);
+//**begin
+//**  {$IFNDEF ALCompilerVersionSupported123}
+//**    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
+//**    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
+//**  {$ENDIF}
+//**  if not FInPaintTo and not IsUpdating then
+//**    Repaint;
+//**  if SameValue(Scale.X, 1.0, TEpsilon.Scale) and SameValue(Scale.Y, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
+//**  begin
+//**    if (Owner <> nil) and not TALDynamicControlAccessPrivate(Owner).FSimpleTransform then
+//**      TALDynamicControlAccessPrivate(Self).FSimpleTransform := False
+//**    else
+//**      TALDynamicControlAccessPrivate(Self).FSimpleTransform := True;
+//**  end
+//**  else
+//**    TALDynamicControlAccessPrivate(Self).FSimpleTransform := False;
+//**
+//**  if not TALDynamicControlAccessPrivate(Self).FSimpleTransform then
+//**  begin
+//**    if not SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
+//**    begin
+//**      FLocalMatrix :=
+//**        TMatrix.CreateTranslation(-Pivot.X * FSize.Width, -Pivot.Y * FSize.Height) *
+//**        TMatrix.CreateScaling(Scale.X, Scale.Y) *
+//**        TMatrix.CreateRotation(DegToRad(RotationAngle)) *
+//**        TMatrix.CreateTranslation(Pivot.X * FSize.Width + Left, Pivot.Y * FSize.Height + Top);
+//**    end
+//**    else
+//**    begin
+//**      FLocalMatrix := TMatrix.Identity;
+//**      FLocalMatrix.m31 := Left + ((1 - Scale.X) * Pivot.X * FSize.Width);
+//**      FLocalMatrix.m32 := Top + ((1 - Scale.Y) * Pivot.Y * FSize.Height);
+//**      FLocalMatrix.m11 := Scale.X;
+//**      FLocalMatrix.m22 := Scale.Y;
+//**    end;
+//**  end
+//**  else
+//**  begin
+//**    FLocalMatrix := TMatrix.Identity;
+//**    FLocalMatrix.m31 := Left;
+//**    FLocalMatrix.m32 := Top;
+//**  end;
+//**
+//**  RecalcAbsolute;
+//**  RecalcUpdateRect;
+//**  if HasDisablePaintEffect then
+//**    UpdateEffects;
+//**  if Visible then
+//**    ParentContentChanged;
+//**
+//**  if not GetAnchorMove then
+//**  begin
+//**    UpdateExplicitBounds;
+//**    UpdateAnchorRules(True);
+//**  end;
+//**  if not FInPaintTo and not IsUpdating then
+//**    Repaint;
+//**end;
 
-//procedure TALDynamicExtendedControl.DoMatrixChanged(Sender: TObject);
-//begin
-//  {$IFNDEF ALCompilerVersionSupported123}
-//    {$MESSAGE WARN 'Check if FMX.Controls.TControl.DoMatrixChanged was not updated and adjust the IFDEF'}
-//    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2823 was not corrected and adjust the IFDEF'}
-//  {$ENDIF}
-//  if not FInPaintTo and not IsUpdating then
-//    Repaint;
-//  if SameValue(Scale.X, 1.0, TEpsilon.Scale) and SameValue(Scale.Y, 1.0, TEpsilon.Scale) and SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
-//  begin
-//    if (Owner <> nil) and not TALDynamicControlAccessPrivate(Owner).FSimpleTransform then
-//      TALDynamicControlAccessPrivate(Self).FSimpleTransform := False
-//    else
-//      TALDynamicControlAccessPrivate(Self).FSimpleTransform := True;
-//  end
-//  else
-//    TALDynamicControlAccessPrivate(Self).FSimpleTransform := False;
-//
-//  if not TALDynamicControlAccessPrivate(Self).FSimpleTransform then
-//  begin
-//    if not SameValue(RotationAngle, 0.0, TEpsilon.Scale) then
-//    begin
-//      FLocalMatrix :=
-//        TMatrix.CreateTranslation(-Pivot.X * FSize.Width, -Pivot.Y * FSize.Height) *
-//        TMatrix.CreateScaling(Scale.X, Scale.Y) *
-//        TMatrix.CreateRotation(DegToRad(RotationAngle)) *
-//        TMatrix.CreateTranslation(Pivot.X * FSize.Width + Left, Pivot.Y * FSize.Height + Top);
-//    end
-//    else
-//    begin
-//      FLocalMatrix := TMatrix.Identity;
-//      FLocalMatrix.m31 := Left + ((1 - Scale.X) * Pivot.X * FSize.Width);
-//      FLocalMatrix.m32 := Top + ((1 - Scale.Y) * Pivot.Y * FSize.Height);
-//      FLocalMatrix.m11 := Scale.X;
-//      FLocalMatrix.m22 := Scale.Y;
-//    end;
-//  end
-//  else
-//  begin
-//    FLocalMatrix := TMatrix.Identity;
-//    FLocalMatrix.m31 := Left;
-//    FLocalMatrix.m32 := Top;
-//  end;
-//
-//  RecalcAbsolute;
-//  RecalcUpdateRect;
-//  if HasDisablePaintEffect then
-//    UpdateEffects;
-//  if Visible then
-//    ParentContentChanged;
-//
-//  if not GetAnchorMove then
-//  begin
-//    UpdateExplicitBounds;
-//    UpdateAnchorRules(True);
-//  end;
-//  if not FInPaintTo and not IsUpdating then
-//    Repaint;
-//end;
+{****************************************************}
+//**procedure TALDynamicExtendedControl.DoRootChanged;
+//**begin
+//**  inherited;
+//**  if Root is TCommonCustomForm then FForm := TCommonCustomForm(Root)
+//**  else FForm := nil;
+//**end;
 
-
-//procedure TALDynamicExtendedControl.DoRootChanged;
-//begin
-//  inherited;
-//  if Root is TCommonCustomForm then FForm := TCommonCustomForm(Root)
-//  else FForm := nil;
-//end;
-
-
+{*****************************************************}
 procedure TALDynamicExtendedControl.IsMouseOverChanged;
 begin
   // virtual
 end;
 
+{*******************************************************}
+//**procedure TALDynamicExtendedControl.IsFocusedChanged;
+//**begin
+//**  // virtual
+//**end;
 
-//procedure TALDynamicExtendedControl.IsFocusedChanged;
-//begin
-//  // virtual
-//end;
-
-
+{*************************************************}
 procedure TALDynamicExtendedControl.PressedChanged;
 begin
   // virtual
 end;
 
+{*****************************************************}
+//**Procedure TALDynamicExtendedControl.MarginsChanged;
+//**begin
+//**  // virtual
+//**end;
 
-//Procedure TALDynamicExtendedControl.MarginsChanged;
-//begin
-//  // virtual
-//end;
-
-
+{*************************************************}
 procedure TALDynamicExtendedControl.PaddingChanged;
 begin
   Inherited;
   AdjustSize;
 end;
 
-
+{************************************************}
 procedure TALDynamicExtendedControl.ParentChanged;
 begin
   inherited;
@@ -3891,55 +3891,55 @@ begin
   // temporarily updates the Owner. Unfortunately, Owner is not a virtual property,
   // and TControl.UpdateParentProperties is strictly private. As a result, within TControl.PaintTo,
   // the value of FOwner will be incorrect.
-  //if (Owner <> nil) and (Owner is TALDynamicControl) then
-  //  FOwner := TALDynamicControl(Owner)
-  //else
-  //  FOwner := nil;
+  //**if (Owner <> nil) and (Owner is TALDynamicControl) then
+  //**  FOwner := TALDynamicControl(Owner)
+  //**else
+  //**  FOwner := nil;
 end;
 
+{*****************************************************************************}
+//**procedure TALDynamicExtendedControl.MarginsChangedHandler(Sender: TObject);
+//**begin
+//**  if Assigned(FFormerMarginsChangedHandler) then
+//**    FFormerMarginsChangedHandler(Sender);
+//**  MarginsChanged;
+//**end;
 
-//procedure TALDynamicExtendedControl.MarginsChangedHandler(Sender: TObject);
-//begin
-//  if Assigned(FFormerMarginsChangedHandler) then
-//    FFormerMarginsChangedHandler(Sender);
-//  MarginsChanged;
-//end;
+{***************************************************************************}
+//**procedure TALDynamicExtendedControl.ScaleChangedHandler(Sender: TObject);
+//**begin
+//**  Repaint; //** DoMatrixChanged(Sender);
+//**end;
 
-
-//procedure TALDynamicExtendedControl.ScaleChangedHandler(Sender: TObject);
-//begin
-//  Repaint; // DoMatrixChanged(Sender);
-//end;
-
-
+{**********************************************************}
 constructor TALDynamicContent.Create(const AOwner: TObject);
 begin
   inherited;
-  //SetAcceptsControls(False);
+  //**SetAcceptsControls(False);
 end;
 
-
+{****************************************************************************************************}
 procedure TALDynamicContent.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   inherited;
   ContentChanged;
 end;
 
-
+{*****************************************************************************}
 procedure TALDynamicContent.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   inherited;
   ContentChanged;
 end;
 
+{***********************************************}
+//**procedure TALDynamicContent.DoDeleteChildren;
+//**begin
+//**  inherited;
+//**  ContentChanged;
+//**end;
 
-//procedure TALDynamicContent.DoDeleteChildren;
-//begin
-//  inherited;
-//  ContentChanged;
-//end;
-
-
+{************************************}
 procedure TALDynamicContent.DoRealign;
 //var
 //  AlignRoot: IAlignRoot;
@@ -3969,13 +3969,13 @@ begin
 
 end;
 
-
+{*******************************************}
 procedure TALDynamicContent.DoContentChanged;
 begin
   // Virtual
 end;
 
-
+{*****************************************}
 procedure TALDynamicContent.ContentChanged;
 begin
 
@@ -4003,22 +4003,22 @@ begin
 
 end;
 
+{************************************************************}
+//**function TALDynamicContent.GetTabListClass: TTabListClass;
+//**begin
+//**  Result := TALDynamicContentTabList;
+//**end;
 
-//function TALDynamicContent.GetTabListClass: TTabListClass;
-//begin
-//  Result := TALDynamicContentTabList;
-//end;
-
-
-//function TALDynamicContent.GetTabStopController: ITabStopController;
-//var
-//  Control: IControl;
-//begin
-//  if Supports(Parent, IControl, Control) then
-//    Result := Control.GetTabStopController
-//  else
-//    Result := nil;
-//end;
+{**********************************************************************}
+//**function TALDynamicContent.GetTabStopController: ITabStopController;
+//**var
+//**  Control: IControl;
+//**begin
+//**  if Supports(Parent, IControl, Control) then
+//**    Result := Control.GetTabStopController
+//**  else
+//**    Result := nil;
+//**end;
 
 {$ENDREGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (2)'}
 

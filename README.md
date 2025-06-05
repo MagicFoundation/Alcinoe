@@ -448,13 +448,14 @@ simple and intuitive:
     .SetCloseProc(...)
     .Show;
 ```
-
-<p>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/dialog.gif?raw=true" alt="dialog" width="640" style="width:640px;" />
-</p>
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
 <br/>
 <br/>
+  
+<p>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/dialog.gif?raw=true" alt="dialog" width="640" style="width:640px;" />
+</p>
+
 
 
 Video Player for FireMonkey

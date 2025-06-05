@@ -426,6 +426,33 @@ design preferences.
 | Color              |        ![](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pageindicator_color.gif?raw=true)                | 
 
   
+Design Flexible, Modern Dialogs with TALDialog
+==============================================
+
+**TALDialog** is a dialog component built for mobile 
+applications. It provides the flexibility to display 
+highly customizable dialogs with a modern, 
+Material 3 design.
+
+It uses the <b>Builder Pattern</b> with <b>fluent method 
+chaining</b>, making the dialog creation process 
+simple and intuitive:
+
+```
+  TALDialog.Builder
+    .SetHeadlineText('Delete item')
+    .SetMessageText('Are you sure?')
+    .AddButton('Cancel', 1)
+    .AddButton('Delete', 2)
+    .SetCloseProc(...)
+    .Show;
+```
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/dialog.gif?raw=true" alt="dialog" width="640" style="width:640px;" />
+<br/>
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+  
+  
 Video Player for FireMonkey
 ===========================
 
@@ -493,34 +520,6 @@ smooth, high-performance animation experience.
 Learn more at [Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
-<br/>
-  
-  
-Design Flexible, Modern Dialogs with TALDialog
-==============================================
-
-**TALDialog** is a dialog component built for mobile 
-applications. It provides the flexibility to display 
-highly customizable dialogs with a modern, 
-Material 3 design.
-
-It uses the <b>Builder Pattern</b> with <b>fluent method 
-chaining</b>, making the dialog creation process 
-simple and intuitive:
-
-```
-  TALDialog.Builder
-    .SetHeadlineText('Delete item')
-    .SetMessageText('Are you sure?')
-    .AddButton('Cancel', 1)
-    .AddButton('Delete', 2)
-    .SetCloseProc(...)
-    .Show;
-```
-
-Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/dialog.gif?raw=true" alt="dialog" width="640" style="width:640px;" />
 <br/>
   
   

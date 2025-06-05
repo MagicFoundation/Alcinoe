@@ -61,12 +61,10 @@ forced to apply patches to the original Delphi source files:
 
 * [Enhance MouseEvent Handling by Providing Access to MotionEvent (Android) and UIEvent (iOS)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002)
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
-* [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
 * [The width and height of a TContext3D object must be defined as single-precision, not as integers](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723)
-* [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)
 * [Regression in Alexandria: FMX.StrokeBuilder.pas Revamp Leads to TARC Drawing Issues](https://quality.embarcadero.com/browse/RSP-41618)
 * [Multi-Threading for TBitmap, TCanvas, and TContext3D is not working !](https://quality.embarcadero.com/browse/RSP-19673)
 * [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
@@ -108,7 +106,6 @@ forced to apply patches to the original Delphi source files:
 * [Incorrect indentation of end; in TScreen.IndexFormOfObject](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2902)
 * [ForceQueue with Delay Does Not Work on Android](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206)
 * [FullScreenManager.showSystemUI Resets SystemUiVisibility](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207)
-* [Component Type Name Cannot Contain a "."](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3213)
 * [TControl.SetBounds: Missing ParentContentChanged Call on Size-Only Updates](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264)
 
 
@@ -496,6 +493,34 @@ smooth, high-performance animation experience.
 Learn more at [Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
+<br/>
+  
+  
+Design Flexible, Modern Dialogs with TALDialog
+==============================================
+
+**TALDialog** is a dialog component built for mobile 
+applications. It provides the flexibility to display 
+highly customizable dialogs with a modern, 
+Material 3 design.
+
+It uses the <b>Builder Pattern</b> with <b>fluent method 
+chaining</b>, making the dialog creation process 
+simple and intuitive:
+
+```
+  TALDialog.Builder
+    .SetHeadlineText('Delete item')
+    .SetMessageText('Are you sure?')
+    .AddButton('Cancel', 1)
+    .AddButton('Delete', 2)
+    .SetCloseProc(...)
+    .Show;
+```
+
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/dialog.gif?raw=true" alt="dialog" width="640" style="width:640px;" />
 <br/>
   
   

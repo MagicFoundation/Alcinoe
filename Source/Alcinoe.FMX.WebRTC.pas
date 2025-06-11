@@ -1336,12 +1336,12 @@ begin
   while not Terminated do begin
     Try
 
-      Tmonitor.Enter(fQueue);
+      ALMonitorEnter(fQueue{$IF defined(DEBUG)}, 'TALiOSWebRTC.Execute'{$ENDIF});
       try
         if (fQueue.Count > 0) then LProc := fQueue.Dequeue()
         else LProc := nil;
       finally
-        Tmonitor.exit(fQueue);
+        ALMonitorExit(fQueue);
       end;
       if assigned(LProc) then begin
         LProc();
@@ -1444,11 +1444,11 @@ end;
 {*************************************************}
 procedure TALiOSWebRTC.Enqueue(const aProc: Tproc);
 begin
-  Tmonitor.Enter(fQueue);
+  ALMonitorEnter(fQueue{$IF defined(DEBUG)}, 'TALiOSWebRTC.Enqueue'{$ENDIF});
   try
     fQueue.Enqueue(aProc);
   finally
-    Tmonitor.Exit(fQueue);
+    ALMonitorExit(fQueue);
   end;
   fSignal.SetEvent;
 end;

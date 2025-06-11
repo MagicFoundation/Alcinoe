@@ -1030,7 +1030,7 @@ begin
       SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
       PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1097,7 +1097,7 @@ begin
       SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
       PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1163,7 +1163,7 @@ begin
       SupportingTextSettings.Font.ColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
       PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1231,7 +1231,7 @@ begin
       SupportingTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
       PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1298,7 +1298,7 @@ begin
       SupportingTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
       PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1360,7 +1360,7 @@ begin
       SupportingTextSettings.Font.ColorKey := 'Material.Color.Error'; // md.sys.color.error / md.ref.palette.error40 / #B3261E
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*ARatio,0,0).RoundTo(-2);
       PromptTextColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1437,7 +1437,7 @@ begin
       Stroke.ColorKey := '';
       TextSettings.Font.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1491,7 +1491,7 @@ begin
       Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
       TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1545,7 +1545,7 @@ begin
       Stroke.ColorKey := '';
       TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1595,7 +1595,7 @@ begin
       Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
       Shadow.blur := RoundTo(2 * ARatio, -2);
       Shadow.OffsetY := RoundTo(1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1650,7 +1650,7 @@ begin
       Stroke.ColorKey := '';
       TextSettings.Font.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1710,7 +1710,7 @@ begin
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1765,7 +1765,7 @@ begin
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1820,7 +1820,7 @@ begin
       Fill.ImageTintColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Fill.ResourceName := LPrevResourceName;
       Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1879,7 +1879,7 @@ begin
       Fill.ImageTintColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -1970,7 +1970,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
       CheckMark.ColorKey := ''; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
-      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -2049,7 +2049,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
       CheckMark.ColorKey := ''; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
-      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       TALBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -2136,7 +2136,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
       CheckMark.ColorKey := ''; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -2210,7 +2210,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
       CheckMark.ColorKey := ''; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -3518,7 +3518,7 @@ begin
       Stroke.ColorKey := '';
       TextSettings.Font.ColorKey := 'Material.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3572,7 +3572,7 @@ begin
       Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
       TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3626,7 +3626,7 @@ begin
       Stroke.ColorKey := '';
       TextSettings.Font.ColorKey := 'Material.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3676,7 +3676,7 @@ begin
       Shadow.ColorKey := 'Material.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
       Shadow.blur := RoundTo(2 * ARatio, -2);
       Shadow.OffsetY := RoundTo(1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3731,7 +3731,7 @@ begin
       Stroke.ColorKey := '';
       TextSettings.Font.ColorKey := 'Material.Color.OnSecondaryContainer'; // md.sys.color.on-secondary-container / md.ref.palette.secondary30 / #4A4458
       TextSettings.LetterSpacing := RoundTo(0.1 * ARatio, -2);
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3791,7 +3791,7 @@ begin
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3846,7 +3846,7 @@ begin
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3901,7 +3901,7 @@ begin
       Fill.ImageTintColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Fill.ResourceName := LPrevResourceName;
       Stroke.ColorKey := 'Material.Color.Outline'; // md.sys.color.outline / md.ref.palette.neutral-variant50 / #79747E
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -3960,7 +3960,7 @@ begin
       Fill.ImageTintColorKey := 'Material.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
@@ -4051,7 +4051,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
       CheckMark.ColorKey := ''; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
-      TALDynamicBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      TALDynamicBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       TALDynamicBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -4130,7 +4130,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
       CheckMark.ColorKey := ''; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
-      TALDynamicBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      TALDynamicBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       TALDynamicBaseCheckBoxStateStylesProtectedAccess(StateStyles).Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -4217,7 +4217,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
       CheckMark.ColorKey := ''; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
@@ -4291,7 +4291,7 @@ begin
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
       CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
       CheckMark.ColorKey := ''; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
-      StateStyles.Transition.Interpolation := TALInterpolationType.MaterialStandardDefaultEffects;
+      StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--

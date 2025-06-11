@@ -64,6 +64,7 @@ Type
     FName: string; // 8 bytes | [TComponent] FName: TComponentName;
     FTag: Int64; // 8 bytes | [TComponent] FTag: NativeInt;
     FTagString: string; // 8 bytes | [TFmxObject] FTagString: string;
+    FTagObject: TObject; // 8 bytes | [TFmxObject] [Weak] FTagObject: TObject;
     FLeft: Double; // 8 bytes | [TControl] FPosition: TPosition;
     FTop: Double; // 8 bytes | [TControl] FPosition: TPosition;
     FWidth: Double; // 8 bytes | [TControl] FSize: TControlSize;
@@ -117,7 +118,6 @@ Type
     procedure SetMargins(const AValue: TALBounds); // [TControl] procedure SetMargins(const Value: TBounds);
     procedure PaddingChangedHandler(Sender: TObject); // [TControl] procedure PaddingChangedHandler(Sender: TObject); overload;
     procedure MarginsChangedHandler(Sender: TObject); // [TControl] procedure MarginsChanged(Sender: TObject);
-    procedure SetOwner(const Value: TALDynamicControl);
     function GetControlByIndex(Const AIndex: Integer): TALDynamicControl;
     function GetControlByName(Const AName: String): TALDynamicControl;
     function GetForm: TCommonCustomForm;
@@ -137,6 +137,8 @@ Type
     FIsMouseOver: Boolean; // 1 byte | [TControl] FIsMouseOver: Boolean;
     function CreateMargins: TALBounds; virtual;
     function CreatePadding: TALBounds; virtual;
+    procedure SetOwner(const Value: TALDynamicControl); virtual;
+    procedure SetHost(Const Value: TALDynamicControlHost); virtual;
     procedure SetPivot(const AValue: TPointF);
     procedure SetRotationAngle(const AValue: Single);
     procedure SetScale(const AValue: TPointF);
@@ -150,6 +152,7 @@ Type
     function GetPosition: TALPointD;
     procedure SetPosition(const AValue: TALPointD); overload;
     procedure SetPosition(const AValue: TPointf); overload;
+    procedure SetPosition(const ALeft, ATop: Double); overload;
     procedure SetLeft(const Value: Double);
     procedure SetTop(const Value: Double);
     procedure SetWidth(const Value: Double); // [TControl] procedure SetWidth(const Value: Single); virtual;
@@ -217,7 +220,7 @@ Type
     procedure BeginUpdate; virtual; // [TControl] procedure BeginUpdate; virtual;
     procedure EndUpdate; virtual; abstract; // [TControl] procedure EndUpdate; virtual;
     function IsUpdating: Boolean; virtual; // [TControl] function IsUpdating: Boolean; virtual;
-    function IsReadyToDisplay: Boolean; virtual; abstract;
+    function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; virtual; abstract;
     procedure ApplyColorScheme; virtual; abstract;
     procedure AddControl(const AControl: TALDynamicControl); inline; // [TFmxObject] procedure AddObject(const AObject: TFmxObject);
     procedure InsertControl(const AControl: TALDynamicControl; const AIndex: Integer); // [TFmxObject] procedure InsertObject(Index: Integer; const AObject: TFmxObject);
@@ -248,6 +251,7 @@ Type
     property Tag: Int64 read FTag write FTag; // [TComponent:published] property Tag: NativeInt read FTag write FTag default 0;
     property TagFloat: Double read GetTagFloat write SetTagFloat; // [TComponent:published] property TagFloat: Single read FTagFloat write FTagFloat;
     property TagString: string read FTagString write FTagString; // [TFmxObject] property TagString: string read FTagString write FTagString;
+    property TagObject: TObject read FTagObject write FTagObject; // [TFmxObject] property TagObject: TObject read FTagObject write FTagObject;
     property Enabled: Boolean read FEnabled write SetEnabled; // [TControl] property Enabled: Boolean read FEnabled write SetEnabled stored EnabledStored default True;
     property AbsoluteEnabled: Boolean read FAbsoluteEnabled; // [TControl] property AbsoluteEnabled: Boolean read GetAbsoluteEnabled;
     property Opacity: Single read FOpacity write SetOpacity; // [TControl] property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
@@ -395,7 +399,7 @@ type
     procedure Assign(Source: TALDynamicControl); override;
     procedure EndUpdate; override;
     //**procedure SetNewScene(AScene: IScene); override;
-    function IsReadyToDisplay: Boolean; override;
+    function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
     function IsDisplayed: Boolean; override;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     //**property Form: TCommonCustomForm read FForm;
@@ -648,6 +652,7 @@ begin
   FName := '';
   FTag := 0;
   FTagString := '';
+  FTagObject := nil;
   FLeft := 0;
   FTop := 0;
   var LDefaultSize := GetDefaultSize;
@@ -700,7 +705,7 @@ begin
   FIsMouseOver := False;
   if AOwner <> nil then begin
     if AOwner is TALDynamicControlHost then
-      FHost := TALDynamicControlHost(AOwner)
+      SetHost(TALDynamicControlHost(AOwner))
     else begin
       {$IF defined(DEBUG)}
       if not (AOwner is TALDynamicControl) then
@@ -798,6 +803,41 @@ begin
   end;
 end;
 
+{**********************************************************************}
+procedure TALDynamicControl.SetHost(Const Value: TALDynamicControlHost);
+begin
+  {$IF defined(DEBUG)}
+  if (Owner <> nil) and (Value <> Owner.Host) then
+    Raise exception.Create('Error 8FFB3C46-BFC2-4474-AAA0-001AF039D87E');
+  {$ENDIF}
+
+  if FHost <> value then begin
+
+    If FHost <> nil then begin
+      var LTmpControl := FHost.Captured;
+      while (LTmpControl <> nil) do begin
+        if LTmpControl = Self then begin
+          Host.SetCaptured(nil);
+          break;
+        end;
+        LTmpControl := LTmpControl.Owner;
+      end;
+      //--
+      LTmpControl := Host.Hovered;
+      while (LTmpControl <> nil) do begin
+        if LTmpControl = Self then begin
+          Host.SetHovered(nil);
+          break;
+        end;
+        LTmpControl := LTmpControl.Owner;
+      end;
+    end;
+
+    FHost := Value;
+
+  end;
+end;
+
 {************************************************************************}
 procedure TALDynamicControl.AddControl(const AControl: TALDynamicControl);
 begin
@@ -854,25 +894,6 @@ end;
 {*****************************************************************************}
 procedure TALDynamicControl.DoRemoveControl(const AControl: TALDynamicControl);
 begin
-  if Host <> nil then begin
-    var LTmpControl := Host.Captured;
-    while (LTmpControl <> nil) do begin
-      if LTmpControl = AControl then begin
-        Host.SetCaptured(nil);
-        break;
-      end;
-      LTmpControl := LTmpControl.Owner;
-    end;
-    //--
-    LTmpControl := Host.Hovered;
-    while (LTmpControl <> nil) do begin
-      if LTmpControl = AControl then begin
-        Host.SetHovered(nil);
-        break;
-      end;
-      LTmpControl := LTmpControl.Owner;
-    end;
-  end;
   var LIndex := AControl.Index;
   if LIndex < FControlsCount - 1 then begin
     ALMove(FControls[LIndex + 1], FControls[LIndex], (FControlsCount - 1 - LIndex) * SizeOf(Pointer));
@@ -882,6 +903,7 @@ begin
   Dec(FControlsCount);
   AControl.FIndex := -1;
   AControl.FOwner := nil;
+  AControl.SetHost(nil);
   If not AControl.FIsDestroying then begin
     AControl.ParentChanged;
     for var I := 1 to FUpdating do AControl.EndUpdate;
@@ -1164,6 +1186,12 @@ end;
 procedure TALDynamicControl.SetPosition(const AValue: TPointf);
 begin
   SetBounds(AValue.X, AValue.Y, FWidth, FHeight);
+end;
+
+{*****************************************************************}
+procedure TALDynamicControl.SetPosition(const ALeft, ATop: Double);
+begin
+  SetBounds(ALeft, ATop, FWidth, FHeight);
 end;
 
 {*********************************************************}
@@ -1619,8 +1647,7 @@ end;
 {************************************************}
 procedure TALDynamicControl.AncestorParentChanged;
 begin
-  If FOwner = nil then FHost := nil
-  else FHost := FOwner.FHost;
+  If FOwner <> nil then SetHost(FOwner.FHost);
   for var I := 0 to FControlsCount - 1 do
     FControls[I].AncestorParentChanged;
 end;
@@ -2646,7 +2673,7 @@ begin
       //**TabStop := TALDynamicControl(Source).TabStop;
       Tag := TALDynamicControl(Source).Tag;
       //**TagFloat := TALDynamicControl(Source).TagFloat;
-      //**TagObject := TALDynamicControl(Source).TagObject;
+      TagObject := TALDynamicControl(Source).TagObject;
       TagString := TALDynamicControl(Source).TagString;
       //**TouchTargetExpansion.Assign(TALDynamicControl(Source).TouchTargetExpansion);
       Visible := TALDynamicControl(Source).Visible;
@@ -3522,17 +3549,17 @@ begin
   FAutoAlignToPixel := AValue;
 end;
 
-{***********************************************************}
-function TALDynamicExtendedControl.IsReadyToDisplay: Boolean;
+{*******************************************************************************************}
+function TALDynamicExtendedControl.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function CheckAllChildrenAreReadyToDisplay(const AControl: TALDynamicControl): boolean;
   begin
     Result := True;
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      //**if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay
+      //**if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay(AStrict)
       //**else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);
-      Result := AControl.Controls[i].IsReadyToDisplay;
+      Result := AControl.Controls[i].IsReadyToDisplay(AStrict);
       if not Result then exit;
     end;
   end;

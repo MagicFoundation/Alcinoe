@@ -361,7 +361,6 @@ type
   TALTextHorzAlign = (Center, Leading, Trailing, Justify);
   TALTextVertAlign = (Center, Leading, Trailing);
   TALTextDirection = (RightToLeft, LeftToRight);
-  TALTextTrimming = (Character, Word);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFont = class(TALPersistentObserver)
@@ -516,7 +515,6 @@ type
     FEllipsisSettings: TALEllipsisSettings; // 8 bytes
     FMaxLines: integer; // 4 bytes
     FIsHtml: Boolean; // 1 byte
-    FTrimming: TALTextTrimming; // 1 byte
     FHorzAlign: TALTextHorzAlign; // 1 byte
     FVertAlign: TALTextVertAlign; // 1 byte
     FLineHeightMultiplier: Single; // 4 bytes
@@ -527,7 +525,6 @@ type
     procedure SetEllipsisSettings(const AValue: TALEllipsisSettings);
     procedure SetMaxLines(const AValue: Integer);
     procedure SetIsHtml(const AValue: Boolean);
-    procedure SetTrimming(const AValue: TALTextTrimming);
     procedure SetHorzAlign(const AValue: TALTextHorzAlign);
     procedure SetVertAlign(const AValue: TALTextVertAlign);
     procedure SetLineHeightMultiplier(const AValue: Single);
@@ -538,7 +535,6 @@ type
     function IsEllipsisStored: Boolean;
     function IsMaxLinesStored: Boolean;
     function IsIsHtmlStored: Boolean;
-    function IsTrimmingStored: Boolean;
     function IsHorzAlignStored: Boolean;
     function IsVertAlignStored: Boolean;
     function IsLineHeightMultiplierStored: Boolean;
@@ -558,7 +554,6 @@ type
     function GetDefaultEllipsis: String; virtual;
     function GetDefaultMaxLines: Integer; virtual;
     function GetDefaultIsHtml: Boolean; virtual;
-    function GetDefaultTrimming: TALTextTrimming; virtual;
     function GetDefaultHorzAlign: TALTextHorzAlign; virtual;
     function GetDefaultVertAlign: TALTextVertAlign; virtual;
     function GetDefaultLineHeightMultiplier: Single; virtual;
@@ -576,7 +571,6 @@ type
     property DefaultEllipsis: String read GetDefaultEllipsis;
     property DefaultMaxLines: Integer read GetDefaultMaxLines;
     property DefaultIsHtml: Boolean read GetDefaultIsHtml;
-    property DefaultTrimming: TALTextTrimming read GetDefaultTrimming;
     property DefaultHorzAlign: TALTextHorzAlign read GetDefaultHorzAlign;
     property DefaultVertAlign: TALTextVertAlign read GetDefaultVertAlign;
     property DefaultLineHeightMultiplier: Single read GetDefaultLineHeightMultiplier;
@@ -588,7 +582,6 @@ type
     property EllipsisSettings: TALEllipsisSettings read FEllipsisSettings write SetEllipsisSettings;
     property MaxLines: Integer read FMaxLines write SetMaxLines stored IsMaxLinesStored;
     property IsHtml: Boolean read FIsHtml write SetIsHtml stored IsIsHtmlStored;
-    property Trimming: TALTextTrimming read FTrimming write SetTrimming stored IsTrimmingStored;
     property HorzAlign: TALTextHorzAlign read FHorzAlign write SetHorzAlign stored IsHorzAlignStored;
     property VertAlign: TALTextVertAlign read FVertAlign write SetVertAlign stored IsVertAlignStored;
     property LineHeightMultiplier: Single read FLineHeightMultiplier write SetLineHeightMultiplier stored IsLineHeightMultiplierStored nodefault;
@@ -604,7 +597,6 @@ type
     property EllipsisSettings;
     property MaxLines;
     property IsHtml;
-    property Trimming;
     property HorzAlign;
     property VertAlign;
     property LineHeightMultiplier;
@@ -932,35 +924,42 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALStateTransition = class(TALPersistentObserver)
   private
-    FAnimationType: TAnimationType; // 4 bytes (because FMX.Types use {$MINENUMSIZE 4})
     FDuration: Single; // 4 bytes
-    FInterpolation: TALInterpolationType; // 1 byte
+    FInterpolationType: TALInterpolationType; // 1 byte
+    FInterpolationMode: TALInterpolationMode; // 1 byte
     FDelayClick: Boolean; // 1 byte
-    procedure SetAnimationType(const Value: TAnimationType);
     procedure SetDuration(const Value: Single);
-    procedure SetInterpolation(const Value: TALInterpolationType);
+    procedure SetInterpolationType(const Value: TALInterpolationType);
+    procedure SetInterpolationMode(const Value: TALInterpolationMode);
     procedure SetDelayClick(const Value: Boolean);
-    function IsAnimationTypeStored: Boolean;
     function IsDurationStored: Boolean;
-    function IsInterpolationStored: Boolean;
+    function IsInterpolationTypeStored: Boolean;
+    function IsInterpolationModeStored: Boolean;
     function IsDelayClickStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadAnimationType(Reader: TReader);
+    procedure ReadInterpolation(Reader: TReader);
   protected
-    function GetDefaultAnimationType: TAnimationType; virtual;
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
+  protected
     function GetDefaultDuration: Single; virtual;
-    function GetDefaultInterpolation: TALInterpolationType; virtual;
+    function GetDefaultInterpolationType: TALInterpolationType; virtual;
+    function GetDefaultInterpolationMode: TALInterpolationMode; virtual;
     function GetDefaultDelayClick: Boolean; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    property DefaultAnimationType: TAnimationType read GetDefaultAnimationType;
     property DefaultDuration: Single read GetDefaultDuration;
-    property DefaultInterpolation: TALInterpolationType read GetDefaultInterpolation;
+    property DefaultInterpolationType: TALInterpolationType read GetDefaultInterpolationType;
+    property DefaultInterpolationMode: TALInterpolationMode read GetDefaultInterpolationMode;
     property DefaultDelayClick: Boolean read GetDefaultDelayClick;
   published
-    property AnimationType: TAnimationType read FAnimationType write SetAnimationType stored IsAnimationTypeStored;
     property Duration: Single read FDuration write SetDuration stored IsDurationStored nodefault;
-    property Interpolation: TALInterpolationType read FInterpolation write SetInterpolation stored IsInterpolationStored;
+    property InterpolationType: TALInterpolationType read FInterpolationType write SetInterpolationType stored IsInterpolationTypeStored;
+    property InterpolationMode: TALInterpolationMode read FInterpolationMode write SetInterpolationMode stored IsInterpolationModeStored;
     property DelayClick: Boolean read FDelayClick write SetDelayClick stored IsDelayClickStored;
   end;
 
@@ -1451,6 +1450,9 @@ uses
   System.IOutils,
   System.UIConsts,
   System.Generics.Defaults,
+  {$IF defined(ALBackwardCompatible)}
+  System.TypInfo,
+  {$ENDIF}
   FMX.Utils,
   Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
@@ -3016,7 +3018,6 @@ begin
   FEllipsisSettings.OnChanged := EllipsisSettingsChanged;
   FMaxLines := DefaultMaxLines;
   FIsHtml := DefaultIsHtml;
-  FTrimming := DefaultTrimming;
   FHorzAlign := DefaultHorzAlign;
   FVertAlign := DefaultVertAlign;
   FLineHeightMultiplier := DefaultLineHeightMultiplier;
@@ -3091,13 +3092,7 @@ begin
       if TALTextDecorationKind.LineThrough in Decoration.Kinds then TTextSettings(Dest).Font.Style := TTextSettings(Dest).Font.Style + [TfontStyle.fsStrikeOut];
       TTextSettings(Dest).FontColor := Font.color;
       if Ellipsis = '' then TTextSettings(Dest).Trimming := TTextTrimming.None
-      else begin
-        case Trimming of
-          TALTextTrimming.Character: TTextSettings(Dest).Trimming := TTextTrimming.Character;
-          TALTextTrimming.Word:      TTextSettings(Dest).Trimming := TTextTrimming.Word;
-          else raise Exception.Create('Error 66A0235E-FC1D-4FD9-82B1-1C58AF792AE6');
-        end;
-      end;
+      else TTextSettings(Dest).Trimming := TTextTrimming.Word;
       TTextSettings(Dest).WordWrap := MaxLines > 1;
       case HorzAlign of
         TALTextHorzAlign.Center:   TTextSettings(Dest).HorzAlign := TTextAlign.Center;
@@ -3132,7 +3127,6 @@ begin
       EllipsisSettings.Assign(TALBaseTextSettings(Source).EllipsisSettings);
       MaxLines             := TALBaseTextSettings(Source).MaxLines;
       IsHtml               := TALBaseTextSettings(Source).IsHtml;
-      Trimming             := TALBaseTextSettings(Source).Trimming;
       HorzAlign            := TALBaseTextSettings(Source).HorzAlign;
       VertAlign            := TALBaseTextSettings(Source).VertAlign;
       LineHeightMultiplier := TALBaseTextSettings(Source).LineHeightMultiplier;
@@ -3154,12 +3148,6 @@ begin
       if not TTextSettings(Source).WordWrap then MaxLines := 1
       else MaxLines := DefaultMaxLines;
       IsHtml := DefaultIsHtml;
-      case TTextSettings(Source).Trimming of
-        TTextTrimming.None:      Trimming := DefaultTrimming;
-        TTextTrimming.Character: Trimming := TALTextTrimming.Character;
-        TTextTrimming.Word:      Trimming := TALTextTrimming.Word;
-        else raise Exception.Create('Error FAFCFC8A-6C5F-464C-B2F3-0283C0D6072E');
-      end;
       case TTextSettings(Source).HorzAlign of
         TTextAlign.Center:   HorzAlign := TALTextHorzAlign.Center;
         TTextAlign.Leading:  HorzAlign := TALTextHorzAlign.Leading;
@@ -3194,7 +3182,6 @@ begin
     EllipsisSettings.reset;
     MaxLines := DefaultMaxLines;
     IsHtml := DefaultIsHtml;
-    Trimming := DefaultTrimming;
     HorzAlign := DefaultHorzAlign;
     VertAlign := DefaultVertAlign;
     LineHeightMultiplier := DefaultLineHeightMultiplier;
@@ -3242,7 +3229,6 @@ begin
       EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime);
       MaxLines := ATo.MaxLines;
       IsHtml := ATo.IsHtml;
-      Trimming := ATo.Trimming;
       HorzAlign := ATo.HorzAlign;
       VertAlign := ATo.VertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, ATo.LineHeightMultiplier{Stop}, ANormalizedTime);
@@ -3255,7 +3241,6 @@ begin
       EllipsisSettings.Interpolate(nil, ANormalizedTime);
       MaxLines := DefaultMaxLines;
       IsHtml := DefaultIsHtml;
-      Trimming := DefaultTrimming;
       HorzAlign := DefaultHorzAlign;
       VertAlign := DefaultVertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, DefaultLineHeightMultiplier{Stop}, ANormalizedTime);
@@ -3313,12 +3298,6 @@ begin
   Result := FIsHtml <> DefaultIsHtml;
 end;
 
-{*****************************************************}
-function TALBaseTextSettings.IsTrimmingStored: Boolean;
-begin
-  Result := FTrimming <> DefaultTrimming;
-end;
-
 {******************************************************}
 function TALBaseTextSettings.IsHorzAlignStored: Boolean;
 begin
@@ -3359,12 +3338,6 @@ end;
 function TALBaseTextSettings.GetDefaultIsHtml: Boolean;
 begin
   Result := True;
-end;
-
-{***************************************************************}
-function TALBaseTextSettings.GetDefaultTrimming: TALTextTrimming;
-begin
-  Result := TALTextTrimming.Word;
 end;
 
 {*****************************************************************}
@@ -3432,15 +3405,6 @@ procedure TALBaseTextSettings.SetIsHtml(const AValue: Boolean);
 begin
   If FIsHtml <> AValue then begin
     FIsHtml := AValue;
-    Change;
-  end;
-end;
-
-{***********************************************************************}
-procedure TALBaseTextSettings.SetTrimming(const AValue: TALTextTrimming);
-begin
-  If FTrimming <> AValue then begin
-    FTrimming := AValue;
     Change;
   end;
 end;
@@ -5156,11 +5120,37 @@ end;
 constructor TALStateTransition.Create;
 begin
   inherited Create;
-  FAnimationType := DefaultAnimationType;
   FDuration := DefaultDuration;
-  FInterpolation := DefaultInterpolation;
+  FInterpolationType := DefaultInterpolationType;
+  FInterpolationMode := DefaultInterpolationMode;
   FDelayClick := DefaultDelayClick;
 end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALStateTransition.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('AnimationType', ReadAnimationType, nil{WriteData}, false{hasdata});
+  Filer.DefineProperty('Interpolation', ReadInterpolation, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALStateTransition.ReadAnimationType(Reader: TReader);
+begin
+  InterpolationMode := TALInterpolationMode(GetEnumValue(TypeInfo(TALInterpolationMode), Reader.ReadIdent));
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALStateTransition.ReadInterpolation(Reader: TReader);
+begin
+  InterpolationType := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), Reader.ReadIdent));
+end;
+{$ENDIF}
 
 {*******************************************************}
 procedure TALStateTransition.Assign(Source: TPersistent);
@@ -5168,9 +5158,9 @@ begin
   if Source is TALStateTransition then begin
     BeginUpdate;
     Try
-      AnimationType := TALStateTransition(Source).AnimationType;
       Duration := TALStateTransition(Source).Duration;
-      Interpolation := TALStateTransition(Source).Interpolation;
+      InterpolationType := TALStateTransition(Source).InterpolationType;
+      InterpolationMode := TALStateTransition(Source).InterpolationMode;
       DelayClick := TALStateTransition(Source).DelayClick;
     Finally
       EndUpdate;
@@ -5186,19 +5176,13 @@ begin
   BeginUpdate;
   Try
     inherited;
-    AnimationType := DefaultAnimationType;
     Duration := DefaultDuration;
-    Interpolation := DefaultInterpolation;
+    InterpolationType := DefaultInterpolationType;
+    InterpolationMode := DefaultInterpolationMode;
     DelayClick := DefaultDelayClick;
   finally
     EndUpdate;
   end;
-end;
-
-{*********************************************************}
-function TALStateTransition.IsAnimationTypeStored: Boolean;
-begin
-  result := FAnimationType <> DefaultAnimationType;
 end;
 
 {****************************************************}
@@ -5207,10 +5191,16 @@ begin
   result := not SameValue(fDuration, DefaultDuration, Tepsilon.Scale);
 end;
 
-{*********************************************************}
-function TALStateTransition.IsInterpolationStored: Boolean;
+{*************************************************************}
+function TALStateTransition.IsInterpolationTypeStored: Boolean;
 begin
-  result := FInterpolation <> DefaultInterpolation;
+  result := FInterpolationType <> DefaultInterpolationType;
+end;
+
+{*************************************************************}
+function TALStateTransition.IsInterpolationModeStored: Boolean;
+begin
+  result := FInterpolationMode <> DefaultInterpolationMode;
 end;
 
 {******************************************************}
@@ -5219,37 +5209,28 @@ begin
   result := FDelayClick <> DefaultDelayClick;
 end;
 
-{******************************************************************}
-function TALStateTransition.GetDefaultAnimationType: TAnimationType;
-begin
-  Result := TAnimationType.Out;
-end;
-
 {*****************************************************}
 function TALStateTransition.GetDefaultDuration: Single;
 begin
   Result := 0.16;
 end;
 
-{************************************************************************}
-function TALStateTransition.GetDefaultInterpolation: TALInterpolationType;
+{****************************************************************************}
+function TALStateTransition.GetDefaultInterpolationType: TALInterpolationType;
 begin
   Result := TALInterpolationType.Cubic;
+end;
+
+{****************************************************************************}
+function TALStateTransition.GetDefaultInterpolationMode: TALInterpolationMode;
+begin
+  Result := TALInterpolationMode.Out;
 end;
 
 {********************************************************}
 function TALStateTransition.GetDefaultDelayClick: Boolean;
 begin
   Result := False;
-end;
-
-{*************************************************************************}
-procedure TALStateTransition.SetAnimationType(const Value: TAnimationType);
-begin
-  if fAnimationType <> Value then begin
-    fAnimationType := Value;
-    Change;
-  end;
 end;
 
 {************************************************************}
@@ -5261,11 +5242,20 @@ begin
   end;
 end;
 
-{*******************************************************************************}
-procedure TALStateTransition.SetInterpolation(const Value: TALInterpolationType);
+{***********************************************************************************}
+procedure TALStateTransition.SetInterpolationType(const Value: TALInterpolationType);
 begin
-  if fInterpolation <> Value then begin
-    fInterpolation := Value;
+  if fInterpolationType <> Value then begin
+    fInterpolationType := Value;
+    Change;
+  end;
+end;
+
+{***********************************************************************************}
+procedure TALStateTransition.SetInterpolationMode(const Value: TALInterpolationMode);
+begin
+  if fInterpolationMode <> Value then begin
+    fInterpolationMode := Value;
     Change;
   end;
 end;
@@ -5760,8 +5750,8 @@ begin
     else FTransitionAnimation.Duration := FTransition.Duration;
     FTransitionAnimation.StartValue := 0;
     FTransitionAnimation.StopValue := 1;
-    FTransitionAnimation.AnimationType := FTransition.animationType;
-    FTransitionAnimation.Interpolation := FTransition.Interpolation;
+    FTransitionAnimation.InterpolationType := FTransition.InterpolationType;
+    FTransitionAnimation.InterpolationMode := FTransition.InterpolationMode;
     FTransitionAnimation.Start;
     //--
     // This is necessary in case StartTransition is called again immediately after
@@ -6800,12 +6790,12 @@ var _RenderScript: JRenderScript;
 function getRenderScript: JRenderScript;
 begin
   if _RenderScript = nil then begin
-    Tmonitor.Enter(Application);
+    ALMonitorEnter(Application{$IF defined(DEBUG)}, 'getRenderScript'{$ENDIF});
     try
       if _RenderScript = nil then
         _RenderScript := TJRenderScript.JavaClass.create(TandroidHelper.Context);
     finally
-      Tmonitor.Exit(Application);
+      ALMonitorExit(Application);
     end;
   end;
   result := _RenderScript;

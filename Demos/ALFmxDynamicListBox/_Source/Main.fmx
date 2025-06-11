@@ -19,6 +19,9 @@ object MainForm: TMainForm
     OnCreateLoadingContent = MainDynamicListBoxCreateLoadingContent
     OnCreateTopBar = MainDynamicListBoxCreateTopBar
     OnCreateBottomBar = MainDynamicListBoxCreateBottomBar
+    OnCreatePullToRefreshIndicator = MainDynamicListBoxCreatePullToRefreshIndicator
+    OnCreateLoadMoreIndicator = MainDynamicListBoxCreateLoadMoreIndicator
+    OnCreateLoadMoreRetryButton = MainDynamicListBoxCreateLoadMoreRetryButton
     OnCreateItem = MainDynamicListBoxCreateItem
     OnCreateItemMainContent = MainDynamicListBoxCreateItemMainContent
     OnDownloadItems = MainDynamicListBoxDownloadItems

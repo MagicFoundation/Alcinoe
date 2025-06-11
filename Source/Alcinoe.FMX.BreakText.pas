@@ -76,7 +76,6 @@ type
     // When LineHeightMultiplier is non-null, the line height of the span of text will be a multiple of fontSize and be exactly fontSize * height logical pixels tall
     LineHeightMultiplier: single; // default = 0
     LetterSpacing: Single; // default = 0
-    Trimming: TALTextTrimming; // default = TALTextTrimming.Word
     FailIfTextBroken: boolean; // default = false
     //--
     Direction: TALTextDirection; // default = TALTextDirection.LeftToRight
@@ -377,7 +376,6 @@ begin
   MaxLines := 65535;
   LineHeightMultiplier := 0;
   LetterSpacing := 0;
-  Trimming := TALTextTrimming.Word;
   FailIfTextBroken := false;
   //--
   Direction := TALTextDirection.LeftToRight;
@@ -467,7 +465,6 @@ begin
   MaxLines := Source.MaxLines;
   LineHeightMultiplier := Source.LineHeightMultiplier;
   LetterSpacing := Source.LetterSpacing;
-  Trimming := Source.Trimming;
   FailIfTextBroken := Source.FailIfTextBroken;
   //--
   Direction := Source.Direction;
@@ -665,6 +662,16 @@ procedure ALDrawMultiLineText(
       While Result > 0 do begin
         if (Result < Ln) and (CharInSet(AText.Chars[Result-1], ['\','/'])) then break
         else dec(Result);
+      end;
+    end;
+    // Break on character in last resort
+    if Result <= 0 then begin
+      Result := Min(ANumberOfChars, Ln) - 1;
+      While Result > 0 do begin
+        // High Surrogate = First part of the pair
+        // Low Surrogate = Second part of the pair
+        if AText.Chars[Result].IsHighSurrogate then dec(Result)
+        else break;
       end;
     end;
     // Skip end of text punctuation

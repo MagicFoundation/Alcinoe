@@ -639,8 +639,8 @@ begin
     else FTransitionAnimation.Duration := FTransition.Duration;
     FTransitionAnimation.StartValue := 0;
     FTransitionAnimation.StopValue := 1;
-    FTransitionAnimation.AnimationType := FTransition.animationType;
-    FTransitionAnimation.Interpolation := FTransition.Interpolation;
+    FTransitionAnimation.InterpolationType := FTransition.InterpolationType;
+    FTransitionAnimation.InterpolationMode := FTransition.InterpolationMode;
     FTransitionAnimation.Start;
     //--
     // This is necessary in case StartTransition is called again immediately after

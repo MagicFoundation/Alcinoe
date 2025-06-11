@@ -143,8 +143,8 @@ type
     procedure RemoveAnimation(const Ani: TALAnimation);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALAnimation = class(TObject)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALAnimation = class(TPersistent)
   public const
     DefaultAniFrameRate = 60;
   public class var
@@ -166,7 +166,7 @@ type
     FDidAutoReverse: Boolean;
     FInverse: Boolean;
     FSavedInverse: Boolean;
-    FPause: Boolean;
+    FPaused: Boolean;
     FRunning: Boolean;
     FOnFirstFrame: TNotifyEvent;
     FOnProcess: TNotifyEvent;
@@ -176,23 +176,56 @@ type
     class procedure Uninitialize;
   protected
     procedure ProcessTick(const ATime, ADeltaTime: Double); virtual; abstract;
-    procedure FirstFrame; virtual;
     procedure ProcessAnimation; virtual; abstract;
+    procedure DoFirstFrame; virtual;
     procedure DoProcess; virtual;
     procedure DoFinish; virtual;
     class property AniThread: TALAniThread read FAniThread;
   public
     constructor Create; Virtual;
     destructor Destroy; override;
-    procedure Start; virtual; abstract;
-    procedure Stop; virtual; abstract;
-    procedure StopAtCurrent; virtual; abstract;
+    /// <summary>
+    ///   Moves the animation to its start and executes the OnFirstFrame and OnProcess events.
+    /// </summary>
+    procedure Start; virtual;
+    /// <summary>
+    ///   Moves the animation to its end and executes the OnProcess and OnFinish events.
+    /// </summary>
+    procedure Stop; virtual;
+    /// <summary>
+    ///   Stops the animation at its current position and executes the OnFinish event.
+    /// </summary>
+    procedure StopAtCurrent; virtual;
+    /// <summary>
+    ///   Pauses the animation at its current position.
+    /// </summary>
+    procedure Pause; virtual;
+    /// <summary>
+    ///   Resumes the animation from its current position.
+    /// </summary>
+    procedure Resume; virtual;
+    /// <summary>
+    ///   Continues to return True even when the animation is paused.
+    /// </summary>
     property Running: Boolean read FRunning;
-    property Pause: Boolean read FPause write FPause;
-    property Enabled: Boolean read FEnabled write SetEnabled;
+    property Paused: Boolean read FPaused;
     property Delay: Single read FDelay write FDelay;
     property Loop: Boolean read FLoop write FLoop;
+    /// <summary>
+    ///   Set AutoReverse to True to animate the controlled property backwards,
+    ///   from the StopValue to the StartValue, after the completion of the
+    ///   regular animation. The forward and backward animations each take a
+    ///   Duration number of seconds. If Loop is True, the forward and backward
+    ///   animations are alternated. OnFinish gets called after the backward
+    ///   animation has completed.
+    /// </summary>
     property AutoReverse: Boolean read FAutoReverse write FAutoReverse;
+    /// <summary>
+    ///   Set Inverse to True to animate the controlled property backwards
+    ///   from the StopValue to the StartValue. The backward animation takes
+    ///   a Duration number of seconds. OnFinish gets called after the backward
+    ///   animation has completed.
+    /// </summary>
     property Inverse: Boolean read FInverse write FInverse;
     property CurrentTime: Double read FTime;
     property OnFirstFrame: TNotifyEvent read FOnFirstFrame write FOnFirstFrame;
@@ -201,6 +234,9 @@ type
     property Tag: int64 read FTag write FTag;
     property TagObject: TObject read FTagObject write FTagObject;
     property TagFloat: Double read FTagFloat write FTagFloat;
+    // This property must be declared last to ensure that the animation
+    // starts only after all other properties have been fully loaded.
+    property Enabled: Boolean read FEnabled write SetEnabled;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -230,7 +266,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~}
   TALInterpolationType = (
     Linear,
-    Quadratic,
+    Quadratic, // similar to css ease-in-out
     Cubic,
     Quartic,
     Quintic,
@@ -240,22 +276,36 @@ type
     Elastic,
     Back,
     Bounce,
-    MaterialExpressiveFastSpatial, // Duration =  350ms
-    MaterialExpressiveDefaultSpatial, // Duration =  500ms
-    MaterialExpressiveSlowSpatial, // Duration =  650ms
-    MaterialExpressiveFastEffects, // Duration =  150ms
-    MaterialExpressiveDefaultEffects, // Duration =  200ms
-    MaterialExpressiveSlowEffects, // Duration =  300ms
-    MaterialStandardFastSpatial, // Duration =  350ms
-    MaterialStandardDefaultSpatial, // Duration =  500ms
-    MaterialStandardSlowSpatial, // Duration =  750ms
-    MaterialStandardFastEffects, // Duration =  150ms
-    MaterialStandardDefaultEffects, // Duration =  200ms
-    MaterialStandardSlowEffects, // Duration =  300ms
-    MaterialEmphasized,
-    MaterialEmphasizedDecelerate,
-    MaterialEmphasizedAccelerate,
+    //--
+    // https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+    MaterialExpressiveFastSpatial, // Duration = 350ms
+    MaterialExpressiveDefaultSpatial, // Duration = 500ms
+    MaterialExpressiveSlowSpatial, // Duration = 650ms
+    //--
+    // https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+    MaterialExpressiveFastEffects, // Duration = 150ms
+    MaterialExpressiveDefaultEffects, // Duration = 200ms
+    MaterialExpressiveSlowEffects, // Duration = 300ms
+    //--
+    // https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+    MaterialStandardFastSpatial, // Duration = 350ms
+    MaterialStandardDefaultSpatial, // Duration = 500ms
+    MaterialStandardSlowSpatial, // Duration = 750ms
+    //--
+    // https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
+    MaterialStandardFastEffects, // Duration = 150ms
+    MaterialStandardDefaultEffects, // Duration = 200ms
+    MaterialStandardSlowEffects, // Duration = 300ms
+    //--
+    // https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration#6409707e-1253-449c-b588-d27fe53bd025
+    MaterialEmphasized, // Duration = 500ms | Begin and end on screen
+    MaterialEmphasizedDecelerate, // Duration = 400ms | Enter the screen
+    MaterialEmphasizedAccelerate, // Duration = 200ms | Exit the screen
+    //--
     Custom);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInterpolationMode = (&In, Out, InOut);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALCustomInterpolationEvent = function(Sender: TObject): Single of object;
@@ -265,8 +315,8 @@ type
   private
     FDuration: Single;
     FOnCustomInterpolation: TALCustomInterpolationEvent;
-    FInterpolation: TALInterpolationType;
-    FAnimationType: TAnimationType;
+    FInterpolationType: TALInterpolationType;
+    FInterpolationMode: TALInterpolationMode;
   protected
     procedure ProcessTick(const ATime, ADeltaTime: Double); override;
     function GetNormalizedTime: Single; virtual;
@@ -276,9 +326,9 @@ type
     procedure Start; override;
     procedure Stop; override;
     procedure StopAtCurrent; override;
-    property AnimationType: TAnimationType read FAnimationType write FAnimationType;
     property Duration: Single read FDuration write FDuration;
-    property Interpolation: TALInterpolationType read FInterpolation write FInterpolation;
+    property InterpolationType: TALInterpolationType read FInterpolationType write FInterpolationType;
+    property InterpolationMode: TALInterpolationMode read FInterpolationMode write FInterpolationMode;
     property OnCustomInterpolation: TALCustomInterpolationEvent read FOnCustomInterpolation write FOnCustomInterpolation;
     // Given the current time, NormalizedTime returns a number in the range from
     // 0 through 1, indicating how far the controlled property value has changed
@@ -292,8 +342,8 @@ type
   private
     FStartValue: Single;
     FStopValue: Single;
-    fCurrentValue: Single;
   protected
+    FCurrentValue: Single;
     procedure ProcessAnimation; override;
   public
     constructor Create; override;
@@ -309,8 +359,8 @@ type
   private
     FStartValue: TAlphaColor;
     FStopValue: TAlphaColor;
-    fCurrentValue: TAlphaColor;
   protected
+    FCurrentValue: TAlphaColor;
     procedure ProcessAnimation; override;
   public
     constructor Create; override;
@@ -353,27 +403,26 @@ type
     FOnProcess: TNotifyEvent;
     FOnFinish: TNotifyEvent;
     FOnCustomInterpolation: TALCustomInterpolationEvent;
-    function getAnimationType: TAnimationType;
     function getAutoReverse: Boolean;
     function getDelay: Single;
     function getDuration: Single;
-    function getInterpolation: TALInterpolationType;
+    function getInterpolationType: TALInterpolationType;
+    function getInterpolationMode: TALInterpolationMode;
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
-    function getPause: Boolean;
+    function getPaused: Boolean;
     function getRunning: Boolean;
     function GetStartValue: Single;
     function GetStopValue: Single;
     function GetCurrentValue: Single;
-    procedure setAnimationType(const Value: TAnimationType);
     procedure setAutoReverse(const Value: Boolean);
     procedure setDelay(const Value: Single);
     procedure setDuration(const Value: Single);
-    procedure setInterpolation(const Value: TALInterpolationType);
+    procedure setInterpolationType(const Value: TALInterpolationType);
+    procedure setInterpolationMode(const Value: TALInterpolationMode);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
-    procedure setPause(const Value: Boolean);
     procedure SetStartValue(const Value: Single);
     procedure setStopValue(const Value: Single);
   protected
@@ -390,15 +439,15 @@ type
     procedure Stop; override;
     procedure StopAtCurrent; virtual;
     property Running: Boolean read getRunning;
-    property Pause: Boolean read getPause write setPause;
+    property Paused: Boolean read getPaused;
     property CurrentValue: Single read GetCurrentValue;
     property CurrentTime: Single read GetCurrentTime;
   published
-    property AnimationType: TAnimationType read getAnimationType write setAnimationType default TAnimationType.In;
     property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
     property Delay: Single read getDelay write setDelay;
     property Duration: Single read getDuration write setDuration nodefault;
-    property Interpolation: TALInterpolationType read getInterpolation write setInterpolation default TALInterpolationType.Linear;
+    property InterpolationType: TALInterpolationType read getInterpolationType write setInterpolationType default TALInterpolationType.Linear;
+    property InterpolationMode: TALInterpolationMode read getInterpolationMode write setInterpolationMode default TALInterpolationMode.In;
     property Inverse: Boolean read getInverse write setInverse default False;
     property Loop: Boolean read getLoop write setLoop default False;
     property OnFirstFrame: TNotifyEvent read fOnFirstFrame write fOnFirstFrame;
@@ -422,27 +471,26 @@ type
     FOnProcess: TNotifyEvent;
     FOnFinish: TNotifyEvent;
     FOnCustomInterpolation: TALCustomInterpolationEvent;
-    function getAnimationType: TAnimationType;
     function getAutoReverse: Boolean;
     function getDelay: Single;
     function getDuration: Single;
-    function getInterpolation: TALInterpolationType;
+    function getInterpolationType: TALInterpolationType;
+    function getInterpolationMode: TALInterpolationMode;
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
-    function getPause: Boolean;
+    function getPaused: Boolean;
     function getRunning: Boolean;
     function GetStartValue: TAlphaColor;
     function GetStopValue: TAlphaColor;
     function GetCurrentValue: TAlphaColor;
-    procedure setAnimationType(const Value: TAnimationType);
     procedure setAutoReverse(const Value: Boolean);
     procedure setDelay(const Value: Single);
     procedure setDuration(const Value: Single);
-    procedure setInterpolation(const Value: TALInterpolationType);
+    procedure setInterpolationType(const Value: TALInterpolationType);
+    procedure setInterpolationMode(const Value: TALInterpolationMode);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
-    procedure setPause(const Value: Boolean);
     procedure SetStartValue(const Value: TAlphaColor);
     procedure setStopValue(const Value: TAlphaColor);
   protected
@@ -459,15 +507,15 @@ type
     procedure Stop; override;
     procedure StopAtCurrent; virtual;
     property Running: Boolean read getRunning;
-    property Pause: Boolean read getPause write setPause;
+    property Paused: Boolean read getPaused;
     property CurrentValue: TAlphaColor read GetCurrentValue;
     property CurrentTime: Single read GetCurrentTime;
   published
-    property AnimationType: TAnimationType read getAnimationType write setAnimationType default TAnimationType.In;
     property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
     property Delay: Single read getDelay write setDelay;
     property Duration: Single read getDuration write setDuration nodefault;
-    property Interpolation: TALInterpolationType read getInterpolation write setInterpolation default TALInterpolationType.Linear;
+    property InterpolationType: TALInterpolationType read getInterpolationType write setInterpolationType default TALInterpolationType.Linear;
+    property InterpolationMode: TALInterpolationMode read getInterpolationMode write setInterpolationMode default TALInterpolationMode.In;
     property Inverse: Boolean read getInverse write setInverse default False;
     property Loop: Boolean read getLoop write setLoop default False;
     property OnFirstFrame: TNotifyEvent read fOnFirstFrame write fOnFirstFrame;
@@ -481,16 +529,16 @@ type
   end;
 
 //function ALInterpolateLinear(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single): Single; => function FMX.Ani.InterpolateLinear(t, B, C, D: Single): Single;
-//function ALInterpolateSinusoidal(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateSine(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateQuintic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateQuint(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateQuartic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateQuart(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateQuadratic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateQuad(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateExponential(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateExpo(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateElastic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration, AAmplitude, AOscillationPeriod: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateElastic(t, B, C, D, A, P: Single; AType: TAnimationType): Single;
-//function ALInterpolateCubic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateCubic(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateCircular(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateCirc(t, B, C, D: Single; AType: TAnimationType): Single;
-//function ALInterpolateBack(AElapsedTime, AStartOfRange, ARangeSpan, ADuration, AOvershoot: Single; AType: TAnimationType): Single; => function FMX.Ani.InterpolateBack(t, B, C, D, S: Single; AType: TAnimationType): Single;
-function ALInterpolateBounce(AElapsedTime, ADuration: Single; AType: TAnimationType): Single;
+//function ALInterpolateSinusoidal(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateSine(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateQuintic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateQuint(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateQuartic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateQuart(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateQuadratic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateQuad(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateExponential(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateExpo(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateElastic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration, AAmplitude, AOscillationPeriod: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateElastic(t, B, C, D, A, P: Single; AType: TAnimationType): Single;
+//function ALInterpolateCubic(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateCubic(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateCircular(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateCirc(t, B, C, D: Single; AType: TAnimationType): Single;
+//function ALInterpolateBack(AElapsedTime, AStartOfRange, ARangeSpan, ADuration, AOvershoot: Single; AMode: TALInterpolationMode): Single; => function FMX.Ani.InterpolateBack(t, B, C, D, S: Single; AType: TAnimationType): Single;
+function ALInterpolateBounce(AElapsedTime, ADuration: Single; AMode: TALInterpolationMode): Single;
 function ALInterpolateMaterialExpressiveFastSpatial(AElapsedTime, ADuration: Single): Single;
 function ALInterpolateMaterialExpressiveDefaultSpatial(AElapsedTime, ADuration: Single): Single;
 function ALInterpolateMaterialExpressiveSlowSpatial(AElapsedTime, ADuration: Single): Single;
@@ -621,7 +669,6 @@ type
     FInitialVelocity: Single;
     FCurrentVelocity: Single;
     FStartValue: Single;
-    fCurrentValue: Single;
     FDeltaTime: Double;
     procedure setStiffness(stiffness: Single);
     function getStiffness: Single;
@@ -632,6 +679,7 @@ type
     procedure SetValueThreshold(const Value: Single);
     function GetValueThreshold: Single;
   protected
+    FCurrentValue: Single;
     procedure ProcessTick(const ATime, ADeltaTime: Double); override;
     procedure ProcessAnimation; override;
     property SpringForce: TALSpringForce read FSpringForce;
@@ -666,7 +714,7 @@ type
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
-    function getPause: Boolean;
+    function getPaused: Boolean;
     function getRunning: Boolean;
     function GetStartValue: Single;
     function GetStopValue: Single;
@@ -680,7 +728,6 @@ type
     procedure setDelay(const Value: Single);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
-    procedure setPause(const Value: Boolean);
     procedure SetStartValue(const Value: Single);
     procedure setStopValue(const Value: Single);
     procedure setStiffness(const Value: Single);
@@ -704,7 +751,7 @@ type
     procedure Stop; override;
     procedure StopAtCurrent; virtual;
     property Running: Boolean read getRunning;
-    property Pause: Boolean read getPause write setPause;
+    property Paused: Boolean read getPaused;
     property CurrentValue: Single read GetCurrentValue;
     property CurrentVelocity: Single read GetCurrentVelocity;
     property CurrentTime: Single read GetCurrentTime;
@@ -778,7 +825,7 @@ uses
 
 {*****************************************************}
 // Taken from android.view.animation.BounceInterpolator
-function ALInterpolateBounce(AElapsedTime, ADuration: Single; AType: TAnimationType): Single;
+function ALInterpolateBounce(AElapsedTime, ADuration: Single; AMode: TALInterpolationMode): Single;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _bounce(t: Single): Single;
@@ -810,19 +857,19 @@ function ALInterpolateBounce(AElapsedTime, ADuration: Single; AType: TAnimationT
   end;
 
 begin
-  case AType of
+  case AMode of
 
-    TAnimationType.In:
+    TALInterpolationMode.In:
       begin
         Result := _EaseIn(AElapsedTime, ADuration);
       end;
 
-    TAnimationType.Out:
+    TALInterpolationMode.Out:
       begin
         Result := _EaseOut(AElapsedTime, ADuration);
       end;
 
-    TAnimationType.InOut:
+    TALInterpolationMode.InOut:
       begin
         if AElapsedTime < ADuration / 2 then
           Result := _EaseIn(AElapsedTime * 2, ADuration) * 0.5
@@ -1288,6 +1335,62 @@ begin
   inherited Destroy;
 end;
 
+{***************************}
+procedure TALAnimation.Start;
+begin
+  if FRunning then Exit;
+  FEnabled := True;
+  FRunning := True;
+  FPaused := False;
+
+  if AniThread = nil then
+    FAniThread := TALAniThread.Create;
+
+  AniThread.AddAnimation(Self);
+  {$IF defined(DEBUG)}
+  if not AniThread.Enabled then
+    Raise Exception.Create('Internal error: AniThread.Enabled is False. This should never happen!');
+  {$ENDIF}
+end;
+
+{**************************}
+procedure TALAnimation.Stop;
+begin
+  if not FRunning then Exit;
+  if AniThread <> nil then AniThread.RemoveAnimation(Self);
+end;
+
+{***********************************}
+procedure TALAnimation.StopAtCurrent;
+begin
+  if not FRunning then Exit;
+  if AniThread <> nil then AniThread.RemoveAnimation(Self);
+end;
+
+{***************************}
+procedure TALAnimation.Pause;
+begin
+  if (not FRunning) or (FPaused) then Exit;
+  FPaused := True;
+  if AniThread <> nil then AniThread.RemoveAnimation(Self);
+end;
+
+{****************************}
+procedure TALAnimation.Resume;
+begin
+  if (not FRunning) or (not FPaused) then Exit;
+  FPaused := False;
+
+  if AniThread = nil then
+    FAniThread := TALAniThread.Create;
+
+  AniThread.AddAnimation(Self);
+  {$IF defined(DEBUG)}
+  if not AniThread.Enabled then
+    Raise Exception.Create('Internal error: AniThread.Enabled is False. This should never happen!');
+  {$ENDIF}
+end;
+
 {******************************************************}
 procedure TALAnimation.SetEnabled(const Value: Boolean);
 begin
@@ -1301,8 +1404,8 @@ begin
   end;
 end;
 
-{********************************}
-procedure TALAnimation.FirstFrame;
+{**********************************}
+procedure TALAnimation.DoFirstFrame;
 begin
   // Do not call fOnFirstFrame if enabled is false
   if fEnabled and assigned(fOnFirstFrame) then
@@ -1320,6 +1423,8 @@ end;
 {******************************}
 procedure TALAnimation.DoFinish;
 begin
+  FRunning := False;
+  FPaused := False;
   // Do not call FOnFinish if enabled is false
   if fEnabled and Assigned(FOnFinish) then
     FOnFinish(Self);
@@ -1334,14 +1439,14 @@ end;
 {*************************************************************************}
 procedure TALDisplayAnimation.ProcessTick(const ATime, ADeltaTime: Double);
 begin
-  if (not FRunning) or FPause then
+  if (not FRunning) or FPaused then
     Exit;
 
   if (FDelay > 0) and (FDelayTimeLeft <> 0) then begin
     FDelayTimeLeft := FDelayTimeLeft - ADeltaTime;
     if FDelayTimeLeft <= 0 then begin
       FDelayTimeLeft := 0;
-      FirstFrame;
+      DoFirstFrame;
       ProcessAnimation;
       DoProcess;
     end;
@@ -1369,24 +1474,16 @@ end;
 {**********************************}
 procedure TALDisplayAnimation.Start;
 begin
-  if (FRunning) then
-    Exit;
-  FEnabled := True;
-  FRunning := True;
+  If FPaused then Resume;
+  if FRunning then Exit;
+  inherited;
   FTime := 0;
   FDelayTimeLeft := FDelay;
   if FDelay = 0 then begin
-    FirstFrame;
+    DoFirstFrame;
     ProcessAnimation;
     DoProcess;
   end;
-
-  if AniThread = nil then
-    FAniThread := TALAniThread.Create;
-
-  AniThread.AddAnimation(Self);
-  if not AniThread.Enabled then
-    Stop;
 end;
 
 {*********************************}
@@ -1398,13 +1495,8 @@ end;
 {******************************************}
 procedure TALDisplayAnimation.StopAtCurrent;
 begin
-  if not FRunning then
-    Exit;
-
-  if AniThread <> nil then
-    AniThread.RemoveAnimation(Self);
-
-  FRunning := False;
+  if not FRunning then Exit;
+  inherited;
   DoFinish;
 end;
 
@@ -1418,14 +1510,14 @@ end;
 {*********************************************************************}
 procedure TALDisplayTimer.ProcessTick(const ATime, ADeltaTime: Double);
 begin
-  if (not FRunning) or FPause then
+  if (not FRunning) or FPaused then
     Exit;
 
   if (FDelay > 0) and (FDelayTimeLeft <> 0) then begin
     FDelayTimeLeft := FDelayTimeLeft - ADeltaTime;
     if FDelayTimeLeft <= 0 then begin
       FDelayTimeLeft := 0;
-      FirstFrame;
+      DoFirstFrame;
       ProcessAnimation;
       DoProcess;
     end;
@@ -1451,25 +1543,17 @@ end;
 {******************************}
 procedure TALDisplayTimer.Start;
 begin
-  if (FRunning) then
-    Exit;
-  FEnabled := True;
-  FRunning := True;
+  If FPaused then Resume;
+  if FRunning then Exit;
+  inherited;
   FTime := 0;
   FIntervalTimeLeft := FInterval;
   FDelayTimeLeft := FDelay;
   if FDelay = 0 then begin
-    FirstFrame;
+    DoFirstFrame;
     ProcessAnimation;
     DoProcess;
   end;
-
-  if AniThread = nil then
-    FAniThread := TALAniThread.Create;
-
-  AniThread.AddAnimation(Self);
-  if not AniThread.Enabled then
-    Stop;
 end;
 
 {******************************************}
@@ -1482,7 +1566,7 @@ end;
 {******************************************************************************}
 procedure TALInterpolatedAnimation.ProcessTick(const ATime, ADeltaTime: Double);
 begin
-  if (not FRunning) or FPause then
+  if (not FRunning) or FPaused then
     Exit;
 
   var LContinueRunning := FRunning;
@@ -1491,7 +1575,7 @@ begin
     FDelayTimeLeft := FDelayTimeLeft - ADeltaTime;
     if FDelayTimeLeft <= 0 then begin
       FDelayTimeLeft := 0;
-      FirstFrame;
+      DoFirstFrame;
       ProcessAnimation;
       DoProcess;
     end;
@@ -1553,58 +1637,40 @@ end;
 {***************************************}
 procedure TALInterpolatedAnimation.Start;
 begin
-  if (FRunning) then
-    Exit;
-  FEnabled := True;
-  FRunning := True;
+  If FPaused then Resume;
+  if FRunning then Exit;
+  inherited;
   FDidAutoReverse := False;
   FSavedInverse := FInverse;
   if FInverse then FTime := FDuration
   else FTime := 0;
   FDelayTimeLeft := FDelay;
   if FDelay = 0 then begin
-    FirstFrame;
+    DoFirstFrame;
     ProcessAnimation;
     DoProcess;
   end;
-
-  if AniThread = nil then
-    FAniThread := TALAniThread.Create;
-
-  AniThread.AddAnimation(Self);
-  if not AniThread.Enabled then
-    Stop;
 end;
 
 {**************************************}
 procedure TALInterpolatedAnimation.Stop;
 begin
-  if not FRunning then
-    Exit;
-
-  if AniThread <> nil then
-    AniThread.RemoveAnimation(Self);
-
+  if not FRunning then Exit;
+  inherited;
   FInverse := FSavedInverse;
   if FInverse then FTime := 0
   else FTime := FDuration;
   ProcessAnimation;
   DoProcess;
-  FRunning := False;
   DoFinish;
 end;
 
 {***********************************************}
 procedure TALInterpolatedAnimation.StopAtCurrent;
 begin
-  if not FRunning then
-    Exit;
-
-  if AniThread <> nil then
-    AniThread.RemoveAnimation(Self);
-
+  if not FRunning then Exit;
+  inherited;
   FInverse := FSavedInverse;
-  FRunning := False;
   DoFinish;
 end;
 
@@ -1614,20 +1680,20 @@ begin
   Result := 0;
   if (FDuration > 0) and (FDelayTimeLeft <= 0) then
   begin
-    case FInterpolation of
+    case FInterpolationType of
       TALInterpolationType.Linear: Result := InterpolateLinear(FTime, 0, 1, FDuration);
-      TALInterpolationType.Quadratic: Result := InterpolateQuad(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Cubic: Result := InterpolateCubic(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Quartic: Result := InterpolateQuart(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Quintic: Result := InterpolateQuint(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Sinusoidal: Result := InterpolateSine(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Exponential: Result := InterpolateExpo(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Circular: Result := InterpolateCirc(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Elastic: Result := InterpolateElastic(FTime, 0, 1, FDuration, 0, 0, FAnimationType);
-      TALInterpolationType.Back: Result := InterpolateBack(FTime, 0, 1, FDuration, 0{Overshoot}, FAnimationType);
+      TALInterpolationType.Quadratic: Result := InterpolateQuad(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Cubic: Result := InterpolateCubic(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Quartic: Result := InterpolateQuart(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Quintic: Result := InterpolateQuint(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Sinusoidal: Result := InterpolateSine(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Exponential: Result := InterpolateExpo(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Circular: Result := InterpolateCirc(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Elastic: Result := InterpolateElastic(FTime, 0, 1, FDuration, 0, 0, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Back: Result := InterpolateBack(FTime, 0, 1, FDuration, 0{Overshoot}, TAnimationType(FInterpolationMode));
       //the InterpolateBounce is a little buggy
-      //Result := InterpolateBounce(FTime, 0, 1, FDuration, FAnimationType);
-      TALInterpolationType.Bounce: Result := ALInterpolateBounce(FTime, FDuration, FAnimationType);
+      //Result := InterpolateBounce(FTime, 0, 1, FDuration, FInterpolationMode);
+      TALInterpolationType.Bounce: Result := ALInterpolateBounce(FTime, FDuration, FInterpolationMode);
       TALInterpolationType.MaterialExpressiveFastSpatial: Result := ALInterpolateMaterialExpressiveFastSpatial(FTime, FDuration);
       TALInterpolationType.MaterialExpressiveDefaultSpatial: Result := ALInterpolateMaterialExpressiveDefaultSpatial(FTime, FDuration);
       TALInterpolationType.MaterialExpressiveSlowSpatial: Result := ALInterpolateMaterialExpressiveSlowSpatial(FTime, FDuration);
@@ -1901,12 +1967,6 @@ begin
     result := 0;
 end;
 
-{******************************************************************}
-function TALFloatPropertyAnimation.getAnimationType: TAnimationType;
-begin
-  result := fFloatAnimation.AnimationType;
-end;
-
 {*********************************************************}
 function TALFloatPropertyAnimation.getAutoReverse: Boolean;
 begin
@@ -1931,10 +1991,16 @@ begin
   result := FEnabled;
 end;
 
-{************************************************************************}
-function TALFloatPropertyAnimation.getInterpolation: TALInterpolationType;
+{****************************************************************************}
+function TALFloatPropertyAnimation.getInterpolationType: TALInterpolationType;
 begin
-  result := fFloatAnimation.Interpolation;
+  result := fFloatAnimation.InterpolationType;
+end;
+
+{****************************************************************************}
+function TALFloatPropertyAnimation.getInterpolationMode: TALInterpolationMode;
+begin
+  result := fFloatAnimation.InterpolationMode;
 end;
 
 {*****************************************************}
@@ -1955,10 +2021,10 @@ begin
   result := fFloatAnimation.CurrentTime;
 end;
 
-{***************************************************}
-function TALFloatPropertyAnimation.getPause: Boolean;
+{****************************************************}
+function TALFloatPropertyAnimation.getPaused: Boolean;
 begin
-  result := fFloatAnimation.Pause;
+  result := fFloatAnimation.Paused;
 end;
 
 {*****************************************************}
@@ -1983,12 +2049,6 @@ end;
 function TALFloatPropertyAnimation.GetCurrentValue: Single;
 begin
   result := fFloatAnimation.CurrentValue;
-end;
-
-{********************************************************************************}
-procedure TALFloatPropertyAnimation.setAnimationType(const Value: TAnimationType);
-begin
-  fFloatAnimation.AnimationType := Value;
 end;
 
 {***********************************************************************}
@@ -2020,10 +2080,16 @@ begin
   end;
 end;
 
-{**************************************************************************************}
-procedure TALFloatPropertyAnimation.setInterpolation(const Value: TALInterpolationType);
+{******************************************************************************************}
+procedure TALFloatPropertyAnimation.setInterpolationType(const Value: TALInterpolationType);
 begin
-  fFloatAnimation.Interpolation := Value;
+  fFloatAnimation.InterpolationType := Value;
+end;
+
+{******************************************************************************************}
+procedure TALFloatPropertyAnimation.setInterpolationMode(const Value: TALInterpolationMode);
+begin
+  fFloatAnimation.InterpolationMode := Value;
 end;
 
 {*******************************************************************}
@@ -2036,12 +2102,6 @@ end;
 procedure TALFloatPropertyAnimation.setLoop(const Value: Boolean);
 begin
   fFloatAnimation.Loop := Value;
-end;
-
-{*****************************************************************}
-procedure TALFloatPropertyAnimation.setPause(const Value: Boolean);
-begin
-  fFloatAnimation.Pause := Value;
 end;
 
 {*********************************************************************}
@@ -2155,12 +2215,6 @@ begin
     result := 0;
 end;
 
-{******************************************************************}
-function TALColorPropertyAnimation.getAnimationType: TAnimationType;
-begin
-  result := fColorAnimation.AnimationType;
-end;
-
 {*********************************************************}
 function TALColorPropertyAnimation.getAutoReverse: Boolean;
 begin
@@ -2185,10 +2239,16 @@ begin
   result := FEnabled;
 end;
 
-{************************************************************************}
-function TALColorPropertyAnimation.getInterpolation: TALInterpolationType;
+{****************************************************************************}
+function TALColorPropertyAnimation.getInterpolationType: TALInterpolationType;
 begin
-  result := fColorAnimation.Interpolation;
+  result := fColorAnimation.InterpolationType;
+end;
+
+{****************************************************************************}
+function TALColorPropertyAnimation.getInterpolationMode: TALInterpolationMode;
+begin
+  result := fColorAnimation.InterpolationMode;
 end;
 
 {*****************************************************}
@@ -2209,10 +2269,10 @@ begin
   result := fColorAnimation.CurrentTime;
 end;
 
-{***************************************************}
-function TALColorPropertyAnimation.getPause: Boolean;
+{****************************************************}
+function TALColorPropertyAnimation.getPaused: Boolean;
 begin
-  result := fColorAnimation.Pause;
+  result := fColorAnimation.Paused;
 end;
 
 {*****************************************************}
@@ -2237,12 +2297,6 @@ end;
 function TALColorPropertyAnimation.GetCurrentValue: TAlphaColor;
 begin
   result := fColorAnimation.CurrentValue;
-end;
-
-{********************************************************************************}
-procedure TALColorPropertyAnimation.setAnimationType(const Value: TAnimationType);
-begin
-  fColorAnimation.AnimationType := Value;
 end;
 
 {***********************************************************************}
@@ -2274,10 +2328,16 @@ begin
   end;
 end;
 
-{**************************************************************************************}
-procedure TALColorPropertyAnimation.setInterpolation(const Value: TALInterpolationType);
+{******************************************************************************************}
+procedure TALColorPropertyAnimation.setInterpolationType(const Value: TALInterpolationType);
 begin
-  fColorAnimation.Interpolation := Value;
+  fColorAnimation.InterpolationType := Value;
+end;
+
+{******************************************************************************************}
+procedure TALColorPropertyAnimation.setInterpolationMode(const Value: TALInterpolationMode);
+begin
+  fColorAnimation.InterpolationMode := Value;
 end;
 
 {*******************************************************************}
@@ -2290,12 +2350,6 @@ end;
 procedure TALColorPropertyAnimation.setLoop(const Value: Boolean);
 begin
   fColorAnimation.Loop := Value;
-end;
-
-{*****************************************************************}
-procedure TALColorPropertyAnimation.setPause(const Value: Boolean);
-begin
-  fColorAnimation.Pause := Value;
 end;
 
 {**************************************************************************}
@@ -2546,7 +2600,7 @@ end;
 {*****************************************************************************}
 procedure TALSpringForceAnimation.ProcessTick(const ATime, ADeltaTime: Double);
 begin
-  if (not FRunning) or FPause then
+  if (not FRunning) or FPaused then
     Exit;
 
   var LContinueRunning := FRunning;
@@ -2555,7 +2609,7 @@ begin
     FDelayTimeLeft := FDelayTimeLeft - ADeltaTime;
     if FDelayTimeLeft <= 0 then begin
       FDelayTimeLeft := 0;
-      FirstFrame;
+      DoFirstFrame;
       ProcessAnimation;
       DoProcess;
     end;
@@ -2613,10 +2667,9 @@ end;
 {**************************************}
 procedure TALSpringForceAnimation.Start;
 begin
-  if (FRunning) then
-    Exit;
-  FEnabled := True;
-  FRunning := True;
+  If FPaused then Resume;
+  if FRunning then Exit;
+  inherited;
   FDidAutoReverse := False;
   FSavedInverse := FInverse;
   if FInverse then begin
@@ -2629,29 +2682,18 @@ begin
   FCurrentVelocity := FInitialVelocity;
   FDelayTimeLeft := FDelay;
   if FDelay = 0 then begin
-    FirstFrame;
+    DoFirstFrame;
     FDeltaTime := 0;
     ProcessAnimation;
     DoProcess;
   end;
-
-  if AniThread = nil then
-    FAniThread := TALAniThread.Create;
-
-  AniThread.AddAnimation(Self);
-  if not AniThread.Enabled then
-    Stop;
 end;
 
 {*************************************}
 procedure TALSpringForceAnimation.Stop;
 begin
-  if not FRunning then
-    Exit;
-
-  if AniThread <> nil then
-    AniThread.RemoveAnimation(Self);
-
+  if not FRunning then Exit;
+  inherited;
   if FInverse then begin
     var LSavedStartValue := FStartValue;
     FStartValue := GetStopValue;
@@ -2663,19 +2705,14 @@ begin
   FDeltaTime := 0;
   ProcessAnimation;
   DoProcess;
-  FRunning := False;
   DoFinish;
 end;
 
 {**********************************************}
 procedure TALSpringForceAnimation.StopAtCurrent;
 begin
-  if not FRunning then
-    Exit;
-
-  if AniThread <> nil then
-    AniThread.RemoveAnimation(Self);
-
+  if not FRunning then Exit;
+  inherited;
   if FInverse then begin
     var LSavedStartValue := FStartValue;
     FStartValue := GetStopValue;
@@ -2683,7 +2720,6 @@ begin
   end;
   FInverse := FSavedInverse;
   FCurrentVelocity := 0;
-  FRunning := False;
   DoFinish;
 end;
 
@@ -2840,10 +2876,10 @@ begin
   result := FSpringForceAnimation.CurrentTime;
 end;
 
-{*********************************************************}
-function TALSpringForcePropertyAnimation.getPause: Boolean;
+{**********************************************************}
+function TALSpringForcePropertyAnimation.getPaused: Boolean;
 begin
-  result := FSpringForceAnimation.Pause;
+  result := FSpringForceAnimation.Paused;
 end;
 
 {***********************************************************}
@@ -2933,12 +2969,6 @@ end;
 procedure TALSpringForcePropertyAnimation.setLoop(const Value: Boolean);
 begin
   FSpringForceAnimation.Loop := Value;
-end;
-
-{***********************************************************************}
-procedure TALSpringForcePropertyAnimation.setPause(const Value: Boolean);
-begin
-  FSpringForceAnimation.Pause := Value;
 end;
 
 {***************************************************************************}

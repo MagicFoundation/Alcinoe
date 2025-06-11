@@ -247,7 +247,7 @@ end;
 function ALAcquireKeepAliveWinHttpClient(const aURI: TUri): TALWinHttpClient;
 var LList: TobjectList<TALWinHttpClient>;
 begin
-  TMonitor.Enter(_ALWinHttpClientKeepAlives);
+  ALMonitorEnter(_ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWinHttpClient'{$ENDIF});
   try
     if _ALWinHttpClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
       if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
@@ -255,7 +255,7 @@ begin
     end
     else result := ALCreateWinHttpClient;
   finally
-    TMonitor.exit(_ALWinHttpClientKeepAlives);
+    ALMonitorExit(_ALWinHttpClientKeepAlives);
   end;
 end;
 
@@ -263,7 +263,7 @@ end;
 procedure ALReleaseKeepAliveWinHttpClient(const aURI: TUri; var aHTTPClient: TALWinHttpClient);
 var LList: TobjectList<TALWinHttpClient>;
 begin
-  TMonitor.Enter(_ALWinHttpClientKeepAlives);
+  ALMonitorEnter(_ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWinHttpClient'{$ENDIF});
   try
     if _ALWinHttpClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
       while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
@@ -283,18 +283,18 @@ begin
       end;
     end;
   finally
-    TMonitor.exit(_ALWinHttpClientKeepAlives);
+    ALMonitorExit(_ALWinHttpClientKeepAlives);
   end;
 end;
 
 {********************************************}
 procedure ALReleaseAllKeepAliveWinHttpClients;
 begin
-  TMonitor.Enter(_ALWinHttpClientKeepAlives);
+  ALMonitorEnter(_ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseAllKeepAliveWinHttpClients'{$ENDIF});
   try
     _ALWinHttpClientKeepAlives.Clear;
   finally
-    TMonitor.exit(_ALWinHttpClientKeepAlives);
+    ALMonitorExit(_ALWinHttpClientKeepAlives);
   end;
 end;
 

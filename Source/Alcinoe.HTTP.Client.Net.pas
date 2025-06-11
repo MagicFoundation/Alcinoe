@@ -53,7 +53,7 @@ end;
 function ALAcquireKeepAliveNetHttpClient(const aURI: TUri): THTTPClient;
 var LList: TobjectList<THTTPClient>;
 begin
-  TMonitor.Enter(_ALNetHttpClientKeepAlives);
+  ALMonitorEnter(_ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveNetHttpClient'{$ENDIF});
   try
     if _ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then begin
       if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
@@ -61,7 +61,7 @@ begin
     end
     else result := ALCreateNetHTTPClient;
   finally
-    TMonitor.exit(_ALNetHttpClientKeepAlives);
+    ALMonitorExit(_ALNetHttpClientKeepAlives);
   end;
 end;
 
@@ -69,7 +69,7 @@ end;
 procedure ALReleaseKeepAliveNetHttpClient(const aURI: TUri; var aHTTPClient: THTTPClient);
 var LList: TobjectList<THTTPClient>;
 begin
-  TMonitor.Enter(_ALNetHttpClientKeepAlives);
+  ALMonitorEnter(_ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveNetHttpClient'{$ENDIF});
   try
     if _ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then begin
       while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
@@ -89,18 +89,18 @@ begin
       end;
     end;
   finally
-    TMonitor.exit(_ALNetHttpClientKeepAlives);
+    ALMonitorExit(_ALNetHttpClientKeepAlives);
   end;
 end;
 
 {********************************************}
 procedure ALReleaseAllKeepAliveNetHttpClients;
 begin
-  TMonitor.Enter(_ALNetHttpClientKeepAlives);
+  ALMonitorEnter(_ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseAllKeepAliveNetHttpClients'{$ENDIF});
   try
     _ALNetHttpClientKeepAlives.Clear;
   finally
-    TMonitor.exit(_ALNetHttpClientKeepAlives);
+    ALMonitorExit(_ALNetHttpClientKeepAlives);
   end;
 end;
 

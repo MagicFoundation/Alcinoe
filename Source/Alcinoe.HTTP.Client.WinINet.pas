@@ -245,7 +245,7 @@ end;
 function ALAcquireKeepAliveWininetHTTPClient(const aURI: TUri): TALWininetHTTPClient;
 var LList: TobjectList<TALWininetHTTPClient>;
 begin
-  TMonitor.Enter(_ALWininetHTTPClientKeepAlives);
+  ALMonitorEnter(_ALWininetHTTPClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWininetHTTPClient'{$ENDIF});
   try
     if _ALWininetHTTPClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
       if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
@@ -253,7 +253,7 @@ begin
     end
     else result := ALCreateWininetHTTPClient;
   finally
-    TMonitor.exit(_ALWininetHTTPClientKeepAlives);
+    ALMonitorExit(_ALWininetHTTPClientKeepAlives);
   end;
 end;
 
@@ -261,7 +261,7 @@ end;
 procedure ALReleaseKeepAliveWininetHTTPClient(const aURI: TUri; var aHTTPClient: TALWininetHTTPClient);
 var LList: TobjectList<TALWininetHTTPClient>;
 begin
-  TMonitor.Enter(_ALWininetHTTPClientKeepAlives);
+  ALMonitorEnter(_ALWininetHTTPClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWininetHTTPClient'{$ENDIF});
   try
     if _ALWininetHTTPClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
       while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
@@ -281,18 +281,18 @@ begin
       end;
     end;
   finally
-    TMonitor.exit(_ALWininetHTTPClientKeepAlives);
+    ALMonitorExit(_ALWininetHTTPClientKeepAlives);
   end;
 end;
 
 {************************************************}
 procedure ALReleaseAllKeepAliveWininetHTTPClients;
 begin
-  TMonitor.Enter(_ALWininetHTTPClientKeepAlives);
+  ALMonitorEnter(_ALWininetHTTPClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseAllKeepAliveWininetHTTPClients'{$ENDIF});
   try
     _ALWininetHTTPClientKeepAlives.Clear;
   finally
-    TMonitor.exit(_ALWininetHTTPClientKeepAlives);
+    ALMonitorExit(_ALWininetHTTPClientKeepAlives);
   end;
 end;
 

@@ -702,7 +702,6 @@ type
         property Ellipsis;
         property MaxLines;
         property IsHtml;
-        property Trimming;
         property LineHeightMultiplier;
         property LetterSpacing;
         property Margins: TALBounds read FMargins write SetMargins;
@@ -745,7 +744,6 @@ type
         property Ellipsis;
         property MaxLines;
         property IsHtml;
-        property Trimming;
         property LineHeightMultiplier;
         property LetterSpacing;
         property Margins: TALBounds read FMargins write SetMargins;
@@ -4954,8 +4952,8 @@ begin
   FlabelTextAnimation := TALFloatAnimation.Create;
   FlabelTextAnimation.StartValue := 0;
   FlabelTextAnimation.StopValue := 1;
-  FlabelTextAnimation.AnimationType := TanimationType.out;
-  FlabelTextAnimation.Interpolation := TALInterpolationType.linear;
+  FlabelTextAnimation.InterpolationType := TALInterpolationType.linear;
+  FlabelTextAnimation.InterpolationMode := TALInterpolationMode.out;
   FlabelTextAnimation.OnProcess := labelTextAnimationProcess;
   FlabelTextAnimation.OnFinish := labelTextAnimationFinish;
   //--
@@ -6300,7 +6298,6 @@ begin
     LOptions.MaxLines := LabelTextSettings.MaxLines;
     LOptions.LineHeightMultiplier := LabelTextSettings.LineHeightMultiplier;
     LOptions.LetterSpacing := LabelTextSettings.LetterSpacing;
-    LOptions.Trimming := LabelTextSettings.Trimming;
     //LOptions.FailIfTextBroken: boolean; // default = false
     //--
     if TFillTextFlag.RightToLeft in FillTextFlags then LOptions.Direction := TALTextDirection.RightToLeft
@@ -6430,7 +6427,6 @@ begin
     LOptions.MaxLines := SupportingTextSettings.MaxLines;
     LOptions.LineHeightMultiplier := SupportingTextSettings.LineHeightMultiplier;
     LOptions.LetterSpacing := SupportingTextSettings.LetterSpacing;
-    LOptions.Trimming := SupportingTextSettings.Trimming;
     //LOptions.FailIfTextBroken: boolean; // default = false
     //--
     if TFillTextFlag.RightToLeft in FillTextFlags then LOptions.Direction := TALTextDirection.RightToLeft

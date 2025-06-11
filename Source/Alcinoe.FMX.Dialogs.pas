@@ -1058,7 +1058,7 @@ begin
     FScrimAnimation.Enabled := False;
     if (not HasPendingDialogs) then begin
       FScrimAnimation.Tag := TAlphaColorRec(FCurrentDialog.Fill.Color).A;
-      FScrimAnimation.Interpolation := TALInterpolationType.Linear;
+      FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
       FScrimAnimation.Duration := 0.200;
       FScrimAnimation.StartValue := 1;
       FScrimAnimation.StopValue := 0;
@@ -1067,7 +1067,7 @@ begin
 
     FContainerAnimation.Enabled := False;
     FContainerAnimation.TagFloat := FCurrentDialog.Container.Position.y;
-    FContainerAnimation.Interpolation := TALInterpolationType.MaterialEmphasizedAccelerate;
+    FContainerAnimation.InterpolationType := TALInterpolationType.MaterialEmphasizedAccelerate;
     FContainerAnimation.Duration := 0.200;
     FContainerAnimation.StartValue := 1;
     FContainerAnimation.StopValue := 0;
@@ -1416,7 +1416,7 @@ begin
 
     FScrimAnimation.Enabled := False;
     FScrimAnimation.TagFloat := (TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255) * 100;
-    FScrimAnimation.Interpolation := TALInterpolationType.Linear;
+    FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
     FScrimAnimation.Duration := 0.4;
     FScrimAnimation.StartValue := 0;
     FScrimAnimation.StopValue := 1;
@@ -1424,7 +1424,7 @@ begin
 
     FContainerAnimation.Enabled := False;
     FContainerAnimation.TagFloat := LCurrentDialogCenteredPosY;
-    FContainerAnimation.Interpolation := TALInterpolationType.MaterialExpressiveDefaultSpatial;
+    FContainerAnimation.InterpolationType := TALInterpolationType.MaterialExpressiveDefaultSpatial;
     FContainerAnimation.Duration := 0.5;
     FContainerAnimation.StartValue := 0;
     FContainerAnimation.StopValue := 1;

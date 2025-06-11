@@ -25,7 +25,7 @@ object Form1: TForm1
       793s
       360s
       793s)
-    object TabItemInterpolation: TTabItem
+    object TabItemInterpolationType: TTabItem
       CustomIcon = <
         item
         end>
@@ -36,11 +36,11 @@ object Form1: TForm1
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
-      Text = 'Interpolation'
+      Text = 'InterpolationType'
       OnResized = LayoutResized
       ExplicitSize.cx = 69.000000000000000000
       ExplicitSize.cy = 26.000000000000000000
-      object LayoutInterpolation: TALLayout
+      object LayoutInterpolationType: TALLayout
         Align = Top
         Margins.Top = 15.000000000000000000
         Position.Y = 15.000000000000000000
@@ -48,16 +48,16 @@ object Form1: TForm1
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
-        object TextInterpolation: TALText
+        object TextInterpolationType: TALText
           AutoSize = True
           Position.X = 15.000000000000000000
           Size.Width = 80.000000000000000000
           Size.Height = 19.000000000000000000
           Size.PlatformDefault = False
-          Text = 'Interpolation'
+          Text = 'InterpolationType'
           OnResized = LayoutResized
         end
-        object ComboBoxInterpolation: TComboBox
+        object ComboBoxInterpolationType: TComboBox
           Items.Strings = (
             'Linear'
             'Sinusoidal'
@@ -77,11 +77,11 @@ object Form1: TForm1
           Size.Height = 22.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 3
-          OnChange = ComboBoxInterpolationChange
+          OnChange = ComboBoxInterpolationTypeChange
           OnResized = LayoutResized
         end
       end
-      object LayoutAnimationType: TALLayout
+      object LayoutInterpolationMode: TALLayout
         Align = Top
         Margins.Top = 15.000000000000000000
         Position.Y = 89.000000000000000000
@@ -89,16 +89,16 @@ object Form1: TForm1
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        object TextAnimationType: TALText
+        object TextInterpolationMode: TALText
           AutoSize = True
           Position.X = 15.000000000000000000
           Size.Width = 93.000000000000000000
           Size.Height = 19.000000000000000000
           Size.PlatformDefault = False
-          Text = 'AnimationType'
+          Text = 'InterpolationMode'
           OnResized = LayoutResized
         end
-        object ComboBoxAnimationType: TComboBox
+        object ComboBoxInterpolationMode: TComboBox
           Items.Strings = (
             'In'
             'Out'

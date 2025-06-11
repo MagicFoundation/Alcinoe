@@ -153,7 +153,6 @@ type
     FResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
     FMaskBitmap: TALRefCountBitmap; // 8 bytes
-    FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 bytes
     FExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
     FRotateAccordingToExifOrientation: Boolean; // 1 bytes
@@ -186,7 +185,7 @@ type
     procedure setBackgroundColorKey(const Value: String);
     procedure setLoadingColor(const Value: TAlphaColor);
     procedure setLoadingColorKey(const Value: String);
-    procedure SetTintColor(const Value: TAlphaColor); virtual;
+    procedure SetTintColor(const Value: TAlphaColor);
     procedure setTintColorKey(const Value: String);
     function IsBackgroundColorStored: Boolean;
     function IsBackgroundColorKeyStored: Boolean;
@@ -273,8 +272,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent{TALControl}); override;
-    property ReadyAfterResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
-    function IsReadyToDisplay: Boolean; override;
+    function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
@@ -394,63 +392,47 @@ type
   TALAnimatedImage = class(TALControl)
   Public
     type
-      TAnimation = class(TALPersistentObserver)
+      TAnimation = class(TALInterpolatedAnimation)
       private
         fOwner: TALAnimatedImage;
-        FFloatAnimation: TALFloatAnimation;
-        FSpeed: Single;
         FDuration: Single;
-        function GetAutoReverse: Boolean;
-        function GetEnabled: Boolean; virtual;
-        function GetDelay: Single;
+        FSpeed: Single;
+        FStartProgress: Single;
+        FStopProgress: Single;
+        fCurrentProgress: Single;
+        FEnabled: Boolean;
         function GetDuration: Single;
-        function GetInverse: Boolean;
-        function GetLoop: Boolean;
         function GetCurrentTime: Single;
-        function GetPause: Boolean;
-        function GetRunning: Boolean;
-        function GetStartProgress: Single;
-        function GetStopProgress: Single;
-        function GetCurrentProgress: Single;
         function GetSpeed: Single;
-        procedure SetEnabled(const Value: Boolean); virtual;
-        procedure SetAutoReverse(const Value: Boolean);
-        procedure SetDelay(const Value: Single);
-        procedure SetInverse(const Value: Boolean);
-        procedure SetLoop(const Value: Boolean);
-        procedure SetPause(const Value: Boolean);
+        procedure SetEnabled(const Value: Boolean);
         procedure SetStartProgress(const Value: Single);
         procedure SetStopProgress(const Value: Single);
         procedure SetSpeed(const Value: Single);
         function IsStopProgressStored: Boolean;
         function IsSpeedStored: Boolean;
-        procedure UpdateFloatAnimationDuration;
+        procedure UpdateInheritedAnimationDuration;
         procedure repaint;
       protected
         procedure SetDuration(const Value: Single);
-        procedure doFirstFrame(Sender: TObject);
-        procedure doProcess(Sender: TObject);
-        procedure doFinish(Sender: TObject);
+        procedure ProcessAnimation; override;
+        procedure DoFirstFrame; override;
+        procedure DoProcess; override;
+        procedure DoFinish; override;
       public
         constructor Create(const AOwner: TALAnimatedImage); reintroduce; virtual;
-        destructor Destroy; override;
-        procedure Start; virtual;
-        procedure Stop; virtual;
-        procedure StopAtCurrent; virtual;
-        property Running: Boolean read getRunning;
-        property Pause: Boolean read getPause write setPause;
-        property CurrentProgress: Single read GetCurrentProgress;
+        procedure Start; override;
+        property CurrentProgress: Single read FCurrentProgress;
         property CurrentTime: Single read GetCurrentTime;
       published
-        property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
-        property Delay: Single read getDelay write setDelay;
+        property AutoReverse default False;
+        property Delay;
         property Duration: Single read getDuration;
-        property Enabled: Boolean read getEnabled write SetEnabled default False;
-        property Inverse: Boolean read getInverse write setInverse default False;
-        property Loop: Boolean read getLoop write setLoop default True;
+        property Enabled Read FEnabled write SetEnabled default True;
+        property Inverse default False;
+        property Loop default True;
         property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
-        property StartProgress: Single read GetStartProgress write SetStartProgress;
-        property StopProgress: Single read GetStopProgress write setStopProgress stored IsStopProgressStored nodefault;
+        property StartProgress: Single read FStartProgress write SetStartProgress;
+        property StopProgress: Single read FStopProgress write SetStopProgress stored IsStopProgressStored nodefault;
       end;
   private
     fAnimation: TAnimation;
@@ -1591,7 +1573,6 @@ begin
   FResourceName := '';
   FMaskResourceName := '';
   FMaskBitmap := nil;
-  FReadyAfterResourcesLoaded := False;
   FWrapMode := TALImageWrapMode.Fit;
   FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   FRotateAccordingToExifOrientation := False;
@@ -1644,7 +1625,6 @@ begin
       ResourceName := TALImage(Source).ResourceName;
       MaskResourceName := TALImage(Source).MaskResourceName;
       MaskBitmap := TALImage(Source).MaskBitmap;
-      ReadyAfterResourcesLoaded := TALImage(Source).ReadyAfterResourcesLoaded;
       WrapMode := TALImage(Source).WrapMode;
       RotateAccordingToExifOrientation := TALImage(Source).RotateAccordingToExifOrientation;
       Corners := TALImage(Source).Corners;
@@ -1668,11 +1648,11 @@ begin
   End;
 end;
 
-{******************************************}
-function TALImage.IsReadyToDisplay: Boolean;
+{**************************************************************************}
+function TALImage.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 begin
   Result := Inherited and
-            ((not FReadyAfterResourcesLoaded) or (FResourceDownloadContext = nil)) and
+            ((not AStrict) or (FResourceDownloadContext = nil)) and
             ((FFadeInStartTimeNano <= 0) or
              ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
@@ -1808,7 +1788,7 @@ end;
 {*************************************************}
 function TALImage.GetDefaultTintColor: TAlphaColor;
 begin
-  Result := 0;
+  Result := TAlphaColors.null;
 end;
 
 {***********************************************}
@@ -2177,14 +2157,14 @@ begin
   if FResourceDownloadContext <> nil then begin
     var LContextToFree: TResourceDownloadContext;
     var LLock := FResourceDownloadContext.FLock;
-    TMonitor.Enter(LLock);
+    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALImage.CancelResourceDownload'{$ENDIF});
     try
       if not FResourceDownloadContext.FFreeByThread then LContextToFree := FResourceDownloadContext
       else LContextToFree := nil;
       FResourceDownloadContext.FOwner := nil;
       FResourceDownloadContext := nil;
     Finally
-      TMonitor.Exit(LLock);
+      ALMonitorExit(LLock);
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -2219,14 +2199,14 @@ begin
   var LContext := TResourceDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
-  TMonitor.Enter(LContext.FLock);
+  ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALImage.HandleResourceDownloadError (1)'{$ENDIF});
   try
     if LContext.Owner <> nil then begin
       LContext.FFreeByThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    TMonitor.Exit(LContext.FLock);
+    ALMonitorExit(LContext.FLock);
   end;
   exit;
   {$ENDIF}
@@ -2236,14 +2216,14 @@ begin
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
-    TMonitor.Enter(LContext.FLock);
+    ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALImage.HandleResourceDownloadError (2)'{$ENDIF});
     try
       if LContext.FOwner <> nil then begin
         LContext.FFreeByThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      TMonitor.Exit(LContext.FLock);
+      ALMonitorExit(LContext.FLock);
     end;
     exit;
   end;
@@ -2890,68 +2870,47 @@ constructor TALAnimatedImage.TAnimation.Create(const AOwner: TALAnimatedImage);
 begin
   inherited create;
   fOwner := AOwner;
-  fFloatAnimation := TALFloatAnimation.Create;
-  fFloatAnimation.Loop := True;
-  fFloatAnimation.StopValue := 1.0;
-  fFloatAnimation.Duration := MaxSingle;
-  fFloatAnimation.OnFirstFrame := DoFirstFrame;
-  fFloatAnimation.OnProcess := DoProcess;
-  fFloatAnimation.OnFinish := DoFinish;
-  FSpeed := 1.0;
+  Loop := True;
+  inherited Duration := MaxSingle;
   FDuration := 0.0;
+  FSpeed := 1.0;
+  FStartProgress := 0;
+  FStopProgress := 1.0;
+  fCurrentProgress := 0;
+  FEnabled := True;
 end;
 
-{*********************************************}
-destructor TALAnimatedImage.TAnimation.Destroy;
+{******************************************}
+procedure TALAnimatedImage.TAnimation.Start;
 begin
-  ALFreeAndNil(fFloatAnimation);
-  inherited;
+  if (Running) then
+    Exit;
+  fCurrentProgress := FStartProgress;
+  inherited Start;
 end;
 
-{*****************************************************************}
-procedure TALAnimatedImage.TAnimation.UpdateFloatAnimationDuration;
+{*********************************************************************}
+procedure TALAnimatedImage.TAnimation.UpdateInheritedAnimationDuration;
 begin
   if not SameValue(FSpeed, 0.0, Single.Epsilon) then
-    FFloatAnimation.Duration := (FDuration / FSpeed) * abs(FFloatAnimation.StopValue - FFloatAnimation.StartValue)
+    inherited Duration := (FDuration / FSpeed) * abs(StopProgress - StartProgress)
   else
-    FFloatAnimation.Duration := maxSingle;
+    inherited Duration := maxSingle;
 end;
 
 {********************************************}
 procedure TALAnimatedImage.TAnimation.repaint;
 begin
   if Fowner.IsDisplayed then
-    Fowner.Repaint;
-end;
-
-{***********************************************************}
-function TALAnimatedImage.TAnimation.GetAutoReverse: Boolean;
-begin
-  Result := FFloatAnimation.AutoReverse;
-end;
-
-{****************************************************}
-function TALAnimatedImage.TAnimation.GetDelay: Single;
-begin
-  Result := FFloatAnimation.Delay;
+    Fowner.Repaint
+  else if Loop then
+    Pause;
 end;
 
 {*******************************************************}
 function TALAnimatedImage.TAnimation.GetDuration: Single;
 begin
   Result := FDuration;
-end;
-
-{*******************************************************}
-function TALAnimatedImage.TAnimation.GetInverse: Boolean;
-begin
-  Result := FFloatAnimation.Inverse;
-end;
-
-{****************************************************}
-function TALAnimatedImage.TAnimation.GetLoop: Boolean;
-begin
-  Result := FFloatAnimation.Loop;
 end;
 
 {**********************************************************}
@@ -2970,93 +2929,42 @@ begin
   end;
 end;
 
-{*****************************************************}
-function TALAnimatedImage.TAnimation.GetPause: Boolean;
-begin
-  Result := FFloatAnimation.Pause;
-end;
-
-{*******************************************************}
-function TALAnimatedImage.TAnimation.GetRunning: Boolean;
-begin
-  Result := FFloatAnimation.Running;
-end;
-
-{************************************************************}
-function TALAnimatedImage.TAnimation.GetStartProgress: Single;
-begin
-  Result := FFloatAnimation.StartValue;
-end;
-
-{***********************************************************}
-function TALAnimatedImage.TAnimation.GetStopProgress: Single;
-begin
-  Result := FFloatAnimation.StopValue;
-end;
-
-{**************************************************************}
-function TALAnimatedImage.TAnimation.GetCurrentProgress: Single;
-begin
-  Result := FFloatAnimation.CurrentValue;
-end;
-
 {****************************************************}
 function TALAnimatedImage.TAnimation.GetSpeed: Single;
 begin
   Result := FSpeed;
 end;
 
-{*************************************************************************}
-procedure TALAnimatedImage.TAnimation.SetAutoReverse(const Value: Boolean);
-begin
-  FFloatAnimation.AutoReverse := Value;
-end;
-
-{******************************************************************}
-procedure TALAnimatedImage.TAnimation.SetDelay(const Value: Single);
-begin
-  FFloatAnimation.Delay := Value;
-end;
-
 {*********************************************************************}
 procedure TALAnimatedImage.TAnimation.SetDuration(const Value: Single);
 begin
   FDuration := Value;
-  UpdateFloatAnimationDuration;
+  UpdateInheritedAnimationDuration;
 end;
 
 {*********************************************************************}
-procedure TALAnimatedImage.TAnimation.SetInverse(const Value: Boolean);
+procedure TALAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
 begin
-  FFloatAnimation.Inverse := Value;
-  Repaint;
-end;
-
-{******************************************************************}
-procedure TALAnimatedImage.TAnimation.SetLoop(const Value: Boolean);
-begin
-  FFloatAnimation.Loop := Value;
-end;
-
-{*******************************************************************}
-procedure TALAnimatedImage.TAnimation.SetPause(const Value: Boolean);
-begin
-  FFloatAnimation.Pause := Value;
+  if Value <> FEnabled then begin
+    FEnabled := Value;
+    if not FEnabled then
+      inherited Enabled := False;
+  end;
 end;
 
 {**************************************************************************}
 procedure TALAnimatedImage.TAnimation.SetStartProgress(const Value: Single);
 begin
-  FFloatAnimation.StartValue := Min(Max(Value, 0), 1);
-  UpdateFloatAnimationDuration;
+  FStartProgress := Min(Max(Value, 0), 1);
+  UpdateInheritedAnimationDuration;
   Repaint;
 end;
 
 {*************************************************************************}
 procedure TALAnimatedImage.TAnimation.SetStopProgress(const Value: Single);
 begin
-  FFloatAnimation.StopValue := Min(Max(Value, 0), 1);
-  UpdateFloatAnimationDuration;
+  FStopProgress := Min(Max(Value, 0), 1);
+  UpdateInheritedAnimationDuration;
   Repaint;
 end;
 
@@ -3065,14 +2973,14 @@ procedure TALAnimatedImage.TAnimation.SetSpeed(const Value: Single);
 begin
   if not SameValue(FSpeed, Value, Single.Epsilon) then begin
     FSpeed := Value;
-    UpdateFloatAnimationDuration;
+    UpdateInheritedAnimationDuration;
   end;
 end;
 
 {*****************************************************************}
 function TALAnimatedImage.TAnimation.IsStopProgressStored: Boolean;
 begin
-  Result := Not SameValue(FFloatAnimation.StopValue, 1.0, Single.Epsilon);
+  Result := Not SameValue(FStopProgress, 1.0, Single.Epsilon);
 end;
 
 {**********************************************************}
@@ -3081,58 +2989,43 @@ begin
   Result := Not SameValue(FSpeed, 1.0, Single.Epsilon);
 end;
 
-{*******************************************************}
-function TALAnimatedImage.TAnimation.getEnabled: Boolean;
+{*****************************************************}
+procedure TALAnimatedImage.TAnimation.ProcessAnimation;
 begin
-  Result := FFloatAnimation.Enabled;
+  fCurrentProgress := FStartProgress + (FStopProgress - FStartProgress) * NormalizedTime;
 end;
 
-{*********************************************************************}
-procedure TALAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
+{*************************************************}
+procedure TALAnimatedImage.TAnimation.DoFirstFrame;
 begin
-  FFloatAnimation.Enabled := Value;
+  inherited;
+  if Enabled then begin
+    if assigned(FOwner.FOnAnimationFirstFrame) then
+      FOwner.FOnAnimationFirstFrame(FOwner);
+    Repaint;
+  end;
 end;
 
-{******************************************************************}
-procedure TALAnimatedImage.TAnimation.doFirstFrame(Sender: TObject);
+{**********************************************}
+procedure TALAnimatedImage.TAnimation.DoProcess;
 begin
-  if assigned(FOwner.FOnAnimationFirstFrame) then
-    FOwner.FOnAnimationFirstFrame(FOwner);
-  Repaint;
+  inherited;
+  if Enabled then begin
+    if assigned(FOwner.FOnAnimationProcess) then
+      FOwner.FOnAnimationProcess(FOwner);
+    Repaint;
+  end;
 end;
 
-{***************************************************************}
-procedure TALAnimatedImage.TAnimation.doProcess(Sender: TObject);
+{*********************************************}
+procedure TALAnimatedImage.TAnimation.DoFinish;
 begin
-  if assigned(FOwner.FOnAnimationProcess) then
-    FOwner.FOnAnimationProcess(FOwner);
-  Repaint;
-end;
-
-{**************************************************************}
-procedure TALAnimatedImage.TAnimation.doFinish(Sender: TObject);
-begin
-  if assigned(FOwner.FOnAnimationFinish) then
-    FOwner.FOnAnimationFinish(FOwner);
-  Repaint;
-end;
-
-{******************************************}
-procedure TALAnimatedImage.TAnimation.Start;
-begin
-  FFloatAnimation.Start;
-end;
-
-{*****************************************}
-procedure TALAnimatedImage.TAnimation.Stop;
-begin
-  FFloatAnimation.Stop;
-end;
-
-{**************************************************}
-procedure TALAnimatedImage.TAnimation.StopAtCurrent;
-begin
-  FFloatAnimation.StopAtCurrent;
+  inherited;
+  if Enabled then begin
+    if assigned(FOwner.FOnAnimationFinish) then
+      FOwner.FOnAnimationFinish(FOwner);
+    Repaint;
+  end;
 end;
 
 {******************************************************}
@@ -3375,6 +3268,13 @@ end;
 {*******************************}
 procedure TALAnimatedImage.Paint;
 begin
+
+  if FAnimation.Enabled then begin
+    if not TALFloatAnimation(FAnimation).Enabled then
+      TALFloatAnimation(FAnimation).Enabled := True
+    else
+      FAnimation.Resume;
+  end;
 
   if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
   begin
@@ -5692,7 +5592,6 @@ begin
   Result.MaxLines := TextSettings.MaxLines;
   Result.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
   Result.LetterSpacing := TextSettings.LetterSpacing;
-  Result.Trimming := TextSettings.Trimming;
   Result.FailIfTextBroken := false;
   //--
   if TFillTextFlag.RightToLeft in FillTextFlags then Result.Direction := TALTextDirection.RightToLeft

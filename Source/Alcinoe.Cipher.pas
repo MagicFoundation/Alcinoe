@@ -5283,7 +5283,7 @@ function ALGenerateGoogleOAuth2AccessToken(
 begin
 
   //lock the access
-  TMonitor.Enter(_GoogleOAuth2AccessTokens);
+  ALMonitorEnter(_GoogleOAuth2AccessTokens{$IF defined(DEBUG)}, 'ALGenerateGoogleOAuth2AccessToken'{$ENDIF});
   Try
 
     var LTokensListKey := aServiceAccountEmail + #30{record separator} + aScope;
@@ -5366,7 +5366,7 @@ begin
     end;
 
   finally
-    TMonitor.Exit(_GoogleOAuth2AccessTokens);
+    ALMonitorExit(_GoogleOAuth2AccessTokens);
   end;
 
 end;

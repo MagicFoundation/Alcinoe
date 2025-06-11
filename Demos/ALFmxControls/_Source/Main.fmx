@@ -83,7 +83,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
@@ -139,7 +139,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
       TabOrder = 1
@@ -194,7 +194,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
       TabOrder = 2
@@ -248,7 +248,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
@@ -316,7 +316,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
       TabOrder = 5
@@ -370,7 +370,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
@@ -440,7 +440,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
@@ -508,7 +508,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
       TabOrder = 10
@@ -605,11 +605,11 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 343
+      TabOrder = 348
       Text = 'Bench TCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -661,10 +661,10 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 370
+      TabOrder = 375
       Text = 'Bench TALCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -749,7 +749,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 394
+      TabOrder = 399
       Value = 25.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.Fill.ColorKey = 'Material.Color.InverseSurface'
@@ -991,7 +991,7 @@ object MainForm: TMainForm
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 275
+      TabOrder = 280
       object ALText53: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1051,7 +1051,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 266
+      TabOrder = 271
       object ALText49: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1161,7 +1161,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.329999923706050000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.329999923706050000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF49454F
         Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
         Stroke.Thickness = 2.220000028610229000
@@ -1262,10 +1262,10 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 491
+      TabOrder = 506
       Text = 'Show Date Picker Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1317,10 +1317,10 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 497
+      TabOrder = 513
       Text = 'Apply Effect to the Video'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1338,7 +1338,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 503
+      TabOrder = 519
       object ALButton6: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -1378,7 +1378,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 0
@@ -1430,7 +1430,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 1
@@ -1451,7 +1451,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 513
+      TabOrder = 529
       object ALButton10: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1492,7 +1492,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 0
@@ -1543,7 +1543,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 1
@@ -1564,7 +1564,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 518
+      TabOrder = 534
       object ALButton11: TALButton
         Align = LeftCenter
         Fill.Color = xFFF7F2FA
@@ -1609,7 +1609,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 0
@@ -1666,7 +1666,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 1
@@ -1687,7 +1687,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 524
+      TabOrder = 540
       object ALButton14: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1719,7 +1719,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 0
@@ -1761,7 +1761,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 1
@@ -1782,7 +1782,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 529
+      TabOrder = 545
       object ALButton17: TALButton
         Align = LeftCenter
         Fill.Color = claNull
@@ -1821,7 +1821,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF79747E
         Stroke.ColorKey = 'Material.Color.Outline'
         Stroke.Thickness = 1.289999961853027000
@@ -1873,7 +1873,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF79747E
         Stroke.ColorKey = 'Material.Color.Outline'
         Stroke.Thickness = 1.289999961853027000
@@ -2221,7 +2221,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 43.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 604
+      TabOrder = 620
       object ALLayout33: TALLayout
         Align = Left
         AutoSize = True
@@ -2468,7 +2468,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 635
+      TabOrder = 651
       object ALLayout36: TALLayout
         Align = Left
         AutoSize = True
@@ -2699,7 +2699,7 @@ object MainForm: TMainForm
       StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
       StateStyles.Focused.Stroke.Inherit = False
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF49454F
       Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
       Stroke.Thickness = 1.120000004768372000
@@ -2708,7 +2708,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 662
+      TabOrder = 678
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material.Color.OnSurface'
@@ -2737,7 +2737,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 666
+      TabOrder = 682
       object ALButton21: TALButton
         Align = LeftCenter
         Fill.Color = xFFE8DEF8
@@ -2777,7 +2777,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 0
@@ -2829,7 +2829,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         Stroke.Thickness = 1.289999961853027000
         TabOrder = 1
@@ -2913,7 +2913,7 @@ object MainForm: TMainForm
       StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
       StateStyles.Focused.Stroke.Inherit = False
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF49454F
       Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
       Stroke.Thickness = 1.120000004768372000
@@ -2922,7 +2922,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 671
+      TabOrder = 687
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material.Color.OnSurface'
@@ -2939,7 +2939,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 69.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 674
+      TabOrder = 690
       object ALLayout47: TALLayout
         Align = Left
         AutoSize = True
@@ -3016,7 +3016,7 @@ object MainForm: TMainForm
           StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
           StateStyles.Focused.Stroke.Inherit = False
           StateStyles.Transition.Duration = 0.200000002980232200
-          StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+          StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
           Stroke.Color = xFFB3261E
           Stroke.ColorKey = 'Material.Color.Error'
           Stroke.Thickness = 1.120000004768372000
@@ -3123,7 +3123,7 @@ object MainForm: TMainForm
           StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
           StateStyles.Focused.Stroke.Inherit = False
           StateStyles.Transition.Duration = 0.200000002980232200
-          StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+          StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
           Stroke.Color = xFF49454F
           Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
           Stroke.Thickness = 1.120000004768372000
@@ -3210,7 +3210,7 @@ object MainForm: TMainForm
       StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
       StateStyles.Focused.Stroke.Inherit = False
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.120000004768372000
@@ -3219,7 +3219,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 678
+      TabOrder = 694
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material.Color.OnSurface'
@@ -3248,7 +3248,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 60.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 679
+      TabOrder = 695
       object ALLayout49: TALLayout
         Align = Left
         AutoSize = True
@@ -3316,7 +3316,7 @@ object MainForm: TMainForm
           StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
           StateStyles.Focused.Stroke.Inherit = False
           StateStyles.Transition.Duration = 0.200000002980232200
-          StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+          StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
           Stroke.Color = xFFB3261E
           Stroke.ColorKey = 'Material.Color.Error'
           Stroke.Thickness = 1.120000004768372000
@@ -3420,7 +3420,7 @@ object MainForm: TMainForm
           StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
           StateStyles.Focused.Stroke.Inherit = False
           StateStyles.Transition.Duration = 0.200000002980232200
-          StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+          StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
           Stroke.Color = xFF79747E
           Stroke.ColorKey = 'Material.Color.Outline'
           Stroke.Thickness = 1.120000004768372000
@@ -3507,7 +3507,7 @@ object MainForm: TMainForm
       StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
       StateStyles.Focused.Stroke.Inherit = False
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.120000004768372000
@@ -3516,7 +3516,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 682
+      TabOrder = 698
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material.Color.OnSurface'
@@ -3594,7 +3594,7 @@ object MainForm: TMainForm
       StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
       StateStyles.Focused.Stroke.Inherit = False
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.120000004768372000
@@ -3603,7 +3603,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 684
+      TabOrder = 700
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material.Color.OnSurface'
@@ -3690,7 +3690,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 356
+      TabOrder = 361
       object ALAutoSizeLayoutImage: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -3913,10 +3913,9 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 509
+      TabOrder = 525
       object ALAnimatedImage1: TALAnimatedImage
         Align = Left
-        Animation.Enabled = True
         ResourceName = 'lottieloader1'
         Size.Width = 75.000000000000000000
         Size.Height = 75.000000000000000000
@@ -3924,7 +3923,6 @@ object MainForm: TMainForm
       end
       object ALAnimatedImage3: TALAnimatedImage
         Align = Left
-        Animation.Enabled = True
         Margins.Left = 50.000000000000000000
         Position.X = 125.000000000000000000
         ResourceName = 'lottieloader3'
@@ -4134,7 +4132,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 237
+      TabOrder = 242
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = True
@@ -6663,7 +6661,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 224
+      TabOrder = 229
       object ALImage14: TALImage
         Align = MostLeftTop
         Margins.Left = 16.000000000000000000
@@ -6823,7 +6821,6 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
-        Fill.ImageNoRadius = True
         Fill.ImageTintColor = claWhite
         Fill.ImageTintColorKey = 'Material.Color.OnPrimary'
         Margins.Left = 24.000000000000000000
@@ -6857,7 +6854,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         TabOrder = 3
         TouchTargetExpansion.Left = 4.000000000000000000
@@ -6875,7 +6872,6 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
-        Fill.ImageNoRadius = True
         Fill.ImageTintColor = xFF49454F
         Fill.ImageTintColorKey = 'Material.Color.OnSurfaceVariant'
         Margins.Left = 16.000000000000000000
@@ -6912,7 +6908,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF79747E
         Stroke.ColorKey = 'Material.Color.Outline'
         TabOrder = 2
@@ -6931,7 +6927,6 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
-        Fill.ImageNoRadius = True
         Fill.ImageTintColor = xFF49454F
         Fill.ImageTintColorKey = 'Material.Color.OnSurfaceVariant'
         Margins.Left = 16.000000000000000000
@@ -6964,7 +6959,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         TabOrder = 1
         TouchTargetExpansion.Left = 4.000000000000000000
@@ -6983,7 +6978,6 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
-        Fill.ImageNoRadius = True
         Fill.ImageTintColor = xFF4A4458
         Fill.ImageTintColorKey = 'Material.Color.OnSecondaryContainer'
         Margins.Left = 16.000000000000000000
@@ -7017,7 +7011,7 @@ object MainForm: TMainForm
         StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
         StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = claNull
         TabOrder = 0
         TouchTargetExpansion.Left = 4.000000000000000000
@@ -7230,7 +7224,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.329999923706050000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.329999923706050000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFFB3261E
         Stroke.ColorKey = 'Material.Color.Error'
         Stroke.Thickness = 2.220000028610229000
@@ -7362,7 +7356,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.199999809265140000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.199999809265140000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF49454F
         Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
         Stroke.Thickness = 2.200000047683716000
@@ -7488,7 +7482,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.199999809265140000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.199999809265140000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFFB3261E
         Stroke.ColorKey = 'Material.Color.Error'
         Stroke.Thickness = 2.200000047683716000
@@ -8422,10 +8416,10 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 498
+      TabOrder = 508
       Text = 'Scale-Out Effect'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -8455,7 +8449,6 @@ object MainForm: TMainForm
     end
     object ALAnimatedImage2: TALAnimatedImage
       Align = TopLeft
-      Animation.Enabled = True
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8475,6 +8468,10 @@ object MainForm: TMainForm
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
       Position.Y = 9223.000000000000000000
+      ResourceName = 'aniindicator'
+      MotionMode = Frame
+      FrameCount = 20
+      RowCount = 4
     end
     object ALText45: TALText
       Align = Top
@@ -8902,10 +8899,10 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 411
+      TabOrder = 421
       Text = 'Show Simple Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -8956,11 +8953,11 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 409
+      TabOrder = 419
       Text = 'Show Multiple Choice Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -9011,11 +9008,11 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 410
+      TabOrder = 420
       Text = 'Show Single Choice Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -9066,11 +9063,11 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 407
+      TabOrder = 417
       Text = 'Show Edit Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -9256,7 +9253,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.199999809265140000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.199999809265140000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF49454F
         Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
         Stroke.Thickness = 2.200000047683716000
@@ -9389,7 +9386,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.199999809265140000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.199999809265140000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF49454F
         Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
         Stroke.Thickness = 2.200000047683716000
@@ -9522,7 +9519,7 @@ object MainForm: TMainForm
         StateStyles.Unchecked.Focused.StateLayer.Margins.Right = -13.199999809265140000
         StateStyles.Unchecked.Focused.StateLayer.Margins.Bottom = -13.199999809265140000
         StateStyles.Transition.Duration = 0.200000002980232200
-        StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+        StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
         Stroke.Color = xFF49454F
         Stroke.ColorKey = 'Material.Color.OnSurfaceVariant'
         Stroke.Thickness = 2.200000047683716000
@@ -9542,7 +9539,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 630
+      TabOrder = 640
     end
     object ALRangeTrackBarCustomStyle: TALRangeTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
@@ -9645,7 +9642,7 @@ object MainForm: TMainForm
       StateStyles.Focused.Stroke.Thickness = 3.380000114440918000
       StateStyles.Focused.Stroke.Inherit = False
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.120000004768372000
@@ -9654,7 +9651,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 636
+      TabOrder = 646
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material.Color.OnSurface'
@@ -9716,7 +9713,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
@@ -9771,7 +9768,7 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.XRadius = -50.000000000000000000
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
-      StateStyles.Transition.Interpolation = MaterialStandardDefaultEffects
+      StateStyles.Transition.InterpolationType = MaterialStandardDefaultEffects
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material.Color.Outline'
       Stroke.Thickness = 1.289999961853027000

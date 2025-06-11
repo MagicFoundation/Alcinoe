@@ -604,7 +604,6 @@ type
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
     FWrapMode: TALImageWrapMode; // 1 byte
-    FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
@@ -679,8 +678,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
-    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
-    function IsReadyToDisplay: Boolean; override;
+    function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -1857,7 +1855,7 @@ begin
   fOnVideoSizeChangedEvent := nil;
   //--
   if not AppAudioSessionActivated then begin
-    Tmonitor.Enter(AppAudioSessionLock);
+    ALMonitorEnter(AppAudioSessionLock{$IF defined(DEBUG)}, 'TALIOSVideoPlayer.Create'{$ENDIF});
     Try
       if not AppAudioSessionActivated then begin
         AppAudioSessionActivated := True;
@@ -1866,7 +1864,7 @@ begin
         LAudioSession.setActive(True, nil);
       end;
     finally
-      TMonitor.Exit(AppAudioSessionLock);
+      ALMonitorExit(AppAudioSessionLock);
     end;
   end;
   //--
@@ -2854,13 +2852,13 @@ begin
   While true do begin
 
     var LCommand: TCommand;
-    Tmonitor.Enter(FCommandQueue);
+    ALMonitorEnter(FCommandQueue{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.ProcessCommandQueue (1)'{$ENDIF});
     Try
       if FCommandQueue.Count = 0 then
         Exit;
       LCommand := FCommandQueue.Dequeue;
     Finally
-      Tmonitor.Exit(FCommandQueue);
+      ALMonitorExit(FCommandQueue);
     End;
 
     var LEngine := GetEngine(LCommand.EngineIndex);
@@ -2879,7 +2877,7 @@ begin
             LVideoPlayer.OnFrameAvailable := DoOnFrameAvailable;
             LVideoPlayer.OnCompletion := DoOnCompletion;
             LVideoPlayer.OnVideoSizeChanged := DoOnVideoSizeChanged;
-            TMonitor.Enter(LEngine);
+            ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.ProcessCommandQueue (2)'{$ENDIF});
             Try
               {$IF defined(DEBUG)}
               if LEngine.EmptySlot then Raise Exception.Create('Error 077B6931-5B11-4DCB-B716-93FB469C3999');
@@ -2887,13 +2885,13 @@ begin
               {$ENDIF}
               LEngine.CoreVideoPlayer := LVideoPlayer;
             Finally
-              Tmonitor.Exit(LEngine);
+              ALMonitorExit(LEngine);
             End;
           end;
         end;
 
         TOperation.ReleaseEngine: begin
-          TMonitor.Enter(LEngine);
+          ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.ProcessCommandQueue (3)'{$ENDIF});
           Try
             {$IF defined(DEBUG)}
             if LEngine.EmptySlot then Raise Exception.Create('Error FE6C5764-EFC5-4DE7-815F-4F12B469B2FE');
@@ -2902,7 +2900,7 @@ begin
             ALFreeAndNil(LEngine.CoreVideoPlayer);
             LEngine.EmptySlot := True;
           Finally
-            Tmonitor.Exit(LEngine);
+            ALMonitorExit(LEngine);
           End;
         end;
 
@@ -2993,11 +2991,11 @@ begin
     LCommand.Request.Param1Boolean := AParamBoolean;
     LCommand.Request.Param1String := AParamString;
 
-    Tmonitor.Enter(FCommandQueue);
+    ALMonitorEnter(FCommandQueue{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.EnqueueCommand'{$ENDIF});
     try
       FCommandQueue.Enqueue(LCommand);
     finally
-      Tmonitor.Exit(FCommandQueue);
+      ALMonitorExit(FCommandQueue);
     end;
 
     {$IF defined(android)}
@@ -3093,7 +3091,7 @@ begin
   //ALLog('TALVideoPlayerControllerThread.DoOnError');
   {$ENDIF}
   var LEngine := GetEngine(TALBaseVideoPlayer(Sender).tag);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnError (1)'{$ENDIF});
   try
     if LEngine.ProxyVideoPlayer = nil then exit;
     If assigned(LEngine.ProxyVideoPlayer.OnError) then begin
@@ -3107,19 +3105,19 @@ begin
         TThread.Queue(nil,
           procedure
           begin
-            TMonitor.Enter(LEngine);
+            ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnError (2)'{$ENDIF});
             try
               if LEngine.ProxyVideoPlayer <> LProxyVideoPlayer then exit;
               If assigned(LEngine.ProxyVideoPlayer.OnError) then
                 LEngine.ProxyVideoPlayer.OnError(LEngine.ProxyVideoPlayer);
             finally
-              TMonitor.Exit(LEngine);
+              ALMonitorExit(LEngine);
             end;
           end);
       end;
     end;
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
 end;
 
@@ -3130,7 +3128,7 @@ begin
   //ALLog('TALVideoPlayerControllerThread.DoOnPrepared');
   {$ENDIF}
   var LEngine := GetEngine(TALBaseVideoPlayer(Sender).tag);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnPrepared (1)'{$ENDIF});
   try
     if LEngine.ProxyVideoPlayer = nil then exit;
     If assigned(LEngine.ProxyVideoPlayer.OnPrepared) then begin
@@ -3144,19 +3142,19 @@ begin
         TThread.Queue(nil,
           procedure
           begin
-            TMonitor.Enter(LEngine);
+            ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnPrepared (2)'{$ENDIF});
             try
               if LEngine.ProxyVideoPlayer <> LProxyVideoPlayer then exit;
               If assigned(LEngine.ProxyVideoPlayer.OnPrepared) then
                 LEngine.ProxyVideoPlayer.OnPrepared(LEngine.ProxyVideoPlayer);
             finally
-              TMonitor.Exit(LEngine);
+              ALMonitorExit(LEngine);
             end;
           end);
       end;
     end;
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
 end;
 
@@ -3169,13 +3167,13 @@ begin
     Raise Exception.Create('Error 30414840-A389-48FC-B1C8-2DB3E4B29B70');
   {$ENDIF}
   var LEngine := GetEngine(TALBaseVideoPlayer(Sender).tag);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnFrameAvailable'{$ENDIF});
   try
     if LEngine.ProxyVideoPlayer = nil then exit;
     If assigned(LEngine.ProxyVideoPlayer.OnFrameAvailable) then
       LEngine.ProxyVideoPlayer.OnFrameAvailable(LEngine.ProxyVideoPlayer);
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
 end;
 
@@ -3186,7 +3184,7 @@ begin
   //ALLog('TALVideoPlayerControllerThread.DoOnCompletion');
   {$ENDIF}
   var LEngine := GetEngine(TALBaseVideoPlayer(Sender).tag);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnCompletion (1)'{$ENDIF});
   try
     if LEngine.ProxyVideoPlayer = nil then exit;
     If assigned(LEngine.ProxyVideoPlayer.OnCompletion) then begin
@@ -3200,19 +3198,19 @@ begin
         TThread.Queue(nil,
           procedure
           begin
-            TMonitor.Enter(LEngine);
+            ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnCompletion (2)'{$ENDIF});
             try
               if LEngine.ProxyVideoPlayer <> LProxyVideoPlayer then exit;
               If assigned(LEngine.ProxyVideoPlayer.OnCompletion) then
                 LEngine.ProxyVideoPlayer.OnCompletion(LEngine.ProxyVideoPlayer);
             finally
-              TMonitor.Exit(LEngine);
+              ALMonitorExit(LEngine);
             end;
           end);
       end;
     end;
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
 end;
 
@@ -3223,7 +3221,7 @@ begin
   //ALLog('TALVideoPlayerControllerThread.DoOnVideoSizeChanged');
   {$ENDIF}
   var LEngine := GetEngine(TALBaseVideoPlayer(Sender).tag);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnVideoSizeChanged (1)'{$ENDIF});
   try
     if LEngine.ProxyVideoPlayer = nil then exit;
     If assigned(LEngine.ProxyVideoPlayer.OnVideoSizeChanged) then begin
@@ -3237,19 +3235,19 @@ begin
         TThread.Queue(nil,
           procedure
           begin
-            TMonitor.Enter(LEngine);
+            ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.DoOnVideoSizeChanged (2)'{$ENDIF});
             try
               if LEngine.ProxyVideoPlayer <> LProxyVideoPlayer then exit;
               If assigned(LEngine.ProxyVideoPlayer.OnVideoSizeChanged) then
                 LEngine.ProxyVideoPlayer.OnVideoSizeChanged(LEngine.ProxyVideoPlayer, width, height);
             finally
-              TMonitor.Exit(LEngine);
+              ALMonitorExit(LEngine);
             end;
           end);
       end;
     end;
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
 end;
 
@@ -3305,14 +3303,14 @@ end;
 procedure TALVideoPlayerControllerThread.ReleaseEngine(const AEngineIndex: Integer);
 begin
   var LEngine := GetEngine(AEngineIndex);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.ReleaseEngine'{$ENDIF});
   try
     {$IF defined(DEBUG)}
     if LEngine.ProxyVideoPlayer = nil then Raise Exception.Create('Error B0E9E26E-959E-4426-B82B-7406DBDDE659');
     {$ENDIF}
     LEngine.ProxyVideoPlayer := nil;
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
   EnqueueCommand(AEngineIndex, TOperation.ReleaseEngine, False{AWaitResponse});
 end;
@@ -3321,11 +3319,11 @@ end;
 function TALVideoPlayerControllerThread.GetCoreVideoPlayer(const AEngineIndex: Integer): TALBaseVideoPlayer;
 begin
   var LEngine := GetEngine(AEngineIndex);
-  TMonitor.Enter(LEngine);
+  ALMonitorEnter(LEngine{$IF defined(DEBUG)}, 'TALVideoPlayerControllerThread.GetCoreVideoPlayer'{$ENDIF});
   try
     Result := LEngine.CoreVideoPlayer;
   finally
-    TMonitor.Exit(LEngine);
+    ALMonitorExit(LEngine);
   end;
 end;
 
@@ -3476,7 +3474,6 @@ begin
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
   FWrapMode := TALImageWrapMode.Fit;
-  FReadyAfterResourcesLoaded := False;
   FCacheIndex := 0;
   FCacheEngine := nil;
   FPreviewDownloadContext := nil;
@@ -3506,11 +3503,11 @@ begin
   inherited;
 end;
 
-{*******************************************************}
-function TALVideoPlayerSurface.IsReadyToDisplay: Boolean;
+{***************************************************************************************}
+function TALVideoPlayerSurface.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 begin
   Result := Inherited and
-            ((not FReadyAfterResourcesLoaded) or (FPreviewDownloadContext = nil)) and
+            ((not AStrict) or (FPreviewDownloadContext = nil)) and
             ((FFadeInStartTimeNano <= 0) or
              ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
@@ -3936,14 +3933,14 @@ begin
   if FPreviewDownloadContext <> nil then begin
     var LContextToFree: TPreviewDownloadContext;
     var LLock := FPreviewDownloadContext.FLock;
-    TMonitor.Enter(LLock);
+    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALVideoPlayerSurface.CancelPreviewDownload'{$ENDIF});
     try
       if not FPreviewDownloadContext.FFreeByThread then LContextToFree := FPreviewDownloadContext
       else LContextToFree := nil;
       FPreviewDownloadContext.FOwner := nil;
       FPreviewDownloadContext := nil;
     Finally
-      TMonitor.Exit(LLock);
+      ALMonitorExit(LLock);
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -3978,14 +3975,14 @@ begin
   var LContext := TPreviewDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
-  TMonitor.Enter(LContext.FLock);
+  ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALVideoPlayerSurface.HandlePreviewDownloadError (1)'{$ENDIF});
   try
     if LContext.Owner <> nil then begin
       LContext.FFreeByThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    TMonitor.Exit(LContext.FLock);
+    ALMonitorExit(LContext.FLock);
   end;
   exit;
   {$ENDIF}
@@ -3995,14 +3992,14 @@ begin
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
-    TMonitor.Enter(LContext.FLock);
+    ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALVideoPlayerSurface.HandlePreviewDownloadError (2)'{$ENDIF});
     try
       if LContext.FOwner <> nil then begin
         LContext.FFreeByThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      TMonitor.Exit(LContext.FLock);
+      ALMonitorExit(LContext.FLock);
     end;
     exit;
   end;

@@ -146,7 +146,7 @@ type
     procedure Assign(Source: TPersistent{TALControl}); override;
     procedure EndUpdate; override;
     procedure SetNewScene(AScene: IScene); override;
-    function IsReadyToDisplay: Boolean; virtual;
+    function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; virtual;
     function IsDisplayed: Boolean; virtual;
     property DisplayedRect: TRectF read GetAbsoluteDisplayedRect;
     property Form: TCommonCustomForm read FForm;
@@ -1231,15 +1231,15 @@ begin
   FAutoAlignToPixel := AValue;
 end;
 
-{********************************************}
-function TALControl.IsReadyToDisplay: Boolean;
+{****************************************************************************}
+function TALControl.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function CheckAllChildrenAreReadyToDisplay(const AControl: TControl): boolean;
   begin
     Result := True;
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      if AControl.Controls[i] is TALControl then Result := TALControl(AControl.Controls[i]).IsReadyToDisplay
+      if AControl.Controls[i] is TALControl then Result := TALControl(AControl.Controls[i]).IsReadyToDisplay(AStrict)
       else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);
       if not Result then exit;
     end;

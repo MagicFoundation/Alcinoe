@@ -13,15 +13,15 @@ uses
 type
   TForm1 = class(TForm)
     CircleBullet: TALCircle;
-    TextAnimationType: TALText;
-    ComboBoxAnimationType: TComboBox;
+    TextInterpolationMode: TALText;
+    ComboBoxInterpolationMode: TComboBox;
     ButtonStart: TButton;
     ALFloatPropertyAnimation: TALFloatPropertyAnimation;
-    LayoutInterpolation: TALLayout;
+    LayoutInterpolationType: TALLayout;
     LayoutStart: TALLayout;
     LayoutBullet: TALLayout;
-    TextInterpolation: TALText;
-    ComboBoxInterpolation: TComboBox;
+    TextInterpolationType: TALText;
+    ComboBoxInterpolationType: TComboBox;
     PaintBoxChart: TPaintBox;
     LayoutGraph: TALLayout;
     ALText0_0: TALText;
@@ -30,9 +30,9 @@ type
     ALTextmin1_0: TALText;
     ALTextmin1_4: TALText;
     CheckBoxClearGraph: TCheckBox;
-    LayoutAnimationType: TALLayout;
+    LayoutInterpolationMode: TALLayout;
     MainTabControl: TTabControl;
-    TabItemInterpolation: TTabItem;
+    TabItemInterpolationType: TTabItem;
     TabItemSpringForce: TTabItem;
     CircleSpringForce: TALCircle;
     ALSpringForcePropertyAnimationY: TALSpringForcePropertyAnimation;
@@ -61,7 +61,7 @@ type
     procedure LayoutSpringForceMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseLeave(Sender: TObject);
-    procedure ComboBoxInterpolationChange(Sender: TObject);
+    procedure ComboBoxInterpolationTypeChange(Sender: TObject);
     procedure ButtonStartTestClick(Sender: TObject);
   private
     FPoints: Array[TALInterpolationType] of Tlist<Tpointf>;
@@ -97,10 +97,10 @@ begin
     FPoints[i] := Tlist<Tpointf>.create;
   for var I := Low(FTestPoints) to High(FTestPoints) do
     FTestPoints[i] := Tlist<Tpointf>.create;
-  ComboBoxInterpolation.Items.Clear;
+  ComboBoxInterpolationType.Items.Clear;
   for var I := Ord(Low(TALInterpolationType)) to Ord(High(TALInterpolationType)) do
-    ComboBoxInterpolation.Items.Add(GetEnumName(TypeInfo(TALInterpolationType), I));
-  ComboBoxInterpolation.ItemIndex := 0;
+    ComboBoxInterpolationType.Items.Add(GetEnumName(TypeInfo(TALInterpolationType), I));
+  ComboBoxInterpolationType.ItemIndex := 0;
   LayoutResized(nil);
 end;
 
@@ -160,7 +160,7 @@ end;
 {*******************************************************************}
 procedure TForm1.ALFloatPropertyAnimationFirstFrame(Sender: TObject);
 begin
-  FPoints[ALFloatPropertyAnimation.Interpolation].Add(
+  FPoints[ALFloatPropertyAnimation.InterpolationType].Add(
     TpointF.Create(
       ALElapsedTimeMillisAsInt64 - FStartTime,
       ALFloatPropertyAnimation.CurrentValue));
@@ -170,7 +170,7 @@ end;
 {****************************************************************}
 procedure TForm1.ALFloatPropertyAnimationProcess(Sender: TObject);
 begin
-  FPoints[ALFloatPropertyAnimation.Interpolation].Add(
+  FPoints[ALFloatPropertyAnimation.InterpolationType].Add(
     TpointF.Create(
       ALElapsedTimeMillisAsInt64 - FStartTime,
       ALFloatPropertyAnimation.CurrentValue));
@@ -191,18 +191,18 @@ begin
   ALText1_4.Position.Y := (0) - (ALText1_4.Height / 2);
   ALTextmin1_0.Position.Y := (LayoutGraph.Height) - ((LayoutGraph.Height / 2) / 100 * (100 - (100/1.40))) - (ALText1_4.Height / 2);
   ALTextmin1_4.Position.Y := LayoutGraph.Height - (ALText1_4.Height / 2);
-  LayoutInterpolation.Height := max(ComboBoxInterpolation.Height, TextInterpolation.Height);
-  TextInterpolation.Position.Y := (LayoutInterpolation.Height - TextInterpolation.Height) / 2;
-  ComboBoxInterpolation.Position.Y := (LayoutInterpolation.Height - ComboBoxInterpolation.Height) / 2;
-  ComboBoxInterpolation.Position.X := textInterpolation.position.X + textInterpolation.Width + 15;
+  LayoutInterpolationType.Height := max(ComboBoxInterpolationType.Height, TextInterpolationType.Height);
+  TextInterpolationType.Position.Y := (LayoutInterpolationType.Height - TextInterpolationType.Height) / 2;
+  ComboBoxInterpolationType.Position.Y := (LayoutInterpolationType.Height - ComboBoxInterpolationType.Height) / 2;
+  ComboBoxInterpolationType.Position.X := textInterpolationType.position.X + textInterpolationType.Width + 15;
   LayoutCustomInterpolation.Height := max(ComboBoxCustomInterpolation.Height, TextCustomInterpolation.Height);
   TextCustomInterpolation.Position.Y := (LayoutCustomInterpolation.Height - TextCustomInterpolation.Height) / 2;
   ComboBoxCustomInterpolation.Position.Y := (LayoutCustomInterpolation.Height - ComboBoxCustomInterpolation.Height) / 2;
   ComboBoxCustomInterpolation.Position.X := textCustomInterpolation.position.X + textCustomInterpolation.Width + 15;
-  LayoutAnimationType.Height := max(ComboBoxAnimationType.Height, TextAnimationType.Height);
-  TextAnimationType.Position.Y := (LayoutAnimationType.Height - TextAnimationType.Height) / 2;
-  ComboBoxAnimationType.Position.Y := (LayoutAnimationType.Height - ComboBoxAnimationType.Height) / 2;
-  ComboBoxAnimationType.Position.X := textAnimationType.position.X + textAnimationType.Width + 15;
+  LayoutInterpolationMode.Height := max(ComboBoxInterpolationMode.Height, TextInterpolationMode.Height);
+  TextInterpolationMode.Position.Y := (LayoutInterpolationMode.Height - TextInterpolationMode.Height) / 2;
+  ComboBoxInterpolationMode.Position.Y := (LayoutInterpolationMode.Height - ComboBoxInterpolationMode.Height) / 2;
+  ComboBoxInterpolationMode.Position.X := textInterpolationMode.position.X + textInterpolationMode.Width + 15;
   LayoutStart.Height := max(ButtonStart.Height, CheckBoxClearGraph.Height);
   ButtonStart.Position.Y := (LayoutStart.Height - ButtonStart.Height) / 2;
   CheckBoxClearGraph.Position.Y := (LayoutStart.Height - CheckBoxClearGraph.Height) / 2;
@@ -227,9 +227,9 @@ begin
   ALFloatPropertyAnimation.Duration := 2;
   ALFloatPropertyAnimation.StartValue := -CircleBullet.height / 2;
   ALFloatPropertyAnimation.StopValue := (LayoutBullet.height / 1.4) - (CircleBullet.height / 2);
-  ALFloatPropertyAnimation.Interpolation := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex]));
-  ALFloatPropertyAnimation.AnimationType := TAnimationType(GetEnumValue(TypeInfo(TAnimationType), ComboBoxAnimationType.Items[ComboBoxAnimationType.ItemIndex]));
-  FPoints[ALFloatPropertyAnimation.Interpolation].Clear;
+  ALFloatPropertyAnimation.InterpolationType := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolationType.Items[ComboBoxInterpolationType.ItemIndex]));
+  ALFloatPropertyAnimation.InterpolationMode := TALInterpolationMode(GetEnumValue(TypeInfo(TALInterpolationMode), ComboBoxInterpolationMode.Items[ComboBoxInterpolationMode.ItemIndex]));
+  FPoints[ALFloatPropertyAnimation.InterpolationType].Clear;
   ALFloatPropertyAnimation.Start;
 end;
 
@@ -243,11 +243,11 @@ begin
   invalidate;
 end;
 
-{************************************************************}
-procedure TForm1.ComboBoxInterpolationChange(Sender: TObject);
+{****************************************************************}
+procedure TForm1.ComboBoxInterpolationTypeChange(Sender: TObject);
 begin
-  if ComboBoxInterpolation.ItemIndex >= 0 then
-    ComboBoxCustomInterpolation.Enabled := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex])) = TALInterpolationType.Custom;
+  if ComboBoxInterpolationType.ItemIndex >= 0 then
+    ComboBoxCustomInterpolation.Enabled := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolationType.Items[ComboBoxInterpolationType.ItemIndex])) = TALInterpolationType.Custom;
 end;
 
 {********************************************************************}

@@ -26,35 +26,75 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxAniIndicator = class(TALDynamicExtendedControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDynamicAniIndicator = class(TALDynamicExtendedControl)
+  Public
+    type
+      // ---------
+      // TMotionMode
+      TMotionMode = (Frame, Rotate);
+      // ----------
+      // TAnimation
+      TAnimation = class(TALFloatAnimation)
+      private
+        fOwner: TALDynamicAniIndicator;
+        FEnabled: Boolean;
+        procedure SetEnabled(const Value: Boolean);
+        function IsDurationStored: Boolean;
+        procedure repaint;
+      protected
+        procedure DoProcess; override;
+      public
+        constructor Create(const AOwner: TALDynamicAniIndicator); reintroduce; virtual;
+      public
+        property AutoReverse default False;
+        property Delay;
+        property Duration stored IsDurationStored nodefault;
+        property Enabled Read FEnabled write SetEnabled default True;
+        property Inverse default False;
+        property Loop default True;
+        property InterpolationType default TALInterpolationType.Linear;
+        property InterpolationMode default TALInterpolationMode.In;
+      end;
   private
-    FTimer: TALDisplayTimer;
-    FInterval: Single;
-    FFrameCount: Integer;
-    FRowCount: Integer;
-    FResourceName: String;
-    FFrameIndex: TSmallPoint;
+    FAnimation: TAnimation; // 8 bytes
+    FResourceName: String; // 8 bytes
+    FTintColorKey: String; // 8 bytes
+    FTintColor: TAlphaColor; // 4 bytes
+    FFrameCount: Integer; // 4 bytes
+    FRowCount: Integer; // 4 bytes
+    FMotionMode: TMotionMode; // 1 byte
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
+    procedure SetTintColor(const Value: TAlphaColor);
+    procedure setTintColorKey(const Value: String);
+    procedure SetAnimation(const Value: TAnimation);
     procedure SetResourceName(const Value: String);
-    procedure DoTimerProcess(sender: Tobject);
-    function IsResourceNameStored: Boolean;
-    function IsIntervalStored: Boolean;
+    procedure SetMotionMode(const Value: TMotionMode);
+    procedure SetFrameCount(const Value: Integer);
+    procedure SetRowCount(const Value: Integer);
+    function IsTintColorStored: Boolean;
+    function IsTintColorKeyStored: Boolean;
   protected
     FBufDrawable: TALDrawable;
     FBufDrawableRect: TRectF;
+    procedure ApplyTintColorScheme; virtual;
     function GetCacheSubIndex: Integer; virtual;
     function GetDoubleBuffered: boolean; override;
-    procedure Paint; override;
     function GetDefaultSize: TSizeF; override;
+    function GetDefaultTintColor: TAlphaColor; virtual;
+    function GetDefaultTintColorKey: String; virtual;
+    procedure Paint; override;
     procedure DoResized; override;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
+    property DefaultTintColor: TAlphaColor read GetDefaultTintColor;
+    property DefaultTintColorKey: String read GetDefaultTintColorKey;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
     // prevent duplicate drawables across multiple identical controls.
     // CacheIndex specifies the slot in the cache engine where an existing
@@ -65,6 +105,7 @@ type
   public
     //property Action;
     property Align;
+    property Animation: TAnimation read fAnimation write SetAnimation;
     //**property Anchors;
     //property AutoSize;
     //property CanFocus;
@@ -88,10 +129,10 @@ type
     property Padding;
     //**property PopupMenu;
     //**property Position;
-    property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
-    property FrameCount: Integer read FFrameCount write FFrameCount default 20;
-    property RowCount: Integer read FRowCount write FRowCount default 4;
-    property Interval: Single read FInterval write FInterval Stored IsIntervalStored noDefault;
+    property ResourceName: String read FResourceName write SetResourceName;
+    property MotionMode: TMotionMode read FMotionMode write SetMotionMode default TMotionMode.Rotate;
+    property FrameCount: Integer read FFrameCount write SetFrameCount default 1;
+    property RowCount: Integer read FRowCount write SetRowCount default 1;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -99,6 +140,8 @@ type
     //**property Size;
     //property TabOrder;
     //property TabStop;
+    property TintColor: TAlphaColor read FTintColor write SetTintColor stored IsTintColorStored;
+    property TintColorKey: String read FTintColorKey write setTintColorKey Stored IsTintColorKeyStored;
     property TouchTargetExpansion;
     property Visible;
     property Width;
@@ -1330,7 +1373,6 @@ type
         property Ellipsis;
         property MaxLines;
         property IsHtml;
-        property Trimming;
         property HorzAlign;
         property VertAlign;
         property LineHeightMultiplier;
@@ -2897,57 +2939,136 @@ Type
 
 {$REGION 'Auto-generated by <ALCINOE>\Tools\CodeBuilder (2)'}
 
-{**********************************************************************}
-constructor TALDynamicListBoxAniIndicator.Create(const AOwner: TObject);
+{*****************************************************************************************}
+constructor TALDynamicAniIndicator.TAnimation.Create(const AOwner: TALDynamicAniIndicator);
+begin
+  inherited Create;
+  FOwner := AOwner;
+  FEnabled := True;
+  Loop := True;
+  Duration := 1;
+  StartValue := 0;
+  StopValue := 1.0;
+end;
+
+{****************************************************}
+procedure TALDynamicAniIndicator.TAnimation.DoProcess;
+begin
+  inherited;
+  if Enabled then Repaint;
+end;
+
+{**************************************************}
+procedure TALDynamicAniIndicator.TAnimation.repaint;
+begin
+  if Fowner.IsDisplayed then
+    Fowner.Repaint
+  else if Loop then
+    Pause;
+end;
+
+{***************************************************************************}
+procedure TALDynamicAniIndicator.TAnimation.SetEnabled(const Value: Boolean);
+begin
+  if Value <> FEnabled then begin
+    FEnabled := Value;
+    if not FEnabled then
+      inherited Enabled := False;
+  end;
+end;
+
+{*******************************************************************}
+function TALDynamicAniIndicator.TAnimation.IsDurationStored: Boolean;
+begin
+  Result := Not SameValue(Duration, 1.0, TEpsilon.Scale);
+end;
+
+{***************************************************************}
+constructor TALDynamicAniIndicator.Create(const AOwner: TObject);
 begin
   inherited Create(AOwner);
-  FInterval := 0.05;
-  FFrameCount := 20;
-  FRowCount := 4;
-  FResourceName := 'aniindicator_540x432';
-  FFrameIndex := TSmallPoint.Create(0,0);
+  FAnimation := TAnimation.Create(Self);
+  FResourceName := '';
+  FTintColor := DefaultTintColor;
+  FTintColorKey := DefaultTintColorKey;
+  FFrameCount := 1;
+  FRowCount := 1;
+  FMotionMode := TMotionMode.Rotate;
   FCacheIndex := 0;
   FCacheEngine := nil;
-  FTimer := TALDisplayTimer.Create;
-  FTimer.Enabled := False;
-  FTimer.Interval := FInterval;
-  FTimer.OnProcess := DoTimerProcess;
   FBufDrawable := ALNullDrawable;
   //**SetAcceptsControls(False);
 end;
 
-{***********************************************}
-destructor TALDynamicListBoxAniIndicator.Destroy;
+{****************************************}
+destructor TALDynamicAniIndicator.Destroy;
 begin
-  ALFreeAndNil(FTimer);
+  ALFreeAndNil(FAnimation);
   inherited;
 end;
 
-{********************************************************}
-procedure TALDynamicListBoxAniIndicator.BeforeDestruction;
+{*************************************************}
+procedure TALDynamicAniIndicator.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
   // Necessary if the control is destroyed using
   // AlFreeAndNil with the delayed flag
-  FTimer.Enabled := False;
+  FAnimation.Enabled := False;
   inherited;
 end;
 
-{************************************************************}
-function TALDynamicListBoxAniIndicator.GetDefaultSize: TSizeF;
+{****************************************************}
+procedure TALDynamicAniIndicator.ApplyTintColorScheme;
+begin
+  if FTintColorKey <> '' then begin
+    var LTintColor := TALStyleManager.Instance.GetColor(FTintColorKey);
+    if FTintColor <> LTintColor then begin
+      FTintColor := LTintColor;
+      ClearBufDrawable;
+      Repaint;
+    end;
+  end;
+end;
+
+{************************************************}
+procedure TALDynamicAniIndicator.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    ApplyTintColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************************}
+function TALDynamicAniIndicator.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(36, 36);
 end;
 
-{************************************************}
-procedure TALDynamicListBoxAniIndicator.DoResized;
+{***************************************************************}
+function TALDynamicAniIndicator.GetDefaultTintColor: TAlphaColor;
+begin
+  Result := 0;
+end;
+
+{*************************************************************}
+function TALDynamicAniIndicator.GetDefaulttintColorKey: String;
+begin
+  Result := '';
+end;
+
+{*****************************************}
+procedure TALDynamicAniIndicator.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-{*******************************************************}
-procedure TALDynamicListBoxAniIndicator.ClearBufDrawable;
+{************************************************}
+procedure TALDynamicAniIndicator.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not IsDestroying) and
@@ -2957,8 +3078,8 @@ begin
   ALFreeAndNilDrawable(FBufDrawable);
 end;
 
-{******************************************************}
-procedure TALDynamicListBoxAniIndicator.MakeBufDrawable;
+{***********************************************}
+procedure TALDynamicAniIndicator.MakeBufDrawable;
 begin
 
   if //--- Do not create BufDrawable if the size is 0
@@ -2997,7 +3118,7 @@ begin
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
                       TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
                       TpointF.Create(-50,-50), // const ACropCenter: TpointF;
-                      TalphaColors.Null, // const ATintColor: TalphaColor;
+                      FTintColor, // const ATintColor: TalphaColor;
                       0, // const ABlurRadius: single;
                       0, // const AXRadius: Single;
                       0); // const AYRadius: Single);
@@ -3009,27 +3130,16 @@ begin
 
 end;
 
-{**********************************************************************}
-procedure TALDynamicListBoxAniIndicator.DoTimerProcess(sender: Tobject);
-begin
-  if not IsDisplayed then begin
-    FTimer.Enabled := False;
-    exit;
-  end;
-  inc(FFrameIndex.x);
-  if FFrameIndex.x >= FFrameCount div FRowCount then begin
-    FFrameIndex.x := 0;
-    inc(FFrameIndex.Y);
-    if FFrameIndex.Y >= FRowCount then FFrameIndex.Y := 0;
-  end;
-  repaint;
-end;
-
-{********************************************}
-procedure TALDynamicListBoxAniIndicator.Paint;
+{*************************************}
+procedure TALDynamicAniIndicator.Paint;
 begin
 
-  FTimer.Enabled := True;
+  if FAnimation.Enabled then begin
+    if not TALFloatAnimation(FAnimation).Enabled then
+      TALFloatAnimation(FAnimation).Enabled := True
+    else
+      FAnimation.Resume;
+  end;
 
   //**if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
   //**begin
@@ -3056,52 +3166,141 @@ begin
     end;
   end;
 
-  ALDrawDrawable(
-    Canvas, // const ACanvas: Tcanvas;
-    LDrawable, // const ADrawable: TALDrawable;
-    TRectF.Create(
-      TPointF.Create(
-        fFrameIndex.x * Width * ALGetScreenScale,
-        fFrameIndex.Y * Height * ALGetScreenScale),
-      Width * ALGetScreenScale,
-      Height * ALGetScreenScale), // const ASrcRect: TrectF; // IN REAL PIXEL !
-    LDrawableRect, // const ADestRect: TrectF; // IN virtual pixels !
-    AbsoluteOpacity); // const AOpacity: Single);
+  if FMotionMode = TMotionMode.Frame then begin
+
+    var LFrameFlatIndex := Round(FAnimation.CurrentValue * FrameCount) mod FrameCount;
+    var LTotalFramesPerRow := FrameCount div RowCount;
+    var LFrameIndex: TSmallPoint;
+    LFrameIndex.X := LFrameFlatIndex mod LTotalFramesPerRow;
+    LFrameIndex.Y := LFrameFlatIndex div LTotalFramesPerRow;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LDrawable, // const ADrawable: TALDrawable;
+      TRectF.Create(
+        TPointF.Create(
+          LFrameIndex.x * Width * ALGetScreenScale,
+          LFrameIndex.Y * Height * ALGetScreenScale),
+        Width * ALGetScreenScale,
+        Height * ALGetScreenScale), // const ASrcRect: TrectF; // IN REAL PIXEL !
+      LDrawableRect, // const ADestRect: TrectF; // IN virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single);
+
+  end
+  else begin
+
+    var LSavedMatrix := Canvas.Matrix;
+    var LMatrixRotationCenter: TpointF;
+    LMatrixRotationCenter.X := (Width / 2) + Canvas.Matrix.m31;
+    LMatrixRotationCenter.Y := (Height / 2) + Canvas.Matrix.m32;
+    var LMatrix := Canvas.Matrix;
+    LMatrix := LMatrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+    LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(Fanimation.CurrentValue * 360));
+    LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+    Canvas.SetMatrix(LMatrix);
+    try
+
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        LDrawable, // const ADrawable: TALDrawable;
+        LDrawableRect.TopLeft, // const ADstTopLeft: TpointF;
+        AbsoluteOpacity); // const AOpacity: Single);
+
+    finally
+      Canvas.SetMatrix(LSavedMatrix);
+    end;
+
+  end;
 
 end;
 
-{***************************************************************}
-function TALDynamicListBoxAniIndicator.GetCacheSubIndex: Integer;
+{********************************************************}
+function TALDynamicAniIndicator.GetCacheSubIndex: Integer;
 begin
   Result := 0;
 end;
 
-{****************************************************************}
-function TALDynamicListBoxAniIndicator.GetDoubleBuffered: boolean;
+{*********************************************************}
+function TALDynamicAniIndicator.GetDoubleBuffered: boolean;
 begin
   result := True;
 end;
 
-{*******************************************************************}
-function TALDynamicListBoxAniIndicator.IsResourceNameStored: Boolean;
+{**********************************************************************}
+procedure TALDynamicAniIndicator.setTintColor(const Value: TAlphaColor);
 begin
-  result := fResourceName <> 'aniindicator_540x432';
+  if FTintColor <> Value then begin
+    FTintColor := Value;
+    FTintColorKey := '';
+    ClearBufDrawable;
+    Repaint;
+  end;
 end;
 
-{***************************************************************}
-function TALDynamicListBoxAniIndicator.IsIntervalStored: Boolean;
+{********************************************************************}
+procedure TALDynamicAniIndicator.setTintColorKey(const Value: String);
 begin
-  result := Not SameValue(Finterval, 0.05, 1E-5);
+  if FTintColorKey <> Value then begin
+    FTintColorKey := Value;
+    ApplyTintColorScheme;
+  end;
 end;
 
-{***************************************************************************}
-procedure TALDynamicListBoxAniIndicator.setResourceName(const Value: String);
+{*********************************************************************}
+procedure TALDynamicAniIndicator.SetAnimation(const Value: TAnimation);
+begin
+  FAnimation.Assign(Value);
+end;
+
+{********************************************************************}
+procedure TALDynamicAniIndicator.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
     ClearBufDrawable;
     FResourceName := Value;
     Repaint;
   end;
+end;
+
+{***********************************************************************}
+procedure TALDynamicAniIndicator.SetMotionMode(const Value: TMotionMode);
+begin
+  if FMotionMode <> Value then begin
+    FMotionMode := Value;
+    Repaint;
+  end;
+end;
+
+{*******************************************************************}
+procedure TALDynamicAniIndicator.SetFrameCount(const Value: Integer);
+begin
+  if FFrameCount <> Value then begin
+    ClearBufDrawable;
+    FFrameCount := Value;
+    Repaint;
+  end;
+end;
+
+{*****************************************************************}
+procedure TALDynamicAniIndicator.SetRowCount(const Value: Integer);
+begin
+  if FRowCount <> Value then begin
+    ClearBufDrawable;
+    FRowCount := Value;
+    Repaint;
+  end;
+end;
+
+{*********************************************************}
+function TALDynamicAniIndicator.IsTintColorStored: Boolean;
+begin
+  Result := FTintColor <> DefaultTintColor;
+end;
+
+{************************************************************}
+function TALDynamicAniIndicator.IsTintColorKeyStored: Boolean;
+begin
+  Result := FTintColorKey <> DefaultTintColorKey;
 end;
 
 {*******************************************************************************}
@@ -9392,8 +9591,8 @@ begin
   FFloatAnimation.StartValue := 0;
   FFloatAnimation.StopValue := 1;
   FFloatAnimation.Duration := 0.2;
-  FFloatAnimation.AnimationType := TanimationType.out;
-  FFloatAnimation.Interpolation := TALInterpolationType.cubic;
+  FFloatAnimation.InterpolationType := TALInterpolationType.cubic;
+  FFloatAnimation.InterpolationMode := TALInterpolationMode.out;
   FFloatAnimation.OnProcess := AnimationProcess;
   FFloatAnimation.OnFinish := AnimationFinish;
   //--

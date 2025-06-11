@@ -369,7 +369,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'TALBaseText', 'TALDynamicBaseText');
     aSrc := FindAndReplace(aSrc, 'TALText', 'TALDynamicText');
     aSrc := FindAndReplace(aSrc, 'TALBaseStateStyle', 'TALDynamicBaseStateStyle');
-    aSrc := FindAndReplace(aSrc, 'TALAniIndicator', 'TALDynamicListBoxAniIndicator');
+    aSrc := FindAndReplace(aSrc, 'TALAniIndicator', 'TALDynamicAniIndicator');
     aSrc := FindAndReplace(aSrc, 'TALBaseCheckBox', 'TALDynamicBaseCheckBox');
     aSrc := FindAndReplace(aSrc, 'TALCheckBox', 'TALDynamicCheckBox');
     aSrc := FindAndReplace(aSrc, 'TALRadioButton', 'TALDynamicRadioButton');
@@ -542,7 +542,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'procedure SetDoubleBuffered(const AValue: Boolean); virtual;','procedure SetDoubleBuffered(const AValue: Boolean); override;');
     aSrc := FindAndReplace(aSrc, 'function IsDisplayed: Boolean; virtual;','function IsDisplayed: Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'function GetAbsoluteDisplayedRect: TRectF; virtual;','//**function GetAbsoluteDisplayedRect: TRectF; virtual;');
-    aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay: Boolean; virtual;','function IsReadyToDisplay: Boolean; override;');
+    aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; virtual;','function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'procedure IContent.Changed = ContentChanged;','//**procedure IContent.Changed = ContentChanged;');
     aSrc := FindAndReplace(aSrc, 'function IsVisibleObject(const AObject: TControl): Boolean; override;','//**function IsVisibleObject(const AObject: TControl): Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'FreeNotification(AObject: TObject);','FreeNotification(const AObject: TALDynamicControl);');
@@ -592,7 +592,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'TabStop := TALDynamicCustomTrack(Source).TabStop;','//**TabStop := TALDynamicCustomTrack(Source).TabStop;');
     aSrc := FindAndReplace(aSrc, 'TabStop := TALDynamicControl(Source).TabStop;','//**TabStop := TALDynamicControl(Source).TabStop;');
     aSrc := FindAndReplace(aSrc, 'TagFloat := TALDynamicControl(Source).TagFloat;','//**TagFloat := TALDynamicControl(Source).TagFloat;');
-    aSrc := FindAndReplace(aSrc, 'TagObject := TALDynamicControl(Source).TagObject;','//**TagObject := TALDynamicControl(Source).TagObject;');
     aSrc := FindAndReplace(aSrc, 'TouchTargetExpansion.Assign(TALDynamicControl(Source).TouchTargetExpansion);','//**TouchTargetExpansion.Assign(TALDynamicControl(Source).TouchTargetExpansion);');
     aSrc := FindAndReplace(aSrc, 'OnDragEnter := TALDynamicControl(Source).OnDragEnter;','//**OnDragEnter := TALDynamicControl(Source).OnDragEnter;');
     aSrc := FindAndReplace(aSrc, 'OnDragLeave := TALDynamicControl(Source).OnDragLeave;','//**OnDragLeave := TALDynamicControl(Source).OnDragLeave;');
@@ -798,7 +797,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  begin'+#13#10+
               '    Result := True;'+#13#10+
               '    for var I := 0 to AControl.ControlsCount - 1 do begin'+#13#10+
-              '      if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay'+#13#10+
+              '      if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay(AStrict)'+#13#10+
               '      else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);'+#13#10+
               '      if not Result then exit;'+#13#10+
               '    end;'+#13#10+
@@ -807,9 +806,9 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  begin'+#13#10+
               '    Result := True;'+#13#10+
               '    for var I := 0 to AControl.ControlsCount - 1 do begin'+#13#10+
-              '      //**if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay'+#13#10+
+              '      //**if AControl.Controls[i] is TALDynamicControl then Result := TALDynamicControl(AControl.Controls[i]).IsReadyToDisplay(AStrict)'+#13#10+
               '      //**else Result := CheckAllChildrenAreReadyToDisplay(AControl.Controls[i]);'+#13#10+
-              '      Result := AControl.Controls[i].IsReadyToDisplay;'+#13#10+
+              '      Result := AControl.Controls[i].IsReadyToDisplay(AStrict);'+#13#10+
               '      if not Result then exit;'+#13#10+
               '    end;'+#13#10+
               '  end;');

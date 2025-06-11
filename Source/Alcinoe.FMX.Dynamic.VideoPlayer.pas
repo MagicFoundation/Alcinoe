@@ -54,7 +54,6 @@ type
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
     FWrapMode: TALImageWrapMode; // 1 byte
-    FReadyAfterResourcesLoaded: Boolean; // 1 byte
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
@@ -129,8 +128,7 @@ type
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
-    property ReadyBeforeResourcesLoaded: Boolean read FReadyAfterResourcesLoaded write FReadyAfterResourcesLoaded;
-    function IsReadyToDisplay: Boolean; override;
+    function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -312,7 +310,6 @@ begin
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
   FWrapMode := TALImageWrapMode.Fit;
-  FReadyAfterResourcesLoaded := False;
   FCacheIndex := 0;
   FCacheEngine := nil;
   FPreviewDownloadContext := nil;
@@ -342,11 +339,11 @@ begin
   inherited;
 end;
 
-{**************************************************************}
-function TALDynamicVideoPlayerSurface.IsReadyToDisplay: Boolean;
+{**********************************************************************************************}
+function TALDynamicVideoPlayerSurface.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 begin
   Result := Inherited and
-            ((not FReadyAfterResourcesLoaded) or (FPreviewDownloadContext = nil)) and
+            ((not AStrict) or (FPreviewDownloadContext = nil)) and
             ((FFadeInStartTimeNano <= 0) or
              ((ALElapsedTimeNano - FFadeInStartTimeNano) / ALNanosPerSec > FFadeInDuration));
 end;
@@ -772,14 +769,14 @@ begin
   if FPreviewDownloadContext <> nil then begin
     var LContextToFree: TPreviewDownloadContext;
     var LLock := FPreviewDownloadContext.FLock;
-    TMonitor.Enter(LLock);
+    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicVideoPlayerSurface.CancelPreviewDownload'{$ENDIF});
     try
       if not FPreviewDownloadContext.FFreeByThread then LContextToFree := FPreviewDownloadContext
       else LContextToFree := nil;
       FPreviewDownloadContext.FOwner := nil;
       FPreviewDownloadContext := nil;
     Finally
-      TMonitor.Exit(LLock);
+      ALMonitorExit(LLock);
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -814,14 +811,14 @@ begin
   var LContext := TPreviewDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
   {$IFDEF ALDPK}
-  TMonitor.Enter(LContext.FLock);
+  ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicVideoPlayerSurface.HandlePreviewDownloadError (1)'{$ENDIF});
   try
     if LContext.Owner <> nil then begin
       LContext.FFreeByThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    TMonitor.Exit(LContext.FLock);
+    ALMonitorExit(LContext.FLock);
   end;
   exit;
   {$ENDIF}
@@ -831,14 +828,14 @@ begin
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
-    TMonitor.Enter(LContext.FLock);
+    ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicVideoPlayerSurface.HandlePreviewDownloadError (2)'{$ENDIF});
     try
       if LContext.FOwner <> nil then begin
         LContext.FFreeByThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      TMonitor.Exit(LContext.FLock);
+      ALMonitorExit(LContext.FLock);
     end;
     exit;
   end;

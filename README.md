@@ -1162,6 +1162,17 @@ undesired conversions.
 History
 =======
 
+#### 10/05/2025 – Updates and Refactoring
+
+- Removed `ReadyBeforeResourcesLoaded`.
+- Replaced `IsReadyToDisplay` with `IsReadyToDisplay(const AStrict: Boolean = False)`.
+- Renamed `TALAnimation.Interpolation` → `TALAnimation.InterpolationType`.
+- Renamed `TALAnimation.AnimationType` → `TALAnimation.InterpolationMode`.
+- Updated `TALStateTransition.Interpolation` to use `TALAnimation.InterpolationType`.
+- Updated `TALStateTransition.AnimationType` to use `TALAnimation.InterpolationMode`.
+- Refactored `TALAniIndicator`; added `MotionMode = (Frame, Rotate)`.
+- Removed `Trimming` property from `TALBaseTextSettings`.
+
 #### 04/05/2025
 
 - `Fill.ImageNoRadius` is now `True` by default.

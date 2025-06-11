@@ -696,6 +696,8 @@ function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
 procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
 procedure ALMove(const Source; var Dest; Count: NativeInt); inline;
+procedure ALMonitorEnter(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF}); inline;
+procedure ALMonitorExit(const AObject: TObject); inline;
 {$IFDEF MSWINDOWS}
 type
   TALConsoleColor = (
@@ -3457,6 +3459,25 @@ end;
 procedure ALMove(const Source; var Dest; Count: NativeInt);
 begin
   Move(Source, Dest, Count);
+end;
+
+{*****************************************************************************************************}
+procedure ALMonitorEnter(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF});
+begin
+  {$IF defined(DEBUG)}
+  if not TMonitor.Enter(AObject, 1{Timeout}) then begin
+    ALLog(ATag, 'Lock contention detected', TALLogType.WARN);
+    TMonitor.Enter(AObject);
+  end;
+  {$ELSE}
+  TMonitor.Enter(AObject);
+  {$ENDIF}
+end;
+
+{**********************************************}
+procedure ALMonitorExit(const AObject: TObject);
+begin
+  TMonitor.Exit(AObject);
 end;
 
 {******************************************************}

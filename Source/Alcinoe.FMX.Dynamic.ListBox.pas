@@ -21,549 +21,593 @@ uses
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Common,
+  Alcinoe.FMX.Dynamic.StdCtrls,
   Alcinoe.FMX.Dynamic.Controls,
   Alcinoe.FMX.Dynamic.Objects;
 
 type
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBox = class;
-  TALDynamicListBoxItem = class;
-  TALDynamicListBoxView = class;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxItemContent = class(TALDynamicRectangle)
-  public
-    type
-      TFill = class(TALBrush)
-      protected
-        function GetDefaultColor: TAlphaColor; override;
-      end;
-      TStroke = class(TALStrokeBrush)
-      protected
-        function GetDefaultColor: TAlphaColor; override;
-      end;
-  protected
-    function CreateFill: TALBrush; override;
-    function CreateStroke: TALStrokeBrush; override;
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); reintroduce; virtual;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxItemMainContent = class(TALDynamicListBoxItemContent);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxItemLoadingContent = class(TALDynamicListBoxItemContent)
-  public
-    type
-      TSkeletonAnimationKind = (None, Pulse, Wave);
-      TSkeletonAnimation = class(Tobject)
-      private
-        FOwner: TALDynamicListBoxItemLoadingContent;
-        FKind: TSkeletonAnimationKind;
-        FAnimation: TALFloatAnimation;
-        FWaveColor: TAlphaColor;
-        FWaveAngle: Single;
-      protected
-        procedure SetKind(const AValue: TSkeletonAnimationKind); virtual;
-        procedure AnimationProcess(Sender: TObject); virtual;
-        procedure AnimationFinish(Sender: TObject); virtual;
-      public
-        constructor Create(const AOwner: TALDynamicListBoxItemLoadingContent); Virtual;
-        destructor Destroy; override;
-        property Kind: TSkeletonAnimationKind read FKind write SetKind;
-        property Animation: TALFloatAnimation read FAnimation;
-        property WaveColor: TAlphaColor read FWaveColor write FWaveColor;
-        property WaveAngle: Single read FWaveAngle write FWaveAngle;
-      end;
-  private
-    FSkeletonAnimation: TSkeletonAnimation;
-  protected
-    procedure Paint; override;
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); override;
-    destructor Destroy; override;
-    procedure BeforeDestruction; override;
-    property SkeletonAnimation: TSkeletonAnimation read FSkeletonAnimation;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxItemErrorContent = class(TALDynamicListBoxItemContent);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxItem = class(TALDynamicExtendedControl)
-  public
-    type
-      TDownloadDataContext = class;
-      TDownloadDataEvent = procedure(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer) of object;
-      TDownloadDataContext = Class(TALDownloadContext)
-      private
-        FOnDownloadData: TDownloadDataEvent;
-        function GetOwner: TALDynamicListBoxItem;
-      public
-        CustomParams: TALStringListW;
-        constructor Create(const AOwner: TALDynamicListBoxItem); reintroduce; virtual;
-        destructor Destroy; override;
-        Property Owner: TALDynamicListBoxItem read GetOwner;
-      end;
-  public
-    const
-      MainContentType = 1; {core content}
-      LoadingContentType = 2; {core content}
-      ErrorContentType = 3; {core content}
-    type
-      TContentBuilderContext = class;
-      TCreateContentEvent = function(const AContext: TContentBuilderContext): TALDynamicListBoxItemContent of object;
-      TCreateMainContentEvent = function(const AContext: TContentBuilderContext): TALDynamicListBoxItemMainContent of object;
-      TCreateLoadingContentEvent = function(const AContext: TContentBuilderContext): TALDynamicListBoxItemLoadingContent of object;
-      TCreateErrorContentEvent = function(const AContext: TContentBuilderContext): TALDynamicListBoxItemErrorContent of object;
-      TContentBuilderContext = Class(TALDownloadContext)
-      private
-        FParentViewOrientation: TOrientation;
-        FContentType: Integer;
-        FNewContent: TALDynamicListBoxItemContent;
-        // Since we don't use the Self pointer in these events,
-        // we can safely cache them locally without worrying
-        // that the reference will be destroyed.
-        FOnCreateMainContent: TCreateMainContentEvent;
-        FOnCreateLoadingContent: TCreateLoadingContentEvent;
-        FOnCreateErrorContent: TCreateErrorContentEvent;
-        function GetOwner: TALDynamicListBoxItem;
-      protected
-        function GetContentAlign(const AContentType: Integer): TALAlignLayout; virtual;
-        function GetCreateContentMethod(const AContentType: Integer): TMethod; virtual;
-      public
-        CustomParams: TALStringListW;
-        CacheEngine: TALBufDrawableCacheEngine;
-        TargetRect: TALRectD;
-        constructor Create(const AOwner: TALDynamicListBoxItem; const AContentType: Integer); reintroduce; virtual;
-        destructor Destroy; override;
-        Property Owner: TALDynamicListBoxItem read GetOwner;
-      end;
-  private
-    FData: TALJSONNodeW; // 8 bytes
-    FDownloadDataContext: TDownloadDataContext; // 8 bytes
-    FDownloadDataErrorCode: Integer; // 4 byte
-    FOnDownloadData: TDownloadDataEvent; // 16 bytes
-    //--
-    FContentBuilderContext: TContentBuilderContext; // 8 bytes
-    FMainContent: TALDynamicListBoxItemContent; // 8 bytes
-    FLoadingContent: TALDynamicListBoxItemContent; // 8 bytes
-    FErrorContent: TALDynamicListBoxItemContent; // 8 bytes
-    FOnCreateMainContent: TCreateMainContentEvent; // 16 bytes
-    FOnCreateLoadingContent: TCreateLoadingContentEvent; // 16 bytes
-    FOnCreateErrorContent: TCreateErrorContentEvent; // 16 bytes
-    //--
-    Function GetHost: TALDynamicListBox;
-  protected
-    function DownloadData(const AForceReload: Boolean = False): boolean; virtual;
-    function CreateDownloadDataContext: TDownloadDataContext; virtual;
-    class procedure DownloadDataBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
-    class procedure DownloadDataBackgroundProcFetchData(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer); virtual; // [MultiThread]
-    class procedure DownloadDataBackgroundProcInitData(const AContext: TDownloadDataContext; const AErrorCode: Integer; const AData: TALJSONNodeW); virtual; // [MultiThread]
-    class function DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; virtual; // [MultiThread]
-    procedure DownloadDataProcessData(const AContext: TDownloadDataContext; const AErrorCode: Integer; var AData: TALJSONNodeW); virtual;
-    procedure DownloadDataFinished; virtual;
-    function CanDownloadData: Boolean; virtual;
-    function IsDownloadDataRunning: Boolean;
-    Function HasDataBeenDownloaded: Boolean;
-    procedure CancelDownloadData;
-    //--
-    function CanCreateContent(const AContentType: Integer): Boolean; virtual;
-    function CreateContentBuilderContext(const AContentType: Integer): TContentBuilderContext; virtual;
-    class function CreateContent(const AContentType: Integer; const AContext: TContentBuilderContext): TALDynamicListBoxItemContent; virtual;
-    class procedure CreateContextContent(const AContext: TContentBuilderContext); virtual;
-    procedure DoShiftContent(var ASrcContent: TALDynamicListBoxItemContent; var ADstContent: TALDynamicListBoxItemContent); virtual;
-    procedure ShiftContent(const AContext: TContentBuilderContext); virtual;
-    class procedure DoPreloadContent(var AContext: Tobject); virtual;
-    procedure PreloadContent(const AContentType: Integer); virtual;
-    procedure TryPreloadContent(const AContentType: Integer); virtual;
-    procedure CancelPreloadContent; virtual;
-    function IsPreloadingContent: Boolean; virtual; // [MultiThread]
-    procedure CreateAndActivateContent(const AContentType: Integer); virtual;
-    procedure TryCreateAndActivateContent(const AContentType: Integer); virtual;
-    procedure ActivateContent(const AContentType: Integer); virtual;
-    procedure FetchContent(const APreload: boolean); overload; virtual;
-    procedure FetchContent; overload; virtual;
-    //--
-    function GetParentView: TALDynamicListBoxView; virtual;
-    procedure VisibleChanged; override;
-    procedure SizeChanged; override;
-    procedure PaintInternal(const ACanvas: TCanvas); override;
-    function GetAbsoluteDisplayedRect: TRectF; override;
-    procedure DoRemoveControl(const AControl: TALDynamicControl); override;
-    function DoGetDownloadPriority: Int64; override;
-  public
-    constructor Create(const AOwner: TObject); override;
-    destructor Destroy; override;
-    function HasUnconstrainedAutosizeX: Boolean; override;
-    function HasUnconstrainedAutosizeY: Boolean; override;
-    function IsReadyToDisplay: Boolean; override;
-    procedure Prepare; virtual;
-    procedure Unprepare; virtual;
-    Property ParentView: TALDynamicListBoxView read GetParentView;
-    property Host: TALDynamicListBox read GetHost;
-    property Data: TALJSONNodeW read FData;
-    property OnDownloadData: TDownloadDataEvent read FOnDownloadData write FOnDownloadData; // [MultiThread]
-    property OnCreateMainContent: TCreateMainContentEvent read FOnCreateMainContent write FOnCreateMainContent; // [MultiThread]
-    property OnCreateLoadingContent: TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent; // [MultiThread]
-    property OnCreateErrorContent: TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewMainContent = class(TALDynamicListBoxItemMainContent)
-  private
-    Type
-      TRealignEvent = procedure(const AContent: TALDynamicListBoxViewMainContent; const AStartIndex: integer) of object;
-  private
-    FOnRealign: TRealignEvent; // 8 bytes
-    function GetOwner: TALDynamicListBoxView;
-    procedure SetOwner(const Value: TALDynamicListBoxView);
-  protected
-    procedure DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer); override;
-    procedure DoRemoveControl(const AControl: TALDynamicControl); override;
-    procedure DoMoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer); override;
-    procedure DoRealign(const AStartIndex: integer); reintroduce; overload; virtual;
-    procedure DoRealign; overload; override;
-    procedure Realign(const AStartIndex: integer); overload;
-    procedure AdjustSize; override;
-    function GetFirstVisibleObjectIndex: Integer; override;
-    function GetLastVisibleObjectIndex: Integer; override;
-    function PaintChildrenOnly: Boolean; override;
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); override;
-    property Owner: TALDynamicListBoxView read GetOwner write SetOwner;
-    procedure InsertItems(const AItems: TArray<TALDynamicListBoxItem>; const AIndex: Integer); virtual;
-    function GetTopBarSize: Single;
-    property OnRealign: TRealignEvent read FOnRealign write FOnRealign;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewContent = class(TALDynamicListBoxItemContent)
-  private
-    function GetOwner: TALDynamicListBoxView;
-    procedure SetOwner(const Value: TALDynamicListBoxView);
-  public
-    property Owner: TALDynamicListBoxView read GetOwner write SetOwner;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewNoItemsContent = class(TALDynamicListBoxViewContent);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewSurroundingContent = class(TALDynamicListBoxViewContent)
-  private
-    FShowWithMainContent: boolean;
-    FShowWithLoadingContent: boolean;
-    FShowWithErrorContent: boolean;
-    FShowWithNoItemsContent: boolean;
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); override;
-    property ShowWithMainContent: Boolean read FShowWithMainContent write FShowWithMainContent;
-    property ShowWithLoadingContent: Boolean read FShowWithLoadingContent write FShowWithLoadingContent;
-    property ShowWithErrorContent: Boolean read FShowWithErrorContent write FShowWithErrorContent;
-    property ShowWithNoItemsContent: Boolean read FShowWithNoItemsContent write FShowWithNoItemsContent;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewBackgroundContent = class(TALDynamicListBoxViewSurroundingContent);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewForegroundContent = class(TALDynamicListBoxViewSurroundingContent)
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); override;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewTopBar = class(TALDynamicListBoxViewSurroundingContent)
-  private
-    FhidesOnScroll: Boolean;
-  protected
-    procedure VisibleChanged; override;
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); override;
-    property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewBottomBar = class(TALDynamicListBoxViewSurroundingContent)
-  private
-    FhidesOnScroll: Boolean;
-  protected
-    procedure VisibleChanged; override;
-  public
-    constructor Create(const AOwner: TALDynamicListBoxItem); override;
-    property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewPullToRefreshIndicator = class(TALDynamicListBoxViewContent)
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewLoadMoreIndicator = class(TALDynamicListBoxViewContent)
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxViewLoadMoreRetryButton = class(TALDynamicListBoxViewContent)
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDynamicListBoxView = class(TALDynamicListBoxItem)
-  public
-    const
-      DefaultPreloadItemCount = 10;
-    type
-      TItemIdType = (Unknown, Int64, Text);
-      TScrollDirection = (FromBeginToEnd, FromEndToBegin);
-  public
-    type
-      TDownloadItemsContext = class;
-      TCreateItemEvent = function(const AContext: TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBoxItem of object;
-      TDownloadItemsEvent = procedure(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var APaginationToken: String; var AErrorCode: Integer) of object;
-      TDownloadItemsContext = Class(TALDownloadContext)
-      private
-        FOnDownloadItems: TDownloadItemsEvent;
-        FOnCreateItem: TCreateItemEvent;
-        FOnCreateItemMainContent: TCreateMainContentEvent;
-        FOnCreateItemLoadingContent: TCreateLoadingContentEvent;
-        FOnCreateItemErrorContent: TCreateErrorContentEvent;
-        FOnDownloadItemData: TDownloadDataEvent;
-        function GetOwner: TALDynamicListBoxView;
-      public
-        ItemIdType: TItemIdType;
-        ItemIdNodeName: String;
-        MaxItems: integer;
-        PaginationToken: String;
-        CustomParams: TALStringListW;
-        constructor Create(const AOwner: TALDynamicListBoxView); reintroduce; virtual;
-        destructor Destroy; override;
-        Property Owner: TALDynamicListBoxView read GetOwner;
-      end;
-  public
-    const
-      NoItemsContentType = 4; {core content}
-      BackgroundContentType = 5; {surrounding content}
-      ForegroundContentType = 6; {surrounding content}
-      TopBarContentType = 7; {surrounding content}
-      BottomBarContentType = 8; {surrounding content}
-      PullToRefreshIndicatorContentType = 9; {surrounding content}
-      LoadMoreIndicatorContentType = 10; {surrounding content}
-      LoadMoreRetryButtonContentType = 11; {surrounding content}
-    type
-      TCreateMainContentEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewMainContent of object;
-      TCreateNoItemsContentEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewNoItemsContent of object;
-      TCreateBackgroundContentEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBackgroundContent of object;
-      TCreateForegroundContentEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewForegroundContent of object;
-      TCreateTopBarEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewTopBar of object;
-      TCreateBottomBarEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewBottomBar of object;
-      TCreatePullToRefreshIndicatorEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewPullToRefreshIndicator of object;
-      TCreateLoadMoreIndicatorEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewLoadMoreIndicator of object;
-      TCreateLoadMoreRetryButtonEvent = function(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxViewLoadMoreRetryButton of object;
-      TContentBuilderContext = Class(TALDynamicListBoxItem.TContentBuilderContext)
-      private
-        OwnerIsMainView: Boolean;
-        NewBackgroundContent: TALDynamicListBoxItemContent;
-        NewForegroundContent: TALDynamicListBoxItemContent;
-        NewTopBar: TALDynamicListBoxItemContent;
-        NewBottomBar: TALDynamicListBoxItemContent;
-        NewPullToRefreshIndicator: TALDynamicListBoxItemContent;
-        NewLoadMoreIndicator: TALDynamicListBoxItemContent;
-        NewLoadMoreRetryButton: TALDynamicListBoxItemContent;
-        OnCreateNoItemsContent: TCreateNoItemsContentEvent;
-        OnCreateBackgroundContent: TCreateBackgroundContentEvent;
-        OnCreateForegroundContent: TCreateForegroundContentEvent;
-        OnCreateTopBar: TCreateTopBarEvent;
-        OnCreateBottomBar: TCreateBottomBarEvent;
-        OnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent;
-        OnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent;
-        OnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent;
-      protected
-        function GetContentAlign(const AContentType: Integer): TALAlignLayout; override;
-        function GetCreateContentMethod(const AContentType: Integer): TMethod; override;
-      public
-        constructor Create(const AOwner: TALDynamicListBoxView; const AContentType: Integer); reintroduce; virtual;
-        destructor Destroy; override;
-      end;
-  {$IFDEF DEBUG}
-  private
-    class var DisplayDefaultRefreshRate: single;
-  private
-    fDebugFpsStarted: Boolean;
-    fDebugFpsCount: integer;
-    fDebugFpsStopWatch: TstopWatch;
-    fDebugFpsRenderTimeStopWatch: TstopWatch;
-    fDebugAverageFpsCount: integer;
-    fDebugAverageFps: double;
-  protected
-    procedure LogFPS;
-  {$ENDIF}
-  private
-    FOrientation: TOrientation; // 1 byte
-    FItemIdType: TItemIdType; // 1 byte
-    FScrollDirection: TScrollDirection; // 1 byte
-    fScrollCapturedByMe: boolean; // 1 byte
-    FHandleMouseEvents: Boolean; // 1 byte
-    FMouseDownPos: TpointF; // 8 bytes
-    FNoItemsContent: TALDynamicListBoxItemContent; // 8 bytes
-    FBackgroundContent: TALDynamicListBoxViewBackgroundContent; // 8 Bytes
-    FForegroundContent: TALDynamicListBoxViewForegroundContent; // 8 Bytes
-    FTopBar: TALDynamicListBoxViewTopBar; // 8 bytes
-    FBottomBar: TALDynamicListBoxViewBottomBar; // 8 bytes
-    FPullToRefreshIndicator: TALDynamicListBoxViewPullToRefreshIndicator; // 8 bytes
-    FLoadMoreIndicator: TALDynamicListBoxViewLoadMoreIndicator; // 8 bytes
-    FLoadMoreRetryButton: TALDynamicListBoxViewLoadMoreRetryButton; // 8 bytes
-    FItems: ^TArray<TALDynamicListBoxItem>; // 8 bytes
-    FItemIdNodeName: String; // 8 bytes
-    FUniqueInt64ItemIds: TDictionary<Int64, boolean>; // 8 bytes | Used to deduplicate items that contain "Int64" IDs. Must be locked using LockItemIds/UnLockItemIds before used
-    FUniqueTextItemIds: TDictionary<String, boolean>; // 8 bytes | Used to deduplicate items that contain "String" IDs. Must be locked using LockItemIds/UnLockItemIds before used
-    FMaxItems: integer; // 4 bytes
-    FPreloadItemCount: integer; // 4 bytes
-    FScrollEngine: TALScrollEngine; // 8 bytes
-    FFirstVisibleItemIndex: integer; // 4 bytes
-    FLastVisibleItemIndex: integer; // 4 bytes
-    FFirstPreloadedItemIndex: integer; // 4 bytes
-    FLastPreloadedItemIndex: integer; // 4 bytes
-    FPaginationToken: String; // 8 bytes
-    FTriggerDownloadItemsAtIndex: integer; // 4 byte
-    FDownloadItemsErrorCode: Integer; // 4 byte
-    FDownloadItemsContext: TDownloadItemsContext; // 8 bytes
-    FOnDownloadItems: TDownloadItemsEvent; // 16 bytes
-    FOnCreateItem: TCreateItemEvent; // 16 bytes
-    FOnCreateItemMainContent: TALDynamicListBoxItem.TCreateMainContentEvent; // 16 bytes
-    FOnCreateItemLoadingContent: TALDynamicListBoxItem.TCreateLoadingContentEvent; // 16 bytes
-    FOnCreateItemErrorContent: TALDynamicListBoxItem.TCreateErrorContentEvent; // 16 bytes
-    FOnDownloadItemData: TALDynamicListBoxItem.TDownloadDataEvent; // 16 bytes
-    FOnCreateNoItemsContent: TCreateNoItemsContentEvent; // 16 bytes
-    FOnCreateBackgroundContent: TCreateBackgroundContentEvent; // 16 bytes
-    FOnCreateForegroundContent: TCreateForegroundContentEvent; // 16 bytes
-    FOnCreateTopBar: TCreateTopBarEvent; // 16 bytes
-    FOnCreateBottomBar: TCreateBottomBarEvent; // 16 bytes
-    FOnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent; // 16 bytes
-    FOnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent; // 16 bytes
-    FOnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent; // 16 bytes
-    function GetItemByIndex(Const AIndex: Integer): TALDynamicListBoxItem;
-    function GetOnCreateMainContent: TCreateMainContentEvent;
-    procedure SetOnCreateMainContent(const AValue: TCreateMainContentEvent);
-    procedure SetOrientation(const AValue: TOrientation);
-    procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
-    procedure InternalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure InternalMouseMove(Shift: TShiftState; X, Y: Single);
-    procedure InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure InternalMouseLeave;
-  protected
-    procedure LockItemIds; virtual;
-    procedure UnLockItemIds; virtual;
-    function DownloadItems(const AForceReload: Boolean = False): boolean; virtual;
-    function CreateDownloadItemsContext: TDownloadItemsContext; virtual;
-    class procedure DownloadItemsBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
-    class procedure DownloadItemsBackgroundProcFetchData(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var AErrorCode: Integer); virtual; // [MultiThread]
-    class procedure DownloadItemsBackgroundProcCreateItems(const AContext: TDownloadItemsContext; const AErrorCode: Integer; const AData: TALJSONNodeW; out AItems: TArray<TALDynamicListBoxItem>); virtual; // [MultiThread]
-    class function DownloadItemsBackgroundProcCanProcessItems(const AContext: TDownloadItemsContext): boolean; virtual; // [MultiThread]
-    procedure DownloadItemsProcessItems(const AContext: TDownloadItemsContext; const AErrorCode: Integer; var AItems: TArray<TALDynamicListBoxItem>); virtual;
-    procedure DownloadItemsFinished; virtual;
-    function CanDownloadItems: Boolean; virtual;
-    function IsDownloadItemsRunning: Boolean;
-    procedure CancelDownloadItems;
-    //--
-    function IsMainView: Boolean;
-    function CanCreateContent(const AContentType: Integer): Boolean; override;
-    function CreateContentBuilderContext(const AContentType: Integer): TALDynamicListBoxItem.TContentBuilderContext; override;
-    class procedure CreateContextContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext); override; // [MultiThread]
-    function CreateDefaultMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
-    procedure ShiftContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext); override;
-    procedure ActivateContent(const AContentType: Integer); override;
-    procedure FetchContent(const APreload: boolean); overload; override;
-    //--
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure MouseLeave; override;
-    procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
-    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); override;
-    function GetViewportPosition: TALPointD; virtual;
-    procedure SetViewportPosition(const AValue: TALPointD); virtual;
-    procedure ScrollEngineChanged(Sender: TObject); virtual;
-    procedure ScrollEngineStart(Sender: TObject); virtual;
-    procedure ScrollEngineStop(Sender: TObject); virtual;
-    procedure UpdateScrollEngineLimits; virtual;
-    function FindFirstVisibleItemIndex: integer; virtual;
-    function FindLastVisibleItemIndex: integer; virtual;
-    function FindLastActiveItem: TALDynamicListBoxItem; virtual;
-    property FirstPreloadedItemIndex: integer read FFirstPreloadedItemIndex;
-    property LastPreloadedItemIndex: integer read FLastPreloadedItemIndex;
-    property ScrollDirection: TScrollDirection read FScrollDirection;
-    procedure PaintInternal(const ACanvas: TCanvas); override;
-    procedure DoRemoveControl(const AControl: TALDynamicControl); override;
-  public
-    constructor Create(const AOwner: TObject); override;
-    destructor Destroy; override;
-    procedure BeforeDestruction; override;
-    function IsReadyToDisplay: Boolean; override;
-    procedure Prepare; override;
-    procedure Unprepare; override;
-    property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
-    property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
-    property Items[const Index: Integer]: TALDynamicListBoxItem read GetItemByIndex;
-    property ScrollEngine: TALScrollEngine read fScrollEngine;
-    property ViewportPosition: TALPointD read GetViewportPosition;
-    property ItemIdNodeName: String read FItemIdNodeName write FItemIdNodeName;
-    property MaxItems: integer read FMaxItems write FMaxItems;
-    property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount;
-    property Orientation: TOrientation read FOrientation write SetOrientation;
-    property OnDownloadItems: TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
-    property OnCreateItem: TCreateItemEvent read FOnCreateItem write FOnCreateItem; // [MultiThread]
-    property OnCreateItemMainContent: TALDynamicListBoxItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
-    property OnCreateItemLoadingContent: TALDynamicListBoxItem.TCreateLoadingContentEvent read FOnCreateItemLoadingContent write FOnCreateItemLoadingContent; // [MultiThread]
-    property OnCreateItemErrorContent: TALDynamicListBoxItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
-    property OnDownloadItemData: TALDynamicListBoxItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
-    property OnCreateMainContent: TCreateMainContentEvent read GetOnCreateMainContent write SetOnCreateMainContent; // [MultiThread]
-    property OnCreateNoItemsContent: TCreateNoItemsContentEvent read FOnCreateNoItemsContent write FOnCreateNoItemsContent; // [MultiThread]
-    property OnCreateBackgroundContent: TCreateBackgroundContentEvent read FOnCreateBackgroundContent write FOnCreateBackgroundContent; // [MultiThread]
-    property OnCreateForegroundContent: TCreateForegroundContentEvent read FOnCreateForegroundContent write FOnCreateForegroundContent; // [MultiThread]
-    property OnCreateTopBar: TCreateTopBarEvent read FOnCreateTopBar write FOnCreateTopBar; // [MultiThread]
-    property OnCreateBottomBar: TCreateBottomBarEvent read FOnCreateBottomBar write FOnCreateBottomBar; // [MultiThread]
-    property OnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent read FOnCreatePullToRefreshIndicator write FOnCreatePullToRefreshIndicator; // [MultiThread]
-    property OnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent read FOnCreateLoadMoreIndicator write FOnCreateLoadMoreIndicator; // [MultiThread]
-    property OnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent read FOnCreateLoadMoreRetryButton write FOnCreateLoadMoreRetryButton; // [MultiThread]
-  end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALDynamicListBox = class(TALDynamicControlHost)
   public
     type
-      TCreateMainViewEvent = function(Const AListBox: TALDynamicListBox): TALDynamicListBoxView of object;
+      // -----
+      // TItem
+      TView = Class;
+      TItem = class(TALDynamicExtendedControl)
+      public
+        type
+          // --------
+          // TContent
+          TContent = class(TALDynamicRectangle)
+          public
+            type
+              TFill = class(TALBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateFill: TALBrush; override;
+            function CreateStroke: TALStrokeBrush; override;
+          public
+            constructor Create(const AOwner: TItem); reintroduce; virtual;
+          end;
+          // ------------
+          // TMainContent
+          TMainContent = class(TContent);
+          // ---------------
+          // TLoadingContent
+          TLoadingContent = class(TContent)
+          public
+            type
+              TAnimation = class(TALFloatAnimation)
+              public
+                type
+                  TAnimationKind = (None, Pulse, Wave);
+              private
+                FOwner: TLoadingContent;
+                FKind: TAnimationKind;
+                FWaveColor: TAlphaColor;
+                FWaveAngle: Single;
+              protected
+                procedure SetKind(const AValue: TAnimationKind); virtual;
+                procedure DoProcess; override;
+                procedure DoFinish; override;
+              public
+                constructor Create(const AOwner: TLoadingContent); reintroduce; Virtual;
+                property Kind: TAnimationKind read FKind write SetKind;
+                property WaveColor: TAlphaColor read FWaveColor write FWaveColor;
+                property WaveAngle: Single read FWaveAngle write FWaveAngle;
+              end;
+          private
+            FAnimation: TAnimation;
+          protected
+            procedure Paint; override;
+          public
+            constructor Create(const AOwner: TItem); override;
+            destructor Destroy; override;
+            procedure BeforeDestruction; override;
+            property Animation: TAnimation read FAnimation;
+          end;
+          // -------------
+          // TErrorContent
+          TErrorContent = class(TContent);
+      public
+        type
+          TDownloadDataContext = class;
+          TDownloadDataEvent = procedure(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer) of object;
+          TDownloadDataContext = Class(TALDownloadContext)
+          private
+            FOnDownloadData: TDownloadDataEvent;
+            function GetOwner: TItem;
+          public
+            CustomParams: TALStringListW;
+            constructor Create(const AOwner: TItem); reintroduce; virtual;
+            destructor Destroy; override;
+            Property Owner: TItem read GetOwner;
+          end;
+      public
+        const
+          MainContentType = 1; {core content}
+          LoadingContentType = 2; {core content}
+          ErrorContentType = 3; {core content}
+        type
+          TContentBuilderContext = class;
+          TCreateContentEvent = function(const AContext: TContentBuilderContext): TContent of object;
+          TCreateMainContentEvent = function(const AContext: TContentBuilderContext): TMainContent of object;
+          TCreateLoadingContentEvent = function(const AContext: TContentBuilderContext): TLoadingContent of object;
+          TCreateErrorContentEvent = function(const AContext: TContentBuilderContext): TErrorContent of object;
+          TContentBuilderContext = Class(TALDownloadContext)
+          private
+            FParentViewOrientation: TOrientation;
+            FContentType: Integer;
+            FNewContent: TContent;
+            // Since we don't use the Self pointer in these events,
+            // we can safely cache them locally without worrying
+            // that the reference will be destroyed.
+            FOnCreateMainContent: TCreateMainContentEvent;
+            FOnCreateLoadingContent: TCreateLoadingContentEvent;
+            FOnCreateErrorContent: TCreateErrorContentEvent;
+            function GetOwner: TItem;
+          protected
+            function GetContentAlign(const AContentType: Integer): TALAlignLayout; virtual;
+            function GetCreateContentMethod(const AContentType: Integer): TMethod; virtual;
+          public
+            CustomParams: TALStringListW;
+            CacheEngine: TALBufDrawableCacheEngine;
+            TargetRect: TALRectD;
+            constructor Create(const AOwner: TItem; const AContentType: Integer); reintroduce; virtual;
+            destructor Destroy; override;
+            Property Owner: TItem read GetOwner;
+          end;
+      private
+        FCacheEngine: TALBufDrawableCacheEngine;
+        //--
+        FData: TALJSONNodeW; // 8 bytes
+        FDownloadDataContext: TDownloadDataContext; // 8 bytes
+        FDownloadDataErrorCode: Integer; // 4 byte
+        FOnDownloadData: TDownloadDataEvent; // 16 bytes
+        //--
+        FContentBuilderContext: TContentBuilderContext; // 8 bytes
+        FMainContent: TContent; // 8 bytes
+        FLoadingContent: TContent; // 8 bytes
+        FErrorContent: TContent; // 8 bytes
+        FOnCreateMainContent: TCreateMainContentEvent; // 16 bytes
+        FOnCreateLoadingContent: TCreateLoadingContentEvent; // 16 bytes
+        FOnCreateErrorContent: TCreateErrorContentEvent; // 16 bytes
+        //--
+        function GetCacheEngine: TALBufDrawableCacheEngine;
+        Function _GetHost: TALDynamicListBox;
+      protected
+       function DownloadData(const AForceReload: Boolean = False): boolean; virtual;
+        function CreateDownloadDataContext: TDownloadDataContext; virtual;
+        class procedure DownloadDataBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
+        class procedure DownloadDataBackgroundProcFetchData(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer); virtual; // [MultiThread]
+        class procedure DownloadDataBackgroundProcInitData(const AContext: TDownloadDataContext; const AErrorCode: Integer; const AData: TALJSONNodeW); virtual; // [MultiThread]
+        class function DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; virtual; // [MultiThread]
+        procedure DownloadDataProcessData(const AContext: TDownloadDataContext; const AErrorCode: Integer; var AData: TALJSONNodeW); virtual;
+        procedure DownloadDataFinished; virtual;
+        function CanDownloadData: Boolean; virtual;
+        function IsDownloadDataRunning: Boolean;
+        Function HasDataBeenDownloaded: Boolean;
+        procedure CancelDownloadData;
+        //--
+        function CanCreateContent(const AContentType: Integer): Boolean; virtual;
+        function CreateContentBuilderContext(const AContentType: Integer): TContentBuilderContext; virtual;
+        class function CreateContent(const AContentType: Integer; const AContext: TContentBuilderContext): TContent; virtual;
+        class procedure CreateContextContent(const AContext: TContentBuilderContext); virtual;
+        procedure DoShiftContent(var ASrcContent: TContent; var ADstContent: TContent); virtual;
+        procedure ShiftContent(const AContext: TContentBuilderContext); virtual;
+        class procedure DoPreloadContent(var AContext: Tobject); virtual;
+        procedure PreloadContent(const AContentType: Integer); virtual;
+        procedure TryPreloadContent(const AContentType: Integer); virtual;
+        procedure CancelPreloadContent; virtual;
+        function IsPreloadingContent: Boolean; virtual; // [MultiThread]
+        procedure CreateAndActivateContent(const AContentType: Integer); virtual;
+        procedure TryCreateAndActivateContent(const AContentType: Integer); virtual;
+        procedure ActivateContent(const AContentType: Integer); virtual;
+        procedure FetchContent(const APreload: boolean); overload; virtual;
+        procedure FetchContent; overload; virtual;
+        //--
+        procedure SetHost(Const Value: TALDynamicControlHost); override;
+        function GetParentView: TView; virtual;
+        procedure VisibleChanged; override;
+        procedure SizeChanged; override;
+        procedure PaintInternal(const ACanvas: TCanvas); override;
+        function GetAbsoluteDisplayedRect: TRectF; override;
+        procedure DoRemoveControl(const AControl: TALDynamicControl); override;
+        function DoGetDownloadPriority: Int64; override;
+      public
+        constructor Create(const AOwner: TObject); override;
+        destructor Destroy; override;
+        function HasUnconstrainedAutosizeX: Boolean; override;
+        function HasUnconstrainedAutosizeY: Boolean; override;
+        function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
+        procedure Prepare; virtual;
+        procedure Unprepare; virtual;
+        Property ParentView: TView read GetParentView;
+        property Host: TALDynamicListBox read _GetHost;
+        property CacheEngine: TALBufDrawableCacheEngine read GetCacheEngine;
+        property Data: TALJSONNodeW read FData;
+        property OnDownloadData: TDownloadDataEvent read FOnDownloadData write FOnDownloadData; // [MultiThread]
+        property OnCreateMainContent: TCreateMainContentEvent read FOnCreateMainContent write FOnCreateMainContent; // [MultiThread]
+        property OnCreateLoadingContent: TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent; // [MultiThread]
+        property OnCreateErrorContent: TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
+      end;
+      // -----
+      // TView
+      TView = class(TItem)
+      public
+        type
+          // ------------
+          // TMainContent
+          TMainContent = class(TItem.TMainContent)
+          private
+            Type
+              TRealignEvent = procedure(const AContent: TMainContent; const AStartIndex: integer) of object;
+          private
+            FOnRealign: TRealignEvent; // 8 bytes
+            function GetOwner: TView;
+          protected
+            procedure SetOwner(const Value: TView); reintroduce; virtual;
+            procedure DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer); override;
+            procedure DoRemoveControl(const AControl: TALDynamicControl); override;
+            procedure DoMoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer); override;
+            procedure DoRealign(const AStartIndex: integer); reintroduce; overload; virtual;
+            procedure DoRealign; overload; override;
+            procedure Realign(const AStartIndex: integer); overload;
+            procedure AdjustSize; override;
+            function GetFirstVisibleObjectIndex: Integer; override;
+            function GetLastVisibleObjectIndex: Integer; override;
+            function PaintChildrenOnly: Boolean; override;
+          public
+            constructor Create(const AOwner: TItem); override;
+            property Owner: TView read GetOwner write SetOwner;
+            procedure InsertItems(const AItems: TArray<TItem>; const AIndex: Integer); virtual;
+            function GetTopBarSize: Single;
+            property OnRealign: TRealignEvent read FOnRealign write FOnRealign;
+          end;
+          // --------
+          // TContent
+          TContent = class(TItem.TContent)
+          private
+            function GetOwner: TView;
+          protected
+            procedure SetOwner(const Value: TView); reintroduce; virtual;
+          public
+            property Owner: TView read GetOwner write SetOwner;
+          end;
+          // ---------------
+          // TNoItemsContent
+          TNoItemsContent = class(TContent);
+          // -------------------
+          // TSurroundingContent
+          TSurroundingContent = class(TContent)
+          private
+            FShowWithMainContent: boolean;
+            FShowWithLoadingContent: boolean;
+            FShowWithErrorContent: boolean;
+            FShowWithNoItemsContent: boolean;
+          public
+            constructor Create(const AOwner: TItem); override;
+            property ShowWithMainContent: Boolean read FShowWithMainContent write FShowWithMainContent;
+            property ShowWithLoadingContent: Boolean read FShowWithLoadingContent write FShowWithLoadingContent;
+            property ShowWithErrorContent: Boolean read FShowWithErrorContent write FShowWithErrorContent;
+            property ShowWithNoItemsContent: Boolean read FShowWithNoItemsContent write FShowWithNoItemsContent;
+          end;
+          // ------------------
+          // TBackgroundContent
+          TBackgroundContent = class(TSurroundingContent);
+          // ------------------
+          // TForegroundContent
+          TForegroundContent = class(TSurroundingContent)
+          public
+            constructor Create(const AOwner: TItem); override;
+          end;
+          // -------
+          // TTopBar
+          TTopBar = class(TSurroundingContent)
+          private
+            FhidesOnScroll: Boolean;
+          protected
+            procedure VisibleChanged; override;
+          public
+            constructor Create(const AOwner: TItem); override;
+            property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
+          end;
+          // ----------
+          // TBottomBar
+          TBottomBar = class(TSurroundingContent)
+          private
+            FhidesOnScroll: Boolean;
+          protected
+            procedure VisibleChanged; override;
+          public
+            constructor Create(const AOwner: TItem); override;
+            property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
+          end;
+          // -----------------------
+          // TBasePullToRefreshIndicator
+          TBasePullToRefreshIndicator = class(TContent)
+          private
+            FPullThreshold: Single;
+            FPullProgress: Single;
+            FCanTriggerRefresh: boolean;
+            FIsRefreshing: Boolean;
+          protected
+            procedure SetPullProgress(const AValue: Single); virtual;
+            procedure SetIsRefreshing(const AValue: Boolean); virtual;
+          public
+            constructor Create(const AOwner: TItem); override;
+            property PullThreshold: Single read FPullThreshold write FPullThreshold;
+            property PullProgress: Single read FPullProgress write SetPullProgress;
+            property CanTriggerRefresh: Boolean read FCanTriggerRefresh write FCanTriggerRefresh;
+            property IsRefreshing: Boolean read FIsRefreshing write SetIsRefreshing;
+          end;
+          // -----------------------
+          // TPullToRefreshIndicator
+          TPullToRefreshIndicator = class(TBasePullToRefreshIndicator)
+          private
+            FPullingPhaseAniIndicator: TALDynamicAniIndicator;
+            FRefreshingPhaseAniIndicator: TALDynamicAniIndicator;
+          protected
+            function GetDefaultSize: TSizeF; override;
+            procedure SetPullProgress(const Value: Single); override;
+            procedure SetIsRefreshing(const AValue: Boolean); override;
+          public
+            constructor Create(const AOwner: TItem); override;
+            property PullingPhaseAniIndicator: TALDynamicAniIndicator read FPullingPhaseAniIndicator;
+            property RefreshingPhaseAniIndicator: TALDynamicAniIndicator read FRefreshingPhaseAniIndicator;
+          end;
+          // ------------------
+          // TLoadMoreIndicator
+          TLoadMoreIndicator = class(TContent);
+          // --------------------
+          // TLoadMoreRetryButton
+          TLoadMoreRetryButton = class(TContent);
+      public
+        const
+          DefaultPreloadItemCount = 10;
+        type
+          TItemIdType = (Unknown, Int64, Text);
+          TScrollDirection = (FromBeginToEnd, FromEndToBegin);
+      public
+        type
+          TDownloadItemsContext = class;
+          TCreateItemEvent = function(const AContext: TDownloadItemsContext; var AData: TALJSONNodeW): TItem of object;
+          TDownloadItemsEvent = procedure(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var APaginationToken: String; var AErrorCode: Integer) of object;
+          TDownloadItemsContext = Class(TALDownloadContext)
+          private
+            FOnDownloadItems: TDownloadItemsEvent;
+            FOnCreateItem: TCreateItemEvent;
+            FOnCreateItemMainContent: TCreateMainContentEvent;
+            FOnCreateItemLoadingContent: TCreateLoadingContentEvent;
+            FOnCreateItemErrorContent: TCreateErrorContentEvent;
+            FOnDownloadItemData: TDownloadDataEvent;
+            function GetOwner: TView;
+          public
+            ItemIdType: TItemIdType;
+            ItemIdNodeName: String;
+            MaxItems: integer;
+            PaginationToken: String;
+            CustomParams: TALStringListW;
+            constructor Create(const AOwner: TView); reintroduce; virtual;
+            destructor Destroy; override;
+            Property Owner: TView read GetOwner;
+          end;
+      public
+        const
+          NoItemsContentType = 4; {core content}
+          BackgroundContentType = 5; {surrounding content}
+          ForegroundContentType = 6; {surrounding content}
+          TopBarContentType = 7; {surrounding content}
+          BottomBarContentType = 8; {surrounding content}
+          PullToRefreshIndicatorContentType = 9; {surrounding content}
+          LoadMoreIndicatorContentType = 10; {surrounding content}
+          LoadMoreRetryButtonContentType = 11; {surrounding content}
+        type
+          TCreateMainContentEvent = function(const AContext: TItem.TContentBuilderContext): TMainContent of object;
+          TCreateNoItemsContentEvent = function(const AContext: TItem.TContentBuilderContext): TNoItemsContent of object;
+          TCreateBackgroundContentEvent = function(const AContext: TItem.TContentBuilderContext): TBackgroundContent of object;
+          TCreateForegroundContentEvent = function(const AContext: TItem.TContentBuilderContext): TForegroundContent of object;
+          TCreateTopBarEvent = function(const AContext: TItem.TContentBuilderContext): TTopBar of object;
+          TCreateBottomBarEvent = function(const AContext: TItem.TContentBuilderContext): TBottomBar of object;
+          TCreatePullToRefreshIndicatorEvent = function(const AContext: TItem.TContentBuilderContext): TBasePullToRefreshIndicator of object;
+          TCreateLoadMoreIndicatorEvent = function(const AContext: TItem.TContentBuilderContext): TLoadMoreIndicator of object;
+          TCreateLoadMoreRetryButtonEvent = function(const AContext: TItem.TContentBuilderContext): TLoadMoreRetryButton of object;
+          TContentBuilderContext = Class(TItem.TContentBuilderContext)
+          private
+            OwnerIsMainView: Boolean;
+            NewBackgroundContent: TItem.TContent;
+            NewForegroundContent: TItem.TContent;
+            NewTopBar: TItem.TContent;
+            NewBottomBar: TItem.TContent;
+            NewPullToRefreshIndicator: TItem.TContent;
+            NewLoadMoreIndicator: TItem.TContent;
+            NewLoadMoreRetryButton: TItem.TContent;
+            OnCreateNoItemsContent: TCreateNoItemsContentEvent;
+            OnCreateBackgroundContent: TCreateBackgroundContentEvent;
+            OnCreateForegroundContent: TCreateForegroundContentEvent;
+            OnCreateTopBar: TCreateTopBarEvent;
+            OnCreateBottomBar: TCreateBottomBarEvent;
+            OnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent;
+            OnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent;
+            OnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent;
+          protected
+            function GetContentAlign(const AContentType: Integer): TALAlignLayout; override;
+            function GetCreateContentMethod(const AContentType: Integer): TMethod; override;
+          public
+            constructor Create(const AOwner: TView; const AContentType: Integer); reintroduce; virtual;
+            destructor Destroy; override;
+          end;
+      {$IFDEF DEBUG}
+      private
+        class var DisplayDefaultRefreshRate: single;
+      private
+        fDebugFpsStarted: Boolean;
+        fDebugFpsCount: integer;
+        fDebugFpsStopWatch: TstopWatch;
+        fDebugFpsRenderTimeStopWatch: TstopWatch;
+        fDebugAverageFpsCount: integer;
+        fDebugAverageFps: double;
+      protected
+        procedure LogFPS;
+      {$ENDIF}
+      private
+        FOrientation: TOrientation; // 1 byte
+        FItemIdType: TItemIdType; // 1 byte
+        FScrollDirection: TScrollDirection; // 1 byte
+        fScrollCapturedByMe: boolean; // 1 byte
+        FHandleMouseEvents: Boolean; // 1 byte
+        FSetViewPortPositionGuard: Boolean; // 1 byte
+        FMouseDownPos: TpointF; // 8 bytes
+        FRefreshingTimer: TALDisplayTimer; // 8 bytes
+        FRefreshingView: TView; // 8 bytes
+        FNoItemsContent: TItem.TContent; // 8 bytes
+        FBackgroundContent: TBackgroundContent; // 8 Bytes
+        FForegroundContent: TForegroundContent; // 8 Bytes
+        FTopBar: TTopBar; // 8 bytes
+        FBottomBar: TBottomBar; // 8 bytes
+        FPullToRefreshIndicator: TBasePullToRefreshIndicator; // 8 bytes
+        FLoadMoreIndicator: TLoadMoreIndicator; // 8 bytes
+        FLoadMoreRetryButton: TLoadMoreRetryButton; // 8 bytes
+        FItems: ^TArray<TItem>; // 8 bytes
+        FItemIdNodeName: String; // 8 bytes
+        FUniqueInt64ItemIds: TDictionary<Int64, boolean>; // 8 bytes | Used to deduplicate items that contain "Int64" IDs. Must be locked using LockItemIds/UnLockItemIds before used
+        FUniqueTextItemIds: TDictionary<String, boolean>; // 8 bytes | Used to deduplicate items that contain "String" IDs. Must be locked using LockItemIds/UnLockItemIds before used
+        FMaxItems: integer; // 4 bytes
+        FPreloadItemCount: integer; // 4 bytes
+        FScrollEngine: TALScrollEngine; // 8 bytes
+        FFirstVisibleItemIndex: integer; // 4 bytes
+        FLastVisibleItemIndex: integer; // 4 bytes
+        FFirstPreloadedItemIndex: integer; // 4 bytes
+        FLastPreloadedItemIndex: integer; // 4 bytes
+        FPaginationToken: String; // 8 bytes
+        FTriggerDownloadItemsAtIndex: integer; // 4 byte
+        FDownloadItemsErrorCode: Integer; // 4 byte
+        FDownloadItemsContext: TDownloadItemsContext; // 8 bytes
+        FOnDownloadItems: TDownloadItemsEvent; // 16 bytes
+        FOnCreateItem: TCreateItemEvent; // 16 bytes
+        FOnCreateItemMainContent: TItem.TCreateMainContentEvent; // 16 bytes
+        FOnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent; // 16 bytes
+        FOnCreateItemErrorContent: TItem.TCreateErrorContentEvent; // 16 bytes
+        FOnDownloadItemData: TItem.TDownloadDataEvent; // 16 bytes
+        FOnCreateNoItemsContent: TCreateNoItemsContentEvent; // 16 bytes
+        FOnCreateBackgroundContent: TCreateBackgroundContentEvent; // 16 bytes
+        FOnCreateForegroundContent: TCreateForegroundContentEvent; // 16 bytes
+        FOnCreateTopBar: TCreateTopBarEvent; // 16 bytes
+        FOnCreateBottomBar: TCreateBottomBarEvent; // 16 bytes
+        FOnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent; // 16 bytes
+        FOnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent; // 16 bytes
+        FOnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent; // 16 bytes
+        function GetItemByIndex(Const AIndex: Integer): TItem;
+        function GetOnCreateMainContent: TCreateMainContentEvent;
+        procedure SetOnCreateMainContent(const AValue: TCreateMainContentEvent);
+        procedure SetOrientation(const AValue: TOrientation);
+        procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
+        procedure InternalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+        procedure InternalMouseMove(Shift: TShiftState; X, Y: Single);
+        procedure InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+        procedure InternalMouseLeave;
+        procedure RefreshingTimerProcess(Sender: TObject);
+      protected
+        procedure LockItemIds; virtual;
+        procedure UnLockItemIds; virtual;
+        function DownloadItems(const AForceReload: Boolean = False): boolean; virtual;
+        function CreateDownloadItemsContext: TDownloadItemsContext; virtual;
+        class procedure DownloadItemsBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
+        class procedure DownloadItemsBackgroundProcFetchData(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var AErrorCode: Integer); virtual; // [MultiThread]
+        class procedure DownloadItemsBackgroundProcCreateItems(const AContext: TDownloadItemsContext; const AErrorCode: Integer; const AData: TALJSONNodeW; out AItems: TArray<TItem>); virtual; // [MultiThread]
+        class function DownloadItemsBackgroundProcCanProcessItems(const AContext: TDownloadItemsContext): boolean; virtual; // [MultiThread]
+        procedure DownloadItemsProcessItems(const AContext: TDownloadItemsContext; const AErrorCode: Integer; var AItems: TArray<TItem>); virtual;
+        procedure DownloadItemsFinished; virtual;
+        function CanDownloadItems: Boolean; virtual;
+        function IsDownloadItemsRunning: Boolean;
+        procedure CancelDownloadItems;
+        //--
+        function IsMainView: Boolean;
+        function CanCreateContent(const AContentType: Integer): Boolean; override;
+        function CreateContentBuilderContext(const AContentType: Integer): TItem.TContentBuilderContext; override;
+        class procedure CreateContextContent(const AContext: TItem.TContentBuilderContext); override; // [MultiThread]
+        function CreateDefaultMainContent(const AContext: TItem.TContentBuilderContext): TItem.TMainContent;
+        procedure ShiftContent(const AContext: TItem.TContentBuilderContext); override;
+        procedure ActivateContent(const AContentType: Integer); override;
+        procedure FetchContent(const APreload: boolean); overload; override;
+        //--
+        procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+        procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+        procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+        procedure MouseLeave; override;
+        procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
+        procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+        procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); override;
+        procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+        procedure ChildrenMouseLeave(const AObject: TALDynamicControl); override;
+        function GetViewportPosition: TALPointD; virtual;
+        procedure SetViewportPosition(const AValue: TALPointD); virtual;
+        procedure ScrollEngineChanged(Sender: TObject); virtual;
+        procedure ScrollEngineStart(Sender: TObject); virtual;
+        procedure ScrollEngineStop(Sender: TObject); virtual;
+        procedure UpdateScrollEngineLimits; virtual;
+        function FindFirstVisibleItemIndex: integer; virtual;
+        function FindLastVisibleItemIndex: integer; virtual;
+        function FindLastActiveItem: TItem; virtual;
+        property FirstPreloadedItemIndex: integer read FFirstPreloadedItemIndex;
+        property LastPreloadedItemIndex: integer read FLastPreloadedItemIndex;
+        property ScrollDirection: TScrollDirection read FScrollDirection;
+        procedure PaintInternal(const ACanvas: TCanvas); override;
+        procedure DoRemoveControl(const AControl: TALDynamicControl); override;
+        procedure SetHost(Const Value: TALDynamicControlHost); override;
+      public
+        constructor Create(const AOwner: TObject); override;
+        destructor Destroy; override;
+        procedure BeforeDestruction; override;
+        function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
+        procedure Prepare; override;
+        procedure Unprepare; override;
+        function RetryDownloadItems: boolean; virtual;
+        procedure Refresh; virtual;
+        property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
+        property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
+        property Items[const Index: Integer]: TItem read GetItemByIndex;
+        property ScrollEngine: TALScrollEngine read FScrollEngine;
+        property ViewportPosition: TALPointD read GetViewportPosition;
+        property ItemIdNodeName: String read FItemIdNodeName write FItemIdNodeName;
+        property MaxItems: integer read FMaxItems write FMaxItems;
+        property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount;
+        property Orientation: TOrientation read FOrientation write SetOrientation;
+        property OnDownloadItems: TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
+        property OnCreateItem: TCreateItemEvent read FOnCreateItem write FOnCreateItem; // [MultiThread]
+        property OnCreateItemMainContent: TItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
+        property OnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent read FOnCreateItemLoadingContent write FOnCreateItemLoadingContent; // [MultiThread]
+        property OnCreateItemErrorContent: TItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
+        property OnDownloadItemData: TItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
+        property OnCreateMainContent: TCreateMainContentEvent read GetOnCreateMainContent write SetOnCreateMainContent; // [MultiThread]
+        property OnCreateNoItemsContent: TCreateNoItemsContentEvent read FOnCreateNoItemsContent write FOnCreateNoItemsContent; // [MultiThread]
+        property OnCreateBackgroundContent: TCreateBackgroundContentEvent read FOnCreateBackgroundContent write FOnCreateBackgroundContent; // [MultiThread]
+        property OnCreateForegroundContent: TCreateForegroundContentEvent read FOnCreateForegroundContent write FOnCreateForegroundContent; // [MultiThread]
+        property OnCreateTopBar: TCreateTopBarEvent read FOnCreateTopBar write FOnCreateTopBar; // [MultiThread]
+        property OnCreateBottomBar: TCreateBottomBarEvent read FOnCreateBottomBar write FOnCreateBottomBar; // [MultiThread]
+        property OnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent read FOnCreatePullToRefreshIndicator write FOnCreatePullToRefreshIndicator; // [MultiThread]
+        property OnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent read FOnCreateLoadMoreIndicator write FOnCreateLoadMoreIndicator; // [MultiThread]
+        property OnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent read FOnCreateLoadMoreRetryButton write FOnCreateLoadMoreRetryButton; // [MultiThread]
+      end;
+      // --------------------
+      // TCreateMainViewEvent
+      TCreateMainViewEvent = function(Const AListBox: TALDynamicListBox): TView of object;
   private
-    FMainView: TALDynamicListBoxView;
+    FMainView: TView;
     FPreloadItemCount: Integer;
     FActiveScrollEnginesCount: Integer;
     FDisableMouseWheel: Boolean;
     FHasBeenPrepared: Boolean;
-    FOnDownloadItems: TALDynamicListBoxView.TDownloadItemsEvent; // [MultiThread]
-    FOnDownloadItemData: TALDynamicListBoxItem.TDownloadDataEvent; // [MultiThread]
+    FOnDownloadItems: TView.TDownloadItemsEvent; // [MultiThread]
+    FOnDownloadItemData: TItem.TDownloadDataEvent; // [MultiThread]
     FOnCreateMainView: TCreateMainViewEvent; // [MultiThread]
-    FOnCreateLoadingContent: TALDynamicListBoxItem.TCreateLoadingContentEvent; // [MultiThread]
-    FOnCreateErrorContent: TALDynamicListBoxItem.TCreateErrorContentEvent; // [MultiThread]
-    FOnCreateNoItemsContent: TALDynamicListBoxView.TCreateNoItemsContentEvent; // [MultiThread]
-    FOnCreateBackgroundContent: TALDynamicListBoxView.TCreateBackgroundContentEvent; // [MultiThread]
-    FOnCreateForegroundContent: TALDynamicListBoxView.TCreateForegroundContentEvent; // [MultiThread]
-    FOnCreateTopBar: TALDynamicListBoxView.TCreateTopBarEvent; // [MultiThread]
-    FOnCreateBottomBar: TALDynamicListBoxView.TCreateBottomBarEvent; // [MultiThread]
-    FOnCreatePullToRefreshIndicator: TALDynamicListBoxView.TCreatePullToRefreshIndicatorEvent; // [MultiThread]
-    FOnCreateLoadMoreIndicator: TALDynamicListBoxView.TCreateLoadMoreIndicatorEvent; // [MultiThread]
-    FOnCreateLoadMoreRetryButton: TALDynamicListBoxView.TCreateLoadMoreRetryButtonEvent; // [MultiThread]
-    FOnCreateItem: TALDynamicListBoxView.TCreateItemEvent; // [MultiThread]
-    FOnCreateItemMainContent: TALDynamicListBoxItem.TCreateMainContentEvent; // [MultiThread]
-    FOnCreateItemLoadingContent: TALDynamicListBoxItem.TCreateLoadingContentEvent; // [MultiThread]
-    FOnCreateItemErrorContent: TALDynamicListBoxItem.TCreateErrorContentEvent; // [MultiThread]
-    FOnRealignItems: TALDynamicListBoxViewMainContent.TRealignEvent;
+    FOnCreateLoadingContent: TItem.TCreateLoadingContentEvent; // [MultiThread]
+    FOnCreateErrorContent: TItem.TCreateErrorContentEvent; // [MultiThread]
+    FOnCreateNoItemsContent: TView.TCreateNoItemsContentEvent; // [MultiThread]
+    FOnCreateBackgroundContent: TView.TCreateBackgroundContentEvent; // [MultiThread]
+    FOnCreateForegroundContent: TView.TCreateForegroundContentEvent; // [MultiThread]
+    FOnCreateTopBar: TView.TCreateTopBarEvent; // [MultiThread]
+    FOnCreateBottomBar: TView.TCreateBottomBarEvent; // [MultiThread]
+    FOnCreatePullToRefreshIndicator: TView.TCreatePullToRefreshIndicatorEvent; // [MultiThread]
+    FOnCreateLoadMoreIndicator: TView.TCreateLoadMoreIndicatorEvent; // [MultiThread]
+    FOnCreateLoadMoreRetryButton: TView.TCreateLoadMoreRetryButtonEvent; // [MultiThread]
+    FOnCreateItem: TView.TCreateItemEvent; // [MultiThread]
+    FOnCreateItemMainContent: TItem.TCreateMainContentEvent; // [MultiThread]
+    FOnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent; // [MultiThread]
+    FOnCreateItemErrorContent: TItem.TCreateErrorContentEvent; // [MultiThread]
+    FOnRealignItems: TView.TMainContent.TRealignEvent;
     function GetHasActiveScrollEngines: Boolean;
+    procedure SetMainView(const Value: TView);
   protected
+    function CreateMainView: TView;
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     procedure DoResized; override;
     procedure Paint; override;
@@ -577,7 +621,7 @@ type
                out AControlPos: TALPointD; // AControlPos is local to the founded control
                const ACheckHitTest: Boolean = true): TALDynamicControl; overload; override;
     procedure Prepare; virtual;
-    property MainView: TALDynamicListBoxView read FMainView;
+    property MainView: TView read FMainView write SetMainView;
     property OnCreateMainView: TCreateMainViewEvent read FOnCreateMainView write FOnCreateMainView;
   published
     //property Action;
@@ -606,7 +650,7 @@ type
     //property Padding;
     property PopupMenu;
     property Position;
-    property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount default TALDynamicListBoxView.DefaultPreloadItemCount;
+    property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount default TView.DefaultPreloadItemCount;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -618,25 +662,25 @@ type
     property Visible;
     property Width;
     //--
-    property OnCreateLoadingContent: TALDynamicListBoxItem.TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent;
-    property OnCreateErrorContent: TALDynamicListBoxItem.TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
-    property OnCreateNoItemsContent: TALDynamicListBoxview.TCreateNoItemsContentEvent read FOnCreateNoItemsContent write FOnCreateNoItemsContent;
-    property OnCreateBackgroundContent: TALDynamicListBoxView.TCreateBackgroundContentEvent read FOnCreateBackgroundContent write FOnCreateBackgroundContent;
-    property OnCreateForegroundContent: TALDynamicListBoxView.TCreateForegroundContentEvent read FOnCreateForegroundContent write FOnCreateForegroundContent;
-    property OnCreateTopBar: TALDynamicListBoxView.TCreateTopBarEvent read FOnCreateTopBar write FOnCreateTopBar;
-    property OnCreateBottomBar: TALDynamicListBoxView.TCreateBottomBarEvent read FOnCreateBottomBar write FOnCreateBottomBar;
-    property OnCreatePullToRefreshIndicator: TALDynamicListBoxView.TCreatePullToRefreshIndicatorEvent read FOnCreatePullToRefreshIndicator write FOnCreatePullToRefreshIndicator;
-    property OnCreateLoadMoreIndicator: TALDynamicListBoxView.TCreateLoadMoreIndicatorEvent read FOnCreateLoadMoreIndicator write FOnCreateLoadMoreIndicator;
-    property OnCreateLoadMoreRetryButton: TALDynamicListBoxView.TCreateLoadMoreRetryButtonEvent read FOnCreateLoadMoreRetryButton write FOnCreateLoadMoreRetryButton;
+    property OnCreateLoadingContent: TItem.TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent;
+    property OnCreateErrorContent: TItem.TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
+    property OnCreateNoItemsContent: TView.TCreateNoItemsContentEvent read FOnCreateNoItemsContent write FOnCreateNoItemsContent;
+    property OnCreateBackgroundContent: TView.TCreateBackgroundContentEvent read FOnCreateBackgroundContent write FOnCreateBackgroundContent;
+    property OnCreateForegroundContent: TView.TCreateForegroundContentEvent read FOnCreateForegroundContent write FOnCreateForegroundContent;
+    property OnCreateTopBar: TView.TCreateTopBarEvent read FOnCreateTopBar write FOnCreateTopBar;
+    property OnCreateBottomBar: TView.TCreateBottomBarEvent read FOnCreateBottomBar write FOnCreateBottomBar;
+    property OnCreatePullToRefreshIndicator: TView.TCreatePullToRefreshIndicatorEvent read FOnCreatePullToRefreshIndicator write FOnCreatePullToRefreshIndicator;
+    property OnCreateLoadMoreIndicator: TView.TCreateLoadMoreIndicatorEvent read FOnCreateLoadMoreIndicator write FOnCreateLoadMoreIndicator;
+    property OnCreateLoadMoreRetryButton: TView.TCreateLoadMoreRetryButtonEvent read FOnCreateLoadMoreRetryButton write FOnCreateLoadMoreRetryButton;
     //--
-    property OnCreateItem: TALDynamicListBoxView.TCreateItemEvent read FOnCreateItem write FOnCreateItem; // [MultiThread]
-    property OnCreateItemMainContent: TALDynamicListBoxItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
-    property OnCreateItemLoadingContent: TALDynamicListBoxItem.TCreateLoadingContentEvent read FOnCreateItemLoadingContent write FOnCreateItemLoadingContent;
-    property OnCreateItemErrorContent: TALDynamicListBoxItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
-    property OnDownloadItemData: TALDynamicListBoxItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
+    property OnCreateItem: TView.TCreateItemEvent read FOnCreateItem write FOnCreateItem; // [MultiThread]
+    property OnCreateItemMainContent: TItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
+    property OnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent read FOnCreateItemLoadingContent write FOnCreateItemLoadingContent;
+    property OnCreateItemErrorContent: TItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
+    property OnDownloadItemData: TItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
     //--
-    property OnDownloadItems: TALDynamicListBoxView.TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
-    property OnRealignItems: TALDynamicListBoxViewMainContent.TRealignEvent read FOnRealignItems write FOnRealignItems;
+    property OnDownloadItems: TView.TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
+    property OnRealignItems: TView.TMainContent.TRealignEvent read FOnRealignItems write FOnRealignItems;
     //--
     //property OnCanFocus;
     //property OnDragEnter;
@@ -686,6 +730,8 @@ uses
   DesignIntf,
   {$ENDIF}
   FMX.types,
+  FMX.Utils,
+  Alcinoe.FMX.Dialogs,
   Alcinoe.FMX.Graphics,
   Alcinoe.GuardianThread,
   Alcinoe.Localization,
@@ -695,6 +741,7 @@ uses
 {**}
 type
   _TALDynamicControlProtectedAccess = class(TALDynamicControl);
+  _TALFloatAnimationProtectedAccess = class(TALFloatAnimation);
 
 {*************************************************************************************************************************}
 Procedure ALDynamicListBoxMakeBufDrawables(const AControl: TALDynamicControl; const AEnsureDoubleBuffered: Boolean = True);
@@ -707,20 +754,20 @@ begin
     ALDynamicListBoxMakeBufDrawables(AControl.Controls[I], AEnsureDoubleBuffered);
 end;
 
+{***************************************************************************}
+function TALDynamicListBox.TItem.TContent.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
+{*****************************************************************************}
+function TALDynamicListBox.TItem.TContent.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
 {***********************************************************************}
-function TALDynamicListBoxItemContent.TFill.GetDefaultColor: TAlphaColor;
-begin
-  Result := TAlphaColors.Null;
-end;
-
-{*************************************************************************}
-function TALDynamicListBoxItemContent.TStroke.GetDefaultColor: TAlphaColor;
-begin
-  Result := TAlphaColors.Null;
-end;
-
-{***********************************************************************************}
-constructor TALDynamicListBoxItemContent.Create(const AOwner: TALDynamicListBoxItem);
+constructor TALDynamicListBox.TItem.TContent.Create(const AOwner: TItem);
 begin
   inherited create(AOwner);
   Visible := False;
@@ -729,57 +776,47 @@ begin
   IsEphemeral := True;
 end;
 
-{*********************************************************}
-function TALDynamicListBoxItemContent.CreateFill: TALBrush;
+{*************************************************************}
+function TALDynamicListBox.TItem.TContent.CreateFill: TALBrush;
 begin
   result := TFill.Create;
 end;
 
-{*****************************************************************}
-function TALDynamicListBoxItemContent.CreateStroke: TALStrokeBrush;
+{*********************************************************************}
+function TALDynamicListBox.TItem.TContent.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
 end;
 
-{***************************************************************************************************************************}
-constructor TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.Create(const AOwner: TALDynamicListBoxItemLoadingContent);
+{***************************************************************************************************}
+constructor TALDynamicListBox.TItem.TLoadingContent.TAnimation.Create(const AOwner: TLoadingContent);
 Begin
+  Inherited create;
   FOwner := AOwner;
-  FAnimation := TALFloatAnimation.Create;
-  FAnimation.Loop := True;
-  FAnimation.OnProcess := AnimationProcess;
-  FAnimation.OnFinish := AnimationFinish;
-  FKind := TSkeletonAnimationKind.None;
-  SetKind(TSkeletonAnimationKind.Pulse);
+  Loop := True;
+  FKind := TAnimationKind.None;
+  SetKind(TAnimationKind.Pulse);
   FWaveColor := TalphaColors.White;
   FWaveAngle := 80;
-  Inherited create;
 end;
 
-{************************************************************************}
-destructor TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.Destroy;
-begin
-  ALFreeAndNil(FAnimation);
-  Inherited;
-end;
-
-{*************************************************************************************************************}
-procedure TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.SetKind(const AValue: TSkeletonAnimationKind);
+{*************************************************************************************************}
+procedure TALDynamicListBox.TItem.TLoadingContent.TAnimation.SetKind(const AValue: TAnimationKind);
 begin
   If AValue <> FKind then begin
-    FAnimation.Stop;
+    Stop;
     FKind := AValue;
     case FKind of
-      TALDynamicListBoxItemLoadingContent.TSkeletonAnimationKind.None: begin
-        FAnimation.AnimationType := TAnimationType.InOut;
-        FAnimation.Interpolation := TALInterpolationType.Linear;
-        FAnimation.Delay := 0;
-        FAnimation.StartValue := 0;
-        FAnimation.StopValue := 1;
-        FAnimation.Duration := 1;
-        FAnimation.AutoReverse := False;
+      TAnimationKind.None: begin
+        InterpolationType := TALInterpolationType.Linear;
+        InterpolationMode := TALInterpolationMode.InOut;
+        Delay := 0;
+        StartValue := 0;
+        StopValue := 1;
+        Duration := 1;
+        AutoReverse := False;
       end;
-      TALDynamicListBoxItemLoadingContent.TSkeletonAnimationKind.Pulse: begin
+      TAnimationKind.Pulse: begin
         // https://mui.com/material-ui/react-skeleton/
         // animation: animation-c7515d 2s ease-in-out 0.5s infinite;
         // 0% {
@@ -791,29 +828,29 @@ begin
         // 100% {
         //   opacity: 1;
         // }
-        FAnimation.AnimationType := TAnimationType.InOut;
-        FAnimation.Interpolation := TALInterpolationType.Quadratic; // similar to ease-in-out
-        FAnimation.Delay := 0.5;
-        FAnimation.StartValue := 0;
-        FAnimation.StopValue := 1;
-        FAnimation.Duration := 2;
-        FAnimation.AutoReverse := True;
+        InterpolationType := TALInterpolationType.Quadratic; // similar to ease-in-out
+        InterpolationMode := TALInterpolationMode.InOut;
+        Delay := 0.5;
+        StartValue := 0;
+        StopValue := 1;
+        Duration := 2;
+        AutoReverse := True;
       end;
-      TALDynamicListBoxItemLoadingContent.TSkeletonAnimationKind.Wave: begin
-        FAnimation.AnimationType := TAnimationType.InOut;
-        FAnimation.Interpolation := TALInterpolationType.Quadratic;
-        FAnimation.Delay := 0;
-        FAnimation.StartValue := -0.5;
-        FAnimation.StopValue := 1.5;
-        FAnimation.Duration := 2;
-        FAnimation.AutoReverse := False;
+      TAnimationKind.Wave: begin
+        InterpolationType := TALInterpolationType.Quadratic;
+        InterpolationMode := TALInterpolationMode.InOut;
+        Delay := 0;
+        StartValue := -0.5;
+        StopValue := 1.5;
+        Duration := 2;
+        AutoReverse := False;
       end;
     end;
   end;
 end;
 
-{*************************************************************************************************}
-procedure TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.AnimationProcess(Sender: TObject);
+{*********************************************************************}
+procedure TALDynamicListBox.TItem.TLoadingContent.TAnimation.DoProcess;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure UpdateGradient(const AControl: TALDynamicControl);
@@ -825,7 +862,7 @@ procedure TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.AnimationProces
       if LShape.Width <= 0 then continue;
       LShape.DoubleBuffered := False;
       var LShapeLeft: Single := Fowner.AbsoluteToLocal(LShape.LocalToAbsolute(TpointF.Create(0,0))).X;
-      var LGradientCenter: Single := (1/LShape.Width) * ((TALFloatAnimation(Sender).CurrentValue * Fowner.Width) - LShapeLeft);
+      var LGradientCenter: Single := (1/LShape.Width) * ((CurrentValue * Fowner.Width) - LShapeLeft);
       var LGradientRadius: Single := (0.2 * Fowner.Width) / LShape.Width;
       var LGradient := LShape.Fill.Gradient;
       LGradient.Angle := Waveangle;
@@ -839,152 +876,160 @@ procedure TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.AnimationProces
   end;
 
 begin
-  {$IF defined(debug)}
-  if (FOwner.Owner = nil) or
-     (not (FOwner.Owner is TALDynamicListBoxItem)) then
-    Raise Exception.Create('Error 8F54D58D-5E80-49BC-957E-53F7435E2F28');
-  {$ENDIF}
-  if not Animation.Loop then exit;
+  inherited;
+  if Enabled then begin
 
-  Case Kind of
+    {$IF defined(debug)}
+    if (FOwner.Owner = nil) or
+       (not (FOwner.Owner is TItem)) then
+      Raise Exception.Create('Error 8F54D58D-5E80-49BC-957E-53F7435E2F28');
+    {$ENDIF}
+    if not Loop then exit;
 
-    TSkeletonAnimationKind.None:;
+    Case Kind of
 
-    TSkeletonAnimationKind.Pulse: Begin
+      TAnimationKind.None:;
 
-      // https://mui.com/material-ui/react-skeleton/
-      // animation: animation-c7515d 2s ease-in-out 0.5s infinite;
-      // 0% {
-      //   opacity: 1;
-      // }
-      // 50% {
-      //   opacity: 0.4;
-      // }
-      // 100% {
-      //   opacity: 1;
-      // }
+      TAnimationKind.Pulse: Begin
 
-      var LOpacity: Single;
-      var P: Single := TALFloatAnimation(Sender).CurrentValue;
-      if P <= 0.5 then
-        // First half: opacity from 1 → 0.4
-        LOpacity := 1 - (P / 0.5) * (1 - 0.4)
+        // https://mui.com/material-ui/react-skeleton/
+        // animation: animation-c7515d 2s ease-in-out 0.5s infinite;
+        // 0% {
+        //   opacity: 1;
+        // }
+        // 50% {
+        //   opacity: 0.4;
+        // }
+        // 100% {
+        //   opacity: 1;
+        // }
+
+        var LOpacity: Single;
+        var P: Single := CurrentValue;
+        if P <= 0.5 then
+          // First half: opacity from 1 → 0.4
+          LOpacity := 1 - (P / 0.5) * (1 - 0.4)
+        else
+          // Second half: opacity from 0.4 → 1
+          LOpacity := 0.4 + ((P - 0.5) / 0.5) * (1 - 0.4);
+
+        for var I := 0 to FOwner.ControlsCount - 1 do
+          FOwner.Controls[i].Opacity := LOpacity;
+
+      End;
+
+      TAnimationKind.Wave: Begin
+        UpdateGradient(FOwner);
+      End;
+
       else
-        // Second half: opacity from 0.4 → 1
-        LOpacity := 0.4 + ((P - 0.5) / 0.5) * (1 - 0.4);
+        Raise Exception.Create('Error 3E43ABAE-7A19-41F7-A2A0-332020C068D8')
 
-      for var I := 0 to FOwner.ControlsCount - 1 do
-        FOwner.Controls[i].Opacity := LOpacity;
+    end;
 
-    End;
+    if FOwner.Owner.IsReadyToDisplay(False{AStrict}) then begin
+      // We cannot call TItem(FOwner.Owner).ActivateContent(TItem.MainContentType)
+      // from here because it will destroy the LoadingContent and the Animation as well.
+      // Moreover, destroying an animation during its DoProcess event risks an access violation.
+      Loop := False;
+      Duration := 0;
+      StartValue := 0;
+      StopValue := 0;
+      AutoReverse := False;
+      exit;
+    end;
 
-    TSkeletonAnimationKind.Wave: Begin
-      UpdateGradient(FOwner);
-    End;
-
-    else
-      Raise Exception.Create('Error 3E43ABAE-7A19-41F7-A2A0-332020C068D8')
+    FOwner.Repaint;
 
   end;
-
-  if (FOwner.Owner.IsReadyToDisplay) then begin
-    // We cannot call TALDynamicListBoxItem(FOwner.Owner).ActivateContent(TALDynamicListBoxItem.MainContentType)
-    // from here because it will destroy the LoadingContent and the Animation as well.
-    // Moreover, destroying an animation during its onProcess event risks an access violation.
-    Animation.Loop := False;
-    Animation.Duration := 0;
-    Animation.StartValue := 0;
-    Animation.StopValue := 0;
-    Animation.AutoReverse := False;
-    exit;
-  end;
-
-  FOwner.Repaint;
 end;
 
-{************************************************************************************************}
-procedure TALDynamicListBoxItemLoadingContent.TSkeletonAnimation.AnimationFinish(Sender: TObject);
+{********************************************************************}
+procedure TALDynamicListBox.TItem.TLoadingContent.TAnimation.DoFinish;
 begin
-  {$IF defined(debug)}
-  if (FOwner.Owner = nil) or
-     (not (FOwner.Owner is TALDynamicListBoxItem)) then
-    Raise Exception.Create('Error 89D24C99-AA44-4148-8E7E-1A26E2ECAFC8');
-  {$ENDIF}
-  FOwner.Visible := False;
-  TALDynamicListBoxItem(FOwner.Owner).ActivateContent(TALDynamicListBoxItem.MainContentType);
+  inherited;
+  if Enabled then begin
+    {$IF defined(debug)}
+    if (FOwner.Owner = nil) or
+       (not (FOwner.Owner is TItem)) then
+      Raise Exception.Create('Error 89D24C99-AA44-4148-8E7E-1A26E2ECAFC8');
+    {$ENDIF}
+    FOwner.Visible := False;
+    TItem(FOwner.Owner).ActivateContent(TItem.MainContentType);
+  end;
 end;
 
-{******************************************************************************************}
-constructor TALDynamicListBoxItemLoadingContent.Create(const AOwner: TALDynamicListBoxItem);
+{******************************************************************************}
+constructor TALDynamicListBox.TItem.TLoadingContent.Create(const AOwner: TItem);
 begin
   inherited;
   Autosize := False;
-  FSkeletonAnimation := TSkeletonAnimation.Create(Self);
+  FAnimation := TAnimation.Create(Self);
 end;
 
-{*****************************************************}
-destructor TALDynamicListBoxItemLoadingContent.Destroy;
+{*********************************************************}
+destructor TALDynamicListBox.TItem.TLoadingContent.Destroy;
 begin
-  AlFreeAndNil(FSkeletonAnimation);
+  AlFreeAndNil(FAnimation);
   inherited;
 end;
 
-{**************************************************************}
-procedure TALDynamicListBoxItemLoadingContent.BeforeDestruction;
+{******************************************************************}
+procedure TALDynamicListBox.TItem.TLoadingContent.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
-  FSkeletonAnimation.Animation.Enabled := False;
+  FAnimation.Enabled := False;
   Inherited;
 end;
 
-{**************************************************}
-procedure TALDynamicListBoxItemLoadingContent.Paint;
+{******************************************************}
+procedure TALDynamicListBox.TItem.TLoadingContent.Paint;
 begin
-  FSkeletonAnimation.Animation.Start;
+  FAnimation.Start;
   inherited;
 end;
 
-{*************************************************************************************************}
-constructor TALDynamicListBoxItem.TDownloadDataContext.Create(const AOwner: TALDynamicListBoxItem);
+{***********************************************************************************}
+constructor TALDynamicListBox.TItem.TDownloadDataContext.Create(const AOwner: TItem);
 begin
   inherited Create(AOwner);
   CustomParams := TALStringListW.Create;
   FOnDownloadData := AOwner.OnDownloadData;
 end;
 
-{************************************************************}
-destructor TALDynamicListBoxItem.TDownloadDataContext.Destroy;
+{**************************************************************}
+destructor TALDynamicListBox.TItem.TDownloadDataContext.Destroy;
 begin
   ALFreeAndNil(CustomParams);
   inherited Destroy;
 end;
 
-{**********************************************************************************}
-function TALDynamicListBoxItem.TDownloadDataContext.GetOwner: TALDynamicListBoxItem;
+{********************************************************************}
+function TALDynamicListBox.TItem.TDownloadDataContext.GetOwner: TItem;
 begin
-  Result := TALDynamicListBoxItem(FOwner);
+  Result := TItem(FOwner);
 end;
 
-{********************************************************************************************************************************}
-constructor TALDynamicListBoxItem.TContentBuilderContext.Create(const AOwner: TALDynamicListBoxItem; const AContentType: Integer);
+{******************************************************************************************************************}
+constructor TALDynamicListBox.TItem.TContentBuilderContext.Create(const AOwner: TItem; const AContentType: Integer);
 begin
   inherited Create(AOwner);
   CustomParams := TALStringListW.Create;
   {$IF defined(debug)}
-  if AOwner.Host = nil then
+  if AOwner.CacheEngine = nil then
     Raise Exception.Create('Error A377D825-737D-4FB5-8EAF-3A28680DAB6B');
   {$ENDIF}
-  CacheEngine := AOwner.Host.CacheEngine.IncreaseRefCount;
+  CacheEngine := AOwner.CacheEngine.IncreaseRefCount;
   TargetRect := AOwner.LocalRect ;
   if AOwner.ParentView = nil then begin
     {$IF defined(debug)}
-    if not (AOwner is TALDynamicListBoxView) then
+    if not (AOwner is TView) then
       Raise Exception.Create('Error 9228ECC4-9E4D-45FE-805F-B234DCF08372');
     {$ENDIF}
-    FParentViewOrientation := TALDynamicListBoxView(AOwner).orientation
+    FParentViewOrientation := TView(AOwner).orientation
   end
-  else if AOwner is TALDynamicListBoxView then
-    FParentViewOrientation := TALDynamicListBoxView(AOwner).orientation
+  else if AOwner is TView then
+    FParentViewOrientation := TView(AOwner).orientation
   else
     FParentViewOrientation := AOwner.ParentView.orientation;
   FContentType := AContentType;
@@ -1001,8 +1046,8 @@ begin
   else FOnCreateErrorContent := nil;
 end;
 
-{**************************************************************}
-destructor TALDynamicListBoxItem.TContentBuilderContext.Destroy;
+{****************************************************************}
+destructor TALDynamicListBox.TItem.TContentBuilderContext.Destroy;
 begin
   ALFreeAndNil(CustomParams);
   CacheEngine.DecreaseRefCount;
@@ -1010,15 +1055,15 @@ begin
   inherited Destroy;
 end;
 
-{************************************************************************************}
-function TALDynamicListBoxItem.TContentBuilderContext.GetOwner: TALDynamicListBoxItem;
+{**********************************************************************}
+function TALDynamicListBox.TItem.TContentBuilderContext.GetOwner: TItem;
 begin
-  Result := TALDynamicListBoxItem(FOwner);
+  Result := TItem(FOwner);
 end;
 
 {**************}
 // [MultiThread]
-function TALDynamicListBoxItem.TContentBuilderContext.GetContentAlign(const AContentType: Integer): TALAlignLayout;
+function TALDynamicListBox.TItem.TContentBuilderContext.GetContentAlign(const AContentType: Integer): TALAlignLayout;
 begin
   //MainContentType
   //LoadingContentType
@@ -1029,7 +1074,7 @@ end;
 
 {**************}
 // [MultiThread]
-function TALDynamicListBoxItem.TContentBuilderContext.GetCreateContentMethod(const AContentType: Integer): TMethod;
+function TALDynamicListBox.TItem.TContentBuilderContext.GetCreateContentMethod(const AContentType: Integer): TMethod;
 begin
   case AContentType of
     MainContentType: Result := TMethod(FOnCreateMainContent);
@@ -1039,8 +1084,8 @@ begin
   end;
 end;
 
-{**************************************************************}
-constructor TALDynamicListBoxItem.Create(const AOwner: TObject);
+{****************************************************************}
+constructor TALDynamicListBox.TItem.Create(const AOwner: TObject);
 begin
   inherited create(AOwner);
   AutoSize := True;
@@ -1061,8 +1106,8 @@ begin
   FOnCreateErrorContent := nil;
 end;
 
-{***************************************}
-destructor TALDynamicListBoxItem.Destroy;
+{*****************************************}
+destructor TALDynamicListBox.TItem.Destroy;
 begin
   CancelDownloadData;
   CancelPreloadContent;
@@ -1070,8 +1115,8 @@ begin
   Inherited Destroy;
 end;
 
-{****************************************************************}
-function TALDynamicListBoxItem.HasUnconstrainedAutosizeX: Boolean;
+{******************************************************************}
+function TALDynamicListBox.TItem.HasUnconstrainedAutosizeX: Boolean;
 begin
   Result := GetAutoSize;
   if Result then begin
@@ -1082,8 +1127,8 @@ begin
   end;
 end;
 
-{****************************************************************}
-function TALDynamicListBoxItem.HasUnconstrainedAutosizeY: Boolean;
+{******************************************************************}
+function TALDynamicListBox.TItem.HasUnconstrainedAutosizeY: Boolean;
 begin
   Result := GetAutoSize;
   if Result then begin
@@ -1094,14 +1139,14 @@ begin
   end;
 end;
 
-{*******************************************************}
-function TALDynamicListBoxItem.IsReadyToDisplay: Boolean;
+{*****************************************************************************************}
+function TALDynamicListBox.TItem.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 begin
   Result := ((FMainContent <> nil) or (FErrorContent <> nil)) and Inherited;
 end;
 
-{*********************************************************************************}
-procedure TALDynamicListBoxItem.DoRemoveControl(const AControl: TALDynamicControl);
+{***********************************************************************************}
+procedure TALDynamicListBox.TItem.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   if Acontrol = FMainContent then FMainContent := nil
   else if Acontrol = FLoadingContent then FLoadingContent := nil
@@ -1109,8 +1154,8 @@ begin
   inherited;
 end;
 
-{**********************************************************}
-function TALDynamicListBoxItem.DoGetDownloadPriority: Int64;
+{************************************************************}
+function TALDynamicListBox.TItem.DoGetDownloadPriority: Int64;
 begin
 
   Result := 0;
@@ -1121,7 +1166,7 @@ begin
          (Index <= LParentView.LastVisibleItemIndex) then
         Result := 0
       //--
-      else if LParentView.ScrollDirection = TALDynamicListBoxView.TScrollDirection.FromBeginToEnd then begin
+      else if LParentView.ScrollDirection = TView.TScrollDirection.FromBeginToEnd then begin
         if Index > LParentView.LastVisibleItemIndex then
           Result := Index - LParentView.LastVisibleItemIndex // > 0
         else
@@ -1151,22 +1196,22 @@ begin
 
 end;
 
-{**************************************}
-procedure TALDynamicListBoxItem.Prepare;
+{****************************************}
+procedure TALDynamicListBox.TItem.Prepare;
 begin
   {$IFDEF DEBUG}
-  ALLog(ClassName+'.Prepare', 'Index:' + ALintToStrW(Index));
+  ALLog(ClassName+'.Prepare', 'Index: ' + ALintToStrW(Index));
   {$ENDIF}
   // FetchContent will invoke DownloadData, and its execution
   // may potentially be deferred until DownloadData is completed.
   FetchContent;
 end;
 
-{****************************************}
-procedure TALDynamicListBoxItem.Unprepare;
+{******************************************}
+procedure TALDynamicListBox.TItem.Unprepare;
 begin
   {$IFDEF DEBUG}
-  ALLog(ClassName+'.Unprepare', 'Index:' + ALintToStrW(Index));
+  ALLog(ClassName+'.Unprepare', 'Index: ' + ALintToStrW(Index));
   {$ENDIF}
   CancelDownloadData;
   CancelPreloadContent;
@@ -1177,8 +1222,8 @@ begin
     end;
 end;
 
-{*****************************************************************************************}
-function  TALDynamicListBoxItem.DownloadData(const AForceReload: Boolean = False): boolean;
+{******************************************************************************************}
+function TALDynamicListBox.TItem.DownloadData(const AForceReload: Boolean = False): boolean;
 begin
 
   // Exit if the last download resulted in an error, unless AForceReload is True
@@ -1194,7 +1239,7 @@ begin
 
   // Before starting the background thread
   {$IFDEF DEBUG}
-  ALLog(ClassName+'.DownloadData', 'ForceReload:' + ALBoolToStrW(AForceReload));
+  ALLog(ClassName+'.DownloadData', 'ForceReload: ' + ALBoolToStrW(AForceReload));
   {$ENDIF}
   FDownloadDataErrorCode := 0;
 
@@ -1215,14 +1260,14 @@ begin
 
 end;
 
-{*****************************************************************************}
-function TALDynamicListBoxItem.CreateDownloadDataContext: TDownloadDataContext;
+{*******************************************************************************}
+function TALDynamicListBox.TItem.CreateDownloadDataContext: TDownloadDataContext;
 begin
   Result := TDownloadDataContext.Create(Self);
 end;
 
-{**************************************************************************************}
-class procedure TALDynamicListBoxItem.DownloadDataBackgroundProc(var AContext: Tobject);
+{****************************************************************************************}
+class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProc(var AContext: Tobject);
 begin
   var LContext := TDownloadDataContext(AContext);
   if LContext.FOwner = nil then exit;
@@ -1269,15 +1314,15 @@ begin
 
   Except
     On E: Exception do begin
-      ALLog('TALDynamicListBoxItem.DownloadDataBackgroundProc', E);
-      TMonitor.Enter(LContext.FLock);
+      ALLog('TALDynamicListBox.TItem.DownloadDataBackgroundProc', E);
+      ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProc'{$ENDIF});
       try
         if LContext.FOwner <> nil then begin
           LContext.FFreeByThread := False;
           AContext := nil; // AContext will be free by CancelResourceDownload
         end;
       finally
-        TMonitor.Exit(LContext.FLock);
+        ALMonitorExit(LContext.FLock);
       end;
     end;
   end;
@@ -1285,38 +1330,42 @@ end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxItem.DownloadDataBackgroundProcFetchData(
+class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProcFetchData(
                   const AContext: TDownloadDataContext;
                   out AData: TALJSONNodeW;
                   var AErrorCode: Integer);
 begin
-  Tmonitor.Enter(AContext.FLock);
-  Try
-    if AContext.FOwner = nil then exit;
-    if not assigned(AContext.FOnDownloadData) then
-      Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
-    //var LMethod: TMethod;
-    //LMethod.Code := TMethod(AContext.FOnDownloadData).Code;
-    // Set Self to nil to prevent accidental access to instance members,
-    // as we are in a multithreaded context where most members are not thread-safe.
-    // Self can still be accessed via AContext.Owner, but this should be done with caution.
-    //LMethod.Data := nil;
-    //TDownloadDataEvent(LMethod)(
-    //  AContext, // const AContext: TDownloadDataContext;
-    //  AData, // Const AData: TALJSONNodeW;
-    //  AErrorCode); // var AErrorCode: Integer
-    AContext.FOnDownloadData(
-      AContext, // const AContext: TDownloadDataContext;
-      AData, // Const AData: TALJSONNodeW;
-      AErrorCode); // var AErrorCode: Integer
-  finally
-    Tmonitor.Exit(AContext.FLock);
-  End;
+
+  // We cannot call ALMonitorEnter(AContext.FLock) here because
+  // AContext.FOnDownloadData performs a long HTTP request.
+  // In the meantime, CancelDownloadData might be called, and it
+  // also needs to acquire the same lock to set AContext.FOwner to nil.
+  // Therefore, it's the responsibility of FOnDownloadData to call
+  // ALMonitorEnter(AContext.FLock) if it needs to access AContext.FOwner.
+
+  if AContext.FOwner = nil then exit;
+  if not assigned(AContext.FOnDownloadData) then
+    Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
+  //var LMethod: TMethod;
+  //LMethod.Code := TMethod(AContext.FOnDownloadData).Code;
+  // Set Self to nil to prevent accidental access to instance members,
+  // as we are in a multithreaded context where most members are not thread-safe.
+  // Self can still be accessed via AContext.Owner, but this should be done with caution.
+  //LMethod.Data := nil;
+  //TDownloadDataEvent(LMethod)(
+  //  AContext, // const AContext: TDownloadDataContext;
+  //  AData, // Const AData: TALJSONNodeW;
+  //  AErrorCode); // var AErrorCode: Integer
+  AContext.FOnDownloadData(
+    AContext, // const AContext: TDownloadDataContext;
+    AData, // Const AData: TALJSONNodeW;
+    AErrorCode); // var AErrorCode: Integer
+
 end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxItem.DownloadDataBackgroundProcInitData(
+class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProcInitData(
                   const AContext: TDownloadDataContext;
                   const AErrorCode: Integer;
                   const AData: TALJSONNodeW);
@@ -1329,10 +1378,10 @@ end;
 
 {**************}
 // [MultiThread]
-class function TALDynamicListBoxItem.DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; // [MultiThread]
+class function TALDynamicListBox.TItem.DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; // [MultiThread]
 begin
   if TThread.Current.ThreadID = MainThreadID then exit(true);
-  TMonitor.Enter(AContext.FLock);
+  ALMonitorEnter(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProcCanProcessData'{$ENDIF});
   try
     // Primarily because we want to prevent the list
     // from being updated during the bottom-bound animation.
@@ -1341,12 +1390,12 @@ begin
               (LOwner.Host = nil) or
               (not LOwner.Host.HasActiveScrollEngines);
   finally
-    TMonitor.Exit(AContext.FLock);
+    ALMonitorExit(AContext.FLock);
   end;
 end;
 
-{******************************************************}
-procedure TALDynamicListBoxItem.DownloadDataProcessData(
+{********************************************************}
+procedure TALDynamicListBox.TItem.DownloadDataProcessData(
             const AContext: TDownloadDataContext;
             const AErrorCode: Integer;
             var AData: TALJSONNodeW);
@@ -1361,36 +1410,40 @@ begin
   else ALfreeAndNil(AData);
 end;
 
-{***************************************************}
-procedure TALDynamicListBoxItem.DownloadDataFinished;
+{*****************************************************}
+procedure TALDynamicListBox.TItem.DownloadDataFinished;
 begin
-  if FDownloadDataErrorCode <> 0 then Host.ShowErrorMessageBanner(FDownloadDataErrorCode)
-  else FetchContent;
+  if FDownloadDataErrorCode <> 0 then begin
+    if Host <> nil then
+      Host.ShowErrorMessageBanner(FDownloadDataErrorCode)
+  end
+  else
+    FetchContent;
 end;
 
-{******************************************************}
-function TALDynamicListBoxItem.CanDownloadData: Boolean;
+{********************************************************}
+function TALDynamicListBox.TItem.CanDownloadData: Boolean;
 begin
   // Once the data has been downloaded,
   // FOnDownloadData will be set to nil
   Result := assigned(FOnDownloadData);
 end;
 
-{************************************************************}
-function TALDynamicListBoxItem.IsDownloadDataRunning: Boolean;
+{**************************************************************}
+function TALDynamicListBox.TItem.IsDownloadDataRunning: Boolean;
 begin
   result := FDownloadDataContext <> nil;
 end;
 
-{************************************************************}
-Function TALDynamicListBoxItem.HasDataBeenDownloaded: Boolean;
+{**************************************************************}
+function TALDynamicListBox.TItem.HasDataBeenDownloaded: Boolean;
 begin
   result := (not CanDownloadData) or
             (FDownloadDataErrorCode <> 0);
 end;
 
-{*************************************************}
-procedure TALDynamicListBoxItem.CancelDownloadData;
+{***************************************************}
+procedure TALDynamicListBox.TItem.CancelDownloadData;
 begin
   // The FDownloadDataContext pointer can only be
   // updated in the main thread, so there is no need
@@ -1398,21 +1451,21 @@ begin
   if FDownloadDataContext <> nil then begin
     var LContextToFree: TDownloadDataContext;
     var LLock := FDownloadDataContext.FLock;
-    TMonitor.Enter(LLock);
+    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelDownloadData'{$ENDIF});
     try
       if not FDownloadDataContext.FFreeByThread then LContextToFree := FDownloadDataContext
       else LContextToFree := nil;
       FDownloadDataContext.FOwner := nil;
       FDownloadDataContext := nil;
     Finally
-      TMonitor.Exit(LLock);
+      ALMonitorExit(LLock);
     End;
     ALFreeAndNil(LContextToFree);
   end;
 end;
 
-{************************************************************************************}
-function TALDynamicListBoxItem.CanCreateContent(const AContentType: Integer): Boolean;
+{**************************************************************************************}
+function TALDynamicListBox.TItem.CanCreateContent(const AContentType: Integer): Boolean;
 begin
   case AContentType of
     MainContentType: result := (FMainContent = nil) and (assigned(FOnCreateMainContent));
@@ -1422,15 +1475,15 @@ begin
   end;
 end;
 
-{**************************************************************************************************************}
-function TALDynamicListBoxItem.CreateContentBuilderContext(const AContentType: Integer): TContentBuilderContext;
+{****************************************************************************************************************}
+function TALDynamicListBox.TItem.CreateContentBuilderContext(const AContentType: Integer): TContentBuilderContext;
 begin
-  Result := TALDynamicListBoxItem.TContentBuilderContext.Create(self, AContentType);
+  Result := TItem.TContentBuilderContext.Create(self, AContentType);
 end;
 
 {**************}
 // [MultiThread]
-class function TALDynamicListBoxItem.CreateContent(const AContentType: Integer; const AContext: TContentBuilderContext): TALDynamicListBoxItemContent;
+class function TALDynamicListBox.TItem.CreateContent(const AContentType: Integer; const AContext: TContentBuilderContext): TContent;
 begin
   var LMethod := AContext.GetCreateContentMethod(AContentType);
   if LMethod.Code = nil then exit(nil);
@@ -1439,12 +1492,12 @@ begin
   // Self can still be accessed via LContext.Owner, but this should be done with caution.
   //LMethod.Data := nil;
   //--
-  Tmonitor.Enter(AContext.FLock);
+  ALMonitorEnter(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CreateContent'{$ENDIF});
   Try
     if AContext.FOwner = nil then Exit(nil);
     Result := TCreateContentEvent(LMethod)(AContext);
   finally
-    Tmonitor.Exit(AContext.FLock);
+    ALMonitorExit(AContext.FLock);
   End;
   //--
   Result.Align := AContext.GetContentAlign(AContentType);
@@ -1454,7 +1507,7 @@ end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxItem.CreateContextContent(const AContext: TContentBuilderContext);
+class procedure TALDynamicListBox.TItem.CreateContextContent(const AContext: TContentBuilderContext);
 begin
   {$IF defined(debug)}
   if AContext.FNewContent <> nil then Raise Exception.Create('Error BA843DF0-3BAE-461B-B1A6-395B6BCCCDD2');
@@ -1462,8 +1515,8 @@ begin
   AContext.FNewContent := CreateContent(AContext.FContentType, AContext);
 end;
 
-{*******************************************************************************************************************************************}
-procedure TALDynamicListBoxItem.DoShiftContent(var ASrcContent: TALDynamicListBoxItemContent; var ADstContent: TALDynamicListBoxItemContent);
+{*****************************************************************************************************}
+procedure TALDynamicListBox.TItem.DoShiftContent(var ASrcContent: TContent; var ADstContent: TContent);
 begin
   If ASrcContent = nil then exit;
   {$IF defined(debug)}
@@ -1477,8 +1530,8 @@ begin
   ASrcContent := nil;
 end;
 
-{***********************************************************************************}
-procedure TALDynamicListBoxItem.ShiftContent(const AContext: TContentBuilderContext);
+{*************************************************************************************}
+procedure TALDynamicListBox.TItem.ShiftContent(const AContext: TContentBuilderContext);
 begin
   case AContext.FContentType of
     MainContentType: if AContext.FNewContent <> nil then DoShiftContent(AContext.FNewContent, FMainContent);
@@ -1490,7 +1543,7 @@ end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxItem.DoPreloadContent(var AContext: Tobject);
+class procedure TALDynamicListBox.TItem.DoPreloadContent(var AContext: Tobject);
 begin
   var LContext := TContentBuilderContext(AContext);
   if LContext.FOwner = nil then exit;
@@ -1516,22 +1569,22 @@ begin
 
   Except
     On E: Exception do begin
-      ALLog('TALDynamicListBoxItem.DoPreloadContent', E);
-      TMonitor.Enter(LContext.FLock);
+      ALLog('TALDynamicListBox.TItem.DoPreloadContent', E);
+      ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DoPreloadContent'{$ENDIF});
       try
         if LContext.FOwner <> nil then begin
           LContext.FFreeByThread := False;
           AContext := nil; // AContext will be free by CancelPreloadContent
         end;
       finally
-        TMonitor.Exit(LContext.FLock);
+        ALMonitorExit(LContext.FLock);
       end;
     end;
   end;
 end;
 
-{**************************************************************************}
-procedure TALDynamicListBoxItem.PreloadContent(const AContentType: Integer);
+{****************************************************************************}
+procedure TALDynamicListBox.TItem.PreloadContent(const AContentType: Integer);
 begin
   {$IF defined(debug)}
   if FContentBuilderContext <> nil then
@@ -1549,16 +1602,16 @@ begin
   End;
 end;
 
-{*****************************************************************************}
-procedure TALDynamicListBoxItem.TryPreloadContent(const AContentType: Integer);
+{*******************************************************************************}
+procedure TALDynamicListBox.TItem.TryPreloadContent(const AContentType: Integer);
 begin
   If (not CanCreateContent(AContentType)) or
      (IsPreloadingContent) then exit;
   PreloadContent(AContentType);
 end;
 
-{***************************************************}
-procedure TALDynamicListBoxItem.CancelPreloadContent;
+{*****************************************************}
+procedure TALDynamicListBox.TItem.CancelPreloadContent;
 begin
   // The FContentBuilderContext pointer can only be
   // updated in the main thread, so there is no need
@@ -1566,14 +1619,14 @@ begin
   if FContentBuilderContext <> nil then begin
     var LContextToFree: TContentBuilderContext;
     var LLock := FContentBuilderContext.FLock;
-    TMonitor.Enter(LLock);
+    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelPreloadContent'{$ENDIF});
     try
       if not FContentBuilderContext.FFreeByThread then LContextToFree := FContentBuilderContext
       else LContextToFree := nil;
       FContentBuilderContext.FOwner := nil;
       FContentBuilderContext := nil;
     Finally
-      TMonitor.Exit(LLock);
+      ALMonitorExit(LLock);
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -1581,13 +1634,13 @@ end;
 
 {**************}
 // [MultiThread]
-function TALDynamicListBoxItem.IsPreloadingContent: Boolean;
+function TALDynamicListBox.TItem.IsPreloadingContent: Boolean;
 begin
   result := FContentBuilderContext <> nil;
 end;
 
-{************************************************************************************}
-procedure TALDynamicListBoxItem.CreateAndActivateContent(const AContentType: Integer);
+{**************************************************************************************}
+procedure TALDynamicListBox.TItem.CreateAndActivateContent(const AContentType: Integer);
 begin
   CancelPreloadContent;
   FContentBuilderContext := CreateContentBuilderContext(AContentType);
@@ -1600,18 +1653,18 @@ begin
   End;
 end;
 
-{***************************************************************************************}
-procedure TALDynamicListBoxItem.TryCreateAndActivateContent(const AContentType: Integer);
+{*****************************************************************************************}
+procedure TALDynamicListBox.TItem.TryCreateAndActivateContent(const AContentType: Integer);
 begin
   If CanCreateContent(AContentType) then CreateAndActivateContent(AContentType)
   else ActivateContent(AContentType);
 end;
 
-{***************************************************************************}
-procedure TALDynamicListBoxItem.ActivateContent(const AContentType: Integer);
+{*****************************************************************************}
+procedure TALDynamicListBox.TItem.ActivateContent(const AContentType: Integer);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _HideContent(var AContent: TALDynamicListBoxItemContent);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _HideContent(var AContent: TContent);
   begin
     if AContent.IsEphemeral then ALFreeAndNil(AContent, true{ADelayed})
     else AContent.Visible := False;
@@ -1642,8 +1695,8 @@ begin
   end;
 end;
 
-{********************************************************************}
-procedure TALDynamicListBoxItem.FetchContent(const APreload: boolean);
+{**********************************************************************}
+procedure TALDynamicListBox.TItem.FetchContent(const APreload: boolean);
 begin
 
   // If the item is outside the preloaded range, do nothing
@@ -1674,29 +1727,48 @@ begin
 
 end;
 
-{*******************************************}
-procedure TALDynamicListBoxItem.FetchContent;
+{*********************************************}
+procedure TALDynamicListBox.TItem.FetchContent;
 begin
   FetchContent(not IsDisplayed{APreload});
 end;
 
-{********************************************************}
-Function TALDynamicListBoxItem.GetHost: TALDynamicListBox;
+{*************************************************************************}
+function TALDynamicListBox.TItem.GetCacheEngine: TALBufDrawableCacheEngine;
+begin
+  if Host <> nil then Result := Host.CacheEngine
+  else if FCacheEngine <> nil then result := FCacheEngine
+  else if ParentView <> nil then Result := ParentView.CacheEngine
+  else result := nil;
+end;
+
+{***********************************************************}
+function TALDynamicListBox.TItem._GetHost: TALDynamicListBox;
 begin
   Result := TALDynamicListBox(inherited Host);
 end;
 
-{******************************************************************}
-function TALDynamicListBoxItem.GetParentView: TALDynamicListBoxView;
+{****************************************************************************}
+procedure TALDynamicListBox.TItem.SetHost(Const Value: TALDynamicControlHost);
 begin
-  // * Items are owned by TALDynamicListBoxViewMainContent
-  // * TALDynamicListBoxViewMainContent is owned by a view
-  if Owner = nil then exit(nil);
-  Result := TALDynamicListBoxView(Owner{TALDynamicListBoxViewMainContent}.owner{TALDynamicListBoxView});
+  if FHost <> value then begin
+    If (Value <> nil) then FCacheEngine := Value.CacheEngine
+    else FCacheEngine := nil;
+    inherited;
+  end;
 end;
 
-{**************************************************************}
-function TALDynamicListBoxItem.GetAbsoluteDisplayedRect: TRectF;
+{****************************************************}
+function TALDynamicListBox.TItem.GetParentView: TView;
+begin
+  // * Items are owned by TMainContent
+  // * TMainContent is owned by a view
+  if Owner = nil then exit(nil);
+  Result := TView(Owner{TMainContent}.owner{TView});
+end;
+
+{****************************************************************}
+function TALDynamicListBox.TItem.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (ParentView <> nil) and
      ((index < ParentView.FirstVisibleItemIndex) or
@@ -1704,37 +1776,37 @@ begin
   Result := Inherited GetAbsoluteDisplayedRect;
 end;
 
-{*********************************************}
-procedure TALDynamicListBoxItem.VisibleChanged;
+{***********************************************}
+procedure TALDynamicListBox.TItem.VisibleChanged;
 begin
   inherited;
   if (Align = TALAlignLayout.None) and (Owner <> nil) then
-    TALDynamicListBoxViewMainContent(Owner).Realign(Index);
+    TView.TMainContent(Owner).Realign(Index);
 end;
 
-{******************************************}
-procedure TALDynamicListBoxItem.SizeChanged;
+{********************************************}
+procedure TALDynamicListBox.TItem.SizeChanged;
 begin
   {$IF defined(debug)}
   if (Owner <> nil) and (Align <> TALAlignLayout.None) then
     Raise Exception.Create('Error 2214E98E-D67A-4DA2-A608-E3FE2C976256');
-  if (Owner <> nil) and (not (Owner is TALDynamicListBoxViewMainContent)) then
+  if (Owner <> nil) and (not (Owner is TView.TMainContent)) then
     Raise Exception.Create('Error 5270D91C-B858-4B85-9475-609AE201786E');
   {$ENDIF}
   if Owner <> nil then
-    TALDynamicListBoxViewMainContent(Owner).Realign(Index);
+    TView.TMainContent(Owner).Realign(Index);
   inherited;
 end;
 
-{********************************************************************}
-procedure TALDynamicListBoxItem.PaintInternal(const ACanvas: TCanvas);
+{**********************************************************************}
+procedure TALDynamicListBox.TItem.PaintInternal(const ACanvas: TCanvas);
 begin
   FetchContent;
   Inherited;
 end;
 
-{***************************************************************************************}
-constructor TALDynamicListBoxViewMainContent.Create(const AOwner: TALDynamicListBoxItem);
+{***************************************************************************}
+constructor TALDynamicListBox.TView.TMainContent.Create(const AOwner: TItem);
 begin
   inherited create(AOwner);
   Autosize := True;
@@ -1742,20 +1814,20 @@ begin
   FOnRealign := nil;
 end;
 
-{************************************************************************}
-function TALDynamicListBoxViewMainContent.GetOwner: TALDynamicListBoxView;
+{************************************************************}
+function TALDynamicListBox.TView.TMainContent.GetOwner: TView;
 begin
-  Result := TALDynamicListBoxView(inherited Owner);
+  Result := TView(inherited Owner);
 end;
 
-{**************************************************************************************}
-procedure TALDynamicListBoxViewMainContent.SetOwner(const Value: TALDynamicListBoxView);
+{**************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.SetOwner(const Value: TView);
 begin
   inherited Owner := Value;
 end;
 
-{*******************************************************************************************************************}
-procedure TALDynamicListBoxViewMainContent.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
+{***********************************************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);
 begin
   inherited;
   {$IF defined(debug)}
@@ -1765,8 +1837,8 @@ begin
   Realign(AControl.Index);
 end;
 
-{********************************************************************************************}
-procedure TALDynamicListBoxViewMainContent.DoRemoveControl(const AControl: TALDynamicControl);
+{************************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   inherited;
   {$IF defined(debug)}
@@ -1776,8 +1848,8 @@ begin
   Realign(AControl.Index);
 end;
 
-{********************************************************************************************************************}
-procedure TALDynamicListBoxViewMainContent.DoMoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer);
+{************************************************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DoMoveControl(const AControl: TALDynamicControl; const ANewIndex: Integer);
 begin
   inherited;
   {$IF defined(debug)}
@@ -1787,8 +1859,8 @@ begin
   Realign(AControl.Index);
 end;
 
-{*************************************************************************************************************************}
-procedure TALDynamicListBoxViewMainContent.InsertItems(const AItems: TArray<TALDynamicListBoxItem>; const AIndex: Integer);
+{*************************************************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.InsertItems(const AItems: TArray<TItem>; const AIndex: Integer);
 begin
   if Length(AItems) = 0 then
     Raise Exception.Create('InsertItems failed: No items provided');
@@ -1821,8 +1893,8 @@ begin
   Realign(LIndex);
 end;
 
-{**************************************************************}
-function TALDynamicListBoxViewMainContent.GetTopBarSize: Single;
+{******************************************************************}
+function TALDynamicListBox.TView.TMainContent.GetTopBarSize: Single;
 begin
   if (Owner <> nil) and
      (Owner.FTopBar <> nil) and
@@ -1834,8 +1906,8 @@ begin
     Result := 0;
 end;
 
-{*******************************************************************************}
-procedure TALDynamicListBoxViewMainContent.DoRealign(const AStartIndex: integer);
+{***********************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DoRealign(const AStartIndex: integer);
 begin
 
   if (IsDestroying) or
@@ -1882,14 +1954,14 @@ begin
 
 end;
 
-{***************************************************}
-procedure TALDynamicListBoxViewMainContent.DoRealign;
+{*******************************************************}
+procedure TALDynamicListBox.TView.TMainContent.DoRealign;
 begin
   DoRealign(0);
 end;
 
-{*****************************************************************************}
-procedure TALDynamicListBoxViewMainContent.Realign(const AStartIndex: integer);
+{*********************************************************************************}
+procedure TALDynamicListBox.TView.TMainContent.Realign(const AStartIndex: integer);
 begin
   if IsDestroying then
     Exit;
@@ -1900,52 +1972,63 @@ begin
   DoRealign(AStartIndex);
 end;
 
-{****************************************************}
-procedure TALDynamicListBoxViewMainContent.AdjustSize;
+{********************************************************}
+procedure TALDynamicListBox.TView.TMainContent.AdjustSize;
 begin
   If Owner <> nil then begin
-    var LLastActiveItem: TALDynamicListBoxItem := Owner.FindLastActiveItem;
+    var LLastActiveItem: TItem := Owner.FindLastActiveItem;
     if LLastActiveItem <> nil then begin
-      if Owner.Orientation = TOrientation.Horizontal then Width := LLastActiveItem.Left + LLastActiveItem.Width + LLastActiveItem.Margins.Right
-      else Height := LLastActiveItem.Top + LLastActiveItem.height + LLastActiveItem.Margins.bottom
+      if Owner.Orientation = TOrientation.Horizontal then begin
+        var LWidth: Double := LLastActiveItem.Left + LLastActiveItem.Width + LLastActiveItem.Margins.Right;
+        if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = 0) then LWidth := LWidth + Owner.FLoadMoreIndicator.width + Owner.FLoadMoreIndicator.Margins.Left + Owner.FLoadMoreIndicator.Margins.right
+        else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LWidth := LWidth + Owner.FLoadMoreRetryButton.width + Owner.FLoadMoreRetryButton.Margins.Left + Owner.FLoadMoreRetryButton.Margins.right;
+        Width := LWidth;
+      end
+      else begin
+        var LHeight: Double := LLastActiveItem.Top + LLastActiveItem.height + LLastActiveItem.Margins.bottom;
+        if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = 0) then LHeight := LHeight + Owner.FLoadMoreIndicator.Height + Owner.FLoadMoreIndicator.Margins.Top + Owner.FLoadMoreIndicator.Margins.Bottom
+        else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LHeight := LHeight + Owner.FLoadMoreRetryButton.Height + Owner.FLoadMoreRetryButton.Margins.Top + Owner.FLoadMoreRetryButton.Margins.Bottom;
+        Height := LHeight;
+      end;
     end;
+    Owner.SetViewportPosition(Owner.ViewportPosition);
   end;
 end;
 
-{****************************************************************************}
-function TALDynamicListBoxViewMainContent.GetFirstVisibleObjectIndex: Integer;
+{********************************************************************************}
+function TALDynamicListBox.TView.TMainContent.GetFirstVisibleObjectIndex: Integer;
 begin
   if Owner <> nil then Result := Owner.FFirstVisibleItemIndex
   else Result := Inherited;
 end;
 
-{***************************************************************************}
-function TALDynamicListBoxViewMainContent.GetLastVisibleObjectIndex: Integer;
+{*******************************************************************************}
+function TALDynamicListBox.TView.TMainContent.GetLastVisibleObjectIndex: Integer;
 begin
   if Owner <> nil then Result := Owner.FLastVisibleItemIndex
   else Result := Inherited;
 end;
 
-{*******************************************************************}
-function TALDynamicListBoxViewMainContent.PaintChildrenOnly: boolean;
+{***********************************************************************}
+function TALDynamicListBox.TView.TMainContent.PaintChildrenOnly: boolean;
 begin
   Result := True;
 end;
 
-{********************************************************************}
-function TALDynamicListBoxViewContent.GetOwner: TALDynamicListBoxView;
+{********************************************************}
+function TALDynamicListBox.TView.TContent.GetOwner: TView;
 begin
-  Result := TALDynamicListBoxView(inherited Owner);
+  Result := TView(inherited Owner);
 end;
 
-{**********************************************************************************}
-procedure TALDynamicListBoxViewContent.SetOwner(const Value: TALDynamicListBoxView);
+{**********************************************************************}
+procedure TALDynamicListBox.TView.TContent.SetOwner(const Value: TView);
 begin
   inherited Owner := Value;
 end;
 
-{**********************************************************************************************}
-constructor TALDynamicListBoxViewSurroundingContent.Create(const AOwner: TALDynamicListBoxItem);
+{**********************************************************************************}
+constructor TALDynamicListBox.TView.TSurroundingContent.Create(const AOwner: TItem);
 begin
   inherited;
   Autosize := False;
@@ -1955,16 +2038,16 @@ begin
   FShowWithNoItemsContent := True;
 end;
 
-{*********************************************************************************************}
-constructor TALDynamicListBoxViewForegroundContent.Create(const AOwner: TALDynamicListBoxItem);
+{*********************************************************************************}
+constructor TALDynamicListBox.TView.TForegroundContent.Create(const AOwner: TItem);
 begin
   inherited;
   FShowWithLoadingContent := False;
   FShowWithErrorContent := False;
 end;
 
-{**********************************************************************************}
-constructor TALDynamicListBoxViewTopBar.Create(const AOwner: TALDynamicListBoxItem);
+{**********************************************************************}
+constructor TALDynamicListBox.TView.TTopBar.Create(const AOwner: TItem);
 begin
   inherited;
   FhidesOnScroll := true;
@@ -1972,8 +2055,8 @@ begin
   FShowWithErrorContent := False;
 end;
 
-{***************************************************}
-procedure TALDynamicListBoxViewTopBar.VisibleChanged;
+{*******************************************************}
+procedure TALDynamicListBox.TView.TTopBar.VisibleChanged;
 begin
   inherited;
   if visible and (Owner <> nil) then begin
@@ -1982,8 +2065,8 @@ begin
   end;
 end;
 
-{*************************************************************************************}
-constructor TALDynamicListBoxViewBottomBar.Create(const AOwner: TALDynamicListBoxItem);
+{*************************************************************************}
+constructor TALDynamicListBox.TView.TBottomBar.Create(const AOwner: TItem);
 begin
   inherited;
   FhidesOnScroll := true;
@@ -1991,8 +2074,8 @@ begin
   FShowWithErrorContent := False;
 end;
 
-{******************************************************}
-procedure TALDynamicListBoxViewBottomBar.VisibleChanged;
+{**********************************************************}
+procedure TALDynamicListBox.TView.TBottomBar.VisibleChanged;
 begin
   inherited;
   if visible and (Owner <> nil) then begin
@@ -2001,8 +2084,67 @@ begin
   end;
 end;
 
+{******************************************************************************************}
+constructor TALDynamicListBox.TView.TBasePullToRefreshIndicator.Create(const AOwner: TItem);
+begin
+  inherited;
+  FPullThreshold := 24;
+  FPullProgress := 0;
+  FCanTriggerRefresh := False;
+  FIsRefreshing := False;
+end;
+
 {**************************************************************************************************}
-constructor TALDynamicListBoxView.TDownloadItemsContext.Create(const AOwner: TALDynamicListBoxView);
+procedure TALDynamicListBox.TView.TBasePullToRefreshIndicator.SetPullProgress(const AValue: Single);
+begin
+  FPullProgress := AValue;
+end;
+
+{***************************************************************************************************}
+procedure TALDynamicListBox.TView.TBasePullToRefreshIndicator.SetIsRefreshing(const AValue: Boolean);
+begin
+  FIsRefreshing := AValue;
+end;
+
+{**************************************************************************************}
+constructor TALDynamicListBox.TView.TPullToRefreshIndicator.Create(const AOwner: TItem);
+begin
+  inherited;
+  XRadius := -50;
+  YRadius := -50;
+  FPullingPhaseAniIndicator := TALDynamicAniIndicator.Create(self);
+  FPullingPhaseAniIndicator.Align := TALAlignLayout.Client;
+  FPullingPhaseAniIndicator.Animation.Enabled := False;
+  FRefreshingPhaseAniIndicator := TALDynamicAniIndicator.Create(self);
+  FRefreshingPhaseAniIndicator.Align := TALAlignLayout.Client;
+  FRefreshingPhaseAniIndicator.Visible := False;
+  FRefreshingPhaseAniIndicator.Animation.InterpolationType := TALInterpolationType.Linear;
+  FRefreshingPhaseAniIndicator.Animation.Enabled := True;
+end;
+
+{******************************************************************************}
+function TALDynamicListBox.TView.TPullToRefreshIndicator.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(40, 40);
+end;
+
+{***********************************************************************************************}
+procedure TALDynamicListBox.TView.TPullToRefreshIndicator.SetIsRefreshing(const AValue: Boolean);
+begin
+  inherited;
+  FPullingPhaseAniIndicator.Visible := not IsRefreshing;
+  FRefreshingPhaseAniIndicator.Visible := IsRefreshing;
+end;
+
+{*********************************************************************************************}
+procedure TALDynamicListBox.TView.TPullToRefreshIndicator.SetPullProgress(const Value: Single);
+begin
+  inherited;
+  _TALFloatAnimationProtectedAccess(FPullingPhaseAniIndicator.Animation).FCurrentValue := PullProgress / 5;
+end;
+
+{************************************************************************************}
+constructor TALDynamicListBox.TView.TDownloadItemsContext.Create(const AOwner: TView);
 begin
   inherited Create(AOwner);
   ItemIdType := AOwner.FItemIdType;
@@ -2018,21 +2160,21 @@ begin
   FOnDownloadItemData := AOwner.OnDownloadItemData;
 end;
 
-{*************************************************************}
-destructor TALDynamicListBoxView.TDownloadItemsContext.Destroy;
+{***************************************************************}
+destructor TALDynamicListBox.TView.TDownloadItemsContext.Destroy;
 begin
   ALFreeAndNil(CustomParams);
   inherited Destroy;
 end;
 
-{***********************************************************************************}
-function TALDynamicListBoxView.TDownloadItemsContext.GetOwner: TALDynamicListBoxView;
+{*********************************************************************}
+function TALDynamicListBox.TView.TDownloadItemsContext.GetOwner: TView;
 begin
-  Result := TALDynamicListBoxView(FOwner);
+  Result := TView(FOwner);
 end;
 
-{********************************************************************************************************************************}
-constructor TALDynamicListBoxView.TContentBuilderContext.Create(const AOwner: TALDynamicListBoxView; const AContentType: Integer);
+{******************************************************************************************************************}
+constructor TALDynamicListBox.TView.TContentBuilderContext.Create(const AOwner: TView; const AContentType: Integer);
 begin
   inherited create(AOwner, AContentType);
   //-
@@ -2075,8 +2217,8 @@ begin
   else OnCreateLoadMoreRetryButton := nil;
 end;
 
-{**************************************************************}
-destructor TALDynamicListBoxView.TContentBuilderContext.Destroy;
+{****************************************************************}
+destructor TALDynamicListBox.TView.TContentBuilderContext.Destroy;
 begin
   ALFreeAndNil(NewBackgroundContent);
   ALFreeAndNil(NewForegroundContent);
@@ -2090,16 +2232,16 @@ end;
 
 {**************}
 // [MultiThread]
-function TALDynamicListBoxView.TContentBuilderContext.GetContentAlign(const AContentType: Integer): TALAlignLayout;
+function TALDynamicListBox.TView.TContentBuilderContext.GetContentAlign(const AContentType: Integer): TALAlignLayout;
 begin
   case AContentType of
     BackgroundContentType,
-    ForegroundContentType: begin
+    ForegroundContentType,
+    PullToRefreshIndicatorContentType: begin
       Result := TALAlignLayout.None;
     end;
     TopBarContentType,
     BottomBarContentType,
-    PullToRefreshIndicatorContentType,
     LoadMoreIndicatorContentType,
     LoadMoreRetryButtonContentType: begin
       If (FParentViewOrientation = TOrientation.Horizontal) then Result := TALAlignLayout.Vertical
@@ -2123,7 +2265,7 @@ end;
 
 {**************}
 // [MultiThread]
-function TALDynamicListBoxView.TContentBuilderContext.GetCreateContentMethod(const AContentType: Integer): TMethod;
+function TALDynamicListBox.TView.TContentBuilderContext.GetCreateContentMethod(const AContentType: Integer): TMethod;
 begin
   case AContentType of
     NoItemsContentType: Result := TMethod(OnCreateNoItemsContent);
@@ -2138,8 +2280,8 @@ begin
   end;
 end;
 
-{**************************************************************}
-constructor TALDynamicListBoxView.Create(const AOwner: TObject);
+{****************************************************************}
+constructor TALDynamicListBox.TView.Create(const AOwner: TObject);
 begin
   inherited create(AOwner);
   AutoSize := False;
@@ -2157,7 +2299,10 @@ begin
   fScrollCapturedByMe := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   FHandleMouseEvents := False;
+  FSetViewPortPositionGuard := False;
   FMouseDownPos := TPointF.Zero;
+  FRefreshingTimer := nil;
+  FRefreshingView := nil;
   FNoItemsContent := nil;
   FBackgroundContent := nil;
   FForegroundContent := nil;
@@ -2203,41 +2348,46 @@ begin
   FOnCreateLoadMoreRetryButton := nil;
 end;
 
-{***************************************}
-destructor TALDynamicListBoxView.Destroy;
+{*****************************************}
+destructor TALDynamicListBox.TView.Destroy;
 begin
   CancelDownloadItems;
+  ALFreeAndNil(FRefreshingTimer);
+  ALFreeAndNil(FRefreshingView);
   ALFreeAndNil(FUniqueInt64ItemIds);
   ALFreeAndNil(FUniqueTextItemIds);
   ALFreeAndNil(FScrollEngine);
   inherited;
 end;
 
-{************************************************}
-procedure TALDynamicListBoxView.BeforeDestruction;
+{**************************************************}
+procedure TALDynamicListBox.TView.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
   TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  if FscrollEngine.TimerActive then begin
+    FscrollEngine.Stop(true{AAbruptly});
+    ScrollEngineStop(nil);
+  end;
   inherited;
 end;
 
-{*******************************************************}
-function TALDynamicListBoxView.IsReadyToDisplay: Boolean;
+{*****************************************************************************************}
+function TALDynamicListBox.TView.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 begin
   Result := ((FMainContent <> nil) or (FErrorContent <> nil));
   If not result then exit;
   For var I := FirstVisibleItemIndex to LastVisibleItemIndex do begin
-    if FItems^[FirstVisibleItemIndex].FMainContent = nil then
-      Exit(false)
+    if FItems^[i].FMainContent = nil then Exit(false)
     else begin
-      Result := FItems^[FirstVisibleItemIndex].IsReadyToDisplay;
+      Result := FItems^[i].IsReadyToDisplay(AStrict);
       if not result then exit;
     end;
   end;
 end;
 
-{*********************************************************************************}
-procedure TALDynamicListBoxView.DoRemoveControl(const AControl: TALDynamicControl);
+{***********************************************************************************}
+procedure TALDynamicListBox.TView.DoRemoveControl(const AControl: TALDynamicControl);
 begin
   if Acontrol = FNoItemsContent then FNoItemsContent := nil
   else if Acontrol = FBackgroundContent then FBackgroundContent := nil
@@ -2250,8 +2400,20 @@ begin
   inherited;
 end;
 
-{**************************************}
-procedure TALDynamicListBoxView.Prepare;
+{****************************************************************************}
+procedure TALDynamicListBox.TView.SetHost(Const Value: TALDynamicControlHost);
+begin
+  if FHost <> value then begin
+    if (FscrollEngine <> nil) and (FscrollEngine.TimerActive) then begin
+      FscrollEngine.Stop(true{AAbruptly});
+      ScrollEngineStop(nil);
+    end;
+    inherited;
+  end;
+end;
+
+{****************************************}
+procedure TALDynamicListBox.TView.Prepare;
 begin
   inherited;
   // SetViewportPosition will prepare all items
@@ -2263,8 +2425,8 @@ begin
       FItems^[i].Prepare;
 end;
 
-{****************************************}
-procedure TALDynamicListBoxView.Unprepare;
+{******************************************}
+procedure TALDynamicListBox.TView.Unprepare;
 begin
   CancelDownloadItems;
   inherited;
@@ -2273,8 +2435,8 @@ begin
       FItems^[i].Unprepare;
 end;
 
-{******************************************************************************************}
-function TALDynamicListBoxView.GetItemByIndex(Const AIndex: Integer): TALDynamicListBoxItem;
+{****************************************************************************}
+function TALDynamicListBox.TView.GetItemByIndex(Const AIndex: Integer): TItem;
 begin
   if Fitems <> nil then
     result := Fitems^[AIndex]
@@ -2282,20 +2444,20 @@ begin
     raise Exception.Create('Index is out of bounds');
 end;
 
-{*****************************************************************************}
-function TALDynamicListBoxView.GetOnCreateMainContent: TCreateMainContentEvent;
+{*******************************************************************************}
+function TALDynamicListBox.TView.GetOnCreateMainContent: TCreateMainContentEvent;
 begin
   Result := TCreateMainContentEvent(inherited OnCreateMainContent);
 end;
 
-{********************************************************************************************}
-procedure TALDynamicListBoxView.SetOnCreateMainContent(const AValue: TCreateMainContentEvent);
+{**********************************************************************************************}
+procedure TALDynamicListBox.TView.SetOnCreateMainContent(const AValue: TCreateMainContentEvent);
 begin
-  inherited OnCreateMainContent := TALDynamicListBoxItem.TCreateMainContentEvent(AValue);
+  inherited OnCreateMainContent := TItem.TCreateMainContentEvent(AValue);
 end;
 
-{*************************************************************************}
-procedure TALDynamicListBoxView.SetOrientation(const AValue: TOrientation);
+{***************************************************************************}
+procedure TALDynamicListBox.TView.SetOrientation(const AValue: TOrientation);
 begin
   if FOrientation <> AValue then begin
     FOrientation := AValue;
@@ -2304,38 +2466,43 @@ begin
   end;
 end;
 
-{*****************************************************************************************************}
-procedure TALDynamicListBoxView.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
+{*******************************************************************************************************}
+procedure TALDynamicListBox.TView.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.ScrollCapturedByOtherHandler',
   //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
-  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down));
+  //  'ScrollEngine.down: ' + ALBoolToStrW(FScrollEngine.down));
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
     {$IFDEF DEBUG}
     if fScrollCapturedByMe then
       raise Exception.Create('Error 8EA8C349-8441-4D2F-BC5A-872772A40513');
     {$ENDIF}
-    if fScrollEngine.down then begin
-      fScrollEngine.Down := false;
+    if FScrollEngine.down then begin
+      FScrollEngine.Down := false;
       FHandleMouseEvents := False;
     end;
   end;
 end;
 
-{********************************************************************************************************}
-procedure TALDynamicListBoxView.InternalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{**********************************************************************************************************}
+procedure TALDynamicListBox.TView.InternalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.MouseDown',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position: ' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
+    if (FPullToRefreshIndicator <> nil) then begin
+      FPullToRefreshIndicator.CanTriggerRefresh := IsMainView and
+                                                   ScrollEngine.IsVelocityLow and
+                                                   ScrollEngine.ViewportPosition.IsZero;
+    end;
     fMouseDownPos := TpointF.Create(X,Y);
     {$IF (not defined(ALUIAutomationEnabled)) and (defined(ANDROID) or defined(IOS))}
     if form <> nil then
@@ -2346,21 +2513,21 @@ begin
   end;
 end;
 
-{**********************************************************************************}
-procedure TALDynamicListBoxView.InternalMouseMove(Shift: TShiftState; X, Y: Single);
+{************************************************************************************}
+procedure TALDynamicListBox.TView.InternalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.InternalMouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position: ' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if FHandleMouseEvents then begin
     if (not fScrollCapturedByMe) and
-       (fScrollEngine.TouchEnabled) and
-       (((ttHorizontal in fScrollEngine.TouchTracking) and
+       (FScrollEngine.TouchEnabled) and
+       (((ttHorizontal in FScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
          (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop)) or
-        ((ttVertical in fScrollEngine.TouchTracking) and
+        ((ttVertical in FScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.y - y) > abs(fMouseDownPos.x - x)) and
          (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then begin
       {$IFDEF DEBUG}
@@ -2380,13 +2547,13 @@ begin
   end;
 end;
 
-{******************************************************************************************************}
-procedure TALDynamicListBoxView.InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{********************************************************************************************************}
+procedure TALDynamicListBox.TView.InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.InternalMouseUp',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position: ' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
   {$ENDIF}
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     {$IF (not defined(ALUIAutomationEnabled)) and (defined(ANDROID) or defined(IOS))}
@@ -2397,11 +2564,18 @@ begin
     {$ENDIF}
     FScrollCapturedByMe := False;
     FHandleMouseEvents := False;
+    if (FPullToRefreshIndicator <> nil) then begin
+      if (FPullToRefreshIndicator.CanTriggerRefresh) and
+         (FPullToRefreshIndicator.PullProgress > 1) then begin
+        FPullToRefreshIndicator.IsRefreshing := True;
+        Refresh;
+      end;
+    end;
   end;
 end;
 
-{*************************************************}
-procedure TALDynamicListBoxView.InternalMouseLeave;
+{***************************************************}
+procedure TALDynamicListBox.TView.InternalMouseLeave;
 begin
   {$IFDEF DEBUG}
   //ALLog(ClassName + '.InternalMouseLeave');
@@ -2413,36 +2587,36 @@ begin
   end;
 end;
 
-{************************************************************************************************}
-procedure TALDynamicListBoxView.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{**************************************************************************************************}
+procedure TALDynamicListBox.TView.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   InternalMouseDown(Button, Shift, X, Y);
 end;
 
-{**************************************************************************}
-procedure TALDynamicListBoxView.MouseMove(Shift: TShiftState; X, Y: Single);
+{****************************************************************************}
+procedure TALDynamicListBox.TView.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   InternalMouseMove(Shift, X, Y);
   inherited;
 end;
 
-{**********************************************************************************************}
-procedure TALDynamicListBoxView.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{************************************************************************************************}
+procedure TALDynamicListBox.TView.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   InternalMouseUp(Button, Shift, X, Y);
 end;
 
-{*****************************************}
-procedure TALDynamicListBoxView.MouseLeave;
+{*******************************************}
+procedure TALDynamicListBox.TView.MouseLeave;
 begin
   inherited;
   InternalMouseLeave;
 end;
 
-{********************************************************************************************************}
-procedure TALDynamicListBoxView.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
+{**********************************************************************************************************}
+procedure TALDynamicListBox.TView.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
 begin
   inherited;
   if (not Handled) and (FMainContent <> nil) then begin
@@ -2466,8 +2640,8 @@ begin
   end;
 end;
 
-{******************************************************************************************************************************************}
-procedure TALDynamicListBoxView.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{********************************************************************************************************************************************}
+procedure TALDynamicListBox.TView.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then _TALDynamicControlProtectedAccess(AObject).capture;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
@@ -2475,16 +2649,16 @@ begin
   inherited;
 end;
 
-{********************************************************************************************************************}
-procedure TALDynamicListBoxView.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
+{**********************************************************************************************************************}
+procedure TALDynamicListBox.TView.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
 begin
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   InternalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
 
-{****************************************************************************************************************************************}
-procedure TALDynamicListBoxView.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{******************************************************************************************************************************************}
+procedure TALDynamicListBox.TView.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then _TALDynamicControlProtectedAccess(aObject).releasecapture;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
@@ -2492,15 +2666,15 @@ begin
   inherited;
 end;
 
-{***********************************************************************************}
-procedure TALDynamicListBoxView.ChildrenMouseLeave(const AObject: TALDynamicControl);
+{*************************************************************************************}
+procedure TALDynamicListBox.TView.ChildrenMouseLeave(const AObject: TALDynamicControl);
 begin
   InternalMouseLeave;
   inherited;
 end;
 
-{*******************************************************************}
-procedure TALDynamicListBoxView.ScrollEngineChanged(Sender: TObject);
+{*********************************************************************}
+procedure TALDynamicListBox.TView.ScrollEngineChanged(Sender: TObject);
 begin
   {$IFDEF DEBUG}
   //ALLog(Classname+'.ScrollEngineChanged');
@@ -2508,8 +2682,8 @@ begin
   SetViewportPosition(ScrollEngine.ViewportPosition);
 end;
 
-{*****************************************************************}
-procedure TALDynamicListBoxView.ScrollEngineStart(Sender: TObject);
+{*******************************************************************}
+procedure TALDynamicListBox.TView.ScrollEngineStart(Sender: TObject);
 begin
   {$IFDEF DEBUG}
   ALLog(Classname+'.ScrollEngineStart');
@@ -2518,8 +2692,8 @@ begin
     inc(Host.FActiveScrollEnginesCount);
 end;
 
-{****************************************************************}
-procedure TALDynamicListBoxView.ScrollEngineStop(Sender: TObject);
+{******************************************************************}
+procedure TALDynamicListBox.TView.ScrollEngineStop(Sender: TObject);
 begin
   {$IFDEF DEBUG}
   ALLog(Classname+'.ScrollEngineStop');
@@ -2531,10 +2705,17 @@ begin
       Raise Exception.Create('Error E277A8CF-210A-4C0F-8427-C0FF34C470FE');
     {$ENDIF}
   end;
+
+  if (FRefreshingTimer <> nil) and (not FRefreshingTimer.Enabled) and (FRefreshingView <> nil) then begin
+    Host.HitTest := True;
+    var LRefreshingView := FRefreshingView;
+    FRefreshingView := nil;
+    Host.MainView := LRefreshingView;
+  end;
 end;
 
-{*******************************************************}
-procedure TALDynamicListBoxView.UpdateScrollEngineLimits;
+{*********************************************************}
+procedure TALDynamicListBox.TView.UpdateScrollEngineLimits;
 begin
   ScrollEngine.MinScrollLimit := TALPointD.Create(0,0);
   if FMainContent = nil then ScrollEngine.MaxScrollLimit := TALPointD.Create(0,0)
@@ -2542,8 +2723,8 @@ begin
   else ScrollEngine.MaxScrollLimit := TALPointD.Create(0, max(0,FMainContent.Height - height));
 end;
 
-{****************************************************************}
-function TALDynamicListBoxView.FindFirstVisibleItemIndex: integer;
+{******************************************************************}
+function TALDynamicListBox.TView.FindFirstVisibleItemIndex: integer;
 begin
 
   //
@@ -2617,8 +2798,8 @@ begin
 
 end;
 
-{***************************************************************}
-function TALDynamicListBoxView.FindLastVisibleItemIndex: integer;
+{*****************************************************************}
+function TALDynamicListBox.TView.FindLastVisibleItemIndex: integer;
 begin
 
   //
@@ -2692,8 +2873,8 @@ begin
 
 end;
 
-{***********************************************************************}
-function TALDynamicListBoxView.FindLastActiveItem: TALDynamicListBoxItem;
+{*********************************************************}
+function TALDynamicListBox.TView.FindLastActiveItem: TItem;
 begin
   Result := nil;
   if (Fitems <> nil) then
@@ -2704,8 +2885,8 @@ begin
       end;
 end;
 
-{********************************************************************}
-procedure TALDynamicListBoxView.PaintInternal(const ACanvas: TCanvas);
+{**********************************************************************}
+procedure TALDynamicListBox.TView.PaintInternal(const ACanvas: TCanvas);
 begin
   {$IFDEF DEBUG}
   LogFPS;
@@ -2715,7 +2896,7 @@ end;
 
 {************}
 {$IFDEF DEBUG}
-procedure TALDynamicListBoxView.LogFPS;
+procedure TALDynamicListBox.TView.LogFPS;
 begin
 
   if not ScrollEngine.TouchEnabled then exit;
@@ -2763,201 +2944,540 @@ begin
 end;
 {$ENDIF}
 
-{************************************************************}
-function TALDynamicListBoxView.GetViewportPosition: TALPointD;
+{**************************************************************}
+function TALDynamicListBox.TView.GetViewportPosition: TALPointD;
 begin
   If FMainContent = nil then Result := TALPointD.create(0,0)
   else Result := TALPointD.create(-FMainContent.left, -FMainContent.top);
 end;
 
-{***************************************************************************}
-procedure TALDynamicListBoxView.SetViewportPosition(const AValue: TALPointD);
+{*****************************************************************************}
+procedure TALDynamicListBox.TView.SetViewportPosition(const AValue: TALPointD);
 begin
-
-  {$REGION 'Update MainContent position'}
-  if FItems = nil then exit;
-  var LOldViewportPosition := TALPointD.Create(-FMainContent.Left, -FMainContent.Top);
-  FMainContent.SetPosition(-AValue);
-  {$ENDREGION}
-
-  {$REGION 'Update FScrollDirection'}
-  If Orientation = TOrientation.Horizontal then begin
-    var LCompareValue := CompareValue(LOldViewportPosition.X, AValue.X, TEpsilon.Position);
-    if LCompareValue < 0 then FScrollDirection := TScrollDirection.FromBeginToEnd
-    else if LCompareValue > 0 then FScrollDirection := TScrollDirection.FromEndToBegin;
-  end
-  else begin
-    var LCompareValue := CompareValue(LOldViewportPosition.Y, AValue.Y, TEpsilon.Position);
-    if LCompareValue < 0 then FScrollDirection := TScrollDirection.FromBeginToEnd
-    else if LCompareValue > 0 then FScrollDirection := TScrollDirection.FromEndToBegin;
-  end;
-  {$ENDREGION}
-
-  {$REGION 'calculate FFirstVisibleItemIndex/FLastVisibleItemIndex'}
-  FFirstVisibleItemIndex := FindFirstVisibleItemIndex;
-  FLastVisibleItemIndex := FindLastVisibleItemIndex;
-  {$ENDREGION}
-
-  {$REGION 'calculate FFirstPreloadedItemIndex/FLastPreloadedItemIndex'}
-  var LOldFirstPreloadedItemIndex := FFirstPreloadedItemIndex;
-  var LOldLastPreloadedItemIndex := FLastPreloadedItemIndex;
-  FFirstPreloadedItemIndex := Max(Low(FItems^){0 if empty}, FFirstVisibleItemIndex - PreloadItemCount);
-  FLastPreloadedItemIndex := Min(High(FItems^){-1 if empty}, FFirstVisibleItemIndex + PreloadItemCount);
-
-  // Consistency check only in debug
-  {$IF defined(DEBUG)}
-  if (LOldFirstPreloadedItemIndex < Low(FItems^)) or
-     (LOldLastPreloadedItemIndex > High(FItems^)) or
-     (FFirstPreloadedItemIndex < Low(FItems^)) or
-     (FLastPreloadedItemIndex > High(FItems^)) then
-    raise Exception.Create('Error FD682464-DBB8-4D50-B31F-F8AEFCEBBA15');
+  {$IF defined(debug)}
+  if TThread.Current.ThreadID <> MainThreadID then raise exception.Create('Error 0EF7A7EC-1662-48EE-8C75-41BCDB1D96D7');
   {$ENDIF}
-  {$ENDREGION}
+  if (TNonReentrantHelper.EnterSection(FSetViewportPositionGuard)) then begin
+    Try
 
-  {$REGION 'offset preload'}
+      var LPrevDisableAlign := FDisableAlign;
+      FDisableAlign := True;
+      Try
 
-  //
-  // (A)   LOldLastPreloadedItemIndex
-  // (A)   | LOldFirstPreloadedItemIndex
-  //       | |
-  // (B)   | |               | LOldFirstPreloadedItemIndex
-  // (B)   | |               |         | LOldLastPreloadedItemIndex
-  //       | |               |---------|
-  //      -1 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-  // (1)                   7 |---------| 14
-  // (2)                        10 |-----------| 18
-  // (3)                     8 |-----| 13
-  // (4)                 6 |---| 10
-  // (5)           3 |-------| 9
-  // (6)                            12 |---| 16
-  // (7)  -1 |-| 2
-  // (8)                                    16 |-----| 21
-  // (9)  -1 | 1
-  // (10)                                         19 | 21
-  //
+        {$REGION 'Update MainContent position'}
+        if FItems = nil then exit;
+        var LOldViewportPosition := TALPointD.Create(-FMainContent.Left, -FMainContent.Top);
+        FMainContent.SetPosition(-AValue);
+        {$ENDREGION}
 
-  // Delete drawables that get out of the scope on the left
-  // ----->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  // FItems is empty: for I := 0 to -1
-  // (A1) for i := 0 to 7      (B1) for i := 8 to 7
-  // (A2) for i := 0 to 10     (B2) for i := 8 to 10
-  // (A3) for i := 0 to 8      (B3) for i := 8 to 8
-  // (A4) for i := 0 to 6      (B4) for i := 8 to 6
-  // (A5) for i := 0 to 3      (B5) for i := 8 to 3
-  // (A6) for i := 0 to 12     (B6) for i := 8 to 12
-  // (A7) for i := 0 to -1     (B7) for i := 8 to -1
-  // (A8) for i := 0 to 16     (B8) for i := 8 to 16
-  // (A9) for i := 0 to -1     (B9) for i := 8 to -1
-  // (A10) for i := 0 to 19    (B10) for i := 8 to 19
-  for var I := Max(Low(FItems^){0 if empty}, LOldFirstPreloadedItemIndex) to Min(High(FItems^){-1 if empty}, FFirstPreloadedItemIndex - 1) do
-    FItems^[i].Unprepare;
+        {$REGION 'Update FScrollDirection'}
+        If Orientation = TOrientation.Horizontal then begin
+          var LCompareValue := CompareValue(LOldViewportPosition.X, AValue.X, TEpsilon.Position);
+          if LCompareValue < 0 then FScrollDirection := TScrollDirection.FromBeginToEnd
+          else if LCompareValue > 0 then FScrollDirection := TScrollDirection.FromEndToBegin;
+        end
+        else begin
+          var LCompareValue := CompareValue(LOldViewportPosition.Y, AValue.Y, TEpsilon.Position);
+          if LCompareValue < 0 then FScrollDirection := TScrollDirection.FromBeginToEnd
+          else if LCompareValue > 0 then FScrollDirection := TScrollDirection.FromEndToBegin;
+        end;
+        {$ENDREGION}
 
-  // Delete drawables that get out of the scope on the right
-  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----
-  // FItems is empty: for I := -1 downto 0
-  // (A1) for i := -1 downto 14     (B1) for i := 13 downto 14
-  // (A2) for i := -1 downto 18     (B2) for i := 13 downto 18
-  // (A3) for i := -1 downto 13     (B3) for i := 13 downto 13
-  // (A4) for i := -1 downto 10     (B4) for i := 13 downto 10
-  // (A5) for i := -1 downto 9      (B5) for i := 13 downto 9
-  // (A6) for i := -1 downto 16     (B6) for i := 13 downto 16
-  // (A7) for i := -1 downto 2      (B7) for i := 13 downto 2
-  // (A8) for i := -1 downto 21     (B8) for i := 13 downto 21
-  // (A9) for i := -1 downto 1      (B9) for i := 13 downto 1
-  // (A10) for i := -1 downto 21    (B10) for i := 13 downto 21
-  for var I := Min(High(FItems^){-1 if empty}, LOldLastPreloadedItemIndex) downto Max(Low(FItems^){0 if empty}, FLastPreloadedItemIndex + 1) do
-    FItems^[i].Unprepare;
+        {$REGION 'calculate FFirstVisibleItemIndex/FLastVisibleItemIndex'}
+        FFirstVisibleItemIndex := FindFirstVisibleItemIndex;
+        FLastVisibleItemIndex := FindLastVisibleItemIndex;
+        {$ENDREGION}
 
-  // Add drawabled that enter in the scope on the right
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+++++
-  // (A1) for i := 8 to -1      (B1) for i := 8 to 7
-  // (A2) for i := 11 to -1     (B2) for i := 11 to 7
-  // (A3) for i := 9 to -1      (B3) for i := 9 to 7
-  // (A4) for i := 7 to -1      (B4) for i := 7 to 7
-  // (A5) for i := 4 to -1      (B5) for i := 4 to 7
-  // (A6) for i := 13 to -1     (B6) for i := 13 to 7
-  // (A7) for i := 0 to -1      (B7) for i := 0 to 1
-  // (A8) for i := 17 to -1     (B8) for i := 17 to 7
-  // (A9) for i := 0 to -1      (B9) for i := 0 to 0
-  // (A10) for i := 20 to -1    (B10) for i := 20 to 7
-  for var I := Max(Low(FItems^){0 if empty}, FFirstPreloadedItemIndex) to MinIntValue([High(FItems^){-1 if empty}, FLastPreloadedItemIndex, LoldFirstPreloadedItemIndex - 1]) do
-    FItems^[i].prepare;
+        {$REGION 'calculate FFirstPreloadedItemIndex/FLastPreloadedItemIndex'}
+        var LOldFirstPreloadedItemIndex := FFirstPreloadedItemIndex;
+        var LOldLastPreloadedItemIndex := FLastPreloadedItemIndex;
+        FFirstPreloadedItemIndex := Max(Low(FItems^){0 if empty}, FFirstVisibleItemIndex - PreloadItemCount);
+        FLastPreloadedItemIndex := Min(High(FItems^){-1 if empty}, FFirstVisibleItemIndex + PreloadItemCount);
 
-  // Add drawables that enter in the scope on the left
-  // +++++<<<<<<<<>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  // (A1) for i := 13 downto 8      (B1) for i := 13 downto 14
-  // (A2) for i := 17 downto 11     (B2) for i := 17 downto 14
-  // (A3) for i := 12 downto 9      (B3) for i := 12 downto 14
-  // (A4) for i := 9 downto 7       (B4) for i := 9 downto 14
-  // (A5) for i := 8 downto 4       (B5) for i := 8 downto 14
-  // (A6) for i := 15 downto 13     (B6) for i := 15 downto 14
-  // (A7) for i := 1 downto 0       (B7) for i := 1 downto 14
-  // (A8) for i := 20 downto 17     (B8) for i := 20 downto 17
-  // (A9) for i := 0 downto 0       (B9) for i := 0 downto 14
-  // (A10) for i := 20 downto 20    (B10) for i := 20 downto 20
-  for var I := Min(High(FItems^){-1 if empty}, FLastPreloadedItemIndex) downto MaxIntValue([Low(FItems^){0 if empty}, FFirstPreloadedItemIndex, LoldLastPreloadedItemIndex + 1]) do
-    FItems^[i].prepare;
+        // Consistency check only in debug
+        {$IF defined(DEBUG)}
+        if (LOldFirstPreloadedItemIndex < Low(FItems^)) or
+           (LOldLastPreloadedItemIndex > High(FItems^)) or
+           (FFirstPreloadedItemIndex < Low(FItems^)) or
+           (FLastPreloadedItemIndex > High(FItems^)) then
+          raise Exception.Create('Error FD682464-DBB8-4D50-B31F-F8AEFCEBBA15');
+        {$ENDIF}
+        {$ENDREGION}
 
-  {$ENDREGION}
+        {$REGION 'offset preload'}
 
-  {$REGION 'Handle TopBar with HidesOnScroll'}
-  if (FTopBar <> nil) and (FTopBar.HidesOnScroll) then begin
-    If Orientation = TOrientation.horizontal then begin
-      if (aValue.x > Fscrollengine.MinScrollLimit.x) and (aValue.x < Fscrollengine.MaxScrollLimit.x) then begin
-        if aValue.x - LOldViewportPosition.x > 0 then FTopBar.top := max(-FTopBar.Height, FTopBar.top - (aValue.x - LOldViewportPosition.x))
-        else FTopBar.top := min(0, FTopBar.top + (LOldViewportPosition.x - aValue.x));
-      end;
-    end
-    else begin
-      if (aValue.y > Fscrollengine.MinScrollLimit.y) and (aValue.y < Fscrollengine.MaxScrollLimit.y) then begin
-        if aValue.y - LOldViewportPosition.y > 0 then FTopBar.top := max(-FTopBar.Height, FTopBar.top - (aValue.y - LOldViewportPosition.y))
-        else FTopBar.top := min(0, FTopBar.top + (LOldViewportPosition.y - aValue.y));
-      end;
-    end;
+        //
+        // (A)   LOldLastPreloadedItemIndex
+        // (A)   | LOldFirstPreloadedItemIndex
+        //       | |
+        // (B)   | |               | LOldFirstPreloadedItemIndex
+        // (B)   | |               |         | LOldLastPreloadedItemIndex
+        //       | |               |---------|
+        //      -1 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+        // (1)                   7 |---------| 14
+        // (2)                        10 |-----------| 18
+        // (3)                     8 |-----| 13
+        // (4)                 6 |---| 10
+        // (5)           3 |-------| 9
+        // (6)                            12 |---| 16
+        // (7)  -1 |-| 2
+        // (8)                                    16 |-----| 21
+        // (9)  -1 | 1
+        // (10)                                         19 | 21
+        //
+
+        // Delete drawables that get out of the scope on the left
+        // ----->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        // FItems is empty: for I := 0 to -1
+        // (A1) for i := 0 to 7      (B1) for i := 8 to 7
+        // (A2) for i := 0 to 10     (B2) for i := 8 to 10
+        // (A3) for i := 0 to 8      (B3) for i := 8 to 8
+        // (A4) for i := 0 to 6      (B4) for i := 8 to 6
+        // (A5) for i := 0 to 3      (B5) for i := 8 to 3
+        // (A6) for i := 0 to 12     (B6) for i := 8 to 12
+        // (A7) for i := 0 to -1     (B7) for i := 8 to -1
+        // (A8) for i := 0 to 16     (B8) for i := 8 to 16
+        // (A9) for i := 0 to -1     (B9) for i := 8 to -1
+        // (A10) for i := 0 to 19    (B10) for i := 8 to 19
+        for var I := Max(Low(FItems^){0 if empty}, LOldFirstPreloadedItemIndex) to Min(High(FItems^){-1 if empty}, FFirstPreloadedItemIndex - 1) do
+          FItems^[i].Unprepare;
+
+        // Delete drawables that get out of the scope on the right
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-----
+        // FItems is empty: for I := -1 downto 0
+        // (A1) for i := -1 downto 14     (B1) for i := 13 downto 14
+        // (A2) for i := -1 downto 18     (B2) for i := 13 downto 18
+        // (A3) for i := -1 downto 13     (B3) for i := 13 downto 13
+        // (A4) for i := -1 downto 10     (B4) for i := 13 downto 10
+        // (A5) for i := -1 downto 9      (B5) for i := 13 downto 9
+        // (A6) for i := -1 downto 16     (B6) for i := 13 downto 16
+        // (A7) for i := -1 downto 2      (B7) for i := 13 downto 2
+        // (A8) for i := -1 downto 21     (B8) for i := 13 downto 21
+        // (A9) for i := -1 downto 1      (B9) for i := 13 downto 1
+        // (A10) for i := -1 downto 21    (B10) for i := 13 downto 21
+        for var I := Min(High(FItems^){-1 if empty}, LOldLastPreloadedItemIndex) downto Max(Low(FItems^){0 if empty}, FLastPreloadedItemIndex + 1) do
+          FItems^[i].Unprepare;
+
+        // Add drawabled that enter in the scope on the right
+        // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>+++++
+        // (A1) for i := 8 to -1      (B1) for i := 8 to 7
+        // (A2) for i := 11 to -1     (B2) for i := 11 to 7
+        // (A3) for i := 9 to -1      (B3) for i := 9 to 7
+        // (A4) for i := 7 to -1      (B4) for i := 7 to 7
+        // (A5) for i := 4 to -1      (B5) for i := 4 to 7
+        // (A6) for i := 13 to -1     (B6) for i := 13 to 7
+        // (A7) for i := 0 to -1      (B7) for i := 0 to 1
+        // (A8) for i := 17 to -1     (B8) for i := 17 to 7
+        // (A9) for i := 0 to -1      (B9) for i := 0 to 0
+        // (A10) for i := 20 to -1    (B10) for i := 20 to 7
+        for var I := Max(Low(FItems^){0 if empty}, FFirstPreloadedItemIndex) to MinIntValue([High(FItems^){-1 if empty}, FLastPreloadedItemIndex, LoldFirstPreloadedItemIndex - 1]) do
+          FItems^[i].prepare;
+
+        // Add drawables that enter in the scope on the left
+        // +++++<<<<<<<<>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        // (A1) for i := 13 downto 8      (B1) for i := 13 downto 14
+        // (A2) for i := 17 downto 11     (B2) for i := 17 downto 14
+        // (A3) for i := 12 downto 9      (B3) for i := 12 downto 14
+        // (A4) for i := 9 downto 7       (B4) for i := 9 downto 14
+        // (A5) for i := 8 downto 4       (B5) for i := 8 downto 14
+        // (A6) for i := 15 downto 13     (B6) for i := 15 downto 14
+        // (A7) for i := 1 downto 0       (B7) for i := 1 downto 14
+        // (A8) for i := 20 downto 17     (B8) for i := 20 downto 17
+        // (A9) for i := 0 downto 0       (B9) for i := 0 downto 14
+        // (A10) for i := 20 downto 20    (B10) for i := 20 downto 20
+        for var I := Min(High(FItems^){-1 if empty}, FLastPreloadedItemIndex) downto MaxIntValue([Low(FItems^){0 if empty}, FFirstPreloadedItemIndex, LoldLastPreloadedItemIndex + 1]) do
+          FItems^[i].prepare;
+
+        {$ENDREGION}
+
+        {$REGION 'Handle TopBar with HidesOnScroll'}
+        if (FTopBar <> nil) and (FTopBar.HidesOnScroll) then begin
+
+          // (*) When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
+          // Example from TALScrollEngine.DoMouseUp:
+          //   LMaxY := Trunc(FMaxScrollLimit.y * ALScreenScale);
+          // This is by design and reflects how the scroll engine works
+
+          If Orientation = TOrientation.horizontal then begin
+
+            // In the overscroll-at-left zone
+            if CompareValue(aValue.X, 0, TEpsilon.Position) <= 0 then begin
+              FTopBar.Visible := true;
+              FTopBar.Left := 0;
+            end
+
+            // Scrolling up (from right to left) — hide the top bar
+            else if aValue.X - LOldViewportPosition.X > 0 then begin
+              // Not in the overscroll-at-left zone
+              if (aValue.X > FScrollEngine.MinScrollLimit.X + 1{*}) then begin
+                var LLeft: Double := max(-FTopBar.Width, FTopBar.Left - (aValue.X - LOldViewportPosition.X));
+                if LLeft < -FTopBar.Width + TEpsilon.Position then begin
+                  FTopBar.Visible := False;
+                  FTopBar.Left := -FTopBar.Width;
+                end
+                else begin
+                  FTopBar.Visible := True;
+                  FTopBar.Left := LLeft;
+                end;
+              end
+              // In the overscroll-at-left zone
+              // force the top bar to be visible
+              else begin
+                FTopBar.Visible := true;
+                FTopBar.Left := 0;
+              end;
+            end
+
+            // Scrolling down (from left to right) — show the top bar
+            else begin
+              // Not in the overscroll-at-right zone
+              if (aValue.X < FScrollEngine.MaxScrollLimit.X - 1{*}) then begin
+                var LLeft: Double := min(0, FTopBar.Left + (LOldViewportPosition.X - aValue.X));
+                if LLeft < -FTopBar.Width + TEpsilon.Position then begin
+                  FTopBar.Visible := False;
+                  FTopBar.Left := -FTopBar.Width;
+                end
+                else begin
+                  FTopBar.Visible := True;
+                  FTopBar.Left := LLeft;
+                end;
+              end
+              // In the overscroll-at-right zone
+              // force the top bar to be hidden
+              else begin
+                FTopBar.Visible := false;
+                FTopBar.Left := -FTopBar.Width;
+              end;
+            end;
+
+          end
+          else begin
+
+            // In the overscroll-at-top zone
+            if CompareValue(aValue.Y, 0, TEpsilon.Position) <= 0 then begin
+              FTopBar.Visible := True;
+              FTopBar.top := 0;
+            end
+
+            // Scrolling up (from bottom to top) — hide the top bar
+            else if aValue.Y - LOldViewportPosition.Y > 0 then begin
+              // Not in the overscroll-at-top zone
+              if (aValue.Y > FScrollEngine.MinScrollLimit.Y + 1{*}) then begin
+                var LTop: Double := max(-FTopBar.Height, FTopBar.top - (aValue.Y - LOldViewportPosition.Y));
+                if LTop < -FTopBar.Height + TEpsilon.Position then begin
+                  FTopBar.Visible := False;
+                  FTopBar.top := -FTopBar.Height;
+                end
+                else begin
+                  FTopBar.Visible := True;
+                  FTopBar.top := LTop;
+                end;
+              end
+              // In the overscroll-at-top zone
+              // force the top bar to be visible
+              else begin
+                FTopBar.Visible := true;
+                FTopBar.top := 0;
+              end;
+            end
+
+            // Scrolling down (from top to bottom) — show the top bar
+            else begin
+              // Not in the overscroll-at-bottom zone
+              if (aValue.Y < FScrollEngine.MaxScrollLimit.Y - 1{*}) then begin
+                var LTop: Double := min(0, FTopBar.top + (LOldViewportPosition.Y - aValue.Y));
+                if LTop < -FTopBar.Height + TEpsilon.Position then begin
+                  FTopBar.Visible := False;
+                  FTopBar.top := -FTopBar.Height;
+                end
+                else begin
+                  FTopBar.Visible := True;
+                  FTopBar.top := LTop;
+                end;
+              end
+              // In the overscroll-at-bottom zone
+              // force the top bar to be hidden
+              else begin
+                FTopBar.Visible := false;
+                FTopBar.top := -FTopBar.Height;
+              end;
+            end;
+
+          end;
+
+        end;
+        {$ENDREGION}
+
+        {$REGION 'Handle BottomBar with HidesOnScroll'}
+        if (FBottomBar <> nil) and (FBottomBar.HidesOnScroll) then begin
+
+          // (*) When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
+          // Example from TALScrollEngine.DoMouseUp:
+          //   LMaxY := Trunc(FMaxScrollLimit.y * ALScreenScale);
+          // This is by design and reflects how the scroll engine works
+
+          If Orientation = TOrientation.horizontal then begin
+
+            // In the overscroll-at-left zone
+            if CompareValue(aValue.X, 0, TEpsilon.Position) <= 0 then begin
+              FBottomBar.Visible := true;
+              FBottomBar.Left := Width - FBottomBar.Width;
+            end
+
+            // Scrolling up (from right to left) — hide the bottom bar
+            else if aValue.X - LOldViewportPosition.X > 0 then begin
+              // Not in the overscroll-at-left zone
+              if (aValue.X > FScrollEngine.MinScrollLimit.X + 1{*}) then begin
+                var LLeft: Double := min(Width, FBottomBar.Left + (aValue.X - LOldViewportPosition.X));
+                if LLeft > Width - TEpsilon.Position then begin
+                  FBottomBar.Visible := False;
+                  FBottomBar.Left := Width;
+                end
+                else begin
+                  FBottomBar.Visible := True;
+                  FBottomBar.Left := LLeft;
+                end;
+              end
+              // In the overscroll-at-left zone
+              // force the bottom bar to be visible
+              else begin
+                FBottomBar.Visible := true;
+                FBottomBar.Left := Width - FBottomBar.Width;
+              end;
+            end
+
+            // Scrolling down (from left to right) — show the bottom bar
+            else begin
+              // Not in the overscroll-at-right zone
+              if (aValue.X < FScrollEngine.MaxScrollLimit.X - 1{*}) then begin
+                var LLeft: Double := max(Width - FBottomBar.Width, FBottomBar.Left - (LOldViewportPosition.X - aValue.X));
+                if LLeft > Width - TEpsilon.Position then begin
+                  FBottomBar.Visible := False;
+                  FBottomBar.Left := Width;
+                end
+                else begin
+                  FBottomBar.Visible := True;
+                  FBottomBar.Left := LLeft;
+                end;
+              end
+              // In the overscroll-at-right zone
+              // force the bottom bar to be hidden
+              else begin
+                FBottomBar.Visible := false;
+                FBottomBar.Left := Width;
+              end;
+            end;
+
+          end
+          else begin
+
+            // In the overscroll-at-top zone
+            if CompareValue(aValue.Y, 0, TEpsilon.Position) <= 0 then begin
+              FBottomBar.Visible := true;
+              FBottomBar.top := Height - FBottomBar.Height;
+            end
+
+            // Scrolling up (from bottom to top) — hide the bottom bar
+            else if aValue.Y - LOldViewportPosition.Y > 0 then begin
+              // Not in the overscroll-at-top zone
+              if (aValue.Y > FScrollEngine.MinScrollLimit.Y + 1{*}) then begin
+                var LTop: Double := min(Height, FBottomBar.top + (aValue.Y - LOldViewportPosition.Y));
+                if LTop > Height - TEpsilon.Position then begin
+                  FBottomBar.Visible := False;
+                  FBottomBar.top := Height;
+                end
+                else begin
+                  FBottomBar.Visible := True;
+                  FBottomBar.top := LTop;
+                end;
+              end
+              // In the overscroll-at-top zone
+              // force the bottom bar to be visible
+              else begin
+                FBottomBar.Visible := true;
+                FBottomBar.top := Height - FBottomBar.Height;
+              end;
+            end
+
+            // Scrolling down (from top to bottom) — show the bottom bar
+            else begin
+              // Not in the overscroll-at-bottom zone
+              if (aValue.Y < FScrollEngine.MaxScrollLimit.Y - 1{*}) then begin
+                var LTop: Double := max(Height - FBottomBar.Height, FBottomBar.top - (LOldViewportPosition.Y - aValue.Y));
+                if LTop > Height - TEpsilon.Position then begin
+                  FBottomBar.Visible := False;
+                  FBottomBar.top := Height;
+                end
+                else begin
+                  FBottomBar.Visible := True;
+                  FBottomBar.top := LTop;
+                end;
+              end
+              // In the overscroll-at-bottom zone
+              // force the bottom bar to be hidden
+              else begin
+                FBottomBar.Visible := false;
+                FBottomBar.top := Height;
+              end;
+            end;
+
+          end;
+
+        end;
+        {$ENDREGION}
+
+        {$REGION 'Handle FPullToRefreshIndicator'}
+        if (FPullToRefreshIndicator <> nil) then begin
+
+          // (*) When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
+          // Example from TALScrollEngine.DoMouseUp:
+          //   LMaxY := Trunc(FMaxScrollLimit.y * ALScreenScale);
+          // This is by design and reflects how the scroll engine works
+
+          If Orientation = TOrientation.horizontal then begin
+
+            // Calculate LEdgeOffset
+            var LEdgeOffset: Single;
+            If (FTopBar <> nil) and (FTopBar.Visible) then LEdgeOffset := FTopBar.Left + FTopBar.Width
+            else LEdgeOffset := 0;
+
+            // IsRefreshing
+            if FPullToRefreshIndicator.IsRefreshing then begin
+              FPullToRefreshIndicator.Visible := True;
+              FPullToRefreshIndicator.SetPosition(max(LEdgeOffset + FPullToRefreshIndicator.PullThreshold, min(FPullToRefreshIndicator.Left, LEdgeOffset - (aValue.Y*1.5) - FPullToRefreshIndicator.Width)), (Height - FPullToRefreshIndicator.Height) / 2);
+            end
+
+            // not IsRefreshing
+            else begin
+
+              // In the overscroll-at-left zone
+              if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) then begin
+                FPullToRefreshIndicator.Visible := True;
+                FPullToRefreshIndicator.SetPosition(LEdgeOffset - (aValue.Y*1.5) - FPullToRefreshIndicator.Width, (Height - FPullToRefreshIndicator.Height) / 2);
+                FPullToRefreshIndicator.SetPullProgress((FPullToRefreshIndicator.Left - LEdgeOffset) / FPullToRefreshIndicator.PullThreshold);
+              end
+              // Not in the overscroll-at-left zone
+              // force the PullToRefreshIndicator to be hidden
+              else
+                FPullToRefreshIndicator.Visible := false;
+
+            end;
+
+          end
+          else begin
+
+            // Calculate LEdgeOffset
+            var LEdgeOffset: Single;
+            If (FTopBar <> nil) and (FTopBar.Visible) then LEdgeOffset := FTopBar.top + FTopBar.Height
+            else LEdgeOffset := 0;
+
+            // IsRefreshing
+            if FPullToRefreshIndicator.IsRefreshing then begin
+              FPullToRefreshIndicator.Visible := True;
+              FPullToRefreshIndicator.SetPosition((Width - FPullToRefreshIndicator.Width) / 2,  max(LEdgeOffset + FPullToRefreshIndicator.PullThreshold, min(FPullToRefreshIndicator.top, LEdgeOffset - (aValue.Y*1.5) - FPullToRefreshIndicator.Height)));
+            end
+
+            // not IsRefreshing
+            else begin
+
+              // In the overscroll-at-top zone
+              if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) then begin
+                FPullToRefreshIndicator.Visible := True;
+                FPullToRefreshIndicator.SetPosition((Width - FPullToRefreshIndicator.Width) / 2,  LEdgeOffset - (aValue.Y*1.5) - FPullToRefreshIndicator.Height);
+                FPullToRefreshIndicator.SetPullProgress((FPullToRefreshIndicator.Top - LEdgeOffset) / FPullToRefreshIndicator.PullThreshold);
+              end
+              // Not in the overscroll-at-top zone
+              // force the PullToRefreshIndicator to be hidden
+              else
+                FPullToRefreshIndicator.Visible := false;
+
+            end;
+
+          end;
+
+        end;
+        {$ENDREGION}
+
+        {$REGION 'Handle FLoadMoreIndicator'}
+        if (FLoadMoreIndicator <> nil) then begin
+          If (FMainContent <> nil) and (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0) then begin
+            If Orientation = TOrientation.horizontal then begin
+              var LLeft: Double := FMainContent.Width - AValue.X - FLoadMoreIndicator.Width - FLoadMoreIndicator.Margins.Right;
+              if LLeft > Width then FLoadMoreIndicator.Visible := False
+              else begin
+                FLoadMoreIndicator.Visible := True;
+                FLoadMoreIndicator.Left := LLeft;
+              end;
+            end
+            else begin
+              var LTop: Double := FMainContent.Height - AValue.Y - FLoadMoreIndicator.Height - FLoadMoreIndicator.Margins.Bottom;
+              if LTop > Height then FLoadMoreIndicator.Visible := False
+              else begin
+                FLoadMoreIndicator.Visible := True;
+                FLoadMoreIndicator.top := LTop;
+              end;
+            end;
+          end
+          else FLoadMoreIndicator.Visible := False;
+        end;
+        {$ENDREGION}
+
+        {$REGION 'Handle FLoadMoreRetryButton'}
+        if (FLoadMoreRetryButton <> nil) then begin
+          If (FMainContent <> nil) and (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0) then begin
+            If Orientation = TOrientation.horizontal then begin
+              var LLeft: Double := FMainContent.Width - AValue.X - FLoadMoreRetryButton.Width - FLoadMoreRetryButton.Margins.Right;
+              if LLeft > Width then FLoadMoreRetryButton.Visible := False
+              else begin
+                FLoadMoreRetryButton.Visible := True;
+                FLoadMoreRetryButton.Left := LLeft;
+              end;
+            end
+            else begin
+              var LTop: Double := FMainContent.Height - AValue.Y - FLoadMoreRetryButton.Height - FLoadMoreRetryButton.Margins.Bottom;
+              if LTop > Height then FLoadMoreRetryButton.Visible := False
+              else begin
+                FLoadMoreRetryButton.Visible := True;
+                FLoadMoreRetryButton.top := LTop;
+              end;
+            end;
+          end
+          else FLoadMoreRetryButton.Visible := False;
+        end;
+        {$ENDREGION}
+
+        {$REGION 'DownloadItems'}
+        DownloadItems;
+        {$ENDREGION}
+
+        {$REGION 'repaint'}
+        Repaint;
+        {$ENDREGION}
+
+      Finally
+        FDisableAlign := LPrevDisableAlign;
+      End;
+
+    finally
+      TNonReentrantHelper.LeaveSection(FSetViewportPositionGuard);
+    End;
   end;
-  {$ENDREGION}
-
-  {$REGION 'Handle BottomBar with HidesOnScroll'}
-  if (FBottomBar <> nil) and (FBottomBar.HidesOnScroll) then begin
-    If Orientation = TOrientation.horizontal then begin
-      if (aValue.x > Fscrollengine.MinScrollLimit.x) and (aValue.x < Fscrollengine.MaxScrollLimit.x) then begin
-        if aValue.x - LOldViewportPosition.x > 0 then FBottomBar.top := min(Height, FBottomBar.top + (aValue.x - LOldViewportPosition.x))
-        else FBottomBar.top := max(Height - FBottomBar.Height, FBottomBar.top - (LOldViewportPosition.x - aValue.x));
-      end;
-    end
-    else begin
-      if (aValue.y > Fscrollengine.MinScrollLimit.y) and (aValue.y < Fscrollengine.MaxScrollLimit.y) then begin
-        if aValue.y - LOldViewportPosition.y > 0 then FBottomBar.top := min(Height, FBottomBar.top + (aValue.y - LOldViewportPosition.y))
-        else FBottomBar.top := max(Height - FBottomBar.Height, FBottomBar.top - (LOldViewportPosition.y - aValue.y));
-      end;
-    end;
-  end;
-  {$ENDREGION}
-
-  {$REGION 'DownloadItems'}
-  DownloadItems;
-  {$ENDREGION}
-
-  {$REGION 'repaint'}
-  Repaint;
-  {$ENDREGION}
-
-end;
-
-{******************************************}
-procedure TALDynamicListBoxView.LockItemIds;
-begin
-  Tmonitor.enter(FUniqueInt64ItemIds);
 end;
 
 {********************************************}
-procedure TALDynamicListBoxView.UnLockItemIds;
+procedure TALDynamicListBox.TView.LockItemIds;
 begin
-  Tmonitor.exit(FUniqueInt64ItemIds);
+  ALMonitorEnter(FUniqueInt64ItemIds{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.LockItemIds'{$ENDIF});
 end;
 
-{******************************************************************************************}
-function  TALDynamicListBoxView.DownloadItems(const AForceReload: Boolean = False): boolean;
+{**********************************************}
+procedure TALDynamicListBox.TView.UnLockItemIds;
+begin
+  ALMonitorExit(FUniqueInt64ItemIds);
+end;
+
+{*******************************************************************************************}
+function TALDynamicListBox.TView.DownloadItems(const AForceReload: Boolean = False): boolean;
 begin
 
   // Exit if the last download resulted in an error, unless AForceReload is True
@@ -2973,7 +3493,7 @@ begin
 
   // Before starting the background thread
   {$IFDEF DEBUG}
-  ALLog(ClassName+'.DownloadItems', 'ForceReload:' + ALBoolToStrW(AForceReload));
+  ALLog(ClassName+'.DownloadItems', 'ForceReload: ' + ALBoolToStrW(AForceReload));
   {$ENDIF}
   FDownloadItemsErrorCode := 0;
 
@@ -2994,14 +3514,79 @@ begin
 
 end;
 
-{*******************************************************************************}
-function TALDynamicListBoxView.CreateDownloadItemsContext: TDownloadItemsContext;
+{***********************************************************}
+function TALDynamicListBox.TView.RetryDownloadItems: boolean;
+begin
+  result := DownloadItems(true{AForceReload});
+  if result then SetViewportPosition(ViewportPosition);
+end;
+
+{****************************************}
+procedure TALDynamicListBox.TView.Refresh;
+begin
+  if not IsMainView then
+    Raise Exception.Create('Only the main view can be refreshed.');
+  if FRefreshingView <> nil then exit;
+  FRefreshingView := Host.CreateMainView;
+  FRefreshingView.Prepare;
+  if FRefreshingTimer = nil then begin
+    FRefreshingTimer := TALDisplayTimer.Create;
+    FRefreshingTimer.Interval := 0.2;
+    FRefreshingTimer.OnProcess := RefreshingTimerProcess;
+    FRefreshingTimer.Enabled := True;
+  end;
+end;
+
+{************************************************************************}
+procedure TALDynamicListBox.TView.RefreshingTimerProcess(Sender: TObject);
+begin
+  {$If defined(DEBUG)}
+  if FRefreshingView = nil then
+    Raise Exception.Create('Error EE277FA4-FC66-410F-B853-0A6AA2F04F3A');
+  {$ENDIf}
+  if (not Host.Pressed) and
+     (not FScrollEngine.Down) and
+     (not TALDialogManager.Instance.IsShowingDialog) and
+     (FRefreshingView.IsReadyToDisplay(True{AStrict})) then begin
+
+    FRefreshingTimer.Enabled := False;
+
+    if Host.MainView.scrollengine.ViewportPosition.EqualsTo(TALPointD.Zero, TEpsilon.Position) then begin
+      var LRefreshingView := FRefreshingView;
+      FRefreshingView := nil;
+      Host.MainView := LRefreshingView;
+    end
+    else begin
+      var LDelta: double;
+      If (Orientation = TOrientation.Horizontal) then LDelta := abs(Host.MainView.scrollengine.ViewportPosition.x)
+      else LDelta := abs(Host.MainView.scrollengine.ViewportPosition.y);
+
+      var LDuration: integer := min(500, round(LDelta / 5{pixels per ms}));
+      {$If defined(DEBUG)}
+      ALLog(ClassName+'.RefreshingTimerProcess', 'Duration: ' + ALintToStrW(LDuration));
+      {$ENDIf}
+
+      Host.HitTest := False;
+
+      Host.MainView.scrollengine.startScroll(
+        Host.MainView.scrollengine.ViewportPosition.x,// startX: Double;
+        Host.MainView.scrollengine.ViewportPosition.y, // startY: Double;
+        -Host.MainView.scrollengine.ViewportPosition.x, // dx: Double;
+        -Host.MainView.scrollengine.ViewportPosition.y, // dy: Double;
+        LDuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
+    end;
+
+  end;
+end;
+
+{*********************************************************************************}
+function TALDynamicListBox.TView.CreateDownloadItemsContext: TDownloadItemsContext;
 begin
   Result := TDownloadItemsContext.Create(Self);
 end;
 
-{***************************************************************************************}
-class procedure TALDynamicListBoxView.DownloadItemsBackgroundProc(var AContext: Tobject);
+{*****************************************************************************************}
+class procedure TALDynamicListBox.TView.DownloadItemsBackgroundProc(var AContext: Tobject);
 begin
   var LContext := TDownloadItemsContext(AContext);
   if LContext.FOwner = nil then exit;
@@ -3009,7 +3594,7 @@ begin
 
     var LData: TALJSONNodeW := nil;
     var LFreeItems := True;
-    var LItems: TArray<TALDynamicListBoxItem> := nil;
+    var LItems: TArray<TItem> := nil;
     Try
 
       var LDownloadItemsErrorCode: Integer := 0;
@@ -3052,15 +3637,15 @@ begin
 
   Except
     On E: Exception do begin
-      ALLog('TALDynamicListBoxView.DownloadItemsBackgroundProc', E);
-      TMonitor.Enter(LContext.FLock);
+      ALLog('TALDynamicListBox.TView.DownloadItemsBackgroundProc', E);
+      ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProc'{$ENDIF});
       try
         if LContext.FOwner <> nil then begin
           LContext.FFreeByThread := False;
           AContext := nil; // AContext will be free by CancelDownloadItems
         end;
       finally
-        TMonitor.Exit(LContext.FLock);
+        ALMonitorExit(LContext.FLock);
       end;
     end;
   end;
@@ -3068,48 +3653,52 @@ end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxView.DownloadItemsBackgroundProcFetchData(
+class procedure TALDynamicListBox.TView.DownloadItemsBackgroundProcFetchData(
                   const AContext: TDownloadItemsContext;
                   out AData: TALJSONNodeW;
                   var AErrorCode: Integer);
 begin
-  Tmonitor.Enter(AContext.FLock);
-  Try
-    if AContext.FOwner = nil then exit;
-    if not assigned(AContext.FOnDownloadItems) then
-      Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
-    //var LMethod: TMethod;
-    //LMethod.Code := TMethod(AContext.FOnDownloadItems).Code;
-    // Set Self to nil to prevent accidental access to instance members,
-    // as we are in a multithreaded context where most members are not thread-safe.
-    // Self can still be accessed via AContext.Owner, but this should be done with caution.
-    //LMethod.Data := nil;
-    if AContext.PaginationToken = #0 then
-      AContext.PaginationToken := '';
-    //TDownloadItemsEvent(LMethod)(
-    //  AContext, // const AContext: TDownloadItemsContext;
-    //  AData, // Const AData: TALJSONNodeW;
-    //  AContext.PaginationToken, // var APaginationToken: String;
-    //  AErrorCode); // var AErrorCode: Integer
-    AContext.FOnDownloadItems(
-      AContext, // const AContext: TDownloadItemsContext;
-      AData, // Const AData: TALJSONNodeW;
-      AContext.PaginationToken, // var APaginationToken: String;
-      AErrorCode); // var AErrorCode: Integer
-  finally
-    Tmonitor.Exit(AContext.FLock);
-  End;
+
+  // We cannot call ALMonitorEnter(AContext.FLock) here because
+  // AContext.FOnDownloadItems performs a long HTTP request.
+  // In the meantime, CancelDownloadItems might be called, and it
+  // also needs to acquire the same lock to set AContext.FOwner to nil.
+  // Therefore, it's the responsibility of FOnDownloadItems to call
+  // ALMonitorEnter(AContext.FLock) if it needs to access AContext.FOwner.
+
+  if AContext.FOwner = nil then exit;
+  if not assigned(AContext.FOnDownloadItems) then
+    Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
+  //var LMethod: TMethod;
+  //LMethod.Code := TMethod(AContext.FOnDownloadItems).Code;
+  // Set Self to nil to prevent accidental access to instance members,
+  // as we are in a multithreaded context where most members are not thread-safe.
+  // Self can still be accessed via AContext.Owner, but this should be done with caution.
+  //LMethod.Data := nil;
+  if AContext.PaginationToken = #0 then
+    AContext.PaginationToken := '';
+  //TDownloadItemsEvent(LMethod)(
+  //  AContext, // const AContext: TDownloadItemsContext;
+  //  AData, // Const AData: TALJSONNodeW;
+  //  AContext.PaginationToken, // var APaginationToken: String;
+  //  AErrorCode); // var AErrorCode: Integer
+  AContext.FOnDownloadItems(
+    AContext, // const AContext: TDownloadItemsContext;
+    AData, // Const AData: TALJSONNodeW;
+    AContext.PaginationToken, // var APaginationToken: String;
+    AErrorCode); // var AErrorCode: Integer
+
 end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxView.DownloadItemsBackgroundProcCreateItems(
+class procedure TALDynamicListBox.TView.DownloadItemsBackgroundProcCreateItems(
                   const AContext: TDownloadItemsContext;
                   const AErrorCode: Integer;
                   const AData: TALJSONNodeW;
-                  out AItems: TArray<TALDynamicListBoxItem>);
+                  out AItems: TArray<TItem>);
 begin
-  TMonitor.Enter(AContext.FLock);
+  ALMonitorEnter(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProcCreateItems'{$ENDIF});
   try
 
     // Exit
@@ -3166,7 +3755,7 @@ begin
       var LData := AData.ChildNodes.Extract(I);
       LData.ChildNodes.SetSorted(true{Value},true{recurse});
       LData.MultiThreadPrepare(true{aOnlyChildList});
-      var LItem: TALDynamicListBoxItem;
+      var LItem: TItem;
       If assigned(AContext.FOnCreateItem) then begin
         //var LMethod: TMethod;
         //LMethod.Code := TMethod(AContext.FOnCreateItem).Code;
@@ -3182,7 +3771,7 @@ begin
                    LData); // Const AData: TALJSONNodeW;
       end
       else begin
-        LItem := TALDynamicListBoxItem.Create(nil);
+        LItem := TItem.Create(nil);
         LItem.OnCreateMainContent := AContext.FOnCreateItemMainContent;
         LItem.OnCreateLoadingContent := AContext.FOnCreateItemLoadingContent;
         LItem.OnCreateErrorContent := AContext.FOnCreateItemErrorContent;
@@ -3194,34 +3783,34 @@ begin
     end;
 
   finally
-    TMonitor.Exit(AContext.FLock);
+    ALMonitorExit(AContext.FLock);
   end;
 end;
 
 {**************}
 // [MultiThread]
-class function TALDynamicListBoxView.DownloadItemsBackgroundProcCanProcessItems(const AContext: TDownloadItemsContext): boolean; // [MultiThread]
+class function TALDynamicListBox.TView.DownloadItemsBackgroundProcCanProcessItems(const AContext: TDownloadItemsContext): boolean; // [MultiThread]
 begin
   if TThread.Current.ThreadID = MainThreadID then exit(true);
-  TMonitor.Enter(AContext.FLock);
+  ALMonitorEnter(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProcCanProcessItems'{$ENDIF});
   try
     // Primarily because we want to prevent the list
     // from being updated during the bottom-bound animation.
-    var LOwner := TALDynamicListBoxView(AContext.FOwner);
+    var LOwner := TView(AContext.FOwner);
     result := (LOwner = nil) or
               (LOwner.Host = nil) or
               ((not LOwner.IsPreloadingContent) and
                (not LOwner.Host.HasActiveScrollEngines));
   finally
-    TMonitor.Exit(AContext.FLock);
+    ALMonitorExit(AContext.FLock);
   end;
 end;
 
-{********************************************************}
-procedure TALDynamicListBoxView.DownloadItemsProcessItems(
+{**********************************************************}
+procedure TALDynamicListBox.TView.DownloadItemsProcessItems(
             const AContext: TDownloadItemsContext;
             const AErrorCode: Integer;
-            var AItems: TArray<TALDynamicListBoxItem>);
+            var AItems: TArray<TItem>);
 begin
   FDownloadItemsErrorCode := AErrorCode;
   if FDownloadItemsErrorCode = 0 then begin
@@ -3243,7 +3832,7 @@ begin
 
       // Add the items
       if (length(AItems) > 0) then begin
-        TALDynamicListBoxViewMainContent(FMainContent).InsertItems(AItems, Maxint);
+        TMainContent(FMainContent).InsertItems(AItems, Maxint);
         FTriggerDownloadItemsAtIndex := High(FItems^) - (length(AItems) div 3);
         AItems := nil;
       end;
@@ -3261,28 +3850,36 @@ begin
   end;
 end;
 
-{****************************************************}
-procedure TALDynamicListBoxView.DownloadItemsFinished;
+{******************************************************}
+procedure TALDynamicListBox.TView.DownloadItemsFinished;
 begin
-  if FDownloadItemsErrorCode <> 0 then Host.ShowErrorMessageBanner(FDownloadItemsErrorCode)
-  else SetViewportPosition(ViewportPosition);
+  if FDownloadItemsErrorCode <> 0 then begin
+    // Adjust size to accommodate the retry button
+    // and to show the retry button (SetViewportPosition is
+    // called inside AdjustSize);
+    if FMainContent <> nil then FMainContent.AdjustSize;
+    if Host <> nil then
+      Host.ShowErrorMessageBanner(FDownloadItemsErrorCode);
+  end
+  else
+    SetViewportPosition(ViewportPosition);
 end;
 
-{*******************************************************}
-function TALDynamicListBoxView.CanDownloadItems: Boolean;
+{*********************************************************}
+function TALDynamicListBox.TView.CanDownloadItems: Boolean;
 begin
   Result := (FLastVisibleItemIndex >= FTriggerDownloadItemsAtIndex) and
             (FPaginationToken <> '');
 end;
 
-{*************************************************************}
-function TALDynamicListBoxView.IsDownloadItemsRunning: Boolean;
+{***************************************************************}
+function TALDynamicListBox.TView.IsDownloadItemsRunning: Boolean;
 begin
   result := FDownloadItemsContext <> nil;
 end;
 
-{**************************************************}
-procedure TALDynamicListBoxView.CancelDownloadItems;
+{****************************************************}
+procedure TALDynamicListBox.TView.CancelDownloadItems;
 begin
   // The FDownloadItemsContext pointer can only be
   // updated in the main thread, so there is no need
@@ -3290,28 +3887,28 @@ begin
   if FDownloadItemsContext <> nil then begin
     var LContextToFree: TDownloadItemsContext;
     var LLock := FDownloadItemsContext.FLock;
-    TMonitor.Enter(LLock);
+    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.CancelDownloadItems'{$ENDIF});
     try
       if not FDownloadItemsContext.FFreeByThread then LContextToFree := FDownloadItemsContext
       else LContextToFree := nil;
       FDownloadItemsContext.FOwner := nil;
       FDownloadItemsContext := nil;
     Finally
-      TMonitor.Exit(LLock);
+      ALMonitorExit(LLock);
     End;
     ALFreeAndNil(LContextToFree);
   end;
 end;
 
-{*************************************************}
-function TALDynamicListBoxView.IsMainView: Boolean;
+{***************************************************}
+function TALDynamicListBox.TView.IsMainView: Boolean;
 begin
   Result := (Host <> nil) and
             (Host.MainView = Self)
 end;
 
-{************************************************************************************}
-function TALDynamicListBoxView.CanCreateContent(const AContentType: Integer): Boolean;
+{**************************************************************************************}
+function TALDynamicListBox.TView.CanCreateContent(const AContentType: Integer): Boolean;
 begin
   case AContentType of
     0{surrounding content}: Result := False;
@@ -3331,17 +3928,18 @@ begin
             ((FLoadMoreRetryButton = nil) and assigned(FOnCreateLoadMoreRetryButton));
 end;
 
-{************************************************************************************************************************************}
-function TALDynamicListBoxView.CreateContentBuilderContext(const AContentType: Integer): TALDynamicListBoxItem.TContentBuilderContext;
+{**********************************************************************************************************************}
+function TALDynamicListBox.TView.CreateContentBuilderContext(const AContentType: Integer): TItem.TContentBuilderContext;
 begin
-  Result := TALDynamicListBoxView.TContentBuilderContext.Create(Self, AContentType);
+  Result := TView.TContentBuilderContext.Create(Self, AContentType);
 end;
 
 {**************}
 // [MultiThread]
-class procedure TALDynamicListBoxView.CreateContextContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext);
+class procedure TALDynamicListBox.TView.CreateContextContent(const AContext: TItem.TContentBuilderContext);
 begin
-  Inherited CreateContextContent(AContext);
+  if AContext.FContentType <> 0{surrounding content} then
+    Inherited CreateContextContent(AContext);
   var LContext := TContentBuilderContext(AContext);
   {$IF defined(debug)}
   if (LContext.NewBackgroundContent <> nil) or
@@ -3362,42 +3960,43 @@ begin
   If assigned(LContext.OnCreateLoadMoreRetryButton) then LContext.NewLoadMoreRetryButton := CreateContent(LoadMoreRetryButtonContentType, AContext);
 end;
 
-{******************************************************************************************************************************************************}
-function TALDynamicListBoxView.CreateDefaultMainContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext): TALDynamicListBoxItemMainContent;
+{**************************************************************************************************************************}
+function TALDynamicListBox.TView.CreateDefaultMainContent(const AContext: TItem.TContentBuilderContext): TItem.TMainContent;
 begin
-  Result := TALDynamicListBoxViewMainContent.Create(nil);
+  Result := TMainContent.Create(nil);
   Result.SetBoundsRect(AContext.TargetRect);
 end;
 
-{*********************************************************************************************************}
-procedure TALDynamicListBoxView.ShiftContent(const AContext: TALDynamicListBoxItem.TContentBuilderContext);
+{*******************************************************************************************}
+procedure TALDynamicListBox.TView.ShiftContent(const AContext: TItem.TContentBuilderContext);
 begin
   var LContext := TContentBuilderContext(AContext);
-  if LContext.NewBackgroundContent <> nil then DoShiftContent(LContext.NewBackgroundContent, TALDynamicListBoxItemContent(FBackgroundContent));
-  if LContext.NewForegroundContent <> nil then DoShiftContent(LContext.NewForegroundContent, TALDynamicListBoxItemContent(FForegroundContent));
-  if LContext.NewTopBar <> nil then DoShiftContent(LContext.NewTopBar, TALDynamicListBoxItemContent(FTopBar));
-  if LContext.NewBottomBar <> nil then DoShiftContent(LContext.NewBottomBar, TALDynamicListBoxItemContent(FBottomBar));
-  if LContext.NewPullToRefreshIndicator <> nil then DoShiftContent(LContext.NewPullToRefreshIndicator, TALDynamicListBoxItemContent(FPullToRefreshIndicator));
-  if LContext.NewLoadMoreIndicator <> nil then DoShiftContent(LContext.NewLoadMoreIndicator, TALDynamicListBoxItemContent(FLoadMoreIndicator));
-  if LContext.NewLoadMoreRetryButton <> nil then DoShiftContent(LContext.NewLoadMoreRetryButton, TALDynamicListBoxItemContent(FLoadMoreRetryButton));
+  if LContext.NewBackgroundContent <> nil then DoShiftContent(LContext.NewBackgroundContent, TItem.TContent(FBackgroundContent));
+  if LContext.NewForegroundContent <> nil then DoShiftContent(LContext.NewForegroundContent, TItem.TContent(FForegroundContent));
+  if LContext.NewTopBar <> nil then DoShiftContent(LContext.NewTopBar, TItem.TContent(FTopBar));
+  if LContext.NewBottomBar <> nil then DoShiftContent(LContext.NewBottomBar, TItem.TContent(FBottomBar));
+  if LContext.NewPullToRefreshIndicator <> nil then DoShiftContent(LContext.NewPullToRefreshIndicator, TItem.TContent(FPullToRefreshIndicator));
+  if LContext.NewLoadMoreIndicator <> nil then DoShiftContent(LContext.NewLoadMoreIndicator, TItem.TContent(FLoadMoreIndicator));
+  if LContext.NewLoadMoreRetryButton <> nil then DoShiftContent(LContext.NewLoadMoreRetryButton, TItem.TContent(FLoadMoreRetryButton));
   case AContext.FContentType of
+    0{surrounding content}:;
     NoItemsContentType: if LContext.FNewContent <> nil then DoShiftContent(AContext.FNewContent, FNoItemsContent);
     MainContentType: begin
       Inherited;
-      if (IsMainView) and
+      if (IsMainView) and // That mean host <> nil
          (FMainContent <> nil) and
-         (not assigned(TALDynamicListBoxViewMainContent(FMainContent).OnRealign)) then
-        TALDynamicListBoxViewMainContent(FMainContent).OnRealign := Host.OnRealignItems;
+         (not assigned(TMainContent(FMainContent).OnRealign)) then
+        TMainContent(FMainContent).OnRealign := Host.OnRealignItems;
     end
     else inherited;
   end;
 end;
 
-{***************************************************************************}
-procedure TALDynamicListBoxView.ActivateContent(const AContentType: Integer);
+{*****************************************************************************}
+procedure TALDynamicListBox.TView.ActivateContent(const AContentType: Integer);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _HideContent(var AContent: TALDynamicListBoxItemContent);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _HideContent(var AContent: TItem.TContent);
   begin
     if AContent.IsEphemeral then ALFreeAndNil(AContent, true{ADelayed})
     else AContent.Visible := False;
@@ -3423,6 +4022,7 @@ begin
       if FPullToRefreshIndicator <> nil then FPullToRefreshIndicator.Visible := True;
       if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0);
       if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0);
+      SetViewportPosition(ViewportPosition);
     end;
     //--
     LoadingContentType: begin
@@ -3493,13 +4093,13 @@ begin
   if (FLoadMoreIndicator <> nil) then begin inc(LIndex); if FLoadMoreIndicator.Index <> LIndex then MoveControl(FLoadMoreIndicator,LIndex); end;
   if (FLoadMoreRetryButton <> nil) then begin inc(LIndex); if FLoadMoreRetryButton.Index <> LIndex then MoveControl(FLoadMoreRetryButton,LIndex); end;
   if (FForegroundContent <> nil) then begin inc(LIndex); if FForegroundContent.Index <> LIndex then MoveControl(FForegroundContent,LIndex); end;
+  if (FPullToRefreshIndicator <> nil) then begin inc(LIndex); if FPullToRefreshIndicator.Index <> LIndex then MoveControl(FPullToRefreshIndicator,LIndex); end;
   if (FTopBar <> nil) then begin inc(LIndex); if FTopBar.Index <> LIndex then MoveControl(FTopBar,LIndex); end;
   if (FBottomBar <> nil) then begin inc(LIndex); if FBottomBar.Index <> LIndex then MoveControl(FBottomBar,LIndex); end;
-  if (FPullToRefreshIndicator <> nil) then begin inc(LIndex); if FPullToRefreshIndicator.Index <> LIndex then MoveControl(FPullToRefreshIndicator,LIndex); {inc(LIndex);} end;
 end;
 
-{********************************************************************}
-procedure TALDynamicListBoxView.FetchContent(const APreload: boolean);
+{**********************************************************************}
+procedure TALDynamicListBox.TView.FetchContent(const APreload: boolean);
 begin
 
   // If the item is outside the preloaded range, do nothing
@@ -3542,7 +4142,7 @@ end;
 constructor TALDynamicListBox.Create(aOwner: TComponent);
 begin
   inherited create(AOwner);
-  FPreloadItemCount := TALDynamicListBoxView.DefaultPreloadItemCount;
+  FPreloadItemCount := TView.DefaultPreloadItemCount;
   FActiveScrollEnginesCount := 0;
   FDisableMouseWheel := False;
   FHasBeenPrepared := False;
@@ -3574,42 +4174,67 @@ begin
   inherited Destroy;
 end;
 
+{***********************************************}
+function TALDynamicListBox.CreateMainView: TView;
+begin
+  If assigned(OnCreateMainView) then Result := OnCreateMainView(Self)
+  else begin
+    Result := TView.Create(nil);
+    Result.PreloadItemCount := PreloadItemCount;
+    //OnDownloadData
+    //OnCreateMainContent
+    Result.OnCreateLoadingContent := OnCreateLoadingContent;
+    Result.OnCreateErrorContent := OnCreateErrorContent;
+    Result.OnDownloadItems := OnDownloadItems;
+    Result.OnCreateItem := OnCreateItem;
+    Result.OnCreateItemMainContent := OnCreateItemMainContent;
+    Result.OnCreateItemLoadingContent := OnCreateItemLoadingContent;
+    Result.OnCreateItemErrorContent := OnCreateItemErrorContent;
+    Result.OnDownloadItemData := OnDownloadItemData;
+    Result.OnCreateNoItemsContent := OnCreateNoItemsContent;
+    Result.OnCreateBackgroundContent := OnCreateBackgroundContent;
+    Result.OnCreateForegroundContent := OnCreateForegroundContent;
+    Result.OnCreateTopBar := OnCreateTopBar;
+    Result.OnCreateBottomBar := OnCreateBottomBar;
+    Result.OnCreatePullToRefreshIndicator := OnCreatePullToRefreshIndicator;
+    Result.OnCreateLoadMoreIndicator := OnCreateLoadMoreIndicator;
+    Result.OnCreateLoadMoreRetryButton := OnCreateLoadMoreRetryButton;
+  end;
+  {$IF defined(DEBUG)}
+  if (Result.FCacheEngine <> nil) and (Result.FCacheEngine <> CacheEngine) then
+    raise Exception.Create('Error A1847154-423C-4B4E-A8B3-695BB8E8D992');
+  {$ENDIF}
+  Result.FCacheEngine := CacheEngine;
+  Result.Align := TALAlignLayout.Client;
+  Result.SetBounds(0,0,Width,Height);
+end;
+
+{**********************************************************}
+procedure TALDynamicListBox.SetMainView(const Value: TView);
+begin
+  If Value <> FMainView then begin
+    if FMainView <> nil then begin
+      FMainView.SetHost(nil);
+      FMainView.ParentChanged;
+      ALFreeAndNil(FMainView,true{ADelayed});
+    end;
+    FMainView := Value;
+    FMainView.setHost(Self);
+    FMainView.ParentChanged;
+    Repaint;
+  end;
+end;
+
 {**********************************}
 procedure TALDynamicListBox.Prepare;
 begin
   if not FHasBeenPrepared then begin
-    If assigned(OnCreateMainView) then begin
-      FMainView := OnCreateMainView(Self);
-      {$IF defined(DEBUG)}
-      If (FMainView.Host <> self) then
-        Raise Exception.Create('MainView must be created with the ListBox as its owner');
-      {$ENDIF}
-    end
-    else begin
-      FMainView := TALDynamicListBoxView.Create(self);
-      FMainView.PreloadItemCount := PreloadItemCount;
-      //OnDownloadData
-      //OnCreateMainContent
-      FMainView.OnCreateLoadingContent := OnCreateLoadingContent;
-      FMainView.OnCreateErrorContent := OnCreateErrorContent;
-      FMainView.OnDownloadItems := OnDownloadItems;
-      FMainView.OnCreateItem := OnCreateItem;
-      FMainView.OnCreateItemMainContent := OnCreateItemMainContent;
-      FMainView.OnCreateItemLoadingContent := OnCreateItemLoadingContent;
-      FMainView.OnCreateItemErrorContent := OnCreateItemErrorContent;
-      FMainView.OnDownloadItemData := OnDownloadItemData;
-      FMainView.OnCreateNoItemsContent := OnCreateNoItemsContent;
-      FMainView.OnCreateBackgroundContent := OnCreateBackgroundContent;
-      FMainView.OnCreateForegroundContent := OnCreateForegroundContent;
-      FMainView.OnCreateTopBar := OnCreateTopBar;
-      FMainView.OnCreateBottomBar := OnCreateBottomBar;
-      FMainView.OnCreatePullToRefreshIndicator := OnCreatePullToRefreshIndicator;
-      FMainView.OnCreateLoadMoreIndicator := OnCreateLoadMoreIndicator;
-      FMainView.OnCreateLoadMoreRetryButton := OnCreateLoadMoreRetryButton;
-    end;
-    FMainView.Align := TALAlignLayout.Client;
-    FMainView.SetBounds(0,0,Width,Height);
-    FMainView.Prepare;
+    {$IF defined(DEBUG)}
+    If (MainView <> nil) then
+      Raise Exception.Create('Error 5C7E8E31-687F-48D1-9902-3F4BB9DF002E');
+    {$ENDIF}
+    MainView := CreateMainView;
+    MainView.Prepare;
     FHasBeenPrepared := True;
   end;
 end;
@@ -3706,11 +4331,11 @@ initialization
   {$IFDEF DEBUG}
   {$If defined(Android)}
   //https://developer.android.com/media/optimize/performance/frame-rate
-  TALDynamicListBoxView.DisplayDefaultRefreshRate := TAndroidHelper.Display.getRefreshRate;
+  TALDynamicListBox.TView.DisplayDefaultRefreshRate := TAndroidHelper.Display.getRefreshRate;
   {$ELSEIf defined(IOS)}
-  TALDynamicListBoxView.DisplayDefaultRefreshRate := TALUIScreen.Wrap(NSObjectToID(TiOSHelper.MainScreen)).maximumFramesPerSecond;
+  TALDynamicListBox.TView.DisplayDefaultRefreshRate := TALUIScreen.Wrap(NSObjectToID(TiOSHelper.MainScreen)).maximumFramesPerSecond;
   {$ELSE}
-  TALDynamicListBoxView.DisplayDefaultRefreshRate := 60
+  TALDynamicListBox.TView.DisplayDefaultRefreshRate := 60
   {$ENDIF}
   {$ENDIF}
 

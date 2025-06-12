@@ -9,7 +9,6 @@ object Form1: TForm1
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   DesignerMasterStyle = 0
   object MainTabControl: TTabControl
     Align = Client
@@ -31,7 +30,7 @@ object Form1: TForm1
         end>
       TextSettings.Trimming = None
       IsSelected = True
-      Size.Width = 89.000000000000000000
+      Size.Width = 114.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
@@ -51,10 +50,10 @@ object Form1: TForm1
         object TextInterpolationType: TALText
           AutoSize = True
           Position.X = 15.000000000000000000
-          Size.Width = 80.000000000000000000
+          Size.Width = 113.000000000000000000
           Size.Height = 19.000000000000000000
           Size.PlatformDefault = False
-          Text = 'InterpolationType'
+          Text = 'Interpolation Type'
           OnResized = LayoutResized
         end
         object ComboBoxInterpolationType: TComboBox
@@ -72,8 +71,8 @@ object Form1: TForm1
             'Bounce'
             'Custom')
           ItemIndex = 0
-          Position.X = 112.000000000000000000
-          Size.Width = 233.000000000000000000
+          Position.X = 144.000000000000000000
+          Size.Width = 201.000000000000000000
           Size.Height = 22.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 3
@@ -92,10 +91,10 @@ object Form1: TForm1
         object TextInterpolationMode: TALText
           AutoSize = True
           Position.X = 15.000000000000000000
-          Size.Width = 93.000000000000000000
+          Size.Width = 120.000000000000000000
           Size.Height = 19.000000000000000000
           Size.PlatformDefault = False
-          Text = 'InterpolationMode'
+          Text = 'Interpolation Mode'
           OnResized = LayoutResized
         end
         object ComboBoxInterpolationMode: TComboBox
@@ -104,7 +103,7 @@ object Form1: TForm1
             'Out'
             'InOut')
           ItemIndex = 0
-          Position.X = 112.000000000000000000
+          Position.X = 152.000000000000000000
           TabOrder = 4
           OnResized = LayoutResized
         end
@@ -119,18 +118,21 @@ object Form1: TForm1
         TabOrder = 4
         object ButtonStart: TButton
           Position.X = 15.000000000000000000
-          TabOrder = 0
+          TabOrder = 1
           Text = 'Start'
           TextSettings.Trimming = None
           OnClick = ButtonStartClick
           OnResized = LayoutResized
         end
-        object CheckBoxClearGraph: TCheckBox
-          IsChecked = True
-          Position.X = 133.000000000000000000
-          TabOrder = 1
-          Text = 'Clear graph'
-          OnChange = CheckBoxClearGraphChange
+        object ButtonClearGraph: TButton
+          Position.X = 115.000000000000000000
+          Size.Width = 94.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Text = 'Clear Graph'
+          TextSettings.Trimming = None
+          OnClick = ButtonClearGraphClick
           OnResized = LayoutResized
         end
       end

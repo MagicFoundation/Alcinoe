@@ -29,7 +29,6 @@ type
     ALText1_4: TALText;
     ALTextmin1_0: TALText;
     ALTextmin1_4: TALText;
-    CheckBoxClearGraph: TCheckBox;
     LayoutInterpolationMode: TALLayout;
     MainTabControl: TTabControl;
     TabItemInterpolationType: TTabItem;
@@ -48,15 +47,15 @@ type
     LayoutCustomInterpolation: TALLayout;
     TextCustomInterpolation: TALText;
     ComboBoxCustomInterpolation: TComboBox;
+    ButtonClearGraph: TButton;
     procedure ButtonStartClick(Sender: TObject);
     procedure ALFloatPropertyAnimationProcess(Sender: TObject);
     procedure ALFloatPropertyAnimationFirstFrame(Sender: TObject);
     procedure PaintBoxChartPaint(Sender: TObject; Canvas: TCanvas);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure LayoutResized(Sender: TObject);
     function ALFloatPropertyAnimationCustomInterpolation(Sender: TObject): Single;
-    procedure CheckBoxClearGraphChange(Sender: TObject);
+    procedure ButtonClearGraphClick(Sender: TObject);
     procedure LayoutSpringForceMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -64,8 +63,7 @@ type
     procedure ComboBoxInterpolationTypeChange(Sender: TObject);
     procedure ButtonStartTestClick(Sender: TObject);
   private
-    FPoints: Array[TALInterpolationType] of Tlist<Tpointf>;
-    FTestPoints: Array[TALInterpolationType] of Tlist<Tpointf>;
+    FPoints: TArray<TPair<TAlphaColor, Tpointf>>;
     FStartTime: int64;
     FIsDragging: Boolean;
     FOffset: TPointF;  // This will store the offset
@@ -93,24 +91,11 @@ uses
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  for var I := Low(FPoints) to High(FPoints) do
-    FPoints[i] := Tlist<Tpointf>.create;
-  for var I := Low(FTestPoints) to High(FTestPoints) do
-    FTestPoints[i] := Tlist<Tpointf>.create;
   ComboBoxInterpolationType.Items.Clear;
   for var I := Ord(Low(TALInterpolationType)) to Ord(High(TALInterpolationType)) do
     ComboBoxInterpolationType.Items.Add(GetEnumName(TypeInfo(TALInterpolationType), I));
   ComboBoxInterpolationType.ItemIndex := 0;
   LayoutResized(nil);
-end;
-
-{********************************************}
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  for var I := Low(FPoints) to High(FPoints) do
-    AlFreeAndNil(FPoints[i]);
-  for var I := Low(FTestPoints) to High(FTestPoints) do
-    AlFreeAndNil(FTestPoints[i]);
 end;
 
 {***********************************************************************************}
@@ -160,20 +145,19 @@ end;
 {*******************************************************************}
 procedure TForm1.ALFloatPropertyAnimationFirstFrame(Sender: TObject);
 begin
-  FPoints[ALFloatPropertyAnimation.InterpolationType].Add(
-    TpointF.Create(
-      ALElapsedTimeMillisAsInt64 - FStartTime,
-      ALFloatPropertyAnimation.CurrentValue));
-  invalidate;
+
 end;
 
 {****************************************************************}
 procedure TForm1.ALFloatPropertyAnimationProcess(Sender: TObject);
 begin
-  FPoints[ALFloatPropertyAnimation.InterpolationType].Add(
-    TpointF.Create(
-      ALElapsedTimeMillisAsInt64 - FStartTime,
-      ALFloatPropertyAnimation.CurrentValue));
+  var LPair: TPair<TAlphaColor, Tpointf>;
+  Lpair.Key := Cardinal(TALFloatPropertyAnimation(Sender).Tag);
+  Lpair.Value := TpointF.Create(
+                   ALElapsedTimeMillisAsInt64 - FStartTime,
+                   ALFloatPropertyAnimation.CurrentValue);
+  SetLength(FPoints, length(FPoints) + 1);
+  FPoints[high(FPoints)] := Lpair;
   invalidate;
 end;
 
@@ -203,10 +187,10 @@ begin
   TextInterpolationMode.Position.Y := (LayoutInterpolationMode.Height - TextInterpolationMode.Height) / 2;
   ComboBoxInterpolationMode.Position.Y := (LayoutInterpolationMode.Height - ComboBoxInterpolationMode.Height) / 2;
   ComboBoxInterpolationMode.Position.X := textInterpolationMode.position.X + textInterpolationMode.Width + 15;
-  LayoutStart.Height := max(ButtonStart.Height, CheckBoxClearGraph.Height);
+  LayoutStart.Height := max(ButtonStart.Height, ButtonClearGraph.Height);
   ButtonStart.Position.Y := (LayoutStart.Height - ButtonStart.Height) / 2;
-  CheckBoxClearGraph.Position.Y := (LayoutStart.Height - CheckBoxClearGraph.Height) / 2;
-  CheckBoxClearGraph.Position.X := ButtonStart.position.X + ButtonStart.Width + 25;
+  ButtonClearGraph.Position.Y := (LayoutStart.Height - ButtonClearGraph.Height) / 2;
+  ButtonClearGraph.Position.X := ButtonStart.position.X + ButtonStart.Width + 25;
   CircleSpringForce.Position.X := (CircleSpringForce.ParentControl.Width / 2) - (CircleSpringForce.width / 2);
   CircleSpringForce.Position.Y := (CircleSpringForce.ParentControl.Height / 2) - (CircleSpringForce.Height / 2);
   LayoutDampingRatio.Height := max(ComboBoxDampingRatio.Height, TextDampingRatio.Height);
@@ -229,17 +213,79 @@ begin
   ALFloatPropertyAnimation.StopValue := (LayoutBullet.height / 1.4) - (CircleBullet.height / 2);
   ALFloatPropertyAnimation.InterpolationType := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolationType.Items[ComboBoxInterpolationType.ItemIndex]));
   ALFloatPropertyAnimation.InterpolationMode := TALInterpolationMode(GetEnumValue(TypeInfo(TALInterpolationMode), ComboBoxInterpolationMode.Items[ComboBoxInterpolationMode.ItemIndex]));
-  FPoints[ALFloatPropertyAnimation.InterpolationType].Clear;
+  var LColor: TalphaColor;
+  case 1 + random(60) of
+    001: LColor := TalphaColors.Black; // TAlphaColor(Alpha or $000000);
+    002: LColor := TalphaColors.Blue; // TAlphaColor(Alpha or $0000FF);
+    003: LColor := TalphaColors.Blueviolet; // TAlphaColor(Alpha or $8A2BE2);
+    004: LColor := TalphaColors.Brown; // TAlphaColor(Alpha or $A52A2A);
+    005: LColor := TalphaColors.Darkblue; // TAlphaColor(Alpha or $00008B);
+    006: LColor := TalphaColors.Darkcyan; // TAlphaColor(Alpha or $008B8B);
+    007: LColor := TalphaColors.Darkgoldenrod; // TAlphaColor(Alpha or $B8860B);
+    008: LColor := TalphaColors.Darkgreen; // TAlphaColor(Alpha or $006400);
+    009: LColor := TalphaColors.Darkmagenta; // TAlphaColor(Alpha or $8B008B);
+    010: LColor := TalphaColors.Darkolivegreen; // TAlphaColor(Alpha or $556B2F);
+    011: LColor := TalphaColors.Darkorange; // TAlphaColor(Alpha or $FF8C00);
+    012: LColor := TalphaColors.Darkorchid; // TAlphaColor(Alpha or $9932CC);
+    013: LColor := TalphaColors.Darkred; // TAlphaColor(Alpha or $8B0000);
+    014: LColor := TalphaColors.Darkslateblue; // TAlphaColor(Alpha or $483D8B);
+    015: LColor := TalphaColors.Darkslategray; // TAlphaColor(Alpha or $2F4F4F);
+    016: LColor := TalphaColors.Darkslategrey; // TAlphaColor(Alpha or $2F4F4F);
+    017: LColor := TalphaColors.Darkviolet; // TAlphaColor(Alpha or $9400D3);
+    018: LColor := TalphaColors.Deeppink; // TAlphaColor(Alpha or $FF1493);
+    019: LColor := TalphaColors.Firebrick; // TAlphaColor(Alpha or $B22222);
+    020: LColor := TalphaColors.Forestgreen; // TAlphaColor(Alpha or $228B22);
+    021: LColor := TalphaColors.Fuchsia; // TAlphaColor(Alpha or $FF00FF);
+    022: LColor := TalphaColors.Green; // TAlphaColor(Alpha or $008000);
+    023: LColor := TalphaColors.Indigo; // TAlphaColor(Alpha or $4B0082);
+    024: LColor := TalphaColors.Magenta; // TAlphaColor(Alpha or $FF00FF);
+    025: LColor := TalphaColors.Maroon; // TAlphaColor(Alpha or $800000);
+    026: LColor := TalphaColors.Mediumblue; // TAlphaColor(Alpha or $0000CD);
+    027: LColor := TalphaColors.Mediumvioletred; // TAlphaColor(Alpha or $C71585);
+    028: LColor := TalphaColors.Midnightblue; // TAlphaColor(Alpha or $191970);
+    029: LColor := TalphaColors.Navy; // TAlphaColor(Alpha or $000080);
+    030: LColor := TalphaColors.Olive; // TAlphaColor(Alpha or $808000);
+    031: LColor := TalphaColors.Olivedrab; // TAlphaColor(Alpha or $6B8E23);
+    032: LColor := TalphaColors.Orangered; // TAlphaColor(Alpha or $FF4500);
+    033: LColor := TalphaColors.Purple; // TAlphaColor(Alpha or $800080);
+    034: LColor := TalphaColors.Red; // TAlphaColor(Alpha or $FF0000);
+    035: LColor := TalphaColors.Royalblue; // TAlphaColor(Alpha or $4169E1);
+    036: LColor := TalphaColors.Saddlebrown; // TAlphaColor(Alpha or $8B4513);
+    037: LColor := TalphaColors.Sienna; // TAlphaColor(Alpha or $A0522D);
+    038: LColor := TalphaColors.Slateblue; // TAlphaColor(Alpha or $6A5ACD);
+    039: LColor := TalphaColors.Slategray; // TAlphaColor(Alpha or $708090);
+    040: LColor := TalphaColors.Slategrey; // TAlphaColor(Alpha or $708090);
+    041: LColor := TalphaColors.Steelblue; // TAlphaColor(Alpha or $4682B4);
+    042: LColor := TalphaColors.Teal; // TAlphaColor(Alpha or $008080);
+    043: LColor := TalphaColors.Tomato; // TAlphaColor(Alpha or $FF6347);
+    044: LColor := TalphaColors.Crimson; // TAlphaColor(Alpha or $DC143C);
+    045: LColor := TalphaColors.Darkturquoise; // TAlphaColor(Alpha or $00CED1);
+    046: LColor := TalphaColors.Deepskyblue; // TAlphaColor(Alpha or $00BFFF);
+    047: LColor := TalphaColors.Dodgerblue; // TAlphaColor(Alpha or $1E90FF);
+    048: LColor := TalphaColors.Mediumorchid; // TAlphaColor(Alpha or $BA55D3);
+    049: LColor := TalphaColors.Mediumpurple; // TAlphaColor(Alpha or $9370DB);
+    050: LColor := TalphaColors.Mediumseagreen; // TAlphaColor(Alpha or $3CB371);
+    051: LColor := TalphaColors.Mediumslateblue; // TAlphaColor(Alpha or $7B68EE);
+    052: LColor := TalphaColors.Mediumturquoise; // TAlphaColor(Alpha or $48D1CC);
+    053: LColor := TalphaColors.Chocolate; // TAlphaColor(Alpha or $D2691E);
+    054: LColor := TalphaColors.Coral; // TAlphaColor(Alpha or $FF7F50);
+    055: LColor := TalphaColors.Darkkhaki; // TAlphaColor(Alpha or $BDB76B);
+    056: LColor := TalphaColors.Darksalmon; // TAlphaColor(Alpha or $E9967A);
+    057: LColor := TalphaColors.Hotpink; // TAlphaColor(Alpha or $FF69B4);
+    058: LColor := TalphaColors.Indianred; // TAlphaColor(Alpha or $CD5C5C);
+    059: LColor := TalphaColors.Orchid; // TAlphaColor(Alpha or $DA70D6);
+    060: LColor := TalphaColors.Palevioletred; // TAlphaColor(Alpha or $DB7093);
+    else
+      LColor := TalphaColors.Black;
+  end;
+  ALFloatPropertyAnimation.Tag := LColor;
   ALFloatPropertyAnimation.Start;
 end;
 
-{*********************************************************}
-procedure TForm1.CheckBoxClearGraphChange(Sender: TObject);
+{******************************************************}
+procedure TForm1.ButtonClearGraphClick(Sender: TObject);
 begin
-  for var I := Low(FPoints) to High(FPoints) do
-    FPoints[i].Clear;
-  for var I := Low(FTestPoints) to High(FTestPoints) do
-    FTestPoints[i].Clear;
+  Setlength(FPoints, 0);
   invalidate;
 end;
 
@@ -252,29 +298,6 @@ end;
 
 {********************************************************************}
 procedure TForm1.PaintBoxChartPaint(Sender: TObject; Canvas: TCanvas);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _drawGraph(const APoints: Tlist<Tpointf>; const AColor: TAlphaColor);
-  begin
-    if APoints.Count <= 1 then exit;
-
-    var xScale := PaintBoxChart.Width / (ALFloatPropertyAnimation.Duration * 1000);
-    var yScale := (PaintBoxChart.Height / 2 / 1.4) / (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue);
-
-    Canvas.Stroke.Color := AColor;
-    Canvas.Stroke.Thickness := 1;
-    Canvas.Stroke.Kind := TBrushKind.Solid;
-    for var i := 1 to APoints.Count - 1 do
-      Canvas.DrawLine(
-        TpointF.create(
-          APoints[i-1].x * xScale,
-          (PaintBoxChart.Height / 2) - ((APoints[i-1].y + (CircleBullet.height / 2)) * yScale)),
-        TpointF.create(
-          APoints[i].x * xScale,
-          (PaintBoxChart.Height / 2) - ((APoints[i].y + (CircleBullet.height / 2)) * yScale)),
-        1);
-  end;
-
 begin
   Canvas.Fill.Color := TAlphaColors.Lavender;
   Canvas.FillRect(
@@ -287,78 +310,35 @@ begin
     RectF(0, 0, PaintBoxChart.Width, PaintBoxChart.Height),
     0, 0, [], 1);
 
-  for var LInterpolationType := Low(FPoints) to High(FPoints) do begin
-    Var Lcolor: TAlphaColor;
-    case LInterpolationType of
-      TALInterpolationType.Linear: Lcolor := TAlphaColorRec.Darkblue;
-      TALInterpolationType.Quadratic: Lcolor := TAlphaColorRec.Darkcyan;
-      TALInterpolationType.Cubic: Lcolor := TAlphaColorRec.Darkgoldenrod;
-      TALInterpolationType.Quartic: Lcolor := TAlphaColorRec.Darkviolet;
-      TALInterpolationType.Quintic: Lcolor := TAlphaColorRec.Darkgreen;
-      TALInterpolationType.Sinusoidal: Lcolor := TAlphaColorRec.Darkslateblue;
-      TALInterpolationType.Exponential: Lcolor := TAlphaColorRec.Brown;
-      TALInterpolationType.Circular: Lcolor := TAlphaColorRec.Darkmagenta;
-      TALInterpolationType.Elastic: Lcolor := TAlphaColorRec.Darkolivegreen;
-      TALInterpolationType.Back: Lcolor := TAlphaColorRec.Green;
-      TALInterpolationType.Bounce: Lcolor := TAlphaColorRec.Darkorchid;
-      TALInterpolationType.MaterialExpressiveFastSpatial: Lcolor := TAlphaColorRec.Salmon;
-      TALInterpolationType.MaterialExpressiveDefaultSpatial: Lcolor := TAlphaColorRec.Sienna;
-      TALInterpolationType.MaterialExpressiveSlowSpatial: Lcolor := TAlphaColorRec.Mediumorchid;
-      TALInterpolationType.MaterialExpressiveFastEffects: Lcolor := TAlphaColorRec.Teal;
-      TALInterpolationType.MaterialExpressiveDefaultEffects: Lcolor := TAlphaColorRec.Limegreen;
-      TALInterpolationType.MaterialExpressiveSlowEffects: Lcolor := TAlphaColorRec.Mediumvioletred;
-      TALInterpolationType.MaterialStandardFastSpatial: Lcolor := TAlphaColorRec.Orangered;
-      TALInterpolationType.MaterialStandardDefaultSpatial: Lcolor := TAlphaColorRec.Olivedrab;
-      TALInterpolationType.MaterialStandardSlowSpatial: Lcolor := TAlphaColorRec.Gray;
-      TALInterpolationType.MaterialStandardFastEffects: Lcolor := TAlphaColorRec.Sandybrown;
-      TALInterpolationType.MaterialStandardDefaultEffects: Lcolor := TAlphaColorRec.Lightcoral;
-      TALInterpolationType.MaterialStandardSlowEffects: Lcolor := TAlphaColorRec.Firebrick;
-      TALInterpolationType.MaterialEmphasized: Lcolor := TAlphaColorRec.Chocolate;
-      TALInterpolationType.MaterialEmphasizedDecelerate: Lcolor := TAlphaColorRec.Indigo;
-      TALInterpolationType.MaterialEmphasizedAccelerate: Lcolor := TAlphaColorRec.Palevioletred;
-      TALInterpolationType.Custom: Lcolor := TAlphaColorRec.Darkred;
-      else Lcolor := TAlphaColorRec.Black;
+  var xScale := PaintBoxChart.Width / (ALFloatPropertyAnimation.Duration * 1000);
+  var yScale := (PaintBoxChart.Height / 2 / 1.4) / (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue);
+  for var I := Low(FPoints) to High(FPoints) do begin
+    if (I = 0) or (FPoints[i-1].Key <> FPoints[i].Key) then begin
+      Canvas.fill.Color := FPoints[i].Key;
+      Canvas.fill.Kind := TBrushKind.Solid;
+      Canvas.fillRect(
+        TrectF.Create(
+          TpointF.create(
+            FPoints[i].Value.x * xScale,
+            (PaintBoxChart.Height / 2) - ((FPoints[i].Value.y + (CircleBullet.height / 2)) * yScale)),
+          1, 1),
+        1);
+    end
+    else begin
+      Canvas.Stroke.Color := FPoints[i].Key;
+      Canvas.Stroke.Thickness := 1;
+      Canvas.Stroke.Kind := TBrushKind.Solid;
+      Canvas.DrawLine(
+        TpointF.create(
+          FPoints[i-1].Value.x * xScale,
+          (PaintBoxChart.Height / 2) - ((FPoints[i-1].Value.y + (CircleBullet.height / 2)) * yScale)),
+        TpointF.create(
+          FPoints[i].Value.x * xScale,
+          (PaintBoxChart.Height / 2) - ((FPoints[i].Value.y + (CircleBullet.height / 2)) * yScale)),
+        1);
     end;
-    if (CheckBoxClearGraph.IsChecked) and
-       (LInterpolationType <> ALFloatPropertyAnimation.Interpolation) then continue;
-    _drawGraph(FPoints[LInterpolationType], Lcolor);
   end;
-  for var LInterpolationType := Low(FTestPoints) to High(FTestPoints) do begin
-    Var Lcolor: TAlphaColor;
-    case LInterpolationType of
-      TALInterpolationType.Linear: Lcolor := TAlphaColorRec.Darkblue;
-      TALInterpolationType.Quadratic: Lcolor := TAlphaColorRec.Darkcyan;
-      TALInterpolationType.Cubic: Lcolor := TAlphaColorRec.Darkgoldenrod;
-      TALInterpolationType.Quartic: Lcolor := TAlphaColorRec.Darkviolet;
-      TALInterpolationType.Quintic: Lcolor := TAlphaColorRec.Darkgreen;
-      TALInterpolationType.Sinusoidal: Lcolor := TAlphaColorRec.Darkslateblue;
-      TALInterpolationType.Exponential: Lcolor := TAlphaColorRec.Brown;
-      TALInterpolationType.Circular: Lcolor := TAlphaColorRec.Darkmagenta;
-      TALInterpolationType.Elastic: Lcolor := TAlphaColorRec.Darkolivegreen;
-      TALInterpolationType.Back: Lcolor := TAlphaColorRec.Green;
-      TALInterpolationType.Bounce: Lcolor := TAlphaColorRec.Darkorchid;
-      TALInterpolationType.MaterialExpressiveFastSpatial: Lcolor := TAlphaColorRec.Salmon;
-      TALInterpolationType.MaterialExpressiveDefaultSpatial: Lcolor := TAlphaColorRec.Sienna;
-      TALInterpolationType.MaterialExpressiveSlowSpatial: Lcolor := TAlphaColorRec.Mediumorchid;
-      TALInterpolationType.MaterialExpressiveFastEffects: Lcolor := TAlphaColorRec.Teal;
-      TALInterpolationType.MaterialExpressiveDefaultEffects: Lcolor := TAlphaColorRec.Limegreen;
-      TALInterpolationType.MaterialExpressiveSlowEffects: Lcolor := TAlphaColorRec.Mediumvioletred;
-      TALInterpolationType.MaterialStandardFastSpatial: Lcolor := TAlphaColorRec.Orangered;
-      TALInterpolationType.MaterialStandardDefaultSpatial: Lcolor := TAlphaColorRec.Olivedrab;
-      TALInterpolationType.MaterialStandardSlowSpatial: Lcolor := TAlphaColorRec.Gray;
-      TALInterpolationType.MaterialStandardFastEffects: Lcolor := TAlphaColorRec.Sandybrown;
-      TALInterpolationType.MaterialStandardDefaultEffects: Lcolor := TAlphaColorRec.Lightcoral;
-      TALInterpolationType.MaterialStandardSlowEffects: Lcolor := TAlphaColorRec.Firebrick;
-      TALInterpolationType.MaterialEmphasized: Lcolor := TAlphaColorRec.Chocolate;
-      TALInterpolationType.MaterialEmphasizedDecelerate: Lcolor := TAlphaColorRec.Indigo;
-      TALInterpolationType.MaterialEmphasizedAccelerate: Lcolor := TAlphaColorRec.Palevioletred;
-      TALInterpolationType.Custom: Lcolor := TAlphaColorRec.Darkred;
-      else Lcolor := TAlphaColorRec.Black;
-    end;
-    if (CheckBoxClearGraph.IsChecked) and
-       (LInterpolationType <> ALFloatPropertyAnimation.Interpolation) then continue;
-    _drawGraph(FTestPoints[LInterpolationType], Lcolor);
-  end;
+
 end;
 
 {*******************************************************************************************************************}
@@ -446,11 +426,7 @@ type
 {*****************************************************}
 procedure TForm1.ButtonStartTestClick(Sender: TObject);
 begin
-  for var I := Low(FPoints) to High(FPoints) do
-    FPoints[i].Clear;
-  for var I := Low(FTestPoints) to High(FTestPoints) do
-    FTestPoints[i].Clear;
-  CheckBoxClearGraph.IsChecked := False;
+  Setlength(FPoints, 0);
   ALFloatPropertyAnimation.Duration := 2;
   ALFloatPropertyAnimation.StartValue := -CircleBullet.height / 2;
   ALFloatPropertyAnimation.StopValue := (LayoutBullet.height / 1.4) - (CircleBullet.height / 2);
@@ -468,17 +444,21 @@ begin
   begin
     var t: Single := I / StepCount;              // 0.00, 0.01, …, 1.00
     var y1: Single := ALInterpolateMaterialEmphasized(t, 1);
-    FPoints[TALInterpolationType.MaterialEmphasized].Add(
-      TpointF.Create(
-        t * 1000 * 3,
-        ALFloatPropertyAnimation.StartValue + (y1 * (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue))));
-
+    var LPair: TPair<TAlphaColor, Tpointf>;
+    Lpair.Key := TalphaColors.darkred;
+    Lpair.Value := TpointF.Create(
+                     t * 1000 * 3,
+                     ALFloatPropertyAnimation.StartValue + (y1 * (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue)));
+    SetLength(FPoints, length(FPoints) + 1);
+    FPoints[high(FPoints)] := Lpair;
     {$IF defined(android)}
     var y2: Single := Interpolator.getInterpolation(t);
-    FTestPoints[TALInterpolationType.MaterialEmphasized].Add(
-      TpointF.Create(
-        t * 1000 * 3,
-        ALFloatPropertyAnimation.StartValue + (y2 * (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue))));
+    Lpair.Key := TalphaColors.DarkGreen;
+    Lpair.Value := TpointF.Create(
+                     t * 1000 * 3,
+                     ALFloatPropertyAnimation.StartValue + (y2 * (ALFloatPropertyAnimation.StopValue - ALFloatPropertyAnimation.StartValue)));
+    SetLength(FPoints, length(FPoints) + 1);
+    FPoints[high(FPoints)] := Lpair;
     {$ENDIF}
 
   end;

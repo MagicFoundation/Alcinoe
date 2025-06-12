@@ -1622,7 +1622,7 @@ end;
 {********************************************************}
 function TALDynamicImage.GetDefaultTintColor: TAlphaColor;
 begin
-  Result := 0;
+  Result := TAlphaColors.null;
 end;
 
 {******************************************************}

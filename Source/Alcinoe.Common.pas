@@ -21,6 +21,14 @@ uses
 
 type
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTriplet<T1, T2, T3> = record
+    First: T1;
+    Second: T2;
+    Third: T3;
+    constructor Create(const AFirst: T1; const ASecond: T2; const AThird: T3);
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALWorkerThreadRefProc = reference to procedure(var AContext: Tobject);
   TALWorkerThreadObjProc = procedure(var AContext: Tobject) of object;
@@ -786,6 +794,14 @@ uses
   System.Diagnostics,
   Alcinoe.Localization,
   Alcinoe.StringUtils;
+
+{***********************************************************************************************}
+constructor TALTriplet<T1, T2, T3>.Create(const AFirst: T1; const ASecond: T2; const AThird: T3);
+begin
+  First := AFirst;
+  Second := ASecond;
+  Third := AThird;
+end;
 
 {****************************************}
 constructor TALWorkerThreadRequest.Create(

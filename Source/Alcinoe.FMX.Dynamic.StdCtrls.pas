@@ -63,9 +63,9 @@ type
     FTintColor: TAlphaColor; // 4 bytes
     FFrameCount: Integer; // 4 bytes
     FRowCount: Integer; // 4 bytes
-    FMotionMode: TMotionMode; // 1 byte
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
+    FMotionMode: TMotionMode; // 1 byte
     procedure SetTintColor(const Value: TAlphaColor);
     procedure setTintColorKey(const Value: String);
     procedure SetAnimation(const Value: TAnimation);
@@ -2993,9 +2993,9 @@ begin
   FTintColorKey := DefaultTintColorKey;
   FFrameCount := 1;
   FRowCount := 1;
-  FMotionMode := TMotionMode.Rotate;
   FCacheIndex := 0;
   FCacheEngine := nil;
+  FMotionMode := TMotionMode.Rotate;
   FBufDrawable := ALNullDrawable;
   //**SetAcceptsControls(False);
 end;
@@ -3051,7 +3051,7 @@ end;
 {***************************************************************}
 function TALDynamicAniIndicator.GetDefaultTintColor: TAlphaColor;
 begin
-  Result := 0;
+  Result := TAlphaColors.null;
 end;
 
 {*************************************************************}

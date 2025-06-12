@@ -485,7 +485,9 @@ type
         FOnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent; // 16 bytes
         FOnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent; // 16 bytes
         FOnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent; // 16 bytes
+        FOnRealignItems: TView.TMainContent.TRealignEvent;
         function GetItemByIndex(Const AIndex: Integer): TItem;
+        function GetItemsCount: integer;
         function GetOnCreateMainContent: TCreateMainContentEvent;
         procedure SetOnCreateMainContent(const AValue: TCreateMainContentEvent);
         procedure SetOrientation(const AValue: TOrientation);
@@ -550,11 +552,14 @@ type
         function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
         procedure Prepare; override;
         procedure Unprepare; override;
+        function HasMoreItemsToDownload: Boolean; virtual;
         function RetryDownloadItems: boolean; virtual;
         procedure Refresh; virtual;
+        property PaginationToken: String read FPaginationToken;
         property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
         property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
         property Items[const Index: Integer]: TItem read GetItemByIndex;
+        property ItemsCount: integer read GetItemsCount;
         property ScrollEngine: TALScrollEngine read FScrollEngine;
         property ViewportPosition: TALPointD read GetViewportPosition;
         property ItemIdNodeName: String read FItemIdNodeName write FItemIdNodeName;
@@ -576,6 +581,7 @@ type
         property OnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent read FOnCreatePullToRefreshIndicator write FOnCreatePullToRefreshIndicator; // [MultiThread]
         property OnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent read FOnCreateLoadMoreIndicator write FOnCreateLoadMoreIndicator; // [MultiThread]
         property OnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent read FOnCreateLoadMoreRetryButton write FOnCreateLoadMoreRetryButton; // [MultiThread]
+        property OnRealignItems: TView.TMainContent.TRealignEvent read FOnRealignItems write FOnRealignItems;
       end;
       // --------------------
       // TCreateMainViewEvent
@@ -2346,6 +2352,7 @@ begin
   FOnCreatePullToRefreshIndicator := nil;
   FOnCreateLoadMoreIndicator := nil;
   FOnCreateLoadMoreRetryButton := nil;
+  FOnRealignItems := nil;
 end;
 
 {*****************************************}
@@ -2442,6 +2449,15 @@ begin
     result := Fitems^[AIndex]
   else
     raise Exception.Create('Index is out of bounds');
+end;
+
+{******************************************************}
+function TALDynamicListBox.TView.GetItemsCount: integer;
+begin
+  if FMainContent <> nil then
+    Result := FMainContent.ControlsCount
+  else
+    Result := 0;
 end;
 
 {*******************************************************************************}
@@ -3514,6 +3530,12 @@ begin
 
 end;
 
+{***************************************************************}
+function TALDynamicListBox.TView.HasMoreItemsToDownload: Boolean;
+begin
+  Result := FPaginationtoken <> '';
+end;
+
 {***********************************************************}
 function TALDynamicListBox.TView.RetryDownloadItems: boolean;
 begin
@@ -3983,10 +4005,9 @@ begin
     NoItemsContentType: if LContext.FNewContent <> nil then DoShiftContent(AContext.FNewContent, FNoItemsContent);
     MainContentType: begin
       Inherited;
-      if (IsMainView) and // That mean host <> nil
-         (FMainContent <> nil) and
+      if (FMainContent <> nil) and
          (not assigned(TMainContent(FMainContent).OnRealign)) then
-        TMainContent(FMainContent).OnRealign := Host.OnRealignItems;
+        TMainContent(FMainContent).OnRealign := OnRealignItems;
     end
     else inherited;
   end;
@@ -4199,6 +4220,7 @@ begin
     Result.OnCreatePullToRefreshIndicator := OnCreatePullToRefreshIndicator;
     Result.OnCreateLoadMoreIndicator := OnCreateLoadMoreIndicator;
     Result.OnCreateLoadMoreRetryButton := OnCreateLoadMoreRetryButton;
+    Result.OnRealignItems := OnRealignItems;
   end;
   {$IF defined(DEBUG)}
   if (Result.FCacheEngine <> nil) and (Result.FCacheEngine <> CacheEngine) then

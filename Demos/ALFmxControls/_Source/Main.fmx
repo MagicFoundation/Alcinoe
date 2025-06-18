@@ -264,7 +264,7 @@ object MainForm: TMainForm
     end
     object Text1: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 8.000000000000000000
       Position.Y = 2519.000000000000000000
       Size.Width = 380.000000000000000000
@@ -386,7 +386,7 @@ object MainForm: TMainForm
     end
     object Text4: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -456,7 +456,7 @@ object MainForm: TMainForm
     end
     object Text10: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 8.000000000000000000
       Position.Y = 4411.000000000000000000
       Size.Width = 380.000000000000000000
@@ -523,7 +523,7 @@ object MainForm: TMainForm
     end
     object Text7: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -554,7 +554,7 @@ object MainForm: TMainForm
     end
     object Text9: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 8.000000000000000000
       Position.Y = 3929.000000000000000000
       Size.Width = 380.000000000000000000
@@ -760,7 +760,7 @@ object MainForm: TMainForm
     end
     object Text11: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -881,7 +881,7 @@ object MainForm: TMainForm
     end
     object ALText10: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -933,7 +933,7 @@ object MainForm: TMainForm
     end
     object ALText22: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -954,7 +954,7 @@ object MainForm: TMainForm
     end
     object ALText27: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -982,7 +982,7 @@ object MainForm: TMainForm
     end
     object ALLayout64: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 21.000000000000000000
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -994,7 +994,7 @@ object MainForm: TMainForm
       TabOrder = 282
       object ALText53: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 15.000000000000000000
         Position.X = 43.000000000000000000
         Position.Y = 3.500000000000000000
@@ -1042,7 +1042,7 @@ object MainForm: TMainForm
     end
     object ALLayout61: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -1054,7 +1054,7 @@ object MainForm: TMainForm
       TabOrder = 273
       object ALText49: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 38.000000000000000000
         Size.Width = 178.000000000000000000
@@ -1176,7 +1176,7 @@ object MainForm: TMainForm
     end
     object ALText44: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -1197,7 +1197,7 @@ object MainForm: TMainForm
     end
     object ALText46: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -1332,7 +1332,7 @@ object MainForm: TMainForm
     end
     object ALLayout7: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 8.000000000000000000
       Position.Y = 10285.000000000000000000
       Size.Width = 380.000000000000000000
@@ -1445,7 +1445,7 @@ object MainForm: TMainForm
     end
     object ALLayout14: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 16.000000000000000000
       Position.Y = 10565.000000000000000000
       Size.Width = 380.000000000000000000
@@ -1558,7 +1558,7 @@ object MainForm: TMainForm
     end
     object ALLayout17: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 16.000000000000000000
       Position.Y = 10495.000000000000000000
       Size.Width = 380.000000000000000000
@@ -1681,7 +1681,7 @@ object MainForm: TMainForm
     end
     object ALLayout20: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 16.000000000000000000
       Position.Y = 10425.000000000000000000
       Size.Width = 380.000000000000000000
@@ -1776,7 +1776,7 @@ object MainForm: TMainForm
     end
     object ALLayout26: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 16.000000000000000000
       Position.Y = 10355.000000000000000000
       Size.Width = 380.000000000000000000
@@ -1889,7 +1889,7 @@ object MainForm: TMainForm
     end
     object ALText17: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -1920,7 +1920,7 @@ object MainForm: TMainForm
     end
     object MainTitle: TALText
       Align = MostTop
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 12.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -1939,7 +1939,7 @@ object MainForm: TMainForm
     end
     object SubTitle: TALText
       Align = MostTop
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 24.000000000000000000
@@ -1957,7 +1957,7 @@ object MainForm: TMainForm
     end
     object ALText18: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -1978,7 +1978,7 @@ object MainForm: TMainForm
     end
     object ALText21: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2005,7 +2005,7 @@ object MainForm: TMainForm
     end
     object ALText23: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2026,7 +2026,7 @@ object MainForm: TMainForm
     end
     object ALText19: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 30.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -2046,7 +2046,7 @@ object MainForm: TMainForm
     end
     object ALTextDemo: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFFFD8E4
       Fill.ColorKey = 'Material.Color.TertiaryContainer'
       HitTest = True
@@ -2116,7 +2116,7 @@ object MainForm: TMainForm
     end
     object ALText9: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2137,7 +2137,7 @@ object MainForm: TMainForm
     end
     object ALText24: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2158,7 +2158,7 @@ object MainForm: TMainForm
     end
     object ALText11: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2179,7 +2179,7 @@ object MainForm: TMainForm
     end
     object ALText15: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
@@ -2211,7 +2211,7 @@ object MainForm: TMainForm
     end
     object ALLayout32: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -2224,14 +2224,14 @@ object MainForm: TMainForm
       TabOrder = 626
       object ALLayout33: TALLayout
         Align = Left
-        AutoSize = Both
+        AutoSize = All
         Size.Width = 100.000000000000000000
         Size.Height = 43.000000000000000000
         Size.PlatformDefault = False
       end
       object ALLayout34: TALLayout
         Align = Left
-        AutoSize = Both
+        AutoSize = All
         Position.X = 100.000000000000000000
         Size.Width = 100.000000000000000000
         Size.Height = 43.000000000000000000
@@ -2240,7 +2240,7 @@ object MainForm: TMainForm
     end
     object ALText25: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2265,7 +2265,7 @@ object MainForm: TMainForm
     end
     object ALText26: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2287,7 +2287,7 @@ object MainForm: TMainForm
     end
     object ALText28: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2311,7 +2311,7 @@ object MainForm: TMainForm
     end
     object ALText16: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2332,7 +2332,7 @@ object MainForm: TMainForm
     end
     object ALText12: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2353,7 +2353,7 @@ object MainForm: TMainForm
     end
     object ALText13: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2374,7 +2374,7 @@ object MainForm: TMainForm
     end
     object ALText14: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2395,7 +2395,7 @@ object MainForm: TMainForm
     end
     object ALText30: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2416,7 +2416,7 @@ object MainForm: TMainForm
     end
     object ALText31: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2437,7 +2437,7 @@ object MainForm: TMainForm
     end
     object ALText32: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2458,7 +2458,7 @@ object MainForm: TMainForm
     end
     object ALLayout1: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -2471,13 +2471,13 @@ object MainForm: TMainForm
       TabOrder = 657
       object ALLayout36: TALLayout
         Align = Left
-        AutoSize = Both
+        AutoSize = All
         Size.Width = 54.000000000000000000
         Size.Height = 21.000000000000000000
         Size.PlatformDefault = False
         object ALText38: TALText
           Align = Bottom
-          AutoSize = Both
+          AutoSize = All
           Size.Width = 54.000000000000000000
           Size.Height = 21.000000000000000000
           Size.PlatformDefault = False
@@ -2489,14 +2489,14 @@ object MainForm: TMainForm
       end
       object ALLayout37: TALLayout
         Align = Left
-        AutoSize = Both
+        AutoSize = All
         Position.X = 54.000000000000000000
         Size.Width = 38.000000000000000000
         Size.Height = 21.000000000000000000
         Size.PlatformDefault = False
         object ALText39: TALText
           Align = Bottom
-          AutoSize = Both
+          AutoSize = All
           Size.Width = 38.000000000000000000
           Size.Height = 21.000000000000000000
           Size.PlatformDefault = False
@@ -2509,7 +2509,7 @@ object MainForm: TMainForm
     end
     object ALText33: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2530,7 +2530,7 @@ object MainForm: TMainForm
     end
     object ALText34: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2562,7 +2562,7 @@ object MainForm: TMainForm
     end
     object ALText35: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2585,7 +2585,7 @@ object MainForm: TMainForm
     end
     object ALText36: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -2609,7 +2609,7 @@ object MainForm: TMainForm
     end
     object ALText37: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -2731,7 +2731,7 @@ object MainForm: TMainForm
     end
     object ALLayout38: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 16.000000000000000000
       Position.Y = 10635.000000000000000000
       Size.Width = 380.000000000000000000
@@ -2933,7 +2933,7 @@ object MainForm: TMainForm
     end
     object ALLayout46: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 32.000000000000000000
       Position.Y = 19217.000000000000000000
       Size.Width = 380.000000000000000000
@@ -2942,7 +2942,7 @@ object MainForm: TMainForm
       TabOrder = 696
       object ALLayout47: TALLayout
         Align = Left
-        AutoSize = Both
+        AutoSize = All
         Size.Width = 184.000000000000000000
         Size.Height = 69.000000000000000000
         Size.PlatformDefault = False
@@ -3049,7 +3049,7 @@ object MainForm: TMainForm
       end
       object ALLayout48: TALLayout
         Align = Client
-        AutoSize = Both
+        AutoSize = All
         Size.Width = 196.000000000000000000
         Size.Height = 69.000000000000000000
         Size.PlatformDefault = False
@@ -3242,7 +3242,7 @@ object MainForm: TMainForm
     end
     object ALLayout45: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 40.000000000000000000
       Position.Y = 19762.242187500000000000
       Size.Width = 380.000000000000000000
@@ -3251,7 +3251,7 @@ object MainForm: TMainForm
       TabOrder = 701
       object ALLayout49: TALLayout
         Align = Left
-        AutoSize = Both
+        AutoSize = All
         Size.Width = 184.000000000000000000
         Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
@@ -3349,7 +3349,7 @@ object MainForm: TMainForm
       end
       object ALLayout50: TALLayout
         Align = Client
-        AutoSize = Both
+        AutoSize = All
         Size.Width = 196.000000000000000000
         Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
@@ -3626,7 +3626,7 @@ object MainForm: TMainForm
     end
     object ALText42: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       HitTest = True
       Margins.Left = 16.000000000000000000
       Margins.Top = 18.000000000000000000
@@ -3664,7 +3664,7 @@ object MainForm: TMainForm
     end
     object ALText43: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -3685,7 +3685,7 @@ object MainForm: TMainForm
     end
     object ALAutoSizeLayout1: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Position.Y = 6158.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
@@ -3703,7 +3703,7 @@ object MainForm: TMainForm
       end
       object ALAutoSizeLayoutText: TALText
         Align = Top
-        AutoSize = Both
+        AutoSize = All
         HitTest = True
         Margins.Left = 12.000000000000000000
         Margins.Right = 12.000000000000000000
@@ -3761,7 +3761,7 @@ object MainForm: TMainForm
     end
     object ALText51: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 40.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -3781,7 +3781,7 @@ object MainForm: TMainForm
     end
     object ALText52: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 30.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -3858,7 +3858,7 @@ object MainForm: TMainForm
     end
     object ALText54: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 30.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -3882,7 +3882,7 @@ object MainForm: TMainForm
     end
     object ALText41: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 12.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -3933,7 +3933,7 @@ object MainForm: TMainForm
     end
     object ALText56: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -3954,7 +3954,7 @@ object MainForm: TMainForm
     end
     object ALText57: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -3981,7 +3981,7 @@ object MainForm: TMainForm
     end
     object ALText59: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -4008,7 +4008,7 @@ object MainForm: TMainForm
     end
     object ALText58: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -4029,7 +4029,7 @@ object MainForm: TMainForm
     end
     object ALText60: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -4050,7 +4050,7 @@ object MainForm: TMainForm
     end
     object ALText61: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE8DEF8
       Fill.ColorKey = 'Material.Color.SecondaryContainer'
       Margins.Left = 16.000000000000000000
@@ -4105,7 +4105,7 @@ object MainForm: TMainForm
     end
     object ALText62: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 12.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -4126,7 +4126,7 @@ object MainForm: TMainForm
     end
     object ALLayout72: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 12.000000000000000000
       Position.Y = 7029.000000000000000000
       Size.Width = 380.000000000000000000
@@ -4135,7 +4135,7 @@ object MainForm: TMainForm
       TabOrder = 244
       object ALLayout74: TALLayout
         Align = MostLeft
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 16.000000000000000000
         Margins.Right = 12.000000000000000000
         Position.X = 16.000000000000000000
@@ -6623,7 +6623,7 @@ object MainForm: TMainForm
       end
       object ALText63: TALText
         Align = Client
-        AutoSize = Both
+        AutoSize = All
         HitTest = True
         Margins.Right = 16.000000000000000000
         MaxHeight = 150.000000000000000000
@@ -6655,7 +6655,7 @@ object MainForm: TMainForm
     end
     object ALLayout75: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 24.000000000000000000
       Position.Y = 7203.000000000000000000
       Size.Width = 380.000000000000000000
@@ -6674,7 +6674,7 @@ object MainForm: TMainForm
       end
       object ALText64: TALText
         Align = Client
-        AutoSize = Both
+        AutoSize = All
         HitTest = True
         Margins.Right = 16.000000000000000000
         MaxHeight = 150.000000000000000000
@@ -6706,7 +6706,7 @@ object MainForm: TMainForm
     end
     object ALLayout70: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Top = 24.000000000000000000
       Position.Y = 7377.000000000000000000
       Size.Width = 380.000000000000000000
@@ -6725,7 +6725,7 @@ object MainForm: TMainForm
       end
       object Text2: TALText
         Align = Top
-        AutoSize = Both
+        AutoSize = All
         HitTest = True
         Margins.Right = 16.000000000000000000
         MaxHeight = 150.000000000000000000
@@ -6757,7 +6757,7 @@ object MainForm: TMainForm
     end
     object ALText65: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -6785,7 +6785,7 @@ object MainForm: TMainForm
     end
     object ALText66: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 24.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7024,7 +7024,7 @@ object MainForm: TMainForm
     end
     object ALText67: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 20.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7047,7 +7047,7 @@ object MainForm: TMainForm
     end
     object ALLayout84: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 21.000000000000000000
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7059,7 +7059,7 @@ object MainForm: TMainForm
       TabOrder = 39
       object ALText40: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 15.000000000000000000
         Position.X = 43.000000000000000000
         Position.Y = 3.500000000000000000
@@ -7105,7 +7105,7 @@ object MainForm: TMainForm
     end
     object ALLayout86: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7117,7 +7117,7 @@ object MainForm: TMainForm
       TabOrder = 43
       object ALText50: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 38.000000000000000000
         Size.Width = 217.000000000000000000
@@ -7239,7 +7239,7 @@ object MainForm: TMainForm
     end
     object ALLayout88: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7251,7 +7251,7 @@ object MainForm: TMainForm
       TabOrder = 64
       object ALText71: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 40.000000000000000000
         Position.Y = 0.500000000000000000
@@ -7369,7 +7369,7 @@ object MainForm: TMainForm
     end
     object ALLayout44: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7381,7 +7381,7 @@ object MainForm: TMainForm
       TabOrder = 40
       object ALText47: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 40.000000000000000000
         Position.Y = 0.500000000000000000
@@ -7495,7 +7495,7 @@ object MainForm: TMainForm
     end
     object ALLayout104: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7507,7 +7507,7 @@ object MainForm: TMainForm
       TabOrder = 54
       object ALText78: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 70.000000000000000000
         Position.Y = 5.500000000000000000
@@ -7657,7 +7657,7 @@ object MainForm: TMainForm
     end
     object ALLayout102: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7669,7 +7669,7 @@ object MainForm: TMainForm
       TabOrder = 49
       object ALText77: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 70.000000000000000000
         Position.Y = 5.500000000000000000
@@ -7820,7 +7820,7 @@ object MainForm: TMainForm
     end
     object ALLayout108: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -7832,7 +7832,7 @@ object MainForm: TMainForm
       TabOrder = 52
       object ALText80: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 76.000000000000000000
         Position.Y = 5.500000000000000000
@@ -8067,7 +8067,7 @@ object MainForm: TMainForm
     end
     object ALText82: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8085,7 +8085,7 @@ object MainForm: TMainForm
     end
     object ALText83: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8103,7 +8103,7 @@ object MainForm: TMainForm
     end
     object ALText84: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8205,7 +8205,7 @@ object MainForm: TMainForm
     end
     object ALText86: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8223,7 +8223,7 @@ object MainForm: TMainForm
     end
     object ALText90: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8326,7 +8326,7 @@ object MainForm: TMainForm
     end
     object ALText91: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8344,7 +8344,7 @@ object MainForm: TMainForm
     end
     object ALText92: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8475,7 +8475,7 @@ object MainForm: TMainForm
     end
     object ALText45: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 24.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8521,7 +8521,7 @@ object MainForm: TMainForm
     end
     object ALText48: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 24.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8565,7 +8565,7 @@ object MainForm: TMainForm
     end
     object ALText55: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Top = 24.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -8808,7 +8808,7 @@ object MainForm: TMainForm
     end
     object ALText1: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -8829,7 +8829,7 @@ object MainForm: TMainForm
     end
     object ALText2: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -9079,7 +9079,7 @@ object MainForm: TMainForm
     end
     object ALText3: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Fill.Color = xFFE6E0E9
       Fill.ColorKey = 'Material.Color.SurfaceContainerHighest'
       Margins.Top = 60.000000000000000000
@@ -9100,7 +9100,7 @@ object MainForm: TMainForm
     end
     object ALText4: TALText
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
@@ -9135,7 +9135,7 @@ object MainForm: TMainForm
     end
     object ALLayout3: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -9147,7 +9147,7 @@ object MainForm: TMainForm
       TabOrder = 63
       object ALText5: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 40.000000000000000000
         Size.Width = 40.000000000000000000
@@ -9269,7 +9269,7 @@ object MainForm: TMainForm
     end
     object ALLayout4: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -9281,7 +9281,7 @@ object MainForm: TMainForm
       TabOrder = 62
       object ALText6: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 40.000000000000000000
         Size.Width = 37.000000000000000000
@@ -9402,7 +9402,7 @@ object MainForm: TMainForm
     end
     object ALLayout6: TALLayout
       Align = Top
-      AutoSize = Both
+      AutoSize = All
       Margins.Left = 24.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -9414,7 +9414,7 @@ object MainForm: TMainForm
       TabOrder = 61
       object ALText7: TALText
         Align = LeftCenter
-        AutoSize = Both
+        AutoSize = All
         Margins.Left = 18.000000000000000000
         Position.X = 40.000000000000000000
         Size.Width = 149.000000000000000000

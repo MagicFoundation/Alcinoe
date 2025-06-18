@@ -65,6 +65,20 @@ type
     MostBottomLeft,   // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the left.
     MostBottomRight); // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the right.
 
+  {*****************}
+  TALAutoSizeMode = (
+    None,
+    {$IFNDEF ALCompilerVersionSupported123}
+      {$MESSAGE WARN 'Delete this temp hack'}
+    {$ENDIF}
+    {$IF defined(ALBackwardCompatible)}
+    False, // !! Ugly hack !!
+    True, // !! Ugly hack !!
+    {$ENDIF}
+    Width,
+    Height,
+    All);
+
   {*************************************}
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
@@ -94,7 +108,7 @@ type
     procedure MarginsChangedHandler(Sender: TObject);
     procedure ScaleChangedHandler(Sender: TObject);
   protected
-    FAutoSize: Boolean; // 1 byte
+    FAutoSize: TALAutoSizeMode; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
@@ -102,11 +116,11 @@ type
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
     property Scale: TPosition read FScale write SetScale;
     property Pivot: TPosition read GetPivot write SetPivot;
-    function GetAutoSize: Boolean; virtual;
-    procedure SetAutoSize(const Value: Boolean); virtual;
+    function GetAutoSize: TALAutoSizeMode; virtual;
+    procedure SetAutoSize(const Value: TALAutoSizeMode); virtual;
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    property AutoSize: TALAutoSizeMode read GetAutoSize write SetAutoSize default TALAutoSizeMode.None;
     function GetAutoAlignToPixel: Boolean; virtual;
     procedure SetAutoAlignToPixel(const AValue: Boolean); Virtual;
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
@@ -157,8 +171,8 @@ type
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
     procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
+    function HasUnconstrainedAutosizeWidth: Boolean; virtual;
+    function HasUnconstrainedAutosizeHeight: Boolean; virtual;
     procedure MakeBufDrawable; virtual;
     procedure ClearBufDrawable; virtual;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
@@ -249,6 +263,9 @@ type
     property OnResized;
   end;
 
+var
+  ALGlobalClickSoundEnabled: Boolean;
+
 implementation
 
 uses
@@ -294,7 +311,7 @@ begin
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
   FBeforeDestructionExecuted := False;
-  FAutoSize := False;
+  FAutoSize := TALAutoSizeMode.None;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;
 end;
@@ -769,7 +786,7 @@ begin
   if (not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
-     (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
+     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // If AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -781,7 +798,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       var LSize := TSizeF.Create(0,0);
@@ -829,11 +846,11 @@ begin
           //--
           TALAlignLayout.Top,
           TALAlignLayout.MostTop: begin
-            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeWidth then
               // If the child control has autosize enabled on the X-axis, adjusts
               // AControl width to ensure it contains the child control at its
               // current position. For example, TALText will never have
-              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Top,
+              // HasUnconstrainedAutosizeWidth set to true with TALAlignLayout.Top,
               // but TALLayout/TRectangle will have it set to true if their
               // autosize property is enabled.
               LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
@@ -848,11 +865,11 @@ begin
           //--
           TALAlignLayout.Bottom,
           TALAlignLayout.MostBottom: begin
-            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeWidth then
               // If the child control has autosize enabled on the X-axis, adjusts
               // AControl width to ensure it contains the child control at its
               // current position. For example, TALText will never have
-              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Top,
+              // HasUnconstrainedAutosizeWidth set to true with TALAlignLayout.Top,
               // but TALLayout/TRectangle will have it set to true if their
               // autosize property is enabled.
               LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
@@ -904,11 +921,11 @@ begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
             LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right);
-            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeY then
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeHeight then
               // If the child control has autosize enabled on the X-axis, adjusts
               // AControl height to ensure it contains the child control at its
               // current position. For example, TALText will never have
-              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Left,
+              // HasUnconstrainedAutosizeWidth set to true with TALAlignLayout.Left,
               // but TALLayout/TRectangle will have it set to true if their
               // autosize property is enabled.
               LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
@@ -923,11 +940,11 @@ begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
             LSize.Width := Max(LSize.Width, Width - LChildControl.Position.X + LChildControl.Margins.left + padding.left);
-            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeY then
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeHeight then
               // If the child control has autosize enabled on the X-axis, adjusts
               // AControl height to ensure it contains the child control at its
               // current position. For example, TALText will never have
-              // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Left,
+              // HasUnconstrainedAutosizeWidth set to true with TALAlignLayout.Left,
               // but TALLayout/TRectangle will have it set to true if their
               // autosize property is enabled.
               LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
@@ -978,9 +995,9 @@ begin
           //TALAlignLayout.FitRight,
           TALAlignLayout.Client: Begin
             if LALChildControl <> nil then begin
-              if LALChildControl.HasUnconstrainedAutosizeX then LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
+              if LALChildControl.HasUnconstrainedAutosizeWidth then LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
               else LSize.Width := Max(LSize.Width, Width);
-              if LALChildControl.HasUnconstrainedAutosizeY then LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
+              if LALChildControl.HasUnconstrainedAutosizeHeight then LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
               else LSize.height := Max(LSize.Height, Height);
             end
             else begin
@@ -992,7 +1009,7 @@ begin
           //--
           TALAlignLayout.Horizontal,
           TALAlignLayout.VertCenter: Begin
-            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeX then
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeWidth then
               LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right)
             else
               LSize.Width := Max(LSize.Width, Width);
@@ -1001,7 +1018,7 @@ begin
           //--
           TALAlignLayout.Vertical,
           TALAlignLayout.HorzCenter: Begin
-            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeY then
+            if (LALChildControl <> nil) and LALChildControl.HasUnconstrainedAutosizeHeight then
               LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
             else
               LSize.height := Max(LSize.Height, Height);
@@ -1014,9 +1031,9 @@ begin
         end;
       end;
 
-      if (not HasUnconstrainedAutosizeX) or (SameValue(LSize.Width, 0, Tepsilon.Position)) then
+      if (not HasUnconstrainedAutosizeWidth) or (SameValue(LSize.Width, 0, Tepsilon.Position)) then
         LSize.Width := Width;
-      if (not HasUnconstrainedAutosizeY) or (SameValue(LSize.Height, 0, Tepsilon.Position)) then
+      if (not HasUnconstrainedAutosizeHeight) or (SameValue(LSize.Height, 0, Tepsilon.Position)) then
         LSize.Height := Height;
       SetFixedSizeBounds(Position.X, Position.Y, LSize.Width, LSize.Height);
     finally
@@ -1156,25 +1173,34 @@ begin
 end;
 
 {***************************************}
-function TALControl.GetAutoSize: Boolean;
+function TALControl.GetAutoSize: TALAutoSizeMode;
 begin
   result := FAutoSize;
 end;
 
 {*****************************************************}
-procedure TALControl.SetAutoSize(const Value: Boolean);
+procedure TALControl.SetAutoSize(const Value: TALAutoSizeMode);
 begin
   if FAutoSize <> Value then
   begin
     FAutoSize := Value;
+    {$IFNDEF ALCompilerVersionSupported123}
+      {$MESSAGE WARN 'Delete this temp hack'}
+    {$ENDIF}
+    {$IF defined(ALBackwardCompatible)}
+    if FAutoSize = TALAutoSizeMode.False then
+      FAutoSize := TALAutoSizeMode.None
+    else if FAutoSize = TALAutoSizeMode.True then
+      FAutoSize := TALAutoSizeMode.All;
+    {$ENDIF}
     AdjustSize;
   end;
 end;
 
 {*****************************************************}
-function TALControl.HasUnconstrainedAutosizeX: Boolean;
+function TALControl.HasUnconstrainedAutosizeWidth: Boolean;
 begin
-  Result := GetAutoSize;
+  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Width];
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
                              TALAlignLayout.Contents,
@@ -1185,14 +1211,14 @@ begin
                              TALAlignLayout.Horizontal,
                              TALAlignLayout.VertCenter]);
     if (not result) and (ALParentControl <> nil) then
-      Result := ALParentControl.HasUnconstrainedAutosizeX;
+      Result := ALParentControl.HasUnconstrainedAutosizeWidth;
   end;
 end;
 
 {*****************************************************}
-function TALControl.HasUnconstrainedAutosizeY: Boolean;
+function TALControl.HasUnconstrainedAutosizeHeight: Boolean;
 begin
-  Result := GetAutoSize;
+  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Height];
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
                              TALAlignLayout.Contents,
@@ -1203,7 +1229,7 @@ begin
                              TALAlignLayout.Vertical,
                              TALAlignLayout.HorzCenter]);
     if (not result) and (ALParentControl <> nil) then
-      Result := ALParentControl.HasUnconstrainedAutosizeY;
+      Result := ALParentControl.HasUnconstrainedAutosizeHeight;
   end;
 end;
 
@@ -1461,6 +1487,8 @@ end;
 {*************************}
 procedure TALControl.Click;
 begin
+  if ALGlobalClickSoundEnabled and assigned(OnClick) then
+    ALPlayClickSound;
   inherited;
   if FDoubleClick then begin
     DblClick;
@@ -1752,5 +1780,11 @@ begin
   else
     Result := nil;
 end;
+
+initialization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Controls','initialization');
+  {$ENDIF}
+  ALGlobalClickSoundEnabled := False;
 
 end.

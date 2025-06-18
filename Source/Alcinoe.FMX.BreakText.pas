@@ -9,6 +9,7 @@ uses
   System.Types,
   Fmx.types,
   FMX.graphics,
+  Alcinoe.fmx.Controls,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Graphics;
 
@@ -68,9 +69,7 @@ type
     EllipsisDecorationThicknessMultiplier: Single; // default = 1
     EllipsisDecorationColor: TAlphaColor; // default = TAlphaColors.Null
     //--
-    AutoSize: Boolean; // default = True
-    AutoSizeX: Boolean; // default = False
-    AutoSizeY: Boolean; // default = False
+    AutoSize: TALAutoSizeMode; // default = TALAutoSizeMode.All
     MaxLines: integer; // default = 65535
     // When LineHeightMultiplier = 0 the line height will be the sum of the font ascent + font descent + font leading.
     // When LineHeightMultiplier is non-null, the line height of the span of text will be a multiple of fontSize and be exactly fontSize * height logical pixels tall
@@ -89,7 +88,6 @@ type
     FillGradientOffsets: TArray<Single>; // Default = [];
     FillResourceName: String; // default = ''
     FillMaskResourceName: String; // default = ''
-    FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
     FillImageNoRadius: Boolean; // default = False
@@ -370,9 +368,7 @@ begin
   EllipsisDecorationThicknessMultiplier := 1;
   EllipsisDecorationColor := TAlphaColors.Null;
   //--
-  AutoSize := True;
-  AutoSizeX := False;
-  AutoSizeY := False;
+  AutoSize := TALAutoSizeMode.All;
   MaxLines := 65535;
   LineHeightMultiplier := 0;
   LetterSpacing := 0;
@@ -389,7 +385,6 @@ begin
   FillGradientOffsets := [];
   FillResourceName := '';
   FillMaskResourceName := '';
-  FillMaskBitmap := ALNullBitmap;
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
   FillImageNoRadius := False;
@@ -460,8 +455,6 @@ begin
   EllipsisDecorationColor := Source.EllipsisDecorationColor;
   //--
   AutoSize := Source.AutoSize;
-  AutoSizeX := Source.AutoSizeX;
-  AutoSizeY := Source.AutoSizeY;
   MaxLines := Source.MaxLines;
   LineHeightMultiplier := Source.LineHeightMultiplier;
   LetterSpacing := Source.LetterSpacing;
@@ -478,7 +471,6 @@ begin
   FillGradientOffsets := Source.FillGradientOffsets;
   FillResourceName := Source.FillResourceName;
   FillMaskResourceName := Source.FillMaskResourceName;
-  FillMaskBitmap := Source.FillMaskBitmap;
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
   FillImageNoRadius := Source.FillImageNoRadius;
@@ -2458,12 +2450,12 @@ begin
               //       auto floorWidth = SkScalarFloorToScalar(rawWidth);
               //
               var LOriginalRectWidth: Single := ARect.Width;
-              if LOptions.Autosize or (LOptions.AutosizeX and LOptions.AutosizeY) then begin
+              if LOptions.Autosize = TALAutoSizeMode.All then begin
                 ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + LOptions.Padding.Left + LOptions.Padding.Right);
                 ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
               end
-              else if LOptions.AutosizeX then ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + LOptions.Padding.Left + LOptions.Padding.Right)
-              else if LOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
+              else if LOptions.Autosize = TALAutoSizeMode.Width then ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + LOptions.Padding.Left + LOptions.Padding.Right)
+              else if LOptions.Autosize = TALAutoSizeMode.Height then ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
 
               // init LParagraphRect.topleft
               case LOptions.VTextAlign of
@@ -2596,7 +2588,6 @@ begin
                       .SetFillGradientOffsets(LOptions.FillGradientOffsets)
                       .SetFillResourceName(LOptions.FillResourceName)
                       .SetFillMaskResourceName(LOptions.FillMaskResourceName)
-                      .SetFillMaskBitmap(LOptions.FillMaskBitmap)
                       .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
                       .SetFillImageMarginsRect(LOptions.FillImageMargins)
                       .SetFillImageNoRadius(LOptions.FillImageNoRadius)
@@ -2660,7 +2651,6 @@ begin
                                     LImgSrc, // const AResourceName: String;
                                     nil, // const AResourceStream: TStream;
                                     '', // const AMaskResourceName: String;
-                                    0, // const AMaskImage: sk_image_t;
                                     1, // const AScale: Single;
                                     LDstRect.Width, LDstRect.Height, // const W, H: single;
                                     TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -2680,7 +2670,6 @@ begin
                                     LImgSrc, // const AResourceName: String;
                                     nil, // const AResourceStream: TStream;
                                     '', // const AMaskResourceName: String;
-                                    0, // const AMaskImage: sk_image_t;
                                     1, // const AScale: Single;
                                     LDstRect.Width, LDstRect.Height, // const W, H: single;
                                     TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -3751,12 +3740,12 @@ begin
       LParagraphRect.height := LParagraphRect.height;
 
       // Autosize
-      if LOptions.Autosize or (LOptions.AutosizeX and LOptions.AutosizeY) then begin
+      if LOptions.Autosize = TALAutoSizeMode.All then begin
         ARect.Width := Min(ARect.Width, LParagraphRect.Width + LOptions.Padding.Left + LOptions.Padding.Right);
         ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
       end
-      else if LOptions.AutosizeX then ARect.Width := Min(ARect.Width, LParagraphRect.Width + LOptions.Padding.Left + LOptions.Padding.Right)
-      else if LOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
+      else if LOptions.Autosize = TALAutoSizeMode.Width then ARect.Width := Min(ARect.Width, LParagraphRect.Width + LOptions.Padding.Left + LOptions.Padding.Right)
+      else if LOptions.Autosize = TALAutoSizeMode.Height then ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
 
       // HTextAlign/VTextAlign
       // TALTextHorzAlign.Justify is not yet supported
@@ -3952,7 +3941,6 @@ begin
               .SetFillGradientOffsets(LOptions.FillGradientOffsets)
               .SetFillResourceName(LOptions.FillResourceName)
               .SetFillMaskResourceName(LOptions.FillMaskResourceName)
-              .SetFillMaskBitmap(LOptions.FillMaskBitmap)
               .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
               .SetFillImageMarginsRect(LOptions.FillImageMargins)
               .SetFillImageNoRadius(LOptions.FillImageNoRadius)
@@ -3995,7 +3983,6 @@ begin
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
-                            nil, // const AMaskBitmap: JBitmap;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4061,7 +4048,6 @@ begin
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
-                            nil, // const AMaskImage: CGImageRef;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4145,7 +4131,6 @@ begin
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
-                            nil, // const AMaskBitmap: TBitmap;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;

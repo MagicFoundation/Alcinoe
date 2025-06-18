@@ -1772,7 +1772,7 @@ type
     //property Action;
     property Align;
     property Anchors;
-    property AutoSize default True;
+    property AutoSize default TALAutoSizeMode.All;
     property AutoTranslate;
     property CanFocus default true;
     //property CanParentFocus;
@@ -2461,7 +2461,7 @@ type
         //property Align;
         //property Anchors;
         property Animation: TAnimation read FAnimation write FAnimation default TAnimation.ScaleInOut;
-        property AutoSize default true;
+        property AutoSize default TALAutoSizeMode.All;
         //property AutoTranslate;
         //property CanFocus;
         //property CanParentFocus;
@@ -3300,7 +3300,6 @@ begin
                       FResourceName, // const AResourceName: String;
                       nil, // const AResourceStream: TStream;
                       '', // const AMaskResourceName: String;
-                      ALNullBitmap, // const AMaskBitmap: TALBitmap;
                       1, // const AScale: Single;
                       Width * (fframeCount div fRowCount) * ALGetScreenScale,
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
@@ -4472,7 +4471,7 @@ end;
 constructor TALCustomTrack.TValueIndicator.Create(const ACustomTrack: TALCustomTrack);
 begin
   inherited create(ACustomTrack);
-  AutoSize := True;
+  AutoSize := TALAutoSizeMode.All;
   Visible := False;
   Pivot.Point := TPointF.Create(0.5,1);
   FCustomTrack := ACustomTrack;
@@ -12017,7 +12016,7 @@ begin
   //--
   CanFocus := True;
   HitTest := True;
-  AutoSize := True;
+  AutoSize := TALAutoSizeMode.All;
   Cursor := crHandPoint;
   //--
   var LPaddingChange: TNotifyEvent := Padding.OnChange;

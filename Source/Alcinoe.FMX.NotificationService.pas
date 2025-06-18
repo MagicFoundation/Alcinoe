@@ -659,7 +659,6 @@ begin
                               '', // const AResourceName: String;
                               ANotification.FLargeIconStream, // const AResourceStream: TStream;
                               '', // const AMaskResourceName: String;
-                              nil, // const AMaskBitmap: JBitmap;
                               0, // const AScale: Single;
                               LIconSize.Width, LIconSize.Height, // const W, H: single;
                               TALImageWrapMode.fitAndCrop, // const AWrapMode: TALImageWrapMode;

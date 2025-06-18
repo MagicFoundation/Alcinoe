@@ -247,10 +247,7 @@ uses
   System.Skia.API,
   FMX.Skia.Canvas,
   {$ENDIF}
-  {$IF defined(MSWindows)}
-  Winapi.Windows,
-  FMX.Platform.Win,
-  {$ENDIF}
+  FMX.Forms,
   FMX.Platform,
   FMX.Graphics,
   FMX.types,
@@ -946,7 +943,6 @@ begin
                         AResourceName, // const AResourceName: String;
                         AResourceStream, // const AResourceStream: TStream;
                         '', // AMaskResourceName, // const AMaskResourceName: String;
-                        ALNullBitmap, // AMaskBitmap, // const AMaskBitmap: TALBitmap;
                         AScale, // const AScale: Single;
                         ARect.Width, ARect.Height, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -1062,6 +1058,33 @@ end;
 
 {*******************************************}
 procedure TALDynamicVideoPlayerSurface.Paint;
+
+  {~~~~~~~~~~~~~~~~~~~~}
+  procedure _Invalidate;
+  begin
+    // We cannot call Repaint from within a paint method,
+    // but we can call Form.Invalidate. We use Form.Invalidate
+    // to avoid using any TALFloatAnimation object
+    {$IF defined(ANDROID)}
+    If Form <> nil then
+      Form.Invalidate;
+    {$ELSE}
+    If Form <> nil then begin
+      var LForm := Form;
+      TThread.ForceQueue(nil,
+        procedure
+        begin
+          If (Screen <> nil) then
+            for var I := 0 to Screen.FormCount - 1 do
+              if LForm = Screen.Forms[I] then begin
+                LForm.Invalidate;
+                Break;
+              end;
+        end);
+    end;
+    {$ENDIF}
+  end;
+
 begin
 
   If (FAutoStartMode = TAutoStartMode.WhenDisplayed) and (FInternalState <> VPSStarted) then begin
@@ -1104,22 +1127,7 @@ begin
     if LElapsedTime > FFadeInDuration then FFadeInStartTimeNano := 0
     else begin
       LOpacity := LOpacity * (LElapsedTime / FFadeInDuration);
-      // We cannot call Repaint from within a paint method,
-      // but we can call Form.Invalidate. We use Form.Invalidate
-      // to avoid using any TALFloatAnimation object
-      {$IF defined(MSWindows)}
-      If Form <> nil then begin
-        var LWnd := FormToHWND(Form);
-        TThread.ForceQueue(nil,
-          procedure
-          begin
-            Winapi.Windows.InvalidateRect(LWnd, nil, False);
-          end);
-      end;
-      {$ELSE}
-      If Form <> nil then
-        Form.Invalidate;
-      {$ENDIF}
+      _invalidate;
     end;
   end;
 
@@ -1194,22 +1202,7 @@ begin
       if (FFadeInDuration > 0) and (FFadeInStartTimeNano <= 0) then begin
         FFadeInStartTimeNano := ALElapsedTimeNano;
         LOpacity := 0;
-        // We cannot call Repaint from within a paint method,
-        // but we can call Form.Invalidate. We use Form.Invalidate
-        // to avoid using any TALFloatAnimation object
-        {$IF defined(MSWindows)}
-        If Form <> nil then begin
-          var LWnd := FormToHWND(Form);
-          TThread.ForceQueue(nil,
-            procedure
-            begin
-              Winapi.Windows.InvalidateRect(LWnd, nil, False);
-            end);
-        end;
-        {$ELSE}
-        If Form <> nil then
-          Form.Invalidate;
-        {$ENDIF}
+        _invalidate;
       end;
       FIsFirstFrame := false;
     end;

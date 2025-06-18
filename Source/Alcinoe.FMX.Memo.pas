@@ -34,6 +34,7 @@ uses
   Fmx.controls,
   FMX.types,
   fmx.Graphics,
+  Alcinoe.fmx.Controls,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Common;
 
@@ -389,7 +390,7 @@ type
     procedure SetTextSettings(const Value: TTextSettings);
   protected
     function GetDefaultSize: TSizeF; override;
-    function GetAutoSize: Boolean; override;
+    function GetAutoSize: TALAutoSizeMode; override;
     procedure SetAutosizeLineCount(const Value: Integer); virtual;
     function CreateStateStyles: TALBaseEdit.TStateStyles; override;
     function CreateTextSettings: TALBaseEdit.TTextSettings; override;
@@ -398,7 +399,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
-    function HasUnconstrainedAutosizeX: Boolean; override;
+    function HasUnconstrainedAutosizeWidth: Boolean; override;
   published
     property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
@@ -441,7 +442,6 @@ uses
   {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
-  Alcinoe.FMX.Controls,
   Alcinoe.Common;
 
 {$REGION ' Android'}
@@ -1780,7 +1780,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
@@ -1794,7 +1794,7 @@ begin
         if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
       end;
 
-      if HasUnconstrainedAutosizeY then begin
+      if HasUnconstrainedAutosizeHeight then begin
 
         var LLineHeight: Single := GetLineHeight;
         if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
@@ -1838,7 +1838,7 @@ begin
 end;
 
 {**************************************************}
-function TALMemo.HasUnconstrainedAutosizeX: Boolean;
+function TALMemo.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   result := False;
 end;
@@ -1850,9 +1850,10 @@ begin
 end;
 
 {************************************}
-function TALMemo.GetAutoSize: Boolean;
+function TALMemo.GetAutoSize: TALAutoSizeMode;
 begin
-  result := FAutoSizeLineCount > 0;
+  if FAutoSizeLineCount > 0 then Result := TALAutoSizeMode.Height
+  else Result := TALAutoSizeMode.None;
 end;
 
 {***********************************************************}

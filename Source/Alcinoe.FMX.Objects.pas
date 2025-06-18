@@ -9,9 +9,6 @@ interface
 {$ENDIF}
 
 uses
-  {$IF defined(MSWindows)}
-  Winapi.Windows,
-  {$ENDIF}
   System.Classes,
   System.Types,
   System.UITypes,
@@ -124,7 +121,6 @@ type
         ResourceName: String;
         ResourceStream: TStream;
         MaskResourceName: String;
-        MaskBitmap: TALRefCountBitmap;
         WrapMode: TALImageWrapMode;
         CropCenter: TpointF;
         RotateAccordingToExifOrientation: Boolean;
@@ -152,7 +148,6 @@ type
     FTintColorKey: String; // 8 bytes
     FResourceName: String; // 8 bytes
     FMaskResourceName: String; // 8 bytes
-    FMaskBitmap: TALRefCountBitmap; // 8 bytes
     FWrapMode: TALImageWrapMode; // 1 bytes
     FExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
     FRotateAccordingToExifOrientation: Boolean; // 1 bytes
@@ -180,7 +175,6 @@ type
     procedure SetRotateAccordingToExifOrientation(const Value: Boolean);
     procedure setResourceName(const Value: String);
     procedure setMaskResourceName(const Value: String);
-    procedure setMaskBitmap(const Value: TALRefCountBitmap);
     procedure setBackgroundColor(const Value: TAlphaColor);
     procedure setBackgroundColorKey(const Value: String);
     procedure setLoadingColor(const Value: TAlphaColor);
@@ -251,7 +245,6 @@ type
                       const AResourceName: String;
                       const AResourceStream: TStream;
                       const AMaskResourceName: String;
-                      const AMaskBitmap: TALRefCountBitmap;
                       const AWrapMode: TALImageWrapMode;
                       const ACropCenter: TpointF;
                       const ARotateAccordingToExifOrientation: Boolean;
@@ -289,8 +282,6 @@ type
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
     property DefaultBlurRadius: Single read GetDefaultBlurRadius;
-    // MaskBitmap will not be owned and will not be freed with the TALImage
-    property MaskBitmap: TALRefCountBitmap read fMaskBitmap write setMaskBitmap;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
     // prevent duplicate drawables across multiple identical controls.
     // CacheIndex specifies the slot in the cache engine where an existing
@@ -1084,7 +1075,7 @@ type
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetAlign(const Value: TALAlignLayout); override;
-    procedure SetAutoSize(const Value: Boolean); override;
+    procedure SetAutoSize(const Value: TALAutoSizeMode); override;
     function GetElementAtPos(const APos: TPointF): TALTextElement;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
@@ -1331,6 +1322,7 @@ uses
   system.Math.Vectors,
   FMX.utils,
   FMX.platform,
+  FMX.Forms,
   {$IF defined(ALSkiaAvailable)}
   FMX.Skia,
   FMX.Skia.Canvas,
@@ -1347,9 +1339,6 @@ uses
   iOSapi.UIKit,
   FMX.Canvas.GPU,
   FMX.Surfaces,
-  {$ENDIF}
-  {$IF defined(MSWindows)}
-  FMX.Platform.Win,
   {$ENDIF}
   {$IFDEF ALDPK}
   DesignIntf,
@@ -1525,8 +1514,6 @@ begin
   ResourceName := AOwner.ResourceName;
   ResourceStream := nil;
   MaskResourceName := AOwner.MaskResourceName;
-  MaskBitmap := AOwner.MaskBitmap;
-  if MaskBitmap <> nil then MaskBitmap.IncreaseRefCount;
   WrapMode := AOwner.WrapMode;
   CropCenter := AOwner.CropCenter.Point;
   RotateAccordingToExifOrientation := AOwner.RotateAccordingToExifOrientation;
@@ -1547,10 +1534,6 @@ end;
 destructor TALImage.TResourceDownloadContext.Destroy;
 begin
   ALFreeAndNil(ResourceStream);
-  if MaskBitmap <> nil then begin
-    MaskBitmap.DecreaseRefCount;
-    MaskBitmap := nil;
-  end;
   inherited
 end;
 
@@ -1572,7 +1555,6 @@ begin
   FTintColorKey := DefaultTintColorKey;
   FResourceName := '';
   FMaskResourceName := '';
-  FMaskBitmap := nil;
   FWrapMode := TALImageWrapMode.Fit;
   FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   FRotateAccordingToExifOrientation := False;
@@ -1603,10 +1585,6 @@ begin
   ALFreeAndNil(fCropCenter);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
-  if FMaskBitmap <> nil then begin
-    FMaskBitmap.DecreaseRefCount;
-    FMaskBitmap := nil;
-  end;
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
 end;
 
@@ -1624,7 +1602,6 @@ begin
       TintColorKey := TALImage(Source).TintColorKey;
       ResourceName := TALImage(Source).ResourceName;
       MaskResourceName := TALImage(Source).MaskResourceName;
-      MaskBitmap := TALImage(Source).MaskBitmap;
       WrapMode := TALImage(Source).WrapMode;
       RotateAccordingToExifOrientation := TALImage(Source).RotateAccordingToExifOrientation;
       Corners := TALImage(Source).Corners;
@@ -1905,18 +1882,6 @@ begin
   if FMaskResourceName <> Value then begin
     ClearBufDrawable;
     FMaskResourceName := Value;
-    Repaint;
-  end;
-end;
-
-{***************************************************************}
-procedure TALImage.setMaskBitmap(const Value: TALRefCountBitmap);
-begin
-  if FMaskBitmap <> Value then begin
-    ClearBufDrawable;
-    if FMaskBitmap <> nil then FMaskBitmap.DecreaseRefCount;
-    FMaskBitmap := Value;
-    if FMaskBitmap <> nil then FMaskBitmap.IncreaseRefCount;
     Repaint;
   end;
 end;
@@ -2243,7 +2208,6 @@ begin
   LContext.ResourceName := ALBrokenImageResourceName;
   ALFreeAndNil(LContext.ResourceStream);
   LContext.MaskResourceName := '';
-  LContext.MaskBitmap := nil;
   LContext.WrapMode := TALImageWrapMode.Fit;
   //LContext.CropCenter: TpointF;
   //LContext.RotateAccordingToExifOrientation: Boolean;
@@ -2294,7 +2258,6 @@ begin
       LContext.ResourceName, // const AResourceName: String;
       LContext.ResourceStream, // const AResourceStream: TStream;
       LContext.MaskResourceName, // const AMaskResourceName: String;
-      LContext.MaskBitmap, // const AMaskBitmap: TALRefCountBitmap;
       LContext.WrapMode, // const AWrapMode: TALImageWrapMode;
       LContext.CropCenter, // const ACropCenter: TpointF;
       LContext.RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
@@ -2355,7 +2318,6 @@ class Procedure TALImage.CreateBufDrawable(
                   const AResourceName: String;
                   const AResourceStream: TStream;
                   const AMaskResourceName: String;
-                  const AMaskBitmap: TALRefCountBitmap;
                   const AWrapMode: TALImageWrapMode;
                   const ACropCenter: TpointF;
                   const ARotateAccordingToExifOrientation: Boolean;
@@ -2373,10 +2335,6 @@ class Procedure TALImage.CreateBufDrawable(
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
-
-  var LMaskBitmap: TALbitmap;
-  if AMaskBitmap <> nil then LMaskBitmap := AMaskBitmap.Bitmap
-  else LMaskBitmap := ALNullBitmap;
 
   var lResourceName: String;
   if ALIsHttpOrHttpsUrl(AResourceName) then lResourceName := ''
@@ -2436,7 +2394,6 @@ begin
                         AResourceName, // const AResourceName: String;
                         AResourceStream, // const AResourceStream: TStream;
                         AMaskResourceName, // const AMaskResourceName: String;
-                        LMaskBitmap, // const AMaskBitmap: TALBitmap;
                         AScale, // const AScale: Single;
                         ARect.Width, ARect.Height, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -2502,7 +2459,6 @@ begin
         .SetFillResourceName(LResourceName)
         .SetFillResourceStream(AResourceStream)
         .SetFillMaskResourceName(AMaskResourceName)
-        .SetFillMaskBitmap(LMaskBitmap)
         .SetFillImageTintColor(ATintColor)
         .SetFillWrapMode(AWrapMode)
         .SetFillCropCenter(ACropCenter)
@@ -2579,7 +2535,6 @@ begin
 
     if (LoadingColor <> TAlphaColors.Null) and
        ((MaskResourceName <> '') or
-        (MaskBitmap <> nil) or
         (not SameValue(xRadius, 0, TEpsilon.Vector)) or
         (not SameValue(yRadius, 0, TEpsilon.Vector))) then begin
 
@@ -2598,13 +2553,12 @@ begin
         LocalRect, // const ARect: TRectF;
         ALGetScreenScale, // const AScale: Single;
         AutoAlignToPixel, // const AAlignToPixel: Boolean;
-        LoadingColor, // const AColor: TAlphaColor;
-        TAlphaColors.Null, // const ATintColor: TAlphaColor;
-        '', // const AResourceName: String;
+        ALIfThen(MaskResourceName <> '', TAlphaColors.null, LoadingColor), // const AColor: TAlphaColor;
+        ALIfThen(MaskResourceName <> '', LoadingColor, TAlphaColors.null), // const ATintColor: TAlphaColor;
+        MaskResourceName, // const AResourceName: String;
         nil, // const AResourceStream: TStream;
-        MaskResourceName, // const AMaskResourceName: String;
-        MaskBitmap, // const AMaskBitmap: TALRefCountBitmap;
-        TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
+        '', // const AMaskResourceName: String;
+        WrapMode, // const AWrapMode: TALImageWrapMode;
         TpointF.Zero, // const ACropCenter: TpointF;
         false, // const ARotateAccordingToExifOrientation: Boolean;
         TAlphaColors.Null, // const AStrokeColor: TAlphaColor;
@@ -2640,7 +2594,6 @@ begin
     ResourceName, // const AResourceName: String;
     nil, // const AResourceStream: TStream;
     MaskResourceName, // const AMaskResourceName: String;
-    MaskBitmap, // const AMaskBitmap: TALRefCountBitmap;
     WrapMode, // const AWrapMode: TALImageWrapMode;
     CropCenter.Point, // const ACropCenter: TpointF;
     RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
@@ -2660,6 +2613,33 @@ end;
 
 {***********************}
 procedure TALImage.Paint;
+
+  {~~~~~~~~~~~~~~~~~~~~}
+  procedure _Invalidate;
+  begin
+    // We cannot call Repaint from within a paint method,
+    // but we can call Form.Invalidate. We use Form.Invalidate
+    // to avoid using any TALFloatAnimation object
+    {$IF defined(ANDROID)}
+    If Form <> nil then
+      Form.Invalidate;
+    {$ELSE}
+    If Form <> nil then begin
+      var LForm := Form;
+      TThread.ForceQueue(nil,
+        procedure
+        begin
+          If (Screen <> nil) then
+            for var I := 0 to Screen.FormCount - 1 do
+              if LForm = Screen.Forms[I] then begin
+                LForm.Invalidate;
+                Break;
+              end;
+        end);
+    end;
+    {$ENDIF}
+  end;
+
 begin
 
   // Draw a dashed rectangle in design mode
@@ -2683,22 +2663,7 @@ begin
     if LElapsedTime > FFadeInDuration then FFadeInStartTimeNano := 0
     else begin
       LOpacity := LOpacity * (LElapsedTime / FFadeInDuration);
-      // We cannot call Repaint from within a paint method,
-      // but we can call Form.Invalidate. We use Form.Invalidate
-      // to avoid using any TALFloatAnimation object
-      {$IF defined(MSWindows)}
-      If Form <> nil then begin
-        var LWnd := FormToHWND(Form);
-        TThread.ForceQueue(nil,
-          procedure
-          begin
-            Winapi.Windows.InvalidateRect(LWnd, nil, False);
-          end);
-      end;
-      {$ELSE}
-      If Form <> nil then
-        Form.Invalidate;
-      {$ENDIF}
+      _invalidate;
     end;
   end;
 
@@ -5077,7 +5042,7 @@ procedure TALBaseText.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // if AutoSize is false nothing to adjust
+     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // if AutoSize is false nothing to adjust
      (Text <> '') and // if Text is empty do not do autosize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
@@ -5090,7 +5055,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       var R: TrectF;
@@ -5124,11 +5089,11 @@ begin
           Shadow); // const AShadow: TALShadow);
       end;
 
-      if not HasUnconstrainedAutosizeX then begin
+      if not HasUnconstrainedAutosizeWidth then begin
         r.Left := 0;
         r.Width := Width;
       end;
-      if not HasUnconstrainedAutosizeY then begin
+      if not HasUnconstrainedAutosizeHeight then begin
         r.Top := 0;
         r.height := height;
       end;
@@ -5505,7 +5470,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALBaseText.SetAutoSize(const Value: Boolean);
+procedure TALBaseText.SetAutoSize(const Value: TALAutoSizeMode);
 begin
   if FAutoSize <> Value then
   begin
@@ -5582,12 +5547,10 @@ begin
   Result.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
   Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
   //--
-  Result.AutoSize := False;
-  Result.AutoSizeX := False;
-  Result.AutoSizeY := False;
-  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then Result.AutoSize := True
-  else if HasUnconstrainedAutosizeX then Result.AutoSizeX := True
-  else if HasUnconstrainedAutosizeY then Result.AutoSizeY := True;
+  Result.AutoSize := TALAutoSizeMode.None;
+  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.All
+  else if HasUnconstrainedAutosizeWidth then Result.Autosize := TALAutoSizeMode.Width
+  else if HasUnconstrainedAutosizeHeight then Result.Autosize := TALAutoSizeMode.Height;
   //--
   Result.MaxLines := TextSettings.MaxLines;
   Result.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
@@ -5606,7 +5569,6 @@ begin
   Result.FillGradientOffsets := AFill.Gradient.Offsets;
   Result.FillResourceName := AFill.ResourceName;
   Result.FillMaskResourceName := '';
-  Result.FillMaskBitmap := ALNullBitmap;
   Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
   Result.FillImageMargins := AFill.ImageMargins.Rect;
   Result.FillImageNoRadius := AFill.ImageNoRadius;
@@ -5708,9 +5670,9 @@ begin
   if (AText <> '') then begin
 
     var LMaxSize: TSizeF;
-    if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-    else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
-    else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+    if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+    else if HasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(maxWidth, Height)
+    else if HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, maxHeight)
     else LMaxSize := TSizeF.Create(width, height);
 
     ARect.Width := LMaxSize.cX;
@@ -5789,9 +5751,9 @@ Procedure TALBaseText.MeasureMultilineText(
             const AShadow: TALShadow);
 begin
   var LMaxSize: TSizeF;
-  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-  else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
-  else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+  else if HasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(maxWidth, Height)
+  else if HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, maxHeight)
   else LMaxSize := TSizeF.Create(width, height);
 
   ARect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
@@ -5851,9 +5813,9 @@ begin
   if (AText <> '') then begin
 
     var LMaxSize: TSizeF;
-    if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-    else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
-    else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+    if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+    else if HasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(maxWidth, Height)
+    else if HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, maxHeight)
     else LMaxSize := TSizeF.Create(width, height);
 
     ABufDrawableRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);

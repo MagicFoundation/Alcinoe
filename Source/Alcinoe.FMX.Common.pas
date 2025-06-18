@@ -1179,6 +1179,7 @@ function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const S
 function  ALTextAlignToTextHorzAlign(const ATextAlign: TTextAlign): TALTextHorzAlign;
 function  ALTextAlignToTextVertAlign(const ATextAlign: TTextAlign): TALTextVertAlign;
 procedure ALVibrateDevice(const ADurationMs: Integer = 500);
+procedure ALPlayClickSound;
 
 {$IF defined(ALAppleOS)}
 type
@@ -1462,7 +1463,9 @@ uses
   Androidapi.JNI.Os,
   Androidapi.JNIBridge,
   Androidapi.Helpers,
+  Androidapi.JNI.App,
   FMX.forms,
+  Alcinoe.Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(ALMacOS)}
   Macapi.ObjectiveC,
@@ -6517,6 +6520,18 @@ begin
   {$ENDIF}
 end;
 
+{*************************}
+procedure ALPlayClickSound;
+begin
+  {$IF defined(ANDROID)}
+  var LView := TJView.Wrap(TAndroidHelper.Activity.getWindow.getDecorView.getRootView);
+  LView.playSoundEffect(TJALSoundEffectConstants.JavaClass.CLICK);
+  {$ELSEIF defined(IOS)}
+  // https://towardsdev.com/swiftui-sound-effect-2-ways-8ead163abe1b
+  AudioServicesPlaySystemSound(1104); // key_press_click.caf
+  {$ENDIF}
+end;
+
 {**********************}
 {$IF defined(ALAppleOS)}
 class function TAlphaColorCGFloat.Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat;
@@ -6830,6 +6845,9 @@ begin
   // --
   // On Android you can change screenscale via
   //   FMX.Platform.Screen.Android.SetScreenScaleOverrideHook
+  // --
+  // On iOS you can change screenscale via
+  //   setContentScaleFactor
   result := ALScreenScale;
   if Result = 0 then begin
     ALInitScreenScale;

@@ -22,11 +22,11 @@ uses
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALTriplet<T1, T2, T3> = record
-    First: T1;
-    Second: T2;
-    Third: T3;
-    constructor Create(const AFirst: T1; const ASecond: T2; const AThird: T3);
+  TALTriplet<K,V,E> = record
+    Key: K;
+    Value: V;
+    Extra: E;
+    constructor Create(const AKey: K; const AValue: V; const AExtra: E);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -795,12 +795,12 @@ uses
   Alcinoe.Localization,
   Alcinoe.StringUtils;
 
-{***********************************************************************************************}
-constructor TALTriplet<T1, T2, T3>.Create(const AFirst: T1; const ASecond: T2; const AThird: T3);
+{************************************************************************************}
+constructor TALTriplet<K,V,E>.Create(const AKey: K; const AValue: V; const AExtra: E);
 begin
-  First := AFirst;
-  Second := ASecond;
-  Third := AThird;
+  Key := AKey;
+  Value := AValue;
+  Extra := AExtra;
 end;
 
 {****************************************}

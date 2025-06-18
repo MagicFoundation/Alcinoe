@@ -1241,9 +1241,9 @@ type
     procedure AdjustSize; override;
   public
     constructor Create(AOwner: TComponent); override;
-    function HasUnconstrainedAutosizeX: Boolean; override;
+    function HasUnconstrainedAutosizeWidth: Boolean; override;
   published
-    property AutoSize default True;
+    property AutoSize default TALAutoSizeMode.All;
     property Password;
   end;
 
@@ -6163,7 +6163,7 @@ begin
     //LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
     //LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
     //--
-    LOptions.AutoSize := True;
+    LOptions.AutoSize := TALAutoSizeMode.All;
     //--
     LOptions.MaxLines := 1;
     //LOptions.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
@@ -6183,7 +6183,6 @@ begin
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillMaskResourceName: String; // default = ''
-    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
@@ -6293,7 +6292,7 @@ begin
     //LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
     //LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
     //--
-    LOptions.AutoSize := True;
+    LOptions.AutoSize := TALAutoSizeMode.All;
     //--
     LOptions.MaxLines := LabelTextSettings.MaxLines;
     LOptions.LineHeightMultiplier := LabelTextSettings.LineHeightMultiplier;
@@ -6312,7 +6311,6 @@ begin
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillMaskResourceName: String; // default = ''
-    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
@@ -6422,7 +6420,7 @@ begin
     //LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
     //LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
     //--
-    LOptions.AutoSize := True;
+    LOptions.AutoSize := TALAutoSizeMode.All;
     //--
     LOptions.MaxLines := SupportingTextSettings.MaxLines;
     LOptions.LineHeightMultiplier := SupportingTextSettings.LineHeightMultiplier;
@@ -6441,7 +6439,6 @@ begin
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillMaskResourceName: String; // default = ''
-    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
@@ -7184,11 +7181,11 @@ end;
 constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
-  FAutoSize := True;
+  FAutoSize := TALAutoSizeMode.All;
 end;
 
 {**************************************************}
-function TALEdit.HasUnconstrainedAutosizeX: Boolean;
+function TALEdit.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   result := False;
 end;
@@ -7209,7 +7206,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
@@ -7223,7 +7220,7 @@ begin
         if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
       end;
 
-      if HasUnconstrainedAutosizeY then begin
+      if HasUnconstrainedAutosizeHeight then begin
 
         var LLineHeight: Single := GetLineHeight;
         if AutoAlignToPixel then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);

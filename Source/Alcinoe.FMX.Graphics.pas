@@ -274,7 +274,6 @@ function ALCreateSkSurfaceFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: sk_image_t;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -287,7 +286,6 @@ function ALCreateSkImageFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: sk_image_t;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -317,7 +315,6 @@ function ALCreateJBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: JBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -347,7 +344,6 @@ function ALCreateCGContextRefFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: CGImageRef;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -360,7 +356,6 @@ function ALCreateCGImageRefFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: CGImageRef;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -390,7 +385,6 @@ function ALCreateTBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: TBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -419,7 +413,6 @@ function ALCreateBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: TALBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -450,7 +443,6 @@ function ALCreateDrawableFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: TALBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -481,7 +473,6 @@ Type
     FFillResourceName: String;
     FFillResourceStream: TStream;
     FFillMaskResourceName: String;
-    FFillMaskBitmap: TALBitmap;
     FFillBackgroundMarginsRect: TRectF;
     FFillImageMarginsRect: TRectF;
     FFillImageTintColor: TAlphaColor;
@@ -529,7 +520,6 @@ Type
     function SetFillResourceName(const AValue: String): PALDrawRectangleHelper;
     function SetFillResourceStream(const AValue: TStream): PALDrawRectangleHelper;
     function SetFillMaskResourceName(const AValue: String): PALDrawRectangleHelper;
-    function SetFillMaskBitmap(const AValue: TALBitmap): PALDrawRectangleHelper;
     function SetFillBackgroundMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
     function SetFillImageMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
     function SetFillImageTintColor(const AValue: TAlphaColor): PALDrawRectangleHelper;
@@ -1929,7 +1919,6 @@ function ALCreateSkSurfaceFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: sk_image_t;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -1971,9 +1960,8 @@ begin
 
   try
 
-    // handle AMaskImage / AMaskImage
-    var LOwnMaskImage := False;
-    var LMaskImage := AMaskImage;
+    // handle AMaskResourceName
+    var LMaskImage: sk_image_t := 0;
     try
 
       // Create the MaskImage
@@ -1982,7 +1970,6 @@ begin
                         AMaskResourceName, // const AResourceName: String;
                         nil, // const AResourceStream: TStream;
                         '', // const AMaskResourceName: String;
-                        0, // const AMaskImage: sk_image_t;
                         AScale, // const AScale: Single;
                         W, H, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -1991,7 +1978,6 @@ begin
                         0, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
                         AYRadius); // const AYRadius: Single)
-        LOwnMaskImage := True;
       end;
 
       var LSrcRect: TRectF;
@@ -2074,7 +2060,7 @@ begin
       end;
 
     finally
-      if LOwnMaskImage then
+      if LMaskImage <> 0 then
         sk4d_refcnt_unref(LMaskImage);
     end;
 
@@ -2091,7 +2077,6 @@ function ALCreateSkImageFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: sk_image_t;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -2105,7 +2090,6 @@ begin
                     AResourceName, // const AResourceName: String;
                     AResourceStream, // const AResourceStream: TStream;
                     AMaskResourceName, // const AMaskResourceName: String;
-                    AMaskImage, // const AMaskImage: sk_image_t;
                     AScale, // const AScale: Single;
                     W, H, // const W, H: single;
                     AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -2385,7 +2369,6 @@ function ALCreateJBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: JBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -2443,9 +2426,8 @@ begin
 
   try
 
-    // handle AMaskBitmap / AMaskBitmap
-    var LOwnMaskBitmap := False;
-    var LMaskBitmap := AMaskBitmap;
+    // handle AMaskResourceName
+    var LMaskBitmap: JBitmap := nil;
     try
 
       // Create the MaskBitmap
@@ -2454,7 +2436,6 @@ begin
                          AMaskResourceName, // const AResourceName: String;
                          nil, // const AResourceStream: TStream;
                          '', // const AMaskResourceName: String;
-                         nil, // const AMaskBitmap: JBitmap;
                          AScale, // const AScale: Single;
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -2463,7 +2444,6 @@ begin
                          0, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
                          AYRadius); // const AYRadius: Single)
-        LOwnMaskBitmap := True;
       end;
 
       var LSrcRect: TRectF;
@@ -2570,7 +2550,7 @@ begin
       end;
 
     finally
-      if LOwnMaskBitmap then begin
+      if LMaskBitmap <> nil then begin
         LMaskBitmap.recycle;
         LMaskBitmap := nil;
       end;
@@ -2850,7 +2830,6 @@ function ALCreateCGContextRefFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: CGImageRef;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -2925,9 +2904,8 @@ begin
     // Init LImage
     var LImage := ALOSImageGetCgImage(LOSImage);
 
-    // handle AMaskImage / AMaskImage
-    var LOwnMaskImage := False;
-    var LMaskImage := AMaskImage;
+    // handle AMaskResourceName
+    var LMaskImage: CGImageRef := nil;
     try
 
       // Create the MaskImage
@@ -2936,7 +2914,6 @@ begin
                         AMaskResourceName, // const AResourceName: String;
                         nil, // const AResourceStream: TStream;
                         '', // const AMaskResourceName: String;
-                        nil, // const AMaskImage: CGImageRef;
                         AScale, // const AScale: Single;
                         W, H, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -2945,7 +2922,6 @@ begin
                         0, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
                         AYRadius); // const AYRadius: Single)
-        LOwnMaskImage := True;
       end;
 
       var LSrcRect: TRectF;
@@ -3027,7 +3003,7 @@ begin
       end;
 
     finally
-      if LOwnMaskImage then
+      if LMaskImage <> nil then
         CGImageRelease(LMaskImage);
     end;
 
@@ -3044,7 +3020,6 @@ function ALCreateCGImageRefFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskImage: CGImageRef;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -3058,7 +3033,6 @@ begin
                          AResourceName, // const AResourceName: String;
                          AResourceStream, // const AResourceStream: TStream;
                          AMaskResourceName, // const AMaskResourceName: String;
-                         AMaskImage, // const AMaskImage: CGImageRef;
                          AScale, // const AScale: Single;
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3239,7 +3213,6 @@ function ALCreateTBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: TBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -3269,9 +3242,8 @@ begin
 
   try
 
-    // handle AMaskBitmap / AMaskBitmap
-    var LOwnMaskBitmap := False;
-    var LMaskBitmap := AMaskBitmap;
+    // handle AMaskResourceName
+    var LMaskBitmap: TBitmap := nil;
     try
 
       // Create the MaskBitmap
@@ -3280,7 +3252,6 @@ begin
                          AMaskResourceName, // const AResourceName: String;
                          nil, // const AResourceStream: TStream;
                          '', // const AMaskResourceName: String;
-                         nil, // const AMaskBitmap: TBitmap;
                          AScale, // const AScale: Single;
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3289,7 +3260,6 @@ begin
                          0, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
                          AYRadius); // const AYRadius: Single)
-        LOwnMaskBitmap := True;
       end;
 
       var LSrcRect: TRectF;
@@ -3372,8 +3342,7 @@ begin
       end;
 
     finally
-      if LOwnMaskBitmap then
-        ALFreeAndNil(LMaskBitmap);
+      ALFreeAndNil(LMaskBitmap);
     end;
 
   finally
@@ -3466,7 +3435,6 @@ function ALCreateBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: TALBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -3481,7 +3449,6 @@ begin
               AResourceName, // const AResourceName: String;
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
-              AMaskBitmap, // const AMaskImage: sk_image_t;
               AScale, // const AScale: Single;
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3495,7 +3462,6 @@ begin
               AResourceName, // const AResourceName: String;
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
-              AMaskBitmap, // const AMaskBitmap: JBitmap;
               AScale, // const AScale: Single;
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3509,7 +3475,6 @@ begin
               AResourceName, // const AResourceName: String;
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
-              AMaskBitmap, // const AMaskImage: CGImageRef;
               AScale, // const AScale: Single;
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3523,7 +3488,6 @@ begin
               AResourceName, // const AResourceName: String;
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
-              AMaskBitmap, // const AMaskBitmap: TBitmap;
               AScale, // const AScale: Single;
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3676,7 +3640,6 @@ function ALCreateDrawableFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
-           const AMaskBitmap: TALBitmap;
            const AScale: Single;
            const W, H: single;
            const AWrapMode: TALImageWrapMode;
@@ -3692,7 +3655,6 @@ begin
                 AResourceName, // const AResourceName: String;
                 AResourceStream, // const AResourceStream: TStream;
                 AMaskResourceName, // const AMaskResourceName: String;
-                AMaskBitmap, // const AMaskImage: sk_image_t;
                 AScale, // const AScale: Single;
                 W, H, // const W, H: single;
                 AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3706,7 +3668,6 @@ begin
                       AResourceName, // const AResourceName: String;
                       AResourceStream, // const AResourceStream: TStream;
                       AMaskResourceName, // const AMaskResourceName: String;
-                      AMaskBitmap, // const AMaskImage: sk_image_t;
                       AScale, // const AScale: Single;
                       W, H, // const W, H: single;
                       AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3730,7 +3691,6 @@ begin
                    AResourceName, // const AResourceName: String;
                    AResourceStream, // const AResourceStream: TStream;
                    AMaskResourceName, // const AMaskResourceName: String;
-                   AMaskBitmap, // const AMaskBitmap: JBitmap;
                    AScale, // const AScale: Single;
                    W, H, // const W, H: single;
                    AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3750,7 +3710,6 @@ begin
                          AResourceName, // const AResourceName: String;
                          AResourceStream, // const AResourceStream: TStream;
                          AMaskResourceName, // const AMaskResourceName: String;
-                         AMaskBitmap, // const AMaskImage: CGImageRef;
                          AScale, // const AScale: Single;
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3773,7 +3732,6 @@ begin
               AResourceName, // const AResourceName: String;
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
-              AMaskBitmap, // const AMaskBitmap: TBitmap;
               AScale, // const AScale: Single;
               W, H, // const W, H: single;
               AWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -3810,7 +3768,6 @@ begin
   FFillResourceName := '';
   FFillResourceStream := nil;
   FFillMaskResourceName := '';
-  FFillMaskBitmap := ALNullBitmap;
   FFillBackgroundMarginsRect := TRectF.Empty;
   FFillImageMarginsRect := TRectF.Empty;
   FFillImageTintColor := TAlphaColors.Null;
@@ -3949,13 +3906,6 @@ end;
 function TALDrawRectangleHelper.SetFillMaskResourceName(const AValue: String): PALDrawRectangleHelper;
 begin
   FFillMaskResourceName := AValue;
-  Result := @Self;
-end;
-
-{*************************************************************************************************}
-function TALDrawRectangleHelper.SetFillMaskBitmap(const AValue: TALBitmap): PALDrawRectangleHelper;
-begin
-  FFillMaskBitmap := AValue;
   Result := @Self;
 end;
 
@@ -5723,7 +5673,6 @@ begin
                         LFillResourceName, // const AResourceName: String;
                         LFillResourceStream, // const AResourceStream: TStream;
                         FFillMaskResourceName, // const AMaskResourceName: String;
-                        FFillMaskBitmap, // const AMaskImage: sk_image_t;
                         1, // const AScale: Single;
                         LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                         FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -5990,7 +5939,6 @@ begin
                                   LFillResourceName, // const AResourceName: String;
                                   LFillResourceStream, // const AResourceStream: TStream;
                                   FFillMaskResourceName, // const AMaskResourceName: String;
-                                  FFillMaskBitmap, // const AMaskBitmap: JBitmap;
                                   1, // const AScale: Single;
                                   LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                                   FFillWrapMode, // const AWrapMode: TALImageWrapMode;
@@ -6304,7 +6252,6 @@ begin
                                     LFillResourceName, // const AResourceName: String;
                                     LFillResourceStream, // const AResourceStream: TStream;
                                     FFillMaskResourceName, // const AMaskResourceName: String;
-                                    FFillMaskBitmap, // const AMaskImage: CGImageRef;
                                     1, // const AScale: Single;
                                     LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
                                     FFillWrapMode, // const AWrapMode: TALImageWrapMode;

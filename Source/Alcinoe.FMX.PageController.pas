@@ -996,7 +996,7 @@ begin
   FActiveIndicator.OnChanged := ActiveIndicatorChanged;
   FInactiveIndicator := TInactiveIndicator.Create;
   FInactiveIndicator.OnChanged := InactiveIndicatorChanged;
-  AutoSize := True;
+  AutoSize := TALAutoSizeMode.All;
 end;
 
 {**********************************}
@@ -1094,7 +1094,7 @@ begin
   if (not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
-     (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
+     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // If AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -1106,7 +1106,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       var LWidth := Padding.Left + Padding.Right +
@@ -1114,9 +1114,9 @@ begin
       var LHeight := Padding.Top + Padding.Bottom +
                      FInactiveIndicator.Margins.Top + FInactiveIndicator.Margins.Bottom + FInactiveIndicator.Height;
 
-      if (not HasUnconstrainedAutosizeX) or (SameValue(LWidth, 0, Tepsilon.Position)) then
+      if (not HasUnconstrainedAutosizeWidth) or (SameValue(LWidth, 0, Tepsilon.Position)) then
         LWidth := Width;
-      if (not HasUnconstrainedAutosizeY) or (SameValue(LHeight, 0, Tepsilon.Position)) then
+      if (not HasUnconstrainedAutosizeHeight) or (SameValue(LHeight, 0, Tepsilon.Position)) then
         LHeight := Height;
       SetFixedSizeBounds(Position.X, Position.Y, LWidth, LHeight);
 
@@ -1787,7 +1787,7 @@ begin
     var LNewViewportPosition := ViewportPosition;
     if (assigned(FPageController.FOnViewportPositionChange)) and
        (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
-      FPageController.FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
+      FPageController.FOnViewportPositionChange(FPageController, fLastViewportPosition, LNewViewportPosition);
     fLastViewportPosition := LNewViewportPosition;
 
     If FPageController.PageIndicator <> nil then begin

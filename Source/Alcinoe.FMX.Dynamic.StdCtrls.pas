@@ -18,6 +18,7 @@ uses
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Common,
+  Alcinoe.fmx.Controls,
   Alcinoe.fmx.Dynamic.Controls,
   Alcinoe.fmx.Dynamic.Common,
   Alcinoe.Fmx.Dynamic.Objects;
@@ -1560,7 +1561,7 @@ type
     //property Action;
     property Align;
     //**property Anchors;
-    property AutoSize default True;
+    property AutoSize default TALAutoSizeMode.All;
     property AutoTranslate;
     //**property CanFocus default true;
     //property CanParentFocus;
@@ -2273,7 +2274,7 @@ type
         //property Align;
         //property Anchors;
         property Animation: TAnimation read FAnimation write FAnimation default TAnimation.ScaleInOut;
-        property AutoSize default true;
+        property AutoSize default TALAutoSizeMode.All;
         //property AutoTranslate;
         //property CanFocus;
         //property CanParentFocus;
@@ -2926,7 +2927,6 @@ uses
   Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Styles,
-  Alcinoe.FMX.Controls,
   Alcinoe.Common;
 
 {*}
@@ -3112,7 +3112,6 @@ begin
                       FResourceName, // const AResourceName: String;
                       nil, // const AResourceStream: TStream;
                       '', // const AMaskResourceName: String;
-                      ALNullBitmap, // const AMaskBitmap: TALBitmap;
                       1, // const AScale: Single;
                       Width * (fframeCount div fRowCount) * ALGetScreenScale,
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
@@ -7958,7 +7957,7 @@ begin
   //--
   //**CanFocus := True;
   HitTest := True;
-  AutoSize := True;
+  AutoSize := TALAutoSizeMode.All;
   Cursor := crHandPoint;
   //--
   //**var LPaddingChange: TNotifyEvent := Padding.OnChange;
@@ -9578,7 +9577,7 @@ end;
 constructor TALDynamicCustomTrack.TValueIndicator.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   inherited create(ACustomTrack);
-  AutoSize := True;
+  AutoSize := TALAutoSizeMode.All;
   Visible := False;
   Pivot := TPointF.Create(0.5,1);
   FCustomTrack := ACustomTrack;

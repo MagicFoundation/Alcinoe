@@ -722,7 +722,7 @@ begin
     var LNewViewportPosition := ViewportPosition;
     if (assigned(FScrollBox.FOnViewportPositionChange)) and
        (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
-      FScrollBox.FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
+      FScrollBox.FOnViewportPositionChange(FScrollBox, fLastViewportPosition, LNewViewportPosition);
     fLastViewportPosition := LNewViewportPosition;
 
   end;

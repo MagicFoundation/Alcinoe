@@ -230,7 +230,7 @@ begin
   LText1.parent := LLayout2;
   LText1.Align := TALALignLayout.Top;
   Ltext1.Margins.Bottom := 8;
-  LText1.AutoSize := True;
+  LText1.AutoSize := TALAutoSizeMode.All;
   LText1.TextSettings.Font.Family := 'sans-serif';
   LText1.TextSettings.IsHtml := true;
   LText1.TextSettings.Font.Size := 1;
@@ -578,22 +578,22 @@ begin
                   //--
                   case random(5) of
                     0: begin
-                      LOptions.AutoSize := True;
+                      LOptions.AutoSize := TALAutoSizeMode.All;
                       LOptions.AutoSizeX := True;
                       LOptions.AutoSizeY := True;
                     end;
                     1: begin
-                      LOptions.AutoSize := False;
+                      LOptions.AutoSize := TALAutoSizeMode.None;
                       LOptions.AutoSizeX := True;
                       LOptions.AutoSizeY := False;
                     end;
                     2: begin
-                      LOptions.AutoSize := False;
+                      LOptions.AutoSize := TALAutoSizeMode.None;
                       LOptions.AutoSizeX := False;
                       LOptions.AutoSizeY := True;
                     end
                     else begin
-                      LOptions.AutoSize := False;
+                      LOptions.AutoSize := TALAutoSizeMode.None;
                       LOptions.AutoSizeX := False;
                       LOptions.AutoSizeY := False;
                     end;
@@ -720,22 +720,22 @@ begin
                   //--
                   case random(5) of
                     0: begin
-                      LOptions.AutoSize := True;
+                      LOptions.AutoSize := TALAutoSizeMode.All;
                       LOptions.AutoSizeX := True;
                       LOptions.AutoSizeY := True;
                     end;
                     1: begin
-                      LOptions.AutoSize := False;
+                      LOptions.AutoSize := TALAutoSizeMode.None;
                       LOptions.AutoSizeX := True;
                       LOptions.AutoSizeY := False;
                     end;
                     2: begin
-                      LOptions.AutoSize := False;
+                      LOptions.AutoSize := TALAutoSizeMode.None;
                       LOptions.AutoSizeX := False;
                       LOptions.AutoSizeY := True;
                     end
                     else begin
-                      LOptions.AutoSize := False;
+                      LOptions.AutoSize := TALAutoSizeMode.None;
                       LOptions.AutoSizeX := False;
                       LOptions.AutoSizeY := False;
                     end;

@@ -85,7 +85,7 @@ Procedure TForm1.CreateRectangles(
       Text := AText;
       Align := TAlignLayout.Top;
       Margins.left := 16;
-      AutoSize := True;
+      AutoSize := TALAutoSizeMode.All;
       Size.Width := 44;
       Size.Height := 16;
       TextSettings.Font.Size := 12;
@@ -236,7 +236,7 @@ Procedure TForm1.CreateCircles(
       Text := AText;
       Align := TAlignLayout.Top;
       Margins.left := 16;
-      AutoSize := True;
+      AutoSize := TALAutoSizeMode.All;
       Size.Width := 44;
       Size.Height := 16;
       TextSettings.Font.Size := 12;

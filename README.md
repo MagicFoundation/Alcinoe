@@ -1162,6 +1162,11 @@ undesired conversions.
 History
 =======
 
+#### 18/06/2025 – Updates and Refactoring
+
+- Replaced `AutoSize: Boolean` with `AutoSize: TALAutoSizeMode` to provide more granular control over sizing behavior.
+  ```TALAutoSizeMode = (None, Width, Height, All);```
+
 #### 10/05/2025 – Updates and Refactoring
 
 - Removed `ReadyBeforeResourcesLoaded`.

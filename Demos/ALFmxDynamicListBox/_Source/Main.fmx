@@ -11,19 +11,19 @@ object MainForm: TMainForm
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMasterStyle = 0
-  object MainDynamicListBox: TALDynamicListBox
+  object MainListBox: TALDynamicListBox
     Align = Client
     Size.Width = 380.000000000000000000
     Size.Height = 870.000000000000000000
     Size.PlatformDefault = False
-    OnCreateLoadingContent = MainDynamicListBoxCreateLoadingContent
-    OnCreateTopBar = MainDynamicListBoxCreateTopBar
-    OnCreateBottomBar = MainDynamicListBoxCreateBottomBar
-    OnCreatePullToRefreshIndicator = MainDynamicListBoxCreatePullToRefreshIndicator
-    OnCreateLoadMoreIndicator = MainDynamicListBoxCreateLoadMoreIndicator
-    OnCreateLoadMoreRetryButton = MainDynamicListBoxCreateLoadMoreRetryButton
-    OnCreateItem = MainDynamicListBoxCreateItem
-    OnCreateItemMainContent = MainDynamicListBoxCreateItemMainContent
-    OnDownloadItems = MainDynamicListBoxDownloadItems
+    OnCreateLoadingContent = MainListBoxCreateLoadingContent
+    OnCreateTopBar = MainListBoxCreateTopBar
+    OnCreateBottomBar = MainListBoxCreateBottomBar
+    OnCreatePullToRefreshIndicator = MainListBoxCreatePullToRefreshIndicator
+    OnCreateLoadMoreIndicator = MainListBoxCreateLoadMoreIndicator
+    OnCreateLoadMoreRetryButton = MainListBoxCreateLoadMoreRetryButton
+    OnCreateItem = MainListBoxCreateItem
+    OnCreateItemMainContent = MainListBoxCreateItemMainContent
+    OnDownloadItems = MainListBoxDownloadItems
   end
 end

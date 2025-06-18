@@ -49,28 +49,29 @@ uses
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.Controls,
   Alcinoe.JSONDoc,
-  Alcinoe.GuardianThread, Alcinoe.FMX.Dynamic.Controls;
+  Alcinoe.GuardianThread,
+  Alcinoe.FMX.Dynamic.Controls;
 
 type
 
 
   {**********************}
   TMainForm = class(TForm)
-    MainDynamicListBox: TALDynamicListBox;
+    MainListBox: TALDynamicListBox;
     procedure FormCreate(Sender: TObject);
-    procedure MainDynamicListBoxDownloadItems(
+    procedure MainListBoxDownloadItems(
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
                 var AErrorCode: Integer);
-    function MainDynamicListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
-    function MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
-    function MainDynamicListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
-    function MainDynamicListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
-    function MainDynamicListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
-    function MainDynamicListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
-    function MainDynamicListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
-    function MainDynamicListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
+    function MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
+    function MainListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
+    function MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
+    function MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
+    function MainListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
+    function MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+    function MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+    function MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
   private
     {$IF defined(ALUIAutomationEnabled)}
     FSimulateInfiniteScrollCurrentPoint: TPointF;
@@ -80,25 +81,25 @@ type
     procedure UpdateSystemBarsAppearance;
     function ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
     {$ENDIF}
-    procedure TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
-    procedure TextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
-    procedure TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
-    procedure PageControllerActivePageChanged(Sender: TObject);
-    procedure BottomBarResized(Sender: TObject);
     procedure StoriesCarouselDownloadItems(
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
                 var AErrorCode: Integer);
     function StoriesCarouselCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
-    function CarouselCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
-    function CarouselCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
     procedure SuggestedCarouselDownloadItems(
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
                 var AErrorCode: Integer);
     function SuggestedCarouselCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
+    function CarouselCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+    function CarouselCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+    procedure TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
+    procedure TextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+    procedure TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+    procedure PageControllerActivePageChanged(Sender: TObject);
+    procedure BottomBarResized(Sender: TObject);
     procedure RetryButtonClick(Sender: TObject);
     procedure FollowButtonClick(Sender: TObject);
   end;
@@ -143,6 +144,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   TALErrorReporting.Instance;
   TALGuardianThread.Instance;
+  ALGlobalClickSoundEnabled := True;
   {$IF defined(DEBUG)}
   ALInitHasTouchScreen;
   ALHasTouchScreen := true;
@@ -264,7 +266,7 @@ begin
 end;
 
 {***************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
+function TMainForm.MainListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
 begin
   if AData.GetChildNodeValueText('type', '') = 'stories' then begin
     var Lview := TALDynamicListBox.TView.Create(nil);
@@ -292,12 +294,12 @@ begin
   end
   else begin
     Result := TALDynamicListBox.TItem.Create(nil);
-    Result.OnCreateMainContent := MainDynamicListBoxCreateItemMainContent;
+    Result.OnCreateMainContent := MainListBoxCreateItemMainContent;
   end;
 end;
 
 {*****************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
+function TMainForm.MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
 begin
   Result := TALDynamicListBox.TItem.TLoadingContent.Create(nil);
   Try
@@ -395,7 +397,7 @@ begin
 end;
 
 {***********************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+function TMainForm.MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreIndicator.Create(nil);
   try
@@ -416,7 +418,7 @@ begin
 end;
 
 {***************************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+function TMainForm.MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreRetryButton.Create(nil);
   try
@@ -439,7 +441,7 @@ begin
 end;
 
 {*************************************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
+function TMainForm.MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
 begin
   Result := TALDynamicListBox.TView.TPullToRefreshIndicator.Create(nil);
   try
@@ -474,17 +476,17 @@ begin
   if LFollowButton.Text = 'Follow' then begin
     LFollowButton.Fill.Color := $ff66bd2b;
     LFollowButton.Text := 'Following';
-    LFollowButton.CacheIndex := 12;
+    LFollowButton.CacheIndex := 13;
   end
   else begin
     LFollowButton.Fill.Color := $FF4193ef;
     LFollowButton.Text := 'Follow';
-    LFollowButton.CacheIndex := 11;
+    LFollowButton.CacheIndex := 12;
   end;
 end;
 
 {*************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
+function TMainForm.MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
 begin
   Result := TALDynamicListBox.TView.TTopBar.Create(nil);
   try
@@ -497,7 +499,7 @@ begin
     LTitle.TextSettings.Font.Size := 22;
     LTitle.TextSettings.Font.weight := TFontWeight.Bold;
     LTitle.TextSettings.Font.Color := $FF0d1014;
-    LTitle.AutoSize := True;
+    LTitle.AutoSize := TALAutoSizeMode.All;
     LTitle.Margins.left := 18;
     LTitle.Text := 'For you';
 
@@ -526,7 +528,7 @@ begin
 end;
 
 {*******************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
+function TMainForm.MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
 begin
   Result := TALDynamicListBox.TView.TBottomBar.Create(nil);
   try
@@ -595,7 +597,7 @@ begin
 end;
 
 {***************************************************************************************************************************************************************}
-function TMainForm.MainDynamicListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
+function TMainForm.MainListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
 begin
   Result := TALDynamicListBox.TItem.TMainContent.Create(nil);
   Try
@@ -627,6 +629,8 @@ begin
     LAvatar.Width := 30;
     LAvatar.XRadius := -50;
     LAvatar.yRadius := -50;
+    LAvatar.LoadingCacheIndex := 2;
+    LAvatar.CacheEngine := AContext.CacheEngine;
 
     var LMenuBtn := TALDynamicButton.Create(LLayout1);
     LMenuBtn.Fill.Color := TalphaColors.Null;
@@ -636,20 +640,20 @@ begin
     LMenuBtn.Margins.right := 14;
     LMenuBtn.Height := 16;
     LMenuBtn.Width := 4;
-    LMenuBtn.CacheIndex := 2;
+    LMenuBtn.CacheIndex := 3;
     LMenuBtn.CacheEngine := AContext.CacheEngine;
 
     Var LLayout2 := TALDynamicLayout.Create(LLayout1);
     LLayout2.Align := TALAlignLayout.LeftCenter;
     LLayout2.Margins.Left := 13;
-    LLayout2.AutoSize := True;
+    LLayout2.AutoSize := TALAutoSizeMode.All;
 
     var LUsername := TALDynamicText.Create(LLayout2);
     LUsername.Align := TALAlignLayout.topLeft;
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.Medium;
     LUsername.TextSettings.Font.Color := $FF262626;
-    LUsername.AutoSize := True;
+    LUsername.AutoSize := TALAutoSizeMode.All;
     LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
     var LGeotag := TALDynamicText.Create(LLayout2);
@@ -658,7 +662,7 @@ begin
     LGeotag.TextSettings.Font.Size := 12;
     LGeotag.TextSettings.Font.weight := TFontWeight.Regular;
     LGeotag.TextSettings.Font.Color := $FF262626;
-    LGeotag.AutoSize := True;
+    LGeotag.AutoSize := TALAutoSizeMode.All;
     LGeotag.Text := AContext.Owner.Data.GetChildNodeValueText('geotag', '');
 
     var LmediaNode := AContext.Owner.Data.GetChildNode('media');
@@ -701,7 +705,7 @@ begin
       LpageIndicator.InactiveIndicator.Fill.Color := $FFdcdfe3;
       LpageIndicator.ActiveIndicator.Fill.Color := $FF4193ef;
       LPageIndicator.AnimationType := TALDynamicPageIndicator.TAnimationType.Slide;
-      LPageIndicator.CacheIndex := 8;
+      LPageIndicator.CacheIndex := 4;
       LPageIndicator.CacheEngine := AContext.CacheEngine;
       LPageController.PageIndicator := LPageIndicator;
       var LPageCountText := TALDynamicText.Create(LPageController);
@@ -714,7 +718,7 @@ begin
       LPageCountText.TextSettings.Font.weight := TFontWeight.regular;
       LPageCountText.TextSettings.Font.Color := $FFffffff;
       LPageCountText.Fill.Color := $B2000000;
-      LPageCountText.AutoSize := True;
+      LPageCountText.AutoSize := TALAutoSizeMode.All;
       LPageCountText.XRadius := -50;
       LPageCountText.YRadius := -50;
       LPageCountText.Text := '1/'+AlIntToStrW(LPageController.PageCount);
@@ -750,7 +754,7 @@ begin
           LUsername.TextSettings.Font.Color := $FFffffff;
           LGeotag.TextSettings.Font.Color := $FFffffff;
           LMenuBtn.Fill.ResourceName := 'menu_dark';
-          LMenuBtn.CacheIndex := 3;
+          LMenuBtn.CacheIndex := 5;
           LMenuBtn.CacheEngine := AContext.CacheEngine;
         end;
       end;
@@ -770,7 +774,7 @@ begin
     LLikeCountBtn.Margins.Left := 17;
     LLikeCountBtn.Height := 20;
     LLikeCountBtn.Width := 23;
-    LLikeCountBtn.CacheIndex := 4;
+    LLikeCountBtn.CacheIndex := 6;
     LLikeCountBtn.CacheEngine := AContext.CacheEngine;
 
     var LLikeCountText := TALDynamicText.Create(LLayout3);
@@ -779,7 +783,7 @@ begin
     LLikeCountText.TextSettings.Font.Size := 14;
     LLikeCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LLikeCountText.TextSettings.Font.Color := $FF0d1014;
-    LLikeCountText.AutoSize := True;
+    LLikeCountText.AutoSize := TALAutoSizeMode.All;
     LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
 
     var LCommentCountBtn := TALDynamicButton.Create(LLayout3);
@@ -790,7 +794,7 @@ begin
     LCommentCountBtn.Margins.Left := 14;
     LCommentCountBtn.Height := 22;
     LCommentCountBtn.Width := 22;
-    LCommentCountBtn.CacheIndex := 5;
+    LCommentCountBtn.CacheIndex := 7;
     LCommentCountBtn.CacheEngine := AContext.CacheEngine;
 
     var LCommentCountText := TALDynamicText.Create(LLayout3);
@@ -799,7 +803,7 @@ begin
     LCommentCountText.TextSettings.Font.Size := 14;
     LCommentCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LCommentCountText.TextSettings.Font.Color := $FF0d1014;
-    LCommentCountText.AutoSize := True;
+    LCommentCountText.AutoSize := TALAutoSizeMode.All;
     LCommentCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('comment_count', 0));
 
     var LReshareCountsBtn := TALDynamicButton.Create(LLayout3);
@@ -810,7 +814,7 @@ begin
     LReshareCountsBtn.Margins.Left := 14;
     LReshareCountsBtn.Height := 19;
     LReshareCountsBtn.Width := 22;
-    LReshareCountsBtn.CacheIndex := 6;
+    LReshareCountsBtn.CacheIndex := 8;
     LReshareCountsBtn.CacheEngine := AContext.CacheEngine;
 
     var LReshareCountText := TALDynamicText.Create(LLayout3);
@@ -819,7 +823,7 @@ begin
     LReshareCountText.TextSettings.Font.Size := 14;
     LReshareCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LReshareCountText.TextSettings.Font.Color := $FF0d1014;
-    LReshareCountText.AutoSize := True;
+    LReshareCountText.AutoSize := TALAutoSizeMode.All;
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
 
     var LBookmarkBtn := TALDynamicButton.Create(LLayout3);
@@ -830,7 +834,7 @@ begin
     LBookmarkBtn.Margins.right := 19;
     LBookmarkBtn.Height := 20;
     LBookmarkBtn.Width := 18;
-    LBookmarkBtn.CacheIndex := 7;
+    LBookmarkBtn.CacheIndex := 9;
     LBookmarkBtn.CacheEngine := AContext.CacheEngine;
 
     var LCaption := TALDynamicText.Create(Result);
@@ -840,7 +844,7 @@ begin
     LCaption.TextSettings.Font.Size := 14;
     LCaption.TextSettings.Font.Color := $FF272727;
     LCaption.TextSettings.LineHeightMultiplier := 1.3;
-    LCaption.AutoSize := True;
+    LCaption.AutoSize := TALAutoSizeMode.All;
     LCaption.TextSettings.MaxLines := 2;
     LCaption.TextSettings.IsHtml := True;
     LCaption.TextSettings.Ellipsis := '… more';
@@ -881,7 +885,7 @@ begin
     LDate.TextSettings.Font.Size := 12.5;
     LDate.TextSettings.Font.weight := TFontWeight.Regular;
     LDate.TextSettings.Font.Color := $FF71757f;
-    LDate.AutoSize := True;
+    LDate.AutoSize := TALAutoSizeMode.All;
     LDate.Text := inttostr(1+ALRandom32(23)) + ' hours ago';
     LDate.TextSettings.IsHtml := True;
 
@@ -928,6 +932,8 @@ begin
     LAvatar.Width := 84;
     LAvatar.XRadius := -50;
     LAvatar.yRadius := -50;
+    LAvatar.LoadingCacheIndex := 21;
+    LAvatar.CacheEngine := AContext.CacheEngine;
 
     var LUsername := TALDynamicText.Create(LLayout1);
     LUsername.Align := TALAlignLayout.top;
@@ -936,7 +942,7 @@ begin
     LUsername.TextSettings.Font.Color := $FF262626;
     LUsername.TextSettings.HorzAlign := TALTextHorzAlign.Center;
     LUsername.TextSettings.MaxLines := 1;
-    LUsername.AutoSize := True;
+    LUsername.AutoSize := TALAutoSizeMode.All;
     LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
   Except
@@ -1020,13 +1026,15 @@ begin
     LAvatar.XRadius := -50;
     LAvatar.yRadius := -50;
     LAvatar.Margins.top := 16;
+    LAvatar.LoadingCacheIndex := 11;
+    LAvatar.CacheEngine := AContext.CacheEngine;
 
     var LUsername := TALDynamicText.Create(LBackground);
     LUsername.Align := TALAlignLayout.topcenter;
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.medium;
     LUsername.TextSettings.Font.Color := $FF0d1014;
-    LUsername.AutoSize := True;
+    LUsername.AutoSize := TALAutoSizeMode.All;
     LUsername.TextSettings.MaxLines := 1;
     LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
     LUsername.Margins.top := 12;
@@ -1045,7 +1053,7 @@ begin
     LFollowButton.Margins.bottom := 12;
     LFollowButton.XRadius := 6;
     LFollowButton.YRadius := 6;
-    LFollowButton.CacheIndex := 11; // and 12 in FollowButtonClick
+    LFollowButton.CacheIndex := 12; // and 13 in FollowButtonClick
     LFollowButton.CacheEngine := AContext.CacheEngine;
     LFollowButton.OnClick := FollowButtonClick;
 
@@ -1057,7 +1065,7 @@ begin
     LCloseButton.left := 199;
     LCloseButton.Height := 11;
     LCloseButton.Width := 11;
-    LCloseButton.CacheIndex := 13;
+    LCloseButton.CacheIndex := 14;
     LCloseButton.CacheEngine := AContext.CacheEngine;
 
   Except
@@ -1068,7 +1076,7 @@ begin
 end;
 
 {**************************************************}
-procedure TMainForm.MainDynamicListBoxDownloadItems(
+procedure TMainForm.MainListBoxDownloadItems(
             const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
             out AData: TALJSONNodeW;
             var APaginationToken: string;
@@ -1269,7 +1277,7 @@ begin
   TThread.ForceQueue(nil,
     procedure
     begin
-      var LControl := TALControlProtectedAccess(MainDynamicListBox);
+      var LControl := TALControlProtectedAccess(MainListBox);
       FSimulateInfiniteScrollCurrentPoint.X := 10;
       FSimulateInfiniteScrollCurrentPoint.Y := LControl.Height - 10;
       LControl.MouseDown(TMouseButton.mbLeft, [TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);
@@ -1281,7 +1289,7 @@ begin
     TThread.ForceQueue(nil,
       procedure
       begin
-        var LControl := TALControlProtectedAccess(MainDynamicListBox);
+        var LControl := TALControlProtectedAccess(MainListBox);
         FSimulateInfiniteScrollCurrentPoint.X := max(LControl.Width, FSimulateInfiniteScrollCurrentPoint.X + (Random * 5));
         FSimulateInfiniteScrollCurrentPoint.Y := max(0, FSimulateInfiniteScrollCurrentPoint.Y - (Random * 75));
         LControl.MouseMove([TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);
@@ -1292,7 +1300,7 @@ begin
   TThread.ForceQueue(nil,
     procedure
     begin
-      var LControl := TALControlProtectedAccess(MainDynamicListBox);
+      var LControl := TALControlProtectedAccess(MainListBox);
       FSimulateInfiniteScrollCurrentPoint.X := max(LControl.Width, FSimulateInfiniteScrollCurrentPoint.X + (Random * 5));
       FSimulateInfiniteScrollCurrentPoint.Y := max(0, FSimulateInfiniteScrollCurrentPoint.Y - (Random * 75));
       LControl.MouseUp(TMouseButton.mbLeft, [TShiftStateItem.ssLeft], FSimulateInfiniteScrollCurrentPoint.X, FSimulateInfiniteScrollCurrentPoint.Y);

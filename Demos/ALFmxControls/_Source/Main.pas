@@ -457,6 +457,7 @@ type
 procedure TMainForm.InitializeNewForm;
 begin
   ALLog('TMainForm.InitializeNewForm', 'begin');
+  ALGlobalClickSoundEnabled := True;
   {$IF defined(DEBUG)}
   ALInitHasTouchScreen;
   ALHasTouchScreen := true;
@@ -548,7 +549,7 @@ begin
   fALRectangle.HitTest := False;
   var LText := TalText.Create(fALRectangle);
   LText.Parent := fALRectangle;
-  LText.AutoSize := true;
+  LText.AutoSize := TALAutoSizeMode.All;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -571,7 +572,7 @@ begin
   fRectangle.HitTest := false;
   LText := TalText.Create(fRectangle);
   LText.Parent := fRectangle;
-  LText.AutoSize := true;
+  LText.AutoSize := TALAutoSizeMode.All;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -590,7 +591,7 @@ begin
   fALCircle.HitTest := False;
   LText := TalText.Create(fALCircle);
   LText.Parent := fALCircle;
-  LText.AutoSize := true;
+  LText.AutoSize := TALAutoSizeMode.All;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -608,7 +609,7 @@ begin
   fCircle.HitTest := False;
   LText := TalText.Create(fCircle);
   LText.Parent := fCircle;
-  LText.AutoSize := true;
+  LText.AutoSize := TALAutoSizeMode.All;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -991,7 +992,7 @@ begin
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;
     LText.TextSettings.MaxLines := 1;
-    LText.autosize := True;
+    LText.AutoSize := TALAutoSizeMode.All;
     //-----
     var LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
@@ -1121,7 +1122,7 @@ begin
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;
     LText.WordWrap := False;
-    LText.autosize := True;
+    LText.AutoSize := True;
     //-----
     var LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;

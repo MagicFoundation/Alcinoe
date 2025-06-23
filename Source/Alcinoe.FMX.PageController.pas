@@ -996,7 +996,7 @@ begin
   FActiveIndicator.OnChanged := ActiveIndicatorChanged;
   FInactiveIndicator := TInactiveIndicator.Create;
   FInactiveIndicator.OnChanged := InactiveIndicatorChanged;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
 end;
 
 {**********************************}

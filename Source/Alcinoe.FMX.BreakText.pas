@@ -69,7 +69,7 @@ type
     EllipsisDecorationThicknessMultiplier: Single; // default = 1
     EllipsisDecorationColor: TAlphaColor; // default = TAlphaColors.Null
     //--
-    AutoSize: TALAutoSizeMode; // default = TALAutoSizeMode.All
+    AutoSize: TALAutoSizeMode; // default = TALAutoSizeMode.Both
     MaxLines: integer; // default = 65535
     // When LineHeightMultiplier = 0 the line height will be the sum of the font ascent + font descent + font leading.
     // When LineHeightMultiplier is non-null, the line height of the span of text will be a multiple of fontSize and be exactly fontSize * height logical pixels tall
@@ -368,7 +368,7 @@ begin
   EllipsisDecorationThicknessMultiplier := 1;
   EllipsisDecorationColor := TAlphaColors.Null;
   //--
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
   MaxLines := 65535;
   LineHeightMultiplier := 0;
   LetterSpacing := 0;
@@ -2450,7 +2450,7 @@ begin
               //       auto floorWidth = SkScalarFloorToScalar(rawWidth);
               //
               var LOriginalRectWidth: Single := ARect.Width;
-              if LOptions.Autosize = TALAutoSizeMode.All then begin
+              if LOptions.Autosize = TALAutoSizeMode.Both then begin
                 ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + LOptions.Padding.Left + LOptions.Padding.Right);
                 ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
               end
@@ -3740,7 +3740,7 @@ begin
       LParagraphRect.height := LParagraphRect.height;
 
       // Autosize
-      if LOptions.Autosize = TALAutoSizeMode.All then begin
+      if LOptions.Autosize = TALAutoSizeMode.Both then begin
         ARect.Width := Min(ARect.Width, LParagraphRect.Width + LOptions.Padding.Left + LOptions.Padding.Right);
         ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
       end
@@ -4521,3 +4521,4 @@ begin
 end;
 
 end.
+

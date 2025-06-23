@@ -77,7 +77,7 @@ type
     {$ENDIF}
     Width,
     Height,
-    All);
+    Both);
 
   {*************************************}
   {$IFNDEF ALCompilerVersionSupported123}
@@ -1191,7 +1191,7 @@ begin
     if FAutoSize = TALAutoSizeMode.False then
       FAutoSize := TALAutoSizeMode.None
     else if FAutoSize = TALAutoSizeMode.True then
-      FAutoSize := TALAutoSizeMode.All;
+      FAutoSize := TALAutoSizeMode.Both;
     {$ENDIF}
     AdjustSize;
   end;
@@ -1200,7 +1200,7 @@ end;
 {*****************************************************}
 function TALControl.HasUnconstrainedAutosizeWidth: Boolean;
 begin
-  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Width];
+  Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Width];
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
                              TALAlignLayout.Contents,
@@ -1218,7 +1218,7 @@ end;
 {*****************************************************}
 function TALControl.HasUnconstrainedAutosizeHeight: Boolean;
 begin
-  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Height];
+  Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Height];
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
                              TALAlignLayout.Contents,

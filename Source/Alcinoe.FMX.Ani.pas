@@ -50,6 +50,7 @@ uses
   System.Generics.Collections,
   System.UITypes,
   System.TypInfo,
+  System.Types,
   {$IFDEF IOS}
   Macapi.ObjectiveC,
   iOSapi.Foundation,
@@ -70,6 +71,36 @@ var
   ALPreferredFramesPerSecond: Integer = 120;
 
 type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Converted from Chromium's source code:
+  // https://github.com/chromium/chrome/browser/resources/lens/overlay/cubic_bezier.ts
+  // - JavaScript "ease-in" corresponds to: cubic-bezier(0.42, 0, 1, 1)
+  // - JavaScript "ease-out" corresponds to: cubic-bezier(0, 0, 0.58, 1)
+  // - JavaScript "ease-in-out" corresponds to: cubic-bezier(0.42, 0, 0.58, 1)
+  TALCubicBezier = class
+  private
+    const
+      BEZIER_EPSILON = 1e-7;
+      CUBIC_BEZIER_SPLINE_SAMPLES = 11;
+      MAX_NEWTON_METHOD_ITERATIONS = 4;
+  private
+    P1, P2: TALPointD;
+    A, B, C: TALPointD;
+    SplineSamples: array[0..CUBIC_BEZIER_SPLINE_SAMPLES - 1] of Double;
+    procedure InitCoefficients(const P1, P2: TALPointD);
+    procedure InitSpline;
+    function SampleCurveX(T: Double): Double;
+    function SampleCurveDerivativeX(T: Double): Double;
+    function SampleCurveY(T: Double): Double;
+    function ToFinite(N: Double): Double;
+  public
+    constructor Create(X1, Y1, X2, Y2: Double);
+    // Determines the Y value of the cubic Bezier curve for a given X value.
+    function SolveForY(X: Double): Double;
+    // Finds the parameter T (a value between 0 and 1) for a given X value on the curve.
+    function SolveCurveX(X: Double): Double;
+  end;
 
   {~~~~~~~~~~~~~~~~~~~}
   TALAnimation = Class;
@@ -301,6 +332,7 @@ type
     Elastic,
     Back,
     Bounce,
+    Bezier,
     //--
     // https://m3.material.io/styles/motion/overview/specs#1b299695-5822-4738-ae56-ef9389b412d2
     MaterialExpressiveFastSpatial, // Duration = 350ms
@@ -335,6 +367,32 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALCustomInterpolationEvent = function(Sender: TObject): Single of object;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInterpolationParams = class(TPersistent)
+  private
+    FCubicBezier: TALCubicBezier;
+    FBezierX1: Single;
+    FBezierY1: Single;
+    FBezierX2: Single;
+    FBezierY2: Single;
+    FOvershoot: Single;
+    procedure SetBezierX1(const AValue: Single);
+    procedure SetBezierY1(const AValue: Single);
+    procedure SetBezierX2(const AValue: Single);
+    procedure SetBezierY2(const AValue: Single);
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; virtual;
+  published
+    property BezierX1: Single read FBezierX1 write SetBezierX1;
+    property BezierY1: Single read FBezierY1 write SetBezierY1;
+    property BezierX2: Single read FBezierX2 write SetBezierX2;
+    property BezierY2: Single read FBezierY2 write SetBezierY2;
+    property Overshoot: Single read FOvershoot write FOvershoot;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInterpolatedAnimation = class(TALAnimation)
   private
@@ -342,6 +400,8 @@ type
     FOnCustomInterpolation: TALCustomInterpolationEvent;
     FInterpolationType: TALInterpolationType;
     FInterpolationMode: TALInterpolationMode;
+    FInterpolationParams: TALInterpolationParams;
+    procedure SetInterpolationParams(const AValue: TALInterpolationParams);
     function IsDurationStored: Boolean;
     function IsInterpolationTypeStored: Boolean;
     function IsInterpolationModeStored: Boolean;
@@ -365,6 +425,7 @@ type
     property DefaultInterpolationMode: TALInterpolationMode read GetDefaultInterpolationMode;
   public
     constructor Create; override;
+    destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure Start; override;
@@ -373,6 +434,7 @@ type
     property Duration: Single read FDuration write FDuration stored IsDurationStored nodefault;
     property InterpolationType: TALInterpolationType read FInterpolationType write FInterpolationType stored IsInterpolationTypeStored;
     property InterpolationMode: TALInterpolationMode read FInterpolationMode write FInterpolationMode stored IsInterpolationModeStored;
+    property InterpolationParams: TALInterpolationParams read FInterpolationParams write SetInterpolationParams;
     property OnCustomInterpolation: TALCustomInterpolationEvent read FOnCustomInterpolation write FOnCustomInterpolation;
     // Given the current time, NormalizedTime returns a number in the range from
     // 0 through 1, indicating how far the controlled property value has changed
@@ -470,6 +532,7 @@ type
     function getDuration: Single;
     function getInterpolationType: TALInterpolationType;
     function getInterpolationMode: TALInterpolationMode;
+    function getInterpolationParams: TALInterpolationParams;
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
@@ -483,6 +546,7 @@ type
     procedure setDuration(const Value: Single);
     procedure setInterpolationType(const Value: TALInterpolationType);
     procedure setInterpolationMode(const Value: TALInterpolationMode);
+    procedure setInterpolationParams(const Value: TALInterpolationParams);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
     procedure SetStartValue(const Value: Single);
@@ -510,6 +574,7 @@ type
     property Duration: Single read getDuration write setDuration nodefault;
     property InterpolationType: TALInterpolationType read getInterpolationType write setInterpolationType default TALInterpolationType.Linear;
     property InterpolationMode: TALInterpolationMode read getInterpolationMode write setInterpolationMode default TALInterpolationMode.In;
+    property InterpolationParams: TALInterpolationParams read GetInterpolationParams write SetInterpolationParams;
     property Inverse: Boolean read getInverse write setInverse default False;
     property Loop: Boolean read getLoop write setLoop default False;
     property OnFirstFrame: TNotifyEvent read fOnFirstFrame write fOnFirstFrame;
@@ -538,6 +603,7 @@ type
     function getDuration: Single;
     function getInterpolationType: TALInterpolationType;
     function getInterpolationMode: TALInterpolationMode;
+    function getInterpolationParams: TALInterpolationParams;
     function getInverse: Boolean;
     function getLoop: Boolean;
     function GetCurrentTime: Single;
@@ -551,6 +617,7 @@ type
     procedure setDuration(const Value: Single);
     procedure setInterpolationType(const Value: TALInterpolationType);
     procedure setInterpolationMode(const Value: TALInterpolationMode);
+    procedure setInterpolationParams(const Value: TALInterpolationParams);
     procedure setInverse(const Value: Boolean);
     procedure setLoop(const Value: Boolean);
     procedure SetStartValue(const Value: TAlphaColor);
@@ -578,6 +645,7 @@ type
     property Duration: Single read getDuration write setDuration nodefault;
     property InterpolationType: TALInterpolationType read getInterpolationType write setInterpolationType default TALInterpolationType.Linear;
     property InterpolationMode: TALInterpolationMode read getInterpolationMode write setInterpolationMode default TALInterpolationMode.In;
+    property InterpolationParams: TALInterpolationParams read GetInterpolationParams write SetInterpolationParams;
     property Inverse: Boolean read getInverse write setInverse default False;
     property Loop: Boolean read getLoop write setLoop default False;
     property OnFirstFrame: TNotifyEvent read fOnFirstFrame write fOnFirstFrame;
@@ -857,36 +925,6 @@ type
     property InitialVelocity: Single read GetInitialVelocity write SetInitialVelocity stored InitialVelocityStored nodefault;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  // Converted from Chromium's source code:
-  // https://github.com/chromium/chrome/browser/resources/lens/overlay/cubic_bezier.ts
-  // - JavaScript "ease-in" corresponds to: cubic-bezier(0.42, 0, 1, 1)
-  // - JavaScript "ease-out" corresponds to: cubic-bezier(0, 0, 0.58, 1)
-  // - JavaScript "ease-in-out" corresponds to: cubic-bezier(0.42, 0, 0.58, 1)
-  TALCubicBezier = class
-  private
-    const
-      BEZIER_EPSILON = 1e-7;
-      CUBIC_BEZIER_SPLINE_SAMPLES = 11;
-      MAX_NEWTON_METHOD_ITERATIONS = 4;
-  private
-    P1, P2: TALPointD;
-    A, B, C: TALPointD;
-    SplineSamples: array[0..CUBIC_BEZIER_SPLINE_SAMPLES - 1] of Double;
-    procedure InitCoefficients(const P1, P2: TALPointD);
-    procedure InitSpline;
-    function SampleCurveX(T: Double): Double;
-    function SampleCurveDerivativeX(T: Double): Double;
-    function SampleCurveY(T: Double): Double;
-    function ToFinite(N: Double): Double;
-  public
-    constructor Create(X1, Y1, X2, Y2: Double);
-    // Determines the Y value of the cubic Bezier curve for a given X value.
-    function SolveForY(X: Double): Double;
-    // Finds the parameter T (a value between 0 and 1) for a given X value on the curve.
-    function SolveCurveX(X: Double): Double;
-  end;
-
 procedure Register;
 
 implementation
@@ -905,6 +943,131 @@ uses
   {$ENDIF}
   FMX.Ani,
   FMX.Utils;
+
+{********************************************************}
+constructor TALCubicBezier.Create(X1, Y1, X2, Y2: Double);
+begin
+  P1 := TALPointD.Create(X1, Y1);
+  P2 := TALPointD.Create(X2, Y2);
+  InitCoefficients(P1, P2);
+  InitSpline;
+end;
+
+{*****************************************************************}
+procedure TALCubicBezier.InitCoefficients(const P1, P2: TALPointD);
+begin
+  // Calculate the polynomial coefficients, implicit first and last control
+  // points are (0,0) and (1,1). First, for x.
+  c.x := 3 * p1.x;
+  b.x := 3 * (p2.x - p1.x) - c.x;
+  a.x := 1 - c.x - b.x;
+
+  // Now for y.
+  c.y := toFinite(3 * p1.y);
+  b.y := toFinite(3 * (p2.y - p1.y) - c.y);
+  a.y := toFinite(1 - c.y - b.y);
+end;
+
+{**********************************}
+procedure TALCubicBezier.InitSpline;
+begin
+  const deltaT = 1 / (CUBIC_BEZIER_SPLINE_SAMPLES - 1);
+  for var i := 0 to CUBIC_BEZIER_SPLINE_SAMPLES - 1 do
+    splineSamples[i] := sampleCurveX(i * deltaT);
+end;
+
+{******************************************************}
+function TALCubicBezier.SampleCurveX(T: Double): Double;
+begin
+  // `ax t^3 + bx t^2 + cx t' expanded using Horner's rule.
+  // The x values are in the range [0, 1]. So it isn't needed toFinite
+  // clamping.
+  // https://drafts.csswg.org/css-easing-1/#funcdef-cubic-bezier-easing-function-cubic-bezier
+  result := ((a.x * t + b.x) * t + c.x) * t;
+end;
+
+{****************************************************************}
+function TALCubicBezier.SampleCurveDerivativeX(T: Double): Double;
+begin
+  Result := (3 * a.x * t + 2 * b.x) * t + c.x;
+end;
+
+{******************************************************}
+function TALCubicBezier.SampleCurveY(T: Double): Double;
+begin
+  Result := toFinite(((a.y * t + b.y) * t + c.y) * t);
+end;
+
+{**************************************************}
+function TALCubicBezier.ToFinite(N: Double): Double;
+begin
+  if IsInfinite(N) then
+    Result := IfThen(N > 0, MaxInt, -MaxInt)
+  else
+    Result := N;
+end;
+
+{*****************************************************}
+function TALCubicBezier.SolveCurveX(X: Double): Double;
+begin
+  var t0: Double := NAN;
+  var t1: Double := NAN;
+  var x2: Double{ := NAN};
+  var d2: Double;
+
+  var t2: Double := x;
+
+  // Linear interpolation of spline curve for initial guess.
+  const deltaT = 1 / (CUBIC_BEZIER_SPLINE_SAMPLES - 1);
+  for var i := 1 to CUBIC_BEZIER_SPLINE_SAMPLES - 1 do begin
+    if (x <= splineSamples[i]) then begin
+      t1 := deltaT * i;
+      t0 := t1 - deltaT;
+      t2 := t0 + (t1 - t0) * (x - splineSamples[i - 1]) / (splineSamples[i] - splineSamples[i - 1]);
+      break;
+    end;
+  end;
+
+  // Perform a few iterations of Newton's method -- normally very fast.
+  // See https://en.wikipedia.org/wiki/Newton%27s_method.
+  for var i := 0 to MAX_NEWTON_METHOD_ITERATIONS - 1 do begin
+    x2 := sampleCurveX(t2) - x;
+    if (abs(x2) < BEZIER_EPSILON) then
+      exit(t2);
+    d2 := sampleCurveDerivativeX(t2);
+    if (abs(d2) < BEZIER_EPSILON) then
+      break;
+    t2 := t2 - x2 / d2;
+  end;
+  if ((not IsNan(x2)) and (abs(x2) < BEZIER_EPSILON)) then
+    exit(t2);
+
+  // Fall back to the bisection method for reliability.
+  if ((not IsNan(t0)) and (not IsNan(t1))) then begin
+    while (t0 < t1) do begin
+      x2 := sampleCurveX(t2);
+      if (abs(x2 - x) < BEZIER_EPSILON) then
+        exit(t2);
+
+      if (x > x2) then
+        t0 := t2
+      else
+        t1 := t2;
+
+      t2 := (t1 + t0) * 0.5;
+    end;
+  end;
+
+  // Failed to solve.
+  result := t2;
+end;
+
+{***************************************************}
+function TALCubicBezier.SolveForY(X: Double): Double;
+begin
+  x := max(0, min(1, x));
+  Result := sampleCurveY(solveCurveX(x));
+end;
 
 {*****************************************************}
 // Taken from android.view.animation.BounceInterpolator
@@ -1769,6 +1932,85 @@ Begin
   Result := 0.05;
 end;
 
+{****************************************}
+constructor TALInterpolationParams.Create;
+begin
+  inherited;
+  FCubicBezier := nil;
+  FBezierX1 := 0;
+  FBezierY1 := 0;
+  FBezierX2 := 0;
+  FBezierY2 := 0;
+  FOvershoot := 0;
+end;
+
+{****************************************}
+destructor TALInterpolationParams.Destroy;
+begin
+  ALFreeAndNil(FCubicBezier);
+  inherited;
+end;
+
+{****************************************}
+procedure TALInterpolationParams.Assign(Source: TPersistent);
+begin
+  if Source is TALInterpolationParams then begin
+    BezierX1 := TALInterpolationParams(Source).BezierX1;
+    BezierY1 := TALInterpolationParams(Source).BezierY1;
+    BezierX2 := TALInterpolationParams(Source).BezierX2;
+    BezierY2 := TALInterpolationParams(Source).BezierY2;
+    Overshoot := TALInterpolationParams(Source).Overshoot;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{****************************************}
+procedure TALInterpolationParams.Reset;
+begin
+  BezierX1 := 0;
+  BezierY1 := 0;
+  BezierX2 := 0;
+  BezierY2 := 0;
+  Overshoot := 0;
+end;
+
+{****************************************}
+procedure TALInterpolationParams.SetBezierX1(const AValue: Single);
+begin
+  if not SameValue(AValue, FBezierX1, TEpsilon.Vector) then begin
+    FBezierX1 := AValue;
+    ALFreeAndNil(FCubicBezier);
+  end;
+end;
+
+{****************************************}
+procedure TALInterpolationParams.SetBezierY1(const AValue: Single);
+begin
+  if not SameValue(AValue, FBezierY1, TEpsilon.Vector) then begin
+    FBezierY1 := AValue;
+    ALFreeAndNil(FCubicBezier);
+  end;
+end;
+
+{****************************************}
+procedure TALInterpolationParams.SetBezierX2(const AValue: Single);
+begin
+  if not SameValue(AValue, FBezierX2, TEpsilon.Vector) then begin
+    FBezierX2 := AValue;
+    ALFreeAndNil(FCubicBezier);
+  end;
+end;
+
+{****************************************}
+procedure TALInterpolationParams.SetBezierY2(const AValue: Single);
+begin
+  if not SameValue(AValue, FBezierY2, TEpsilon.Vector) then begin
+    FBezierY2 := AValue;
+    ALFreeAndNil(FCubicBezier);
+  end;
+end;
+
 {******************************************}
 constructor TALInterpolatedAnimation.Create;
 begin
@@ -1776,6 +2018,14 @@ begin
   FDuration := DefaultDuration;
   FInterpolationType := DefaultInterpolationType;
   FInterpolationMode := DefaultInterpolationMode;
+  FInterpolationParams := TALInterpolationParams.Create;
+end;
+
+{******************************************}
+destructor TALInterpolatedAnimation.Destroy;
+begin
+  ALFreeAndNil(FInterpolationParams);
+  inherited;
 end;
 
 {*************************************************************}
@@ -1786,6 +2036,7 @@ begin
     OnCustomInterpolation := TALInterpolatedAnimation(Source).OnCustomInterpolation;
     InterpolationType := TALInterpolatedAnimation(Source).InterpolationType;
     InterpolationMode := TALInterpolatedAnimation(Source).InterpolationMode;
+    InterpolationParams.Assign(TALInterpolatedAnimation(Source).InterpolationParams);
     inherited Assign(Source);
   end
   else
@@ -1799,6 +2050,7 @@ begin
   OnCustomInterpolation := nil;
   InterpolationType := DefaultInterpolationType;
   InterpolationMode := DefaultInterpolationMode;
+  InterpolationParams.reset;
   inherited;
 end;
 
@@ -1955,10 +2207,19 @@ begin
       TALInterpolationType.Exponential: Result := InterpolateExpo(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
       TALInterpolationType.Circular: Result := InterpolateCirc(FTime, 0, 1, FDuration, TAnimationType(FInterpolationMode));
       TALInterpolationType.Elastic: Result := InterpolateElastic(FTime, 0, 1, FDuration, 0, 0, TAnimationType(FInterpolationMode));
-      TALInterpolationType.Back: Result := InterpolateBack(FTime, 0, 1, FDuration, 0{Overshoot}, TAnimationType(FInterpolationMode));
+      TALInterpolationType.Back: Result := InterpolateBack(FTime, 0, 1, FDuration, FInterpolationParams.Overshoot{Overshoot}, TAnimationType(FInterpolationMode));
       //the InterpolateBounce is a little buggy
       //Result := InterpolateBounce(FTime, 0, 1, FDuration, FInterpolationMode);
       TALInterpolationType.Bounce: Result := ALInterpolateBounce(FTime, FDuration, FInterpolationMode);
+      TALInterpolationType.Bezier: begin
+        if FInterpolationParams.FCubicBezier = nil then
+          FInterpolationParams.FCubicBezier := TALCubicBezier.Create(
+                                                 FInterpolationParams.BezierX1,
+                                                 FInterpolationParams.BezierY1,
+                                                 FInterpolationParams.BezierX2,
+                                                 FInterpolationParams.BezierY2);
+        result := FInterpolationParams.FCubicBezier.SolveForY(FTime / FDuration);
+      end;
       TALInterpolationType.MaterialExpressiveFastSpatial: Result := ALInterpolateMaterialExpressiveFastSpatial(FTime, FDuration);
       TALInterpolationType.MaterialExpressiveDefaultSpatial: Result := ALInterpolateMaterialExpressiveDefaultSpatial(FTime, FDuration);
       TALInterpolationType.MaterialExpressiveSlowSpatial: Result := ALInterpolateMaterialExpressiveSlowSpatial(FTime, FDuration);
@@ -2022,6 +2283,12 @@ end;
 function TALInterpolatedAnimation.GetDefaultInterpolationMode: TALInterpolationMode;
 Begin
   Result := TALInterpolationMode.In;
+end;
+
+{***********************************}
+procedure TALInterpolatedAnimation.SetInterpolationParams(const AValue: TALInterpolationParams);
+begin
+  FInterpolationParams.Assign(AValue);
 end;
 
 {***********************************}
@@ -2392,6 +2659,12 @@ begin
   result := fFloatAnimation.InterpolationMode;
 end;
 
+{****************************************************************************}
+function TALFloatPropertyAnimation.getInterpolationParams: TALInterpolationParams;
+begin
+  Result := fFloatAnimation.InterpolationParams;
+end;
+
 {*****************************************************}
 function TALFloatPropertyAnimation.getInverse: Boolean;
 begin
@@ -2479,6 +2752,12 @@ end;
 procedure TALFloatPropertyAnimation.setInterpolationMode(const Value: TALInterpolationMode);
 begin
   fFloatAnimation.InterpolationMode := Value;
+end;
+
+{******************************************************************************************}
+procedure TALFloatPropertyAnimation.setInterpolationParams(const Value: TALInterpolationParams);
+begin
+  fFloatAnimation.InterpolationParams := Value;
 end;
 
 {*******************************************************************}
@@ -2640,6 +2919,12 @@ begin
   result := fColorAnimation.InterpolationMode;
 end;
 
+{****************************************************************************}
+function TALColorPropertyAnimation.getInterpolationParams: TALInterpolationParams;
+begin
+  Result := fColorAnimation.InterpolationParams;
+end;
+
 {*****************************************************}
 function TALColorPropertyAnimation.getInverse: Boolean;
 begin
@@ -2727,6 +3012,12 @@ end;
 procedure TALColorPropertyAnimation.setInterpolationMode(const Value: TALInterpolationMode);
 begin
   fColorAnimation.InterpolationMode := Value;
+end;
+
+{******************************************************************************************}
+procedure TALColorPropertyAnimation.setInterpolationParams(const Value: TALInterpolationParams);
+begin
+  fColorAnimation.InterpolationParams := Value;
 end;
 
 {*******************************************************************}
@@ -3542,131 +3833,6 @@ end;
 procedure TALSpringForcePropertyAnimation.StopAtCurrent;
 begin
   FSpringForceAnimation.StopAtCurrent;
-end;
-
-{********************************************************}
-constructor TALCubicBezier.Create(X1, Y1, X2, Y2: Double);
-begin
-  P1 := TALPointD.Create(X1, Y1);
-  P2 := TALPointD.Create(X2, Y2);
-  InitCoefficients(P1, P2);
-  InitSpline;
-end;
-
-{*****************************************************************}
-procedure TALCubicBezier.InitCoefficients(const P1, P2: TALPointD);
-begin
-  // Calculate the polynomial coefficients, implicit first and last control
-  // points are (0,0) and (1,1). First, for x.
-  c.x := 3 * p1.x;
-  b.x := 3 * (p2.x - p1.x) - c.x;
-  a.x := 1 - c.x - b.x;
-
-  // Now for y.
-  c.y := toFinite(3 * p1.y);
-  b.y := toFinite(3 * (p2.y - p1.y) - c.y);
-  a.y := toFinite(1 - c.y - b.y);
-end;
-
-{**********************************}
-procedure TALCubicBezier.InitSpline;
-begin
-  const deltaT = 1 / (CUBIC_BEZIER_SPLINE_SAMPLES - 1);
-  for var i := 0 to CUBIC_BEZIER_SPLINE_SAMPLES - 1 do
-    splineSamples[i] := sampleCurveX(i * deltaT);
-end;
-
-{******************************************************}
-function TALCubicBezier.SampleCurveX(T: Double): Double;
-begin
-  // `ax t^3 + bx t^2 + cx t' expanded using Horner's rule.
-  // The x values are in the range [0, 1]. So it isn't needed toFinite
-  // clamping.
-  // https://drafts.csswg.org/css-easing-1/#funcdef-cubic-bezier-easing-function-cubic-bezier
-  result := ((a.x * t + b.x) * t + c.x) * t;
-end;
-
-{****************************************************************}
-function TALCubicBezier.SampleCurveDerivativeX(T: Double): Double;
-begin
-  Result := (3 * a.x * t + 2 * b.x) * t + c.x;
-end;
-
-{******************************************************}
-function TALCubicBezier.SampleCurveY(T: Double): Double;
-begin
-  Result := toFinite(((a.y * t + b.y) * t + c.y) * t);
-end;
-
-{**************************************************}
-function TALCubicBezier.ToFinite(N: Double): Double;
-begin
-  if IsInfinite(N) then
-    Result := IfThen(N > 0, MaxInt, -MaxInt)
-  else
-    Result := N;
-end;
-
-{*****************************************************}
-function TALCubicBezier.SolveCurveX(X: Double): Double;
-begin
-  var t0: Double := NAN;
-  var t1: Double := NAN;
-  var x2: Double{ := NAN};
-  var d2: Double;
-
-  var t2: Double := x;
-
-  // Linear interpolation of spline curve for initial guess.
-  const deltaT = 1 / (CUBIC_BEZIER_SPLINE_SAMPLES - 1);
-  for var i := 1 to CUBIC_BEZIER_SPLINE_SAMPLES - 1 do begin
-    if (x <= splineSamples[i]) then begin
-      t1 := deltaT * i;
-      t0 := t1 - deltaT;
-      t2 := t0 + (t1 - t0) * (x - splineSamples[i - 1]) / (splineSamples[i] - splineSamples[i - 1]);
-      break;
-    end;
-  end;
-
-  // Perform a few iterations of Newton's method -- normally very fast.
-  // See https://en.wikipedia.org/wiki/Newton%27s_method.
-  for var i := 0 to MAX_NEWTON_METHOD_ITERATIONS - 1 do begin
-    x2 := sampleCurveX(t2) - x;
-    if (abs(x2) < BEZIER_EPSILON) then
-      exit(t2);
-    d2 := sampleCurveDerivativeX(t2);
-    if (abs(d2) < BEZIER_EPSILON) then
-      break;
-    t2 := t2 - x2 / d2;
-  end;
-  if ((not IsNan(x2)) and (abs(x2) < BEZIER_EPSILON)) then
-    exit(t2);
-
-  // Fall back to the bisection method for reliability.
-  if ((not IsNan(t0)) and (not IsNan(t1))) then begin
-    while (t0 < t1) do begin
-      x2 := sampleCurveX(t2);
-      if (abs(x2 - x) < BEZIER_EPSILON) then
-        exit(t2);
-
-      if (x > x2) then
-        t0 := t2
-      else
-        t1 := t2;
-
-      t2 := (t1 + t0) * 0.5;
-    end;
-  end;
-
-  // Failed to solve.
-  result := t2;
-end;
-
-{***************************************************}
-function TALCubicBezier.SolveForY(X: Double): Double;
-begin
-  x := max(0, min(1, x));
-  Result := sampleCurveY(solveCurveX(x));
 end;
 
 {*****************}

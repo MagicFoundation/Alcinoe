@@ -147,6 +147,7 @@ type
   TALAnimation = class(TPersistent)
   public const
     DefaultAniFrameRate = 60;
+    TimeEpsilon = 1E-3;
   public class var
     // The AniFrameRate property is unnecessary on Android and iOS since
     // the animation is synchronized with the system's Choreographer (Android)
@@ -174,6 +175,11 @@ type
     FEnabled: Boolean;
     procedure SetEnabled(const Value: Boolean);
     class procedure Uninitialize;
+    function IsDelayStored: Boolean;
+    function IsLoopStored: Boolean;
+    function IsAutoReverseStored: Boolean;
+    function IsInverseStored: Boolean;
+    function IsEnabledStored: Boolean;
   protected
     procedure ProcessTick(const ATime, ADeltaTime: Double); virtual; abstract;
     procedure ProcessAnimation; virtual; abstract;
@@ -181,9 +187,22 @@ type
     procedure DoProcess; virtual;
     procedure DoFinish; virtual;
     class property AniThread: TALAniThread read FAniThread;
+    function GetDefaultDelay: Single; virtual;
+    function GetDefaultLoop: Boolean; virtual;
+    function GetDefaultAutoReverse: Boolean; virtual;
+    function GetDefaultInverse: Boolean; virtual;
+    function GetDefaultEnabled: Boolean; virtual;
+  public
+    property DefaultDelay: Single read GetDefaultDelay;
+    property DefaultLoop: Boolean read GetDefaultLoop;
+    property DefaultAutoReverse: Boolean read GetDefaultAutoReverse;
+    property DefaultInverse: Boolean read GetDefaultInverse;
+    property DefaultEnabled: Boolean read GetDefaultEnabled;
   public
     constructor Create; Virtual;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; virtual;
     /// <summary>
     ///   Moves the animation to its start and executes the OnFirstFrame and OnProcess events.
     /// </summary>
@@ -209,8 +228,8 @@ type
     /// </summary>
     property Running: Boolean read FRunning;
     property Paused: Boolean read FPaused;
-    property Delay: Single read FDelay write FDelay;
-    property Loop: Boolean read FLoop write FLoop;
+    property Delay: Single read FDelay write FDelay stored IsDelayStored nodefault;
+    property Loop: Boolean read FLoop write FLoop stored IsLoopStored;
     /// <summary>
     ///   Set AutoReverse to True to animate the controlled property backwards,
     ///   from the StopValue to the StartValue, after the completion of the
@@ -219,14 +238,14 @@ type
     ///   animations are alternated. OnFinish gets called after the backward
     ///   animation has completed.
     /// </summary>
-    property AutoReverse: Boolean read FAutoReverse write FAutoReverse;
+    property AutoReverse: Boolean read FAutoReverse write FAutoReverse stored IsAutoReverseStored;
     /// <summary>
     ///   Set Inverse to True to animate the controlled property backwards
     ///   from the StopValue to the StartValue. The backward animation takes
     ///   a Duration number of seconds. OnFinish gets called after the backward
     ///   animation has completed.
     /// </summary>
-    property Inverse: Boolean read FInverse write FInverse;
+    property Inverse: Boolean read FInverse write FInverse stored IsInverseStored;
     property CurrentTime: Double read FTime;
     property OnFirstFrame: TNotifyEvent read FOnFirstFrame write FOnFirstFrame;
     property OnProcess: TNotifyEvent read FOnProcess write FOnProcess;
@@ -236,7 +255,7 @@ type
     property TagFloat: Double read FTagFloat write FTagFloat;
     // This property must be declared last to ensure that the animation
     // starts only after all other properties have been fully loaded.
-    property Enabled: Boolean read FEnabled write SetEnabled;
+    property Enabled: Boolean read FEnabled write SetEnabled stored IsEnabledStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -255,12 +274,18 @@ type
   private
     FInterval: Single;
     FIntervalTimeLeft: Single;
+    function IsIntervalStored: Boolean;
   protected
     procedure ProcessTick(const ATime, ADeltaTime: Double); override;
+    function GetDefaultInterval: Single; virtual;
+  public
+    property DefaultInterval: Single read GetDefaultInterval;
   public
     constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
     procedure Start; override;
-    property Interval: Single read FInterval write FInterval;
+    property Interval: Single read FInterval write FInterval stored IsIntervalStored nodefault;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~}
@@ -317,18 +342,37 @@ type
     FOnCustomInterpolation: TALCustomInterpolationEvent;
     FInterpolationType: TALInterpolationType;
     FInterpolationMode: TALInterpolationMode;
+    function IsDurationStored: Boolean;
+    function IsInterpolationTypeStored: Boolean;
+    function IsInterpolationModeStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadAnimationType(Reader: TReader);
+    procedure ReadInterpolation(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
   protected
     procedure ProcessTick(const ATime, ADeltaTime: Double); override;
     function GetNormalizedTime: Single; virtual;
     function DoCustomInterpolation: Single; virtual;
+    function GetDefaultDuration: Single; virtual;
+    function GetDefaultInterpolationType: TALInterpolationType; virtual;
+    function GetDefaultInterpolationMode: TALInterpolationMode; virtual;
+  public
+    property DefaultDuration: Single read GetDefaultDuration;
+    property DefaultInterpolationType: TALInterpolationType read GetDefaultInterpolationType;
+    property DefaultInterpolationMode: TALInterpolationMode read GetDefaultInterpolationMode;
   public
     constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
     procedure Start; override;
     procedure Stop; override;
     procedure StopAtCurrent; override;
-    property Duration: Single read FDuration write FDuration;
-    property InterpolationType: TALInterpolationType read FInterpolationType write FInterpolationType;
-    property InterpolationMode: TALInterpolationMode read FInterpolationMode write FInterpolationMode;
+    property Duration: Single read FDuration write FDuration stored IsDurationStored nodefault;
+    property InterpolationType: TALInterpolationType read FInterpolationType write FInterpolationType stored IsInterpolationTypeStored;
+    property InterpolationMode: TALInterpolationMode read FInterpolationMode write FInterpolationMode stored IsInterpolationModeStored;
     property OnCustomInterpolation: TALCustomInterpolationEvent read FOnCustomInterpolation write FOnCustomInterpolation;
     // Given the current time, NormalizedTime returns a number in the range from
     // 0 through 1, indicating how far the controlled property value has changed
@@ -342,14 +386,23 @@ type
   private
     FStartValue: Single;
     FStopValue: Single;
+    function IsStartValueStored: Boolean;
+    function IsStopValueStored: Boolean;
   protected
     FCurrentValue: Single;
     procedure ProcessAnimation; override;
+    function GetDefaultStartValue: Single; virtual;
+    function GetDefaultStopValue: Single; virtual;
+  public
+    property DefaultStartValue: Single read GetDefaultStartValue;
+    property DefaultStopValue: Single read GetDefaultStopValue;
   public
     constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
     procedure Start; override;
-    property StartValue: Single read FStartValue write FStartValue;
-    property StopValue: Single read FStopValue write FStopValue;
+    property StartValue: Single read FStartValue write FStartValue stored IsStartValueStored nodefault;
+    property StopValue: Single read FStopValue write FStopValue stored IsStopValueStored nodefault;
     property CurrentValue: Single read fCurrentValue;
   end;
 
@@ -359,14 +412,23 @@ type
   private
     FStartValue: TAlphaColor;
     FStopValue: TAlphaColor;
+    function IsStartValueStored: Boolean;
+    function IsStopValueStored: Boolean;
   protected
     FCurrentValue: TAlphaColor;
     procedure ProcessAnimation; override;
+    function GetDefaultStartValue: TAlphaColor; virtual;
+    function GetDefaultStopValue: TAlphaColor; virtual;
+  public
+    property DefaultStartValue: TAlphaColor read GetDefaultStartValue;
+    property DefaultStopValue: TAlphaColor read GetDefaultStopValue;
   public
     constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
     procedure Start; override;
-    property StartValue: TAlphaColor read FStartValue write FStartValue;
-    property StopValue: TAlphaColor read FStopValue write FStopValue;
+    property StartValue: TAlphaColor read FStartValue write FStartValue stored IsStartValueStored;
+    property StopValue: TAlphaColor read FStopValue write FStopValue stored IsStopValueStored;
     property CurrentValue: TAlphaColor read fCurrentValue;
   end;
 
@@ -678,24 +740,45 @@ type
     function GetStopValue: Single;
     procedure SetValueThreshold(const Value: Single);
     function GetValueThreshold: Single;
+    function IsInitialVelocityStored: Boolean;
+    function IsStartValueStored: Boolean;
+    function IsStopValueStored: Boolean;
+    function IsStiffnessStored: Boolean;
+    function IsDampingRatioStored: Boolean;
+    function IsValueThresholdStored: Boolean;
   protected
     FCurrentValue: Single;
     procedure ProcessTick(const ATime, ADeltaTime: Double); override;
     procedure ProcessAnimation; override;
     property SpringForce: TALSpringForce read FSpringForce;
+    function GetDefaultInitialVelocity: Single; virtual;
+    function GetDefaultStartValue: Single; virtual;
+    function GetDefaultStopValue: Single; virtual;
+    function GetDefaultStiffness: Single; virtual;
+    function GetDefaultDampingRatio: Single; virtual;
+    function GetDefaultValueThreshold: Single; virtual;
+  public
+    property DefaultInitialVelocity: Single read GetDefaultInitialVelocity;
+    property DefaultStartValue: Single read GetDefaultStartValue;
+    property DefaultStopValue: Single read GetDefaultStopValue;
+    property DefaultStiffness: Single read GetDefaultStiffness;
+    property DefaultDampingRatio: Single read GetDefaultDampingRatio;
+    property DefaultValueThreshold: Single read GetDefaultValueThreshold;
   public
     constructor Create; override;
     destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
     procedure Start; override;
     procedure Stop; override;
     procedure StopAtCurrent; override;
-    property Stiffness: Single read getStiffness write setStiffness;
-    property DampingRatio: Single read getDampingRatio write setDampingRatio;
-    property ValueThreshold: Single read getValueThreshold write setValueThreshold;
-    property InitialVelocity: Single read FInitialVelocity write FInitialVelocity;
+    property Stiffness: Single read getStiffness write setStiffness stored IsStiffnessStored nodefault;
+    property DampingRatio: Single read getDampingRatio write setDampingRatio stored IsDampingRatioStored nodefault;
+    property ValueThreshold: Single read getValueThreshold write setValueThreshold stored IsValueThresholdStored nodefault;
+    property InitialVelocity: Single read FInitialVelocity write FInitialVelocity stored IsInitialVelocityStored nodefault;
     property CurrentVelocity: Single read FCurrentVelocity;
-    property StartValue: Single read FStartValue write FStartValue;
-    property StopValue: Single read GetStopValue write SetStopValue;
+    property StartValue: Single read FStartValue write FStartValue stored IsStartValueStored nodefault;
+    property StopValue: Single read GetStopValue write SetStopValue stored IsStopValueStored nodefault;
     property CurrentValue: Single read fCurrentValue;
   end;
 
@@ -1321,10 +1404,14 @@ end;
 constructor TALAnimation.Create;
 begin
   inherited Create;
-  FEnabled := False;
-  fTag := 0;
+  FTag := 0;
   FTagObject := nil;
   FTagFloat := 0.0;
+  FDelay := DefaultDelay;
+  FLoop := DefaultLoop;
+  FAutoReverse := DefaultAutoReverse;
+  FInverse := DefaultInverse;
+  FEnabled := DefaultEnabled;
 end;
 
 {******************************}
@@ -1333,6 +1420,42 @@ begin
   if AniThread <> nil then
     AniThread.FAniList.Remove(Self);
   inherited Destroy;
+end;
+
+{*************************************************}
+procedure TALAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALAnimation then begin
+    Tag := TALAnimation(Source).Tag;
+    TagObject := TALAnimation(Source).TagObject;
+    TagFloat := TALAnimation(Source).TagFloat;
+    Delay := TALAnimation(Source).Delay;
+    Loop := TALAnimation(Source).Loop;
+    AutoReverse := TALAnimation(Source).AutoReverse;
+    Inverse := TALAnimation(Source).Inverse;
+    OnFirstFrame := TALAnimation(Source).OnFirstFrame;
+    OnProcess := TALAnimation(Source).OnProcess;
+    OnFinish := TALAnimation(Source).OnFinish;
+    Enabled := TALAnimation(Source).Enabled;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{***************************}
+procedure TALAnimation.Reset;
+begin
+  Tag := 0;
+  TagObject := nil;
+  TagFloat := 0;
+  Delay := DefaultDelay;
+  Loop := DefaultLoop;
+  AutoReverse := DefaultAutoReverse;
+  Inverse := DefaultInverse;
+  OnFirstFrame := nil;
+  OnProcess := nil;
+  OnFinish := nil;
+  Enabled := DefaultEnabled;
 end;
 
 {***************************}
@@ -1389,6 +1512,66 @@ begin
   if not AniThread.Enabled then
     Raise Exception.Create('Internal error: AniThread.Enabled is False. This should never happen!');
   {$ENDIF}
+end;
+
+{*******************************************}
+function TALAnimation.IsDelayStored: Boolean;
+begin
+  result := not SameValue(fDelay, DefaultDelay, TimeEpsilon);
+end;
+
+{******************************************}
+function TALAnimation.IsLoopStored: Boolean;
+begin
+  result := fLoop <> DefaultLoop;
+end;
+
+{*******************************************}
+function TALAnimation.IsAutoReverseStored: Boolean;
+begin
+  result := fAutoReverse <> DefaultAutoReverse;
+end;
+
+{*******************************************}
+function TALAnimation.IsInverseStored: Boolean;
+begin
+  result := fInverse <> DefaultInverse;
+end;
+
+{*******************************************}
+function TALAnimation.IsEnabledStored: Boolean;
+begin
+  result := fEnabled <> DefaultEnabled;
+end;
+
+{***********************************}
+function TALAnimation.GetDefaultDelay: Single;
+Begin
+  Result := 0;
+end;
+
+{***********************************}
+function TALAnimation.GetDefaultLoop: Boolean;
+Begin
+  Result := False;
+end;
+
+{***********************************}
+function TALAnimation.GetDefaultAutoReverse: Boolean;
+Begin
+  Result := False;
+end;
+
+{***********************************}
+function TALAnimation.GetDefaultInverse: Boolean;
+Begin
+  Result := False;
+end;
+
+{***********************************}
+function TALAnimation.GetDefaultEnabled: Boolean;
+Begin
+  Result := False;
 end;
 
 {******************************************************}
@@ -1504,7 +1687,25 @@ end;
 constructor TALDisplayTimer.Create;
 begin
   inherited Create;
-  FInterval := 0.05;
+  FInterval := DefaultInterval;
+end;
+
+{****************************************************}
+procedure TALDisplayTimer.Assign(Source: TPersistent);
+begin
+  if Source is TALDisplayTimer then begin
+    Interval := TALDisplayTimer(Source).Interval;
+    inherited Assign(Source);
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{****************************************************}
+procedure TALDisplayTimer.Reset;
+begin
+  Interval := DefaultInterval;
+  inherited;
 end;
 
 {*********************************************************************}
@@ -1556,12 +1757,76 @@ begin
   end;
 end;
 
+{*******************************************}
+function TALDisplayTimer.IsIntervalStored: Boolean;
+begin
+  result := not SameValue(fInterval, DefaultInterval, TimeEpsilon);
+end;
+
+{***********************************}
+function TALDisplayTimer.GetDefaultInterval: Single;
+Begin
+  Result := 0.05;
+end;
+
 {******************************************}
 constructor TALInterpolatedAnimation.Create;
 begin
   inherited Create;
-  FDuration := 0.2;
+  FDuration := DefaultDuration;
+  FInterpolationType := DefaultInterpolationType;
+  FInterpolationMode := DefaultInterpolationMode;
 end;
+
+{*************************************************************}
+procedure TALInterpolatedAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALInterpolatedAnimation then begin
+    Duration := TALInterpolatedAnimation(Source).Duration;
+    OnCustomInterpolation := TALInterpolatedAnimation(Source).OnCustomInterpolation;
+    InterpolationType := TALInterpolatedAnimation(Source).InterpolationType;
+    InterpolationMode := TALInterpolatedAnimation(Source).InterpolationMode;
+    inherited Assign(Source);
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{*************************************************}
+procedure TALInterpolatedAnimation.Reset;
+begin
+  Duration := DefaultDuration;
+  OnCustomInterpolation := nil;
+  InterpolationType := DefaultInterpolationType;
+  InterpolationMode := DefaultInterpolationMode;
+  inherited;
+end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALInterpolatedAnimation.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('AnimationType', ReadAnimationType, nil{WriteData}, false{hasdata});
+  Filer.DefineProperty('Interpolation', ReadInterpolation, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALInterpolatedAnimation.ReadAnimationType(Reader: TReader);
+begin
+  InterpolationMode := TALInterpolationMode(GetEnumValue(TypeInfo(TALInterpolationMode), Reader.ReadIdent));
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALInterpolatedAnimation.ReadInterpolation(Reader: TReader);
+begin
+  InterpolationType := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), Reader.ReadIdent));
+end;
+{$ENDIF}
 
 {******************************************************************************}
 procedure TALInterpolatedAnimation.ProcessTick(const ATime, ADeltaTime: Double);
@@ -1723,13 +1988,69 @@ begin
     result := 0;
 end;
 
+{*******************************************}
+function TALInterpolatedAnimation.IsDurationStored: Boolean;
+begin
+  result := not SameValue(fDuration, DefaultDuration, TimeEpsilon);
+end;
+
+{*******************************************}
+function TALInterpolatedAnimation.IsInterpolationTypeStored: Boolean;
+begin
+  result := fInterpolationType <> DefaultInterpolationType;
+end;
+
+{*******************************************}
+function TALInterpolatedAnimation.IsInterpolationModeStored: Boolean;
+begin
+  result := fInterpolationMode <> DefaultInterpolationMode;
+end;
+
+{***********************************}
+function TALInterpolatedAnimation.GetDefaultDuration: Single;
+Begin
+  Result := 0.2;
+end;
+
+{***********************************}
+function TALInterpolatedAnimation.GetDefaultInterpolationType: TALInterpolationType;
+Begin
+  Result := TALInterpolationType.Linear;
+end;
+
+{***********************************}
+function TALInterpolatedAnimation.GetDefaultInterpolationMode: TALInterpolationMode;
+Begin
+  Result := TALInterpolationMode.In;
+end;
+
 {***********************************}
 constructor TALFloatAnimation.Create;
 begin
   inherited;
-  FStartValue := 0;
-  FStopValue := 0;
+  FStartValue := DefaultStartValue;
+  FStopValue := DefaultStopValue;
   fCurrentValue := 0;
+end;
+
+{****************************************************}
+procedure TALFloatAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALFloatAnimation then begin
+    StartValue := TALFloatAnimation(Source).StartValue;
+    StopValue := TALFloatAnimation(Source).StopValue;
+    inherited Assign(Source);
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{*************************************************}
+procedure TALFloatAnimation.Reset;
+begin
+  StartValue := DefaultStartValue;
+  StopValue := DefaultStopValue;
+  inherited;
 end;
 
 {********************************}
@@ -1747,13 +2068,57 @@ begin
   fCurrentValue := FStartValue + (FStopValue - FStartValue) * NormalizedTime;
 end;
 
+{*******************************************}
+function TALFloatAnimation.IsStartValueStored: Boolean;
+begin
+  result := not SameValue(fStartValue, DefaultStartValue);
+end;
+
+{*******************************************}
+function TALFloatAnimation.IsStopValueStored: Boolean;
+begin
+  result := not SameValue(fStopValue, DefaultStopValue);
+end;
+
+{***********************************}
+function TALFloatAnimation.GetDefaultStartValue: Single;
+Begin
+  Result := 0;
+end;
+
+{***********************************}
+function TALFloatAnimation.GetDefaultStopValue: Single;
+Begin
+  Result := 0;
+end;
+
 {***********************************}
 constructor TALColorAnimation.Create;
 begin
   inherited;
-  FStartValue := $FFFFFFFF;
-  FStopValue := $FFFFFFFF;
-  fCurrentValue := $FFFFFFFF;
+  FStartValue := DefaultStartValue;
+  FStopValue := DefaultStopValue;
+  fCurrentValue := FStartValue;
+end;
+
+{****************************************************}
+procedure TALColorAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALColorAnimation then begin
+    StartValue := TALColorAnimation(Source).StartValue;
+    StopValue := TALColorAnimation(Source).StopValue;
+    inherited Assign(Source);
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{*************************************************}
+procedure TALColorAnimation.Reset;
+begin
+  StartValue := DefaultStartValue;
+  StopValue := DefaultStopValue;
+  inherited;
 end;
 
 {********************************}
@@ -1769,6 +2134,30 @@ end;
 procedure TALColorAnimation.ProcessAnimation;
 begin
   fCurrentValue := ALInterpolateColor(FStartValue, FStopValue, NormalizedTime);
+end;
+
+{*******************************************}
+function TALColorAnimation.IsStartValueStored: Boolean;
+begin
+  result := fStartValue <> DefaultStartValue;
+end;
+
+{*******************************************}
+function TALColorAnimation.IsStopValueStored: Boolean;
+begin
+  result := fStopValue <> DefaultStopValue;
+end;
+
+{***********************************}
+function TALColorAnimation.GetDefaultStartValue: TAlphaColor;
+Begin
+  Result := $FFFFFFFF;
+end;
+
+{***********************************}
+function TALColorAnimation.GetDefaultStopValue: TAlphaColor;
+Begin
+  Result := $FFFFFFFF;
 end;
 
 {********************************************************}
@@ -2575,11 +2964,15 @@ constructor TALSpringForceAnimation.Create;
 begin
   inherited Create;
   FSpringForce := TALSpringForce.Create;
-  FInitialVelocity := 0.0;
+  FInitialVelocity := DefaultInitialVelocity;
   FCurrentVelocity := 0.0;
-  FStartValue := 0.0;
+  FStartValue := DefaultStartValue;
   fCurrentValue := 0.0;
   FDeltaTime := 0.0;
+  StopValue := DefaultStopValue;
+  Stiffness := DefaultStiffness;
+  DampingRatio := DefaultDampingRatio;
+  ValueThreshold := DefaultValueThreshold;
 end;
 
 {*****************************************}
@@ -2587,6 +2980,34 @@ destructor TALSpringForceAnimation.Destroy;
 begin
   ALFreeAndNil(FSpringForce);
   inherited Destroy;
+end;
+
+{****************************************************}
+procedure TALSpringForceAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALSpringForceAnimation then begin
+    InitialVelocity := TALSpringForceAnimation(Source).InitialVelocity;
+    StartValue := TALSpringForceAnimation(Source).StartValue;
+    StopValue := TALSpringForceAnimation(Source).StopValue;
+    Stiffness := TALSpringForceAnimation(Source).Stiffness;
+    DampingRatio := TALSpringForceAnimation(Source).DampingRatio;
+    ValueThreshold := TALSpringForceAnimation(Source).ValueThreshold;
+    inherited Assign(Source);
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{*************************************************}
+procedure TALSpringForceAnimation.Reset;
+begin
+  InitialVelocity := DefaultInitialVelocity;
+  StartValue := DefaultStartValue;
+  StopValue := DefaultStopValue;
+  Stiffness := DefaultStiffness;
+  DampingRatio := DefaultDampingRatio;
+  ValueThreshold := DefaultValueThreshold;
+  inherited;
 end;
 
 {*************************************************}
@@ -2721,6 +3142,78 @@ begin
   FInverse := FSavedInverse;
   FCurrentVelocity := 0;
   DoFinish;
+end;
+
+{*******************************************}
+function TALSpringForceAnimation.IsInitialVelocityStored: Boolean;
+begin
+  result := not SameValue(fInitialVelocity, DefaultInitialVelocity);
+end;
+
+{*******************************************}
+function TALSpringForceAnimation.IsStartValueStored: Boolean;
+begin
+  result := not SameValue(fStartValue, DefaultStartValue);
+end;
+
+{*******************************************}
+function TALSpringForceAnimation.IsStopValueStored: Boolean;
+begin
+  result := not SameValue(StopValue, DefaultStopValue);
+end;
+
+{*******************************************}
+function TALSpringForceAnimation.IsStiffnessStored: Boolean;
+begin
+  result := not SameValue(Stiffness, DefaultStiffness);
+end;
+
+{*******************************************}
+function TALSpringForceAnimation.IsDampingRatioStored: Boolean;
+begin
+  result := not SameValue(DampingRatio, DefaultDampingRatio);
+end;
+
+{*******************************************}
+function TALSpringForceAnimation.IsValueThresholdStored: Boolean;
+begin
+  result := not SameValue(ValueThreshold, DefaultValueThreshold);
+end;
+
+{***********************************}
+function TALSpringForceAnimation.GetDefaultInitialVelocity: Single;
+Begin
+  Result := 0.0;
+end;
+
+{***********************************}
+function TALSpringForceAnimation.GetDefaultStartValue: Single;
+Begin
+  Result := 0.0;
+end;
+
+{***********************************}
+function TALSpringForceAnimation.GetDefaultStopValue: Single;
+Begin
+  Result := 0.0;
+end;
+
+{***********************************}
+function TALSpringForceAnimation.GetDefaultStiffness: Single;
+Begin
+  Result := TALSpringForce.STIFFNESS_MEDIUM;
+end;
+
+{***********************************}
+function TALSpringForceAnimation.GetDefaultDampingRatio: Single;
+Begin
+  Result := TALSpringForce.DAMPING_RATIO_MEDIUM_BOUNCY;
+end;
+
+{***********************************}
+function TALSpringForceAnimation.GetDefaultValueThreshold: Single;
+Begin
+  Result := TALSpringForce.MIN_VISIBLE_CHANGE_PIXELS * TALSpringForce.THRESHOLD_MULTIPLIER;
 end;
 
 {****************************************************************}

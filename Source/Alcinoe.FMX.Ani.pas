@@ -2297,7 +2297,7 @@ begin
   inherited;
   FStartValue := DefaultStartValue;
   FStopValue := DefaultStopValue;
-  fCurrentValue := 0;
+  fCurrentValue := FStartValue;
 end;
 
 {****************************************************}
@@ -3258,7 +3258,7 @@ begin
   FInitialVelocity := DefaultInitialVelocity;
   FCurrentVelocity := 0.0;
   FStartValue := DefaultStartValue;
-  fCurrentValue := 0.0;
+  fCurrentValue := FStartValue;
   FDeltaTime := 0.0;
   StopValue := DefaultStopValue;
   Stiffness := DefaultStiffness;

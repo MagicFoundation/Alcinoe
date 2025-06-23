@@ -5072,7 +5072,7 @@ begin
   Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
   //--
   Result.AutoSize := TALAutoSizeMode.None;
-  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.All
+  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.Both
   else if HasUnconstrainedAutosizeWidth then Result.Autosize := TALAutoSizeMode.Width
   else if HasUnconstrainedAutosizeHeight then Result.Autosize := TALAutoSizeMode.Height;
   //--

@@ -5611,13 +5611,27 @@ begin
     Result.StateLayerYRadius := 0;
   end;
   //--
-  Result.StrokeColor := AStroke.Color;
-  Result.StrokeThickness := AStroke.Thickness;
+  if AStroke <> nil then begin
+    Result.StrokeColor := AStroke.Color;
+    Result.StrokeThickness := AStroke.Thickness;
+  end
+  else begin
+    Result.StrokeColor := TalphaColors.Null;
+    Result.StrokeThickness := 0;
+  end;
   //--
-  Result.ShadowColor := AShadow.Color;
-  Result.ShadowBlur := AShadow.Blur;
-  Result.ShadowOffsetX := AShadow.OffsetX;
-  Result.ShadowOffsetY := AShadow.OffsetY;
+  if AShadow <> nil then begin
+    Result.ShadowColor := AShadow.Color;
+    Result.ShadowBlur := AShadow.Blur;
+    Result.ShadowOffsetX := AShadow.OffsetX;
+    Result.ShadowOffsetY := AShadow.OffsetY;
+  end
+  else begin
+    Result.ShadowColor := TalphaColors.Null;
+    Result.ShadowBlur := 0;
+    Result.ShadowOffsetX := 0;
+    Result.ShadowOffsetY := 0;
+  end;
   //--
   Result.Sides := Sides;
   Result.XRadius := AXRadius;

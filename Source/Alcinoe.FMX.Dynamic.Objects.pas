@@ -360,34 +360,35 @@ type
         fCurrentProgress: Single;
         FEnabled: Boolean;
         function GetDuration: Single;
+        procedure SetDuration(const Value: Single);
         function GetCurrentTime: Single;
         function GetSpeed: Single;
+        procedure SetSpeed(const Value: Single);
         procedure SetEnabled(const Value: Boolean);
         procedure SetStartProgress(const Value: Single);
         procedure SetStopProgress(const Value: Single);
-        procedure SetSpeed(const Value: Single);
         function IsStopProgressStored: Boolean;
         function IsSpeedStored: Boolean;
         procedure UpdateInheritedAnimationDuration;
         procedure repaint;
       protected
-        procedure SetDuration(const Value: Single);
         procedure ProcessAnimation; override;
         procedure DoFirstFrame; override;
         procedure DoProcess; override;
         procedure DoFinish; override;
+        function GetDefaultLoop: Boolean; override;
       public
         constructor Create(const AOwner: TALDynamicAnimatedImage); reintroduce; virtual;
         procedure Start; override;
         property CurrentProgress: Single read FCurrentProgress;
         property CurrentTime: Single read GetCurrentTime;
       public
-        property AutoReverse default False;
+        property AutoReverse;
         property Delay;
-        property Duration: Single read getDuration;
+        property Duration: Single read getDuration stored false;
         property Enabled Read FEnabled write SetEnabled default True;
-        property Inverse default False;
-        property Loop default True;
+        property Inverse;
+        property Loop;
         property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
         property StartProgress: Single read FStartProgress write SetStartProgress;
         property StopProgress: Single read FStopProgress write SetStopProgress stored IsStopProgressStored nodefault;
@@ -958,7 +959,9 @@ type
                const AFill: TALBrush;
                const AStateLayer: TALStateLayer;
                const AStroke: TALStrokeBrush;
-               const AShadow: TALShadow): TALMultiLineTextOptions;
+               const AShadow: TALShadow;
+               const AXRadius: Single;
+               const AYRadius: Single): TALMultiLineTextOptions;
     Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); virtual;
     Procedure DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
     Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
@@ -978,7 +981,9 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow;
+                const AXRadius: Single;
+                const AYRadius: Single);
     Procedure MeasureMultilineText(
                 out ARect: TRectF;
                 out ATextBroken: Boolean;
@@ -993,7 +998,9 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow;
+                const AXRadius: Single;
+                const AYRadius: Single);
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
                 out ABufDrawableRect: TRectF;
@@ -1009,7 +1016,9 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow;
+                const AXRadius: Single;
+                const AYRadius: Single);
     {$IF NOT DEFINED(ALSkiaCanvas)}
     function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
     procedure InitRenderTargets(var ARect: TrectF); virtual;
@@ -2669,7 +2678,6 @@ constructor TALDynamicAnimatedImage.TAnimation.Create(const AOwner: TALDynamicAn
 begin
   inherited create;
   fOwner := AOwner;
-  Loop := True;
   inherited Duration := MaxSingle;
   FDuration := 0.0;
   FSpeed := 1.0;
@@ -2706,6 +2714,12 @@ begin
     Pause;
 end;
 
+{******************************************************************}
+function TALDynamicAnimatedImage.TAnimation.GetDefaultLoop: Boolean;
+begin
+  Result := True;
+end;
+
 {**************************************************************}
 function TALDynamicAnimatedImage.TAnimation.GetDuration: Single;
 begin
@@ -2732,6 +2746,15 @@ end;
 function TALDynamicAnimatedImage.TAnimation.GetSpeed: Single;
 begin
   Result := FSpeed;
+end;
+
+{*************************************************************************}
+procedure TALDynamicAnimatedImage.TAnimation.SetSpeed(const Value: Single);
+begin
+  if not SameValue(FSpeed, Value, Single.Epsilon) then begin
+    FSpeed := Value;
+    UpdateInheritedAnimationDuration;
+  end;
 end;
 
 {****************************************************************************}
@@ -2765,15 +2788,6 @@ begin
   FStopProgress := Min(Max(Value, 0), 1);
   UpdateInheritedAnimationDuration;
   Repaint;
-end;
-
-{*************************************************************************}
-procedure TALDynamicAnimatedImage.TAnimation.SetSpeed(const Value: Single);
-begin
-  if not SameValue(FSpeed, Value, Single.Epsilon) then begin
-    FSpeed := Value;
-    UpdateInheritedAnimationDuration;
-  end;
 end;
 
 {************************************************************************}
@@ -4584,13 +4598,9 @@ begin
 
       var R: TrectF;
       If {$IF not DEFINED(ALDPK)}DoubleBuffered{$ELSE}True{$ENDIF} then begin
-        if (CacheIndex > 0) and (CacheEngine <> nil) then begin
-          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, R{ARect}) then begin
-            MakeBufDrawable;
-            R := FBufDrawableRect;
-          end;
-        end
-        else begin
+        if (CacheIndex <= 0) or
+           (CacheEngine = nil) or
+           (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, R{ARect})) then begin
           MakeBufDrawable;
           R := FBufDrawableRect;
         end;
@@ -4610,7 +4620,9 @@ begin
           Fill, // const AFill: TALBrush;
           nil, // const AStateLayer: TALStateLayer;
           Stroke, // const AStroke: TALStrokeBrush;
-          Shadow); // const AShadow: TALShadow);
+          Shadow, // const AShadow: TALShadow;
+          XRadius, // const AXRadius: Single;
+          YRadius); // const AYRadius: Single
       end;
 
       if not HasUnconstrainedAutosizeWidth then begin
@@ -4911,7 +4923,9 @@ begin
       Fill, // const AFill: TALBrush;
       nil, // const AStateLayer: TALStateLayer;
       Stroke, // const AStroke: TALStrokeBrush;
-      Shadow); // const AShadow: TALShadow);
+      Shadow, // const AShadow: TALShadow;
+      XRadius, // const AXRadius: Single;
+      YRadius); // const AYRadius: Single
     {$ELSE}
     var LRect := LocalRect.ReducePrecision;
     InitRenderTargets(LRect);
@@ -4934,7 +4948,9 @@ begin
         Fill, // const AFill: TALBrush;
         nil, // const AStateLayer: TALStateLayer;
         Stroke, // const AStroke: TALStrokeBrush;
-        Shadow); // const AShadow: TALShadow);
+        Shadow, // const AShadow: TALShadow;
+        XRadius, // const AXRadius: Single;
+        YRadius); // const AYRadius: Single
     finally
       ALCanvasEndScene(FRenderTargetCanvas)
     end;
@@ -5037,7 +5053,9 @@ function TALDynamicBaseText.GetMultiLineTextOptions(
            const AFill: TALBrush;
            const AStateLayer: TALStateLayer;
            const AStroke: TALStrokeBrush;
-           const AShadow: TALShadow): TALMultiLineTextOptions;
+           const AShadow: TALShadow;
+           const AXRadius: Single;
+           const AYRadius: Single): TALMultiLineTextOptions;
 begin
   Result := FMultiLineTextOptions;
   Result.Scale := AScale;
@@ -5117,17 +5135,31 @@ begin
     Result.StateLayerYRadius := 0;
   end;
   //--
-  Result.StrokeColor := AStroke.Color;
-  Result.StrokeThickness := AStroke.Thickness;
+  if AStroke <> nil then begin
+    Result.StrokeColor := AStroke.Color;
+    Result.StrokeThickness := AStroke.Thickness;
+  end
+  else begin
+    Result.StrokeColor := TalphaColors.Null;
+    Result.StrokeThickness := 0;
+  end;
   //--
-  Result.ShadowColor := AShadow.Color;
-  Result.ShadowBlur := AShadow.Blur;
-  Result.ShadowOffsetX := AShadow.OffsetX;
-  Result.ShadowOffsetY := AShadow.OffsetY;
+  if AShadow <> nil then begin
+    Result.ShadowColor := AShadow.Color;
+    Result.ShadowBlur := AShadow.Blur;
+    Result.ShadowOffsetX := AShadow.OffsetX;
+    Result.ShadowOffsetY := AShadow.OffsetY;
+  end
+  else begin
+    Result.ShadowColor := TalphaColors.Null;
+    Result.ShadowBlur := 0;
+    Result.ShadowOffsetX := 0;
+    Result.ShadowOffsetY := 0;
+  end;
   //--
   Result.Sides := Sides;
-  Result.XRadius := XRadius;
-  Result.YRadius := YRadius;
+  Result.XRadius := AXRadius;
+  Result.YRadius := AYRadius;
   Result.Corners := Corners;
   Result.Padding := padding.Rect;
   //--
@@ -5173,7 +5205,9 @@ Procedure TALDynamicBaseText.DrawMultilineText(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow);
+            const AShadow: TALShadow;
+            const AXRadius: Single;
+            const AYRadius: Single);
 begin
 
   if ALIsCanvasNull(ACanvas) then
@@ -5189,7 +5223,9 @@ begin
                                  AFill,
                                  AStateLayer,
                                  AStroke,
-                                 AShadow);
+                                 AShadow,
+                                 AXRadius,
+                                 AYRadius);
 
   if (AText <> '') then begin
 
@@ -5244,8 +5280,8 @@ begin
       .SetShadow(AShadow)
       .SetSides(Sides)
       .SetCorners(Corners)
-      .SetXRadius(XRadius)
-      .SetYRadius(YRadius)
+      .SetXRadius(AXRadius)
+      .SetYRadius(AYRadius)
       .Draw;
 
     DrawMultilineTextBeforeDrawParagraph(
@@ -5272,7 +5308,9 @@ Procedure TALDynamicBaseText.MeasureMultilineText(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow);
+            const AShadow: TALShadow;
+            const AXRadius: Single;
+            const AYRadius: Single);
 begin
   var LMaxSize: TSizeF;
   if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
@@ -5298,7 +5336,9 @@ begin
       AFill,
       AStateLayer,
       AStroke,
-      AShadow));
+      AShadow,
+      AXRadius,
+      AYRadius));
 end;
 
 {*********************************************}
@@ -5317,7 +5357,9 @@ Procedure TALDynamicBaseText.CreateBufDrawable(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow);
+            const AShadow: TALShadow;
+            const AXRadius: Single;
+            const AYRadius: Single);
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
@@ -5332,7 +5374,9 @@ begin
                                  AFill,
                                  AStateLayer,
                                  AStroke,
-                                 AShadow);
+                                 AShadow,
+                                 AXRadius,
+                                 AYRadius);
 
   if (AText <> '') then begin
 
@@ -5415,8 +5459,8 @@ begin
             .SetShadow(AShadow)
             .SetSides(Sides)
             .SetCorners(Corners)
-            .SetXRadius(XRadius)
-            .SetYRadius(YRadius)
+            .SetXRadius(AXRadius)
+            .SetYRadius(AYRadius)
             .Draw;
 
         DrawMultilineTextBeforeDrawParagraph(
@@ -5476,7 +5520,9 @@ begin
     Fill, // const AFill: TALBrush;
     nil, // const AStateLayer: TALStateLayer;
     Stroke, // const AStroke: TALStrokeBrush;
-    Shadow); // const AShadow: TALShadow);
+    Shadow, // const AShadow: TALShadow;
+    XRadius, // const AXRadius: Single;
+    YRadius); // const AYRadius: Single
 
 end;
 

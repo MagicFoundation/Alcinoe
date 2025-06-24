@@ -1791,7 +1791,7 @@ begin
     var LNewViewportPosition := ViewportPosition;
     if (assigned(FPageController.FOnViewportPositionChange)) and
        (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
-      FPageController.FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
+      FPageController.FOnViewportPositionChange(FPageController, fLastViewportPosition, LNewViewportPosition);
     fLastViewportPosition := LNewViewportPosition;
 
     If FPageController.PageIndicator <> nil then begin

@@ -14,6 +14,7 @@ uses
   FMX.stdActns,
   FMX.Controls,
   FMX.Graphics,
+  Alcinoe.Common,
   Alcinoe.FMX.CacheEngines,
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Ani,
@@ -41,21 +42,25 @@ type
         fOwner: TALDynamicAniIndicator;
         FEnabled: Boolean;
         procedure SetEnabled(const Value: Boolean);
-        function IsDurationStored: Boolean;
         procedure repaint;
       protected
         procedure DoProcess; override;
+        function GetDefaultDuration: Single; override;
+        function GetDefaultLoop: Boolean; override;
+        function GetDefaultStartValue: Single; override;
+        function GetDefaultStopValue: Single; override;
       public
         constructor Create(const AOwner: TALDynamicAniIndicator); reintroduce; virtual;
       public
-        property AutoReverse default False;
+        property AutoReverse;
         property Delay;
-        property Duration stored IsDurationStored nodefault;
+        property Duration;
         property Enabled Read FEnabled write SetEnabled default True;
-        property Inverse default False;
-        property Loop default True;
-        property InterpolationType default TALInterpolationType.Linear;
-        property InterpolationMode default TALInterpolationMode.In;
+        property Inverse;
+        property Loop;
+        property InterpolationType;
+        property InterpolationMode;
+        property InterpolationParams;
       end;
   private
     FAnimation: TAnimation; // 8 bytes
@@ -295,7 +300,6 @@ type
       public
         property CheckMark: TInheritCheckMarkBrush read FCheckMark write SetCheckMark;
         property Fill;
-        property Scale;
         property Shadow;
         property Stroke;
       end;
@@ -329,6 +333,7 @@ type
         function GetCacheSubIndex: Integer; override;
       public
         property StateLayer;
+        property Scale;
       end;
       // ------------------
       // TPressedStateStyle
@@ -337,6 +342,7 @@ type
         function GetCacheSubIndex: Integer; override;
       public
         property StateLayer;
+        property Scale;
       end;
       // ------------------
       // TFocusedStateStyle
@@ -345,6 +351,7 @@ type
         function GetCacheSubIndex: Integer; override;
       public
         property StateLayer;
+        property Scale;
       end;
       // -----------------
       // TCheckStateStyles
@@ -747,9 +754,6 @@ type
             function CreateStateLayer: TALStateLayer; override;
           public
             property Fill;
-            // When the track is scaled, the thumb is no longer aligned with the track.
-            // Therefore, currently, scaling of the track is disabled.
-            //property Scale;
             property Shadow;
             property Stroke;
           end;
@@ -783,6 +787,9 @@ type
             function GetCacheSubIndex: Integer; override;
           public
             property StateLayer;
+            // When the track is scaled, the thumb is no longer aligned with the track.
+            // Therefore, currently, scaling of the track is disabled.
+            //property Scale;
           end;
           // ------------------
           // TPressedStateStyle
@@ -791,6 +798,9 @@ type
             function GetCacheSubIndex: Integer; override;
           public
             property StateLayer;
+            // When the track is scaled, the thumb is no longer aligned with the track.
+            // Therefore, currently, scaling of the track is disabled.
+            //property Scale;
           end;
           // ------------------
           // TFocusedStateStyle
@@ -799,6 +809,9 @@ type
             function GetCacheSubIndex: Integer; override;
           public
             property StateLayer;
+            // When the track is scaled, the thumb is no longer aligned with the track.
+            // Therefore, currently, scaling of the track is disabled.
+            //property Scale;
           end;
           // -----------------
           // TCheckStateStyles
@@ -1125,14 +1138,23 @@ type
           // ------------
           // TStateStyles
           TStateStyles = class(TALDynamicBaseCheckBox.TStateStyles)
-          private
-            FStartPositionX: Single;
+          public
+            type
+              // -----------
+              // TTransition
+              TTransition = class(TALDynamicBaseStateStyles.TTransition)
+              private
+                FStartPositionX: Single;
+              protected
+                procedure DoProcess; override;
+                procedure DoFinish; override;
+              public
+                procedure Start; override;
+              end;
           protected
+            function CreateTransition: TALDynamicBaseStateStyles.TTransition; override;
             function CreateCheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles; override;
             function CreateUncheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles; override;
-            procedure StartTransition; override;
-            procedure TransitionAnimationProcess(Sender: TObject); override;
-            procedure TransitionAnimationFinish(Sender: TObject); override;
           end;
       protected
         function CreateStroke: TALStrokeBrush; override;
@@ -1213,16 +1235,69 @@ type
         //property OnResize;
         //property OnResized;
       end;
+      // -----------
+      // TTransition
+      TTransition = class(TPersistent)
+      public
+        type
+          TInterpolationParams = class(TPersistent)
+          private
+            FOwner: TTransition;
+            function GetBezierX1: Single;
+            function GetBezierY1: Single;
+            function GetBezierX2: Single;
+            function GetBezierY2: Single;
+            procedure SetBezierX1(const AValue: Single);
+            procedure SetBezierY1(const AValue: Single);
+            procedure SetBezierX2(const AValue: Single);
+            procedure SetBezierY2(const AValue: Single);
+            function GetOvershoot: Single;
+            procedure SetOvershoot(const AValue: Single);
+          public
+            constructor Create(Const AOwner: TTransition); reintroduce; virtual;
+          public
+            property BezierX1: Single read GetBezierX1 write SetBezierX1;
+            property BezierY1: Single read GetBezierY1 write SetBezierY1;
+            property BezierX2: Single read GetBezierX2 write SetBezierX2;
+            property BezierY2: Single read GetBezierY2 write SetBezierY2;
+            property Overshoot: Single read GetOvershoot write SetOvershoot;
+          end;
+      private
+        FOwner: TALDynamicSwitch;
+        FInterpolationParams: TInterpolationParams;
+        function GetDuration: Single;
+        procedure SetDuration(const AValue: Single);
+        function GetDelayClick: Boolean;
+        procedure SetDelayClick(const AValue: Boolean);
+        function GetInterpolationType: TALInterpolationType;
+        procedure SetInterpolationType(const AValue: TALInterpolationType);
+        function GetInterpolationMode: TALInterpolationMode;
+        procedure SetInterpolationMode(const AValue: TALInterpolationMode);
+        procedure SetInterpolationParams(const AValue: TInterpolationParams);
+        Function IsDurationStored: Boolean;
+        Function IsDelayClickStored: Boolean;
+        Function IsInterpolationTypeStored: Boolean;
+        Function IsInterpolationModeStored: Boolean;
+      public
+        constructor Create(Const AOwner: TALDynamicSwitch); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Start;
+      public
+        property Duration: Single read GetDuration write SetDuration stored IsDurationStored nodefault;
+        property InterpolationType: TALInterpolationType read GetInterpolationType write SetInterpolationType stored IsInterpolationTypeStored;
+        property InterpolationMode: TALInterpolationMode read GetInterpolationMode write SetInterpolationMode stored IsInterpolationModeStored;
+        property InterpolationParams: TInterpolationParams read FInterpolationParams write SetInterpolationParams;
+        property DelayClick: Boolean read GetDelayClick write SetDelayClick stored IsDelayClickStored;
+      end;
   private
     FThumb: TThumb;
     FTrack: TTrack;
-    FTransition: TALStateTransition;
+    FTransition: TTransition;
     FPressedThumbPos: TPointF;
     FOnChange: TNotifyEvent;
     fScrollCapturedByMe: boolean;
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
-    procedure SetTransition(const Value: TALStateTransition);
-    procedure TransitionChanged(ASender: TObject);
+    procedure SetTransition(const Value: TTransition);
     function GetCacheIndex: integer;
     procedure SetCacheIndex(const AValue: Integer);
     function GetCacheEngine: TALBufDrawableCacheEngine;
@@ -1236,7 +1311,6 @@ type
     function GetDefaultSize: TSizeF; override;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    procedure StartTransition; virtual;
     procedure IsMouseOverChanged; override;
     //**procedure IsFocusedChanged; override;
     procedure PressedChanged; override;
@@ -1304,7 +1378,7 @@ type
     property Thumb: TThumb read FThumb;
     property TouchTargetExpansion;
     property Track: TTrack read FTrack;
-    property Transition: TALStateTransition read FTransition write SetTransition;
+    property Transition: TTransition read FTransition write SetTransition;
     property Visible;
     property Width;
     //**property OnCanFocus;
@@ -1408,17 +1482,25 @@ type
       private
         FText: String;
         FTextSettings: TBaseStateStyle.TTextSettings;
+        FXRadius: Single;
+        FYRadius: Single;
         function GetStateStyleParent: TBaseStateStyle;
         function GetControlParent: TALDynamicButton;
         procedure SetText(const Value: string);
         procedure SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
+        procedure SetXRadius(const Value: Single); virtual;
+        procedure SetYRadius(const Value: Single); virtual;
         procedure TextSettingsChanged(ASender: TObject);
         function IsTextStored: Boolean;
+        function IsXRadiusStored: Boolean;
+        function IsYRadiusStored: Boolean;
       protected
         function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
         function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
         function CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings; virtual;
         function GetDefaultText: String; virtual;
+        function GetDefaultXRadius: Single; virtual;
+        function GetDefaultYRadius: Single; virtual;
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
@@ -1432,13 +1514,16 @@ type
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALDynamicButton read GetControlParent;
         property DefaultText: String read GetDefaultText;
+        property DefaultXRadius: Single read GetDefaultXRadius;
+        property DefaultYRadius: Single read GetDefaultYRadius;
       public
         property Fill;
-        property Scale;
         property Shadow;
         property Stroke;
         property Text: string read FText write SetText stored IsTextStored nodefault;
         property TextSettings: TBaseStateStyle.TTextSettings read fTextSettings write SetTextSettings;
+        property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
+        property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
       end;
       // -------------------
       // TDisabledStateStyle
@@ -1464,6 +1549,7 @@ type
         function GetCacheSubIndex: Integer; override;
       public
         property StateLayer;
+        property Scale;
       end;
       // ------------------
       // TPressedStateStyle
@@ -1472,6 +1558,7 @@ type
         function GetCacheSubIndex: Integer; override;
       public
         property StateLayer;
+        property Scale;
       end;
       // ------------------
       // TFocusedStateStyle
@@ -1480,6 +1567,7 @@ type
         function GetCacheSubIndex: Integer; override;
       public
         property StateLayer;
+        property Scale;
       end;
       // ------------
       // TStateStyles
@@ -1561,7 +1649,7 @@ type
     //property Action;
     property Align;
     //**property Anchors;
-    property AutoSize default TALAutoSizeMode.All;
+    property AutoSize default TALAutoSizeMode.Both;
     property AutoTranslate;
     //**property CanFocus default true;
     //property CanParentFocus;
@@ -2002,7 +2090,6 @@ type
             function CreateStateLayer: TALStateLayer; override;
           public
             property Fill;
-            property Scale;
             property Shadow;
             property Stroke;
           end;
@@ -2027,18 +2114,21 @@ type
           THoveredStateStyle = class(TBaseStateStyle)
           public
             property StateLayer;
+            property Scale;
           end;
           // ------------------
           // TPressedStateStyle
           TPressedStateStyle = class(TBaseStateStyle)
           public
             property StateLayer;
+            property Scale;
           end;
           // ------------------
           // TFocusedStateStyle
           TFocusedStateStyle = class(TBaseStateStyle)
           public
             property StateLayer;
+            property Scale;
           end;
           // ------------
           // TStateStyles
@@ -2274,7 +2364,7 @@ type
         //property Align;
         //property Anchors;
         property Animation: TAnimation read FAnimation write FAnimation default TAnimation.ScaleInOut;
-        property AutoSize default TALAutoSizeMode.All;
+        property AutoSize default TALAutoSizeMode.Both;
         //property AutoTranslate;
         //property CanFocus;
         //property CanParentFocus;
@@ -2926,8 +3016,7 @@ uses
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Localization,
   Alcinoe.StringUtils,
-  Alcinoe.FMX.Styles,
-  Alcinoe.Common;
+  Alcinoe.FMX.Styles;
 
 {*}
 var
@@ -2945,10 +3034,6 @@ begin
   inherited Create;
   FOwner := AOwner;
   FEnabled := True;
-  Loop := True;
-  Duration := 1;
-  StartValue := 0;
-  StopValue := 1.0;
 end;
 
 {****************************************************}
@@ -2967,6 +3052,30 @@ begin
     Pause;
 end;
 
+{********************************************************************}
+function TALDynamicAniIndicator.TAnimation.GetDefaultDuration: Single;
+begin
+  Result := 1.0;
+end;
+
+{*****************************************************************}
+function TALDynamicAniIndicator.TAnimation.GetDefaultLoop: Boolean;
+begin
+  Result := True;
+end;
+
+{**********************************************************************}
+function TALDynamicAniIndicator.TAnimation.GetDefaultStartValue: Single;
+begin
+  Result := 0.0;
+end;
+
+{*********************************************************************}
+function TALDynamicAniIndicator.TAnimation.GetDefaultStopValue: Single;
+begin
+  Result := 1.0;
+end;
+
 {***************************************************************************}
 procedure TALDynamicAniIndicator.TAnimation.SetEnabled(const Value: Boolean);
 begin
@@ -2975,12 +3084,6 @@ begin
     if not FEnabled then
       inherited Enabled := False;
   end;
-end;
-
-{*******************************************************************}
-function TALDynamicAniIndicator.TAnimation.IsDurationStored: Boolean;
-begin
-  Result := Not SameValue(Duration, 1.0, TEpsilon.Scale);
 end;
 
 {***************************************************************}
@@ -4336,7 +4439,6 @@ begin
       StateStyles.Assign(TALDynamicBaseCheckBox(Source).StateStyles);
       CheckMark.Assign(TALDynamicBaseCheckBox(Source).CheckMark);
       Checked := TALDynamicBaseCheckBox(Source).Checked;
-      DoubleBuffered := TALDynamicBaseCheckBox(Source).DoubleBuffered;
       XRadius := TALDynamicBaseCheckBox(Source).XRadius;
       YRadius := TALDynamicBaseCheckBox(Source).YRadius;
       CacheIndex := TALDynamicBaseCheckBox(Source).CacheIndex;
@@ -4527,7 +4629,7 @@ end;
 procedure TALDynamicBaseCheckBox.IsMouseOverChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.Start;
   repaint;
 end;
 
@@ -4535,7 +4637,7 @@ end;
 //**procedure TALDynamicBaseCheckBox.IsFocusedChanged;
 //**begin
 //**  inherited;
-//**  StateStyles.startTransition;
+//**  StateStyles.Transition.Start;
 //**  repaint;
 //**end;
 
@@ -4543,7 +4645,7 @@ end;
 procedure TALDynamicBaseCheckBox.PressedChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.Start;
   repaint;
 end;
 
@@ -4560,8 +4662,15 @@ end;
 {*************************************}
 procedure TALDynamicBaseCheckBox.Click;
 begin
-  Checked := not Checked;
-  inherited;
+  if StateStyles.Transition.Running and StateStyles.Transition.DelayClick then begin
+    Checked := not Checked;
+    StateStyles.Transition.ClickDelayed := True
+  end
+  else begin
+    if not StateStyles.Transition.ClickDelayed then
+      Checked := not Checked;
+    inherited click;
+  end;
 end;
 
 {*****************************************************}
@@ -4961,26 +5070,26 @@ end;
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicBaseCheckBox.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     Result := ARect;
-    if StateStyles.TransitionFrom <> nil then begin
+    if StateStyles.Transition.FromStateStyle <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
-    if StateStyles.TransitionTo <> nil then begin
+    if StateStyles.Transition.ToStateStyle <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -5039,7 +5148,7 @@ begin
 
   var LDrawable: TALDrawable := ALNullDrawable;
   var LDrawableRect: TRectF := TRectF.Empty;
-  if not StateStyles.IsTransitionAnimationRunning then begin
+  if not StateStyles.Transition.Running then begin
     //--
     var LSubIndexOffset: Integer;
     var LDefaultStateStyle: TBaseStateStyle;
@@ -6261,7 +6370,7 @@ end;
 procedure TALDynamicSwitch.TTrack.IsMouseOverChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.Start;
   repaint;
 end;
 
@@ -6269,7 +6378,7 @@ end;
 //**procedure TALDynamicSwitch.TTrack.IsFocusedChanged;
 //**begin
 //**  inherited;
-//**  StateStyles.startTransition;
+//**  StateStyles.Transition.Start;
 //**  repaint;
 //**end;
 
@@ -6277,7 +6386,7 @@ end;
 procedure TALDynamicSwitch.TTrack.PressedChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.Start;
   repaint;
 end;
 
@@ -6461,26 +6570,26 @@ end;
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicSwitch.TTrack.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     Result := ARect;
-    if StateStyles.TransitionFrom <> nil then begin
+    if StateStyles.Transition.FromStateStyle <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
-    if StateStyles.TransitionTo <> nil then begin
+    if StateStyles.Transition.ToStateStyle <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -6539,7 +6648,7 @@ begin
 
   var LDrawable: TALDrawable := ALNullDrawable;
   var LDrawableRect: TRectF := TRectF.Empty;
-  if not StateStyles.IsTransitionAnimationRunning then begin
+  if not StateStyles.Transition.Running then begin
     //--
     var LSubIndexOffset: Integer;
     var LDefaultStateStyle: TBaseStateStyle;
@@ -6884,6 +6993,46 @@ begin
   Result := TFocusedStateStyle.Create(AParent);
 end;
 
+{***************************************************************}
+procedure TALDynamicSwitch.TThumb.TStateStyles.TTransition.Start;
+begin
+  FStartPositionX := Owner{StateStyles}.Parent{Thumb}.Left;
+  inherited;
+  if not Running then
+    TALDynamicSwitch(Owner{StateStyles}.Parent{Thumb}.Owner{Track}.Owner{Switch}).AlignThumb;
+end;
+
+{*******************************************************************}
+procedure TALDynamicSwitch.TThumb.TStateStyles.TTransition.DoProcess;
+begin
+  if Enabled then begin
+    var LThumb := Owner{StateStyles}.Parent{Thumb};
+    var LSwitch := TALDynamicSwitch(LThumb.Owner{Track}.Owner{Switch});
+    if (not LSwitch.Pressed) and (Lthumb.Align = TALAlignLayout.None) then begin
+      var LStopPositionX: Single;
+      If LSwitch.Checked then LStopPositionX := LSwitch.GetMaxThumbPos
+      else LStopPositionX := LSwitch.GetMinThumbPos;
+      LThumb.Left := FStartPositionX + (LStopPositionX - FStartPositionX) * CurrentValue;
+    end;
+  end;
+  inherited;
+end;
+
+{******************************************************************}
+procedure TALDynamicSwitch.TThumb.TStateStyles.TTransition.DoFinish;
+begin
+  if Enabled then begin
+    TALDynamicSwitch(Owner{StateStyles}.Parent{Thumb}.Owner{Track}.Owner{Switch}).AlignThumb;
+  end;
+  inherited;
+end;
+
+{****************************************************************************************************}
+function TALDynamicSwitch.TThumb.TStateStyles.CreateTransition: TALDynamicBaseStateStyles.TTransition;
+begin
+  result := TTransition.Create(Self);
+end;
+
 {*************************************************************************************************************************************************}
 function TALDynamicSwitch.TThumb.TStateStyles.CreateCheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles;
 begin
@@ -6894,37 +7043,6 @@ end;
 function TALDynamicSwitch.TThumb.TStateStyles.CreateUncheckedStateStyles(const AParent: TALDynamicControl): TALDynamicBaseCheckBox.TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
-end;
-
-{*************************************************************}
-procedure TALDynamicSwitch.TThumb.TStateStyles.StartTransition;
-begin
-  FStartPositionX := Parent{Thumb}.Left;
-  inherited;
-  if not IsTransitionAnimationRunning then
-    TALDynamicSwitch(Parent{Thumb}.Owner{Track}.Owner{Switch}).AlignThumb;
-end;
-
-{*****************************************************************************************}
-procedure TALDynamicSwitch.TThumb.TStateStyles.TransitionAnimationProcess(Sender: TObject);
-begin
-  var LThumb := Parent;
-  var LSwitch := TALDynamicSwitch(LThumb.Owner{Track}.Owner{Switch});
-  if (not LSwitch.Pressed) and (Lthumb.Align = TALAlignLayout.None) then begin
-    var LFloatAnimation := TALFloatAnimation(Sender);
-    var LStopPositionX: Single;
-    If LSwitch.Checked then LStopPositionX := LSwitch.GetMaxThumbPos
-    else LStopPositionX := LSwitch.GetMinThumbPos;
-    LThumb.Left := FStartPositionX + (LStopPositionX - FStartPositionX) * LFloatAnimation.CurrentValue;
-  end;
-  inherited;
-end;
-
-{****************************************************************************************}
-procedure TALDynamicSwitch.TThumb.TStateStyles.TransitionAnimationFinish(Sender: TObject);
-begin
-  TALDynamicSwitch(Parent{Thumb}.Owner{Track}.Owner{Switch}).AlignThumb;
-  inherited;
 end;
 
 {****************************************************************}
@@ -6998,6 +7116,182 @@ begin
   TALDynamicSwitch(Owner{Track}.Owner{Switch}).click;
 end;
 
+{**********************************************************************************************}
+constructor TALDynamicSwitch.TTransition.TInterpolationParams.Create(Const AOwner: TTransition);
+begin
+  inherited create;
+  FOwner := AOwner;
+end;
+
+{*****************************************************************************}
+function TALDynamicSwitch.TTransition.TInterpolationParams.GetBezierX1: Single;
+begin
+  Result := FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierX1;
+end;
+
+{*****************************************************************************}
+function TALDynamicSwitch.TTransition.TInterpolationParams.GetBezierY1: Single;
+begin
+  Result := FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierY1;
+end;
+
+{*****************************************************************************}
+function TALDynamicSwitch.TTransition.TInterpolationParams.GetBezierX2: Single;
+begin
+  Result := FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierX2;
+end;
+
+{*****************************************************************************}
+function TALDynamicSwitch.TTransition.TInterpolationParams.GetBezierY2: Single;
+begin
+  Result := FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierY2;
+end;
+
+{********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.TInterpolationParams.SetBezierX1(const AValue: Single);
+begin
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierX1 := AValue;
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationParams.BezierX1 := AValue;
+end;
+
+{********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.TInterpolationParams.SetBezierY1(const AValue: Single);
+begin
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierY1 := AValue;
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationParams.BezierY1 := AValue;
+end;
+
+{********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.TInterpolationParams.SetBezierX2(const AValue: Single);
+begin
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierX2 := AValue;
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationParams.BezierX2 := AValue;
+end;
+
+{********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.TInterpolationParams.SetBezierY2(const AValue: Single);
+begin
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierY2 := AValue;
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationParams.BezierY2 := AValue;
+end;
+
+{******************************************************************************}
+function TALDynamicSwitch.TTransition.TInterpolationParams.GetOvershoot: Single;
+begin
+  Result := FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.Overshoot;
+end;
+
+{*********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.TInterpolationParams.SetOvershoot(const AValue: Single);
+begin
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationParams.Overshoot := AValue;
+  FOwner{TTransition}.FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationParams.Overshoot := AValue;
+end;
+
+{******************************************************************************}
+constructor TALDynamicSwitch.TTransition.Create(Const AOwner: TALDynamicSwitch);
+begin
+  inherited create;
+  FOwner := AOwner;
+  FInterpolationParams := TInterpolationParams.Create(self);
+end;
+
+{**********************************************}
+destructor TALDynamicSwitch.TTransition.Destroy;
+begin
+  ALFreeAndNil(FInterpolationParams);
+  inherited;
+end;
+
+{*******************************************}
+procedure TALDynamicSwitch.TTransition.Start;
+begin
+  FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.Start;
+  FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.Start;
+end;
+
+{********************************************************}
+function TALDynamicSwitch.TTransition.GetDuration: Single;
+begin
+  Result := FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.Duration;
+end;
+
+{***********************************************************************}
+procedure TALDynamicSwitch.TTransition.SetDuration(const AValue: Single);
+begin
+  FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.Duration := AValue;
+  FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.Duration := AValue;
+end;
+
+{***********************************************************}
+function TALDynamicSwitch.TTransition.GetDelayClick: Boolean;
+begin
+  Result := FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.DelayClick;
+end;
+
+{**************************************************************************}
+procedure TALDynamicSwitch.TTransition.SetDelayClick(const AValue: Boolean);
+begin
+  FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.DelayClick := AValue;
+  FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.DelayClick := AValue;
+end;
+
+{*******************************************************************************}
+function TALDynamicSwitch.TTransition.GetInterpolationType: TALInterpolationType;
+begin
+  Result := FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationType;
+end;
+
+{**********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.SetInterpolationType(const AValue: TALInterpolationType);
+begin
+  FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationType := AValue;
+  FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationType := AValue;
+end;
+
+{*******************************************************************************}
+function TALDynamicSwitch.TTransition.GetInterpolationMode: TALInterpolationMode;
+begin
+  Result := FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationMode;
+end;
+
+{**********************************************************************************************}
+procedure TALDynamicSwitch.TTransition.SetInterpolationMode(const AValue: TALInterpolationMode);
+begin
+  FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.InterpolationMode := AValue;
+  FOwner{TALDynamicSwitch}.Track.StateStyles.Transition.InterpolationMode := AValue;
+end;
+
+{************************************************************************************************}
+procedure TALDynamicSwitch.TTransition.SetInterpolationParams(const AValue: TInterpolationParams);
+begin
+  // No action required; Transition acts only as a proxy
+end;
+
+{**************************************************************}
+Function TALDynamicSwitch.TTransition.IsDurationStored: Boolean;
+begin
+  result := not SameValue(Duration, FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.DefaultDuration, TALAnimation.TimeEpsilon);
+end;
+
+{****************************************************************}
+Function TALDynamicSwitch.TTransition.IsDelayClickStored: Boolean;
+begin
+  result := DelayClick <> FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.DefaultDelayClick;
+end;
+
+{***********************************************************************}
+Function TALDynamicSwitch.TTransition.IsInterpolationTypeStored: Boolean;
+begin
+  result := InterpolationType <> FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.DefaultInterpolationType;
+end;
+
+{***********************************************************************}
+Function TALDynamicSwitch.TTransition.IsInterpolationModeStored: Boolean;
+begin
+  result := InterpolationMode <> FOwner{TALDynamicSwitch}.Thumb.StateStyles.Transition.DefaultInterpolationMode;
+end;
+
 {*********************************************************}
 constructor TALDynamicSwitch.Create(const AOwner: TObject);
 begin
@@ -7014,9 +7308,6 @@ begin
   fScrollCapturedByMe := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //--
-  FTransition := TALStateTransition.Create;
-  FTransition.OnChanged := TransitionChanged;
-  //--
   FTrack := CreateTrack;
   //**FTrack.Parent := self;
   //**FTrack.Stored := False;
@@ -7031,6 +7322,8 @@ begin
   //**FThumb.Stored := False;
   //**FThumb.SetSubComponent(True);
   //**FThumb.Name := 'Thumb'; // Useful at design time in the IDE
+  //--
+  FTransition := TTransition.Create(Self);
 end;
 
 {**********************************}
@@ -7076,8 +7369,6 @@ end;
 //**procedure TALDynamicSwitch.Loaded;
 //**begin
 //**  inherited;
-//**  Thumb.StateStyles.Transition.Assign(Transition);
-//**  Track.StateStyles.Transition.Assign(Transition);
 //**  AlignThumb;
 //**end;
 
@@ -7182,25 +7473,10 @@ begin
   if Assigned(FOnChange) then FOnChange(Self);
 end;
 
-{************************************************************************}
-procedure TALDynamicSwitch.SetTransition(const Value: TALStateTransition);
+{*****************************************************************}
+procedure TALDynamicSwitch.SetTransition(const Value: TTransition);
 begin
-  FTransition.Assign(Value);
-end;
-
-{*************************************************************}
-procedure TALDynamicSwitch.TransitionChanged(ASender: TObject);
-begin
-  //**if csLoading in ComponentState then exit;
-  Thumb.StateStyles.Transition.Assign(Transition);
-  Track.StateStyles.Transition.Assign(Transition);
-end;
-
-{*****************************************}
-procedure TALDynamicSwitch.StartTransition;
-begin
-  Thumb.StateStyles.StartTransition;
-  Track.StateStyles.StartTransition;
+  // No action required; Transition acts only as a proxy
 end;
 
 {*******************************************************************************************}
@@ -7260,14 +7536,14 @@ begin
     if LChecked <> Checked then begin
       if (transition.DelayClick) and
          (compareValue(FTransition.Duration,0.0,TEpsilon.Scale) > 0) then
-        Thumb.StateStyles.TransitionClickDelayed := True;
+        Thumb.StateStyles.Transition.ClickDelayed := True;
       FTrack.Checked := LChecked;
       FThumb.Checked := LChecked;
-      if not Thumb.StateStyles.TransitionClickDelayed then
+      if not Thumb.StateStyles.Transition.ClickDelayed then
         DoChange;
     end;
     fThumb.Align := TALALignLayout.None;
-    StartTransition;
+    Transition.Start;
   end;
 end;
 
@@ -7283,14 +7559,14 @@ begin
     if LChecked <> Checked then begin
       if (transition.DelayClick) and
          (compareValue(FTransition.Duration,0.0,TEpsilon.Scale) > 0) then
-        Thumb.StateStyles.TransitionClickDelayed := True;
+        Thumb.StateStyles.Transition.ClickDelayed := True;
       FTrack.Checked := LChecked;
       FThumb.Checked := LChecked;
-      if not Thumb.StateStyles.TransitionClickDelayed then
+      if not Thumb.StateStyles.Transition.ClickDelayed then
         DoChange;
     end;
     fThumb.Align := TALALignLayout.None;
-    StartTransition;
+    Transition.Start;
   end;
 end;
 
@@ -7304,12 +7580,12 @@ begin
   else if (Pressed) and
           (Transition.DelayClick) and
           (compareValue(FTransition.Duration,0.0,TEpsilon.Scale) > 0) then begin
-    Thumb.StateStyles.TransitionClickDelayed := True;
+    Thumb.StateStyles.Transition.ClickDelayed := True;
     var LChecked := not Checked;
     FTrack.Checked := LChecked;
     FThumb.Checked := LChecked;
     fThumb.Align := TALALignLayout.None;
-    StartTransition;
+    Transition.Start;
     exit;
   end
   // If Pressed is true, it means this event is triggered by MouseDown/MouseUp.
@@ -7320,7 +7596,7 @@ begin
     fThumb.Align := TALALignLayout.None;
     DoChange;
     inherited;
-    StartTransition;
+    Transition.Start;
   end
   // if not Pressed, it means this event is triggered by event like TransitionAnimationFinish
   else begin
@@ -7476,6 +7752,8 @@ begin
   else if ControlParent <> nil then FTextSettings := CreateTextSettings(ControlParent.TextSettings)
   else FTextSettings := CreateTextSettings(nil);
   FTextSettings.OnChanged := TextSettingsChanged;
+  FXRadius := DefaultXRadius;
+  FYRadius := DefaultYRadius;
 end;
 
 {**************************************************}
@@ -7511,6 +7789,8 @@ begin
     Try
       Text := TBaseStateStyle(Source).text;
       TextSettings.Assign(TBaseStateStyle(Source).TextSettings);
+      XRadius := TBaseStateStyle(Source).XRadius;
+      YRadius := TBaseStateStyle(Source).YRadius;
       inherited Assign(Source);
     Finally
       EndUpdate;
@@ -7528,6 +7808,8 @@ begin
     inherited;
     Text := DefaultText;
     TextSettings.reset;
+    XRadius := DefaultXRadius;
+    YRadius := DefaultYRadius;
   finally
     EndUpdate;
   end;
@@ -7570,12 +7852,16 @@ begin
     if ATo <> nil then begin
       Text := TBaseStateStyle(ATo).Text;
       TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
+      XRadius := InterpolateSingle(XRadius{Start}, TBaseStateStyle(ATo).XRadius{Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, TBaseStateStyle(ATo).YRadius{Stop}, ANormalizedTime);
     end
     else if StateStyleParent <> nil then begin
       StateStyleParent.SupersedeNoChanges(true{ASaveState});
       try
         Text := StateStyleParent.Text;
         TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime);
+        XRadius := InterpolateSingle(XRadius{Start}, StateStyleParent.XRadius{Stop}, ANormalizedTime);
+        YRadius := InterpolateSingle(YRadius{Start}, StateStyleParent.YRadius{Stop}, ANormalizedTime);
       finally
         StateStyleParent.RestoreStateNoChanges;
       end;
@@ -7583,10 +7869,14 @@ begin
     else if ControlParent <> nil then begin
       Text := ControlParent.Text;
       TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+      XRadius := InterpolateSingle(XRadius{Start}, ControlParent.XRadius{Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, ControlParent.YRadius{Stop}, ANormalizedTime);
     end
     else begin
       Text := DefaultText;
       TextSettings.Interpolate(nil, ANormalizedTime);
+      XRadius := InterpolateSingle(XRadius{Start}, ALIfThen(IsNaN(DefaultXRadius), 0, DefaultXRadius){Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, ALIfThen(IsNaN(DefaultYRadius), 0, DefaultYRadius){Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -7600,6 +7890,14 @@ begin
   if Text = '' then begin
     if StateStyleParent <> nil then Text := StateStyleParent.Text
     else Text := ControlParent.Text;
+  end;
+  if IsNaN(XRadius) then begin
+    if StateStyleParent <> nil then XRadius := StateStyleParent.XRadius
+    else XRadius := ControlParent.XRadius;
+  end;
+  if IsNaN(YRadius) then begin
+    if StateStyleParent <> nil then YRadius := StateStyleParent.YRadius
+    else YRadius := ControlParent.YRadius;
   end;
   TextSettings.SuperSede;
 end;
@@ -7641,10 +7939,42 @@ begin
   FTextSettings.Assign(AValue);
 end;
 
+{*************************************************************************}
+procedure TALDynamicButton.TBaseStateStyle.SetXRadius(const Value: Single);
+begin
+  if IsNan(FXRadius) and IsNan(Value) then Exit;
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
+    FXRadius := Value;
+    Change;
+  end;
+end;
+
+{*************************************************************************}
+procedure TALDynamicButton.TBaseStateStyle.SetYRadius(const Value: Single);
+begin
+  if IsNan(FYRadius) and IsNan(Value) then Exit;
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
+    FYRadius := Value;
+    Change;
+  end;
+end;
+
 {***************************************************************}
 function TALDynamicButton.TBaseStateStyle.GetDefaultText: String;
 begin
   Result := '';
+end;
+
+{******************************************************************}
+function TALDynamicButton.TBaseStateStyle.GetDefaultXRadius: Single;
+begin
+  Result := NaN;
+end;
+
+{******************************************************************}
+function TALDynamicButton.TBaseStateStyle.GetDefaultYRadius: Single;
+begin
+  Result := NaN;
 end;
 
 {************************************************************}
@@ -7665,6 +7995,20 @@ end;
 function TALDynamicButton.TBaseStateStyle.IsTextStored: Boolean;
 begin
   Result := FText <> DefaultText;
+end;
+
+{*****************************************************************}
+function TALDynamicButton.TBaseStateStyle.IsXRadiusStored: Boolean;
+begin
+  if IsNan(FXRadius) and IsNan(DefaultXRadius) then Exit(False);
+  Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
+end;
+
+{*****************************************************************}
+function TALDynamicButton.TBaseStateStyle.IsYRadiusStored: Boolean;
+begin
+  if IsNan(FYRadius) and IsNan(DefaultYRadius) then Exit(False);
+  Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
 {*********************************************************************}
@@ -7957,7 +8301,7 @@ begin
   //--
   //**CanFocus := True;
   HitTest := True;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
   Cursor := crHandPoint;
   //--
   //**var LPaddingChange: TNotifyEvent := Padding.OnChange;
@@ -8210,7 +8554,7 @@ end;
 procedure TALDynamicButton.IsMouseOverChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.Start;
   repaint;
 end;
 
@@ -8218,7 +8562,7 @@ end;
 //**procedure TALDynamicButton.IsFocusedChanged;
 //**begin
 //**  inherited;
-//**  StateStyles.startTransition;
+//**  StateStyles.Transition.Start;
 //**  repaint;
 //**end;
 
@@ -8226,15 +8570,15 @@ end;
 procedure TALDynamicButton.PressedChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.Start;
   repaint;
 end;
 
 {*******************************}
 procedure TALDynamicButton.Click;
 begin
-  if StateStyles.IsTransitionAnimationRunning and StateStyles.Transition.DelayClick then
-    StateStyles.TransitionClickDelayed := True
+  if StateStyles.Transition.Running and StateStyles.Transition.DelayClick then
+    StateStyles.Transition.ClickDelayed := True
   else
     inherited click;
 end;
@@ -8301,7 +8645,9 @@ begin
       LStateStyle.Fill, // const AFill: TALBrush;
       LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
       LStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-      LStateStyle.Shadow); // const AShadow: TALShadow);
+      LStateStyle.Shadow, // const AShadow: TALShadow;
+      LStateStyle.XRadius, // const AXRadius: Single;
+      LStateStyle.YRadius); // const AYRadius: Single
 
     // LStateStyle.FBufDrawableRect must include the LScale
     LStateStyle.FBufDrawableRect.Top := LStateStyle.FBufDrawableRect.Top * LStateStyle.Scale;
@@ -8350,26 +8696,26 @@ end;
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicButton.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     Result := ARect;
-    if StateStyles.TransitionFrom <> nil then begin
+    if StateStyles.Transition.FromStateStyle <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
-    if StateStyles.TransitionTo <> nil then begin
+    if StateStyles.Transition.ToStateStyle <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -8405,7 +8751,7 @@ begin
 
   var LDrawable: TALDrawable := ALNullDrawable;
   var LDrawableRect: TRectF := TRectF.Empty;
-  if not StateStyles.IsTransitionAnimationRunning then begin
+  if not StateStyles.Transition.Running then begin
     //--
     var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
     if LStateStyle <> nil then begin
@@ -8488,7 +8834,9 @@ begin
         LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
         LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
         LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow); // const AShadow: TALShadow);
+        LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+        LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+        LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
 
     finally
       if LCanvasSaveState <> nil then
@@ -8523,7 +8871,9 @@ begin
         LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
         LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
         LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow); // const AShadow: TALShadow);
+        LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow;
+        LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+        LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single;
 
     finally
       ALCanvasEndScene(RenderTargetCanvas)
@@ -9087,7 +9437,7 @@ end;
 procedure TALDynamicCustomTrack.TThumb.IsMouseOverChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.start;
   if FcustomTrack.FValueIndicator <> nil then
     FcustomTrack.FValueIndicator.Refresh(Self);
   repaint;
@@ -9097,7 +9447,7 @@ end;
 //**procedure TALDynamicCustomTrack.TThumb.IsFocusedChanged;
 //**begin
 //**  inherited;
-//**  StateStyles.startTransition;
+//**  StateStyles.Transition.start;
 //**  if FcustomTrack.FValueIndicator <> nil then
 //**    FcustomTrack.FValueIndicator.Refresh(Self);
 //**  repaint;
@@ -9107,7 +9457,7 @@ end;
 procedure TALDynamicCustomTrack.TThumb.PressedChanged;
 begin
   inherited;
-  StateStyles.startTransition;
+  StateStyles.Transition.start;
   if FcustomTrack.FValueIndicator <> nil then
     FcustomTrack.FValueIndicator.Refresh(Self);
   repaint;
@@ -9335,26 +9685,26 @@ end;
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALDynamicCustomTrack.TThumb.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     Result := ARect;
-    if StateStyles.TransitionFrom <> nil then begin
+    if StateStyles.Transition.FromStateStyle <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
-    if StateStyles.TransitionTo <> nil then begin
+    if StateStyles.Transition.ToStateStyle <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -9391,7 +9741,7 @@ begin
 
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     LDrawable := ALNullDrawable;
     LDrawableRect := TRectF.Empty;
   end
@@ -9577,7 +9927,7 @@ end;
 constructor TALDynamicCustomTrack.TValueIndicator.Create(const ACustomTrack: TALDynamicCustomTrack);
 begin
   inherited create(ACustomTrack);
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
   Visible := False;
   Pivot := TPointF.Create(0.5,1);
   FCustomTrack := ACustomTrack;

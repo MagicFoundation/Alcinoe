@@ -963,7 +963,7 @@ begin
     BeginUpdate;
     Try
       ALResetRectangleStyle(AEdit, ARatio);
-      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := TALAutoSizeMode.All
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := TALAutoSizeMode.Both
       else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 0;
       //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
       Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
@@ -1407,7 +1407,7 @@ begin
     BeginUpdate;
     Try
       ALResetTextStyle(AButton, ARatio);
-      AutoSize := TALAutoSizeMode.All;
+      AutoSize := TALAutoSizeMode.Both;
       //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
       Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
       TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, ARatio).RoundTo(-2);
@@ -2556,7 +2556,7 @@ begin
         if ValueIndicator.XRadius > 0 then ValueIndicator.XRadius := RoundTo(ValueIndicator.XRadius * ARatio, -2);
         if ValueIndicator.YRadius > 0 then ValueIndicator.YRadius := RoundTo(ValueIndicator.YRadius * ARatio, -2);
         ValueIndicator.Animation := TValueIndicator.TAnimation.ScaleInOut;
-        ValueIndicator.AutoSize := TALAutoSizeMode.All;
+        ValueIndicator.AutoSize := TALAutoSizeMode.Both;
         ValueIndicator.Corners := AllCorners;
         ValueIndicator.Sides := AllSides;
         ValueIndicator.Opacity := 1;
@@ -2764,7 +2764,7 @@ begin
     // DefaultContainer
     ALResetRectangleStyle(DefaultContainer);
     DefaultContainer.Padding.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
-    DefaultContainer.AutoSize := TALAutoSizeMode.All;
+    DefaultContainer.AutoSize := TALAutoSizeMode.Both;
     DefaultContainer.Align := TALAlignLayout.Center;
     DefaultContainer.Fill.Color := $FFFFFFFF;
     DefaultContainer.Fill.ColorKey := '';
@@ -2790,7 +2790,7 @@ begin
     ALResetTextStyle(DefaultHeadline, LRatio);
     if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
     DefaultHeadline.Margins.Top := RoundTo(16 * ARatio, -2);
-    DefaultHeadline.AutoSize := TALAutoSizeMode.All;
+    DefaultHeadline.AutoSize := TALAutoSizeMode.Both;
     DefaultHeadline.Align := TALAlignLayout.TopLeft;
 
     // DefaultContent
@@ -2801,14 +2801,14 @@ begin
     LRatio := 14 / DefaultMessage.Textsettings.Font.DefaultSize;
     ALResetTextStyle(DefaultMessage, LRatio * ARatio);
     DefaultMessage.Margins.Rect := TRectF.Create(24*ARatio{Left}, 0{Top}, 24*ARatio{Right}, 0{Bottom}).RoundTo(-2);
-    DefaultMessage.AutoSize := TALAutoSizeMode.All;
+    DefaultMessage.AutoSize := TALAutoSizeMode.Both;
     DefaultMessage.Align := TALAlignLayout.TopLeft;
 
     // DefaultOptionLayout
     ALResetLayoutStyle(DefaultOptionLayout);
     DefaultOptionLayout.Margins.Rect := TRectF.Create(24*ARatio{Left}, 16*ARatio{Top}, 24*ARatio{Right}, 0{Bottom}).RoundTo(-2);
     DefaultOptionLayout.TagFloat := 12 * LRatio; // The padding top of the first item (except message) and padding bottom of the last item (except message)
-    DefaultOptionLayout.AutoSize := TALAutoSizeMode.All;
+    DefaultOptionLayout.AutoSize := TALAutoSizeMode.Both;
     DefaultOptionLayout.Align := TALAlignLayout.TopLeft;
 
     // DefaultRadioButton
@@ -2830,14 +2830,14 @@ begin
                                           24*ARatio{Right},
                                           0{Bottom}).RoundTo(-2);
     DefaultInlineButton.TagFloat := 0; // The padding top of the first item (except message) and padding bottom of the last item (except message)
-    DefaultInlineButton.AutoSize := TALAutoSizeMode.All;
+    DefaultInlineButton.AutoSize := TALAutoSizeMode.Both;
     DefaultInlineButton.Align := TALAlignLayout.TopLeft;
 
     // DefaultEdit
     LRatio := 16 / DefaultEdit.Textsettings.Font.DefaultSize;
     ALResetEditStyle(DefaultEdit, LRatio * ARatio);
     DefaultEdit.Margins.Rect := TRectF.Create(0{Left}, 16*ARatio{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
-    DefaultEdit.AutoSize := TALAutoSizeMode.All;
+    DefaultEdit.AutoSize := TALAutoSizeMode.Both;
     DefaultEdit.Align := TALAlignLayout.TopLeft;
 
     // DefaultMemo
@@ -2851,7 +2851,7 @@ begin
     LRatio := 14 / DefaultLabel.Textsettings.Font.DefaultSize;
     ALResetTextStyle(DefaultLabel, LRatio * ARatio);
     DefaultLabel.Margins.Left := RoundTo(12 * ARatio, -2);
-    DefaultLabel.AutoSize := TALAutoSizeMode.All;
+    DefaultLabel.AutoSize := TALAutoSizeMode.Both;
     DefaultLabel.Align := TALAlignLayout.LeftCenter;
     DefaultLabel.HitTest := true;
     DefaultLabel.Cursor := crHandPoint;
@@ -2860,7 +2860,7 @@ begin
     // DefaultFooterBar
     ALResetRectangleStyle(DefaultFooterBar, ARatio);
     DefaultFooterBar.Margins.Top := RoundTo(24{* ARatio}, -2);
-    DefaultFooterBar.AutoSize := TALAutoSizeMode.All;
+    DefaultFooterBar.AutoSize := TALAutoSizeMode.Both;
     DefaultFooterBar.Align := TALAlignLayout.TopRight;
     DefaultFooterBar.Fill.Color := TalphaColors.Null;
     DefaultFooterBar.Fill.ColorKey := '';
@@ -3487,7 +3487,7 @@ begin
     BeginUpdate;
     Try
       ALResetDynamicTextStyle(AButton, ARatio);
-      AutoSize := TALAutoSizeMode.All;
+      AutoSize := TALAutoSizeMode.Both;
       //Margins.Rect := ALScaleRect(Margins.DefaultValue, ARatio).RoundTo(-2);
       Padding.Rect := ALScaleRect(Padding.DefaultValue, ARatio).RoundTo(-2);
       TouchTargetExpansion := ALScaleRect(TRectF.Empty, ARatio).RoundTo(-2);
@@ -4636,7 +4636,7 @@ begin
         if ValueIndicator.XRadius > 0 then ValueIndicator.XRadius := RoundTo(ValueIndicator.XRadius * ARatio, -2);
         if ValueIndicator.YRadius > 0 then ValueIndicator.YRadius := RoundTo(ValueIndicator.YRadius * ARatio, -2);
         ValueIndicator.Animation := TValueIndicator.TAnimation.ScaleInOut;
-        ValueIndicator.AutoSize := TALAutoSizeMode.All;
+        ValueIndicator.AutoSize := TALAutoSizeMode.Both;
         ValueIndicator.Corners := AllCorners;
         ValueIndicator.Sides := AllSides;
         ValueIndicator.Opacity := 1;

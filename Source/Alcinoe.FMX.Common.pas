@@ -1038,13 +1038,13 @@ type
         property FromStateStyle: TALBaseStateStyle read FFromStateStyle;
         property ToStateStyle: TALBaseStateStyle read FToStateStyle;
         property ClickDelayed: Boolean read FClickDelayed write FClickDelayed;
+        property FadeImage: Boolean read FFadeImage write FFadeImage stored IsFadeImageStored;
       published
         property Duration: Single read FDuration write FDuration stored IsDurationStored nodefault;
         property InterpolationType;
         property InterpolationMode;
         property InterpolationParams;
         property DelayClick: Boolean read FDelayClick write FDelayClick stored IsDelayClickStored;
-        property FadeImage: Boolean read FFadeImage write FFadeImage stored IsFadeImageStored;
       end;
   private
     FParent: TALControl; // 8 bytes

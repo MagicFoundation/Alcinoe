@@ -81,7 +81,7 @@ type
                 procedure SetKind(const AValue: TAnimationKind); virtual;
                 procedure DoProcess; override;
                 procedure DoFinish; override;
-                function GetDefaultLoop: Boolean;
+                function GetDefaultLoop: Boolean; override;
               public
                 constructor Create(const AOwner: TLoadingContent); reintroduce; Virtual;
                 property Kind: TAnimationKind read FKind write SetKind;

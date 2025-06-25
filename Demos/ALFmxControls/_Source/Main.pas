@@ -549,7 +549,7 @@ begin
   fALRectangle.HitTest := False;
   var LText := TalText.Create(fALRectangle);
   LText.Parent := fALRectangle;
-  LText.AutoSize := TALAutoSizeMode.All;
+  LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -572,7 +572,7 @@ begin
   fRectangle.HitTest := false;
   LText := TalText.Create(fRectangle);
   LText.Parent := fRectangle;
-  LText.AutoSize := TALAutoSizeMode.All;
+  LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -591,7 +591,7 @@ begin
   fALCircle.HitTest := False;
   LText := TalText.Create(fALCircle);
   LText.Parent := fALCircle;
-  LText.AutoSize := TALAutoSizeMode.All;
+  LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -609,7 +609,7 @@ begin
   fCircle.HitTest := False;
   LText := TalText.Create(fCircle);
   LText.Parent := fCircle;
-  LText.AutoSize := TALAutoSizeMode.All;
+  LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
   LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
@@ -992,7 +992,7 @@ begin
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;
     LText.TextSettings.MaxLines := 1;
-    LText.AutoSize := TALAutoSizeMode.All;
+    LText.AutoSize := TALAutoSizeMode.Both;
     //-----
     var LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;

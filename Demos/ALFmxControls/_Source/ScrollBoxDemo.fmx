@@ -14,7 +14,7 @@ object ScrollBoxDemoForm: TScrollBoxDemoForm
   DesignerMasterStyle = 0
   object HeaderText: TALText
     Align = Top
-    AutoSize = True
+    AutoSize = Both
     Margins.Top = 10.000000000000000000
     Margins.Bottom = 10.000000000000000000
     Position.Y = 10.000000000000000000

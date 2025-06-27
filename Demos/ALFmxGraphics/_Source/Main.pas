@@ -230,7 +230,7 @@ begin
   LText1.parent := LLayout2;
   LText1.Align := TALALignLayout.Top;
   Ltext1.Margins.Bottom := 8;
-  LText1.AutoSize := TALAutoSizeMode.All;
+  LText1.AutoSize := TALAutoSizeMode.Both;
   LText1.TextSettings.Font.Family := 'sans-serif';
   LText1.TextSettings.IsHtml := true;
   LText1.TextSettings.Font.Size := 1;
@@ -578,7 +578,7 @@ begin
                   //--
                   case random(5) of
                     0: begin
-                      LOptions.AutoSize := TALAutoSizeMode.All;
+                      LOptions.AutoSize := TALAutoSizeMode.Both;
                       LOptions.AutoSizeX := True;
                       LOptions.AutoSizeY := True;
                     end;
@@ -720,7 +720,7 @@ begin
                   //--
                   case random(5) of
                     0: begin
-                      LOptions.AutoSize := TALAutoSizeMode.All;
+                      LOptions.AutoSize := TALAutoSizeMode.Both;
                       LOptions.AutoSizeX := True;
                       LOptions.AutoSizeY := True;
                     end;

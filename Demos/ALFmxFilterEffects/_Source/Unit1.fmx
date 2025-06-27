@@ -13237,7 +13237,7 @@ object Form2: TForm2
     end
     object Label3: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 16.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13251,7 +13251,7 @@ object Form2: TForm2
     end
     object Label6: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13265,7 +13265,7 @@ object Form2: TForm2
     end
     object Label7: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13279,7 +13279,7 @@ object Form2: TForm2
     end
     object Label8: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13293,7 +13293,7 @@ object Form2: TForm2
     end
     object Label9: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13307,7 +13307,7 @@ object Form2: TForm2
     end
     object Label10: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13321,7 +13321,7 @@ object Form2: TForm2
     end
     object Label13: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13335,7 +13335,7 @@ object Form2: TForm2
     end
     object Label11: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000
@@ -13349,7 +13349,7 @@ object Form2: TForm2
     end
     object Label12: TALText
       Align = Top
-      AutoSize = True
+      AutoSize = Both
       Margins.Left = 32.000000000000000000
       Margins.Top = 8.000000000000000000
       Margins.Right = 32.000000000000000000

@@ -46,9 +46,9 @@ object Form1: TForm1
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 3
+        TabOrder = 5
         object TextInterpolationType: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 113.000000000000000000
           Size.Height = 19.000000000000000000
@@ -87,9 +87,9 @@ object Form1: TForm1
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 1
+        TabOrder = 3
         object TextInterpolationMode: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 120.000000000000000000
           Size.Height = 19.000000000000000000
@@ -111,11 +111,11 @@ object Form1: TForm1
       object LayoutStart: TALLayout
         Align = Top
         Margins.Top = 20.000000000000000000
-        Position.Y = 131.000000000000000000
+        Position.Y = 205.000000000000000000
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 4
+        TabOrder = 6
         object ButtonStart: TButton
           Position.X = 15.000000000000000000
           TabOrder = 1
@@ -141,9 +141,9 @@ object Form1: TForm1
         Margins.Top = 20.000000000000000000
         Margins.Bottom = 25.000000000000000000
         Size.Width = 360.000000000000000000
-        Size.Height = 595.000000000000000000
+        Size.Height = 521.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 6
+        TabOrder = 8
         OnResized = LayoutResized
         object LayoutBullet: TALLayout
           Align = Left
@@ -152,7 +152,7 @@ object Form1: TForm1
           Position.X = 15.000000000000000000
           RotationAngle = 180.000000000000000000
           Size.Width = 20.000000000000000000
-          Size.Height = 595.000000000000000000
+          Size.Height = 521.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 4
           object CircleBullet: TALCircle
@@ -170,8 +170,8 @@ object Form1: TForm1
               PropertyName = 'Position.Y'
               StartValue = 0.000000000000000000
               StopValue = 0.000000000000000000
-              Left = 88
-              Top = 192
+              Left = 248
+              Top = 568
             end
           end
         end
@@ -179,12 +179,12 @@ object Form1: TForm1
           Align = Client
           Margins.Right = 15.000000000000000000
           Size.Width = 285.000000000000000000
-          Size.Height = 595.000000000000000000
+          Size.Height = 521.000000000000000000
           Size.PlatformDefault = False
           OnPaint = PaintBoxChartPaint
         end
         object ALText0_0: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 42.000000000000000000
           Position.Y = 296.000000000000000000
           Size.Width = 13.000000000000000000
@@ -195,7 +195,7 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALText1_4: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 43.000000000000000000
           Size.Width = 13.000000000000000000
           Size.Height = 13.000000000000000000
@@ -205,7 +205,7 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALTextmin1_0: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 44.000000000000000000
           Position.Y = 456.000000000000000000
           Size.Width = 17.000000000000000000
@@ -216,7 +216,7 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALTextmin1_4: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 39.000000000000000000
           Position.Y = 640.000000000000000000
           Size.Width = 17.000000000000000000
@@ -227,7 +227,7 @@ object Form1: TForm1
           OnResized = LayoutResized
         end
         object ALText1_0: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 43.000000000000000000
           Position.Y = 88.000000000000000000
           Size.Width = 13.000000000000000000
@@ -245,9 +245,9 @@ object Form1: TForm1
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
+        TabOrder = 4
         object TextCustomInterpolation: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 132.000000000000000000
           Size.Height = 19.000000000000000000
@@ -269,6 +269,100 @@ object Form1: TForm1
           Size.PlatformDefault = False
           TabOrder = 3
           OnResized = LayoutResized
+        end
+      end
+      object LayoutBezier: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 126.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object TextBezier: TALText
+          AutoSize = Both
+          Position.X = 15.000000000000000000
+          Size.Width = 121.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'Bezier (X1,Y2,X2,Y2)'
+          OnResized = LayoutResized
+        end
+        object NumberBoxBezierX1: TNumberBox
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 8
+          Cursor = crIBeam
+          Value = 0.420000000000000000
+          ValueType = Float
+          KeyboardType = NumbersAndPunctuation
+          Position.X = 151.000000000000000000
+          Size.Width = 38.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+        end
+        object NumberBoxBezierY1: TNumberBox
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 7
+          Cursor = crIBeam
+          ValueType = Float
+          KeyboardType = NumbersAndPunctuation
+          Position.X = 197.000000000000000000
+          Size.Width = 38.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+        end
+        object NumberBoxBezierX2: TNumberBox
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 6
+          Cursor = crIBeam
+          Value = 0.580000000000000000
+          ValueType = Float
+          KeyboardType = NumbersAndPunctuation
+          Position.X = 243.000000000000000000
+          Size.Width = 38.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+        end
+        object NumberBoxBezierY2: TNumberBox
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 5
+          Cursor = crIBeam
+          Value = 1.000000000000000000
+          ValueType = Float
+          KeyboardType = NumbersAndPunctuation
+          Position.X = 289.000000000000000000
+          Size.Width = 38.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+        end
+      end
+      object LayoutOvershoot: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 163.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object TextOvershoot: TALText
+          AutoSize = Both
+          Position.X = 15.000000000000000000
+          Size.Width = 65.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'Overshoot'
+          OnResized = LayoutResized
+        end
+        object NumberBoxOvershoot: TNumberBox
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 5
+          Cursor = crIBeam
+          ValueType = Float
+          KeyboardType = NumbersAndPunctuation
+          Position.X = 96.000000000000000000
+          Size.Width = 51.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
         end
       end
     end
@@ -295,7 +389,7 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 1
         object TextDampingRatio: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 89.000000000000000000
           Size.Height = 19.000000000000000000
@@ -327,7 +421,7 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 0
         object TextStiffness: TALText
-          AutoSize = True
+          AutoSize = Both
           Position.X = 15.000000000000000000
           Size.Width = 52.000000000000000000
           Size.Height = 19.000000000000000000
@@ -372,19 +466,19 @@ object Form1: TForm1
             PropertyName = 'Position.Y'
             StartValue = 0.000000000000000000
             StopValue = 0.000000000000000000
-            Left = 88
-            Top = 248
+            Left = 248
+            Top = 624
           end
           object ALSpringForcePropertyAnimationX: TALSpringForcePropertyAnimation
             PropertyName = 'Position.X'
             StartValue = 0.000000000000000000
             StopValue = 0.000000000000000000
-            Left = 88
-            Top = 304
+            Left = 248
+            Top = 680
           end
           object TextDragMe: TALText
             Align = Center
-            AutoSize = True
+            AutoSize = Both
             Size.Width = 39.000000000000000000
             Size.Height = 13.000000000000000000
             Size.PlatformDefault = False

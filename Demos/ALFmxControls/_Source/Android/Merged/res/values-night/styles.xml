@@ -2,27 +2,27 @@
 <resources>
     <style name="Theme.App.Material.Dialog.Alert" parent="@android:style/Theme.Material.Dialog.Alert">
     <item name="android:datePickerStyle">@style/Widget.App.Material.DatePicker</item>
-    <item name="android:colorAccent">@color/material_primary</item>
-    <item name="android:windowBackground">@color/material_surface_container_high</item>
-    <item name="android:textColorPrimary">@color/material_on_surface_variant</item>
+    <item name="android:colorAccent">@color/material3_primary</item>
+    <item name="android:windowBackground">@color/material3_surface_container_high</item>
+    <item name="android:textColorPrimary">@color/material3_on_surface_variant</item>
   </style>
     <style name="Widget.App.Material.DatePicker" parent="@android:style/Widget.Material.DatePicker">
     <item name="android:datePickerMode">spinner</item>
   </style>
-    <style name="Material.Edit" parent="@android:style/Widget.Material.EditText">
+    <style name="Material3.Edit" parent="@android:style/Widget.Material.EditText">
     <item name="android:background">@null</item>   
-    <item name="android:textCursorDrawable">@drawable/material_text_cursor</item> 
-    <item name="android:textColorHighlight">@color/material_primary_alpha40</item>
-    <item name="android:textSelectHandle">@drawable/material_text_select_handle_middle</item>
-    <item name="android:textSelectHandleLeft">@drawable/material_text_select_handle_left</item>
-    <item name="android:textSelectHandleRight">@drawable/material_text_select_handle_right</item>
+    <item name="android:textCursorDrawable">@drawable/material3_text_cursor</item> 
+    <item name="android:textColorHighlight">@color/material3_primary_alpha40</item>
+    <item name="android:textSelectHandle">@drawable/material3_text_select_handle_middle</item>
+    <item name="android:textSelectHandleLeft">@drawable/material3_text_select_handle_left</item>
+    <item name="android:textSelectHandleRight">@drawable/material3_text_select_handle_right</item>
   </style>
-    <style name="Material.Edit.Error" parent="@android:style/Widget.Material.EditText">
+    <style name="Material3.Edit.Error" parent="@android:style/Widget.Material.EditText">
     <item name="android:background">@null</item>   
-    <item name="android:textCursorDrawable">@drawable/material_text_cursor_error</item> 
-    <item name="android:textColorHighlight">@color/material_error_alpha40</item>
-    <item name="android:textSelectHandle">@drawable/material_text_select_handle_middle_error</item>
-    <item name="android:textSelectHandleLeft">@drawable/material_text_select_handle_left_error</item>
-    <item name="android:textSelectHandleRight">@drawable/material_text_select_handle_right_error</item>
+    <item name="android:textCursorDrawable">@drawable/material3_text_cursor_error</item> 
+    <item name="android:textColorHighlight">@color/material3_error_alpha40</item>
+    <item name="android:textSelectHandle">@drawable/material3_text_select_handle_middle_error</item>
+    <item name="android:textSelectHandleLeft">@drawable/material3_text_select_handle_left_error</item>
+    <item name="android:textSelectHandleRight">@drawable/material3_text_select_handle_right_error</item>
   </style>
 </resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <attr name="MaterialEdit" format="reference"/>
-    <attr name="MaterialEditError" format="reference"/>
+    <attr name="Material3Edit" format="reference"/>
+    <attr name="Material3EditError" format="reference"/>
 </resources>

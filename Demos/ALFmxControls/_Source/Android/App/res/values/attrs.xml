@@ -1,7 +1,7 @@
 <?xml version="10" encoding="utf-8"?>
 <resources>
  
-  <attr name="MaterialEdit" format="reference"/>
-  <attr name="MaterialEditError" format="reference"/>
+  <attr name="Material3Edit" format="reference"/>
+  <attr name="Material3EditError" format="reference"/>
 
 </resources>

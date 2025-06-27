@@ -462,7 +462,7 @@ begin
   ALInitHasTouchScreen;
   ALHasTouchScreen := true;
   {$ENDIF}
-  TALStyleManager.Instance.ApplyDialogManagerStyle('Material.DialogManager', TALDialogManager.Instance, 18{AFontSize});
+  TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
   // We can not call RegisterTypefaceFromResource in FormCreate because FormCreate is
   // called in TCommonCustomForm.AfterConstruction once all child components are
   // already fully loaded.
@@ -536,8 +536,8 @@ begin
   fALRectangle := TALRectangleStopWatch.Create(self);
   fALRectangle.Parent := ALVertScrollBox1;
   //fALRectangle.DoubleBuffered := False;
-  fALRectangle.Fill.ColorKey := 'Material.Color.SurfaceContainerHighest';
-  fALRectangle.Stroke.ColorKey := 'Material.Color.OutlineVariant';
+  fALRectangle.Fill.ColorKey := 'Material3.Color.SurfaceContainerHighest';
+  fALRectangle.Stroke.ColorKey := 'Material3.Color.OutlineVariant';
   fALRectangle.Align := TALalignLayout.Top;
   fALRectangle.Margins.Left := 16;
   fALRectangle.Margins.Top := 8;
@@ -552,15 +552,15 @@ begin
   LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
-  LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
+  LText.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
   LText.Text := 'TALRectangle';
   LText.HitTest := false;
   //-----
   fRectangle := TRectangleStopWatch.Create(self);
   fRectangle.Parent := ALVertScrollBox1;
   fRectangle.Align := TalignLayout.Top;
-  fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
-  fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');
+  fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest');
+  fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.OutlineVariant');
   fRectangle.Margins.Left := 16;
   fRectangle.Margins.Top := 12;
   fRectangle.Margins.Right := 16;
@@ -575,15 +575,15 @@ begin
   LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
-  LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
+  LText.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
   LText.Text := 'TRectangle';
   LText.HitTest := false;
   //-----
   fALCircle := TALCircleStopWatch.Create(ALLayout33);
   fALCircle.Parent := ALLayout33;
   //fALCircle.DoubleBuffered := False;
-  fALCircle.Fill.ColorKey := 'Material.Color.SurfaceContainerHighest';
-  fALCircle.Stroke.ColorKey := 'Material.Color.OutlineVariant';
+  fALCircle.Fill.ColorKey := 'Material3.Color.SurfaceContainerHighest';
+  fALCircle.Stroke.ColorKey := 'Material3.Color.OutlineVariant';
   fALCircle.Margins.Left := 15;
   fALCircle.Margins.Right := 15;
   fALCircle.Size.Height := 100;
@@ -594,14 +594,14 @@ begin
   LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
-  LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
+  LText.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
   LText.Text := 'TALCircle';
   LText.HitTest := False;
   //-----
   fCircle := TCircleStopWatch.Create(ALLayout34);
   fCircle.Parent := ALLayout34;
-  fCircle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
-  fCircle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');
+  fCircle.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest');
+  fCircle.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.OutlineVariant');
   fCircle.Margins.Left := 15;
   fCircle.Margins.Right := 15;
   fCircle.Size.Height := 100;
@@ -612,7 +612,7 @@ begin
   LText.AutoSize := TALAutoSizeMode.Both;
   LText.Align := TALAlignLayout.Center;
   LText.TextSettings.Font.Size := 16;
-  LText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
+  LText.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
   LText.Text := 'TCircle';
   LText.HitTest := False;
   //-----
@@ -622,7 +622,7 @@ begin
   fALText.TextSettings.HorzAlign := TALTextHorzAlign.Center;
   fALText.TextSettings.Font.Size := 18;
   fALText.TextSettings.Font.Family := 'sans-serif';
-  fALText.TextSettings.Font.ColorKey := 'Material.Color.OnSurface';
+  fALText.TextSettings.Font.ColorKey := 'Material3.Color.OnSurface';
   fALText.Align := TALalignLayout.Top;
   fALText.Margins.Top := 12;
   fALText.Margins.left := 16;
@@ -638,7 +638,7 @@ begin
   fText.TextSettings.HorzAlign := TTextAlign.Center;
   fText.TextSettings.Font.Size := 18;
   fText.TextSettings.Font.Family := TALStyleManager.Instance.GetFontFamily('sans-serif');
-  fText.TextSettings.FontColor := TALStyleManager.Instance.GetColor('Material.Color.OnSurface');
+  fText.TextSettings.FontColor := TALStyleManager.Instance.GetColor('Material3.Color.OnSurface');
   fText.Align := TalignLayout.Top;
   fText.Margins.Top := 8;
   fText.Margins.left := 16;
@@ -656,7 +656,7 @@ begin
   fALline.Size.Height := 100;
   fALline.Size.Width := 100;
   fALline.Stroke.Thickness := 3;
-  fALline.Stroke.ColorKey := 'Material.Color.Outline';
+  fALline.Stroke.ColorKey := 'Material3.Color.Outline';
   fALline.LineType := TALLineType.TopLeftToBottomRight;
   fALline.HitTest := False;
   //-----
@@ -667,7 +667,7 @@ begin
   fline.Size.Height := 100;
   fline.Size.Width := 100;
   fline.Stroke.Thickness := 3;
-  fline.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.Outline');
+  fline.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.Outline');
   fline.LineType := TLineType.Diagonal;
   fline.HitTest := False;
 
@@ -679,8 +679,8 @@ begin
     TALStyleManager.TDarkModeBehavior.AlwaysDark: ALRadioButtonDarkTheme.Checked := True;
     TALStyleManager.TDarkModeBehavior.FollowSystem: ALRadioButtonAutoTheme.Checked := True;
   end;
-  Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.Surface');
-  SystemStatusBar.BackgroundColor := TALStyleManager.Instance.GetColor('Material.Color.Surface');
+  Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.Surface');
+  SystemStatusBar.BackgroundColor := TALStyleManager.Instance.GetColor('Material3.Color.Surface');
 
   if TALStyleManager.Instance.IsDarkMode then begin
     ALTrackBarCustomStyle.Thumb.Fill.Color := $FFe5e0e8;
@@ -714,8 +714,8 @@ procedure TMainForm.UpdateSystemBarsAppearance;
 begin
   if TOSVersion.Check(11{API level 30}) then begin
     var LWindow := TAndroidHelper.Activity.getWindow;
-    LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
-    LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
+    LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
+    LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
     var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
     if LInsetsController <> nil then begin
       if TALStyleManager.Instance.IsDarkMode then begin
@@ -738,8 +738,8 @@ begin
       procedure
       begin
         var LWindow := TAndroidHelper.Activity.getWindow;
-        LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
-        LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material.Color.Surface')));
+        LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
+        LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
         if TALStyleManager.Instance.IsDarkMode then begin
           LWindow.getDecorView.setSystemUiVisibility(0);
         end
@@ -785,13 +785,13 @@ begin
           {$IF defined(android)}
           UpdateSystemBarsAppearance;
           {$ENDIF}
-          TALStyleManager.Instance.ApplyColorScheme(Self, 'Material.Color.Surface'{AFormFillColorKey}, 'Material.Color.Surface'{ASystemStatusBarBackgroundColorKey});
-          fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
-          fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');
-          fCircle.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.SurfaceContainerHighest');
-          fCircle.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.OutlineVariant');
-          fText.TextSettings.FontColor := TALStyleManager.Instance.GetColor('Material.Color.OnSurface');
-          fline.Stroke.Color := TALStyleManager.Instance.GetColor('Material.Color.Outline');
+          TALStyleManager.Instance.ApplyColorScheme(Self, 'Material3.Color.Surface'{AFormFillColorKey}, 'Material3.Color.Surface'{ASystemStatusBarBackgroundColorKey});
+          fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest');
+          fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.OutlineVariant');
+          fCircle.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest');
+          fCircle.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.OutlineVariant');
+          fText.TextSettings.FontColor := TALStyleManager.Instance.GetColor('Material3.Color.OnSurface');
+          fline.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.Outline');
           if TALStyleManager.Instance.IsDarkMode then begin
             ALTrackBarCustomStyle.Thumb.Fill.Color := $FFe5e0e8;
             ALTrackBarCustomStyle.Thumb.Stroke.Color := TalphaColors.Null;
@@ -800,9 +800,9 @@ begin
           end
           else begin
             ALTrackBarCustomStyle.Thumb.Fill.Color := $FFFFFFFF;
-            ALTrackBarCustomStyle.Thumb.Stroke.ColorKey := 'Material.Color.OutlineVariant';
+            ALTrackBarCustomStyle.Thumb.Stroke.ColorKey := 'Material3.Color.OutlineVariant';
             ALRangeTrackBarCustomStyle.Thumb.Fill.Color := $FFFFFFFF;
-            ALRangeTrackBarCustomStyle.Thumb.Stroke.ColorKey := 'Material.Color.OutlineVariant';
+            ALRangeTrackBarCustomStyle.Thumb.Stroke.ColorKey := 'Material3.Color.OutlineVariant';
           end;
           ALMakeBufDrawables(ALVertScrollBox1, False{AEnsureDoubleBuffered});
         end)
@@ -914,7 +914,7 @@ begin
   If FCurrentTextElements.TryGetValue(Sender, LTextElement) then begin
     var LtextElements := ALGetTextElementsByID(TALText(Sender).elements, LTextElement.id);
     For var I := low(LtextElements) to high (LtextElements) do begin
-      Canvas.Fill.Color := TALStyleManager.Instance.GetColor('Material.Color.OnTertiaryContainer');
+      Canvas.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.OnTertiaryContainer');
       Canvas.FillRect(LtextElements[i].Rect, 0.2);
     end;
   end;
@@ -1289,7 +1289,7 @@ begin
              ACanClose := False;
              var LRadioButtons := ADialog.GetRadioButtons;
              For var I := low(LRadioButtons) to high(LRadioButtons) do
-               TALStyleManager.Instance.ApplyRadioButtonStyle('Material.RadioButton.Error', LRadioButtons[i]);
+               TALStyleManager.Instance.ApplyRadioButtonStyle('Material3.RadioButton.Error', LRadioButtons[i]);
            end;
          end;
        end)
@@ -1352,12 +1352,12 @@ begin
            Var LLoginEdit := ADialog.GetEdit(1{ATag});
            if LLoginEdit.Text = '' then begin
              ACanClose := False;
-             TALStyleManager.Instance.ApplyEditStyle('Material.Edit.Hybrid.Error', LLoginEdit);
+             TALStyleManager.Instance.ApplyEditStyle('Material3.Edit.Hybrid.Error', LLoginEdit);
            end;
            Var LPasswordEdit := ADialog.GetEdit(2{ATag});
            if LPasswordEdit.Text = '' then begin
              ACanClose := False;
-             TALStyleManager.Instance.ApplyEditStyle('Material.Edit.Hybrid.Error', LPasswordEdit);
+             TALStyleManager.Instance.ApplyEditStyle('Material3.Edit.Hybrid.Error', LPasswordEdit);
            end;
          end;
        end)

@@ -305,6 +305,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
@@ -468,6 +469,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -625,6 +627,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -746,6 +749,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -863,6 +867,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -959,6 +964,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -1083,6 +1089,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseEnter; override;
     procedure DoMouseLeave; override;
+    procedure DoClickSound; override;
     procedure Click; override;
     procedure PaddingChanged; override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
@@ -1252,6 +1259,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -5192,6 +5200,16 @@ begin
   if assigned(FOnElementMouseLeave) and (FHoveredElement.ID <> '') then
     FOnElementMouseLeave(self, FHoveredElement);
   FHoveredElement := TALTextElement.Empty;
+end;
+
+{********************************}
+procedure TALBaseText.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((assigned(OnClick) or (assigned(FOnElementClick) and (FPressedElement.ID <> ''))) and
+      (ClickSound=TALClickSoundMode.Default) and
+      (ALGlobalClickSoundEnabled)) then
+    ALPlayClickSound;
 end;
 
 {**************************}

@@ -664,6 +664,7 @@ type
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
+    //property ClickSound;
     property ClipChildren default true;
     //property ClipParent;
     //property Cursor;

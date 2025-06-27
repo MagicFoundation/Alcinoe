@@ -1429,6 +1429,8 @@ begin
     var LMaxRadius := Min(AScaledRect.Width / 2, AScaledRect.Height / 2);
     LScaledXRadius := min(LScaledXRadius, LMaxRadius);
     LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+    LScaledXRadius := min(LScaledXRadius, LScaledYRadius);
+    LScaledYRadius := LScaledXRadius;
   end;
   AXRadius := Min(AScaledRect.Width / 2, LScaledXRadius);
   AYRadius := Min(AScaledRect.Height / 2, LScaledYRadius);

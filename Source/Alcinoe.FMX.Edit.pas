@@ -1152,6 +1152,7 @@ type
     //property CanParentFocus;
     //property Caret;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;

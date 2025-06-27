@@ -648,7 +648,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, '(csDestroying in componentState)','IsDestroying');
     aSrc := FindAndReplace(aSrc, '(not (csDestroying in FPageController.ComponentState))','(not (FPageController.IsDestroying))');
     aSrc := FindAndReplace(aSrc, 'if not (csLoading in ComponentState) and Assigned(FOnChange) then','//**if {not (csLoading in ComponentState) and} Assigned(FOnChange) then');
-    aSrc := FindAndReplace(aSrc, 'If ([csLoading, csDestroying, csDesigning] * parent.ComponentState <> []) then Exit;','If parent.IsDestroying then Exit;');
+    aSrc := FindAndReplace(aSrc, 'If ([csLoading, csDestroying, csDesigning] * Owner.parent.ComponentState <> []) then Exit;','If Owner.parent.IsDestroying then Exit;');
     aSrc := FindAndReplace(aSrc, '(not (csLoading in ComponentState)) and','//**(not (csLoading in ComponentState)) and');
     aSrc := FindAndReplace(aSrc, 'if csLoading in ComponentState then exit;','//**if csLoading in ComponentState then exit;');
     aSrc := FindAndReplace(aSrc, 'If (csLoading in componentState) or','If //**(csLoading in componentState) or');

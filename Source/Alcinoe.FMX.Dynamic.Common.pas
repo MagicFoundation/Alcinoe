@@ -356,7 +356,7 @@ begin
   ALFreeAndNilDrawable(FBufDrawable);
 end;
 
-{*****************************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALDynamicBaseStateStyle.Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -423,7 +423,7 @@ begin
   End;
 end;
 
-{**************************************************************************************************************************}
+{***************************************************************************************************************************************************}
 procedure TALDynamicBaseStateStyle.InterpolateNoChanges(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -888,14 +888,14 @@ begin
     FCurrentAdjustedStyle.Assign(LStateStyle);
     FCurrentAdjustedStyle.SupersedeNoChanges(false{ASaveState});
     //--
-    if FTransition.FToStateStyle = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransition.CurrentValue, false)
-    else if FTransition.FFromStateStyle = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransition.CurrentValue, true)
+    if FTransition.FToStateStyle = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransition.CurrentValue, False{AReverse})
+    else if FTransition.FFromStateStyle = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransition.CurrentValue, True{AReverse})
     else begin
       {$IF defined(debug)}
       if not FTransition.FFromStateStyle.Superseded then
         raise Exception.Create('Error 3A71A6B7-40C3-40A6-B678-D1FC6A0DD152');
       {$ENDIF}
-      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransition.FFromStateStyle{AFromStateStyle}, 1-FTransition.CurrentValue, true);
+      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransition.FFromStateStyle{AFromStateStyle}, 1-FTransition.CurrentValue, True{AReverse});
     end;
   end
   else begin

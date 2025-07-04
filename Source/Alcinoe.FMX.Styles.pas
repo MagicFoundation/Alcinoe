@@ -15409,6 +15409,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15463,6 +15464,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15517,6 +15519,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15571,6 +15574,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15625,6 +15629,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15679,6 +15684,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15733,6 +15739,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15787,6 +15794,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15841,6 +15849,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15895,6 +15904,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -15949,6 +15959,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16003,6 +16014,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16057,6 +16069,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16111,6 +16124,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16165,6 +16179,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16267,6 +16282,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16321,6 +16337,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16375,6 +16392,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16429,6 +16447,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16483,6 +16502,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16537,6 +16557,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16591,6 +16612,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16645,6 +16667,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16699,6 +16722,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16753,6 +16777,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16807,6 +16832,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16861,6 +16887,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16915,6 +16942,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -16969,6 +16997,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17023,6 +17052,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17150,6 +17180,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17204,6 +17235,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17258,6 +17290,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17312,6 +17345,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17366,6 +17400,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17420,6 +17455,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17474,6 +17510,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17528,6 +17565,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17582,6 +17620,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17636,6 +17675,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17690,6 +17730,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17744,6 +17785,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17798,6 +17840,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17852,6 +17895,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -17906,6 +17950,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18007,6 +18052,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18061,6 +18107,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18115,6 +18162,7 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18169,6 +18217,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18223,6 +18272,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18277,6 +18327,7 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18331,6 +18382,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18385,6 +18437,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18439,6 +18492,7 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18493,6 +18547,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18547,6 +18602,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18601,6 +18657,7 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18655,6 +18712,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18709,6 +18767,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -18763,6 +18822,7 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -19201,21 +19261,21 @@ begin
       padding.Rect := TRectF.Create(24*ARatio{Left}, 10*ARatio{Top}, 24*ARatio{Right}, 10*ARatio{Bottom}).RoundTo(-2);
       XRadius := -50;
       YRadius := -50;
-      Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      Fill.ColorKey := 'Material3.Color.SurfaceContainer'; // md.sys.color.surface-container / md.ref.palette.neutral94 / #F3EDF7
       Stroke.Color := Talphacolors.Null;
       Stroke.ColorKey := '';
-      TextSettings.Font.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      TextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       StateStyles.Transition.InterpolationType := TALInterpolationType.MaterialStandardDefaultEffects;
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
-      StateStyles.UnChecked.Default.fill.Assign(Fill);
-      StateStyles.UnChecked.Default.fill.Inherit := False;
-      StateStyles.UnChecked.Default.Fill.ColorKey := 'Material3.Color.SurfaceContainer'; // md.sys.color.surface-container / md.ref.palette.neutral94 / #F3EDF7
-      StateStyles.UnChecked.Default.TextSettings.Assign(TextSettings);
-      StateStyles.UnChecked.Default.TextSettings.Inherit := False;
-      StateStyles.UnChecked.Default.TextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       //--Default (Checked)--
+      StateStyles.Checked.Default.fill.Assign(Fill);
+      StateStyles.Checked.Default.fill.Inherit := False;
+      StateStyles.Checked.Default.Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Default.TextSettings.Assign(TextSettings);
+      StateStyles.Checked.Default.TextSettings.Inherit := False;
+      StateStyles.Checked.Default.TextSettings.Font.ColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
 
       //--Disabled (UnChecked)--
       StateStyles.UnChecked.Disabled.Opacity := 1;
@@ -20583,8 +20643,8 @@ begin
       XRadius := -50;
       YRadius := -50;
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio,8*ARatio,8*ARatio,8*ARatio).RoundTo(-2);
-      Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
-      Fill.ImageTintColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
+      Fill.ColorKey := 'Material3.Color.SurfaceContainer'; // md.sys.color.surface-container / md.ref.palette.neutral94 / #F3EDF7
+      Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       Fill.ResourceName := LPrevResourceName;
       Stroke.Color := TALphaColors.Null;
       Stroke.ColorKey := '';
@@ -20592,11 +20652,11 @@ begin
       StateStyles.Transition.Duration := 0.2;
 
       //--Default (UnChecked)--
-      StateStyles.UnChecked.Default.fill.Assign(Fill);
-      StateStyles.UnChecked.Default.fill.Inherit := False;
-      StateStyles.UnChecked.Default.Fill.ColorKey := 'Material3.Color.SurfaceContainer'; // md.sys.color.surface-container / md.ref.palette.neutral94 / #F3EDF7
-      StateStyles.UnChecked.Default.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
       //--Default (Checked)--
+      StateStyles.Checked.Default.fill.Assign(Fill);
+      StateStyles.Checked.Default.fill.Inherit := False;
+      StateStyles.Checked.Default.Fill.ColorKey := 'Material3.Color.Primary'; // md.sys.color.primary / md.ref.palette.primary40 / #6750A4
+      StateStyles.Checked.Default.Fill.ImageTintColorKey := 'Material3.Color.OnPrimary'; // md.sys.color.on-primary / md.ref.palette.primary100 / #FFFFFF
 
       //--Disabled (UnChecked)--
       StateStyles.UnChecked.Disabled.Opacity := 1;
@@ -20653,6 +20713,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -20707,6 +20770,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -20761,6 +20827,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -20815,6 +20884,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -20869,6 +20941,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -20923,6 +20998,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -20977,6 +21055,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21031,6 +21112,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21085,6 +21169,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21139,6 +21226,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21193,6 +21283,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21247,6 +21340,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21301,6 +21397,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21355,6 +21454,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21409,6 +21511,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21538,6 +21643,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21592,6 +21700,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21646,6 +21757,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21700,6 +21814,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21754,6 +21871,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21808,6 +21928,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21862,6 +21985,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21916,6 +22042,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -21970,6 +22099,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22024,6 +22156,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22078,6 +22213,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22132,6 +22270,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22186,6 +22327,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22240,6 +22384,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22294,6 +22441,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22422,6 +22572,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22476,6 +22629,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22530,6 +22686,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22584,6 +22743,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22638,6 +22800,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22692,6 +22857,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22746,6 +22914,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22800,6 +22971,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22854,6 +23028,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22908,6 +23085,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -22962,6 +23142,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23016,6 +23199,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23070,6 +23256,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23124,6 +23313,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23178,6 +23370,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23304,6 +23499,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(6*ARatio{Left},6*ARatio{Top},6*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23358,6 +23556,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},6*ARatio{Top},4*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23412,6 +23613,9 @@ begin
       Height := RoundTo(32 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left},6*ARatio{Top},10*ARatio{Right},6*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23466,6 +23670,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(8*ARatio{Left},8*ARatio{Top},8*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23520,6 +23727,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(4*ARatio{Left},8*ARatio{Top},4*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23574,6 +23784,9 @@ begin
       Height := RoundTo(40 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(14*ARatio{Left},8*ARatio{Top},14*ARatio{Right},8*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23628,6 +23841,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},16*ARatio{Top},16*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23682,6 +23898,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(12*ARatio{Left},16*ARatio{Top},12*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23736,6 +23955,9 @@ begin
       Height := RoundTo(56 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(24*ARatio{Left},16*ARatio{Top},24*ARatio{Right},16*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(1 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23790,6 +24012,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},32*ARatio{Top},32*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23844,6 +24069,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(16*ARatio{Left},32*ARatio{Top},16*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23898,6 +24126,9 @@ begin
       Height := RoundTo(96 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},32*ARatio{Top},48*ARatio{Right},32*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(2 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -23952,6 +24183,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(48*ARatio{Left},48*ARatio{Top},48*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -24006,6 +24240,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(32*ARatio{Left},48*ARatio{Top},32*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;
@@ -24060,6 +24297,9 @@ begin
       Height := RoundTo(136 * ARatio, -2);
       Fill.ImageMargins.Rect := TRectF.Create(72*ARatio{Left},48*ARatio{Top},72*ARatio{Right},48*ARatio{Bottom}).RoundTo(-2);
       Stroke.Thickness := RoundTo(3 * ARatio, -2);
+      StateStyles.Checked.Default.fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.UnChecked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
+      StateStyles.Checked.Disabled.Fill.ImageMargins.Rect := Fill.ImageMargins.Rect;
 
     finally
       EndUpdate;

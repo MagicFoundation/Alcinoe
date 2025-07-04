@@ -283,7 +283,16 @@ rich text.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3button.png?raw=true" />
 
-### 2. **TALCheckBox and TALRadioButton**
+### 2. **TALToggleButton**
+**TALToggleButton** is a customizable toggle control with distinct styles 
+for On and Off across all states — **Enabled**, **Pressed**, **Focused**, **Hovered**, 
+and **Disabled**. It supports **fill, border, shadow**, and **font** customization, 
+as well as HTML content for icons or rich text, making it ideal for 
+interactive Material 3 components.
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3tooglebutton.gif?raw=true" />
+
+### 3. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 
 design. They include customizable properties for **checkmark, 
 border**, and **shadow** and utilize smooth transitions between states. 
@@ -305,7 +314,7 @@ Delphi applications.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3switch.gif?raw=true" />
 
-### 3. **TALTrackBar and TALRangeTrackBar**
+### 5. **TALTrackBar and TALRangeTrackBar**
 **TALTrackBar** allows for extensive customization of its appearance 
 and behavior, making it an ideal choice for implementing Material 3’s 
 clean and modern slider design. You can easily customize the track and 
@@ -318,7 +327,7 @@ and **Pressed** contribute to a polished, fluid user experience.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3trackbar.gif?raw=true" />
 
-### 4. **TALEdit and TALMemo**
+### 6. **TALEdit and TALMemo**
 Alcinoe’s native **TALEdit** and **TALMemo** controls are designed to 
 match Material 3’s input fields, offering customizable **border, 
 shadow**, and **font** properties. These controls adapt across platforms 
@@ -1161,6 +1170,19 @@ undesired conversions.
 
 History
 =======
+
+#### 04/07/2025 – Added TALToggleButton and Enhancements
+
+- **Added** `TALToggleButton` control.
+- **Added** Material 3 Expressive button styles.
+- **Extended** `TALInterpolatedAnimation` with `Bezier` support 
+  via `TALInterpolationType` and `TALInterpolationParams`.
+- **Improved** text layout to allow character-level breaking when 
+  word boundaries are not available.
+- **Added** `ClickSound: TALClickSoundMode (Default, Always, Never)` 
+  property to all `TALControl` components.
+- **Changed** `StateLayer.XRadius` and `YRadius` to default to `NaN`, 
+  allowing them to inherit radius values from their parent control.
 
 #### 18/06/2025 – Updates and Refactoring
 

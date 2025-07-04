@@ -265,7 +265,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
 begin
   if AData.GetChildNodeValueText('type', '') = 'stories' then begin
@@ -298,7 +298,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************************************************************************************}
+{**********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
 begin
   Result := TALDynamicListBox.TItem.TLoadingContent.Create(nil);
@@ -396,7 +396,7 @@ begin
   End;
 end;
 
-{***********************************************************************************************************************************************************************}
+{****************************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreIndicator.Create(nil);
@@ -417,7 +417,7 @@ begin
   End;
 end;
 
-{***************************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreRetryButton.Create(nil);
@@ -440,7 +440,7 @@ begin
   End;
 end;
 
-{*************************************************************************************************************************************************************************************}
+{******************************************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
 begin
   Result := TALDynamicListBox.TView.TPullToRefreshIndicator.Create(nil);
@@ -485,7 +485,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************************************************************}
+{******************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
 begin
   Result := TALDynamicListBox.TView.TTopBar.Create(nil);
@@ -527,7 +527,7 @@ begin
   End;
 end;
 
-{*******************************************************************************************************************************************************}
+{************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
 begin
   Result := TALDynamicListBox.TView.TBottomBar.Create(nil);
@@ -596,7 +596,7 @@ begin
   End;
 end;
 
-{***************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
 begin
   Result := TALDynamicListBox.TItem.TMainContent.Create(nil);
@@ -1075,7 +1075,7 @@ begin
 
 end;
 
-{**************************************************}
+{*******************************************}
 procedure TMainForm.MainListBoxDownloadItems(
             const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
             out AData: TALJSONNodeW;

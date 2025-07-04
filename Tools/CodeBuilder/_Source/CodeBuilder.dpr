@@ -375,6 +375,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'TALRadioButton', 'TALDynamicRadioButton');
     aSrc := FindAndReplace(aSrc, 'TALSwitch', 'TALDynamicSwitch');
     aSrc := FindAndReplace(aSrc, 'TALButton', 'TALDynamicButton');
+    aSrc := FindAndReplace(aSrc, 'TALToggleButton', 'TALDynamicToggleButton');
     aSrc := FindAndReplace(aSrc, 'TALCustomTrack', 'TALDynamicCustomTrack');
     aSrc := FindAndReplace(aSrc, 'TALTrackBar', 'TALDynamicTrackBar');
     aSrc := FindAndReplace(aSrc, 'TALRangeTrackBar', 'TALDynamicRangeTrackBar');
@@ -551,6 +552,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);','ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseLeave(const AObject: TControl);','ChildrenMouseLeave(const AObject: TALDynamicControl);');
     aSrc := FindAndReplace(aSrc, 'ApplyColorSchemeRecursive(const AControl: TControl);','ApplyColorSchemeRecursive(const AControl: TALDynamicControl);');
+    aSrc := FindAndReplace(aSrc, 'AdjustSize; virtual;','AdjustSize; override;');
     aSrc := FindAndReplace(aSrc, 'DoAddObject(const AObject: TFmxObject);','DoInsertControl(const AControl: TALDynamicControl; const AIndex: Integer);');
     aSrc := FindAndReplace(aSrc, 'DoRemoveObject(const AObject: TFmxObject);','DoRemoveControl(const AControl: TALDynamicControl);');
     aSrc := FindAndReplace(aSrc, 'procedure DoDeleteChildren; override;','//**procedure DoDeleteChildren; override;');
@@ -1185,6 +1187,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     //--
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicSwitch.TThumb', 'Margins', '4,4,4,4');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicButton', 'Padding', '12{Left}, 6{Top}, 12{Right}, 6{Bottom}');
+    aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicToggleButton', 'Padding', '12{Left}, 6{Top}, 12{Right}, 6{Bottom}');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicCustomTrack.TValueIndicator', 'Margins', '6{Left}, 4{Top}, 6{Right}, 4{Bottom}');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicCustomTrack.TValueIndicator', 'Padding', '16{Left}, 12{Top}, 16{Right}, 12{Bottom}');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicCustomTrack.TTrack', 'Margins', '0{Left}, 15{Top}, 0{Right}, 15{Bottom}');
@@ -1369,6 +1372,7 @@ begin
   ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALRadioButton', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
   ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALSwitch', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
   ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALButton', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
+  ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALToggleButton', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
   ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALCustomTrack', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
   ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALTrackBar', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
   ExtractClass(LAlcinoeFMXStdCtrlsPas, 'TALRangeTrackBar', LWholeInterface, LWholeImplementation, LOutputFMXStdCtrlsInterface, LOutputFMXStdCtrlsImplementation);
@@ -1486,6 +1490,7 @@ begin
   ExtractSection(LAlcinoeFMXStylesPas, 'IMAGE', LOutputImplementation);
   ExtractSection(LAlcinoeFMXStylesPas, 'TEXT', LOutputImplementation);
   ExtractSection(LAlcinoeFMXStylesPas, 'BUTTON', LOutputImplementation);
+  ExtractSection(LAlcinoeFMXStylesPas, 'TOGGLEBUTTON', LOutputImplementation);
   ExtractSection(LAlcinoeFMXStylesPas, 'CHECKBOX', LOutputImplementation);
   ExtractSection(LAlcinoeFMXStylesPas, 'RADIOBUTTON', LOutputImplementation);
   ExtractSection(LAlcinoeFMXStylesPas, 'SWITCH', LOutputImplementation);
@@ -1507,6 +1512,7 @@ begin
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALRadioButton', 'TALDynamicRadioButton', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALSwitch', 'TALDynamicSwitch', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALButton', 'TALDynamicButton', [rfIgnoreCase, RfReplaceALL]);
+  LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALToggleButton', 'TALDynamicToggleButton', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALCustomTrack', 'TALDynamicCustomTrack', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALTrackBar', 'TALDynamicTrackBar', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALRangeTrackBar', 'TALDynamicRangeTrackBar', [rfIgnoreCase, RfReplaceALL]);
@@ -1520,7 +1526,8 @@ begin
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TALPageController', 'TALDynamicPageController', [rfIgnoreCase, RfReplaceALL]);
   //-----
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'ALReset', 'ALResetDynamic', [rfIgnoreCase, RfReplaceALL]);
-  LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'ALApplyMaterial', 'ALApplyMaterialDynamic', [rfIgnoreCase, RfReplaceALL]);
+  LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'ALApplyMaterial3', 'ALApplyMaterial3Dynamic', [rfIgnoreCase, RfReplaceALL]);
+  LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'ALApplyMaterial3DynamicExpressive', 'ALApplyMaterial3ExpressiveDynamic', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'TouchTargetExpansion.Rect','TouchTargetExpansion', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'InactiveTrack.TouchTargetExpansion.DefaultValue','TRectF.Empty', [rfIgnoreCase, RfReplaceALL]);
   LOutputImplementation := AlStringReplaceA(LOutputImplementation, 'ActiveTrack.TouchTargetExpansion.DefaultValue','TRectF.Empty', [rfIgnoreCase, RfReplaceALL]);

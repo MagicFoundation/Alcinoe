@@ -420,7 +420,7 @@ type
         property AutoReverse;
         property Delay;
         property Duration: Single read getDuration stored false;
-        property Enabled Read FEnabled write SetEnabled default True;
+        property Enabled Read FEnabled write SetEnabled stored true default True;
         property Inverse;
         property Loop;
         property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
@@ -2866,6 +2866,7 @@ procedure TALAnimatedImage.TAnimation.Start;
 begin
   if (Running) then
     Exit;
+  FEnabled := True;
   fCurrentProgress := FStartProgress;
   inherited Start;
 end;
@@ -5556,32 +5557,68 @@ begin
   Result.AlignToPixel := AutoAlignToPixel;
   Result.Opacity := AOpacity;
   //--
-  Result.FontFamily := Afont.Family;
-  Result.FontSize := Afont.Size;
-  Result.FontWeight := Afont.Weight;
-  Result.FontSlant := Afont.Slant;
-  Result.FontStretch := Afont.Stretch;
-  Result.FontColor := AFont.Color;
+  if Afont <> nil then begin
+    Result.FontFamily := Afont.Family;
+    Result.FontSize := Afont.Size;
+    Result.FontWeight := Afont.Weight;
+    Result.FontSlant := Afont.Slant;
+    Result.FontStretch := Afont.Stretch;
+    Result.FontColor := AFont.Color;
+  end
+  else begin
+    Result.FontFamily := '';
+    Result.FontSize := 14;
+    Result.FontWeight := TfontWeight.Regular;
+    Result.FontSlant := TFontSlant.Regular;
+    Result.FontStretch := TfontStretch.Regular;
+    Result.FontColor := TAlphaColors.Black;
+  end;
   //--
-  Result.DecorationKinds := ADecoration.Kinds;
-  Result.DecorationStyle := ADecoration.Style;
-  Result.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
-  Result.DecorationColor := ADecoration.Color;
+  if ADecoration <> nil then begin
+    Result.DecorationKinds := ADecoration.Kinds;
+    Result.DecorationStyle := ADecoration.Style;
+    Result.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
+    Result.DecorationColor := ADecoration.Color;
+  end
+  else begin
+    Result.DecorationKinds := [];
+    Result.DecorationStyle := TALTextDecorationStyle.Solid;
+    Result.DecorationThicknessMultiplier := 1;
+    Result.DecorationColor := Talphacolors.Null;
+  end;
   //--
   Result.EllipsisText := TextSettings.Ellipsis;
   Result.EllipsisInheritSettings := TextSettings.EllipsisSettings.inherit;
   //--
-  Result.EllipsisFontFamily := AEllipsisfont.Family;
-  Result.EllipsisFontSize := AEllipsisfont.Size;
-  Result.EllipsisFontWeight := AEllipsisfont.Weight;
-  Result.EllipsisFontSlant := AEllipsisfont.Slant;
-  Result.EllipsisFontStretch := AEllipsisfont.Stretch;
-  Result.EllipsisFontColor := AEllipsisFont.Color;
+  if AEllipsisfont <> nil then begin
+    Result.EllipsisFontFamily := AEllipsisfont.Family;
+    Result.EllipsisFontSize := AEllipsisfont.Size;
+    Result.EllipsisFontWeight := AEllipsisfont.Weight;
+    Result.EllipsisFontSlant := AEllipsisfont.Slant;
+    Result.EllipsisFontStretch := AEllipsisfont.Stretch;
+    Result.EllipsisFontColor := AEllipsisFont.Color;
+  end
+  else begin
+    Result.EllipsisFontFamily := '';
+    Result.EllipsisFontSize := 14;
+    Result.EllipsisFontWeight := TfontWeight.Regular;
+    Result.EllipsisFontSlant := TfontSlant.Regular;
+    Result.EllipsisFontStretch := TfontStretch.Regular;
+    Result.EllipsisFontColor := TAlphaColors.black;
+  end;
   //--
-  Result.EllipsisDecorationKinds := AEllipsisDecoration.Kinds;
-  Result.EllipsisDecorationStyle := AEllipsisDecoration.Style;
-  Result.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
-  Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
+  if AEllipsisDecoration <> nil then begin
+    Result.EllipsisDecorationKinds := AEllipsisDecoration.Kinds;
+    Result.EllipsisDecorationStyle := AEllipsisDecoration.Style;
+    Result.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
+    Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
+  end
+  else begin
+    Result.EllipsisDecorationKinds := [];
+    Result.EllipsisDecorationStyle := TALTextDecorationStyle.Solid;
+    Result.EllipsisDecorationThicknessMultiplier := 1;
+    Result.EllipsisDecorationColor := TAlphaColors.Null;
+  end;
   //--
   Result.AutoSize := TALAutoSizeMode.None;
   if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.Both
@@ -5598,20 +5635,38 @@ begin
   Result.HTextAlign := TextSettings.HorzAlign;
   Result.VTextAlign := TextSettings.VertAlign;
   //--
-  Result.FillColor := AFill.Color;
-  Result.FillGradientStyle := AFill.Gradient.Style;
-  Result.FillGradientAngle := AFill.Gradient.Angle;
-  Result.FillGradientColors := AFill.Gradient.Colors;
-  Result.FillGradientOffsets := AFill.Gradient.Offsets;
-  Result.FillResourceName := AFill.ResourceName;
-  Result.FillMaskResourceName := '';
-  Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
-  Result.FillImageMargins := AFill.ImageMargins.Rect;
-  Result.FillImageNoRadius := AFill.ImageNoRadius;
-  Result.FillImageTintColor := AFill.ImageTintColor;
-  Result.FillWrapMode := AFill.WrapMode;
-  Result.FillCropCenter := TPointF.create(-50,-50);
-  Result.FillBlurRadius := 0;
+  if AFill <> nil then begin
+    Result.FillColor := AFill.Color;
+    Result.FillGradientStyle := AFill.Gradient.Style;
+    Result.FillGradientAngle := AFill.Gradient.Angle;
+    Result.FillGradientColors := AFill.Gradient.Colors;
+    Result.FillGradientOffsets := AFill.Gradient.Offsets;
+    Result.FillResourceName := AFill.ResourceName;
+    Result.FillMaskResourceName := '';
+    Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
+    Result.FillImageMargins := AFill.ImageMargins.Rect;
+    Result.FillImageNoRadius := AFill.ImageNoRadius;
+    Result.FillImageTintColor := AFill.ImageTintColor;
+    Result.FillWrapMode := AFill.WrapMode;
+    Result.FillCropCenter := TPointF.create(-50,-50);
+    Result.FillBlurRadius := 0;
+  end
+  else begin
+    Result.FillColor := TAlphaColors.null;
+    Result.FillGradientStyle := TGradientStyle.Linear;
+    Result.FillGradientAngle := 180;
+    Result.FillGradientColors := [];
+    Result.FillGradientOffsets := [];
+    Result.FillResourceName := '';
+    Result.FillMaskResourceName := '';
+    Result.FillBackgroundMargins := TRectF.Empty;
+    Result.FillImageMargins := TRectF.Empty;
+    Result.FillImageNoRadius := False;
+    Result.FillImageTintColor := TAlphaColors.null;
+    Result.FillWrapMode := TALImageWrapMode.Fit;
+    Result.FillCropCenter := TPointF.create(-50,-50);
+    Result.FillBlurRadius := 0;
+  end;
   //--
   if AStateLayer <> nil then begin
     Result.StateLayerOpacity := AStateLayer.Opacity;
@@ -5625,8 +5680,8 @@ begin
     Result.StateLayerOpacity := 0;
     Result.StateLayerColor := TalphaColors.Null;
     Result.StateLayerMargins := TRectF.Empty;
-    Result.StateLayerXRadius := 0;
-    Result.StateLayerYRadius := 0;
+    Result.StateLayerXRadius := NaN;
+    Result.StateLayerYRadius := NaN;
   end;
   //--
   if AStroke <> nil then begin
@@ -5635,7 +5690,7 @@ begin
   end
   else begin
     Result.StrokeColor := TalphaColors.Null;
-    Result.StrokeThickness := 0;
+    Result.StrokeThickness := 1;
   end;
   //--
   if AShadow <> nil then begin
@@ -5646,7 +5701,7 @@ begin
   end
   else begin
     Result.ShadowColor := TalphaColors.Null;
-    Result.ShadowBlur := 0;
+    Result.ShadowBlur := 12;
     Result.ShadowOffsetX := 0;
     Result.ShadowOffsetY := 0;
   end;
@@ -5768,7 +5823,7 @@ begin
       .SetDstRect(ARect)
       .SetOpacity(AOpacity)
       .SetFill(AFill)
-      .SetStateLayer(AStateLayer, AFont.color)
+      .SetStateLayer(AStateLayer, LMultiLineTextOptions.Fontcolor)
       .SetDrawStateLayerOnTop(AText <> '')
       .SetStroke(AStroke)
       .SetShadow(AShadow)

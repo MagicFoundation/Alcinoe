@@ -218,6 +218,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -317,6 +318,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -529,6 +531,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;

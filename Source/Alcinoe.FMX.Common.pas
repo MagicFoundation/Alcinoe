@@ -292,8 +292,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALShadow; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALShadow; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single; const AReverse: Boolean);
     function HasShadow: boolean; virtual;
     property Defaultblur: Single read GetDefaultblur;
     property DefaultOffsetX: Single read GetDefaultOffsetX;
@@ -385,8 +385,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALFont; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALFont; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single; const AReverse: Boolean);
     property DefaultFamily: TFontName read GetDefaultFamily;
     property DefaultSize: Single read GetDefaultSize;
     property DefaultWeight: TFontWeight read GetDefaultWeight;
@@ -433,8 +433,8 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single; const AReverse: Boolean);
     property DefaultKinds: TALTextDecorationKinds read GetDefaultKinds;
     property DefaultStyle: TALTextDecorationStyle read GetDefaultStyle;
     property DefaultThicknessMultiplier: Single read GetDefaultThicknessMultiplier;
@@ -471,8 +471,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single; const AReverse: Boolean);
     property DefaultInherit: Boolean read GetDefaultInherit;
   published
     property Inherit: Boolean read FInherit write SetInherit stored IsInheritStored;
@@ -541,8 +541,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single; const AReverse: Boolean);
     //--
     property DefaultEllipsis: String read GetDefaultEllipsis;
     property DefaultMaxLines: Integer read GetDefaultMaxLines;
@@ -633,8 +633,8 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALGradient; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALGradient; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single; const AReverse: Boolean);
     property DefaultStyle: TGradientStyle read GetDefaultStyle;
     property DefaultAngle: Single read GetDefaultAngle;
     property Colors: TArray<TAlphaColor> read FColors write SetColors;
@@ -720,8 +720,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALBrush; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALBrush; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single; const AReverse: Boolean);
     function HasFill: boolean; virtual;
     function Styles: TALBrushStyles; virtual;
     function IsRemoteResource: Boolean;
@@ -795,8 +795,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single; const AReverse: Boolean);
     function HasStroke: boolean; virtual;
     property DefaultColor: TAlphaColor read GetDefaultColor;
     property DefaultColorKey: String read GetDefaultColorKey;
@@ -873,8 +873,8 @@ type
     procedure Reset; override;
     procedure AlignToPixel; virtual;
     procedure ApplyColorScheme; virtual;
-    procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single; const AReverse: Boolean);
     function HasFill: boolean; virtual;
     property DefaultOpacity: Single read GetDefaultOpacity;
     property DefaultColor: TAlphaColor read GetDefaultColor;
@@ -957,8 +957,8 @@ type
     procedure ApplyColorScheme; virtual;
     procedure ClearBufDrawable; virtual;
     Property Inherit: Boolean read GetInherit;
-    procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
     procedure Supersede(Const ASaveState: Boolean = False); virtual;
     procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
     property Superseded: Boolean read FSuperseded;
@@ -1870,7 +1870,7 @@ begin
 end;
 
 {***********************************************************************************}
-procedure TALShadow.Interpolate(const ATo: TALShadow; const ANormalizedTime: Single);
+procedure TALShadow.Interpolate(const ATo: TALShadow; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -1894,11 +1894,11 @@ begin
 end;
 
 {********************************************************************************************}
-procedure TALShadow.InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
+procedure TALShadow.InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -2250,27 +2250,27 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TALFont.Interpolate(const ATo: TALFont; const ANormalizedTime: Single);
+procedure TALFont.Interpolate(const ATo: TALFont; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
     var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
-      Family := ATo.Family;
+      if not AReverse then Family := ATo.Family;
       Size := InterpolateSingle(Size{Start}, ATo.Size{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
       Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(ATo.Weight), ANormalizedTime)));
-      Slant := ATo.Slant;
+      if not AReverse then Slant := ATo.Slant;
       //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(ATo.Stretch), ANormalizedTime)));
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
     end
     else begin
-      Family := DefaultFamily;
+      if not AReverse then Family := DefaultFamily;
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
       Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(DefaultWeight), ANormalizedTime)));
-      Slant := DefaultSlant;
+      if not AReverse then Slant := DefaultSlant;
       //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(DefaultStretch), ANormalizedTime)));
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
@@ -2282,11 +2282,11 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TALFont.InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
+procedure TALFont.InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -2521,30 +2521,22 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALTextDecoration.Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single);
+procedure TALTextDecoration.Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
     var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
-      Kinds := ATo.Kinds;
-      Style := ATo.Style;
+      if not AReverse then Kinds := ATo.Kinds;
+      if not AReverse then Style := ATo.Style;
       ThicknessMultiplier := InterpolateSingle(ThicknessMultiplier{Start}, ATo.ThicknessMultiplier{Stop}, ANormalizedTime);
-      if (ATo.Color = TalphaColors.Null) or
-         (Color = TalphaColors.Null) then
-        Color := ATo.Color
-      else
-        Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
     end
     else begin
-      Kinds := DefaultKinds;
-      Style := DefaultStyle;
+      if not AReverse then Kinds := DefaultKinds;
+      if not AReverse then Style := DefaultStyle;
       ThicknessMultiplier := InterpolateSingle(ThicknessMultiplier{Start}, DefaultThicknessMultiplier{Stop}, ANormalizedTime);
-      if (DefaultColor = TalphaColors.Null) or
-         (Color = TalphaColors.Null) then
-        Color := DefaultColor
-      else
-        Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
     end;
     FColorKey := LPrevColorKey;
   finally
@@ -2553,11 +2545,11 @@ begin
 end;
 
 {************************************************************************************************************}
-procedure TALTextDecoration.InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
+procedure TALTextDecoration.InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -2766,32 +2758,32 @@ begin
 end;
 
 {*******************************************************************************************************}
-procedure TALEllipsisSettings.Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
+procedure TALEllipsisSettings.Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
       if ATo.Inherit or Inherit then begin
-        Font.assign(ATo.Font);
-        Decoration.assign(ATo.Decoration);
-        Inherit := ATo.Inherit; // True or False
+        if not AReverse then Font.assign(ATo.Font);
+        if not AReverse then Decoration.assign(ATo.Decoration);
+        if not AReverse then Inherit := ATo.Inherit; // True or False
       end
       else begin
-        Font.Interpolate(ATo.Font, ANormalizedTime);
-        Decoration.Interpolate(ATo.Decoration, ANormalizedTime);
-        Inherit := ATo.Inherit; // False
+        Font.Interpolate(ATo.Font, ANormalizedTime, AReverse);
+        Decoration.Interpolate(ATo.Decoration, ANormalizedTime, AReverse);
+        if not AReverse then Inherit := ATo.Inherit; // False
       end;
     end
     else begin
       if DefaultInherit or Inherit then begin
-        Font.Reset;
-        Decoration.reset;
-        Inherit := DefaultInherit; // True or False
+        if not AReverse then Font.Reset;
+        if not AReverse then Decoration.reset;
+        if not AReverse then Inherit := DefaultInherit; // True or False
       end
       else begin
-        Font.Interpolate(nil, ANormalizedTime);
-        Decoration.Interpolate(nil, ANormalizedTime);
-        Inherit := DefaultInherit; // False
+        Font.Interpolate(nil, ANormalizedTime, AReverse);
+        Decoration.Interpolate(nil, ANormalizedTime, AReverse);
+        if not AReverse then Inherit := DefaultInherit; // False
       end;
     end;
   finally
@@ -2800,11 +2792,11 @@ begin
 end;
 
 {****************************************************************************************************************}
-procedure TALEllipsisSettings.InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
+procedure TALEllipsisSettings.InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -3068,31 +3060,31 @@ begin
 end;
 
 {*******************************************************************************************************}
-procedure TALBaseTextSettings.Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
+procedure TALBaseTextSettings.Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
-      Font.Interpolate(ATo.Font, ANormalizedTime);
-      Decoration.Interpolate(ATo.Decoration, ANormalizedTime);
-      Ellipsis := ATo.Ellipsis;
-      EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime);
-      MaxLines := ATo.MaxLines;
-      IsHtml := ATo.IsHtml;
-      HorzAlign := ATo.HorzAlign;
-      VertAlign := ATo.VertAlign;
+      Font.Interpolate(ATo.Font, ANormalizedTime, AReverse);
+      Decoration.Interpolate(ATo.Decoration, ANormalizedTime, AReverse);
+      if not AReverse then Ellipsis := ATo.Ellipsis;
+      EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime, AReverse);
+      if not AReverse then MaxLines := ATo.MaxLines;
+      if not AReverse then IsHtml := ATo.IsHtml;
+      if not AReverse then HorzAlign := ATo.HorzAlign;
+      if not AReverse then VertAlign := ATo.VertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, ATo.LineHeightMultiplier{Stop}, ANormalizedTime);
       LetterSpacing := InterpolateSingle(LetterSpacing{Start}, ATo.LetterSpacing{Stop}, ANormalizedTime);
     end
     else begin
-      Font.Interpolate(nil, ANormalizedTime);
-      Decoration.Interpolate(nil, ANormalizedTime);
-      Ellipsis := DefaultEllipsis;
-      EllipsisSettings.Interpolate(nil, ANormalizedTime);
-      MaxLines := DefaultMaxLines;
-      IsHtml := DefaultIsHtml;
-      HorzAlign := DefaultHorzAlign;
-      VertAlign := DefaultVertAlign;
+      Font.Interpolate(nil, ANormalizedTime, AReverse);
+      Decoration.Interpolate(nil, ANormalizedTime, AReverse);
+      if not AReverse then Ellipsis := DefaultEllipsis;
+      EllipsisSettings.Interpolate(nil, ANormalizedTime, AReverse);
+      if not AReverse then MaxLines := DefaultMaxLines;
+      if not AReverse then IsHtml := DefaultIsHtml;
+      if not AReverse then HorzAlign := DefaultHorzAlign;
+      if not AReverse then VertAlign := DefaultVertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, DefaultLineHeightMultiplier{Stop}, ANormalizedTime);
       LetterSpacing := InterpolateSingle(LetterSpacing{Start}, DefaultLetterSpacing{Stop}, ANormalizedTime);
     end;
@@ -3102,11 +3094,11 @@ begin
 end;
 
 {****************************************************************************************************************}
-procedure TALBaseTextSettings.InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
+procedure TALBaseTextSettings.InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -3460,7 +3452,7 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALGradient.Interpolate(const ATo: TALGradient; const ANormalizedTime: Single);
+procedure TALGradient.Interpolate(const ATo: TALGradient; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -3469,7 +3461,7 @@ begin
       if (Style = ATo.Style) and
          (length(Colors) = length(ATo.Colors)) and
          (length(Offsets) = length(ATo.Offsets)) then begin
-        Style := ATo.Style;
+        if not AReverse then Style := ATo.Style;
         Angle := InterpolateSingle(Angle{Start}, ATo.Angle{Stop}, ANormalizedTime);
         for var I := Low(Colors) to High(Colors) do
           Colors[i] := ALInterpolateColor(Colors[i]{Start}, ATo.Colors[i]{Stop}, ANormalizedTime);
@@ -3477,17 +3469,17 @@ begin
           Offsets[i] := InterpolateSingle(Offsets[i]{Start}, ATo.Offsets[i]{Stop}, ANormalizedTime);
       end
       else begin
-        Style := ATo.Style;
-        Angle := ATo.Angle;
-        Colors := ATo.Colors;
-        Offsets := ATo.Offsets;
+        if not AReverse then Style := ATo.Style;
+        if not AReverse then Angle := ATo.Angle;
+        if not AReverse then Colors := ATo.Colors;
+        if not AReverse then Offsets := ATo.Offsets;
       end;
     end
     else begin
-      Style := DefaultStyle;
-      Angle := DefaultAngle;
-      Colors := [];
-      Offsets := [];
+      if not AReverse then Style := DefaultStyle;
+      if not AReverse then Angle := DefaultAngle;
+      if not AReverse then Colors := [];
+      if not AReverse then Offsets := [];
     end;
     var FColorKeys := LPrevColorKeys;
   finally
@@ -3496,11 +3488,11 @@ begin
 end;
 
 {************************************************************************************************}
-procedure TALGradient.InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single);
+procedure TALGradient.InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -4035,7 +4027,7 @@ begin
 end;
 
 {*********************************************************************************}
-procedure TALBrush.Interpolate(const ATo: TALBrush; const ANormalizedTime: Single);
+procedure TALBrush.Interpolate(const ATo: TALBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -4043,8 +4035,8 @@ begin
     var LPrevImageTintColorKey := FImageTintColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
-      Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
-      ResourceName := ATo.ResourceName;
+      Gradient.Interpolate(aTo.Gradient, ANormalizedTime, AReverse);
+      if not AReverse then ResourceName := ATo.ResourceName;
       BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, ATo.BackgroundMargins.Left{Stop}, ANormalizedTime);
       BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, ATo.BackgroundMargins.Right{Stop}, ANormalizedTime);
       BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, ATo.BackgroundMargins.Top{Stop}, ANormalizedTime);
@@ -4053,14 +4045,14 @@ begin
       ImageMargins.Right := InterpolateSingle(ImageMargins.Right{Start}, ATo.ImageMargins.Right{Stop}, ANormalizedTime);
       ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ATo.ImageMargins.Top{Stop}, ANormalizedTime);
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ATo.ImageMargins.Bottom{Stop}, ANormalizedTime);
-      ImageNoRadius := ATo.ImageNoRadius;
+      if not AReverse then ImageNoRadius := ATo.ImageNoRadius;
       ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, ATo.ImageTintColor{Stop}, ANormalizedTime);
-      WrapMode := ATo.WrapMode;
+      if not AReverse then WrapMode := ATo.WrapMode;
     end
     else begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
-      Gradient.Interpolate(nil, ANormalizedTime);
-      ResourceName := DefaultResourceName;
+      Gradient.Interpolate(nil, ANormalizedTime, AReverse);
+      if not AReverse then ResourceName := DefaultResourceName;
       BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, BackgroundMargins.DefaultValue.Left{Stop}, ANormalizedTime);
       BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, BackgroundMargins.DefaultValue.Right{Stop}, ANormalizedTime);
       BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, BackgroundMargins.DefaultValue.Top{Stop}, ANormalizedTime);
@@ -4069,9 +4061,9 @@ begin
       ImageMargins.Right := InterpolateSingle(ImageMargins.Right{Start}, ImageMargins.DefaultValue.Right{Stop}, ANormalizedTime);
       ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ImageMargins.DefaultValue.Top{Stop}, ANormalizedTime);
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ImageMargins.DefaultValue.Bottom{Stop}, ANormalizedTime);
-      ImageNoRadius := DefaultImageNoRadius;
+      if not AReverse then ImageNoRadius := DefaultImageNoRadius;
       ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, DefaultImageTintColor{Stop}, ANormalizedTime);
-      WrapMode := DefaultWrapMode;
+      if not AReverse then WrapMode := DefaultWrapMode;
     end;
     FColorKey := LPrevColorKey;
     FImageTintColorKey := LPrevImageTintColorKey;
@@ -4081,11 +4073,11 @@ begin
 end;
 
 {******************************************************************************************}
-procedure TALBrush.InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
+procedure TALBrush.InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -4481,7 +4473,7 @@ begin
 end;
 
 {*********************************************************************************************}
-procedure TALStrokeBrush.Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
+procedure TALStrokeBrush.Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -4501,11 +4493,11 @@ begin
 end;
 
 {******************************************************************************************************}
-procedure TALStrokeBrush.InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
+procedure TALStrokeBrush.InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -4776,7 +4768,7 @@ begin
 end;
 
 {*******************************************************************************************}
-procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single);
+procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -4784,7 +4776,7 @@ begin
     if ATo <> nil then begin
       Opacity := InterpolateSingle(Opacity{Start}, ATo.Opacity{Stop}, ANormalizedTime);
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
-      UseContentColor := ATo.UseContentColor;
+      if not AReverse then UseContentColor := ATo.UseContentColor;
       Margins.Left := InterpolateSingle(Margins.Left{Start}, ATo.Margins.Left{Stop}, ANormalizedTime);
       Margins.Right := InterpolateSingle(Margins.Right{Start}, ATo.Margins.Right{Stop}, ANormalizedTime);
       Margins.Top := InterpolateSingle(Margins.Top{Start}, ATo.Margins.Top{Stop}, ANormalizedTime);
@@ -4795,13 +4787,13 @@ begin
     else begin
       Opacity := InterpolateSingle(Opacity{Start}, DefaultOpacity{Stop}, ANormalizedTime);
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
-      UseContentColor := DefaultUseContentColor;
+      if not AReverse then UseContentColor := DefaultUseContentColor;
       Margins.Left := InterpolateSingle(Margins.Left{Start}, Margins.DefaultValue.Left{Stop}, ANormalizedTime);
       Margins.Right := InterpolateSingle(Margins.Right{Start}, Margins.DefaultValue.Right{Stop}, ANormalizedTime);
       Margins.Top := InterpolateSingle(Margins.Top{Start}, Margins.DefaultValue.Top{Stop}, ANormalizedTime);
       Margins.Bottom := InterpolateSingle(Margins.Bottom{Start}, Margins.DefaultValue.Bottom{Stop}, ANormalizedTime);
-      XRadius := InterpolateSingle(XRadius{Start}, DefaultXRadius{Stop}, ANormalizedTime);
-      YRadius := InterpolateSingle(YRadius{Start}, DefaultYRadius{Stop}, ANormalizedTime);
+      XRadius := InterpolateSingle(XRadius{Start}, ALIfThen(IsNaN(DefaultXRadius), 0, DefaultXRadius){Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, ALIfThen(IsNaN(DefaultYRadius), 0, DefaultYRadius){Stop}, ANormalizedTime);
     end;
     FColorKey := LPrevColorKey;
   finally
@@ -4810,11 +4802,11 @@ begin
 end;
 
 {****************************************************************************************************}
-procedure TALStateLayer.InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
+procedure TALStateLayer.InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -4854,12 +4846,14 @@ end;
 {**********************************************}
 function TALStateLayer.IsXRadiusStored: Boolean;
 begin
+  if IsNan(FXRadius) and IsNan(DefaultXRadius) then Exit(False);
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
 {**********************************************}
 function TALStateLayer.IsYRadiusStored: Boolean;
 begin
+  if IsNan(FYRadius) and IsNan(DefaultYRadius) then Exit(False);
   Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
@@ -4890,13 +4884,13 @@ end;
 {***********************************************}
 function TALStateLayer.GetDefaultXRadius: Single;
 begin
-  Result := 0;
+  Result := NaN;
 end;
 
 {***********************************************}
 function TALStateLayer.GetDefaultYRadius: Single;
 begin
-  Result := 0;
+  Result := NaN;
 end;
 
 {******************************************************}
@@ -4945,6 +4939,7 @@ end;
 {******************************************************}
 procedure TALStateLayer.SetXRadius(const Value: Single);
 begin
+  if IsNan(FXRadius) and IsNan(Value) then Exit;
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     FXRadius := Value;
     Change;
@@ -4954,6 +4949,7 @@ end;
 {******************************************************}
 procedure TALStateLayer.SetYRadius(const Value: Single);
 begin
+  if IsNan(FYRadius) and IsNan(Value) then Exit;
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     FYRadius := Value;
     Change;
@@ -5349,7 +5345,7 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -5359,20 +5355,20 @@ begin
     var LPrevStateLayerYRadius := StateLayer.YRadius;
 
     if ATo <> nil then begin
-      Fill.Interpolate(ATo.Fill, ANormalizedTime);
-      StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime);
-      Stroke.Interpolate(ATo.Stroke, ANormalizedTime);
-      Shadow.Interpolate(ATo.Shadow, ANormalizedTime);
+      Fill.Interpolate(ATo.Fill, ANormalizedTime, AReverse);
+      StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime, AReverse);
+      Stroke.Interpolate(ATo.Stroke, ANormalizedTime, AReverse);
+      Shadow.Interpolate(ATo.Shadow, ANormalizedTime, AReverse);
       Scale := InterpolateSingle(Scale{Start}, ATo.Scale{Stop}, ANormalizedTime);
       //Transition
     end
     else if FStateStyleParent <> nil then begin
       FStateStyleParent.SupersedeNoChanges(true{ASaveState});
       try
-        Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime);
-        StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime);
-        Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
-        Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
+        Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime, AReverse);
+        StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime, AReverse);
+        Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime, AReverse);
+        Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime, AReverse);
         Scale := InterpolateSingle(Scale{Start}, FStateStyleParent.Scale{Stop}, ANormalizedTime);
         //Transition
       finally
@@ -5381,18 +5377,18 @@ begin
     end
     else if (FControlParent is TALShape) then begin
       var LShapeControl := TALShape(FControlParent);
-      Fill.Interpolate(LShapeControl.Fill, ANormalizedTime);
-      StateLayer.Interpolate(nil, ANormalizedTime);
-      Stroke.Interpolate(LShapeControl.Stroke, ANormalizedTime);
-      Shadow.Interpolate(LShapeControl.Shadow, ANormalizedTime);
+      Fill.Interpolate(LShapeControl.Fill, ANormalizedTime, AReverse);
+      StateLayer.Interpolate(nil, ANormalizedTime, AReverse);
+      Stroke.Interpolate(LShapeControl.Stroke, ANormalizedTime, AReverse);
+      Shadow.Interpolate(LShapeControl.Shadow, ANormalizedTime, AReverse);
       Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end
     else begin
-      Fill.Interpolate(nil, ANormalizedTime);
-      StateLayer.Interpolate(nil, ANormalizedTime);
-      Stroke.Interpolate(nil, ANormalizedTime);
-      Shadow.Interpolate(nil, ANormalizedTime);
+      Fill.Interpolate(nil, ANormalizedTime, AReverse);
+      StateLayer.Interpolate(nil, ANormalizedTime, AReverse);
+      Stroke.Interpolate(nil, ANormalizedTime, AReverse);
+      Shadow.Interpolate(nil, ANormalizedTime, AReverse);
       Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end;
@@ -5416,11 +5412,11 @@ begin
 end;
 
 {************************************************************************************************************}
-procedure TALBaseStateStyle.InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALBaseStateStyle.InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -5660,14 +5656,14 @@ begin
     FCurrentAdjustedStyle.Assign(LStateStyle);
     FCurrentAdjustedStyle.SupersedeNoChanges(false{ASaveState});
     //--
-    if FTransition.FToStateStyle = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransition.CurrentValue)
-    else if FTransition.FFromStateStyle = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransition.CurrentValue)
+    if FTransition.FToStateStyle = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransition.CurrentValue, False{AReverse})
+    else if FTransition.FFromStateStyle = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransition.CurrentValue, True{AReverse})
     else begin
       {$IF defined(debug)}
       if not FTransition.FFromStateStyle.Superseded then
         raise Exception.Create('Error 3A71A6B7-40C3-40A6-B678-D1FC6A0DD152');
       {$ENDIF}
-      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransition.FFromStateStyle{AFromStateStyle}, 1-FTransition.CurrentValue);
+      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransition.FFromStateStyle{AFromStateStyle}, 1-FTransition.CurrentValue, True{AReverse});
     end;
   end
   else begin

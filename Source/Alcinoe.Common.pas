@@ -27,7 +27,7 @@ type
     FUpdateCount: Integer; // 4 Bytes
     FIsChanged: Boolean; // 1 Bytes
     FOnChanged: TNotifyEvent; // 16 Bytes
-    FSavedStates: TObjectQueue<TALPersistentObserver>; // 8 Bytes
+    FSavedStates: TObjectStack<TALPersistentObserver>; // 8 Bytes
     procedure DoChanged; virtual;
   protected
     function CreateSavedState: TALPersistentObserver; virtual;
@@ -888,12 +888,12 @@ end;
 procedure TALPersistentObserver.SaveState;
 begin
   if FSavedStates = nil then
-    FSavedStates := TObjectQueue<TALPersistentObserver>.Create(True{AOwnsObjects});
+    FSavedStates := TObjectStack<TALPersistentObserver>.Create(True{AOwnsObjects});
   var LSavedState := CreateSavedState;
   if LSavedState.classtype <> classtype then
     Raise Exception.create('The saved state type returned by "CreateSavedState" does not match the current object type');
   LSavedState.Assign(self);
-  FSavedStates.Enqueue(LSavedState);
+  FSavedStates.Push(LSavedState);
 end;
 
 {*******************************************}

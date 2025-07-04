@@ -942,6 +942,7 @@ uses
   Alcinoe.iOSapi.QuartzCore,
   {$ENDIF}
   FMX.Ani,
+  FMX.Forms,
   FMX.Utils;
 
 {********************************************************}
@@ -1634,7 +1635,7 @@ begin
 
   AniThread.AddAnimation(Self);
   {$IF defined(DEBUG)}
-  if not AniThread.Enabled then
+  if (not AniThread.Enabled) and (not Application.Terminated) then
     Raise Exception.Create('Internal error: AniThread.Enabled is False. This should never happen!');
   {$ENDIF}
 end;
@@ -1672,7 +1673,7 @@ begin
 
   AniThread.AddAnimation(Self);
   {$IF defined(DEBUG)}
-  if not AniThread.Enabled then
+  if (not AniThread.Enabled) and (not Application.Terminated) then
     Raise Exception.Create('Internal error: AniThread.Enabled is False. This should never happen!');
   {$ENDIF}
 end;

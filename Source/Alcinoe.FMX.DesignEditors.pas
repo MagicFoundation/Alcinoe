@@ -77,6 +77,16 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
+  {*************************************}
+  TALToggleButtonEditor = class(TDefaultEditor)
+  protected
+    procedure ApplyStyleClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
   {***************************************}
   TALCheckBoxEditor = class(TDefaultEditor)
   protected
@@ -208,6 +218,7 @@ procedure Register;
 implementation
 
 uses
+  System.Generics.Collections,
   System.SysUtils,
   Vcl.Menus,
   FMX.Design.Items,
@@ -223,6 +234,39 @@ uses
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.FMX.PageController;
+
+{*****************************************************************************************************************************************}
+procedure ALBuildItemMenuHierarchy(const AParentItem: IMenuItem; const ANames: TList<TPair<String, String>>; const AOnClick: TNotifyEvent);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _getItem(const AParentItem: IMenuItem; const ACaption: String): IMenuItem;
+  begin
+    Result := nil;
+    for var i := 0 to AParentItem.Count - 1 do begin
+      if ALSameTextW(AParentItem.Items[i].Caption, ACaption) then begin
+        Result := AParentItem.Items[i];
+        Exit;
+      end;
+    end;
+    Result := AParentItem.AddItem(ACaption{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, nil{AOnClick}, 0{hCtx}, ''{AName});
+  end;
+
+begin
+  for var I := 0 to ANames.Count - 1 do begin
+    var LLst := TALStringListW.Create;
+    try
+      LLst.LineBreak := '.';
+      LLst.Text := ANames[i].Key; // Material3.Original.Filled
+      var LItem := AParentItem;
+      for var J := 0 to lLst.Count - 2 do
+        LItem := _getItem(LItem, lLst[J]);
+      LItem := LItem.AddItem(lLst[lLst.Count - 1]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, AOnClick{AOnClick}, 0{hCtx}, ''{AName});
+      LItem.Hint := ANames[i].Value; // // Material3.Button.Filled
+    finally
+      ALFreeAndNil(LLst);
+    end;
+  end;
+end;
 
 {**************************************************************}
 function TALColorKeyProperty.GetAttributes: TPropertyAttributes;
@@ -349,17 +393,73 @@ end;
 {*********************************************************}
 procedure TALButtonEditor.ApplyStyleClick(Sender: TObject);
 begin
-  var LStyleName := TmenuItem(Sender).Caption;
-  LStyleName := StringReplace(LStyleName, '&','',[rfReplaceALL]);
+  var LStyleName := TmenuItem(Sender).Hint;
+  if LStyleName = '' then exit;
   TALStyleManager.Instance.ApplyButtonStyle(LStyleName, TALButton(Component));
 end;
 
 {****************************************************************************}
 procedure TALButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
-  var LNames := TALStyleManager.Instance.GetButtonStyleNames;
-  for var I := low(LNames) to high(LNames) do
-    AItem.AddItem(LNames[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyStyleClick{AOnClick}, 0{hCtx}, ''{AName});
+  var LLstNames := TList<TPair<String, String>>.Create;
+  try
+    var LArrNames := TALStyleManager.Instance.GetButtonStyleNames;
+    for var I := low(LArrNames) to high(LArrNames) do begin
+      var LKey := ALStringReplaceW(LArrNames[i], 'Material3.Button.Icon',            'Material3.Original.Icon',    [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.Button.FAB',             'Material3.Original.FAB',     [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.Button',                 'Material3.Original.Button',  [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.Expressive.Button.Icon', 'Material3.Expressive.Icon',  [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.Expressive.Button.FAB',  'Material3.Expressive.FAB',   [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.',                       'Material3 ', [RFIgnoreCase]);
+      LLstNames.Add(TPair<String, String>.Create(LKey, LArrNames[i]));
+    end;
+    ALBuildItemMenuHierarchy(AItem{AParentItem}, LLstNames{ANames}, ApplyStyleClick{AOnClick});
+  finally
+    ALFreeAndNil(LLstNames);
+  end;
+end;
+
+{*******************************************************}
+function TALToggleButtonEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Style';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{*********************************************}
+function TALToggleButtonEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{*********************************************************}
+procedure TALToggleButtonEditor.ApplyStyleClick(Sender: TObject);
+begin
+  var LStyleName := TmenuItem(Sender).Hint;
+  if LStyleName = '' then exit;
+  TALStyleManager.Instance.ApplyToggleButtonStyle(LStyleName, TALToggleButton(Component));
+end;
+
+{****************************************************************************}
+procedure TALToggleButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LLstNames := TList<TPair<String, String>>.Create;
+  try
+    var LArrNames := TALStyleManager.Instance.GetToggleButtonStyleNames;
+    for var I := low(LArrNames) to high(LArrNames) do begin
+      var LKey := ALStringReplaceW(LArrNames[i], 'Material3.ToggleButton.Icon',            'Material3.Original.Icon',    [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.ToggleButton',                 'Material3.Original.ToggleButton',  [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.Expressive.ToggleButton.Icon', 'Material3.Expressive.Icon',  [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.Expressive.ToggleButton.FAB',  'Material3.Expressive.FAB',   [RFIgnoreCase]);
+      LKey := ALStringReplaceW(LKey,             'Material3.',                             'Material3 ', [RFIgnoreCase]);
+      LLstNames.Add(TPair<String, String>.Create(LKey, LArrNames[i]));
+    end;
+    ALBuildItemMenuHierarchy(AItem{AParentItem}, LLstNames{ANames}, ApplyStyleClick{AOnClick});
+  finally
+    ALFreeAndNil(LLstNames);
+  end;
 end;
 
 {*********************************************************}
@@ -818,6 +918,7 @@ begin
   RegisterComponentEditor(TALEdit, TALEditEditor);
   RegisterComponentEditor(TALMemo, TALMemoEditor);
   RegisterComponentEditor(TALButton, TALButtonEditor);
+  RegisterComponentEditor(TALToggleButton, TALToggleButtonEditor);
   RegisterComponentEditor(TALCheckBox, TALCheckBoxEditor);
   RegisterComponentEditor(TALRadioButton, TALRadioButtonEditor);
   RegisterComponentEditor(TALSwitch, TALSwitchEditor);

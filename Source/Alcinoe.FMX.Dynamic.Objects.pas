@@ -273,6 +273,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
@@ -386,7 +387,7 @@ type
         property AutoReverse;
         property Delay;
         property Duration: Single read getDuration stored false;
-        property Enabled Read FEnabled write SetEnabled default True;
+        property Enabled Read FEnabled write SetEnabled stored true default True;
         property Inverse;
         property Loop;
         property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
@@ -435,6 +436,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -591,6 +593,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -711,6 +714,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -803,6 +807,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -927,6 +932,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseEnter; override;
     procedure MouseLeave; override;
+    procedure DoClickSound; override;
     procedure Click; override;
     procedure PaddingChanged; override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
@@ -1095,6 +1101,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -2692,6 +2699,7 @@ procedure TALDynamicAnimatedImage.TAnimation.Start;
 begin
   if (Running) then
     Exit;
+  FEnabled := True;
   fCurrentProgress := FStartProgress;
   inherited Start;
 end;
@@ -4718,6 +4726,16 @@ begin
   FHoveredElement := TALTextElement.Empty;
 end;
 
+{****************************************}
+procedure TALDynamicBaseText.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((assigned(OnClick) or (assigned(FOnElementClick) and (FPressedElement.ID <> ''))) and
+      (ClickSound=TALClickSoundMode.Default) and
+      (ALGlobalClickSoundEnabled)) then
+    ALPlayClickSound;
+end;
+
 {*********************************}
 procedure TALDynamicBaseText.Click;
 begin
@@ -5131,8 +5149,8 @@ begin
     Result.StateLayerOpacity := 0;
     Result.StateLayerColor := TalphaColors.Null;
     Result.StateLayerMargins := TRectF.Empty;
-    Result.StateLayerXRadius := 0;
-    Result.StateLayerYRadius := 0;
+    Result.StateLayerXRadius := NaN;
+    Result.StateLayerYRadius := NaN;
   end;
   //--
   if AStroke <> nil then begin

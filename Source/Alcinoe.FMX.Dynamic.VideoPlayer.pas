@@ -167,6 +167,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //**property ClipChildren;
     //property ClipParent;
     property Cursor;

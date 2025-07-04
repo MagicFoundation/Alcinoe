@@ -849,7 +849,7 @@ type
         procedure Reset; override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
-        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
+        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseEdit read GetControlParent;
         property DefaultPromptTextColor: TalphaColor read GetDefaultPromptTextColor;
@@ -1059,8 +1059,6 @@ type
     procedure IsMouseOverChanged; override;
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
-    procedure SetXRadius(const Value: Single); override;
-    procedure SetYRadius(const Value: Single); override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
     procedure LabelTextSettingsChanged(Sender: TObject); virtual;
     procedure SupportingTextSettingsChanged(Sender: TObject); virtual;
@@ -4459,7 +4457,7 @@ begin
 end;
 
 {*************************************************************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
   if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
@@ -4470,11 +4468,11 @@ begin
     var LPrevPromptTextColorKey := FPromptTextColorKey;
     var LPrevTintColorKey := FTintColorKey;
 
-    inherited Interpolate(ATo, ANormalizedTime);
+    inherited Interpolate(ATo, ANormalizedTime, AReverse);
 
     if ATo <> nil then begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, TBaseStateStyle(ATo).PromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
+      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime, AReverse);
       TintColor := ALInterpolateColor(TintColor{Start}, TBaseStateStyle(ATo).TintColor{Stop}, ANormalizedTime);
     end
     {$IF defined(debug)}
@@ -4482,12 +4480,12 @@ begin
     {$ENDIF}
     else if ControlParent <> nil then begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, ControlParent.PromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime, AReverse);
       TintColor := ALInterpolateColor(TintColor{Start}, ControlParent.TintColor{Stop}, ANormalizedTime);
     end
     else begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(nil, ANormalizedTime);
+      TextSettings.Interpolate(nil, ANormalizedTime, AReverse);
       TintColor := ALInterpolateColor(TintColor{Start}, DefaultTintColor{Stop}, ANormalizedTime);
     end;
 
@@ -5647,58 +5645,6 @@ begin
   ClearBufPromptTextDrawable;
   UpdateEditControlStyle;
   AdjustSize;
-end;
-
-{****************************************************}
-procedure TALBaseEdit.SetXRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
-    end;
-    APrevStateStyle.StateLayer.XRadius := XRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
-end;
-
-{****************************************************}
-procedure TALBaseEdit.SetYRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
-    end;
-    APrevStateStyle.StateLayer.YRadius := YRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
 end;
 
 {**************************************************************************}

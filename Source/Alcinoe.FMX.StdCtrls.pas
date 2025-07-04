@@ -65,11 +65,12 @@ type
         function GetDefaultStopValue: Single; override;
       public
         constructor Create(const AOwner: TALAniIndicator); reintroduce; virtual;
+        procedure Start; override;
       published
         property AutoReverse;
         property Delay;
         property Duration;
-        property Enabled Read FEnabled write SetEnabled default True;
+        property Enabled Read FEnabled write SetEnabled stored true default True;
         property Inverse;
         property Loop;
         property InterpolationType;
@@ -131,6 +132,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -235,8 +237,8 @@ type
         procedure Reset; override;
         procedure AlignToPixel; virtual;
         procedure ApplyColorScheme; virtual;
-        procedure Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single); virtual;
-        procedure InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
+        procedure Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+        procedure InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single; const AReverse: Boolean);
         function HasCheckMark: boolean;
         property DefaultColor: TAlphaColor read GetDefaultColor;
         property DefaultColorKey: String read GetDefaultColorKey;
@@ -308,7 +310,7 @@ type
         procedure Reset; override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
-        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
+        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseCheckBox read GetControlParent;
       published
@@ -411,15 +413,26 @@ type
       // ------------
       // TStateStyles
       TStateStyles = class(TALBaseStateStyles)
+      public
+        type
+          // -----------
+          // TTransition
+          TTransition = class(TALBaseStateStyles.TTransition)
+          published
+            property FadeImage;
+          end;
       private
         FChecked: TCheckStateStyles;
         FUnchecked: TCheckStateStyles;
         function GetParent: TALBaseCheckBox;
+        function GetTransition: TStateStyles.TTransition;
+        procedure SetTransition(const AValue: TStateStyles.TTransition);
         procedure SetChecked(const AValue: TCheckStateStyles);
         procedure SetUnchecked(const AValue: TCheckStateStyles);
         procedure CheckedChanged(ASender: TObject);
         procedure UncheckedChanged(ASender: TObject);
       protected
+        function CreateTransition: TALBaseStateStyles.TTransition; override;
         function CreateCheckedStateStyles(const AParent: TALControl): TCheckStateStyles; virtual;
         function CreateUncheckedStateStyles(const AParent: TALControl): TCheckStateStyles; virtual;
       public
@@ -435,6 +448,7 @@ type
       published
         property Checked: TCheckStateStyles read FChecked write SetChecked;
         property Unchecked: TCheckStateStyles read FUnchecked write SetUnchecked;
+        property Transition: TStateStyles.TTransition read GetTransition write SetTransition;
       end;
   private
     FStateStyles: TStateStyles;
@@ -477,6 +491,7 @@ type
     function GetChecked: Boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+    procedure DoClickSound; override;
     procedure Click; override;
     procedure DoChanged; virtual;
     procedure DoResized; override;
@@ -484,6 +499,7 @@ type
                 const ACanvas: TALCanvas;
                 const AScale: Single;
                 const ADstRect: TrectF;
+                const AOpacity: Single;
                 const AChecked: Boolean;
                 const ACheckMark: TCheckMarkBrush); virtual;
     Procedure CreateBufDrawable(
@@ -561,6 +577,7 @@ type
     //property DisableFocusEffect;
     property CheckMark;
     property Checked;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -714,6 +731,7 @@ type
                 const ACanvas: TALCanvas;
                 const AScale: Single;
                 const ADstRect: TrectF;
+                const AOpacity: Single;
                 const AChecked: Boolean;
                 const ACheckMark: TALBaseCheckBox.TCheckMarkBrush); override;
   public
@@ -977,6 +995,7 @@ type
         //property CanFocus default False;
         //property CanParentFocus;
         //property DisableFocusEffect;
+        property ClickSound;
         //property ClipChildren;
         //property ClipParent;
         //property Cursor;
@@ -1186,6 +1205,7 @@ type
         //property DisableFocusEffect;
         property CheckMark;
         //property Checked;
+        property ClickSound;
         //property ClipChildren;
         //property ClipParent;
         //property Cursor;
@@ -1329,6 +1349,7 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
+    procedure DoClickSound; override;
     procedure Click; override;
     function GetChecked: boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
@@ -1359,6 +1380,7 @@ type
     //property DisableFocusEffect;
     property DoubleBuffered default true;
     property Checked: Boolean read GetChecked write SetChecked default false;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor default crHandPoint;
@@ -1512,7 +1534,7 @@ type
         procedure Reset; override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
-        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
+        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALButton read GetControlParent;
         property DefaultText: String read GetDefaultText;
@@ -1625,8 +1647,6 @@ type
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
     procedure SetName(const Value: TComponentName); override;
     procedure TextSettingsChanged(Sender: TObject); override;
-    procedure SetXRadius(const Value: Single); override;
-    procedure SetYRadius(const Value: Single); override;
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure IsMouseOverChanged; override;
     procedure IsFocusedChanged; override;
@@ -1656,6 +1676,7 @@ type
     property CanFocus default true;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -1817,7 +1838,7 @@ type
         procedure Reset; override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
-        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
+        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALToggleButton read GetControlParent;
         property DefaultText: String read GetDefaultText;
@@ -1931,17 +1952,15 @@ type
           // -----------
           // TTransition
           TTransition = class(TALBaseStateStyles.TTransition)
-          private
-            FAdjustSizeWhenFinish: boolean;
-          protected
-            procedure DoFinish; override;
-          public
-            constructor Create(Const AOwner: TALBaseStateStyles); override;
+          published
+            property FadeImage;
           end;
       private
         FChecked: TCheckStateStyles;
         FUnchecked: TCheckStateStyles;
         function GetParent: TALToggleButton;
+        function GetTransition: TStateStyles.TTransition;
+        procedure SetTransition(const AValue: TStateStyles.TTransition);
         procedure SetChecked(const AValue: TCheckStateStyles);
         procedure SetUnchecked(const AValue: TCheckStateStyles);
         procedure CheckedChanged(ASender: TObject);
@@ -1963,7 +1982,7 @@ type
       published
         property Checked: TCheckStateStyles read FChecked write SetChecked;
         property Unchecked: TCheckStateStyles read FUnchecked write SetUnchecked;
-        property Transition;
+        property Transition: TStateStyles.TTransition read GetTransition write SetTransition;
       end;
   private
     {$IF defined(ALDPK)}
@@ -1982,8 +2001,6 @@ type
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
     procedure SetName(const Value: TComponentName); override;
     procedure TextSettingsChanged(Sender: TObject); override;
-    procedure SetXRadius(const Value: Single); override;
-    procedure SetYRadius(const Value: Single); override;
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure IsMouseOverChanged; override;
     procedure IsFocusedChanged; override;
@@ -2019,6 +2036,7 @@ type
     //property CanParentFocus;
     //property DisableFocusEffect;
     property Checked: Boolean read GetChecked write SetChecked default False;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -2136,8 +2154,8 @@ type
             procedure Reset; override;
             procedure AlignToPixel; virtual;
             procedure ApplyColorScheme; virtual;
-            procedure Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single); virtual;
-            procedure InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
+            procedure Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+            procedure InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single; const AReverse: Boolean);
             function hasStopIndicator: Boolean;
             property DefaultColor: TAlphaColor read GetDefaultColor;
             property DefaultColorKey: String read GetDefaultColorKey;
@@ -2210,7 +2228,7 @@ type
             procedure Reset; override;
             procedure AlignToPixel; override;
             procedure ApplyColorScheme; override;
-            procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
+            procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); override;
             property ControlParent: TTrack read GetControlParent;
           published
             property Fill;
@@ -2257,9 +2275,6 @@ type
             property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
           end;
       private
-        {$IF defined(ALDPK)}
-        FPrevStateStyles: TStateStyles;
-        {$ENDIF}
         FStateStyles: TStateStyles;
         FCustomTrack: TALCustomTrack;
         FStopIndicator: TStopIndicatorBrush;
@@ -2270,8 +2285,6 @@ type
         function CreateStroke: TALStrokeBrush; override;
         function CreateStopIndicator: TStopIndicatorBrush; virtual;
         function CreateStateStyles: TStateStyles; virtual;
-        procedure SetXRadius(const Value: Single); override;
-        procedure SetYRadius(const Value: Single); override;
         procedure StateStylesChanged(Sender: TObject); virtual;
         procedure StopIndicatorChanged(Sender: TObject); virtual;
         procedure PaddingChanged; override;
@@ -2318,6 +2331,7 @@ type
         //property CanFocus;
         //property CanParentFocus;
         //property DisableFocusEffect;
+        property ClickSound;
         //property ClipChildren;
         //property ClipParent;
         property Corners;
@@ -2528,9 +2542,6 @@ type
             property Transition;
           end;
       private
-        {$IF defined(ALDPK)}
-        FPrevStateStyles: TStateStyles;
-        {$ENDIF}
         FStateStyles: TStateStyles;
         fValueRange: TValueRange;
         FCustomTrack: TALCustomTrack;
@@ -2545,8 +2556,6 @@ type
         procedure DoEndUpdate; override;
         function GetDefaultXRadius: Single; override;
         function GetDefaultYRadius: Single; override;
-        procedure SetXRadius(const Value: Single); override;
-        procedure SetYRadius(const Value: Single); override;
         procedure StateStylesChanged(Sender: TObject); virtual;
         procedure IsMouseOverChanged; override;
         procedure IsFocusedChanged; override;
@@ -2582,6 +2591,7 @@ type
         //property CanFocus default true;
         //property CanParentFocus;
         //property DisableFocusEffect;
+        property ClickSound;
         //property ClipChildren;
         //property ClipParent;
         property Corners;
@@ -2711,6 +2721,7 @@ type
         //property CanFocus;
         //property CanParentFocus;
         //property DisableFocusEffect;
+        property ClickSound;
         //property ClipChildren;
         //property ClipParent;
         property Corners;
@@ -2883,6 +2894,7 @@ type
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -3058,6 +3070,7 @@ type
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -3274,6 +3287,7 @@ type
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -3378,6 +3392,15 @@ begin
   inherited Create;
   FOwner := AOwner;
   FEnabled := True;
+end;
+
+{*****************************************}
+procedure TALAniIndicator.TAnimation.Start;
+begin
+  if (Running) then
+    Exit;
+  FEnabled := True;
+  inherited Start;
 end;
 
 {*********************************************}
@@ -4036,9 +4059,6 @@ end;
 {***************************************************************************}
 constructor TALCustomTrack.TThumb.Create(const ACustomTrack: TALCustomTrack);
 begin
-  {$IF defined(ALDPK)}
-  FPrevStateStyles := nil;
-  {$ENDIF}
   FStateStyles := nil;
   //--
   inherited create(ACustomTrack);
@@ -4065,10 +4085,6 @@ begin
   fScrollCapturedByMe := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //--
-  {$IF defined(ALDPK)}
-  FPrevStateStyles := TStateStyles.Create(nil);
-  {$ENDIF}
-  //--
   FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
 end;
@@ -4076,9 +4092,6 @@ end;
 {***************************************}
 destructor TALCustomTrack.TThumb.Destroy;
 begin
-  {$IF defined(ALDPK)}
-  ALFreeAndNil(FPrevStateStyles);
-  {$ENDIF}
   ALFreeAndNil(FStateStyles);
   ALFreeAndNil(FValueRange);
   inherited;
@@ -4184,60 +4197,6 @@ end;
 function TALCustomTrack.TThumb.GetDefaultYRadius: Single;
 begin
   result := -50;
-end;
-
-{**************************************************************}
-procedure TALCustomTrack.TThumb.SetXRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
-    end;
-    APrevStateStyle.StateLayer.XRadius := XRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
-end;
-
-{**************************************************************}
-procedure TALCustomTrack.TThumb.SetYRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
-    end;
-    APrevStateStyle.StateLayer.YRadius := YRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
 end;
 
 {******************************************************************}
@@ -5068,21 +5027,21 @@ begin
 end;
 
 {*****************************************************************************************************************************}
-procedure TALCustomTrack.TTrack.TStopIndicatorBrush.Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
+procedure TALCustomTrack.TTrack.TStopIndicatorBrush.Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
     var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
-      ResourceName := ATo.ResourceName;
-      WrapMode := ATo.WrapMode;
+      if not AReverse then ResourceName := ATo.ResourceName;
+      if not AReverse then WrapMode := ATo.WrapMode;
       Size := InterpolateSingle(Size{Start}, ATo.Size{Stop}, ANormalizedTime);
     end
     else begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
-      ResourceName := DefaultResourceName;
-      WrapMode := DefaultWrapMode;
+      if not AReverse then ResourceName := DefaultResourceName;
+      if not AReverse then WrapMode := DefaultWrapMode;
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
     end;
     FColorKey := LPrevColorKey;
@@ -5092,11 +5051,11 @@ begin
 end;
 
 {**************************************************************************************************************************************}
-procedure TALCustomTrack.TTrack.TStopIndicatorBrush.InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
+procedure TALCustomTrack.TTrack.TStopIndicatorBrush.InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -5406,7 +5365,7 @@ begin
 end;
 
 {***********************************************************************************************************************}
-procedure TALCustomTrack.TTrack.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALCustomTrack.TTrack.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
   if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
@@ -5414,13 +5373,13 @@ begin
   {$ENDIF}
   BeginUpdate;
   Try
-    inherited Interpolate(ATo, ANormalizedTime);
-    if ATo <> nil then StopIndicator.Interpolate(TBaseStateStyle(ATo).StopIndicator, ANormalizedTime)
+    inherited Interpolate(ATo, ANormalizedTime, AReverse);
+    if ATo <> nil then StopIndicator.Interpolate(TBaseStateStyle(ATo).StopIndicator, ANormalizedTime, AReverse)
     {$IF defined(debug)}
     else if StateStyleParent <> nil then Raise Exception.Create('Error 9B674B61-66C2-4BB1-8A94-D6A58AEAF404')
     {$ENDIF}
-    else if ControlParent <> nil then StopIndicator.Interpolate(ControlParent.StopIndicator, ANormalizedTime)
-    else StopIndicator.Interpolate(nil, ANormalizedTime);
+    else if ControlParent <> nil then StopIndicator.Interpolate(ControlParent.StopIndicator, ANormalizedTime, AReverse)
+    else StopIndicator.Interpolate(nil, ANormalizedTime, AReverse);
   Finally
     EndUpdate;
   End;
@@ -5629,9 +5588,6 @@ end;
 {***************************************************************************}
 constructor TALCustomTrack.TTrack.Create(const ACustomTrack: TALCustomTrack);
 begin
-  {$IF defined(ALDPK)}
-  FPrevStateStyles := nil;
-  {$ENDIF}
   FStateStyles := nil;
   //--
   inherited Create(ACustomTrack);
@@ -5641,10 +5597,6 @@ begin
   Locked := True;
   HitTest := False;
   //--
-  {$IF defined(ALDPK)}
-  FPrevStateStyles := TStateStyles.Create(nil);
-  {$ENDIF}
-  //--
   FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
 end;
@@ -5652,9 +5604,6 @@ end;
 {***************************************}
 destructor TALCustomTrack.TTrack.Destroy;
 begin
-  {$IF defined(ALDPK)}
-  ALFreeAndNil(FPrevStateStyles);
-  {$ENDIF}
   ALFreeAndNil(FStateStyles);
   ALFreeAndNil(FStopIndicator);
   inherited;
@@ -5743,54 +5692,6 @@ end;
 procedure TALCustomTrack.TTrack.SetStopIndicator(const Value: TStopIndicatorBrush);
 begin
   FStopIndicator.Assign(Value);
-end;
-
-{**************************************************************}
-procedure TALCustomTrack.TTrack.SetXRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
-    end;
-    APrevStateStyle.StateLayer.XRadius := XRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  end;
-  {$ENDIF}
-end;
-
-{**************************************************************}
-procedure TALCustomTrack.TTrack.SetYRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
-    end;
-    APrevStateStyle.StateLayer.YRadius := YRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  end;
-  {$ENDIF}
 end;
 
 {******************************************************************}
@@ -7764,15 +7665,15 @@ begin
 end;
 
 {***************************************************************************************************************}
-procedure TALBaseCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
+procedure TALBaseCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
     var LPrevColorKey := FColorKey;
     if ATo <> nil then begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
-      ResourceName := ATo.ResourceName;
-      WrapMode := ATo.WrapMode;
+      if not AReverse then ResourceName := ATo.ResourceName;
+      if not AReverse then WrapMode := ATo.WrapMode;
       Thickness := InterpolateSingle(Thickness{Start}, ATo.Thickness{Stop}, ANormalizedTime);
       Margins.Left := InterpolateSingle(Margins.Left{Start}, ATo.Margins.Left{Stop}, ANormalizedTime);
       Margins.Right := InterpolateSingle(Margins.Right{Start}, ATo.Margins.Right{Stop}, ANormalizedTime);
@@ -7781,8 +7682,8 @@ begin
     end
     else begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
-      ResourceName := DefaultResourceName;
-      WrapMode := DefaultWrapMode;
+      if not AReverse then ResourceName := DefaultResourceName;
+      if not AReverse then WrapMode := DefaultWrapMode;
       Thickness := InterpolateSingle(Thickness{Start}, DefaultThickness{Stop}, ANormalizedTime);
       Margins.Left := InterpolateSingle(Margins.Left{Start}, Margins.DefaultValue.Left{Stop}, ANormalizedTime);
       Margins.Right := InterpolateSingle(Margins.Right{Start}, Margins.DefaultValue.Right{Stop}, ANormalizedTime);
@@ -7796,11 +7697,11 @@ begin
 end;
 
 {************************************************************************************************************************}
-procedure TALBaseCheckBox.TCheckMarkBrush.InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
+procedure TALBaseCheckBox.TCheckMarkBrush.InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -8110,7 +8011,7 @@ begin
 end;
 
 {*****************************************************************************************************************}
-procedure TALBaseCheckBox.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALBaseCheckBox.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
   if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
@@ -8118,18 +8019,18 @@ begin
   {$ENDIF}
   BeginUpdate;
   Try
-    inherited Interpolate(ATo, ANormalizedTime);
-    if ATo <> nil then CheckMark.Interpolate(TBaseStateStyle(ATo).CheckMark, ANormalizedTime)
+    inherited Interpolate(ATo, ANormalizedTime, AReverse);
+    if ATo <> nil then CheckMark.Interpolate(TBaseStateStyle(ATo).CheckMark, ANormalizedTime, AReverse)
     else if StateStyleParent <> nil then begin
       StateStyleParent.SupersedeNoChanges(true{ASaveState});
       try
-        CheckMark.Interpolate(StateStyleParent.CheckMark, ANormalizedTime)
+        CheckMark.Interpolate(StateStyleParent.CheckMark, ANormalizedTime, AReverse)
       finally
         StateStyleParent.RestoreStateNoChanges;
       end;
     end
-    else if ControlParent <> nil then CheckMark.Interpolate(ControlParent.CheckMark, ANormalizedTime)
-    else CheckMark.Interpolate(nil, ANormalizedTime);
+    else if ControlParent <> nil then CheckMark.Interpolate(ControlParent.CheckMark, ANormalizedTime, AReverse)
+    else CheckMark.Interpolate(nil, ANormalizedTime, AReverse);
   Finally
     EndUpdate;
   End;
@@ -8496,6 +8397,12 @@ begin
   inherited Destroy;
 end;
 
+{*************************************************************************************}
+function TALBaseCheckBox.TStateStyles.CreateTransition: TALBaseStateStyles.TTransition;
+begin
+  result := TTransition.Create(Self);
+end;
+
 {***********************************************************************************************************}
 function TALBaseCheckBox.TStateStyles.CreateCheckedStateStyles(const AParent: TALControl): TCheckStateStyles;
 begin
@@ -8595,6 +8502,18 @@ end;
 function TALBaseCheckBox.TStateStyles.GetParent: TALBaseCheckBox;
 begin
   Result := TALBaseCheckBox(inherited Parent);
+end;
+
+{*********************************************************************************}
+function TALBaseCheckBox.TStateStyles.GetTransition: TStateStyles.TTransition;
+begin
+  Result := TStateStyles.TTransition(inherited Transition);
+end;
+
+{*********************************************************************************}
+procedure TALBaseCheckBox.TStateStyles.SetTransition(const AValue: TStateStyles.TTransition);
+begin
+  inherited Transition := AValue;
 end;
 
 {*********************************************************************************}
@@ -8892,6 +8811,14 @@ begin
   end;
 end;
 
+{*************************************}
+procedure TALBaseCheckBox.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((ClickSound=TALClickSoundMode.Default) and ALGlobalClickSoundEnabled) then
+    ALPlayClickSound;
+end;
+
 {******************************}
 procedure TALBaseCheckBox.Click;
 begin
@@ -9030,6 +8957,7 @@ procedure TALBaseCheckBox.DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
             const ADstRect: TrectF;
+            const AOpacity: Single;
             const AChecked: Boolean;
             const ACheckMark: TCheckMarkBrush);
 begin
@@ -9209,6 +9137,7 @@ begin
     TALDrawRectangleHelper.Create(ACanvas)
       .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LRect)
+      .SetOpacity(AOpacity)
       .SetFillColor(ACheckMark.Color)
       .SetFillResourceName(ACheckMark.ResourceName)
       .SetFillWrapMode(ACheckMark.WrapMode)
@@ -9281,6 +9210,7 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         AScale, // const AScale: Single;
         ABufDrawableRect, // const ADstRect: TrectF;
+        1, // const AOpacity: Single;
         Checked, // const AChecked: Boolean
         ACheckMark); // const ACheckMark: TCheckMarkBrush;
 
@@ -9491,14 +9421,59 @@ begin
           .SetYRadius(YRadius)
           .Draw;
 
-        DrawCheckMark(
-          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-          1, // const AScale: Single;
-          LRect, // const ADstRect: TrectF;
-          // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
-          // Without this, the checkMark disappears immediately.
-          Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
-          LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+        if (StateStyles.Transition.Running) and
+           (StateStyles.Transition.FadeImage) and
+           (StateStyles.Transition.FromStateStyle <> nil) and
+           (TBaseStateStyle(StateStyles.Transition.FromStateStyle).CheckMark.ResourceName <> '') and
+           (StateStyles.Transition.ToStateStyle <> nil) and
+           (TBaseStateStyle(StateStyles.Transition.ToStateStyle).CheckMark.ResourceName <> '') and
+           (TBaseStateStyle(StateStyles.Transition.FromStateStyle).CheckMark.ResourceName <> TBaseStateStyle(StateStyles.Transition.ToStateStyle).CheckMark.ResourceName) then begin
+
+          LCurrentAdjustedStateStyle.BeginUpdate;
+          try
+
+            LCurrentAdjustedStateStyle.CheckMark.ResourceName := TBaseStateStyle(StateStyles.Transition.FromStateStyle).CheckMark.ResourceName;
+
+            DrawCheckMark(
+              TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+              1, // const AScale: Single;
+              LRect, // const ADstRect: TrectF;
+              1-StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+              // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+              // Without this, the checkMark disappears immediately.
+              Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+              LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+            LCurrentAdjustedStateStyle.CheckMark.ResourceName := TBaseStateStyle(StateStyles.Transition.ToStateStyle).CheckMark.ResourceName;
+
+            DrawCheckMark(
+              TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+              1, // const AScale: Single;
+              LRect, // const ADstRect: TrectF;
+              StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+              // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+              // Without this, the checkMark disappears immediately.
+              Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+              LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+          finally
+            LCurrentAdjustedStateStyle.EndUpdateNoChanges;
+          end;
+
+        end
+        else begin
+
+          DrawCheckMark(
+            TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+            1, // const AScale: Single;
+            LRect, // const ADstRect: TrectF;
+            1, // const AOpacity: Single;
+            // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+            // Without this, the checkMark disappears immediately.
+            Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+            LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+        end;
 
       finally
         if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then
@@ -9534,14 +9509,59 @@ begin
         .SetYRadius(YRadius)
         .Draw;
 
-      DrawCheckMark(
-        RenderTargetCanvas, // const ACanvas: TALCanvas;
-        ALGetScreenScale, // const AScale: Single;
-        LRect, // const ADstRect: TrectF;
-        // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
-        // Without this, the checkMark disappears immediately.
-        Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
-        LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+      if (StateStyles.Transition.Running) and
+         (StateStyles.Transition.FadeImage) and
+         (StateStyles.Transition.FromStateStyle <> nil) and
+         (TBaseStateStyle(StateStyles.Transition.FromStateStyle).CheckMark.ResourceName <> '') and
+         (StateStyles.Transition.ToStateStyle <> nil) and
+         (TBaseStateStyle(StateStyles.Transition.ToStateStyle).CheckMark.ResourceName <> '') and
+         (TBaseStateStyle(StateStyles.Transition.FromStateStyle).CheckMark.ResourceName <> TBaseStateStyle(StateStyles.Transition.ToStateStyle).CheckMark.ResourceName) then begin
+
+        LCurrentAdjustedStateStyle.BeginUpdate;
+        try
+
+          LCurrentAdjustedStateStyle.CheckMark.ResourceName := TBaseStateStyle(StateStyles.Transition.FromStateStyle).CheckMark.ResourceName;
+
+          DrawCheckMark(
+            RenderTargetCanvas, // const ACanvas: TALCanvas;
+            ALGetScreenScale, // const AScale: Single;
+            LRect, // const ADstRect: TrectF;
+            1-StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+            // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+            // Without this, the checkMark disappears immediately.
+            Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+            LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+          LCurrentAdjustedStateStyle.CheckMark.ResourceName := TBaseStateStyle(StateStyles.Transition.ToStateStyle).CheckMark.ResourceName;
+
+          DrawCheckMark(
+            RenderTargetCanvas, // const ACanvas: TALCanvas;
+            ALGetScreenScale, // const AScale: Single;
+            LRect, // const ADstRect: TrectF;
+            StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+            // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+            // Without this, the checkMark disappears immediately.
+            Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+            LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+        finally
+          LCurrentAdjustedStateStyle.EndUpdateNoChanges;
+        end;
+
+      end
+      else begin
+
+        DrawCheckMark(
+          RenderTargetCanvas, // const ACanvas: TALCanvas;
+          ALGetScreenScale, // const AScale: Single;
+          LRect, // const ADstRect: TrectF;
+          1, // const AOpacity: Single;
+          // Check CheckMark.Color = TalphaColors.Null to enable an interpolation fade-out effect on the checkMark.
+          // Without this, the checkMark disappears immediately.
+          Checked or (TBaseStateStyle(StateStyles.GetCurrentRawStyle).CheckMark.Color = TalphaColors.Null), // const AChecked: Boolean
+          LCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+      end;
 
     finally
       ALCanvasEndScene(RenderTargetCanvas)
@@ -9831,6 +9851,7 @@ procedure TALRadioButton.DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
             const ADstRect: TrectF;
+            const AOpacity: Single;
             const AChecked: Boolean;
             const ACheckMark: TALBaseCheckBox.TCheckMarkBrush);
 begin
@@ -9887,6 +9908,7 @@ begin
     TALDrawRectangleHelper.Create(ACanvas)
       .SetAlignToPixel(AutoAlignToPixel)
       .SetDstRect(LRect)
+      .SetOpacity(AOpacity)
       .SetFillColor(ACheckMark.Color)
       .SetFillResourceName(ACheckMark.ResourceName)
       .SetFillWrapMode(ACheckMark.WrapMode)
@@ -11791,6 +11813,14 @@ begin
   end;
 end;
 
+{*******************************}
+procedure TALSwitch.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((ClickSound=TALClickSoundMode.Default) and ALGlobalClickSoundEnabled) then
+    ALPlayClickSound;
+end;
+
 {************************}
 procedure TALSwitch.Click;
 begin
@@ -12061,7 +12091,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-procedure TALButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
   if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
@@ -12069,18 +12099,18 @@ begin
   {$ENDIF}
   BeginUpdate;
   try
-    Inherited Interpolate(ATo, ANormalizedTime);
+    Inherited Interpolate(ATo, ANormalizedTime, AReverse);
     if ATo <> nil then begin
-      Text := TBaseStateStyle(ATo).Text;
-      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
+      if not AReverse then Text := TBaseStateStyle(ATo).Text;
+      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime, AReverse);
       XRadius := InterpolateSingle(XRadius{Start}, TBaseStateStyle(ATo).XRadius{Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, TBaseStateStyle(ATo).YRadius{Stop}, ANormalizedTime);
     end
     else if StateStyleParent <> nil then begin
       StateStyleParent.SupersedeNoChanges(true{ASaveState});
       try
-        Text := StateStyleParent.Text;
-        TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime);
+        if not AReverse then Text := StateStyleParent.Text;
+        TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime, AReverse);
         XRadius := InterpolateSingle(XRadius{Start}, StateStyleParent.XRadius{Stop}, ANormalizedTime);
         YRadius := InterpolateSingle(YRadius{Start}, StateStyleParent.YRadius{Stop}, ANormalizedTime);
       finally
@@ -12088,14 +12118,14 @@ begin
       end;
     end
     else if ControlParent <> nil then begin
-      Text := ControlParent.Text;
-      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+      if not AReverse then Text := ControlParent.Text;
+      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime, AReverse);
       XRadius := InterpolateSingle(XRadius{Start}, ControlParent.XRadius{Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, ControlParent.YRadius{Stop}, ANormalizedTime);
     end
     else begin
-      Text := DefaultText;
-      TextSettings.Interpolate(nil, ANormalizedTime);
+      if not AReverse then Text := DefaultText;
+      TextSettings.Interpolate(nil, ANormalizedTime, AReverse);
       XRadius := InterpolateSingle(XRadius{Start}, ALIfThen(IsNaN(DefaultXRadius), 0, DefaultXRadius){Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, ALIfThen(IsNaN(DefaultYRadius), 0, DefaultYRadius){Stop}, ANormalizedTime);
     end;
@@ -12202,6 +12232,8 @@ end;
 function TALButton.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
+            IsNan(FXRadius) and
+            IsNan(FYRadius) and
             Text.IsEmpty and
             TextSettings.Inherit;
 end;
@@ -12695,60 +12727,6 @@ begin
   end;
   {$ENDIF}
   inherited;
-end;
-
-{**************************************************}
-procedure TALButton.SetXRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
-    end;
-    APrevStateStyle.StateLayer.XRadius := XRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
-end;
-
-{**************************************************}
-procedure TALButton.SetYRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
-    end;
-    APrevStateStyle.StateLayer.YRadius := YRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
 end;
 
 {******************************************************}
@@ -13294,7 +13272,7 @@ begin
 end;
 
 {***********************************************************************************************************}
-procedure TALToggleButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+procedure TALToggleButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
   if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
@@ -13302,18 +13280,18 @@ begin
   {$ENDIF}
   BeginUpdate;
   try
-    Inherited Interpolate(ATo, ANormalizedTime);
+    Inherited Interpolate(ATo, ANormalizedTime, AReverse);
     if ATo <> nil then begin
-      Text := TBaseStateStyle(ATo).Text;
-      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
+      if not AReverse then Text := TBaseStateStyle(ATo).Text;
+      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime, AReverse);
       XRadius := InterpolateSingle(XRadius{Start}, TBaseStateStyle(ATo).XRadius{Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, TBaseStateStyle(ATo).YRadius{Stop}, ANormalizedTime);
     end
     else if StateStyleParent <> nil then begin
       StateStyleParent.SupersedeNoChanges(true{ASaveState});
       try
-        Text := StateStyleParent.Text;
-        TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime);
+        if not AReverse then Text := StateStyleParent.Text;
+        TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime, AReverse);
         XRadius := InterpolateSingle(XRadius{Start}, StateStyleParent.XRadius{Stop}, ANormalizedTime);
         YRadius := InterpolateSingle(YRadius{Start}, StateStyleParent.YRadius{Stop}, ANormalizedTime);
       finally
@@ -13321,14 +13299,14 @@ begin
       end;
     end
     else if ControlParent <> nil then begin
-      Text := ControlParent.Text;
-      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+      if not AReverse then Text := ControlParent.Text;
+      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime, AReverse);
       XRadius := InterpolateSingle(XRadius{Start}, ControlParent.XRadius{Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, ControlParent.YRadius{Stop}, ANormalizedTime);
     end
     else begin
-      Text := DefaultText;
-      TextSettings.Interpolate(nil, ANormalizedTime);
+      if not AReverse then Text := DefaultText;
+      TextSettings.Interpolate(nil, ANormalizedTime, AReverse);
       XRadius := InterpolateSingle(XRadius{Start}, ALIfThen(IsNaN(DefaultXRadius), 0, DefaultXRadius){Stop}, ANormalizedTime);
       YRadius := InterpolateSingle(YRadius{Start}, ALIfThen(IsNaN(DefaultYRadius), 0, DefaultYRadius){Stop}, ANormalizedTime);
     end;
@@ -13435,6 +13413,8 @@ end;
 function TALToggleButton.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
+            IsNan(FXRadius) and
+            IsNan(FYRadius) and
             Text.IsEmpty and
             TextSettings.Inherit;
 end;
@@ -13758,23 +13738,6 @@ begin
   Change;
 end;
 
-{************************************************************}
-constructor TALToggleButton.TStateStyles.TTransition.Create(Const AOwner: TALBaseStateStyles);
-begin
-  inherited;
-  FAdjustSizeWhenFinish := False;
-end;
-
-{************************************************************}
-procedure TALToggleButton.TStateStyles.TTransition.DoFinish;
-begin
-  inherited;
-  if Enabled then begin
-    if FAdjustSizeWhenFinish then
-      _TALControlProtectedAccess(Owner.Parent).AdjustSize;
-  end;
-end;
-
 {*************************************************************************}
 constructor TALToggleButton.TStateStyles.Create(const AParent: TALControl);
 begin
@@ -13900,6 +13863,18 @@ end;
 function TALToggleButton.TStateStyles.GetParent: TALToggleButton;
 begin
   Result := TALToggleButton(inherited Parent);
+end;
+
+{*********************************************************************************}
+function TALToggleButton.TStateStyles.GetTransition: TStateStyles.TTransition;
+begin
+  Result := TStateStyles.TTransition(inherited Transition);
+end;
+
+{*********************************************************************************}
+procedure TALToggleButton.TStateStyles.SetTransition(const AValue: TStateStyles.TTransition);
+begin
+  inherited Transition := AValue;
 end;
 
 {*********************************************************************************}
@@ -14047,8 +14022,7 @@ begin
     FChecked := Value;
     if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
     else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
-    if not StateStyles.Transition.Running then AdjustSize
-    else TStateStyles.TTransition(StateStyles.Transition).FAdjustSizeWhenFinish := true;
+    AdjustSize;
     DoChanged;
   end;
 end;
@@ -14147,72 +14121,6 @@ begin
   end;
   {$ENDIF}
   inherited;
-end;
-
-{**************************************************}
-procedure TALToggleButton.SetXRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
-    end;
-    APrevStateStyle.StateLayer.XRadius := XRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.checked.Default, StateStyles.checked.Default);
-    _PropagateChanges(FPrevStateStyles.checked.Disabled, StateStyles.checked.Disabled);
-    _PropagateChanges(FPrevStateStyles.checked.Hovered, StateStyles.checked.Hovered);
-    _PropagateChanges(FPrevStateStyles.checked.Pressed, StateStyles.checked.Pressed);
-    _PropagateChanges(FPrevStateStyles.checked.Focused, StateStyles.checked.Focused);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Default, StateStyles.Unchecked.Default);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Disabled, StateStyles.Unchecked.Disabled);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Hovered, StateStyles.Unchecked.Hovered);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Pressed, StateStyles.Unchecked.Pressed);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Focused, StateStyles.Unchecked.Focused);
-  end;
-  {$ENDIF}
-end;
-
-{**************************************************}
-procedure TALToggleButton.SetYRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
-    end;
-    APrevStateStyle.StateLayer.YRadius := YRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.checked.Default, StateStyles.checked.Default);
-    _PropagateChanges(FPrevStateStyles.checked.Disabled, StateStyles.checked.Disabled);
-    _PropagateChanges(FPrevStateStyles.checked.Hovered, StateStyles.checked.Hovered);
-    _PropagateChanges(FPrevStateStyles.checked.Pressed, StateStyles.checked.Pressed);
-    _PropagateChanges(FPrevStateStyles.checked.Focused, StateStyles.checked.Focused);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Default, StateStyles.Unchecked.Default);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Disabled, StateStyles.Unchecked.Disabled);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Hovered, StateStyles.Unchecked.Hovered);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Pressed, StateStyles.Unchecked.Pressed);
-    _PropagateChanges(FPrevStateStyles.Unchecked.Focused, StateStyles.Unchecked.Focused);
-  end;
-  {$ENDIF}
 end;
 
 {************************************************************}
@@ -14666,25 +14574,93 @@ begin
       var LTextBroken: Boolean;
       var LAllTextDrawn: Boolean;
       var LElements: TALTextElements;
-      DrawMultilineText(
-        TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-        LRect, // var ARect: TRectF;
-        LTextBroken, // out ATextBroken: Boolean;
-        LAllTextDrawn, // out AAllTextDrawn: Boolean;
-        LElements, // out AElements: TALTextElements;
-        1{Ascale},
-        AbsoluteOpacity, // const AOpacity: Single;
-        LCurrentAdjustedStateStyle.Text, // const AText: String;
-        LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
-        LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
-        LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
-        LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
-        LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+      if (StateStyles.Transition.Running) and
+         (StateStyles.Transition.FadeImage) and
+         (LCurrentAdjustedStateStyle.Text = '') and
+         (StateStyles.Transition.FromStateStyle <> nil) and
+         (TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ResourceName <> '') and
+         (StateStyles.Transition.ToStateStyle <> nil) and
+         (TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ResourceName <> '') and
+         (TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ResourceName <> TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ResourceName) then begin
+
+        LCurrentAdjustedStateStyle.BeginUpdate;
+        try
+
+          LCurrentAdjustedStateStyle.Fill.ResourceName := TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ResourceName;
+          LCurrentAdjustedStateStyle.Fill.ImageTintColor := TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ImageTintColor;
+
+          DrawMultilineText(
+            TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+            LRect, // var ARect: TRectF;
+            LTextBroken, // out ATextBroken: Boolean;
+            LAllTextDrawn, // out AAllTextDrawn: Boolean;
+            LElements, // out AElements: TALTextElements;
+            1{Ascale},
+            1-StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+            '', // const AText: String;
+            nil, // const AFont: TALFont;
+            nil, // const ADecoration: TALTextDecoration;
+            nil, // const AEllipsisFont: TALFont;
+            nil, // const AEllipsisDecoration: TALTextDecoration;
+            LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+            LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+            LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+            LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+            LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+            LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+          LCurrentAdjustedStateStyle.Fill.ResourceName := TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ResourceName;
+          LCurrentAdjustedStateStyle.Fill.ImageTintColor := TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ImageTintColor;
+
+          DrawMultilineText(
+            TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+            LRect, // var ARect: TRectF;
+            LTextBroken, // out ATextBroken: Boolean;
+            LAllTextDrawn, // out AAllTextDrawn: Boolean;
+            LElements, // out AElements: TALTextElements;
+            1{Ascale},
+            StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+            '', // const AText: String;
+            nil, // const AFont: TALFont;
+            nil, // const ADecoration: TALTextDecoration;
+            nil, // const AEllipsisFont: TALFont;
+            nil, // const AEllipsisDecoration: TALTextDecoration;
+            LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+            LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+            LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+            LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+            LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+            LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+        finally
+          LCurrentAdjustedStateStyle.EndUpdateNoChanges;
+        end;
+
+      end
+      else begin
+
+        DrawMultilineText(
+          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+          LRect, // var ARect: TRectF;
+          LTextBroken, // out ATextBroken: Boolean;
+          LAllTextDrawn, // out AAllTextDrawn: Boolean;
+          LElements, // out AElements: TALTextElements;
+          1{Ascale},
+          AbsoluteOpacity, // const AOpacity: Single;
+          LCurrentAdjustedStateStyle.Text, // const AText: String;
+          LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+          LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+          LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+          LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+          LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+          LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+      end;
 
     finally
       if LCanvasSaveState <> nil then
@@ -14703,25 +14679,93 @@ begin
       var LTextBroken: Boolean;
       var LAllTextDrawn: Boolean;
       var LElements: TALTextElements;
-      DrawMultilineText(
-        RenderTargetCanvas, // const ACanvas: TALCanvas;
-        LRect, // out ARect: TRectF;
-        LTextBroken, // out ATextBroken: Boolean;
-        LAllTextDrawn, // out AAllTextDrawn: Boolean;
-        LElements, // out AElements: TALTextElements;
-        ALGetScreenScale{Ascale},
-        1, // const AOpacity: Single;
-        LCurrentAdjustedStateStyle.Text, // const AText: String;
-        LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
-        LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
-        LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow;
-        LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
-        LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+      if (StateStyles.Transition.Running) and
+         (StateStyles.Transition.FadeImage) and
+         (LCurrentAdjustedStateStyle.Text = '') and
+         (StateStyles.Transition.FromStateStyle <> nil) and
+         (TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ResourceName <> '') and
+         (StateStyles.Transition.ToStateStyle <> nil) and
+         (TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ResourceName <> '') and
+         (TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ResourceName <> TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ResourceName) then begin
+
+        LCurrentAdjustedStateStyle.BeginUpdate;
+        try
+
+          LCurrentAdjustedStateStyle.Fill.ResourceName := TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ResourceName;
+          LCurrentAdjustedStateStyle.Fill.ImageTintColor := TBaseStateStyle(StateStyles.Transition.FromStateStyle).fill.ImageTintColor;
+
+          DrawMultilineText(
+            RenderTargetCanvas, // const ACanvas: TALCanvas;
+            LRect, // var ARect: TRectF;
+            LTextBroken, // out ATextBroken: Boolean;
+            LAllTextDrawn, // out AAllTextDrawn: Boolean;
+            LElements, // out AElements: TALTextElements;
+            ALGetScreenScale{Ascale},
+            1-StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+            '', // const AText: String;
+            nil, // const AFont: TALFont;
+            nil, // const ADecoration: TALTextDecoration;
+            nil, // const AEllipsisFont: TALFont;
+            nil, // const AEllipsisDecoration: TALTextDecoration;
+            LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+            LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+            LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+            LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+            LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+            LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+          LCurrentAdjustedStateStyle.Fill.ResourceName := TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ResourceName;
+          LCurrentAdjustedStateStyle.Fill.ImageTintColor := TBaseStateStyle(StateStyles.Transition.ToStateStyle).fill.ImageTintColor;
+
+          DrawMultilineText(
+            RenderTargetCanvas, // const ACanvas: TALCanvas;
+            LRect, // var ARect: TRectF;
+            LTextBroken, // out ATextBroken: Boolean;
+            LAllTextDrawn, // out AAllTextDrawn: Boolean;
+            LElements, // out AElements: TALTextElements;
+            ALGetScreenScale{Ascale},
+            StateStyles.Transition.CurrentValue, // const AOpacity: Single;
+            '', // const AText: String;
+            nil, // const AFont: TALFont;
+            nil, // const ADecoration: TALTextDecoration;
+            nil, // const AEllipsisFont: TALFont;
+            nil, // const AEllipsisDecoration: TALTextDecoration;
+            LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+            LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+            LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+            LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+            LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+            LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+        finally
+          LCurrentAdjustedStateStyle.EndUpdateNoChanges;
+        end;
+
+      end
+      else begin
+
+        DrawMultilineText(
+          RenderTargetCanvas, // const ACanvas: TALCanvas;
+          LRect, // out ARect: TRectF;
+          LTextBroken, // out ATextBroken: Boolean;
+          LAllTextDrawn, // out AAllTextDrawn: Boolean;
+          LElements, // out AElements: TALTextElements;
+          ALGetScreenScale{Ascale},
+          1, // const AOpacity: Single;
+          LCurrentAdjustedStateStyle.Text, // const AText: String;
+          LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+          LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+          LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+          LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow;
+          LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+          LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+      end;
 
     finally
       ALCanvasEndScene(RenderTargetCanvas)

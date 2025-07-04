@@ -76,8 +76,8 @@ type
     procedure ApplyColorScheme; virtual;
     procedure ClearBufDrawable; virtual;
     Property Inherit: Boolean read GetInherit;
-    procedure Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single);
+    procedure Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); virtual;
+    procedure InterpolateNoChanges(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
     procedure Supersede(Const ASaveState: Boolean = False); virtual;
     procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
     property Superseded: Boolean read FSuperseded;
@@ -357,7 +357,7 @@ begin
 end;
 
 {*****************************************************************************************************************}
-procedure TALDynamicBaseStateStyle.Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single);
+procedure TALDynamicBaseStateStyle.Interpolate(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
@@ -367,20 +367,20 @@ begin
     var LPrevStateLayerYRadius := StateLayer.YRadius;
 
     if ATo <> nil then begin
-      Fill.Interpolate(ATo.Fill, ANormalizedTime);
-      StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime);
-      Stroke.Interpolate(ATo.Stroke, ANormalizedTime);
-      Shadow.Interpolate(ATo.Shadow, ANormalizedTime);
+      Fill.Interpolate(ATo.Fill, ANormalizedTime, AReverse);
+      StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime, AReverse);
+      Stroke.Interpolate(ATo.Stroke, ANormalizedTime, AReverse);
+      Shadow.Interpolate(ATo.Shadow, ANormalizedTime, AReverse);
       Scale := InterpolateSingle(Scale{Start}, ATo.Scale{Stop}, ANormalizedTime);
       //Transition
     end
     else if FStateStyleParent <> nil then begin
       FStateStyleParent.SupersedeNoChanges(true{ASaveState});
       try
-        Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime);
-        StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime);
-        Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
-        Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
+        Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime, AReverse);
+        StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime, AReverse);
+        Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime, AReverse);
+        Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime, AReverse);
         Scale := InterpolateSingle(Scale{Start}, FStateStyleParent.Scale{Stop}, ANormalizedTime);
         //Transition
       finally
@@ -389,18 +389,18 @@ begin
     end
     else if (FControlParent is TALDynamicShape) then begin
       var LShapeControl := TALDynamicShape(FControlParent);
-      Fill.Interpolate(LShapeControl.Fill, ANormalizedTime);
-      StateLayer.Interpolate(nil, ANormalizedTime);
-      Stroke.Interpolate(LShapeControl.Stroke, ANormalizedTime);
-      Shadow.Interpolate(LShapeControl.Shadow, ANormalizedTime);
+      Fill.Interpolate(LShapeControl.Fill, ANormalizedTime, AReverse);
+      StateLayer.Interpolate(nil, ANormalizedTime, AReverse);
+      Stroke.Interpolate(LShapeControl.Stroke, ANormalizedTime, AReverse);
+      Shadow.Interpolate(LShapeControl.Shadow, ANormalizedTime, AReverse);
       Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end
     else begin
-      Fill.Interpolate(nil, ANormalizedTime);
-      StateLayer.Interpolate(nil, ANormalizedTime);
-      Stroke.Interpolate(nil, ANormalizedTime);
-      Shadow.Interpolate(nil, ANormalizedTime);
+      Fill.Interpolate(nil, ANormalizedTime, AReverse);
+      StateLayer.Interpolate(nil, ANormalizedTime, AReverse);
+      Stroke.Interpolate(nil, ANormalizedTime, AReverse);
+      Shadow.Interpolate(nil, ANormalizedTime, AReverse);
       Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end;
@@ -424,11 +424,11 @@ begin
 end;
 
 {**************************************************************************************************************************}
-procedure TALDynamicBaseStateStyle.InterpolateNoChanges(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single);
+procedure TALDynamicBaseStateStyle.InterpolateNoChanges(const ATo: TALDynamicBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
   Try
-    Interpolate(ATo, ANormalizedTime);
+    Interpolate(ATo, ANormalizedTime, AReverse);
   Finally
     EndUpdateNoChanges;
   end;
@@ -888,14 +888,14 @@ begin
     FCurrentAdjustedStyle.Assign(LStateStyle);
     FCurrentAdjustedStyle.SupersedeNoChanges(false{ASaveState});
     //--
-    if FTransition.FToStateStyle = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransition.CurrentValue)
-    else if FTransition.FFromStateStyle = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransition.CurrentValue)
+    if FTransition.FToStateStyle = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransition.CurrentValue, false)
+    else if FTransition.FFromStateStyle = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransition.CurrentValue, true)
     else begin
       {$IF defined(debug)}
       if not FTransition.FFromStateStyle.Superseded then
         raise Exception.Create('Error 3A71A6B7-40C3-40A6-B678-D1FC6A0DD152');
       {$ENDIF}
-      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransition.FFromStateStyle{AFromStateStyle}, 1-FTransition.CurrentValue);
+      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransition.FFromStateStyle{AFromStateStyle}, 1-FTransition.CurrentValue, true);
     end;
   end
   else begin

@@ -46,7 +46,7 @@ type
     property IsChanged: Boolean read FIsChanged write FIsChanged;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTriplet<K,V,E> = record
     Key: K;
     Value: V;

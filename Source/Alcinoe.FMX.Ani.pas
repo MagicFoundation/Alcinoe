@@ -1690,49 +1690,49 @@ begin
   result := fLoop <> DefaultLoop;
 end;
 
-{*******************************************}
+{*************************************************}
 function TALAnimation.IsAutoReverseStored: Boolean;
 begin
   result := fAutoReverse <> DefaultAutoReverse;
 end;
 
-{*******************************************}
+{*********************************************}
 function TALAnimation.IsInverseStored: Boolean;
 begin
   result := fInverse <> DefaultInverse;
 end;
 
-{*******************************************}
+{*********************************************}
 function TALAnimation.IsEnabledStored: Boolean;
 begin
   result := fEnabled <> DefaultEnabled;
 end;
 
-{***********************************}
+{********************************************}
 function TALAnimation.GetDefaultDelay: Single;
 Begin
   Result := 0;
 end;
 
-{***********************************}
+{********************************************}
 function TALAnimation.GetDefaultLoop: Boolean;
 Begin
   Result := False;
 end;
 
-{***********************************}
+{***************************************************}
 function TALAnimation.GetDefaultAutoReverse: Boolean;
 Begin
   Result := False;
 end;
 
-{***********************************}
+{***********************************************}
 function TALAnimation.GetDefaultInverse: Boolean;
 Begin
   Result := False;
 end;
 
-{***********************************}
+{***********************************************}
 function TALAnimation.GetDefaultEnabled: Boolean;
 Begin
   Result := False;
@@ -1865,7 +1865,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{****************************************************}
+{******************************}
 procedure TALDisplayTimer.Reset;
 begin
   Interval := DefaultInterval;
@@ -1921,13 +1921,13 @@ begin
   end;
 end;
 
-{*******************************************}
+{*************************************************}
 function TALDisplayTimer.IsIntervalStored: Boolean;
 begin
   result := not SameValue(fInterval, DefaultInterval, TimeEpsilon);
 end;
 
-{***********************************}
+{**************************************************}
 function TALDisplayTimer.GetDefaultInterval: Single;
 Begin
   Result := 0.05;
@@ -1952,7 +1952,7 @@ begin
   inherited;
 end;
 
-{****************************************}
+{***********************************************************}
 procedure TALInterpolationParams.Assign(Source: TPersistent);
 begin
   if Source is TALInterpolationParams then begin
@@ -1966,7 +1966,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{****************************************}
+{*************************************}
 procedure TALInterpolationParams.Reset;
 begin
   BezierX1 := 0;
@@ -1976,7 +1976,7 @@ begin
   Overshoot := 0;
 end;
 
-{****************************************}
+{*****************************************************************}
 procedure TALInterpolationParams.SetBezierX1(const AValue: Single);
 begin
   if not SameValue(AValue, FBezierX1, TEpsilon.Vector) then begin
@@ -1985,7 +1985,7 @@ begin
   end;
 end;
 
-{****************************************}
+{*****************************************************************}
 procedure TALInterpolationParams.SetBezierY1(const AValue: Single);
 begin
   if not SameValue(AValue, FBezierY1, TEpsilon.Vector) then begin
@@ -1994,7 +1994,7 @@ begin
   end;
 end;
 
-{****************************************}
+{*****************************************************************}
 procedure TALInterpolationParams.SetBezierX2(const AValue: Single);
 begin
   if not SameValue(AValue, FBezierX2, TEpsilon.Vector) then begin
@@ -2003,7 +2003,7 @@ begin
   end;
 end;
 
-{****************************************}
+{*****************************************************************}
 procedure TALInterpolationParams.SetBezierY2(const AValue: Single);
 begin
   if not SameValue(AValue, FBezierY2, TEpsilon.Vector) then begin
@@ -2044,7 +2044,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{*************************************************}
+{***************************************}
 procedure TALInterpolatedAnimation.Reset;
 begin
   Duration := DefaultDuration;
@@ -2250,43 +2250,43 @@ begin
     result := 0;
 end;
 
-{*******************************************}
+{**********************************************************}
 function TALInterpolatedAnimation.IsDurationStored: Boolean;
 begin
   result := not SameValue(fDuration, DefaultDuration, TimeEpsilon);
 end;
 
-{*******************************************}
+{*******************************************************************}
 function TALInterpolatedAnimation.IsInterpolationTypeStored: Boolean;
 begin
   result := fInterpolationType <> DefaultInterpolationType;
 end;
 
-{*******************************************}
+{*******************************************************************}
 function TALInterpolatedAnimation.IsInterpolationModeStored: Boolean;
 begin
   result := fInterpolationMode <> DefaultInterpolationMode;
 end;
 
-{***********************************}
+{***********************************************************}
 function TALInterpolatedAnimation.GetDefaultDuration: Single;
 Begin
   Result := 0.2;
 end;
 
-{***********************************}
+{**********************************************************************************}
 function TALInterpolatedAnimation.GetDefaultInterpolationType: TALInterpolationType;
 Begin
   Result := TALInterpolationType.Linear;
 end;
 
-{***********************************}
+{**********************************************************************************}
 function TALInterpolatedAnimation.GetDefaultInterpolationMode: TALInterpolationMode;
 Begin
   Result := TALInterpolationMode.In;
 end;
 
-{***********************************}
+{**********************************************************************************************}
 procedure TALInterpolatedAnimation.SetInterpolationParams(const AValue: TALInterpolationParams);
 begin
   FInterpolationParams.Assign(AValue);
@@ -2301,7 +2301,7 @@ begin
   fCurrentValue := FStartValue;
 end;
 
-{****************************************************}
+{******************************************************}
 procedure TALFloatAnimation.Assign(Source: TPersistent);
 begin
   if Source is TALFloatAnimation then begin
@@ -2313,7 +2313,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{*************************************************}
+{********************************}
 procedure TALFloatAnimation.Reset;
 begin
   StartValue := DefaultStartValue;
@@ -2336,25 +2336,25 @@ begin
   fCurrentValue := FStartValue + (FStopValue - FStartValue) * NormalizedTime;
 end;
 
-{*******************************************}
+{*****************************************************}
 function TALFloatAnimation.IsStartValueStored: Boolean;
 begin
   result := not SameValue(fStartValue, DefaultStartValue);
 end;
 
-{*******************************************}
+{****************************************************}
 function TALFloatAnimation.IsStopValueStored: Boolean;
 begin
   result := not SameValue(fStopValue, DefaultStopValue);
 end;
 
-{***********************************}
+{******************************************************}
 function TALFloatAnimation.GetDefaultStartValue: Single;
 Begin
   Result := 0;
 end;
 
-{***********************************}
+{*****************************************************}
 function TALFloatAnimation.GetDefaultStopValue: Single;
 Begin
   Result := 0;
@@ -2369,7 +2369,7 @@ begin
   fCurrentValue := FStartValue;
 end;
 
-{****************************************************}
+{******************************************************}
 procedure TALColorAnimation.Assign(Source: TPersistent);
 begin
   if Source is TALColorAnimation then begin
@@ -2381,7 +2381,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{*************************************************}
+{********************************}
 procedure TALColorAnimation.Reset;
 begin
   StartValue := DefaultStartValue;
@@ -2404,25 +2404,25 @@ begin
   fCurrentValue := ALInterpolateColor(FStartValue, FStopValue, NormalizedTime);
 end;
 
-{*******************************************}
+{*****************************************************}
 function TALColorAnimation.IsStartValueStored: Boolean;
 begin
   result := fStartValue <> DefaultStartValue;
 end;
 
-{*******************************************}
+{****************************************************}
 function TALColorAnimation.IsStopValueStored: Boolean;
 begin
   result := fStopValue <> DefaultStopValue;
 end;
 
-{***********************************}
+{***********************************************************}
 function TALColorAnimation.GetDefaultStartValue: TAlphaColor;
 Begin
   Result := $FFFFFFFF;
 end;
 
-{***********************************}
+{**********************************************************}
 function TALColorAnimation.GetDefaultStopValue: TAlphaColor;
 Begin
   Result := $FFFFFFFF;
@@ -2660,7 +2660,7 @@ begin
   result := fFloatAnimation.InterpolationMode;
 end;
 
-{****************************************************************************}
+{********************************************************************************}
 function TALFloatPropertyAnimation.getInterpolationParams: TALInterpolationParams;
 begin
   Result := fFloatAnimation.InterpolationParams;
@@ -2755,7 +2755,7 @@ begin
   fFloatAnimation.InterpolationMode := Value;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************}
 procedure TALFloatPropertyAnimation.setInterpolationParams(const Value: TALInterpolationParams);
 begin
   fFloatAnimation.InterpolationParams := Value;
@@ -2920,7 +2920,7 @@ begin
   result := fColorAnimation.InterpolationMode;
 end;
 
-{****************************************************************************}
+{********************************************************************************}
 function TALColorPropertyAnimation.getInterpolationParams: TALInterpolationParams;
 begin
   Result := fColorAnimation.InterpolationParams;
@@ -3015,7 +3015,7 @@ begin
   fColorAnimation.InterpolationMode := Value;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************}
 procedure TALColorPropertyAnimation.setInterpolationParams(const Value: TALInterpolationParams);
 begin
   fColorAnimation.InterpolationParams := Value;
@@ -3274,7 +3274,7 @@ begin
   inherited Destroy;
 end;
 
-{****************************************************}
+{************************************************************}
 procedure TALSpringForceAnimation.Assign(Source: TPersistent);
 begin
   if Source is TALSpringForceAnimation then begin
@@ -3290,7 +3290,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{*************************************************}
+{**************************************}
 procedure TALSpringForceAnimation.Reset;
 begin
   InitialVelocity := DefaultInitialVelocity;
@@ -3436,73 +3436,73 @@ begin
   DoFinish;
 end;
 
-{*******************************************}
+{****************************************************************}
 function TALSpringForceAnimation.IsInitialVelocityStored: Boolean;
 begin
   result := not SameValue(fInitialVelocity, DefaultInitialVelocity);
 end;
 
-{*******************************************}
+{***********************************************************}
 function TALSpringForceAnimation.IsStartValueStored: Boolean;
 begin
   result := not SameValue(fStartValue, DefaultStartValue);
 end;
 
-{*******************************************}
+{**********************************************************}
 function TALSpringForceAnimation.IsStopValueStored: Boolean;
 begin
   result := not SameValue(StopValue, DefaultStopValue);
 end;
 
-{*******************************************}
+{**********************************************************}
 function TALSpringForceAnimation.IsStiffnessStored: Boolean;
 begin
   result := not SameValue(Stiffness, DefaultStiffness);
 end;
 
-{*******************************************}
+{*************************************************************}
 function TALSpringForceAnimation.IsDampingRatioStored: Boolean;
 begin
   result := not SameValue(DampingRatio, DefaultDampingRatio);
 end;
 
-{*******************************************}
+{***************************************************************}
 function TALSpringForceAnimation.IsValueThresholdStored: Boolean;
 begin
   result := not SameValue(ValueThreshold, DefaultValueThreshold);
 end;
 
-{***********************************}
+{*****************************************************************}
 function TALSpringForceAnimation.GetDefaultInitialVelocity: Single;
 Begin
   Result := 0.0;
 end;
 
-{***********************************}
+{************************************************************}
 function TALSpringForceAnimation.GetDefaultStartValue: Single;
 Begin
   Result := 0.0;
 end;
 
-{***********************************}
+{***********************************************************}
 function TALSpringForceAnimation.GetDefaultStopValue: Single;
 Begin
   Result := 0.0;
 end;
 
-{***********************************}
+{***********************************************************}
 function TALSpringForceAnimation.GetDefaultStiffness: Single;
 Begin
   Result := TALSpringForce.STIFFNESS_MEDIUM;
 end;
 
-{***********************************}
+{**************************************************************}
 function TALSpringForceAnimation.GetDefaultDampingRatio: Single;
 Begin
   Result := TALSpringForce.DAMPING_RATIO_MEDIUM_BOUNCY;
 end;
 
-{***********************************}
+{****************************************************************}
 function TALSpringForceAnimation.GetDefaultValueThreshold: Single;
 Begin
   Result := TALSpringForce.MIN_VISIBLE_CHANGE_PIXELS * TALSpringForce.THRESHOLD_MULTIPLIER;

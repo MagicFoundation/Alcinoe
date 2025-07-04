@@ -1869,7 +1869,7 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{************************************************************************************************************}
 procedure TALShadow.Interpolate(const ATo: TALShadow; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -1893,7 +1893,7 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************************************}
 procedure TALShadow.InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -2249,7 +2249,7 @@ begin
   end;
 end;
 
-{*******************************************************************************}
+{********************************************************************************************************}
 procedure TALFont.Interpolate(const ATo: TALFont; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -2281,7 +2281,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{*****************************************************************************************************************}
 procedure TALFont.InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -2520,7 +2520,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************************************}
 procedure TALTextDecoration.Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -2544,7 +2544,7 @@ begin
   end;
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************************************}
 procedure TALTextDecoration.InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -2757,7 +2757,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************************************}
 procedure TALEllipsisSettings.Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -2791,7 +2791,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************************}
+{*****************************************************************************************************************************************}
 procedure TALEllipsisSettings.InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -3059,7 +3059,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************************************}
 procedure TALBaseTextSettings.Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -3093,7 +3093,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************************}
+{*****************************************************************************************************************************************}
 procedure TALBaseTextSettings.InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -3451,7 +3451,7 @@ begin
   end;
 end;
 
-{***************************************************************************************}
+{****************************************************************************************************************}
 procedure TALGradient.Interpolate(const ATo: TALGradient; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -3487,7 +3487,7 @@ begin
   end;
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************************************}
 procedure TALGradient.InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4026,7 +4026,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{**********************************************************************************************************}
 procedure TALBrush.Interpolate(const ATo: TALBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4072,7 +4072,7 @@ begin
   end;
 end;
 
-{******************************************************************************************}
+{*******************************************************************************************************************}
 procedure TALBrush.InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4472,7 +4472,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************}
+{**********************************************************************************************************************}
 procedure TALStrokeBrush.Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4492,7 +4492,7 @@ begin
   end;
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************************************}
 procedure TALStrokeBrush.InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4767,7 +4767,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************}
+{********************************************************************************************************************}
 procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4801,7 +4801,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************************************}
 procedure TALStateLayer.InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -4962,7 +4962,7 @@ begin
   change;
 end;
 
-{**********************************************************************}
+{**********************************************************************************}
 constructor TALBaseStateStyles.TTransition.Create(Const AOwner: TALBaseStateStyles);
 begin
   inherited Create;
@@ -4975,7 +4975,7 @@ begin
   FClickDelayed := False;
 end;
 
-{************************************}
+{************************************************}
 destructor TALBaseStateStyles.TTransition.Destroy;
 begin
   ALfreeandNil(FFromStateStyle);
@@ -4983,7 +4983,7 @@ begin
   inherited;
 end;
 
-{*******************************************************}
+{*******************************************************************}
 procedure TALBaseStateStyles.TTransition.Assign(Source: TPersistent);
 begin
   if Source is TTransition then begin
@@ -4996,7 +4996,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{*********************************}
+{*********************************************}
 procedure TALBaseStateStyles.TTransition.Reset;
 begin
   Duration := DefaultDuration;
@@ -5005,7 +5005,7 @@ begin
   inherited;
 end;
 
-{*********************************}
+{*********************************************}
 procedure TALBaseStateStyles.TTransition.Start;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -5102,7 +5102,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{*************************************************}
 procedure TALBaseStateStyles.TTransition.DoProcess;
 begin
   inherited;
@@ -5114,7 +5114,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{************************************************}
 procedure TALBaseStateStyles.TTransition.DoFinish;
 begin
   inherited;
@@ -5134,49 +5134,49 @@ begin
   end;
 end;
 
-{****************************************************}
+{****************************************************************}
 function TALBaseStateStyles.TTransition.IsDurationStored: Boolean;
 begin
   result := not SameValue(fDuration, DefaultDuration, TimeEpsilon);
 end;
 
-{******************************************************}
+{******************************************************************}
 function TALBaseStateStyles.TTransition.IsDelayClickStored: Boolean;
 begin
   result := FDelayClick <> DefaultDelayClick;
 end;
 
-{******************************************************}
+{*****************************************************************}
 function TALBaseStateStyles.TTransition.IsFadeImageStored: Boolean;
 begin
   result := FFadeImage <> DefaultFadeImage;
 end;
 
-{*****************************************************}
+{*****************************************************************}
 function TALBaseStateStyles.TTransition.GetDefaultDuration: Single;
 begin
   Result := 0.16;
 end;
 
-{****************************************************************************}
+{****************************************************************************************}
 function TALBaseStateStyles.TTransition.GetDefaultInterpolationType: TALInterpolationType;
 begin
   Result := TALInterpolationType.Cubic;
 end;
 
-{****************************************************************************}
+{****************************************************************************************}
 function TALBaseStateStyles.TTransition.GetDefaultInterpolationMode: TALInterpolationMode;
 begin
   Result := TALInterpolationMode.Out;
 end;
 
-{********************************************************}
+{********************************************************************}
 function TALBaseStateStyles.TTransition.GetDefaultDelayClick: Boolean;
 begin
   Result := False;
 end;
 
-{********************************************************}
+{*******************************************************************}
 function TALBaseStateStyles.TTransition.GetDefaultFadeImage: Boolean;
 begin
   Result := True;
@@ -5344,7 +5344,7 @@ begin
   ALFreeAndNilDrawable(FBufDrawable);
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************************************}
 procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -5411,7 +5411,7 @@ begin
   End;
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************************************}
 procedure TALBaseStateStyle.InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -5579,7 +5579,7 @@ begin
   result := TALBaseStateStylesClass(classtype).Create(nil{AParent});
 end;
 
-{***************************************************************}
+{***************************************************************************}
 function TALBaseStateStyles.CreateTransition: TALBaseStateStyles.TTransition;
 begin
   result := TALBaseStateStyles.TTransition.Create(Self);
@@ -5688,7 +5688,7 @@ begin
   FLastPaintedRawStyle := GetCurrentRawStyle;
 end;
 
-{**************************************************************************}
+{**************************************************************************************}
 procedure TALBaseStateStyles.SetTransition(const Value: TALBaseStateStyles.TTransition);
 begin
   FTransition.Assign(Value);

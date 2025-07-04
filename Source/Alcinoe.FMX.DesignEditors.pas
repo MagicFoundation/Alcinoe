@@ -77,7 +77,7 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {*************************************}
+  {*******************************************}
   TALToggleButtonEditor = class(TDefaultEditor)
   protected
     procedure ApplyStyleClick(Sender: TObject); virtual;
@@ -419,7 +419,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{*************************************************************}
 function TALToggleButtonEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -428,13 +428,13 @@ begin
   end;
 end;
 
-{*********************************************}
+{***************************************************}
 function TALToggleButtonEditor.GetVerbCount: Integer;
 begin
   result := 1;
 end;
 
-{*********************************************************}
+{***************************************************************}
 procedure TALToggleButtonEditor.ApplyStyleClick(Sender: TObject);
 begin
   var LStyleName := TmenuItem(Sender).Hint;
@@ -442,7 +442,7 @@ begin
   TALStyleManager.Instance.ApplyToggleButtonStyle(LStyleName, TALToggleButton(Component));
 end;
 
-{****************************************************************************}
+{**********************************************************************************}
 procedure TALToggleButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LLstNames := TList<TPair<String, String>>.Create;

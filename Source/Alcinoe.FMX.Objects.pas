@@ -2889,7 +2889,7 @@ begin
     Pause;
 end;
 
-{*******************************************************}
+{***********************************************************}
 function TALAnimatedImage.TAnimation.GetDefaultLoop: Boolean;
 begin
   Result := True;
@@ -5203,7 +5203,7 @@ begin
   FHoveredElement := TALTextElement.Empty;
 end;
 
-{********************************}
+{*********************************}
 procedure TALBaseText.DoClickSound;
 begin
   if (ClickSound=TALClickSoundMode.Always) or
@@ -5504,7 +5504,7 @@ begin
   inherited SetAlign(Value);
 end;
 
-{******************************************************}
+{**************************************************************}
 procedure TALBaseText.SetAutoSize(const Value: TALAutoSizeMode);
 begin
   if FAutoSize <> Value then

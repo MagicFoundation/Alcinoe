@@ -3803,7 +3803,8 @@ begin
 
   var LLen1: Integer := Length(AResourceName) * SizeOf(Char);
   var LLen2: Integer := Length(AMaskResourceName) * SizeOf(Char);
-  SetLength(AHash,
+  SetLength(
+    AHash,
     SizeOf(Integer) + LLen1 +      // Length + AResourceName
     SizeOf(Integer) + LLen2 +      // Length + AMaskResourceName
     SizeOf(Single) + // AScale

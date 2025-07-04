@@ -4456,7 +4456,7 @@ begin
   ALFreeAndNilDrawable(BufSupportingTextDrawable);
 end;
 
-{*************************************************************************************************************}
+{**************************************************************************************************************************************}
 procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
@@ -4733,7 +4733,7 @@ begin
   TStateStyles(Owner).Parent.UpdateEditControlStyle;
 end;
 
-{****************************************************}
+{*******************************************************}
 procedure TALBaseEdit.TStateStyles.TTransition.DoProcess;
 begin
   inherited;
@@ -4741,7 +4741,7 @@ begin
     TStateStyles(Owner).Parent.UpdateEditControlStyle;
 end;
 
-{************************************************************}
+{******************************************************}
 procedure TALBaseEdit.TStateStyles.TTransition.DoFinish;
 begin
   inherited;
@@ -7148,7 +7148,7 @@ begin
   FAutoSize := TALAutoSizeMode.Both;
 end;
 
-{**************************************************}
+{******************************************************}
 function TALEdit.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   result := False;

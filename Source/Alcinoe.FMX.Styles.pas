@@ -779,7 +779,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure ALApplyMaterial3TextDisplayLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -800,7 +800,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
+{***************************************************************************************************}
 procedure ALApplyMaterial3TextDisplayMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -821,7 +821,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure ALApplyMaterial3TextDisplaySmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -842,7 +842,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
+{***************************************************************************************************}
 procedure ALApplyMaterial3TextHeadlineLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -863,7 +863,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************}
 procedure ALApplyMaterial3TextHeadlineMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -884,7 +884,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
+{***************************************************************************************************}
 procedure ALApplyMaterial3TextHeadlineSmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -905,7 +905,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure ALApplyMaterial3TextTitleLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -926,7 +926,7 @@ begin
   end;
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure ALApplyMaterial3TextTitleMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -947,7 +947,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure ALApplyMaterial3TextTitleSmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -968,7 +968,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{***********************************************************************************************}
 procedure ALApplyMaterial3TextBodyLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -989,7 +989,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure ALApplyMaterial3TextBodyMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -1010,7 +1010,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{***********************************************************************************************}
 procedure ALApplyMaterial3TextBodySmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -1031,7 +1031,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure ALApplyMaterial3TextLabelLargeStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -1052,7 +1052,7 @@ begin
   end;
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure ALApplyMaterial3TextLabelMediumStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -1073,7 +1073,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure ALApplyMaterial3TextLabelSmallStyle(const AText: TALBaseText; const ARatio: Single = 1);
 begin
    With _TALBaseTextProtectedAccess(AText) do begin
@@ -5811,7 +5811,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{****************************************************************************************************}
 procedure ALApplyMaterial3ButtonIconStandardStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   With AButton do begin
@@ -6683,7 +6683,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABStyle(const AButton: TALButton; const AContainerColorKey, AIconColorKey: String; const ARatio: Single = 1);
 begin
@@ -6731,14 +6731,14 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalPrimarySmallStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   ALApplyMaterial3ExpressiveButtonFABStyle(AButton, 'Material3.Color.PrimaryContainer', 'Material3.Color.OnPrimaryContainer', ARatio);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalPrimaryMediumStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6757,7 +6757,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalPrimaryLargeStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6776,14 +6776,14 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalSecondarySmallStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   ALApplyMaterial3ExpressiveButtonFABStyle(AButton, 'Material3.Color.SecondaryContainer', 'Material3.Color.OnSecondaryContainer', ARatio);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalSecondaryMediumStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6802,7 +6802,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalSecondaryLargeStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6821,14 +6821,14 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalTertiarySmallStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   ALApplyMaterial3ExpressiveButtonFABStyle(AButton, 'Material3.Color.TertiaryContainer', 'Material3.Color.OnTertiaryContainer', ARatio);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalTertiaryMediumStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6847,7 +6847,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTonalTertiaryLargeStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6866,14 +6866,14 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABPrimarySmallStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   ALApplyMaterial3ExpressiveButtonFABStyle(AButton, 'Material3.Color.Primary', 'Material3.Color.OnPrimary', ARatio);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABPrimaryMediumStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6892,7 +6892,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABPrimaryLargeStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6911,14 +6911,14 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABSecondarySmallStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   ALApplyMaterial3ExpressiveButtonFABStyle(AButton, 'Material3.Color.Secondary', 'Material3.Color.OnSecondary', ARatio);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABSecondaryMediumStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6937,7 +6937,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABSecondaryLargeStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6956,14 +6956,14 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTertiarySmallStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
   ALApplyMaterial3ExpressiveButtonFABStyle(AButton, 'Material3.Color.Tertiary', 'Material3.Color.OnTertiary', ARatio);
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTertiaryMediumStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -6982,7 +6982,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{***************************************************************************************************}
 //https://m3.material.io/components/floating-action-button/specs#254b0f17-a5b9-4adf-b182-99f834ac9c7d
 procedure ALApplyMaterial3ExpressiveButtonFABTertiaryLargeStyle(const AButton: TALButton; const ARatio: Single = 1);
 begin
@@ -7005,7 +7005,7 @@ end;
 // TOGGLEBUTTON //
 //////////////////
 
-{*******************************************************************************}
+{*************************************************************************************************}
 procedure ALResetToggleButtonStyle(const AToggleButton: TALToggleButton; const ARatio: Single = 1);
 begin
   With AToggleButton do begin
@@ -7023,7 +7023,7 @@ begin
   end;
 end;
 
-{************************************************************************************************************************************************************}
+{******************************************************************************************************************************************************************************************}
 procedure ALApplyMaterial3ExpressiveToggleButtonShapeAndTransition(const AToggleButton: TALToggleButton; const ANormalRadius, APressedRadius, ACheckedRadius: Single; const ARatio: Single);
 begin
   With AToggleButton do begin
@@ -11233,7 +11233,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
+{********************************************************************************************************************************}
 procedure ALApplyMaterial3ExpressiveToggleButtonIconStandardStyle(const AToggleButton: TALToggleButton; const ARatio: Single = 1);
 begin
   With AToggleButton do begin
@@ -12982,7 +12982,7 @@ begin
   end;
 end;
 
-{****************************************************************************}
+{*****************************************************************************}
 procedure ALApplyMaterial3ScrollBoxStyle(const AScrollBox: TALCustomScrollBox);
 begin
   With _TALCustomScrollBoxProtectedAccess(AScrollBox) do begin
@@ -25179,7 +25179,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{**************************************************************************************************************************************************************}
+{**************************************************************************************************************************************************************************}
 constructor TALStyleManager.TToggleButtonStyleInfo.create(const AApplyStyleProc: TToggleButtonApplyStyleProc; const ADefaultFontSize: Single; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -25268,7 +25268,7 @@ begin
   DefaultHeight := ADefaultHeight;
 end;
 
-{****************************************************************************************************************************************************************************}
+{****************************************************************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicToggleButtonStyleInfo.create(const AApplyStyleProc: TDynamicToggleButtonApplyStyleProc; const ADefaultFontSize: Single; const ADefaultHeight: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -26637,13 +26637,13 @@ begin
   FButtonStyles.AddOrSetValue(AName, TButtonStyleInfo.create(AApplyStyleProc, 0{ADefaultFontSize}, ADefaultHeight));
 end;
 
-{***********************************************************************************************************************************************}
+{***********************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetToggleButtonStyle(const AName: String; const AApplyStyleProc: TToggleButtonApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FToggleButtonStyles.AddOrSetValue(AName, TToggleButtonStyleInfo.create(AApplyStyleProc, ADefaultFontSize, 0{ADefaultHeight}));
 end;
 
-{*************************************************************************************************************************************************}
+{*************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetToggleButtonIconStyle(const AName: String; const AApplyStyleProc: TToggleButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   FToggleButtonStyles.AddOrSetValue(AName, TToggleButtonStyleInfo.create(AApplyStyleProc, 0{ADefaultFontSize}, ADefaultHeight));
@@ -26721,13 +26721,13 @@ begin
   FDynamicButtonStyles.AddOrSetValue(AName, TDynamicButtonStyleInfo.create(AApplyStyleProc, 0{ADefaultFontSize}, ADefaultHeight));
 end;
 
-{*************************************************************************************************************************************************************}
+{*************************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicToggleButtonStyle(const AName: String; const AApplyStyleProc: TDynamicToggleButtonApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FDynamicToggleButtonStyles.AddOrSetValue(AName, TDynamicToggleButtonStyleInfo.create(AApplyStyleProc, ADefaultFontSize, 0{ADefaultHeight}));
 end;
 
-{***************************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetDynamicToggleButtonIconStyle(const AName: String; const AApplyStyleProc: TDynamicToggleButtonApplyStyleProc; const ADefaultHeight: Single);
 begin
   FDynamicToggleButtonStyles.AddOrSetValue(AName, TDynamicToggleButtonStyleInfo.create(AApplyStyleProc, 0{ADefaultFontSize}, ADefaultHeight));
@@ -26995,7 +26995,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************************************}
+{***********************************************************************************************************************************}
 procedure TALStyleManager.ApplyToggleButtonStyle(const AName: String; const AToggleButton: TALToggleButton; const AFontSize: Single);
 begin
   Var LApplyToggleButtonStyleInfo: TToggleButtonStyleInfo;
@@ -27017,7 +27017,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************}
+{*************************************************************************************************************************************}
 procedure TALStyleManager.ApplyToggleButtonIconStyle(const AName: String; const AToggleButton: TALToggleButton; const AHeight: Single);
 begin
   Var LApplyToggleButtonStyleInfo: TToggleButtonStyleInfo;
@@ -27039,7 +27039,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{**********************************************************************************************************}
 procedure TALStyleManager.ApplyToggleButtonStyle(const AName: String; const AToggleButton: TALToggleButton);
 begin
   Var LApplyToggleButtonStyleInfo: TToggleButtonStyleInfo;
@@ -27507,7 +27507,7 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************************}
+{*************************************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicToggleButtonStyle(const AName: String; const AToggleButton: TALDynamicToggleButton; const AFontSize: Single);
 begin
   Var LApplyDynamicToggleButtonStyleInfo: TDynamicToggleButtonStyleInfo;
@@ -27529,7 +27529,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************************************************}
+{***************************************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicToggleButtonIconStyle(const AName: String; const AToggleButton: TALDynamicToggleButton; const AHeight: Single);
 begin
   Var LApplyDynamicToggleButtonStyleInfo: TDynamicToggleButtonStyleInfo;
@@ -27551,7 +27551,7 @@ begin
   end;
 end;
 
-{******************************************************************************************************}
+{************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicToggleButtonStyle(const AName: String; const AToggleButton: TALDynamicToggleButton);
 begin
   Var LApplyDynamicToggleButtonStyleInfo: TDynamicToggleButtonStyleInfo;
@@ -27897,7 +27897,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{***********************************************************}
+{*****************************************************************}
 function TALStyleManager.GetToggleButtonStyleNames: TArray<String>;
 begin
   var LArray := FToggleButtonStyles.ToArray;

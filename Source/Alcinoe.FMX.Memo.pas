@@ -1837,7 +1837,7 @@ begin
   end;
 end;
 
-{**************************************************}
+{******************************************************}
 function TALMemo.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   result := False;
@@ -1849,7 +1849,7 @@ begin
   Result := TSizeF.Create(200, 75);
 end;
 
-{************************************}
+{********************************************}
 function TALMemo.GetAutoSize: TALAutoSizeMode;
 begin
   if FAutoSizeLineCount > 0 then Result := TALAutoSizeMode.Height

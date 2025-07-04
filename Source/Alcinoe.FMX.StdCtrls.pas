@@ -3419,25 +3419,25 @@ begin
     Pause;
 end;
 
-{********************************************************************}
+{*************************************************************}
 function TALAniIndicator.TAnimation.GetDefaultDuration: Single;
 begin
   Result := 1.0;
 end;
 
-{********************************************************************}
+{**********************************************************}
 function TALAniIndicator.TAnimation.GetDefaultLoop: Boolean;
 begin
   Result := True;
 end;
 
-{********************************************************************}
+{***************************************************************}
 function TALAniIndicator.TAnimation.GetDefaultStartValue: Single;
 begin
   Result := 0.0;
 end;
 
-{**************************************************}
+{**************************************************************}
 function TALAniIndicator.TAnimation.GetDefaultStopValue: Single;
 begin
   Result := 1.0;
@@ -5026,7 +5026,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************************************************}
+{******************************************************************************************************************************************************}
 procedure TALCustomTrack.TTrack.TStopIndicatorBrush.Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -5050,7 +5050,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************************************************}
+{***************************************************************************************************************************************************************}
 procedure TALCustomTrack.TTrack.TStopIndicatorBrush.InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -5364,7 +5364,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************************}
+{************************************************************************************************************************************************}
 procedure TALCustomTrack.TTrack.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
@@ -7664,7 +7664,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************************}
+{****************************************************************************************************************************************}
 procedure TALBaseCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -7696,7 +7696,7 @@ begin
   end;
 end;
 
-{************************************************************************************************************************}
+{*************************************************************************************************************************************************}
 procedure TALBaseCheckBox.TCheckMarkBrush.InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   BeginUpdate;
@@ -8010,7 +8010,7 @@ begin
   End;
 end;
 
-{*****************************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALBaseCheckBox.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
@@ -8504,13 +8504,13 @@ begin
   Result := TALBaseCheckBox(inherited Parent);
 end;
 
-{*********************************************************************************}
+{****************************************************************************}
 function TALBaseCheckBox.TStateStyles.GetTransition: TStateStyles.TTransition;
 begin
   Result := TStateStyles.TTransition(inherited Transition);
 end;
 
-{*********************************************************************************}
+{*******************************************************************************************}
 procedure TALBaseCheckBox.TStateStyles.SetTransition(const AValue: TStateStyles.TTransition);
 begin
   inherited Transition := AValue;
@@ -11257,7 +11257,7 @@ begin
     TALSwitch(Owner{StateStyles}.Parent{Thumb}.ParentControl{Track}.ParentControl{Switch}).AlignThumb;
 end;
 
-{****************************************************}
+{************************************************************}
 procedure TALSwitch.TThumb.TStateStyles.TTransition.DoProcess;
 begin
   if Enabled then begin
@@ -11273,7 +11273,7 @@ begin
   inherited;
 end;
 
-{************************************************************}
+{***********************************************************}
 procedure TALSwitch.TThumb.TStateStyles.TTransition.DoFinish;
 begin
   if Enabled then begin
@@ -11359,32 +11359,32 @@ begin
   TALSwitch(ParentControl{Track}.ParentControl{Switch}).click;
 end;
 
-{*************************************************************************************}
+{***************************************************************************************}
 constructor TALSwitch.TTransition.TInterpolationParams.Create(Const AOwner: TTransition);
 begin
   inherited create;
   FOwner := AOwner;
 end;
 
-{*************************************************************************************}
+{**********************************************************************}
 function TALSwitch.TTransition.TInterpolationParams.GetBezierX1: Single;
 begin
   Result := FOwner{TTransition}.FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierX1;
 end;
 
-{*************************************************************************************}
+{**********************************************************************}
 function TALSwitch.TTransition.TInterpolationParams.GetBezierY1: Single;
 begin
   Result := FOwner{TTransition}.FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierY1;
 end;
 
-{*************************************************************************************}
+{**********************************************************************}
 function TALSwitch.TTransition.TInterpolationParams.GetBezierX2: Single;
 begin
   Result := FOwner{TTransition}.FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierX2;
 end;
 
-{*************************************************************************************}
+{**********************************************************************}
 function TALSwitch.TTransition.TInterpolationParams.GetBezierY2: Single;
 begin
   Result := FOwner{TTransition}.FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationParams.BezierY2;
@@ -11418,20 +11418,20 @@ begin
   FOwner{TTransition}.FOwner{TALSwitch}.Track.StateStyles.Transition.InterpolationParams.BezierY2 := AValue;
 end;
 
-{*************************************************************************************}
+{***********************************************************************}
 function TALSwitch.TTransition.TInterpolationParams.GetOvershoot: Single;
 begin
   Result := FOwner{TTransition}.FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationParams.Overshoot;
 end;
 
-{*************************************************************************************}
+{**************************************************************************************}
 procedure TALSwitch.TTransition.TInterpolationParams.SetOvershoot(const AValue: Single);
 begin
   FOwner{TTransition}.FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationParams.Overshoot := AValue;
   FOwner{TTransition}.FOwner{TALSwitch}.Track.StateStyles.Transition.InterpolationParams.Overshoot := AValue;
 end;
 
-{*************************************************************************************}
+{****************************************************************}
 constructor TALSwitch.TTransition.Create(Const AOwner: TALSwitch);
 begin
   inherited create;
@@ -11439,97 +11439,97 @@ begin
   FInterpolationParams := TInterpolationParams.Create(self);
 end;
 
-{****************************************}
+{***************************************}
 destructor TALSwitch.TTransition.Destroy;
 begin
   ALFreeAndNil(FInterpolationParams);
   inherited;
 end;
 
-{*************************************************************************************}
+{************************************}
 procedure TALSwitch.TTransition.Start;
 begin
   FOwner{TALSwitch}.Thumb.StateStyles.Transition.Start;
   FOwner{TALSwitch}.Track.StateStyles.Transition.Start;
 end;
 
-{*************************************************************************************}
+{*************************************************}
 function TALSwitch.TTransition.GetDuration: Single;
 begin
   Result := FOwner{TALSwitch}.Thumb.StateStyles.Transition.Duration;
 end;
 
-{*************************************************************************************}
+{****************************************************************}
 procedure TALSwitch.TTransition.SetDuration(const AValue: Single);
 begin
   FOwner{TALSwitch}.Thumb.StateStyles.Transition.Duration := AValue;
   FOwner{TALSwitch}.Track.StateStyles.Transition.Duration := AValue;
 end;
 
-{*************************************************************************************}
+{****************************************************}
 function TALSwitch.TTransition.GetDelayClick: Boolean;
 begin
   Result := FOwner{TALSwitch}.Thumb.StateStyles.Transition.DelayClick;
 end;
 
-{*************************************************************************************}
+{*******************************************************************}
 procedure TALSwitch.TTransition.SetDelayClick(const AValue: Boolean);
 begin
   FOwner{TALSwitch}.Thumb.StateStyles.Transition.DelayClick := AValue;
   FOwner{TALSwitch}.Track.StateStyles.Transition.DelayClick := AValue;
 end;
 
-{*************************************************************************************}
+{************************************************************************}
 function TALSwitch.TTransition.GetInterpolationType: TALInterpolationType;
 begin
   Result := FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationType;
 end;
 
-{*************************************************************************************}
+{***************************************************************************************}
 procedure TALSwitch.TTransition.SetInterpolationType(const AValue: TALInterpolationType);
 begin
   FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationType := AValue;
   FOwner{TALSwitch}.Track.StateStyles.Transition.InterpolationType := AValue;
 end;
 
-{*************************************************************************************}
+{************************************************************************}
 function TALSwitch.TTransition.GetInterpolationMode: TALInterpolationMode;
 begin
   Result := FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationMode;
 end;
 
-{*************************************************************************************}
+{***************************************************************************************}
 procedure TALSwitch.TTransition.SetInterpolationMode(const AValue: TALInterpolationMode);
 begin
   FOwner{TALSwitch}.Thumb.StateStyles.Transition.InterpolationMode := AValue;
   FOwner{TALSwitch}.Track.StateStyles.Transition.InterpolationMode := AValue;
 end;
 
-{*************************************************************************************}
+{*****************************************************************************************}
 procedure TALSwitch.TTransition.SetInterpolationParams(const AValue: TInterpolationParams);
 begin
   // No action required; Transition acts only as a proxy
 end;
 
-{*************************************************************************************}
+{*******************************************************}
 Function TALSwitch.TTransition.IsDurationStored: Boolean;
 begin
   result := not SameValue(Duration, FOwner{TALSwitch}.Thumb.StateStyles.Transition.DefaultDuration, TALAnimation.TimeEpsilon);
 end;
 
-{*************************************************************************************}
+{*********************************************************}
 Function TALSwitch.TTransition.IsDelayClickStored: Boolean;
 begin
   result := DelayClick <> FOwner{TALSwitch}.Thumb.StateStyles.Transition.DefaultDelayClick;
 end;
 
-{*************************************************************************************}
+{****************************************************************}
 Function TALSwitch.TTransition.IsInterpolationTypeStored: Boolean;
 begin
   result := InterpolationType <> FOwner{TALSwitch}.Thumb.StateStyles.Transition.DefaultInterpolationType;
 end;
 
-{*************************************************************************************}
+{****************************************************************}
 Function TALSwitch.TTransition.IsInterpolationModeStored: Boolean;
 begin
   result := InterpolationMode <> FOwner{TALSwitch}.Thumb.StateStyles.Transition.DefaultInterpolationMode;
@@ -12090,7 +12090,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************}
+{************************************************************************************************************************************}
 procedure TALButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
@@ -12190,7 +12190,7 @@ begin
   FTextSettings.Assign(AValue);
 end;
 
-{*************************************************}
+{******************************************************************}
 procedure TALButton.TBaseStateStyle.SetXRadius(const Value: Single);
 begin
   if IsNan(FXRadius) and IsNan(Value) then Exit;
@@ -12200,7 +12200,7 @@ begin
   end;
 end;
 
-{*************************************************}
+{******************************************************************}
 procedure TALButton.TBaseStateStyle.SetYRadius(const Value: Single);
 begin
   if IsNan(FYRadius) and IsNan(Value) then Exit;
@@ -12216,13 +12216,13 @@ begin
   Result := '';
 end;
 
-{******************************************}
+{***********************************************************}
 function TALButton.TBaseStateStyle.GetDefaultXRadius: Single;
 begin
   Result := NaN;
 end;
 
-{******************************************}
+{***********************************************************}
 function TALButton.TBaseStateStyle.GetDefaultYRadius: Single;
 begin
   Result := NaN;
@@ -12250,14 +12250,14 @@ begin
   Result := FText <> DefaultText;
 end;
 
-{*****************************************}
+{**********************************************************}
 function TALButton.TBaseStateStyle.IsXRadiusStored: Boolean;
 begin
   if IsNan(FXRadius) and IsNan(DefaultXRadius) then Exit(False);
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-{*****************************************}
+{**********************************************************}
 function TALButton.TBaseStateStyle.IsYRadiusStored: Boolean;
 begin
   if IsNan(FYRadius) and IsNan(DefaultYRadius) then Exit(False);
@@ -13121,61 +13121,61 @@ begin
 
 end;
 
-{****************************************************}
+{**********************************************************}
 function TALToggleButton.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffe1e1e1;
 end;
 
-{******************************************************}
+{************************************************************}
 function TALToggleButton.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := $ffadadad;
 end;
 
-{*******************************************************************}
+{*************************************************************************}
 function TALToggleButton.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-{***************************************************}
+{*********************************************************}
 function TALToggleButton.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-{*********************************************************************}
+{***************************************************************************}
 function TALToggleButton.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
 begin
   Result := TALTextHorzAlign.center;
 end;
 
-{********************************************************************}
+{**************************************************************************}
 function TALToggleButton.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := $FFE1E1E1;
 end;
 
-{**********************************************************************}
+{****************************************************************************}
 function TALToggleButton.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := $FFADADAD;
 end;
 
-{***********************************************************************************}
+{*****************************************************************************************}
 function TALToggleButton.TBaseStateStyle.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-{*******************************************************************}
+{*************************************************************************}
 function TALToggleButton.TBaseStateStyle.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-{*******************************************************************}
+{*************************************************************************}
 constructor TALToggleButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
@@ -13188,32 +13188,32 @@ begin
   FYRadius := DefaultYRadius;
 end;
 
-{*******************************************}
+{*************************************************}
 destructor TALToggleButton.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
   inherited Destroy;
 end;
 
-{**************************************************************************************}
+{********************************************************************************************}
 function TALToggleButton.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
 begin
   Result := TFill.Create(AParent);
 end;
 
-{****************************************************************************************************}
+{**********************************************************************************************************}
 function TALToggleButton.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
   Result := TStroke.Create(AParent);
 end;
 
-{***********************************************************************************************************************}
+{*****************************************************************************************************************************}
 function TALToggleButton.TBaseStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings;
 begin
   Result := TTextSettings.Create(AParent);
 end;
 
-{**************************************************************}
+{********************************************************************}
 procedure TALToggleButton.TBaseStateStyle.Assign(Source: TPersistent);
 begin
   if Source is TBaseStateStyle then begin
@@ -13232,7 +13232,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{****************************************}
+{**********************************************}
 procedure TALToggleButton.TBaseStateStyle.Reset;
 begin
   BeginUpdate;
@@ -13247,7 +13247,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{*****************************************************}
 procedure TALToggleButton.TBaseStateStyle.AlignToPixel;
 begin
   BeginUpdate;
@@ -13259,7 +13259,7 @@ begin
   end;
 end;
 
-{***************************************************}
+{*********************************************************}
 procedure TALToggleButton.TBaseStateStyle.ApplyColorScheme;
 begin
   BeginUpdate;
@@ -13271,7 +13271,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALToggleButton.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
@@ -13315,7 +13315,7 @@ begin
   end;
 end;
 
-{**********************************************}
+{****************************************************}
 procedure TALToggleButton.TBaseStateStyle.DoSupersede;
 begin
   Inherited;
@@ -13356,7 +13356,7 @@ begin
   result := TALToggleButton(inherited ControlParent);
 end;
 
-{***************************************************************}
+{*********************************************************************}
 procedure TALToggleButton.TBaseStateStyle.SetText(const Value: string);
 begin
   if FText <> Value then begin
@@ -13365,13 +13365,13 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
+{*****************************************************************************************************}
 procedure TALToggleButton.TBaseStateStyle.SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
 begin
   FTextSettings.Assign(AValue);
 end;
 
-{*************************************************}
+{************************************************************************}
 procedure TALToggleButton.TBaseStateStyle.SetXRadius(const Value: Single);
 begin
   if IsNan(FXRadius) and IsNan(Value) then Exit;
@@ -13381,7 +13381,7 @@ begin
   end;
 end;
 
-{*************************************************}
+{************************************************************************}
 procedure TALToggleButton.TBaseStateStyle.SetYRadius(const Value: Single);
 begin
   if IsNan(FYRadius) and IsNan(Value) then Exit;
@@ -13391,25 +13391,25 @@ begin
   end;
 end;
 
-{********************************************************}
+{**************************************************************}
 function TALToggleButton.TBaseStateStyle.GetDefaultText: String;
 begin
   Result := '';
 end;
 
-{******************************************}
+{*****************************************************************}
 function TALToggleButton.TBaseStateStyle.GetDefaultXRadius: Single;
 begin
   Result := NaN;
 end;
 
-{******************************************}
+{*****************************************************************}
 function TALToggleButton.TBaseStateStyle.GetDefaultYRadius: Single;
 begin
   Result := NaN;
 end;
 
-{*****************************************************}
+{***********************************************************}
 function TALToggleButton.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
@@ -13419,26 +13419,26 @@ begin
             TextSettings.Inherit;
 end;
 
-{************************************************************************}
+{******************************************************************************}
 procedure TALToggleButton.TBaseStateStyle.TextSettingsChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{*******************************************************}
+{*************************************************************}
 function TALToggleButton.TBaseStateStyle.IsTextStored: Boolean;
 begin
   Result := FText <> DefaultText;
 end;
 
-{*****************************************}
+{****************************************************************}
 function TALToggleButton.TBaseStateStyle.IsXRadiusStored: Boolean;
 begin
   if IsNan(FXRadius) and IsNan(DefaultXRadius) then Exit(False);
   Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
-{*****************************************}
+{****************************************************************}
 function TALToggleButton.TBaseStateStyle.IsYRadiusStored: Boolean;
 begin
   if IsNan(FYRadius) and IsNan(DefaultYRadius) then Exit(False);
@@ -13865,13 +13865,13 @@ begin
   Result := TALToggleButton(inherited Parent);
 end;
 
-{*********************************************************************************}
+{****************************************************************************}
 function TALToggleButton.TStateStyles.GetTransition: TStateStyles.TTransition;
 begin
   Result := TStateStyles.TTransition(inherited Transition);
 end;
 
-{*********************************************************************************}
+{*******************************************************************************************}
 procedure TALToggleButton.TStateStyles.SetTransition(const AValue: TStateStyles.TTransition);
 begin
   inherited Transition := AValue;
@@ -13985,19 +13985,19 @@ begin
   end;
 end;
 
-{**************************************}
+{********************************************}
 function TALToggleButton.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{**********************************************}
+{****************************************************}
 function TALToggleButton.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-{*********************************************************}
+{***************************************************************}
 function TALToggleButton.CreateTextSettings: TALBaseTextSettings;
 begin
   Result := TTextSettings.Create;
@@ -14027,19 +14027,19 @@ begin
   end;
 end;
 
-{************************************************}
+{******************************************************}
 function TALToggleButton.GetTextSettings: TTextSettings;
 begin
   Result := TTextSettings(Inherited TextSettings);
 end;
 
-{**************************************************************}
+{********************************************************************}
 procedure TALToggleButton.SetTextSettings(const Value: TTextSettings);
 begin
   Inherited SetTextSettings(Value);
 end;
 
-{*******************************************************}
+{*************************************************************}
 procedure TALToggleButton.SetName(const Value: TComponentName);
 begin
   var LChangeText := not (csLoading in ComponentState) and (Name = Text) and
@@ -14055,7 +14055,7 @@ begin
   FStateStyles.Assign(AValue);
 end;
 
-{*******************************************************}
+{*************************************************************}
 procedure TALToggleButton.TextSettingsChanged(Sender: TObject);
 
   {~~~~~~~~~~~~~~~~~~}
@@ -14419,7 +14419,7 @@ begin
   // because BufDrawableRect always has the width and height of the localRect.
 end;
 
-{**************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************************}
 Procedure TALToggleButton.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF);
 begin
 

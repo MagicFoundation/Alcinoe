@@ -1180,13 +1180,13 @@ begin
   FScale.Assign(AValue);
 end;
 
-{***************************************}
+{***********************************************}
 function TALControl.GetAutoSize: TALAutoSizeMode;
 begin
   result := FAutoSize;
 end;
 
-{*****************************************************}
+{*************************************************************}
 procedure TALControl.SetAutoSize(const Value: TALAutoSizeMode);
 begin
   if FAutoSize <> Value then
@@ -1205,7 +1205,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{*********************************************************}
 function TALControl.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Width];
@@ -1223,7 +1223,7 @@ begin
   end;
 end;
 
-{*****************************************************}
+{**********************************************************}
 function TALControl.HasUnconstrainedAutosizeHeight: Boolean;
 begin
   Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Height];

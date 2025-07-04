@@ -1159,7 +1159,7 @@ begin
   Inherited Destroy;
 end;
 
-{******************************************************************}
+{**********************************************************************}
 function TALDynamicListBox.TItem.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Width];
@@ -1171,7 +1171,7 @@ begin
   end;
 end;
 
-{******************************************************************}
+{***********************************************************************}
 function TALDynamicListBox.TItem.HasUnconstrainedAutosizeHeight: Boolean;
 begin
   Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Height];
@@ -2242,14 +2242,14 @@ begin
   _TALFloatAnimationProtectedAccess(FPullingPhaseAniIndicator.Animation).FCurrentValue := PullProgress / 5;
 end;
 
-{***************************************************************************}
+{*********************************************************************************}
 constructor TALDynamicListBox.TView.TLoadMoreIndicator.Create(const AOwner: TItem);
 begin
   inherited;
   AutoSize := TALAutoSizeMode.Both;
 end;
 
-{*****************************************************************************}
+{***********************************************************************************}
 constructor TALDynamicListBox.TView.TLoadMoreRetryButton.Create(const AOwner: TItem);
 begin
   inherited;

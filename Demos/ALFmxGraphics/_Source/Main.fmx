@@ -84,7 +84,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 17
+      TabOrder = 19
       Text = 'Recreate Buffers'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -133,7 +133,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 15
+      TabOrder = 17
       Text = 'Test FPS'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite

@@ -336,22 +336,6 @@ with features like autosizing and prompt text.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3edit.webp?raw=true" />
 
-## Why Alcinoe for Material 3?
-While Material 3 focuses on responsive and adaptive design, 
-performance is equally important. Alcinoe’s double-buffered 
-rendering ensures that your controls are fast and fluid, 
-even during complex UI interactions like scrolling. This 
-performance boost aligns perfectly with Material 3’s goal 
-of seamless, responsive user interfaces.
-
-Incorporating Alcinoe in your Delphi projects allows you to 
-create modern, high-performance apps with a polished 
-Material 3 appearance, without compromising on speed or 
-cross-platform compatibility.
-
-Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-<br/>
-<br/>
   
 Effortless Theming with TALStyleManager
 =======================================
@@ -372,6 +356,7 @@ This design allows you to switch effortlessly between light, dark, or custom
 themes—ensuring both consistency and maintainability.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/lightdarkmode.jpg?raw=true" />
+
 
 High-Performance Text Control with HTML Formatting and Interactive Capabilities
 ===============================================================================
@@ -395,6 +380,7 @@ responsive text behavior. Learn more at
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/htmltext.png?raw=true" />
 <br/>
   
+  
 TALPageController – The Page Transition Maestro
 ===============================================
 
@@ -408,6 +394,7 @@ transitions. Learn more at
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pagecontroller.gif?raw=true" />
 <br/>
+  
   
 TALPageIndicator – Animated Multi-Page Navigator
 ================================================

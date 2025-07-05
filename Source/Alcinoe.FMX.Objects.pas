@@ -394,7 +394,9 @@ type
         fCurrentProgress: Single;
         FEnabled: Boolean;
         function GetDuration: Single;
+        {$IF defined(ALSkiaAvailable)}
         procedure SetDuration(const Value: Single);
+        {$ENDIF}
         function GetCurrentTime: Single;
         function GetSpeed: Single;
         procedure SetSpeed(const Value: Single);
@@ -2932,12 +2934,14 @@ begin
   end;
 end;
 
-{*********************************************************************}
+{****************************}
+{$IF defined(ALSkiaAvailable)}
 procedure TALAnimatedImage.TAnimation.SetDuration(const Value: Single);
 begin
   FDuration := Value;
   UpdateInheritedAnimationDuration;
 end;
+{$ENDIF}
 
 {*********************************************************************}
 procedure TALAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);

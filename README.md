@@ -644,8 +644,8 @@ Learn more at
 SpringForce Animation
 =====================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="10" height="711" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" style="width:320px; height:711px;" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" style="height:711px;" />
   
 Inspired by Android's **SpringForce**, the **TALSpringForceAnimation** 
 component brings the dynamics of physics-based animations to the 

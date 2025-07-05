@@ -644,7 +644,7 @@ Learn more at
 SpringForce Animation
 =====================
 
-<table style="border: none; border-collapse: collapse;">
+<table style="border: 1px solid transparent; border-collapse: collapse;">
   <tr>
     <td>
       <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" width="320" height="711" />
@@ -664,8 +664,7 @@ offering a more realistic and engaging user experience.
 This version improves the flow and clarity of the description 
 while keeping the markdown formatting<br/>
 <br/>
-Learn more at 
-
+Learn more at
     </td>
   </tr>
 </table>

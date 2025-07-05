@@ -650,20 +650,20 @@ SpringForce Animation
       <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" width="320" height="711" />
     </td>
     <td style="padding-left: 20px;" valign="top">
-Inspired by Android's **SpringForce**, the **TALSpringForceAnimation** 
+Inspired by Android's <b>SpringForce</b>, the <b>TALSpringForceAnimation</b> 
 component brings the dynamics of physics-based animations to the 
 Delphi platform. This component simulates the real-world behavior 
 of objects influenced by spring mechanics, producing animations that 
-stretch, bounce, and settle, mirroring the physical world. 
-
+stretch, bounce, and settle, mirroring the physical world.<br/>
+<br/>
 Developers can fine-tune various physical properties of the spring, 
 such as stiffness and damping ratio, allowing for a wide range of 
 animation behaviors. This flexibility enables developers to create 
 animations tailored to the specific nuances of different applications, 
 offering a more realistic and engaging user experience.
 This version improves the flow and clarity of the description 
-while keeping the markdown formatting
-
+while keeping the markdown formatting<br/>
+<br/>
 Learn more at 
 [Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
     </td>

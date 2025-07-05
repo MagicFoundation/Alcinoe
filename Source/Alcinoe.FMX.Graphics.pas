@@ -4718,54 +4718,135 @@ var
 
     end
 
-    // use drawRoundRect
-    else if (not aForceDrawPath) and
-            (not aClipPath) and
-            ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
+    // use drawRoundRect/addRoundRect+drawPath
+    else if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
              (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
             (FCorners=AllCorners) and
             (FSides=AllSides) then begin
 
-      if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
-        if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
-          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
-        else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
-          LRect.Inflate(-1, -1);
+      // use drawRoundRect
+      if (not aForceDrawPath) and
+         (not aClipPath) then begin
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
+            LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+          else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
+            LRect.Inflate(-1, -1);
+        end;
+        //--
+        var LJRect := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
+        ACanvas.drawRoundRect(
+          LJRect{rect},
+          LScaledXRadius {rx},
+          LScaledYRadius {ry},
+          apaint);
+        LJRect := nil;
+      end
+
+      // use addRoundRect+drawPath
+      else begin
+        var LPath := TJPath.Create;
+        //--
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          if (aDrawOnlyBorder) or
+             ((LRectIsEqualsToStrokeRect) and
+              (LShadowcolor = TalphaColorRec.Null)) then begin
+            LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
+          end
+          else if (LRectIsEqualsToStrokeRect) and
+                  (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then begin
+            LRect.Inflate(-1, -1);
+          end;
+        end;
+        //--
+        var LXRadius: single := LScaledXRadius;
+        var LYradius: single := LScaledYRadius;
+        if (LXRadius > LRect.width / 2) then LXRadius := LRect.width / 2;
+        if (LYradius > LRect.height / 2) then LYradius := LRect.height / 2;
+        //--
+        var LJRect := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
+        LPath.addRoundRect(
+          LJRect{rect},
+          LXRadius {rx},
+          LYRadius {ry},
+          TJPath_Direction.JavaClass.CW{dir});
+        //--
+        if aPaint <> nil then ACanvas.drawPath(LPath,aPaint);
+        if aClipPath then begin
+          ACanvas.save;
+          ACanvas.clipPath(LPath);
+          {$IF defined(DEBUG)}
+          if LPathClipped then
+            raise Exception.Create('Error 2001FF24-310A-48D3-9D9C-34B8C3358130');
+          {$ENDIF}
+          LPathClipped := True;
+        end;
+        LPath := nil;
       end;
-      //--
-      var LJRect := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
-      ACanvas.drawRoundRect(
-        LJRect{rect},
-        LScaledXRadius {rx},
-        LScaledYRadius {ry},
-        apaint);
-      LJRect := nil;
 
     end
 
-    // use drawRect
-    else if (not aForceDrawPath) and
-            (not aClipPath) and
-            ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
+    // use drawRect/addRect+drawPath
+    else if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
              (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
              (FCorners=[])) and
             (FSides=AllSides) then begin
 
-      if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
-        if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
-          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
-        else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
-          LRect.Inflate(-1, -1);
+      // use drawRect
+      if (not aForceDrawPath) and
+         (not aClipPath) then begin
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
+            LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+          else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
+            LRect.Inflate(-1, -1);
+        end;
+        //--
+        ACanvas.drawRect(
+          LRect.left{left},
+          LRect.top{top},
+          LRect.right{right},
+          LRect.bottom{bottom},
+          apaint);
+      end
+
+      // use addRect+drawPath
+      else begin
+        var LPath := TJPath.Create;
+        //--
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          if (aDrawOnlyBorder) or
+             ((LRectIsEqualsToStrokeRect) and
+              (LShadowcolor = TalphaColorRec.Null)) then begin
+            LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
+          end
+          else if (LRectIsEqualsToStrokeRect) and
+                  (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then begin
+            LRect.Inflate(-1, -1);
+          end;
+        end;
+        //--
+        var LJRect := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
+        LPath.addRect(
+          LJRect{rect},
+          TJPath_Direction.JavaClass.CW{dir});
+        //--
+        if aPaint <> nil then ACanvas.drawPath(LPath,aPaint);
+        if aClipPath then begin
+          ACanvas.save;
+          ACanvas.clipPath(LPath);
+          {$IF defined(DEBUG)}
+          if LPathClipped then
+            raise Exception.Create('Error 2001FF24-310A-48D3-9D9C-34B8C3358130');
+          {$ENDIF}
+          LPathClipped := True;
+        end;
+        LPath := nil;
       end;
-      //--
-      ACanvas.drawRect(
-        LRect.left{left},
-        LRect.top{top},
-        LRect.right{right},
-        LRect.bottom{bottom},
-        apaint);
 
     end
 

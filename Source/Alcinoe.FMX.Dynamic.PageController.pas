@@ -411,7 +411,7 @@ type
         //**procedure DoDeleteChildren; override;
         procedure DoContentChanged; override;
         {$IFNDEF ALDPK}
-        //**function IsVisibleObject(const AObject: TControl): Boolean; override;
+        function IsVisibleObject(const AObject: TALDynamicControl): Boolean; override;
         {$ENDIF}
       public
         constructor Create(const AOwner: TObject); override;
@@ -1607,25 +1607,25 @@ end;
 
 {*************}
 {$IFNDEF ALDPK}
-//**function TALDynamicPageController.TContent.IsVisibleObject(const AObject: TControl): Boolean;
-//**begin
-//**
-//**  if AObject.Visible then begin
-//**
-//**    if FPageController.Orientation = TOrientation.Horizontal then begin
-//**      Result := (AObject.Left < -Left + FPageController.Width) and
-//**                (AObject.Left + AObject.Width > -Left);
-//**    end
-//**    else begin
-//**      Result := (AObject.Top < -Top + FPageController.Height) and
-//**                (AObject.Top + AObject.Height > -Top);
-//**    end;
-//**
-//**  end
-//**  else
-//**    result := False;
-//**
-//**end;
+function TALDynamicPageController.TContent.IsVisibleObject(const AObject: TALDynamicControl): Boolean;
+begin
+
+  if AObject.Visible then begin
+
+    if FPageController.Orientation = TOrientation.Horizontal then begin
+      Result := (AObject.Left < -Left + FPageController.Width) and
+                (AObject.Left + AObject.Width > -Left);
+    end
+    else begin
+      Result := (AObject.Top < -Top + FPageController.Height) and
+                (AObject.Top + AObject.Height > -Top);
+    end;
+
+  end
+  else
+    result := False;
+
+end;
 {$ENDIF}
 
 {********************************************************************************************************************}

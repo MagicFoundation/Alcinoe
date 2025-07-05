@@ -164,6 +164,7 @@ Type
     procedure SetVisible(const Value: Boolean); virtual; // [TControl] procedure SetVisible(const Value: Boolean); virtual;
     function GetFirstVisibleObjectIndex: Integer; virtual; // [TControl] function GetFirstVisibleObjectIndex: Integer; virtual;
     function GetLastVisibleObjectIndex: Integer; virtual; // [TControl] function GetLastVisibleObjectIndex: Integer; virtual;
+    function IsVisibleObject(const AObject: TALDynamicControl): Boolean; virtual;
     procedure RefreshAbsoluteVisible;
     procedure SetAlign(const Value: TALAlignLayout); virtual; // [TControl] procedure SetAlign(const Value: TAlignLayout); virtual;
     function DoGetDownloadPriority: Int64; virtual;
@@ -973,37 +974,35 @@ function TALDynamicControl.GetControlAtPos(
            out AControlPos: TALPointD; // AControlPos is local to the founded control
            const ACheckHitTest: Boolean = true): TALDynamicControl;
 begin
-  if not ExpandedLocalRect.Contains(aPos) then begin
+  if (not Visible) or (not AbsoluteEnabled) then begin
     AControlPos := TALPointD.Zero;
     exit(nil);
   end;
-  //--
-  for var i := FControlsCount - 1 downto 0 do begin
-    var LControl := FControls[i];
-    if not LControl.Visible then continue;
-    if LControl.ExpandedBoundsRect.Contains(aPos) then begin
+  //if (ClipChildren) and (not ExpandedLocalRect.Contains(aPos)) then begin
+  //  AControlPos := TALPointD.Zero;
+  //  exit(nil);
+  //end;
+  if ControlsCount > 0 then
+    for var I := GetLastVisibleObjectIndex downto GetFirstVisibleObjectIndex do
+    begin
+      var LControl := Controls[I];
+      if not IsVisibleObject(LControl) then
+        Continue;
       result := LControl.GetControlAtPos(
                   APos - LControl.BoundsRect.TopLeft,
                   AControlPos,
                   ACheckHitTest);
-      if Result = nil then begin
-        IF ACheckHitTest and (not LControl.HitTest) then AControlPos := TALPointD.Zero
-        else begin
-          result := LControl;
-          AControlPos := APos - LControl.BoundsRect.TopLeft;
-        end;
-      end;
-      exit;
+      if result <> nil then
+        exit;
     end;
-  end;
-  //--
-  IF ACheckHitTest and (not HitTest) then begin
-    Result := Nil;
-    AControlPos := TALPointD.Zero
-  end
-  else begin
+
+  if ExpandedLocalRect.Contains(aPos) and ((not ACheckHitTest) or (HitTest)) then begin
     result := Self;
     AControlPos := aPos;
+  end
+  else begin
+    AControlPos := TALPointD.Zero;
+    exit(nil);
   end;
 end;
 
@@ -1384,7 +1383,16 @@ end;
 {************************************************************}
 function TALDynamicControl.GetLastVisibleObjectIndex: Integer;
 begin
+  // Note: TControl.GetLastVisibleObjectIndex returns FControls.Count,
+  // which refers to an index beyond the last valid one.
+  // We return the correct last index here.
   Result := FControlsCount - 1;
+end;
+
+{************************************************************************************}
+function TALDynamicControl.IsVisibleObject(const AObject: TALDynamicControl): Boolean;
+begin
+  result := AObject.Visible;
 end;
 
 {*************************************************}

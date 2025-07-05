@@ -804,6 +804,7 @@ end;
 constructor TALDynamicListBox.TItem.TContent.Create(const AOwner: TItem);
 begin
   inherited create(AOwner);
+  HitTest := False;
   Visible := False;
   BeginUpdate;
   IsEphemeral := True;
@@ -4393,16 +4394,11 @@ function TALDynamicListBox.GetControlAtPos(
            out AControlPos: TALPointD; // AControlPos is local to the founded control
            const ACheckHitTest: Boolean = true): TALDynamicControl;
 begin
-  if MainView = nil then exit(nil);
-  var LAbsolutePos := LocalToAbsolute(APos.ReducePrecision);
-
-  if Hovered <> nil then
-    result := Hovered.GetControlAtPos(Hovered.AbsoluteToLocal(LAbsolutePos), AControlPos, ACheckHitTest)
-  else
-    result := nil;
-
-  if result = nil then
-    result := MainView.GetControlAtPos(MainView.AbsoluteToLocal(LAbsolutePos), AControlPos, ACheckHitTest);
+  if MainView = nil then begin
+    AControlPos := TALPointD.Zero;
+    exit(nil);
+  end;
+  result := MainView.GetControlAtPos(MainView.AbsoluteToLocal(LocalToAbsolute(APos.ReducePrecision)), AControlPos, ACheckHitTest);
 end;
 
 {****************************************************************************************************}

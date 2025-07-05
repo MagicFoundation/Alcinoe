@@ -2008,6 +2008,7 @@ type
     function GetChecked: Boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+    procedure DoClickSound; override;
     procedure Click; override;
     procedure DoChanged; virtual;
     procedure AdjustSize; override;
@@ -14164,6 +14165,14 @@ begin
     Click; // Emulate mouse click to perform Action.OnExecute
     KeyChar := #0;
   end;
+end;
+
+{*************************************}
+procedure TALToggleButton.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((ClickSound=TALClickSoundMode.Default) and ALGlobalClickSoundEnabled) then
+    ALPlayClickSound;
 end;
 
 {******************************}

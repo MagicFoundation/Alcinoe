@@ -38,6 +38,29 @@ features and custom styling capabilities.
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" width="25" />
   <a href="https://apps.apple.com/app/alcinoe-firemonkey-controls/id6738398604"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemoappstore.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" /></a>
 </p>
+
+#### Alcinoe Dynamic ListBox Demo ####
+
+This demo app features the Alcinoe Dynamic ListBox — a fast, 
+flexible, and highly customizable list control for FireMonkey 
+applications built with Delphi. Designed for modern user 
+interfaces, the Dynamic ListBox supports complex, animated, 
+and scrollable content with smooth performance.
+
+The control is built around an on-demand data model, dynamically 
+creating items when needed and automatically releasing them 
+when they are no longer in view. This approach ensures high 
+performance and minimal memory usage, making it ideal for 
+building feature-rich, content-heavy applications — including 
+Instagram-like feeds, chat interfaces, and dynamic news streams.
+
+<p align="left">
+  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxdynamiclistboxdemo.png?raw=true" alt="Alcinoe Dynamic ListBox Demo" /></a>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" width="25" />
+  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxdynamiclistboxdemogoogleplay.png?raw=true" alt="Alcinoe Dynamic ListBox Demo" /></a>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" width="25" />
+  <a href="https://testflight.apple.com/join/VQnj4KsU"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxdynamiclistboxdemoappstore.png?raw=true" alt="Alcinoe Dynamic ListBox Demo" /></a>
+</p>
   
 #### KisKis ####
 

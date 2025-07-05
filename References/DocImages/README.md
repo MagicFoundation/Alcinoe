@@ -1,3 +1,6 @@
+to create a QR Code:
+https://qrcode.tec-it.com/en
+
 to convert MP4 to animated gif :
 
 Generate the palette:

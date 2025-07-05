@@ -41,18 +41,14 @@ features and custom styling capabilities.
 
 #### Alcinoe Dynamic ListBox Demo ####
 
-This demo app features the Alcinoe Dynamic ListBox — a fast, 
-flexible, and highly customizable list control for FireMonkey 
-applications built with Delphi. Designed for modern user 
-interfaces, the Dynamic ListBox supports complex, animated, 
-and scrollable content with smooth performance.
-
-The control is built around an on-demand data model, dynamically 
-creating items when needed and automatically releasing them 
-when they are no longer in view. This approach ensures high 
-performance and minimal memory usage, making it ideal for 
-building feature-rich, content-heavy applications — including 
-Instagram-like feeds, chat interfaces, and dynamic news streams.
+This demo showcases the Alcinoe Dynamic ListBox — a 
+high-performance, customizable list control for Delphi 
+FireMonkey apps. Optimized for modern UIs, it supports 
+animated, scrollable content using an on-demand data 
+model that creates and frees items dynamically, ensuring 
+smooth performance and low memory usage. Ideal for 
+building rich, content-driven interfaces like social 
+feeds, chats, or news streams.
 
 <p align="left">
   <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxdynamiclistboxdemo.png?raw=true" alt="Alcinoe Dynamic ListBox Demo" /></a>

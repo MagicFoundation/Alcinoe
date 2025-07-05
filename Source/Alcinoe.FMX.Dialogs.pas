@@ -694,7 +694,7 @@ function TALDialog.GetEdits: TArray<TALBaseEdit>;
     for var I := 0 to AControl.ControlsCount - 1 do begin
       if AControl.Controls[i] is TALBaseEdit then begin
         setlength(Result, Length(Result) + 1);
-        Result[High(Result)] := TALEdit(AControl.Controls[i]);
+        Result[High(Result)] := TALBaseEdit(AControl.Controls[i]);
       end
       else _GetEdits(AControl.Controls[i]);
     end;
@@ -818,13 +818,13 @@ end;
 {*************************************************************}
 function TALDialog.GetEdit(const ATag: NativeInt): TALBaseEdit;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _GetEdit(const AControl: TControl): TALEdit;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _GetEdit(const AControl: TControl): TALBaseEdit;
   begin
     Result := nil;
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i].Tag = ATag) and (AControl.Controls[i] is TALEdit) then begin
-        Result := TALEdit(AControl.Controls[i]);
+      if (AControl.Controls[i].Tag = ATag) and (AControl.Controls[i] is TALBaseEdit) then begin
+        Result := TALBaseEdit(AControl.Controls[i]);
         exit;
       end
       else begin

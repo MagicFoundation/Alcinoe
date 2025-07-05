@@ -644,47 +644,28 @@ Learn more at
 SpringForce Animation
 =====================
 
-<table style="border: 1px solid transparent; border-collapse: collapse;">
-  <tr>
-    <td>
-      <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" width="320" height="711" />
-    </td>
-    <td style="padding-left: 20px;" valign="top">
-Inspired by Android's <b>SpringForce</b>, the <b>TALSpringForceAnimation</b> 
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="10" height="711" />
+  
+Inspired by Android's **SpringForce**, the **TALSpringForceAnimation** 
 component brings the dynamics of physics-based animations to the 
 Delphi platform. This component simulates the real-world behavior 
 of objects influenced by spring mechanics, producing animations that 
-stretch, bounce, and settle, mirroring the physical world.<br/>
-<br/>
+stretch, bounce, and settle, mirroring the physical world. 
+
 Developers can fine-tune various physical properties of the spring, 
 such as stiffness and damping ratio, allowing for a wide range of 
 animation behaviors. This flexibility enables developers to create 
 animations tailored to the specific nuances of different applications, 
 offering a more realistic and engaging user experience.
 This version improves the flow and clarity of the description 
-while keeping the markdown formatting<br/>
-<br/>
-Learn more at
-    </td>
-  </tr>
-</table>
+while keeping the markdown formatting
 
-<br/>
-<br/>
-  
-<div style="float: left; margin-right: 20px;">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" width="320" height="711">
-</div>
-
-**SpringForce Animation**
-
-Inspired by Android's **SpringForce**, the `TALSpringForceAnimation` component brings the dynamics of physics-based animations to the Delphi platform. This component simulates the real-world behavior of objects influenced by spring mechanics, producing animations that stretch, bounce, and settle, mirroring the physical world.
-
-Developers can fine-tune various physical properties of the spring, such as stiffness and damping ratio, allowing for a wide range of animation behaviors. This flexibility enables developers to create animations tailored to the specific nuances of different applications, offering a more realistic and engaging user experience.
-
-[Learn more at Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+Learn more at 
+[Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
 
 <br clear="left"/>
+<br/>
   
   
 Scrolling Engine

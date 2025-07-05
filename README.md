@@ -349,8 +349,8 @@ and dark theme variants—or any other custom theme.
 
 The core of this flexibility lies in the fact that each Alcinoe control associates 
 a **ColorKey** with every **Color** property. You can assign a symbolic value to 
-this key, such as **Material.Color.Primary**. Then, within **TALStyleManager**,
-you define the actual color value mapped to **Material.Color.Primary**.
+this key, such as **Material3.Color.Primary**. Then, within **TALStyleManager**,
+you define the actual color value mapped to **Material3.Color.Primary**.
 
 This design allows you to switch effortlessly between light, dark, or custom 
 themes—ensuring both consistency and maintainability.
@@ -392,7 +392,7 @@ and customize the behavior of scrolling animations and
 transitions. Learn more at 
 [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pagecontroller.gif?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/pagecontroller.gif?raw=true" width="380" style="width:380px;" />
 <br/>
   
   
@@ -643,6 +643,31 @@ Learn more at
 
 SpringForce Animation
 =====================
+
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" width="320" height="711" />
+    </td>
+    <td style="padding-left: 20px;">
+      <p><strong>SpringForce Animation</strong></p>
+      <p>
+      Inspired by Android's <strong>SpringForce</strong>, the <code>TALSpringForceAnimation</code> 
+      component brings the dynamics of physics-based animations to the Delphi platform. This component 
+      simulates the real-world behavior of objects influenced by spring mechanics, producing animations 
+      that stretch, bounce, and settle, mirroring the physical world.
+      </p>
+      <p>
+      Developers can fine-tune various physical properties of the spring, such as stiffness and damping ratio, 
+      allowing for a wide range of animation behaviors. This flexibility enables developers to create animations 
+      tailored to the specific nuances of different applications, offering a more realistic and engaging user experience.
+      </p>
+      <p>
+        Learn more at <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation">Demos/ALAnimation</a>
+      </p>
+    </td>
+  </tr>
+</table>
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />

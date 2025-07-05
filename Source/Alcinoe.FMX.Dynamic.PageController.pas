@@ -218,6 +218,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -317,6 +318,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -529,6 +531,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -1000,7 +1003,7 @@ begin
   FActiveIndicator.OnChanged := ActiveIndicatorChanged;
   FInactiveIndicator := TInactiveIndicator.Create;
   FInactiveIndicator.OnChanged := InactiveIndicatorChanged;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
 end;
 
 {*****************************************}
@@ -1791,7 +1794,7 @@ begin
     var LNewViewportPosition := ViewportPosition;
     if (assigned(FPageController.FOnViewportPositionChange)) and
        (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
-      FPageController.FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
+      FPageController.FOnViewportPositionChange(FPageController, fLastViewportPosition, LNewViewportPosition);
     fLastViewportPosition := LNewViewportPosition;
 
     If FPageController.PageIndicator <> nil then begin

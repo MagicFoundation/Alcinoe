@@ -849,7 +849,7 @@ type
         procedure Reset; override;
         procedure AlignToPixel; override;
         procedure ApplyColorScheme; override;
-        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
+        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseEdit read GetControlParent;
         property DefaultPromptTextColor: TalphaColor read GetDefaultPromptTextColor;
@@ -905,6 +905,17 @@ type
       // ------------
       // TStateStyles
       TStateStyles = class(TALBaseStateStyles)
+      public
+        type
+          // -----------
+          // TTransition
+          TTransition = class(TALBaseStateStyles.TTransition)
+          public
+            procedure Start; override;
+          protected
+            procedure DoProcess; override;
+            procedure DoFinish; override;
+          end;
       private
         FDisabled: TDisabledStateStyle;
         FHovered: THoveredStateStyle;
@@ -917,12 +928,10 @@ type
         procedure HoveredChanged(ASender: TObject);
         procedure FocusedChanged(ASender: TObject);
       protected
+        function CreateTransition: TALBaseStateStyles.TTransition; override;
         function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
         function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; virtual;
         function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
-        procedure StartTransition; override;
-        procedure TransitionAnimationProcess(Sender: TObject); override;
-        procedure TransitionAnimationFinish(Sender: TObject); override;
       public
         constructor Create(const AParent: TALControl); override;
         destructor Destroy; override;
@@ -1050,8 +1059,6 @@ type
     procedure IsMouseOverChanged; override;
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
-    procedure SetXRadius(const Value: Single); override;
-    procedure SetYRadius(const Value: Single); override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
     procedure LabelTextSettingsChanged(Sender: TObject); virtual;
     procedure SupportingTextSettingsChanged(Sender: TObject); virtual;
@@ -1143,6 +1150,7 @@ type
     //property CanParentFocus;
     //property Caret;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -1243,7 +1251,7 @@ type
     constructor Create(AOwner: TComponent); override;
     function HasUnconstrainedAutosizeWidth: Boolean; override;
   published
-    property AutoSize default TALAutoSizeMode.All;
+    property AutoSize default TALAutoSizeMode.Both;
     property Password;
   end;
 
@@ -4448,8 +4456,8 @@ begin
   ALFreeAndNilDrawable(BufSupportingTextDrawable);
 end;
 
-{*************************************************************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+{**************************************************************************************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single; const AReverse: Boolean);
 begin
   {$IF defined(debug)}
   if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
@@ -4460,11 +4468,11 @@ begin
     var LPrevPromptTextColorKey := FPromptTextColorKey;
     var LPrevTintColorKey := FTintColorKey;
 
-    inherited Interpolate(ATo, ANormalizedTime);
+    inherited Interpolate(ATo, ANormalizedTime, AReverse);
 
     if ATo <> nil then begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, TBaseStateStyle(ATo).PromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
+      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime, AReverse);
       TintColor := ALInterpolateColor(TintColor{Start}, TBaseStateStyle(ATo).TintColor{Stop}, ANormalizedTime);
     end
     {$IF defined(debug)}
@@ -4472,12 +4480,12 @@ begin
     {$ENDIF}
     else if ControlParent <> nil then begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, ControlParent.PromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime, AReverse);
       TintColor := ALInterpolateColor(TintColor{Start}, ControlParent.TintColor{Stop}, ANormalizedTime);
     end
     else begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(nil, ANormalizedTime);
+      TextSettings.Interpolate(nil, ANormalizedTime, AReverse);
       TintColor := ALInterpolateColor(TintColor{Start}, DefaultTintColor{Stop}, ANormalizedTime);
     end;
 
@@ -4718,6 +4726,29 @@ begin
   Result := inherited GetInherit;
 end;
 
+{***************************************************}
+procedure TALBaseEdit.TStateStyles.TTransition.Start;
+begin
+  inherited;
+  TStateStyles(Owner).Parent.UpdateEditControlStyle;
+end;
+
+{*******************************************************}
+procedure TALBaseEdit.TStateStyles.TTransition.DoProcess;
+begin
+  inherited;
+  if Enabled then
+    TStateStyles(Owner).Parent.UpdateEditControlStyle;
+end;
+
+{******************************************************}
+procedure TALBaseEdit.TStateStyles.TTransition.DoFinish;
+begin
+  inherited;
+  if Enabled then
+    TStateStyles(Owner).Parent.UpdateEditControlStyle;
+end;
+
 {*********************************************************************}
 constructor TALBaseEdit.TStateStyles.Create(const AParent: TALControl);
 begin
@@ -4742,6 +4773,12 @@ begin
   inherited Destroy;
 end;
 
+{*********************************************************************************}
+function TALBaseEdit.TStateStyles.CreateTransition: TALBaseStateStyles.TTransition;
+begin
+  result := TTransition.Create(Self);
+end;
+
 {******************************************************************************************************}
 function TALBaseEdit.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
@@ -4758,27 +4795,6 @@ end;
 function TALBaseEdit.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
-end;
-
-{*************************************************}
-procedure TALBaseEdit.TStateStyles.StartTransition;
-begin
-  inherited;
-  Parent.UpdateEditControlStyle;
-end;
-
-{*****************************************************************************}
-procedure TALBaseEdit.TStateStyles.TransitionAnimationProcess(Sender: TObject);
-begin
-  inherited;
-  Parent.UpdateEditControlStyle;
-end;
-
-{****************************************************************************}
-procedure TALBaseEdit.TStateStyles.TransitionAnimationFinish(Sender: TObject);
-begin
-  inherited;
-  Parent.UpdateEditControlStyle;
 end;
 
 {*************************************************************}
@@ -5412,7 +5428,7 @@ begin
   ALLog('TALBaseEdit.DoEnter', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoEnter;
-  StateStyles.startTransition;
+  StateStyles.Transition.start;
   //--
   if (GetIsTextEmpty) and
      (HasTranslationLabelTextAnimation) then begin
@@ -5444,7 +5460,7 @@ begin
   ALLog('TALBaseEdit.DoExit', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoExit;
-  StateStyles.startTransition;
+  StateStyles.Transition.start;
   UpdateNativeViewVisibility;
   //--
   if (GetIsTextEmpty) and
@@ -5573,7 +5589,7 @@ begin
     end;
     {$ENDIF}
   end;
-  StateStyles.startTransition;
+  StateStyles.Transition.start;
 end;
 
 {****************************************************************}
@@ -5629,58 +5645,6 @@ begin
   ClearBufPromptTextDrawable;
   UpdateEditControlStyle;
   AdjustSize;
-end;
-
-{****************************************************}
-procedure TALBaseEdit.SetXRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
-    end;
-    APrevStateStyle.StateLayer.XRadius := XRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
-end;
-
-{****************************************************}
-procedure TALBaseEdit.SetYRadius(const Value: Single);
-
-  {~~~~~~~~~~~~~~~~~~}
-  {$IF defined(ALDPK)}
-  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
-  begin
-    if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.StateLayer.HasFill) then begin
-      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
-    end;
-    APrevStateStyle.StateLayer.YRadius := YRadius;
-  end;
-  {$ENDIF}
-
-begin
-  inherited;
-  {$IF defined(ALDPK)}
-  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
-    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
-  end;
-  {$ENDIF}
 end;
 
 {**************************************************************************}
@@ -6163,7 +6127,7 @@ begin
     //LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
     //LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
     //--
-    LOptions.AutoSize := TALAutoSizeMode.All;
+    LOptions.AutoSize := TALAutoSizeMode.Both;
     //--
     LOptions.MaxLines := 1;
     //LOptions.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
@@ -6292,7 +6256,7 @@ begin
     //LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
     //LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
     //--
-    LOptions.AutoSize := TALAutoSizeMode.All;
+    LOptions.AutoSize := TALAutoSizeMode.Both;
     //--
     LOptions.MaxLines := LabelTextSettings.MaxLines;
     LOptions.LineHeightMultiplier := LabelTextSettings.LineHeightMultiplier;
@@ -6420,7 +6384,7 @@ begin
     //LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
     //LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
     //--
-    LOptions.AutoSize := TALAutoSizeMode.All;
+    LOptions.AutoSize := TALAutoSizeMode.Both;
     //--
     LOptions.MaxLines := SupportingTextSettings.MaxLines;
     LOptions.LineHeightMultiplier := SupportingTextSettings.LineHeightMultiplier;
@@ -6766,26 +6730,26 @@ end;
 {$IF NOT DEFINED(ALSkiaCanvas)}
 function TALBaseEdit.GetRenderTargetRect(const ARect: TrectF): TRectF;
 begin
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     Result := ARect;
-    if StateStyles.TransitionFrom <> nil then begin
+    if StateStyles.Transition.FromStateStyle <> nil then begin
       var LFromSurfaceRect := ALGetShapeSurfaceRect(
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Fill, // const AFill: TALBrush;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
                                 nil, // const AFillResourceStream: TStream;
-                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).StateLayer, // const AStateLayer: TALStateLayer;
-                                _TALBaseStateStyleProtectedAccess(StateStyles.TransitionFrom).Shadow); // const AShadow: TALShadow): TRectF;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                                _TALBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
-    if StateStyles.TransitionTo <> nil then begin
+    if StateStyles.Transition.ToStateStyle <> nil then begin
       var LToSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
-                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Fill, // const AFill: TALBrush;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
                               nil, // const AFillResourceStream: TStream;
-                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).StateLayer, // const AStateLayer: TALStateLayer;
-                              _TALBaseStateStyleProtectedAccess(StateStyles.TransitionTo).Shadow); // const AShadow: TALShadow): TRectF;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
+                              _TALBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
     end;
   end
@@ -6824,7 +6788,7 @@ begin
   {$REGION 'Background'}
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
-  if StateStyles.IsTransitionAnimationRunning then begin
+  if StateStyles.Transition.Running then begin
     LDrawable := ALNullDrawable;
     LDrawableRect := TRectF.Empty;
   end
@@ -7181,10 +7145,10 @@ end;
 constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
-  FAutoSize := TALAutoSizeMode.All;
+  FAutoSize := TALAutoSizeMode.Both;
 end;
 
-{**************************************************}
+{******************************************************}
 function TALEdit.HasUnconstrainedAutosizeWidth: Boolean;
 begin
   result := False;

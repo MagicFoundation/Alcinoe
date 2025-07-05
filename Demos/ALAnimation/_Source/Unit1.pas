@@ -8,7 +8,7 @@ uses
   FMX.Effects, FMX.Filter.Effects, FMX.Objects, FMX.Layouts, Alcinoe.FMX.Layouts,
   FMX.Controls.Presentation, FMX.StdCtrls, Alcinoe.FMX.FilterEffects, system.messaging,
   Alcinoe.FMX.Objects, FMX.ListBox, FMX.ani, Alcinoe.FMX.Ani, System.Generics.Collections,
-  FMX.TabControl, Alcinoe.FMX.Controls;
+  FMX.TabControl, Alcinoe.FMX.Controls, FMX.Edit, FMX.EditBox, FMX.NumberBox;
 
 type
   TForm1 = class(TForm)
@@ -48,6 +48,15 @@ type
     TextCustomInterpolation: TALText;
     ComboBoxCustomInterpolation: TComboBox;
     ButtonClearGraph: TButton;
+    LayoutBezier: TALLayout;
+    TextBezier: TALText;
+    NumberBoxBezierX1: TNumberBox;
+    NumberBoxBezierY1: TNumberBox;
+    NumberBoxBezierX2: TNumberBox;
+    NumberBoxBezierY2: TNumberBox;
+    LayoutOvershoot: TALLayout;
+    TextOvershoot: TALText;
+    NumberBoxOvershoot: TNumberBox;
     procedure ButtonStartClick(Sender: TObject);
     procedure ALFloatPropertyAnimationProcess(Sender: TObject);
     procedure ALFloatPropertyAnimationFirstFrame(Sender: TObject);
@@ -186,6 +195,15 @@ begin
   LayoutInterpolationMode.Height := max(ComboBoxInterpolationMode.Height, TextInterpolationMode.Height);
   TextInterpolationMode.Position.Y := (LayoutInterpolationMode.Height - TextInterpolationMode.Height) / 2;
   ComboBoxInterpolationMode.Position.Y := (LayoutInterpolationMode.Height - ComboBoxInterpolationMode.Height) / 2;
+  LayoutBezier.Height := max(NumberBoxBezierX1.Height, TextBezier.Height);
+  TextBezier.Position.Y := (LayoutBezier.Height - TextBezier.Height) / 2;
+  NumberBoxBezierX1.Position.Y := (LayoutBezier.Height - NumberBoxBezierX1.Height) / 2;
+  NumberBoxBezierY1.Position.Y := (LayoutBezier.Height - NumberBoxBezierX1.Height) / 2;
+  NumberBoxBezierX2.Position.Y := (LayoutBezier.Height - NumberBoxBezierX1.Height) / 2;
+  NumberBoxBezierY2.Position.Y := (LayoutBezier.Height - NumberBoxBezierX1.Height) / 2;
+  LayoutOvershoot.Height := max(NumberBoxOvershoot.Height, TextOvershoot.Height);
+  TextOvershoot.Position.Y := (LayoutOvershoot.Height - TextOvershoot.Height) / 2;
+  NumberBoxOvershoot.Position.Y := (LayoutOvershoot.Height - NumberBoxOvershoot.Height) / 2;
   ComboBoxInterpolationMode.Position.X := textInterpolationMode.position.X + textInterpolationMode.Width + 15;
   LayoutStart.Height := max(ButtonStart.Height, ButtonClearGraph.Height);
   ButtonStart.Position.Y := (LayoutStart.Height - ButtonStart.Height) / 2;
@@ -213,6 +231,11 @@ begin
   ALFloatPropertyAnimation.StopValue := (LayoutBullet.height / 1.4) - (CircleBullet.height / 2);
   ALFloatPropertyAnimation.InterpolationType := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolationType.Items[ComboBoxInterpolationType.ItemIndex]));
   ALFloatPropertyAnimation.InterpolationMode := TALInterpolationMode(GetEnumValue(TypeInfo(TALInterpolationMode), ComboBoxInterpolationMode.Items[ComboBoxInterpolationMode.ItemIndex]));
+  ALFloatPropertyAnimation.InterpolationParams.BezierX1 := NumberBoxBezierX1.Value;
+  ALFloatPropertyAnimation.InterpolationParams.BezierY1 := NumberBoxBezierY1.Value;
+  ALFloatPropertyAnimation.InterpolationParams.BezierX2 := NumberBoxBezierX2.Value;
+  ALFloatPropertyAnimation.InterpolationParams.BezierY2 := NumberBoxBezierY2.Value;
+  ALFloatPropertyAnimation.InterpolationParams.Overshoot := NumberBoxOvershoot.Value;
   var LColor: TalphaColor;
   case 1 + random(60) of
     001: LColor := TalphaColors.Black; // TAlphaColor(Alpha or $000000);

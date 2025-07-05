@@ -21,7 +21,32 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALPersistentObserver = class(TPersistent)
+  private
+    FUpdateCount: Integer; // 4 Bytes
+    FIsChanged: Boolean; // 1 Bytes
+    FOnChanged: TNotifyEvent; // 16 Bytes
+    FSavedStates: TObjectStack<TALPersistentObserver>; // 8 Bytes
+    procedure DoChanged; virtual;
+  protected
+    function CreateSavedState: TALPersistentObserver; virtual;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Reset; virtual;
+    procedure BeginUpdate; virtual;
+    procedure EndUpdate; virtual;
+    procedure EndUpdateNoChanges; virtual;
+    procedure SaveState; virtual;
+    procedure RestoreState; virtual;
+    procedure RestoreStateNoChanges; virtual;
+    procedure Change; virtual;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+    property IsChanged: Boolean read FIsChanged write FIsChanged;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTriplet<K,V,E> = record
     Key: K;
     Value: V;
@@ -794,6 +819,128 @@ uses
   System.Diagnostics,
   Alcinoe.Localization,
   Alcinoe.StringUtils;
+
+{***************************************}
+constructor TALPersistentObserver.Create;
+begin
+  inherited create;
+  FUpdateCount := 0;
+  FIsChanged := False;
+  FOnChanged := nil;
+  FSavedStates := nil;
+end;
+
+{***************************************}
+destructor TALPersistentObserver.Destroy;
+begin
+  ALFreeAndNil(FSavedStates);
+  Inherited;
+end;
+
+{*********************************************************************}
+function TALPersistentObserver.CreateSavedState: TALPersistentObserver;
+begin
+  result := TALPersistentObserver(classtype.Create);
+end;
+
+{************************************}
+procedure TALPersistentObserver.Reset;
+begin
+  // Virtual
+end;
+
+{******************************************}
+procedure TALPersistentObserver.BeginUpdate;
+begin
+  Inc(FUpdateCount);
+end;
+
+{****************************************}
+procedure TALPersistentObserver.EndUpdate;
+begin
+  if FUpdateCount > 0 then
+  begin
+    Dec(FUpdateCount);
+    if (FUpdateCount = 0) and (FIsChanged) then
+      try
+        DoChanged;
+      finally
+        FIsChanged := False;
+      end;
+  end;
+end;
+
+{*************************************************}
+procedure TALPersistentObserver.EndUpdateNoChanges;
+begin
+  if FUpdateCount > 0 then
+  begin
+    Dec(FUpdateCount);
+    if (FUpdateCount = 0) and (FIsChanged) then
+      // If execution reaches this point, it means there was no previously unclosed
+      // beginUpdate since FUpdateCount is 0. Therefore, ignoring the doChanged
+      // call here will not affect any prior beginUpdate operations.
+      FIsChanged := False;
+  end;
+end;
+
+{****************************************}
+procedure TALPersistentObserver.SaveState;
+begin
+  if FSavedStates = nil then
+    FSavedStates := TObjectStack<TALPersistentObserver>.Create(True{AOwnsObjects});
+  var LSavedState := CreateSavedState;
+  if LSavedState.classtype <> classtype then
+    Raise Exception.create('The saved state type returned by "CreateSavedState" does not match the current object type');
+  LSavedState.Assign(self);
+  FSavedStates.Push(LSavedState);
+end;
+
+{*******************************************}
+procedure TALPersistentObserver.RestoreState;
+begin
+  if (FSavedStates = nil) or
+     (FSavedStates.Count = 0) then
+    raise Exception.Create('No saved state available');
+  var LSavedState := FSavedStates.extract;
+  try
+    Assign(LSavedState);
+  finally
+    ALFreeAndNil(LSavedState);
+  end;
+end;
+
+{****************************************************}
+procedure TALPersistentObserver.RestoreStateNoChanges;
+begin
+  BeginUpdate;
+  try
+    RestoreState;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{****************************************}
+procedure TALPersistentObserver.DoChanged;
+begin
+  if Assigned(OnChanged) then
+    OnChanged(Self);
+end;
+
+{*************************************}
+procedure TALPersistentObserver.Change;
+begin
+  FIsChanged := True;
+  if (FUpdateCount = 0) then
+  begin
+    try
+      DoChanged;
+    finally
+      FIsChanged := False;
+    end;
+  end;
+end;
 
 {************************************************************************************}
 constructor TALTriplet<K,V,E>.Create(const AKey: K; const AValue: V; const AExtra: E);

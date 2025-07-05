@@ -3,12 +3,12 @@
     <style name="Theme.App" parent="Theme.AppCompat.DayNight">
     <item name="android:windowSplashScreenBackground">@color/splashscreen_background</item>
     <item name="android:windowSplashScreenAnimatedIcon">@drawable/splashscreen_icon</item>
-    <item name="android:statusBarColor">@color/material_surface</item>
+    <item name="android:statusBarColor">@color/material3_surface</item>
     <item name="android:windowLightStatusBar">true</item>
-    <item name="android:navigationBarColor">@color/material_surface</item> 
+    <item name="android:navigationBarColor">@color/material3_surface</item> 
     <item name="android:windowLightNavigationBar">true</item>
-    <item name="MaterialEdit">@style/Material.Edit</item>
-    <item name="MaterialEditError">@style/Material.Edit.Error</item>
+    <item name="Material3Edit">@style/Material3.Edit</item>
+    <item name="Material3EditError">@style/Material3.Edit.Error</item>
     <item name="android:datePickerDialogTheme">@style/Theme.App.Material.Dialog.Alert</item>
   </style>
 </resources>

@@ -265,7 +265,7 @@ begin
   end;
 end;
 
-{***************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
 begin
   if AData.GetChildNodeValueText('type', '') = 'stories' then begin
@@ -298,7 +298,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************************************************************************************}
+{**********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
 begin
   Result := TALDynamicListBox.TItem.TLoadingContent.Create(nil);
@@ -396,7 +396,7 @@ begin
   End;
 end;
 
-{***********************************************************************************************************************************************************************}
+{****************************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreIndicator.Create(nil);
@@ -417,7 +417,7 @@ begin
   End;
 end;
 
-{***************************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreRetryButton.Create(nil);
@@ -426,7 +426,7 @@ begin
     Result.Margins.Top := -27;
 
     var LRetryButton := TALDynamicButton.Create(Result);
-    TALStyleManager.Instance.ApplyDynamicButtonIconStyle('Material.Button.Icon.Outlined', LRetryButton, 50);
+    TALStyleManager.Instance.ApplyDynamicButtonIconStyle('Material3.Button.Icon.Outlined', LRetryButton, 50);
     LRetryButton.Align := TALAlignLayout.TopCenter;
     LRetryButton.Fill.ResourceName := 'refresh_thin';
     LRetryButton.Fill.ImageMargins.Rect := TRectF.Create(12,12,12,12);
@@ -440,7 +440,7 @@ begin
   End;
 end;
 
-{*************************************************************************************************************************************************************************************}
+{******************************************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
 begin
   Result := TALDynamicListBox.TView.TPullToRefreshIndicator.Create(nil);
@@ -485,7 +485,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************************************************************}
+{******************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
 begin
   Result := TALDynamicListBox.TView.TTopBar.Create(nil);
@@ -499,7 +499,7 @@ begin
     LTitle.TextSettings.Font.Size := 22;
     LTitle.TextSettings.Font.weight := TFontWeight.Bold;
     LTitle.TextSettings.Font.Color := $FF0d1014;
-    LTitle.AutoSize := TALAutoSizeMode.All;
+    LTitle.AutoSize := TALAutoSizeMode.Both;
     LTitle.Margins.left := 18;
     LTitle.Text := 'For you';
 
@@ -527,7 +527,7 @@ begin
   End;
 end;
 
-{*******************************************************************************************************************************************************}
+{************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
 begin
   Result := TALDynamicListBox.TView.TBottomBar.Create(nil);
@@ -596,7 +596,7 @@ begin
   End;
 end;
 
-{***************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************}
 function TMainForm.MainListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
 begin
   Result := TALDynamicListBox.TItem.TMainContent.Create(nil);
@@ -646,14 +646,14 @@ begin
     Var LLayout2 := TALDynamicLayout.Create(LLayout1);
     LLayout2.Align := TALAlignLayout.LeftCenter;
     LLayout2.Margins.Left := 13;
-    LLayout2.AutoSize := TALAutoSizeMode.All;
+    LLayout2.AutoSize := TALAutoSizeMode.Both;
 
     var LUsername := TALDynamicText.Create(LLayout2);
     LUsername.Align := TALAlignLayout.topLeft;
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.Medium;
     LUsername.TextSettings.Font.Color := $FF262626;
-    LUsername.AutoSize := TALAutoSizeMode.All;
+    LUsername.AutoSize := TALAutoSizeMode.Both;
     LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
     var LGeotag := TALDynamicText.Create(LLayout2);
@@ -662,7 +662,7 @@ begin
     LGeotag.TextSettings.Font.Size := 12;
     LGeotag.TextSettings.Font.weight := TFontWeight.Regular;
     LGeotag.TextSettings.Font.Color := $FF262626;
-    LGeotag.AutoSize := TALAutoSizeMode.All;
+    LGeotag.AutoSize := TALAutoSizeMode.Both;
     LGeotag.Text := AContext.Owner.Data.GetChildNodeValueText('geotag', '');
 
     var LmediaNode := AContext.Owner.Data.GetChildNode('media');
@@ -718,7 +718,7 @@ begin
       LPageCountText.TextSettings.Font.weight := TFontWeight.regular;
       LPageCountText.TextSettings.Font.Color := $FFffffff;
       LPageCountText.Fill.Color := $B2000000;
-      LPageCountText.AutoSize := TALAutoSizeMode.All;
+      LPageCountText.AutoSize := TALAutoSizeMode.Both;
       LPageCountText.XRadius := -50;
       LPageCountText.YRadius := -50;
       LPageCountText.Text := '1/'+AlIntToStrW(LPageController.PageCount);
@@ -783,7 +783,7 @@ begin
     LLikeCountText.TextSettings.Font.Size := 14;
     LLikeCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LLikeCountText.TextSettings.Font.Color := $FF0d1014;
-    LLikeCountText.AutoSize := TALAutoSizeMode.All;
+    LLikeCountText.AutoSize := TALAutoSizeMode.Both;
     LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
 
     var LCommentCountBtn := TALDynamicButton.Create(LLayout3);
@@ -803,7 +803,7 @@ begin
     LCommentCountText.TextSettings.Font.Size := 14;
     LCommentCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LCommentCountText.TextSettings.Font.Color := $FF0d1014;
-    LCommentCountText.AutoSize := TALAutoSizeMode.All;
+    LCommentCountText.AutoSize := TALAutoSizeMode.Both;
     LCommentCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('comment_count', 0));
 
     var LReshareCountsBtn := TALDynamicButton.Create(LLayout3);
@@ -823,7 +823,7 @@ begin
     LReshareCountText.TextSettings.Font.Size := 14;
     LReshareCountText.TextSettings.Font.weight := TFontWeight.Medium;
     LReshareCountText.TextSettings.Font.Color := $FF0d1014;
-    LReshareCountText.AutoSize := TALAutoSizeMode.All;
+    LReshareCountText.AutoSize := TALAutoSizeMode.Both;
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
 
     var LBookmarkBtn := TALDynamicButton.Create(LLayout3);
@@ -844,7 +844,7 @@ begin
     LCaption.TextSettings.Font.Size := 14;
     LCaption.TextSettings.Font.Color := $FF272727;
     LCaption.TextSettings.LineHeightMultiplier := 1.3;
-    LCaption.AutoSize := TALAutoSizeMode.All;
+    LCaption.AutoSize := TALAutoSizeMode.Both;
     LCaption.TextSettings.MaxLines := 2;
     LCaption.TextSettings.IsHtml := True;
     LCaption.TextSettings.Ellipsis := '… more';
@@ -885,7 +885,7 @@ begin
     LDate.TextSettings.Font.Size := 12.5;
     LDate.TextSettings.Font.weight := TFontWeight.Regular;
     LDate.TextSettings.Font.Color := $FF71757f;
-    LDate.AutoSize := TALAutoSizeMode.All;
+    LDate.AutoSize := TALAutoSizeMode.Both;
     LDate.Text := inttostr(1+ALRandom32(23)) + ' hours ago';
     LDate.TextSettings.IsHtml := True;
 
@@ -942,7 +942,7 @@ begin
     LUsername.TextSettings.Font.Color := $FF262626;
     LUsername.TextSettings.HorzAlign := TALTextHorzAlign.Center;
     LUsername.TextSettings.MaxLines := 1;
-    LUsername.AutoSize := TALAutoSizeMode.All;
+    LUsername.AutoSize := TALAutoSizeMode.Both;
     LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
 
   Except
@@ -979,7 +979,7 @@ begin
     Result.BoundsRect := AContext.TargetRect;
 
     var LRetryButton := TALDynamicButton.Create(Result);
-    TALStyleManager.Instance.ApplyDynamicButtonIconStyle('Material.Button.Icon.Outlined', LRetryButton, 50);
+    TALStyleManager.Instance.ApplyDynamicButtonIconStyle('Material3.Button.Icon.Outlined', LRetryButton, 50);
     LRetryButton.Align := TALAlignLayout.LeftCenter;
     LRetryButton.Fill.ResourceName := 'refresh_thin';
     LRetryButton.Fill.ImageMargins.Rect := TRectF.Create(12,12,12,12);
@@ -1034,7 +1034,7 @@ begin
     LUsername.TextSettings.Font.Size := 14;
     LUsername.TextSettings.Font.weight := TFontWeight.medium;
     LUsername.TextSettings.Font.Color := $FF0d1014;
-    LUsername.AutoSize := TALAutoSizeMode.All;
+    LUsername.AutoSize := TALAutoSizeMode.Both;
     LUsername.TextSettings.MaxLines := 1;
     LUsername.Text := {$IF defined(debug)}{'['+ALIntToStrW(AContext.Owner.index)+']'+}{$ENDIF}AContext.Owner.Data.GetChildNodeValueText('username', '') ;
     LUsername.Margins.top := 12;
@@ -1075,7 +1075,7 @@ begin
 
 end;
 
-{**************************************************}
+{*******************************************}
 procedure TMainForm.MainListBoxDownloadItems(
             const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
             out AData: TALJSONNodeW;

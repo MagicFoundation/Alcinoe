@@ -81,6 +81,7 @@ type
                 procedure SetKind(const AValue: TAnimationKind); virtual;
                 procedure DoProcess; override;
                 procedure DoFinish; override;
+                function GetDefaultLoop: Boolean; override;
               public
                 constructor Create(const AOwner: TLoadingContent); reintroduce; Virtual;
                 property Kind: TAnimationKind read FKind write SetKind;
@@ -663,6 +664,7 @@ type
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
+    //property ClickSound;
     property ClipChildren default true;
     //property ClipParent;
     //property Cursor;
@@ -823,7 +825,7 @@ end;
 constructor TALDynamicListBox.TItem.TMainContent.Create(const AOwner: TItem);
 begin
   inherited;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
 end;
 
 {***************************************************************************************************}
@@ -831,11 +833,16 @@ constructor TALDynamicListBox.TItem.TLoadingContent.TAnimation.Create(const AOwn
 Begin
   Inherited create;
   FOwner := AOwner;
-  Loop := True;
   FKind := TAnimationKind.None;
   SetKind(TAnimationKind.Pulse);
   FWaveColor := TalphaColors.White;
   FWaveAngle := 80;
+end;
+
+{**********************************************************************************}
+function TALDynamicListBox.TItem.TLoadingContent.TAnimation.GetDefaultLoop: Boolean;
+begin
+  Result := True;
 end;
 
 {*************************************************************************************************}
@@ -1125,7 +1132,7 @@ end;
 constructor TALDynamicListBox.TItem.Create(const AOwner: TObject);
 begin
   inherited create(AOwner);
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
   Align := TALAlignLayout.None;
   //IsEphemeral := False;
   //--
@@ -1152,10 +1159,10 @@ begin
   Inherited Destroy;
 end;
 
-{******************************************************************}
+{**********************************************************************}
 function TALDynamicListBox.TItem.HasUnconstrainedAutosizeWidth: Boolean;
 begin
-  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Width];
+  Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Width];
   if Result then begin
     result := (ParentView = nil) or
               (ParentView.Orientation <> TOrientation.Vertical);
@@ -1164,10 +1171,10 @@ begin
   end;
 end;
 
-{******************************************************************}
+{***********************************************************************}
 function TALDynamicListBox.TItem.HasUnconstrainedAutosizeHeight: Boolean;
 begin
-  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Height];
+  Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Height];
   if Result then begin
     result := (ParentView = nil) or
               (ParentView.Orientation <> TOrientation.horizontal);
@@ -2179,7 +2186,7 @@ end;
 constructor TALDynamicListBox.TView.TBasePullToRefreshIndicator.Create(const AOwner: TItem);
 begin
   inherited;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
   FPullThreshold := 24;
   FPullProgress := 0;
   FCanTriggerRefresh := False;
@@ -2235,18 +2242,18 @@ begin
   _TALFloatAnimationProtectedAccess(FPullingPhaseAniIndicator.Animation).FCurrentValue := PullProgress / 5;
 end;
 
-{***************************************************************************}
+{*********************************************************************************}
 constructor TALDynamicListBox.TView.TLoadMoreIndicator.Create(const AOwner: TItem);
 begin
   inherited;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
 end;
 
-{*****************************************************************************}
+{***********************************************************************************}
 constructor TALDynamicListBox.TView.TLoadMoreRetryButton.Create(const AOwner: TItem);
 begin
   inherited;
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
 end;
 
 {************************************************************************************}

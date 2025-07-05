@@ -42,6 +42,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -187,6 +188,7 @@ type
         //property CanParentFocus;
         //property DisableFocusEffect;
         property DoubleBuffered;
+        property ClickSound;
         //property ClipChildren;
         //property ClipParent;
         //property Cursor;
@@ -336,6 +338,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -413,6 +416,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -491,6 +495,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     //property ClipChildren;
     //property ClipParent;
     property Cursor;

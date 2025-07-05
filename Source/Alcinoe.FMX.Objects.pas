@@ -305,6 +305,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
@@ -393,34 +394,37 @@ type
         fCurrentProgress: Single;
         FEnabled: Boolean;
         function GetDuration: Single;
+        {$IF defined(ALSkiaAvailable)}
+        procedure SetDuration(const Value: Single);
+        {$ENDIF}
         function GetCurrentTime: Single;
         function GetSpeed: Single;
+        procedure SetSpeed(const Value: Single);
         procedure SetEnabled(const Value: Boolean);
         procedure SetStartProgress(const Value: Single);
         procedure SetStopProgress(const Value: Single);
-        procedure SetSpeed(const Value: Single);
         function IsStopProgressStored: Boolean;
         function IsSpeedStored: Boolean;
         procedure UpdateInheritedAnimationDuration;
         procedure repaint;
       protected
-        procedure SetDuration(const Value: Single);
         procedure ProcessAnimation; override;
         procedure DoFirstFrame; override;
         procedure DoProcess; override;
         procedure DoFinish; override;
+        function GetDefaultLoop: Boolean; override;
       public
         constructor Create(const AOwner: TALAnimatedImage); reintroduce; virtual;
         procedure Start; override;
         property CurrentProgress: Single read FCurrentProgress;
         property CurrentTime: Single read GetCurrentTime;
       published
-        property AutoReverse default False;
+        property AutoReverse;
         property Delay;
-        property Duration: Single read getDuration;
-        property Enabled Read FEnabled write SetEnabled default True;
-        property Inverse default False;
-        property Loop default True;
+        property Duration: Single read getDuration stored false;
+        property Enabled Read FEnabled write SetEnabled stored true default True;
+        property Inverse;
+        property Loop;
         property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
         property StartProgress: Single read FStartProgress write SetStartProgress;
         property StopProgress: Single read FStopProgress write SetStopProgress stored IsStopProgressStored nodefault;
@@ -467,6 +471,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -624,6 +629,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -745,6 +751,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -862,6 +869,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -958,6 +966,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Cursor;
@@ -1082,6 +1091,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseEnter; override;
     procedure DoMouseLeave; override;
+    procedure DoClickSound; override;
     procedure Click; override;
     procedure PaddingChanged; override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
@@ -1114,7 +1124,9 @@ type
                const AFill: TALBrush;
                const AStateLayer: TALStateLayer;
                const AStroke: TALStrokeBrush;
-               const AShadow: TALShadow): TALMultiLineTextOptions;
+               const AShadow: TALShadow;
+               const AXRadius: Single;
+               const AYRadius: Single): TALMultiLineTextOptions;
     Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); virtual;
     Procedure DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
     Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
@@ -1134,7 +1146,9 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow;
+                const AXRadius: Single;
+                const AYRadius: Single);
     Procedure MeasureMultilineText(
                 out ARect: TRectF;
                 out ATextBroken: Boolean;
@@ -1149,7 +1163,9 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow;
+                const AXRadius: Single;
+                const AYRadius: Single);
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
                 out ABufDrawableRect: TRectF;
@@ -1165,7 +1181,9 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow;
+                const AXRadius: Single;
+                const AYRadius: Single);
     {$IF NOT DEFINED(ALSkiaCanvas)}
     function GetRenderTargetRect(const ARect: TrectF): TRectF; virtual;
     procedure InitRenderTargets(var ARect: TrectF); virtual;
@@ -1243,6 +1261,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren;
     //property ClipParent;
     property Corners;
@@ -2835,7 +2854,6 @@ constructor TALAnimatedImage.TAnimation.Create(const AOwner: TALAnimatedImage);
 begin
   inherited create;
   fOwner := AOwner;
-  Loop := True;
   inherited Duration := MaxSingle;
   FDuration := 0.0;
   FSpeed := 1.0;
@@ -2850,6 +2868,7 @@ procedure TALAnimatedImage.TAnimation.Start;
 begin
   if (Running) then
     Exit;
+  FEnabled := True;
   fCurrentProgress := FStartProgress;
   inherited Start;
 end;
@@ -2870,6 +2889,12 @@ begin
     Fowner.Repaint
   else if Loop then
     Pause;
+end;
+
+{***********************************************************}
+function TALAnimatedImage.TAnimation.GetDefaultLoop: Boolean;
+begin
+  Result := True;
 end;
 
 {*******************************************************}
@@ -2900,12 +2925,23 @@ begin
   Result := FSpeed;
 end;
 
-{*********************************************************************}
+{******************************************************************}
+procedure TALAnimatedImage.TAnimation.SetSpeed(const Value: Single);
+begin
+  if not SameValue(FSpeed, Value, Single.Epsilon) then begin
+    FSpeed := Value;
+    UpdateInheritedAnimationDuration;
+  end;
+end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
 procedure TALAnimatedImage.TAnimation.SetDuration(const Value: Single);
 begin
   FDuration := Value;
   UpdateInheritedAnimationDuration;
 end;
+{$ENDIF}
 
 {*********************************************************************}
 procedure TALAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
@@ -2931,15 +2967,6 @@ begin
   FStopProgress := Min(Max(Value, 0), 1);
   UpdateInheritedAnimationDuration;
   Repaint;
-end;
-
-{******************************************************************}
-procedure TALAnimatedImage.TAnimation.SetSpeed(const Value: Single);
-begin
-  if not SameValue(FSpeed, Value, Single.Epsilon) then begin
-    FSpeed := Value;
-    UpdateInheritedAnimationDuration;
-  end;
 end;
 
 {*****************************************************************}
@@ -5060,13 +5087,9 @@ begin
 
       var R: TrectF;
       If {$IF not DEFINED(ALDPK)}DoubleBuffered{$ELSE}True{$ENDIF} then begin
-        if (CacheIndex > 0) and (CacheEngine <> nil) then begin
-          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, R{ARect}) then begin
-            MakeBufDrawable;
-            R := FBufDrawableRect;
-          end;
-        end
-        else begin
+        if (CacheIndex <= 0) or
+           (CacheEngine = nil) or
+           (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, R{ARect})) then begin
           MakeBufDrawable;
           R := FBufDrawableRect;
         end;
@@ -5086,7 +5109,9 @@ begin
           Fill, // const AFill: TALBrush;
           nil, // const AStateLayer: TALStateLayer;
           Stroke, // const AStroke: TALStrokeBrush;
-          Shadow); // const AShadow: TALShadow);
+          Shadow, // const AShadow: TALShadow;
+          XRadius, // const AXRadius: Single;
+          YRadius); // const AYRadius: Single
       end;
 
       if not HasUnconstrainedAutosizeWidth then begin
@@ -5180,6 +5205,16 @@ begin
   if assigned(FOnElementMouseLeave) and (FHoveredElement.ID <> '') then
     FOnElementMouseLeave(self, FHoveredElement);
   FHoveredElement := TALTextElement.Empty;
+end;
+
+{*********************************}
+procedure TALBaseText.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((assigned(OnClick) or (assigned(FOnElementClick) and (FPressedElement.ID <> ''))) and
+      (ClickSound=TALClickSoundMode.Default) and
+      (ALGlobalClickSoundEnabled)) then
+    ALPlayClickSound;
 end;
 
 {**************************}
@@ -5387,7 +5422,9 @@ begin
       Fill, // const AFill: TALBrush;
       nil, // const AStateLayer: TALStateLayer;
       Stroke, // const AStroke: TALStrokeBrush;
-      Shadow); // const AShadow: TALShadow);
+      Shadow, // const AShadow: TALShadow;
+      XRadius, // const AXRadius: Single;
+      YRadius); // const AYRadius: Single
     {$ELSE}
     var LRect := LocalRect;
     InitRenderTargets(LRect);
@@ -5410,7 +5447,9 @@ begin
         Fill, // const AFill: TALBrush;
         nil, // const AStateLayer: TALStateLayer;
         Stroke, // const AStroke: TALStrokeBrush;
-        Shadow); // const AShadow: TALShadow);
+        Shadow, // const AShadow: TALShadow;
+        XRadius, // const AXRadius: Single;
+        YRadius); // const AYRadius: Single
     finally
       ALCanvasEndScene(FRenderTargetCanvas)
     end;
@@ -5469,7 +5508,7 @@ begin
   inherited SetAlign(Value);
 end;
 
-{******************************************************}
+{**************************************************************}
 procedure TALBaseText.SetAutoSize(const Value: TALAutoSizeMode);
 begin
   if FAutoSize <> Value then
@@ -5513,42 +5552,80 @@ function TALBaseText.GetMultiLineTextOptions(
            const AFill: TALBrush;
            const AStateLayer: TALStateLayer;
            const AStroke: TALStrokeBrush;
-           const AShadow: TALShadow): TALMultiLineTextOptions;
+           const AShadow: TALShadow;
+           const AXRadius: Single;
+           const AYRadius: Single): TALMultiLineTextOptions;
 begin
   Result := FMultiLineTextOptions;
   Result.Scale := AScale;
   Result.AlignToPixel := AutoAlignToPixel;
   Result.Opacity := AOpacity;
   //--
-  Result.FontFamily := Afont.Family;
-  Result.FontSize := Afont.Size;
-  Result.FontWeight := Afont.Weight;
-  Result.FontSlant := Afont.Slant;
-  Result.FontStretch := Afont.Stretch;
-  Result.FontColor := AFont.Color;
+  if Afont <> nil then begin
+    Result.FontFamily := Afont.Family;
+    Result.FontSize := Afont.Size;
+    Result.FontWeight := Afont.Weight;
+    Result.FontSlant := Afont.Slant;
+    Result.FontStretch := Afont.Stretch;
+    Result.FontColor := AFont.Color;
+  end
+  else begin
+    Result.FontFamily := '';
+    Result.FontSize := 14;
+    Result.FontWeight := TfontWeight.Regular;
+    Result.FontSlant := TFontSlant.Regular;
+    Result.FontStretch := TfontStretch.Regular;
+    Result.FontColor := TAlphaColors.Black;
+  end;
   //--
-  Result.DecorationKinds := ADecoration.Kinds;
-  Result.DecorationStyle := ADecoration.Style;
-  Result.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
-  Result.DecorationColor := ADecoration.Color;
+  if ADecoration <> nil then begin
+    Result.DecorationKinds := ADecoration.Kinds;
+    Result.DecorationStyle := ADecoration.Style;
+    Result.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
+    Result.DecorationColor := ADecoration.Color;
+  end
+  else begin
+    Result.DecorationKinds := [];
+    Result.DecorationStyle := TALTextDecorationStyle.Solid;
+    Result.DecorationThicknessMultiplier := 1;
+    Result.DecorationColor := Talphacolors.Null;
+  end;
   //--
   Result.EllipsisText := TextSettings.Ellipsis;
   Result.EllipsisInheritSettings := TextSettings.EllipsisSettings.inherit;
   //--
-  Result.EllipsisFontFamily := AEllipsisfont.Family;
-  Result.EllipsisFontSize := AEllipsisfont.Size;
-  Result.EllipsisFontWeight := AEllipsisfont.Weight;
-  Result.EllipsisFontSlant := AEllipsisfont.Slant;
-  Result.EllipsisFontStretch := AEllipsisfont.Stretch;
-  Result.EllipsisFontColor := AEllipsisFont.Color;
+  if AEllipsisfont <> nil then begin
+    Result.EllipsisFontFamily := AEllipsisfont.Family;
+    Result.EllipsisFontSize := AEllipsisfont.Size;
+    Result.EllipsisFontWeight := AEllipsisfont.Weight;
+    Result.EllipsisFontSlant := AEllipsisfont.Slant;
+    Result.EllipsisFontStretch := AEllipsisfont.Stretch;
+    Result.EllipsisFontColor := AEllipsisFont.Color;
+  end
+  else begin
+    Result.EllipsisFontFamily := '';
+    Result.EllipsisFontSize := 14;
+    Result.EllipsisFontWeight := TfontWeight.Regular;
+    Result.EllipsisFontSlant := TfontSlant.Regular;
+    Result.EllipsisFontStretch := TfontStretch.Regular;
+    Result.EllipsisFontColor := TAlphaColors.black;
+  end;
   //--
-  Result.EllipsisDecorationKinds := AEllipsisDecoration.Kinds;
-  Result.EllipsisDecorationStyle := AEllipsisDecoration.Style;
-  Result.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
-  Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
+  if AEllipsisDecoration <> nil then begin
+    Result.EllipsisDecorationKinds := AEllipsisDecoration.Kinds;
+    Result.EllipsisDecorationStyle := AEllipsisDecoration.Style;
+    Result.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
+    Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
+  end
+  else begin
+    Result.EllipsisDecorationKinds := [];
+    Result.EllipsisDecorationStyle := TALTextDecorationStyle.Solid;
+    Result.EllipsisDecorationThicknessMultiplier := 1;
+    Result.EllipsisDecorationColor := TAlphaColors.Null;
+  end;
   //--
   Result.AutoSize := TALAutoSizeMode.None;
-  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.All
+  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.Both
   else if HasUnconstrainedAutosizeWidth then Result.Autosize := TALAutoSizeMode.Width
   else if HasUnconstrainedAutosizeHeight then Result.Autosize := TALAutoSizeMode.Height;
   //--
@@ -5562,20 +5639,38 @@ begin
   Result.HTextAlign := TextSettings.HorzAlign;
   Result.VTextAlign := TextSettings.VertAlign;
   //--
-  Result.FillColor := AFill.Color;
-  Result.FillGradientStyle := AFill.Gradient.Style;
-  Result.FillGradientAngle := AFill.Gradient.Angle;
-  Result.FillGradientColors := AFill.Gradient.Colors;
-  Result.FillGradientOffsets := AFill.Gradient.Offsets;
-  Result.FillResourceName := AFill.ResourceName;
-  Result.FillMaskResourceName := '';
-  Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
-  Result.FillImageMargins := AFill.ImageMargins.Rect;
-  Result.FillImageNoRadius := AFill.ImageNoRadius;
-  Result.FillImageTintColor := AFill.ImageTintColor;
-  Result.FillWrapMode := AFill.WrapMode;
-  Result.FillCropCenter := TPointF.create(-50,-50);
-  Result.FillBlurRadius := 0;
+  if AFill <> nil then begin
+    Result.FillColor := AFill.Color;
+    Result.FillGradientStyle := AFill.Gradient.Style;
+    Result.FillGradientAngle := AFill.Gradient.Angle;
+    Result.FillGradientColors := AFill.Gradient.Colors;
+    Result.FillGradientOffsets := AFill.Gradient.Offsets;
+    Result.FillResourceName := AFill.ResourceName;
+    Result.FillMaskResourceName := '';
+    Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
+    Result.FillImageMargins := AFill.ImageMargins.Rect;
+    Result.FillImageNoRadius := AFill.ImageNoRadius;
+    Result.FillImageTintColor := AFill.ImageTintColor;
+    Result.FillWrapMode := AFill.WrapMode;
+    Result.FillCropCenter := TPointF.create(-50,-50);
+    Result.FillBlurRadius := 0;
+  end
+  else begin
+    Result.FillColor := TAlphaColors.null;
+    Result.FillGradientStyle := TGradientStyle.Linear;
+    Result.FillGradientAngle := 180;
+    Result.FillGradientColors := [];
+    Result.FillGradientOffsets := [];
+    Result.FillResourceName := '';
+    Result.FillMaskResourceName := '';
+    Result.FillBackgroundMargins := TRectF.Empty;
+    Result.FillImageMargins := TRectF.Empty;
+    Result.FillImageNoRadius := False;
+    Result.FillImageTintColor := TAlphaColors.null;
+    Result.FillWrapMode := TALImageWrapMode.Fit;
+    Result.FillCropCenter := TPointF.create(-50,-50);
+    Result.FillBlurRadius := 0;
+  end;
   //--
   if AStateLayer <> nil then begin
     Result.StateLayerOpacity := AStateLayer.Opacity;
@@ -5589,21 +5684,35 @@ begin
     Result.StateLayerOpacity := 0;
     Result.StateLayerColor := TalphaColors.Null;
     Result.StateLayerMargins := TRectF.Empty;
-    Result.StateLayerXRadius := 0;
-    Result.StateLayerYRadius := 0;
+    Result.StateLayerXRadius := NaN;
+    Result.StateLayerYRadius := NaN;
   end;
   //--
-  Result.StrokeColor := AStroke.Color;
-  Result.StrokeThickness := AStroke.Thickness;
+  if AStroke <> nil then begin
+    Result.StrokeColor := AStroke.Color;
+    Result.StrokeThickness := AStroke.Thickness;
+  end
+  else begin
+    Result.StrokeColor := TalphaColors.Null;
+    Result.StrokeThickness := 1;
+  end;
   //--
-  Result.ShadowColor := AShadow.Color;
-  Result.ShadowBlur := AShadow.Blur;
-  Result.ShadowOffsetX := AShadow.OffsetX;
-  Result.ShadowOffsetY := AShadow.OffsetY;
+  if AShadow <> nil then begin
+    Result.ShadowColor := AShadow.Color;
+    Result.ShadowBlur := AShadow.Blur;
+    Result.ShadowOffsetX := AShadow.OffsetX;
+    Result.ShadowOffsetY := AShadow.OffsetY;
+  end
+  else begin
+    Result.ShadowColor := TalphaColors.Null;
+    Result.ShadowBlur := 12;
+    Result.ShadowOffsetX := 0;
+    Result.ShadowOffsetY := 0;
+  end;
   //--
   Result.Sides := Sides;
-  Result.XRadius := XRadius;
-  Result.YRadius := YRadius;
+  Result.XRadius := AXRadius;
+  Result.YRadius := AYRadius;
   Result.Corners := Corners;
   Result.Padding := padding.Rect;
   //--
@@ -5649,7 +5758,9 @@ Procedure TALBaseText.DrawMultilineText(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow);
+            const AShadow: TALShadow;
+            const AXRadius: Single;
+            const AYRadius: Single);
 begin
 
   if ALIsCanvasNull(ACanvas) then
@@ -5665,7 +5776,9 @@ begin
                                  AFill,
                                  AStateLayer,
                                  AStroke,
-                                 AShadow);
+                                 AShadow,
+                                 AXRadius,
+                                 AYRadius);
 
   if (AText <> '') then begin
 
@@ -5714,14 +5827,14 @@ begin
       .SetDstRect(ARect)
       .SetOpacity(AOpacity)
       .SetFill(AFill)
-      .SetStateLayer(AStateLayer, AFont.color)
+      .SetStateLayer(AStateLayer, LMultiLineTextOptions.Fontcolor)
       .SetDrawStateLayerOnTop(AText <> '')
       .SetStroke(AStroke)
       .SetShadow(AShadow)
       .SetSides(Sides)
       .SetCorners(Corners)
-      .SetXRadius(XRadius)
-      .SetYRadius(YRadius)
+      .SetXRadius(AXRadius)
+      .SetYRadius(AYRadius)
       .Draw;
 
     DrawMultilineTextBeforeDrawParagraph(
@@ -5748,7 +5861,9 @@ Procedure TALBaseText.MeasureMultilineText(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow);
+            const AShadow: TALShadow;
+            const AXRadius: Single;
+            const AYRadius: Single);
 begin
   var LMaxSize: TSizeF;
   if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
@@ -5774,7 +5889,9 @@ begin
       AFill,
       AStateLayer,
       AStroke,
-      AShadow));
+      AShadow,
+      AXRadius,
+      AYRadius));
 end;
 
 {**************************************}
@@ -5793,7 +5910,9 @@ Procedure TALBaseText.CreateBufDrawable(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow);
+            const AShadow: TALShadow;
+            const AXRadius: Single;
+            const AYRadius: Single);
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
@@ -5808,7 +5927,9 @@ begin
                                  AFill,
                                  AStateLayer,
                                  AStroke,
-                                 AShadow);
+                                 AShadow,
+                                 AXRadius,
+                                 AYRadius);
 
   if (AText <> '') then begin
 
@@ -5891,8 +6012,8 @@ begin
             .SetShadow(AShadow)
             .SetSides(Sides)
             .SetCorners(Corners)
-            .SetXRadius(XRadius)
-            .SetYRadius(YRadius)
+            .SetXRadius(AXRadius)
+            .SetYRadius(AYRadius)
             .Draw;
 
         DrawMultilineTextBeforeDrawParagraph(
@@ -5952,7 +6073,9 @@ begin
     Fill, // const AFill: TALBrush;
     nil, // const AStateLayer: TALStateLayer;
     Stroke, // const AStroke: TALStrokeBrush;
-    Shadow); // const AShadow: TALShadow);
+    Shadow, // const AShadow: TALShadow;
+    XRadius, // const AXRadius: Single;
+    YRadius); // const AYRadius: Single
 
 end;
 

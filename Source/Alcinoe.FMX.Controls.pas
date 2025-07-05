@@ -77,7 +77,10 @@ type
     {$ENDIF}
     Width,
     Height,
-    All);
+    Both);
+
+  {*******************************************}
+  TALClickSoundMode = (Default, Always, Never);
 
   {*************************************}
   {$IFNDEF ALCompilerVersionSupported123}
@@ -108,6 +111,7 @@ type
     procedure MarginsChangedHandler(Sender: TObject);
     procedure ScaleChangedHandler(Sender: TObject);
   protected
+    FClickSound: TALClickSoundMode; // 1 byte
     FAutoSize: TALAutoSizeMode; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
@@ -132,6 +136,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure DoClickSound; virtual;
     procedure Click; override;
     function GetParentedVisible: Boolean; override;
     procedure DoMatrixChanged(Sender: TObject); override;
@@ -186,6 +191,7 @@ type
     property AutoAlignToPixel: Boolean read GetAutoAlignToPixel write SetAutoAlignToPixel;
     property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     property ALParentControl: TALControl read FALParentControl;
+    property ClickSound: TALClickSoundMode read FClickSound write FClickSound default TALClickSoundMode.Default;
   end;
 
   {*************************************}
@@ -212,6 +218,7 @@ type
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
+    property ClickSound;
     property ClipChildren default False;
     //property ClipParent;
     property Cursor;
@@ -311,6 +318,7 @@ begin
   FAlign := TALAlignLayout.None;
   FIsSetBoundsLocked := False;
   FBeforeDestructionExecuted := False;
+  FClickSound := TALClickSoundMode.Default;
   FAutoSize := TALAutoSizeMode.None;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;
@@ -1172,13 +1180,13 @@ begin
   FScale.Assign(AValue);
 end;
 
-{***************************************}
+{***********************************************}
 function TALControl.GetAutoSize: TALAutoSizeMode;
 begin
   result := FAutoSize;
 end;
 
-{*****************************************************}
+{*************************************************************}
 procedure TALControl.SetAutoSize(const Value: TALAutoSizeMode);
 begin
   if FAutoSize <> Value then
@@ -1191,16 +1199,16 @@ begin
     if FAutoSize = TALAutoSizeMode.False then
       FAutoSize := TALAutoSizeMode.None
     else if FAutoSize = TALAutoSizeMode.True then
-      FAutoSize := TALAutoSizeMode.All;
+      FAutoSize := TALAutoSizeMode.Both;
     {$ENDIF}
     AdjustSize;
   end;
 end;
 
-{*****************************************************}
+{*********************************************************}
 function TALControl.HasUnconstrainedAutosizeWidth: Boolean;
 begin
-  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Width];
+  Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Width];
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
                              TALAlignLayout.Contents,
@@ -1215,10 +1223,10 @@ begin
   end;
 end;
 
-{*****************************************************}
+{**********************************************************}
 function TALControl.HasUnconstrainedAutosizeHeight: Boolean;
 begin
-  Result := GetAutoSize in [TALAutoSizeMode.All, TALAutoSizeMode.Height];
+  Result := GetAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Height];
   if Result then begin
     result := not (Align in [TALAlignLayout.Client,
                              TALAlignLayout.Contents,
@@ -1484,11 +1492,20 @@ begin
   if LPrevPressed <> Pressed then PressedChanged;
 end;
 
+{********************************}
+procedure TALControl.DoClickSound;
+begin
+  if (ClickSound=TALClickSoundMode.Always) or
+     ((assigned(OnClick)) and
+      (ClickSound=TALClickSoundMode.Default) and
+      (ALGlobalClickSoundEnabled)) then
+    ALPlayClickSound;
+end;
+
 {*************************}
 procedure TALControl.Click;
 begin
-  if ALGlobalClickSoundEnabled and assigned(OnClick) then
-    ALPlayClickSound;
+  DoClickSound;
   inherited;
   if FDoubleClick then begin
     DblClick;

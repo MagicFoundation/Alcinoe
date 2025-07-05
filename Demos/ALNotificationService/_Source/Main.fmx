@@ -35,7 +35,7 @@ object Form1: TForm1
   end
   object TextIntro: TALText
     Align = Top
-    AutoSize = True
+    AutoSize = Both
     Margins.Left = 15.000000000000000000
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000

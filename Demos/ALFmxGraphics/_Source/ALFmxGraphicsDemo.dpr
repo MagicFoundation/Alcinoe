@@ -25,7 +25,10 @@ begin
   {$ENDIF}
   {$ENDIF}
   {$IF defined(ALUseMetal)}
-  GlobalUseMetal := True;
+  if TCustomContextMetal.IsMetalSupported then
+    GlobalUseMetal := True
+  else
+    GlobalUseMetal := False;
   {$ELSE}
   GlobalUseMetal := False;
   {$ENDIF}

@@ -69,7 +69,7 @@ type
     EllipsisDecorationThicknessMultiplier: Single; // default = 1
     EllipsisDecorationColor: TAlphaColor; // default = TAlphaColors.Null
     //--
-    AutoSize: TALAutoSizeMode; // default = TALAutoSizeMode.All
+    AutoSize: TALAutoSizeMode; // default = TALAutoSizeMode.Both
     MaxLines: integer; // default = 65535
     // When LineHeightMultiplier = 0 the line height will be the sum of the font ascent + font descent + font leading.
     // When LineHeightMultiplier is non-null, the line height of the span of text will be a multiple of fontSize and be exactly fontSize * height logical pixels tall
@@ -99,8 +99,8 @@ type
     StateLayerOpacity: Single; // default = 0
     StateLayerColor: TAlphaColor; // default = TAlphaColors.null
     StateLayerMargins: TRectF; // default = TRectF.Empty
-    StateLayerXRadius: Single; // default = 0
-    StateLayerYRadius: Single; // default = 0
+    StateLayerXRadius: Single; // default = NaN
+    StateLayerYRadius: Single; // default = NaN
     //--
     StrokeColor: TalphaColor; // default = TAlphaColors.null
     StrokeThickness: Single; // default = 1
@@ -368,7 +368,7 @@ begin
   EllipsisDecorationThicknessMultiplier := 1;
   EllipsisDecorationColor := TAlphaColors.Null;
   //--
-  AutoSize := TALAutoSizeMode.All;
+  AutoSize := TALAutoSizeMode.Both;
   MaxLines := 65535;
   LineHeightMultiplier := 0;
   LetterSpacing := 0;
@@ -396,8 +396,8 @@ begin
   StateLayerOpacity := 0;
   StateLayerColor := TAlphaColors.null;
   StateLayerMargins := TRectF.Empty;
-  StateLayerXRadius := 0;
-  StateLayerYRadius := 0;
+  StateLayerXRadius := NaN;
+  StateLayerYRadius := NaN;
   //--
   StrokeColor := TalphaColors.Null;
   StrokeThickness := 1;
@@ -521,8 +521,8 @@ begin
     StateLayerMargins.Right := StateLayerMargins.Right * Scale;
     StateLayerMargins.Left := StateLayerMargins.Left * Scale;
     StateLayerMargins.Bottom := StateLayerMargins.Bottom * Scale;
-    if compareValue(StateLayerXRadius, 0, TEpsilon.Vector) > 0 then StateLayerXRadius := StateLayerXRadius * Scale;
-    if compareValue(StateLayerYRadius, 0, TEpsilon.Vector) > 0 then StateLayerYRadius := StateLayerYRadius * Scale;
+    if (not isNaN(StateLayerXRadius)) and (compareValue(StateLayerXRadius, 0, TEpsilon.Vector) > 0) then StateLayerXRadius := StateLayerXRadius * Scale;
+    if (not isNaN(StateLayerYRadius)) and (compareValue(StateLayerYRadius, 0, TEpsilon.Vector) > 0) then StateLayerYRadius := StateLayerYRadius * Scale;
     StrokeThickness := StrokeThickness * Scale;
     ShadowBlur := ShadowBlur * Scale;
     ShadowOffsetX := ShadowOffsetX * Scale;
@@ -632,8 +632,9 @@ procedure ALDrawMultiLineText(
   function _findLastBreakPosition(
              const AText: String;
              Const ANumberOfChars: Integer;
-             const AHardBreak: Boolean = False;
-             const ASkipEndOfTextPunctuation: Boolean = False): integer;
+             const AAllowSymbolBreaks: Boolean; // Allow breaking at symbols like \ or /
+             const AAllowCharacterBreak: Boolean; // Allow breaking on any character, not just word boundaries
+             const ASkipEndOfTextPunctuation: Boolean): integer;
   begin
     if ANumberOfChars <= 0 then exit(ANumberOfChars);
     Var Ln := AText.Length;
@@ -649,7 +650,7 @@ procedure ALDrawMultiLineText(
         dec(Result);
     end;
     // Break on \ or /
-    If (AHardBreak) and (Result <= 0) then begin
+    If (AAllowSymbolBreaks) and (Result <= 0) then begin
       Result := Min(ANumberOfChars, Ln);
       While Result > 0 do begin
         if (Result < Ln) and (CharInSet(AText.Chars[Result-1], ['\','/'])) then break
@@ -657,7 +658,7 @@ procedure ALDrawMultiLineText(
       end;
     end;
     // Break on character in last resort
-    if Result <= 0 then begin
+    if AAllowCharacterBreak and (Result <= 0) then begin
       Result := Min(ANumberOfChars, Ln) - 1;
       While Result > 0 do begin
         // High Surrogate = First part of the pair
@@ -1329,7 +1330,8 @@ procedure ALDrawMultiLineText(
              const ALetterSpacing: Single;
              const ADirection: TALTextDirection;
              const AMaxWidth: Single;
-             const AHardBreak: Boolean;
+             const AAllowSymbolBreaks: Boolean;
+             const AAllowCharacterBreak: Boolean;
              out AMeasuredWidth: Single;
              out AMeasuredHeight: Single): integer;
   begin
@@ -1392,11 +1394,11 @@ procedure ALDrawMultiLineText(
       else begin
 
         // Calculate the correct position where the text should break
-        var LBreakPosition := _findLastBreakPosition(AText, Result, AHardBreak);
+        var LBreakPosition := _findLastBreakPosition(AText, Result, AAllowSymbolBreaks, AAllowCharacterBreak, False{ASkipEndOfTextPunctuation});
 
         // No good position found
         if LBreakPosition = 0 then begin
-          if AHardBreak then begin
+          if AAllowSymbolBreaks then begin
             AMeasuredWidth := LMeasuredWidth[0];
             AMeasuredHeight := 0;
           end
@@ -1479,8 +1481,8 @@ procedure ALDrawMultiLineText(
         {$ENDIF}
 
         // https://stackoverflow.com/questions/78144915/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
-        if (Result < AText.Length) and (not AHardBreak) then begin
-          var LBreakPosition := _findLastBreakPosition(AText, Result, AHardBreak);
+        if (Result < AText.Length) and (not AAllowSymbolBreaks) then begin
+          var LBreakPosition := _findLastBreakPosition(AText, Result, AAllowSymbolBreaks, AAllowCharacterBreak, False{ASkipEndOfTextPunctuation});
           if LBreakPosition <= 0 then begin
             Result := 0;
             AMeasuredWidth := 0;
@@ -1645,7 +1647,7 @@ procedure ALDrawMultiLineText(
     //      AMeasuredHeight := LSize.Height/100;
     //      exit;
     //    end;
-    //    Result := _findLastBreakPosition(LText, Result-1, AHardBreak);
+    //    Result := _findLastBreakPosition(LText, Result-1, AAllowSymbolBreaks, AAllowCharacterBreak, False{ASkipEndOfTextPunctuation});
     //    If Result > 0 then
     //      LText := LText.Remove(Result);
     //  end;
@@ -1675,9 +1677,9 @@ procedure ALDrawMultiLineText(
         AMeasuredHeight := LLayout.TextHeight;
         If CompareValue(AMeasuredWidth, AMaxWidth, Tepsilon.Position) <= 0 then exit;
         var LPrevResult: Integer := Result;
-        Result := _findLastBreakPosition(LText, Result-1, AHardBreak);
+        Result := _findLastBreakPosition(LText, Result-1, AAllowSymbolBreaks, AAllowCharacterBreak, False{ASkipEndOfTextPunctuation});
         If Result > 0 then LText := LText.Remove(Result)
-        else if AHardBreak then begin
+        else if AAllowSymbolBreaks or AAllowCharacterBreak then begin
           Result := LPrevResult - 1;
           if LText[Result].IsHighSurrogate then dec(result);
           If Result > 0 then LText := LText.Remove(Result);
@@ -2422,8 +2424,9 @@ begin
                     LInsertEllipsisAt := _findLastBreakPosition(
                                            LTextForRange, // const AText: String;
                                            LPrevInsertEllipsisAt-1, // Const ANumberOfChars: Integer;
-                                           false, // const AHardBreak: Boolean = False;
-                                           true); // const ASkipEndOfTextPunctuation: Boolean = False)
+                                           false, // const AAllowSymbolBreaks: Boolean;
+                                           I = 0, // const AAllowCharacterBreak: Boolean;
+                                           true); // const ASkipEndOfTextPunctuation: Boolean;
                   // _findLastBreakPosition return -1 when LPrevInsertEllipsisAt = 0
                   if LInsertEllipsisAt < 0 then begin
                     ARect.Width := 0;
@@ -2450,7 +2453,7 @@ begin
               //       auto floorWidth = SkScalarFloorToScalar(rawWidth);
               //
               var LOriginalRectWidth: Single := ARect.Width;
-              if LOptions.Autosize = TALAutoSizeMode.All then begin
+              if LOptions.Autosize = TALAutoSizeMode.Both then begin
                 ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + LOptions.Padding.Left + LOptions.Padding.Right);
                 ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
               end
@@ -3047,8 +3050,9 @@ begin
                   var LBreakPos := _findLastBreakPosition(
                                      LCurrText, // const AText: String;
                                      LNumberOfChars, // Const ANumberOfChars: Integer;
-                                     (LExtendedTextElements.Count > 0) and (LExtendedTextElements[LExtendedTextElements.Count-1].IsBreakLine), // const AHardBreak: Boolean = False;
-                                     true); // const ASkipEndOfTextPunctuation: Boolean = False
+                                     (LExtendedTextElements.Count > 0) and (LExtendedTextElements[LExtendedTextElements.Count-1].IsBreakLine), // const AAllowSymbolBreaks: Boolean
+                                     LExtendedTextElements.Count = 0, // const AAllowCharacterBreak: Boolean
+                                     true); // const ASkipEndOfTextPunctuation: Boolean
                   if LBreakPos <= 0 then begin
                     LAddEllipsis := 1;
                     continue; // => Go to => else if LAddEllipsis = 1 then
@@ -3410,7 +3414,8 @@ begin
                                     LLetterSpacing, // const ALetterSpacing: Single;
                                     LOptions.Direction, // const ADirection: TALTextDirection
                                     ARect.Width - LOptions.Padding.Left - LOptions.Padding.Right - LCurrLineWidth, // const AMaxWidth: Single;
-                                    samevalue(LCurrLineWidth, 0, TEpsilon.Position), // const AHardBreak: Boolean;
+                                    samevalue(LCurrLineWidth, 0, TEpsilon.Position), // const AAllowSymbolBreaks: Boolean;
+                                    LExtendedTextElements.Count = 0, // const AAllowCharacterBreak: Boolean
                                     LMeasuredWidth, // out AMeasuredWidth: Single): integer;
                                     LMeasuredHeight) // out AMeasuredHeight: Single): integer;
               else begin
@@ -3740,7 +3745,7 @@ begin
       LParagraphRect.height := LParagraphRect.height;
 
       // Autosize
-      if LOptions.Autosize = TALAutoSizeMode.All then begin
+      if LOptions.Autosize = TALAutoSizeMode.Both then begin
         ARect.Width := Min(ARect.Width, LParagraphRect.Width + LOptions.Padding.Left + LOptions.Padding.Right);
         ARect.Height := Min(ARect.Height, LParagraphRect.Height + LOptions.Padding.Top + LOptions.Padding.Bottom);
       end

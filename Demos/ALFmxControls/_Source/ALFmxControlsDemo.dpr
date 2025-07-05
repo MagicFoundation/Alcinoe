@@ -22,11 +22,19 @@ uses
 begin
   {$IF defined(SKIA)}
   GlobalUseSkia := True;
+  {$IF defined(ALUseVulkan)}
+  GlobalUseVulkan := True;
+  {$ELSE}
   GlobalUseVulkan := False;
   {$ENDIF}
-  {$IF defined(ALAppleOS)}
+  {$ENDIF}
+  {$IF defined(ALUseMetal)}
   if TCustomContextMetal.IsMetalSupported then
-    GlobalUseMetal := True;
+    GlobalUseMetal := True
+  else
+    GlobalUseMetal := False;
+  {$ELSE}
+  GlobalUseMetal := False;
   {$ENDIF}
   Application.Initialize;
   Application.FormFactor.Orientations := [TFormOrientation.Portrait, TFormOrientation.InvertedPortrait];

@@ -31,6 +31,7 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -DProj="%ALBaseDir%\Demos\ALFmxDynamicListBox\_Source\ALFmxDynamicListBoxDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALFmxDynamicListBox\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
+ -Configurations="Debug;Debug_Skia;Debug_Skia_Vulkan;Debug_Skia_Metal;Debug_ALSkiaEngine;Debug_ALSkiaEngine_Vulkan;Debug_ALSkiaEngine_Metal;Debug_Metal;Debug_OpenGL;Release"^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 
 

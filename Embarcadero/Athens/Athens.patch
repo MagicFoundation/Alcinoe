@@ -1458,6 +1458,16 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
  var
    Operation: TDragOperation;
+@@ -5212,6 +5264,9 @@
+             FParentControl.RecalcUpdateRect;
+       UpdateExplicitBounds;
+       UpdateAnchorRules;
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264
++      if (not Moved) and (RotationAngle = 0) and Visible then
++        ParentContentChanged;
+       RequestAlign;
+     end;
+ 
 Index: Embarcadero/Athens/fmx/FMX.Controls3D.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Controls3D.pas b/Embarcadero/Athens/fmx/FMX.Controls3D.pas
@@ -2131,7 +2141,21 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  procedure TAndroidMotionManager.HandleMultiTouch;
-@@ -2932,7 +2991,8 @@
+@@ -2268,6 +2327,13 @@
+         FAdditionalShift := [];
+       end;
+ 
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3762
++      AMOTION_EVENT_ACTION_CANCEL:
++      begin
++        PlatformAndroid.WindowService.MouseUp(FHandle.Form, TMouseButton.mbLeft, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position, False);
++        FAdditionalShift := [];
++      end;
++
+       AMOTION_EVENT_ACTION_MOVE:
+         PlatformAndroid.WindowService.MouseMove(FHandle.Form, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position);
+     else
+@@ -2932,7 +2998,8 @@
  begin
    inherited Create;
    FContext := AContext;
@@ -2141,7 +2165,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
  end;
  
-@@ -2939,19 +2999,23 @@
+@@ -2939,19 +3006,23 @@
  destructor TRender<T>.Destroy;
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
@@ -2173,7 +2197,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  procedure TRender<T>.Render;
-@@ -2958,10 +3022,134 @@
+@@ -2958,10 +3029,134 @@
  begin
  end;
  

@@ -1,0 +1,54 @@
+object Form3: TForm3
+  Left = 0
+  Top = 0
+  Caption = 'Form3'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Rectangle1: TRectangle
+    Align = Client
+    Size.Width = 640.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    OnMouseDown = Rectangle1MouseDown
+    OnMouseUp = Rectangle1MouseUp
+    OnMouseLeave = Rectangle1MouseLeave
+    object Text1: TText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 16.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 95.843750000000000000
+      Size.Width = 608.000000000000000000
+      Size.Height = 21.281250000000000000
+      Size.PlatformDefault = False
+      Text = '...'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Leading
+    end
+    object Text2: TText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 16.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 16.000000000000000000
+      Size.Width = 608.000000000000000000
+      Size.Height = 63.843750000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'Press the screen near the left edge, then gently slide your fing' +
+        'er off the screen.'#10'In some cases, you may notice that the OnMous' +
+        'eUp or OnMouseLeave events are not triggered.'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.HorzAlign = Leading
+    end
+  end
+end

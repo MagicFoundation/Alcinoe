@@ -90,6 +90,7 @@ forced to apply patches to the original Delphi source files:
 * [Allow TTexture to Define a GL_TEXTURE_EXTERNAL_OES Target](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1550)
 * [Make CanvasHelper of TCanvasGpu public](https://quality.embarcadero.com/browse/RSP-18797)
 * [Allow TTexture to Define a Material (GLSL Shader) to Use](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549)
+* [TAndroidMotionManager does not handle AMOTION_EVENT_ACTION_CANCEL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3762)
 * [On iOS we need to pass options: PNSDictionary with the message TApplicationEvent.FinishedLaunching](https://quality.embarcadero.com/browse/RSP-40351)
 * [AVPlayerItem miss the function addOutput](https://quality.embarcadero.com/browse/RSP-16853)
 * [CLVisit is missing from the implementation of CLLocationManager](https://quality.embarcadero.com/browse/RSP-18621)

@@ -545,7 +545,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'function GetAbsoluteDisplayedRect: TRectF; virtual;','//**function GetAbsoluteDisplayedRect: TRectF; virtual;');
     aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; virtual;','function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'procedure IContent.Changed = ContentChanged;','//**procedure IContent.Changed = ContentChanged;');
-    aSrc := FindAndReplace(aSrc, 'function IsVisibleObject(const AObject: TControl): Boolean; override;','//**function IsVisibleObject(const AObject: TControl): Boolean; override;');
+    aSrc := FindAndReplace(aSrc, 'IsVisibleObject(const AObject: TControl)','IsVisibleObject(const AObject: TALDynamicControl)');
     aSrc := FindAndReplace(aSrc, 'FreeNotification(AObject: TObject);','FreeNotification(const AObject: TALDynamicControl);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);','ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);','ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);');
@@ -1122,7 +1122,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetCanFocus(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetTabStop(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('.TContent.IsVisibleObject(const AObject: TControl): Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicExtendedControl.SetScale(const AValue: TPosition)', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('TALDynamicExtendedControl.ScaleChangedHandler(Sender: TObject)', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetPivot: TPosition;', ALTrim(LSrcLine)) > 0) or

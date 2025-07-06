@@ -503,6 +503,10 @@ begin
     LTitle.Margins.left := 18;
     LTitle.Text := 'For you';
 
+    {$IF defined(IOS)}
+    EXIT;
+    {$ENDIF}
+
     var LMessageBtn := TALDynamicButton.Create(Result);
     LMessageBtn.Fill.Color := TalphaColors.Null;
     LMessageBtn.Fill.ResourceName := 'message';
@@ -533,6 +537,11 @@ begin
   Result := TALDynamicListBox.TView.TBottomBar.Create(nil);
   try
     Result.BoundsRect := AContext.TargetRect;
+    {$IF defined(IOS)}
+    Result.Height := 5;
+    EXIT;
+    {$ENDIF}
+
     {$IF defined(IOS)}
     var LhomeIndicatorBottom: CGFloat := 0;
     var LWindow := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication).keyWindow;
@@ -632,6 +641,7 @@ begin
     LAvatar.LoadingCacheIndex := 2;
     LAvatar.CacheEngine := AContext.CacheEngine;
 
+    {$IF not defined(ios)}
     var LMenuBtn := TALDynamicButton.Create(LLayout1);
     LMenuBtn.Fill.Color := TalphaColors.Null;
     LMenuBtn.Fill.ResourceName := 'menu';
@@ -642,6 +652,7 @@ begin
     LMenuBtn.Width := 4;
     LMenuBtn.CacheIndex := 3;
     LMenuBtn.CacheEngine := AContext.CacheEngine;
+    {$ENDIF}
 
     Var LLayout2 := TALDynamicLayout.Create(LLayout1);
     LLayout2.Align := TALAlignLayout.LeftCenter;
@@ -753,9 +764,11 @@ begin
           LMedia1.AddControl(LLayout1);
           LUsername.TextSettings.Font.Color := $FFffffff;
           LGeotag.TextSettings.Font.Color := $FFffffff;
+          {$IF not defined(ios)}
           LMenuBtn.Fill.ResourceName := 'menu_dark';
           LMenuBtn.CacheIndex := 5;
           LMenuBtn.CacheEngine := AContext.CacheEngine;
+          {$ENDIF}
         end;
       end;
     end;
@@ -766,14 +779,24 @@ begin
     LLayout3.Margins.Top := 12;
     LLayout3.Margins.bottom := 10;
 
-    var LLikeCountBtn := TALDynamicButton.Create(LLayout3);
-    LLikeCountBtn.Fill.Color := TalphaColors.Null;
-    LLikeCountBtn.Fill.ResourceName := 'like';
+    var LLikeCountBtn := TALDynamicToggleButton.Create(LLayout3);
+    LLikeCountBtn.StateStyles.Unchecked.Default.Fill.Inherit := False;
+    LLikeCountBtn.StateStyles.Unchecked.Default.Fill.Color := TalphaColors.Null;
+    LLikeCountBtn.StateStyles.Unchecked.Default.fill.ResourceName := 'like_outline';
+    LLikeCountBtn.StateStyles.checked.Default.Fill.Inherit := False;
+    LLikeCountBtn.StateStyles.checked.Default.Fill.Color := TalphaColors.Null;
+    LLikeCountBtn.StateStyles.checked.Default.fill.ResourceName := 'like_solid';
+    LLikeCountBtn.StateStyles.Unchecked.pressed.Scale := 1.4;
+    LLikeCountBtn.StateStyles.checked.pressed.Scale := 1.4;
+    LLikeCountBtn.StateStyles.Transition.Duration := 0.5;
+    LLikeCountBtn.StateStyles.Transition.InterpolationType := TALInterpolationType.Back;
+    LLikeCountBtn.StateStyles.Transition.InterpolationParams.Overshoot := 4;
     LLikeCountBtn.Stroke.Color := TalphaColors.Null;
     LLikeCountBtn.Align := TALAlignLayout.LeftCenter;
     LLikeCountBtn.Margins.Left := 17;
     LLikeCountBtn.Height := 20;
     LLikeCountBtn.Width := 23;
+    LLikeCountBtn.TouchTargetExpansion := TRectF.Create(14,14,14,14);
     LLikeCountBtn.CacheIndex := 6;
     LLikeCountBtn.CacheEngine := AContext.CacheEngine;
 
@@ -826,14 +849,23 @@ begin
     LReshareCountText.AutoSize := TALAutoSizeMode.Both;
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
 
-    var LBookmarkBtn := TALDynamicButton.Create(LLayout3);
-    LBookmarkBtn.Fill.Color := TalphaColors.Null;
-    LBookmarkBtn.Fill.ResourceName := 'bookmark';
+    var LBookmarkBtn := TALDynamicToggleButton.Create(LLayout3);
+    LBookmarkBtn.StateStyles.Unchecked.Default.Fill.Inherit := False;
+    LBookmarkBtn.StateStyles.Unchecked.Default.Fill.Color := TalphaColors.Null;
+    LBookmarkBtn.StateStyles.Unchecked.Default.fill.ResourceName := 'bookmark_outline';
+    LBookmarkBtn.StateStyles.checked.Default.Fill.Inherit := False;
+    LBookmarkBtn.StateStyles.checked.Default.Fill.Color := TalphaColors.Null;
+    LBookmarkBtn.StateStyles.checked.Default.fill.ResourceName := 'bookmark_solid';
+    LBookmarkBtn.StateStyles.Unchecked.pressed.Scale := 1.3;
+    LBookmarkBtn.StateStyles.checked.pressed.Scale := 1.3;
+    LBookmarkBtn.StateStyles.Transition.Duration := 0.2;
+    LBookmarkBtn.StateStyles.Transition.InterpolationType := TALInterpolationType.Quadratic;
     LBookmarkBtn.Stroke.Color := TalphaColors.Null;
     LBookmarkBtn.Align := TALAlignLayout.rightCenter;
     LBookmarkBtn.Margins.right := 19;
     LBookmarkBtn.Height := 20;
     LBookmarkBtn.Width := 18;
+    LBookmarkBtn.TouchTargetExpansion := TRectF.Create(14,14,14,14);
     LBookmarkBtn.CacheIndex := 9;
     LBookmarkBtn.CacheEngine := AContext.CacheEngine;
 
@@ -1057,6 +1089,7 @@ begin
     LFollowButton.CacheEngine := AContext.CacheEngine;
     LFollowButton.OnClick := FollowButtonClick;
 
+    {$IF not defined(ios)}
     var LCloseButton := TALDynamicButton.Create(LBackground);
     LCloseButton.Fill.Color := TalphaColors.Null;
     LCloseButton.Fill.ResourceName := 'cross';
@@ -1067,6 +1100,7 @@ begin
     LCloseButton.Width := 11;
     LCloseButton.CacheIndex := 14;
     LCloseButton.CacheEngine := AContext.CacheEngine;
+    {$ENDIF}
 
   Except
     ALFreeAndNil(Result);

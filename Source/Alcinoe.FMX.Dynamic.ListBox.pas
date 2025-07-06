@@ -3705,7 +3705,7 @@ begin
   end;
 end;
 
-{************************************************************************}
+{***********************************************************************************}
 procedure TALDynamicListBox.TView.RefreshTransitionAnimationProcess(Sender: TObject);
 begin
   case FRefreshTransitionKind of
@@ -3722,7 +3722,7 @@ begin
   Repaint;
 end;
 
-{************************************************************************}
+{**********************************************************************************}
 procedure TALDynamicListBox.TView.RefreshTransitionAnimationFinish(Sender: TObject);
 begin
   Host.HitTest := True;
@@ -4556,7 +4556,7 @@ end;
 {********************************}
 procedure TALDynamicListBox.Paint;
 
-  {*****************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _PaintRefreshingView;
   begin
     var LSavedMatrix := Canvas.Matrix;

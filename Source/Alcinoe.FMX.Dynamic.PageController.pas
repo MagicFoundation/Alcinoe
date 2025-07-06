@@ -2241,8 +2241,9 @@ begin
       FFadeAnimation := TALFloatAnimation.Create;
       FFadeAnimation.OnProcess := FadeAnimationProcess;
       FFadeAnimation.OnFinish := FadeAnimationFinish;
-      FFadeAnimation.Duration := 0.3;
     end;
+    FFadeAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultEffects;
+    FFadeAnimation.Duration := 0.2;
 
     FFadeTouchMode := FScrollEngine.TouchMode;
     FScrollEngine.TouchMode := TALScrollEngine.TTouchMode.Disabled;
@@ -2288,6 +2289,8 @@ begin
         Avalue.Index := 1; // ToPageIndex
         FFadeAnimation.StartValue := 0;
         FFadeAnimation.StopValue := 1;
+        FFadeAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveSlowEffects;
+        FFadeAnimation.duration := 0.3;
       end;
       //--
       else raise Exception.Create('Error AF651414-E6EE-4B42-90D1-3509657FCB22');

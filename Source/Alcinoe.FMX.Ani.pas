@@ -3868,15 +3868,15 @@ initialization
   ALCubicBezierMaterial3StandardDefaultEffects := TALCubicBezier.Create(0.34, 0.80, 0.34, 1.00);
   ALCubicBezierMaterial3StandardSlowEffects := TALCubicBezier.Create(0.34, 0.88, 0.34, 1.00);
   ALCubicBezierMaterial3EmphasizedSegment1 := TALCubicBezier.Create(
-                                               0.05/0.166666,
-                                               0.0,
-                                               0.133333/0.166666,
-                                               0.06/0.4);
+                                                0.05/0.166666,
+                                                0.0,
+                                                0.133333/0.166666,
+                                                0.06/0.4);
   ALCubicBezierMaterial3EmphasizedSegment2 := TALCubicBezier.Create(
-                                               (0.208333 - 0.166666)/(1 - 0.166666),
-                                               (0.82 - 0.4)/(1 - 0.4),
-                                               (0.25 - 0.166666)/(1 - 0.166666),
-                                               (1 - 0.4)/(1 - 0.4));
+                                                (0.208333 - 0.166666)/(1 - 0.166666),
+                                                (0.82 - 0.4)/(1 - 0.4),
+                                                (0.25 - 0.166666)/(1 - 0.166666),
+                                                (1 - 0.4)/(1 - 0.4));
   ALCubicBezierMaterial3EmphasizedDecelerate := TALCubicBezier.Create(0.05, 0.7, 0.1, 1.0);
   ALCubicBezierMaterial3EmphasizedAccelerate := TALCubicBezier.Create(0.3, 0.0, 0.8, 0.15);
 

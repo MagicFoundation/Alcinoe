@@ -466,7 +466,7 @@ begin
   for var I: Integer := 0 to StepCount do
   begin
     var t: Single := I / StepCount;              // 0.00, 0.01, …, 1.00
-    var y1: Single := ALInterpolateMaterialEmphasized(t, 1);
+    var y1: Single := ALInterpolateMaterial3Emphasized(t, 1);
     var LPair: TPair<TAlphaColor, Tpointf>;
     Lpair.Key := TalphaColors.darkred;
     Lpair.Value := TpointF.Create(

@@ -32,6 +32,9 @@ type
   TALDynamicListBox = class(TALDynamicControlHost)
   public
     type
+      // ---------------------
+      // TRefreshTransitionKind
+      TRefreshTransitionKind = (None, Scroll, DirectFadeIn, DirectFadeOut, OverlayFadeIn, RevealFadeOut, CrossFade);
       // -----
       // TItem
       TView = Class;
@@ -461,8 +464,10 @@ type
         fScrollCapturedByMe: boolean; // 1 byte
         FHandleMouseEvents: Boolean; // 1 byte
         FIsSettingViewportPosition: Boolean; // 1 byte
+        FRefreshTransitionKind: TRefreshTransitionKind; // 1 byte
         fLastViewportPosition: TALPointD; // 16 bytes
         FMouseDownPos: TpointF; // 8 bytes
+        FRefreshTransitionAnimation: TALFloatAnimation; // 8 bytes
         FRefreshingTimer: TALDisplayTimer; // 8 bytes
         FRefreshingView: TView; // 8 bytes
         FNoItemsContent: TItem.TContent; // 8 bytes
@@ -514,6 +519,8 @@ type
         procedure InternalMouseMove(Shift: TShiftState; X, Y: Single);
         procedure InternalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
         procedure InternalMouseLeave;
+        procedure RefreshTransitionAnimationProcess(Sender: TObject);
+        procedure RefreshTransitionAnimationFinish(Sender: TObject);
         procedure RefreshingTimerProcess(Sender: TObject);
       protected
         procedure LockItemIds; virtual;
@@ -573,6 +580,7 @@ type
         function HasMoreItemsToDownload: Boolean; virtual;
         function RetryDownloadItems: boolean; virtual;
         procedure Refresh; virtual;
+        property RefreshTransitionKind: TRefreshTransitionKind read FRefreshTransitionKind write FRefreshTransitionKind;
         property PaginationToken: String read FPaginationToken;
         property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
         property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
@@ -614,6 +622,8 @@ type
       TCreateMainViewEvent = function(Const AListBox: TALDynamicListBox): TView of object;
   private
     FMainView: TView;
+    FRefreshingView: TView;
+    FRefreshTransitionKind: TRefreshTransitionKind;
     FPreloadItemCount: Integer;
     FActiveScrollEnginesCount: Integer;
     FDisableMouseWheel: Boolean;
@@ -685,6 +695,7 @@ type
     property PopupMenu;
     property Position;
     property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount default TView.DefaultPreloadItemCount;
+    property RefreshTransitionKind: TRefreshTransitionKind read FRefreshTransitionKind write FRefreshTransitionKind default TRefreshTransitionKind.CrossFade;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -2422,8 +2433,10 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   FHandleMouseEvents := False;
   FIsSettingViewportPosition := False;
+  FRefreshTransitionKind := TRefreshTransitionKind.CrossFade;
   fLastViewportPosition := TALPointD.Create(0,0);
   FMouseDownPos := TPointF.Zero;
+  FRefreshTransitionAnimation := nil;
   FRefreshingTimer := nil;
   FRefreshingView := nil;
   FNoItemsContent := nil;
@@ -2476,6 +2489,7 @@ end;
 {*****************************************}
 destructor TALDynamicListBox.TView.Destroy;
 begin
+  ALFreeAndNil(FRefreshTransitionAnimation);
   ALFreeAndNil(FRefreshingTimer);
   ALFreeAndNil(FRefreshingView);
   ALFreeAndNil(FUniqueInt64ItemIds);
@@ -2488,6 +2502,8 @@ end;
 procedure TALDynamicListBox.TView.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
+  if FRefreshTransitionAnimation <> nil then FRefreshTransitionAnimation.Enabled := False;
+  if FRefreshingTimer <> nil then FRefreshingTimer.Enabled := False;
   CancelDownloadItems;
   TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   if FscrollEngine.TimerActive then begin
@@ -2840,7 +2856,10 @@ begin
     {$ENDIF}
   end;
 
-  if (FRefreshingTimer <> nil) and (not FRefreshingTimer.Enabled) and (FRefreshingView <> nil) then begin
+  if (FRefreshTransitionKind = TRefreshTransitionKind.Scroll) and
+     (FRefreshingTimer <> nil) and
+     (not FRefreshingTimer.Enabled) and
+     (FRefreshingView <> nil) then begin
     Host.HitTest := True;
     var LRefreshingView := FRefreshingView;
     FRefreshingView := nil;
@@ -3687,45 +3706,143 @@ begin
 end;
 
 {************************************************************************}
-procedure TALDynamicListBox.TView.RefreshingTimerProcess(Sender: TObject);
+procedure TALDynamicListBox.TView.RefreshTransitionAnimationProcess(Sender: TObject);
 begin
+  case FRefreshTransitionKind of
+    TRefreshTransitionKind.DirectFadeIn: FRefreshingView.Opacity := FRefreshTransitionAnimation.CurrentValue;
+    TRefreshTransitionKind.DirectFadeOut: Opacity := FRefreshTransitionAnimation.CurrentValue;
+    TRefreshTransitionKind.OverlayFadeIn: FRefreshingView.Opacity := FRefreshTransitionAnimation.CurrentValue;
+    TRefreshTransitionKind.RevealFadeOut: Opacity := FRefreshTransitionAnimation.CurrentValue;
+    TRefreshTransitionKind.CrossFade: begin
+      Opacity := 1-FRefreshTransitionAnimation.CurrentValue;
+      FRefreshingView.Opacity := FRefreshTransitionAnimation.CurrentValue;
+    end;
+    else raise Exception.Create('Error AF651414-E6EE-4B42-90D1-3509657FCB22');
+  end;
+  Repaint;
+end;
+
+{************************************************************************}
+procedure TALDynamicListBox.TView.RefreshTransitionAnimationFinish(Sender: TObject);
+begin
+  Host.HitTest := True;
+  var LRefreshingView := FRefreshingView;
+  FRefreshingView := nil;
+  LRefreshingView.Opacity := 1;
+  Host.MainView := LRefreshingView;
+end;
+
+{************************************************************************}
+procedure TALDynamicListBox.TView.RefreshingTimerProcess(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createRefreshTransitionAnimation;
+  begin
+    {$If defined(DEBUG)}
+    if FRefreshTransitionAnimation <> nil then
+      Raise Exception.Create('Error 79000123-2EA0-41A4-A93A-B181BF7FCF83');
+    {$ENDIf}
+    FRefreshTransitionAnimation := TALFloatAnimation.Create;
+    FRefreshTransitionAnimation.OnProcess := RefreshTransitionAnimationProcess;
+    FRefreshTransitionAnimation.OnFinish := RefreshTransitionAnimationFinish;
+    FRefreshTransitionAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultEffects;
+    FRefreshTransitionAnimation.duration := 0.2;
+  end;
+
+begin
+
   {$If defined(DEBUG)}
   if FRefreshingView = nil then
     Raise Exception.Create('Error EE277FA4-FC66-410F-B853-0A6AA2F04F3A');
   {$ENDIf}
+
   if (not Host.Pressed) and
      (not FScrollEngine.Down) and
+     (Host.FActiveScrollEnginesCount = 0) and
      (not TALDialogManager.Instance.IsShowingDialog) and
      (FRefreshingView.IsReadyToDisplay(True{AStrict})) then begin
 
     FRefreshingTimer.Enabled := False;
+    var LRefreshTransitionKind := FRefreshTransitionKind;
+    if (LRefreshTransitionKind = TRefreshTransitionKind.Scroll) and
+       (Host.MainView.scrollengine.ViewportPosition.EqualsTo(TALPointD.Zero, TEpsilon.Position)) then
+      LRefreshTransitionKind := TRefreshTransitionKind.None;
 
-    if Host.MainView.scrollengine.ViewportPosition.EqualsTo(TALPointD.Zero, TEpsilon.Position) then begin
-      var LRefreshingView := FRefreshingView;
-      FRefreshingView := nil;
-      Host.MainView := LRefreshingView;
-    end
-    else begin
-      var LDelta: double;
-      If (Orientation = TOrientation.Horizontal) then LDelta := abs(Host.MainView.scrollengine.ViewportPosition.x)
-      else LDelta := abs(Host.MainView.scrollengine.ViewportPosition.y);
+    Host.HitTest := False;
 
-      var LDuration: integer := min(500, round(LDelta / 5{pixels per ms}));
-      {$If defined(DEBUG)}
-      ALLog(ClassName+'.RefreshingTimerProcess', 'Duration: ' + ALintToStrW(LDuration));
-      {$ENDIf}
+    case LRefreshTransitionKind of
+      TRefreshTransitionKind.None: begin
+        Host.HitTest := True;
+        var LRefreshingView := FRefreshingView;
+        FRefreshingView := nil;
+        Host.MainView := LRefreshingView;
+      end;
+      //--
+      TRefreshTransitionKind.Scroll: begin
+        var LDelta: double;
+        If (Orientation = TOrientation.Horizontal) then LDelta := abs(Host.MainView.scrollengine.ViewportPosition.x)
+        else LDelta := abs(Host.MainView.scrollengine.ViewportPosition.y);
 
-      Host.HitTest := False;
+        var LDuration: integer := min(500, round(LDelta / 5{pixels per ms}));
+        {$If defined(DEBUG)}
+        ALLog(ClassName+'.RefreshingTimerProcess', 'Duration: ' + ALintToStrW(LDuration));
+        {$ENDIf}
 
-      Host.MainView.scrollengine.startScroll(
-        Host.MainView.scrollengine.ViewportPosition.x,// startX: Double;
-        Host.MainView.scrollengine.ViewportPosition.y, // startY: Double;
-        -Host.MainView.scrollengine.ViewportPosition.x, // dx: Double;
-        -Host.MainView.scrollengine.ViewportPosition.y, // dy: Double;
-        LDuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
+        Host.MainView.scrollengine.startScroll(
+          Host.MainView.scrollengine.ViewportPosition.x,// startX: Double;
+          Host.MainView.scrollengine.ViewportPosition.y, // startY: Double;
+          -Host.MainView.scrollengine.ViewportPosition.x, // dx: Double;
+          -Host.MainView.scrollengine.ViewportPosition.y, // dy: Double;
+          LDuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
+      end;
+      //--
+      TRefreshTransitionKind.DirectFadeIn: begin
+        Host.FRefreshingView := FRefreshingView;
+        Opacity := 0;
+        _createRefreshTransitionAnimation;
+        FRefreshTransitionAnimation.StartValue := 0;
+        FRefreshTransitionAnimation.StopValue := 1;
+        FRefreshTransitionAnimation.Start;
+      end;
+      //--
+      TRefreshTransitionKind.DirectFadeOut: begin
+        _createRefreshTransitionAnimation;
+        FRefreshTransitionAnimation.StartValue := 1;
+        FRefreshTransitionAnimation.StopValue := 0;
+        FRefreshTransitionAnimation.Start;
+      end;
+      //--
+      TRefreshTransitionKind.OverlayFadeIn: begin
+        Host.FRefreshingView := FRefreshingView;
+        _createRefreshTransitionAnimation;
+        FRefreshTransitionAnimation.StartValue := 0;
+        FRefreshTransitionAnimation.StopValue := 1;
+        FRefreshTransitionAnimation.Start;
+      end;
+      //--
+      TRefreshTransitionKind.RevealFadeOut: begin
+        Host.FRefreshingView := FRefreshingView;
+        _createRefreshTransitionAnimation;
+        FRefreshTransitionAnimation.StartValue := 1;
+        FRefreshTransitionAnimation.StopValue := 0;
+        FRefreshTransitionAnimation.Start;
+      end;
+      //--
+      TRefreshTransitionKind.CrossFade: begin
+        Host.FRefreshingView := FRefreshingView;
+        _createRefreshTransitionAnimation;
+        FRefreshTransitionAnimation.StartValue := 0;
+        FRefreshTransitionAnimation.StopValue := 1;
+        FRefreshTransitionAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveSlowEffects;
+        FRefreshTransitionAnimation.duration := 0.3;
+        FRefreshTransitionAnimation.Start;
+      end;
+      //--
+      else raise Exception.Create('Error AF651414-E6EE-4B42-90D1-3509657FCB22');
     end;
 
   end;
+
 end;
 
 {*********************************************************************************}
@@ -4296,6 +4413,7 @@ end;
 constructor TALDynamicListBox.Create(aOwner: TComponent);
 begin
   inherited create(AOwner);
+  FRefreshTransitionKind := TRefreshTransitionKind.CrossFade;
   FPreloadItemCount := TView.DefaultPreloadItemCount;
   FActiveScrollEnginesCount := 0;
   FDisableMouseWheel := False;
@@ -4320,6 +4438,7 @@ begin
   FOnRealignItems := nil;
   FOnViewportPositionChange := nil;
   FMainView := nil;
+  FRefreshingView := nil;
 end;
 
 {***********************************}
@@ -4335,6 +4454,7 @@ begin
   If assigned(OnCreateMainView) then Result := OnCreateMainView(Self)
   else begin
     Result := TView.Create(nil);
+    Result.RefreshTransitionKind := RefreshTransitionKind;
     Result.PreloadItemCount := PreloadItemCount;
     //OnDownloadData
     //OnCreateMainContent
@@ -4370,6 +4490,7 @@ end;
 procedure TALDynamicListBox.SetMainView(const Value: TView);
 begin
   If Value <> FMainView then begin
+    FRefreshingView := nil;
     if FMainView <> nil then begin
       FMainView.SetHost(nil);
       FMainView.ParentChanged;
@@ -4434,6 +4555,20 @@ end;
 
 {********************************}
 procedure TALDynamicListBox.Paint;
+
+  {*****************************}
+  procedure _PaintRefreshingView;
+  begin
+    var LSavedMatrix := Canvas.Matrix;
+    try
+      var LMatrix := LSavedMatrix * TMatrix.CreateTranslation(FRefreshingView.left,FRefreshingView.Top);
+      Canvas.SetMatrix(LMatrix);
+      FRefreshingView.PaintInternal(Canvas);
+    finally
+      Canvas.SetMatrix(LSavedMatrix);
+    end;
+  end;
+
 begin
   if (TALGuardianThread.HasInstance) and (HasActiveScrollEngines) then
     TALGuardianThread.Instance.CanExecute := False;
@@ -4442,9 +4577,11 @@ begin
   //--
   Prepare;
   //--
+  if (FRefreshingView <> nil) and (FRefreshTransitionKind = TRefreshTransitionKind.RevealFadeOut) then
+    _PaintRefreshingView;
+  //--
   if MainView = nil then
     Raise Exception.Create('Error EE6AB6E3-5988-4325-9EA4-92AC8B0D7C28');
-  //--
   var LSavedMatrix := Canvas.Matrix;
   try
     var LMatrix := LSavedMatrix * TMatrix.CreateTranslation(MainView.left,MainView.Top);
@@ -4453,6 +4590,9 @@ begin
   finally
     Canvas.SetMatrix(LSavedMatrix);
   end;
+  //--
+  if (FRefreshingView <> nil) and (FRefreshTransitionKind <> TRefreshTransitionKind.RevealFadeOut) then
+    _PaintRefreshingView;
   //--
   if (csDesigning in ComponentState) and not Locked then
     DrawDesignBorder;

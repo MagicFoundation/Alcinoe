@@ -1067,7 +1067,7 @@ begin
 
     FContainerAnimation.Enabled := False;
     FContainerAnimation.TagFloat := FCurrentDialog.Container.Position.y;
-    FContainerAnimation.InterpolationType := TALInterpolationType.MaterialEmphasizedAccelerate;
+    FContainerAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedAccelerate;
     FContainerAnimation.Duration := 0.200;
     FContainerAnimation.StartValue := 1;
     FContainerAnimation.StopValue := 0;
@@ -1424,7 +1424,7 @@ begin
 
     FContainerAnimation.Enabled := False;
     FContainerAnimation.TagFloat := LCurrentDialogCenteredPosY;
-    FContainerAnimation.InterpolationType := TALInterpolationType.MaterialExpressiveDefaultSpatial;
+    FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
     FContainerAnimation.Duration := 0.5;
     FContainerAnimation.StartValue := 0;
     FContainerAnimation.StopValue := 1;

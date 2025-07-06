@@ -1178,6 +1178,27 @@ undesired conversions.
 History
 =======
 
+#### 06/07/2025 – Renamed Material Interpolation Types
+
+- **Renamed** the following `TALInterpolationType` entries to use 
+  the `Material3` prefix for improved clarity and alignment with 
+  Material Design 3:
+  - `MaterialExpressiveFastSpatial` → `Material3ExpressiveFastSpatial`
+  - `MaterialExpressiveDefaultSpatial` → `Material3ExpressiveDefaultSpatial`
+  - `MaterialExpressiveSlowSpatial` → `Material3ExpressiveSlowSpatial`
+  - `MaterialExpressiveFastEffects` → `Material3ExpressiveFastEffects`
+  - `MaterialExpressiveDefaultEffects` → `Material3ExpressiveDefaultEffects`
+  - `MaterialExpressiveSlowEffects` → `Material3ExpressiveSlowEffects`
+  - `MaterialStandardFastSpatial` → `Material3StandardFastSpatial`
+  - `MaterialStandardDefaultSpatial` → `Material3StandardDefaultSpatial`
+  - `MaterialStandardSlowSpatial` → `Material3StandardSlowSpatial`
+  - `MaterialStandardFastEffects` → `Material3StandardFastEffects`
+  - `MaterialStandardDefaultEffects` → `Material3StandardDefaultEffects`
+  - `MaterialStandardSlowEffects` → `Material3StandardSlowEffects`
+  - `MaterialEmphasized` → `Material3Emphasized`
+  - `MaterialEmphasizedDecelerate` → `Material3EmphasizedDecelerate`
+  - `MaterialEmphasizedAccelerate` → `Material3EmphasizedAccelerate`
+
 #### 04/07/2025 – Added TALToggleButton and Enhancements
 
 - **Added** `TALToggleButton` control.

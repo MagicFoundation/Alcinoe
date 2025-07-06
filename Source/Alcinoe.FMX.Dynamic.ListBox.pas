@@ -3507,7 +3507,7 @@ begin
               // In the overscroll-at-left zone
               if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) then begin
                 FPullToRefreshIndicator.Visible := True;
-                FPullToRefreshIndicator.SetPosition(LEdgeOffset - (aValue.Y*1.5) - FPullToRefreshIndicator.Width, (Height - FPullToRefreshIndicator.Height) / 2);
+                FPullToRefreshIndicator.SetPosition({LEdgeOffset}0 - (aValue.Y*1.5) - FPullToRefreshIndicator.Width, (Height - FPullToRefreshIndicator.Height) / 2);
                 FPullToRefreshIndicator.SetPullProgress((FPullToRefreshIndicator.Left - LEdgeOffset) / FPullToRefreshIndicator.PullThreshold);
               end
               // Not in the overscroll-at-left zone
@@ -3537,7 +3537,7 @@ begin
               // In the overscroll-at-top zone
               if (FPullToRefreshIndicator.CanTriggerRefresh) and (aValue.Y < FScrollEngine.MinScrollLimit.Y - 1{*}) then begin
                 FPullToRefreshIndicator.Visible := True;
-                FPullToRefreshIndicator.SetPosition((Width - FPullToRefreshIndicator.Width) / 2,  LEdgeOffset - (aValue.Y*1.5) - FPullToRefreshIndicator.Height);
+                FPullToRefreshIndicator.SetPosition((Width - FPullToRefreshIndicator.Width) / 2,  {LEdgeOffset}0 - (aValue.Y*1.5) - FPullToRefreshIndicator.Height);
                 FPullToRefreshIndicator.SetPullProgress((FPullToRefreshIndicator.Top - LEdgeOffset) / FPullToRefreshIndicator.PullThreshold);
               end
               // Not in the overscroll-at-top zone

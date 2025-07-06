@@ -209,6 +209,7 @@ type
       public
         constructor Create(const AOwner: TObject); override;
         destructor Destroy; override;
+        procedure BeforeDestruction; override;
         function HasUnconstrainedAutosizeWidth: Boolean; override;
         function HasUnconstrainedAutosizeHeight: Boolean; override;
         function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
@@ -1154,10 +1155,17 @@ end;
 {*****************************************}
 destructor TALDynamicListBox.TItem.Destroy;
 begin
-  CancelDownloadData;
-  CancelPreloadContent;
   AlFreeAndNil(FData);
   Inherited Destroy;
+end;
+
+{**************************************************}
+procedure TALDynamicListBox.TItem.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  CancelDownloadData;
+  CancelPreloadContent;
+  inherited;
 end;
 
 {**********************************************************************}
@@ -2468,7 +2476,6 @@ end;
 {*****************************************}
 destructor TALDynamicListBox.TView.Destroy;
 begin
-  CancelDownloadItems;
   ALFreeAndNil(FRefreshingTimer);
   ALFreeAndNil(FRefreshingView);
   ALFreeAndNil(FUniqueInt64ItemIds);
@@ -2481,6 +2488,7 @@ end;
 procedure TALDynamicListBox.TView.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
+  CancelDownloadItems;
   TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   if FscrollEngine.TimerActive then begin
     FscrollEngine.Stop(true{AAbruptly});

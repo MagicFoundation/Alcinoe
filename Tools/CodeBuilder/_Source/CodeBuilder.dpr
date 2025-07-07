@@ -836,6 +836,26 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    //**end;');
     aSrc := FindAndReplace(
               aSrc,
+              '    if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode'+#13#10+
+              '    else begin'+#13#10+
+              '      if (not value) and fMandatory then exit;'+#13#10+
+              '      _doSetChecked;'+#13#10+
+              '      if Value then begin'+#13#10+
+              '        var M := TRadioButtonGroupMessage.Create(GroupName);'+#13#10+
+              '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
+              '      end;'+#13#10+
+              '    end;',
+              '    //**if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode'+#13#10+
+              '    //**else begin'+#13#10+
+              '      if (not value) and fMandatory then exit;'+#13#10+
+              '      _doSetChecked;'+#13#10+
+              '      if Value then begin'+#13#10+
+              '        var M := TRadioButtonGroupMessage.Create(GroupName);'+#13#10+
+              '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
+              '      end;'+#13#10+
+              '    //**end;');
+    aSrc := FindAndReplace(
+              aSrc,
               '  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then'+#13#10+
               '  begin'+#13#10+
               '    var R := LocalRect.ReducePrecision;'+#13#10+

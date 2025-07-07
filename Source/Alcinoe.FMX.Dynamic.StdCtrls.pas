@@ -1994,10 +1994,16 @@ type
     FPrevStateStyles: TStateStyles;
     {$ENDIF}
     FStateStyles: TStateStyles;
+    FGroupName: string;
+    fMandatory: boolean;
     FChecked: Boolean;
     FOnChange: TNotifyEvent;
     function GetTextSettings: TTextSettings;
     procedure SetStateStyles(const AValue: TStateStyles);
+    function GetGroupName: string;
+    procedure SetGroupName(const Value: string);
+    function GroupNameStored: Boolean;
+    procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
   protected
     function CreateFill: TALBrush; override;
     function CreateStroke: TALStrokeBrush; override;
@@ -2025,6 +2031,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure Assign(Source: TALDynamicControl); override;
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
@@ -2052,6 +2059,8 @@ type
     //**property EnableDragHighlight;
     property Enabled;
     property Fill;
+    property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
+    property Mandatory: Boolean read fMandatory write fMandatory default false;
     property Height;
     //property Hint;
     //property ParentShowHint;
@@ -6003,7 +6012,7 @@ end;
 procedure TALDynamicRadioButton.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
-  // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
+  // Unsubscribe from TRadioButtonGroupMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
@@ -10208,6 +10217,10 @@ begin
   AutoSize := TALAutoSizeMode.Both;
   Cursor := crHandPoint;
   //--
+  FGroupName := '';
+  fMandatory := false;
+  TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
+  //--
   FChecked := False;
   FOnChange := nil;
   //--
@@ -10241,6 +10254,18 @@ begin
   inherited Destroy;
 end;
 
+{*************************************************}
+procedure TALDynamicToggleButton.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  // Unsubscribe from TRadioButtonGroupMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
+  TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
+  inherited;
+end;
+
 {*****************************************************************}
 procedure TALDynamicToggleButton.Assign(Source: TALDynamicControl);
 begin
@@ -10248,6 +10273,8 @@ begin
   Try
     if Source is TALDynamicToggleButton then begin
       StateStyles.Assign(TALDynamicToggleButton(Source).StateStyles);
+      GroupName := TALDynamicToggleButton(Source).GroupName;
+      Mandatory := TALDynamicToggleButton(Source).Mandatory;
       Checked := TALDynamicToggleButton(Source).Checked;
       OnChange := TALDynamicToggleButton(Source).OnChange;
     end
@@ -10315,13 +10342,28 @@ end;
 
 {****************************************************************}
 procedure TALDynamicToggleButton.SetChecked(const Value: Boolean);
-begin
-  if FChecked <> Value then begin
+
+  {~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _doSetChecked;
+  begin
     FChecked := Value;
     if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
     else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
     AdjustSize;
     DoChanged;
+  end;
+
+begin
+  if FChecked <> Value then begin
+    //**if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode
+    //**else begin
+      if (not value) and fMandatory then exit;
+      _doSetChecked;
+      if Value then begin
+        var M := TRadioButtonGroupMessage.Create(GroupName);
+        TMessageManager.DefaultManager.SendMessage(Self, M, True);
+      end;
+    //**end;
   end;
 end;
 
@@ -10351,6 +10393,40 @@ end;
 procedure TALDynamicToggleButton.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
+end;
+
+{***************************************************}
+function TALDynamicToggleButton.GetGroupName: string;
+begin
+  Result := FGroupName;
+end;
+
+{******************************************************************************************}
+procedure TALDynamicToggleButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
+begin
+  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Host <> nil) and
+     (not (Sender is TALDynamicControl) or ((Sender as TALDynamicControl).Host = Host)) then begin
+    var LOldMandatory := fMandatory;
+    fMandatory := False;
+    try
+      Checked := False;
+    finally
+      fMandatory := LOldMandatory;
+    end;
+  end;
+end;
+
+{*******************************************************}
+function TALDynamicToggleButton.GroupNameStored: Boolean;
+begin
+  Result := FGroupName <> '';
+end;
+
+{*****************************************************************}
+procedure TALDynamicToggleButton.SetGroupName(const Value: string);
+begin
+  if FGroupName <> Value then
+    FGroupName := Value;
 end;
 
 {********************************************************************}

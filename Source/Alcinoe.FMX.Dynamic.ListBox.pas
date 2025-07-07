@@ -2417,6 +2417,7 @@ end;
 constructor TALDynamicListBox.TView.Create(const AOwner: TObject);
 begin
   inherited create(AOwner);
+  AutoCapture := True;
   AutoSize := TALAutoSizeMode.None;
   {$IFDEF DEBUG}
   fDebugFpsStarted := False;

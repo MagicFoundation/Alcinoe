@@ -4773,7 +4773,7 @@ begin
       Text := LText;
     end
     else
-      Text := ALFormatFloatW(Format, AThumb.GetValue);
+      Text := ALFormatFloatW(Format, AThumb.GetValue, FormatSettings);
     if FFloatAnimation.TagObject <> AThumb then begin
       FFloatAnimation.Enabled := False;
       visible := False;

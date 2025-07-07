@@ -585,7 +585,7 @@ begin
     Cursor := FCaptured.Cursor;
     FCaptured.MouseMove(Shift, LCapturedMousePos.X, LCapturedMousePos.Y);
   end
-  else begin
+  else if not ALGetHasTouchScreen then begin
     var LControlMousePos: TALPointD;
     var LControl := GetControlAtPos(
                       TALPointD.create(X, Y), // const APos: TPointF; // APos is local to the control

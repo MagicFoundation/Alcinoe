@@ -137,14 +137,14 @@ function  ALGUIDToStringA(const Guid: TGUID; const WithoutBracket: boolean = fal
 function  ALGUIDToStringW(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
 Function  ALNewGUIDStringA(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): AnsiString;
 Function  ALNewGUIDStringW(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
-function  ALFormatA(const Format: AnsiString; const Args: array of const): AnsiString; overload;
-procedure ALFormatA(const Format: AnsiString; const Args: array of const; var Result: ansiString); overload;
 function  ALFormatA(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
 procedure ALFormatA(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettingsA; var Result: ansiString); overload;
-function  ALFormatW(const Format: String; const Args: array of const): String; overload;
-procedure ALFormatW(const Format: String; const Args: array of const; var Result: String); overload;
+function  ALFormatA(const Format: AnsiString; const Args: array of const): AnsiString; overload;
+procedure ALFormatA(const Format: AnsiString; const Args: array of const; var Result: ansiString); overload;
 function  ALFormatW(const Format: String; const Args: array of const; const AFormatSettings: TALFormatSettingsW): String; overload;
 procedure ALFormatW(const Format: String; const Args: array of const; const AFormatSettings: TALFormatSettingsW; var Result: String); overload;
+function  ALFormatW(const Format: String; const Args: array of const): String; overload;
+procedure ALFormatW(const Format: String; const Args: array of const; var Result: String); overload;
 function  ALTryStrToBool(const S: Ansistring; out Value: Boolean): Boolean; overload;
 function  ALTryStrToBool(const S: String; out Value: Boolean): Boolean; overload;
 Function  AlStrToBool(Value:AnsiString):Boolean; overload;
@@ -153,28 +153,50 @@ function  ALBoolToStrA(B: Boolean; const trueStr: ansistring='1'; const falseStr
 procedure ALBoolToStrA(var s: ansiString; B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'); overload;
 function  ALBoolToStrW(B: Boolean; const trueStr: String='1'; const falseStr: String='0'): String; overload;
 procedure ALBoolToStrW(var s: String; B: Boolean; const trueStr: String='1'; const falseStr: String='0'); overload;
-function  ALDateToStrA(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALDateToStrW(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): string; inline;
-function  ALTimeToStrA(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALTimeToStrW(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): string; inline;
+function  ALDateToStrA(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALDateToStrA(const DateTime: TDateTime): AnsiString; overload; inline;
+function  ALDateToStrW(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
+function  ALDateToStrW(const DateTime: TDateTime): string; overload; inline;
+function  ALTimeToStrA(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALTimeToStrA(const DateTime: TDateTime): AnsiString; overload; inline;
+function  ALTimeToStrW(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
+function  ALTimeToStrW(const DateTime: TDateTime): string; overload; inline;
 function  ALDateTimeToStrA(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
 procedure ALDateTimeToStrA(const DateTime: TDateTime; var s: ansiString; const AFormatSettings: TALFormatSettingsA); overload;
+function  ALDateTimeToStrA(const DateTime: TDateTime): AnsiString; overload; inline;
+procedure ALDateTimeToStrA(const DateTime: TDateTime; var s: ansiString); overload; inline;
 function  ALDateTimeToStrW(const DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): String; overload; inline;
 procedure ALDateTimeToStrW(const DateTime: TDateTime; var s: String; const AFormatSettings: TALFormatSettingsW); overload; inline;
-function  ALFormatDateTimeA(const Format: AnsiString; DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALFormatDateTimeW(const Format: string; DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): string; inline;
+function  ALDateTimeToStrW(const DateTime: TDateTime): String; overload; inline;
+procedure ALDateTimeToStrW(const DateTime: TDateTime; var s: String); overload; inline;
+function  ALFormatDateTimeA(const Format: AnsiString; DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALFormatDateTimeA(const Format: AnsiString; DateTime: TDateTime): AnsiString; overload; inline;
+function  ALFormatDateTimeW(const Format: string; DateTime: TDateTime; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
+function  ALFormatDateTimeW(const Format: string; DateTime: TDateTime): string; overload; inline;
 function  ALTryStrToDate(const S: AnsiString; out Value: TDateTime; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToDate(const S: AnsiString; out Value: TDateTime): Boolean; overload; inline;
 function  ALTryStrToDate(const S: string; out Value: TDateTime; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToDate(const S: string; out Value: TDateTime): Boolean; overload; inline;
 function  ALStrToDate(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): TDateTime; overload;
+function  ALStrToDate(const S: AnsiString): TDateTime; overload; inline;
 function  ALStrToDate(const S: string; const AFormatSettings: TALFormatSettingsW): TDateTime; overload; inline;
+function  ALStrToDate(const S: string): TDateTime; overload; inline;
 function  ALTryStrToTime(const S: AnsiString; out Value: TDateTime; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToTime(const S: AnsiString; out Value: TDateTime): Boolean; overload; inline;
 function  ALTryStrToTime(const S: string; out Value: TDateTime; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToTime(const S: string; out Value: TDateTime): Boolean; overload; inline;
 function  ALStrToTime(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): TDateTime; overload;
+function  ALStrToTime(const S: AnsiString): TDateTime; overload; inline;
 function  ALStrToTime(const S: string; const AFormatSettings: TALFormatSettingsW): TDateTime; overload; inline;
+function  ALStrToTime(const S: string): TDateTime; overload; inline;
 function  ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean; overload; inline;
 function  ALTryStrToDateTime(const S: string; out Value: TDateTime; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToDateTime(const S: string; out Value: TDateTime): Boolean; overload; inline;
 function  ALStrToDateTime(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): TDateTime; overload;
+function  ALStrToDateTime(const S: AnsiString): TDateTime; overload; inline;
 function  ALStrToDateTime(const S: string; const AFormatSettings: TALFormatSettingsW): TDateTime; overload; inline;
+function  ALStrToDateTime(const S: string): TDateTime; overload; inline;
 function  ALTryStrToInt(const S: AnsiString; out Value: Integer): Boolean; overload;
 function  ALTryStrToInt(const S: string; out Value: Integer): Boolean; overload; inline;
 function  ALStrToInt(const S: AnsiString): Integer; overload;
@@ -259,37 +281,65 @@ Function  ALIsInt64(const S: String): Boolean; overload;
 Function  ALIsSmallInt(const S: AnsiString): Boolean; overload;
 Function  ALIsSmallInt(const S: String): Boolean; overload;
 Function  ALIsFloat(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+Function  ALIsFloat(const S: AnsiString): Boolean; overload; inline;
 Function  ALIsFloat(const S: String; const AFormatSettings: TALFormatSettingsW): Boolean; overload;
+Function  ALIsFloat(const S: String): Boolean; overload; inline;
 function  ALFloatToStrA(Value: Extended; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
 procedure ALFloatToStrA(Value: Extended; var S: ansiString; const AFormatSettings: TALFormatSettingsA); overload;
+function  ALFloatToStrA(Value: Extended): AnsiString; overload; inline;
+procedure ALFloatToStrA(Value: Extended; var S: ansiString); overload; inline;
 function  ALFloatToStrW(Value: Extended; const AFormatSettings: TALFormatSettingsW): String; overload; inline;
 procedure ALFloatToStrW(Value: Extended; var S: String; const AFormatSettings: TALFormatSettingsW); overload; inline;
-function  ALFloatToStrFA(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALFloatToStrFW(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsW): String; inline;
-function  ALCurrToStrA(Value: Currency; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALCurrToStrW(Value: Currency; const AFormatSettings: TALFormatSettingsW): string; inline;
-function  ALFormatFloatA(const Format: AnsiString; Value: Extended; const AFormatSettings: TALFormatSettingsA): AnsiString;
+function  ALFloatToStrW(Value: Extended): String; overload; inline;
+procedure ALFloatToStrW(Value: Extended; var S: String); overload; inline;
+function  ALFloatToStrFA(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALFloatToStrFA(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer): AnsiString; overload; inline;
+function  ALFloatToStrFW(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsW): String; overload; inline;
+function  ALFloatToStrFW(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer): String; overload; inline;
+function  ALCurrToStrA(Value: Currency; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALCurrToStrA(Value: Currency): AnsiString; overload; inline;
+function  ALCurrToStrW(Value: Currency; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
+function  ALCurrToStrW(Value: Currency): string; overload; inline;
+function  ALFormatFloatA(const Format: AnsiString; Value: Extended; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALFormatFloatA(const Format: AnsiString; Value: Extended): AnsiString; overload; inline;
 function  ALFormatFloatW(const Format: string; Value: Extended; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
 function  ALFormatFloatW(const Format: string; Value: Extended): string; overload; inline;
-function  ALFormatCurrA(const Format: AnsiString; Value: Currency; const AFormatSettings: TALFormatSettingsA): AnsiString;
+function  ALFormatCurrA(const Format: AnsiString; Value: Currency; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
+function  ALFormatCurrA(const Format: AnsiString; Value: Currency): AnsiString; overload; inline;
 function  ALFormatCurrW(const Format: string; Value: Currency; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
 function  ALFormatCurrW(const Format: string; Value: Currency): string; overload; inline;
 function  ALStrToFloat(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): Extended; overload;
+function  ALStrToFloat(const S: AnsiString): Extended; overload; inline;
 function  ALStrToFloat(const S: string; const AFormatSettings: TALFormatSettingsW): Extended; overload; inline;
+function  ALStrToFloat(const S: string): Extended; overload; inline;
 function  ALStrToFloatDef(const S: AnsiString; const Default: Extended; const AFormatSettings: TALFormatSettingsA): Extended; overload;
+function  ALStrToFloatDef(const S: AnsiString; const Default: Extended): Extended; overload; inline;
 function  ALStrToFloatDef(const S: string; const Default: Extended; const AFormatSettings: TALFormatSettingsW): Extended; overload; inline;
+function  ALStrToFloatDef(const S: string; const Default: Extended): Extended; overload; inline;
 function  ALTryStrToFloat(const S: AnsiString; out Value: Extended; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToFloat(const S: AnsiString; out Value: Extended): Boolean; overload; inline;
 function  ALTryStrToFloat(const S: String; out Value: Extended; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToFloat(const S: String; out Value: Extended): Boolean; overload; inline;
 function  ALTryStrToFloat(const S: AnsiString; out Value: Double; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToFloat(const S: AnsiString; out Value: Double): Boolean; overload; inline;
 function  ALTryStrToFloat(const S: String; out Value: Double; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToFloat(const S: String; out Value: Double): Boolean; overload; inline;
 function  ALTryStrToFloat(const S: AnsiString; out Value: Single; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToFloat(const S: AnsiString; out Value: Single): Boolean; overload; inline;
 function  ALTryStrToFloat(const S: String; out Value: Single; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToFloat(const S: String; out Value: Single): Boolean; overload; inline;
 function  ALStrToCurr(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): Currency; overload;
+function  ALStrToCurr(const S: AnsiString): Currency; overload; inline;
 function  ALStrToCurr(const S: string; const AFormatSettings: TALFormatSettingsW): Currency; overload; inline;
+function  ALStrToCurr(const S: string): Currency; overload; inline;
 function  ALStrToCurrDef(const S: AnsiString; const Default: Currency; const AFormatSettings: TALFormatSettingsA): Currency; overload;
+function  ALStrToCurrDef(const S: AnsiString; const Default: Currency): Currency; overload; inline;
 function  ALStrToCurrDef(const S: string; const Default: Currency; const AFormatSettings: TALFormatSettingsW): Currency; overload; inline;
+function  ALStrToCurrDef(const S: string; const Default: Currency): Currency; overload; inline;
 function  ALTryStrToCurr(const S: AnsiString; out Value: Currency; const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function  ALTryStrToCurr(const S: AnsiString; out Value: Currency): Boolean; overload; inline;
 function  ALTryStrToCurr(const S: string; out Value: Currency; const AFormatSettings: TALFormatSettingsW): Boolean; overload; inline;
+function  ALTryStrToCurr(const S: string; out Value: Currency): Boolean; overload; inline;
 function  ALPosA(const SubStr, Str: AnsiString; const Offset: Integer = 1): Integer; inline;
 function  ALPosW(const SubStr, Str: String; const Offset: Integer = 1): Integer; inline;
 function  ALPosIgnoreCaseA(const SubStr, S: Ansistring; const Offset: Integer = 1): Integer;
@@ -1996,18 +2046,6 @@ begin
     SetString(Result, Buffer, Len);
 end;
 
-{***********************************************************************************}
-function ALFormatA(const Format: AnsiString; const Args: array of const): AnsiString;
-begin
-  Result := ALFormatA(Format, Args, ALDefaultFormatSettingsA);
-end;
-
-{************************************************************************************************}
-procedure ALFormatA(const Format: AnsiString; const Args: array of const; var Result: ansiString);
-begin
-  Result := ALFormatA(Format, Args, ALDefaultFormatSettingsA);
-end;
-
 {******************************************************************************************************************************}
 function ALFormatA(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettingsA): AnsiString;
 begin
@@ -2020,16 +2058,16 @@ begin
   ALFmtStr(Result, Format, Args, AFormatSettings);
 end;
 
-{***************************************************************************}
-function ALFormatW(const Format: String; const Args: array of const): String;
+{***********************************************************************************}
+function ALFormatA(const Format: AnsiString; const Args: array of const): AnsiString;
 begin
-  Result := ALFormatW(Format, Args, ALDefaultFormatSettingsW);
+  Result := ALFormatA(Format, Args, ALDefaultFormatSettingsA);
 end;
 
-{****************************************************************************************}
-procedure ALFormatW(const Format: String; const Args: array of const; var Result: String);
+{************************************************************************************************}
+procedure ALFormatA(const Format: AnsiString; const Args: array of const; var Result: ansiString);
 begin
-  Result := ALFormatW(Format, Args, ALDefaultFormatSettingsW);
+  Result := ALFormatA(Format, Args, ALDefaultFormatSettingsA);
 end;
 
 {**********************************************************************************************************************}
@@ -2042,6 +2080,18 @@ end;
 procedure ALFormatW(const Format: String; const Args: array of const; const AFormatSettings: TALFormatSettingsW; var Result: String);
 begin
   Result := System.SysUtils.Format(Format, Args, AFormatSettings);
+end;
+
+{***************************************************************************}
+function ALFormatW(const Format: String; const Args: array of const): String;
+begin
+  Result := ALFormatW(Format, Args, ALDefaultFormatSettingsW);
+end;
+
+{****************************************************************************************}
+procedure ALFormatW(const Format: String; const Args: array of const; var Result: String);
+begin
+  Result := ALFormatW(Format, Args, ALDefaultFormatSettingsW);
 end;
 
 {************************************************************************}
@@ -2756,12 +2806,24 @@ begin
     AFormatSettings);
 end;
 
+{******************}
+function ALDateToStrA(const DateTime: TDateTime): AnsiString;
+begin
+  Result := ALDateToStrA(DateTime, ALDefaultFormatSettingsA);
+end;
+
 {********************}
 function ALDateToStrW(
            const DateTime: TDateTime;
            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.DateToStr(DateTime, AFormatSettings);
+end;
+
+{******************}
+function ALDateToStrW(const DateTime: TDateTime): string;
+begin
+  Result := ALDateToStrW(DateTime, ALDefaultFormatSettingsW);
 end;
 
 {********************}
@@ -2774,12 +2836,24 @@ begin
     AFormatSettings);
 end;
 
+{******************}
+function ALTimeToStrA(const DateTime: TDateTime): AnsiString;
+begin
+  Result := ALTimeToStrA(DateTime, ALDefaultFormatSettingsA);
+end;
+
 {********************}
 function ALTimeToStrW(
            const DateTime: TDateTime;
            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.TimeToStr(DateTime, AFormatSettings);
+end;
+
+{******************}
+function ALTimeToStrW(const DateTime: TDateTime): string;
+begin
+  Result := ALTimeToStrW(DateTime, ALDefaultFormatSettingsW);
 end;
 
 {************************}
@@ -2796,6 +2870,18 @@ begin
   ALDateTimeToString(s, '', DateTime, AFormatSettings);
 end;
 
+{******************}
+function ALDateTimeToStrA(const DateTime: TDateTime): AnsiString;
+begin
+  Result := ALDateTimeToStrA(DateTime, ALDefaultFormatSettingsA);
+end;
+
+{******************}
+procedure ALDateTimeToStrA(const DateTime: TDateTime; var s: ansiString);
+begin
+  ALDateTimeToStrA(DateTime, s, ALDefaultFormatSettingsA);
+end;
+
 {************************}
 function ALDateTimeToStrW(
            const DateTime: TDateTime;
@@ -2810,6 +2896,18 @@ begin
   s := system.sysutils.DateTimeToStr(DateTime, AFormatSettings);
 end;
 
+{******************}
+function ALDateTimeToStrW(const DateTime: TDateTime): String;
+begin
+  Result := ALDateTimeToStrW(DateTime, ALDefaultFormatSettingsW);
+end;
+
+{******************}
+procedure ALDateTimeToStrW(const DateTime: TDateTime; var s: String);
+begin
+  ALDateTimeToStrW(DateTime, s, ALDefaultFormatSettingsW);
+end;
+
 {*************************}
 function ALFormatDateTimeA(
            const Format: AnsiString;
@@ -2819,6 +2917,12 @@ begin
   ALDateTimeToString(Result, Format, DateTime, AFormatSettings);
 end;
 
+{******************}
+function ALFormatDateTimeA(const Format: AnsiString; DateTime: TDateTime): AnsiString;
+begin
+  Result := ALFormatDateTimeA(Format, DateTime, ALDefaultFormatSettingsA);
+end;
+
 {*************************}
 function ALFormatDateTimeW(
            const Format: string;
@@ -2826,6 +2930,12 @@ function ALFormatDateTimeW(
            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatDateTime(Format, DateTime, AFormatSettings);
+end;
+
+{******************}
+function ALFormatDateTimeW(const Format: string; DateTime: TDateTime): string;
+begin
+  Result := ALFormatDateTimeW(Format, DateTime, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -3636,6 +3746,12 @@ begin
   Result := ALScanDate(S, Pos, Value, AFormatSettings) and (Pos > High(S));
 end;
 
+{******************}
+function ALTryStrToDate(const S: AnsiString; out Value: TDateTime): Boolean;
+begin
+  Result := ALTryStrToDate(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {**********************}
 function ALTryStrToDate(
            const S: string;
@@ -3643,6 +3759,12 @@ function ALTryStrToDate(
            const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToDate(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToDate(const S: string; out Value: TDateTime): Boolean;
+begin
+  Result := ALTryStrToDate(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -3657,12 +3779,24 @@ begin
     ALConvertErrorFmt(@System.SysConst.SInvalidDate, [S]);
 end;
 
+{******************}
+function ALStrToDate(const S: AnsiString): TDateTime;
+begin
+  Result := ALStrToDate(S, ALDefaultFormatSettingsA);
+end;
+
 {*******************}
 function ALStrToDate(
            const S: string;
            const AFormatSettings: TALFormatSettingsW): TDateTime;
 begin
   result := system.sysutils.StrToDate(S, AFormatSettings);
+end;
+
+{******************}
+function ALStrToDate(const S: string): TDateTime;
+begin
+  Result := ALStrToDate(S, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -3680,6 +3814,12 @@ begin
   Result := ALScanTime(S, Pos, Value, AFormatSettings) and (Pos > High(S));
 end;
 
+{******************}
+function ALTryStrToTime(const S: AnsiString; out Value: TDateTime): Boolean;
+begin
+  Result := ALTryStrToTime(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {***********************}
 function  ALTryStrToTime(
             const S: string;
@@ -3687,6 +3827,12 @@ function  ALTryStrToTime(
             const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToTime(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToTime(const S: string; out Value: TDateTime): Boolean;
+begin
+  Result := ALTryStrToTime(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -3701,12 +3847,24 @@ begin
     ALConvertErrorFmt(@System.SysConst.SInvalidTime, [S]);
 end;
 
+{******************}
+function ALStrToTime(const S: AnsiString): TDateTime;
+begin
+  Result := ALStrToTime(S, ALDefaultFormatSettingsA);
+end;
+
 {*******************}
 function ALStrToTime(
            const S: string;
            const AFormatSettings: TALFormatSettingsW): TDateTime;
 begin
   result := system.sysutils.StrToTime(S, AFormatSettings);
+end;
+
+{******************}
+function ALStrToTime(const S: string): TDateTime;
+begin
+  Result := ALStrToTime(S, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -3809,6 +3967,12 @@ end;
   {$R+} {Range-Checking}
 {$ENDIF}
 
+{******************}
+function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+begin
+  Result := ALTryStrToDateTime(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {**************************}
 function ALTryStrToDateTime(
            const S: string;
@@ -3816,6 +3980,12 @@ function ALTryStrToDateTime(
            const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToDateTime(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToDateTime(const S: string; out Value: TDateTime): Boolean;
+begin
+  Result := ALTryStrToDateTime(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -3830,12 +4000,24 @@ begin
     ALConvertErrorFmt(@System.SysConst.SInvalidDateTime, [S]);
 end;
 
+{******************}
+function ALStrToDateTime(const S: AnsiString): TDateTime;
+begin
+  Result := ALStrToDateTime(S, ALDefaultFormatSettingsA);
+end;
+
 {************************}
 function  ALStrToDateTime(
             const S: string;
             const AFormatSettings: TALFormatSettingsW): TDateTime;
 begin
   Result := system.sysutils.StrToDateTime(S, AFormatSettings);
+end;
+
+{******************}
+function ALStrToDateTime(const S: string): TDateTime;
+begin
+  Result := ALStrToDateTime(S, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -5390,6 +5572,12 @@ begin
   result := ALTryStrToFloat(s,LDouble,AFormatSettings);
 end;
 
+{******************}
+Function ALIsFloat(const S: AnsiString): Boolean;
+begin
+  Result := ALIsFloat(S, ALDefaultFormatSettingsA);
+end;
+
 {***************************************************************************************}
 Function  ALIsFloat(const S: String; const AFormatSettings: TALFormatSettingsW): Boolean;
 var I: integer;
@@ -5403,6 +5591,12 @@ begin
     end;
   end;
   result := ALTryStrToFloat(s,LDouble,AFormatSettings);
+end;
+
+{******************}
+Function ALIsFloat(const S: String): Boolean;
+begin
+  Result := ALIsFloat(S, ALDefaultFormatSettingsW);
 end;
 
 {*********************************************************************************************}
@@ -5441,6 +5635,18 @@ begin
       AFormatSettings));
 end;
 
+{******************}
+function ALFloatToStrA(Value: Extended): AnsiString;
+begin
+  Result := ALFloatToStrA(Value, ALDefaultFormatSettingsA);
+end;
+
+{******************}
+procedure ALFloatToStrA(Value: Extended; var S: ansiString);
+begin
+  ALFloatToStrA(Value, S, ALDefaultFormatSettingsA);
+end;
+
 {*****************************************************************************************}
 function ALFloatToStrW(Value: Extended; const AFormatSettings: TALFormatSettingsW): String;
 begin
@@ -5451,6 +5657,18 @@ end;
 procedure ALFloatToStrW(Value: Extended; var S: String; const AFormatSettings: TALFormatSettingsW);
 begin
   S := FloatToStr(Value, AFormatSettings);
+end;
+
+{******************}
+function ALFloatToStrW(Value: Extended): String;
+begin
+  Result := ALFloatToStrW(Value, ALDefaultFormatSettingsW);
+end;
+
+{******************}
+procedure ALFloatToStrW(Value: Extended; var S: String);
+begin
+  ALFloatToStrW(Value, S, ALDefaultFormatSettingsW);
 end;
 
 {**********************}
@@ -5475,6 +5693,12 @@ begin
       AFormatSettings));
 end;
 
+{******************}
+function ALFloatToStrFA(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer): AnsiString;
+begin
+  Result := ALFloatToStrFA(Value, Format, Precision, Digits, ALDefaultFormatSettingsA);
+end;
+
 {**********************}
 function ALFloatToStrFW(
            Value: Extended;
@@ -5483,6 +5707,12 @@ function ALFloatToStrFW(
            const AFormatSettings: TALFormatSettingsW): String;
 begin
   result := System.sysUtils.FloatToStrF(Value, Format, Precision, Digits, AFormatSettings);
+end;
+
+{******************}
+function ALFloatToStrFW(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer): String;
+begin
+  Result := ALFloatToStrFW(Value, Format, Precision, Digits, ALDefaultFormatSettingsW);
 end;
 
 {*********************************************************************************************}
@@ -5503,10 +5733,22 @@ begin
       AFormatSettings));
 end;
 
+{******************}
+function ALCurrToStrA(Value: Currency): AnsiString;
+begin
+  Result := ALCurrToStrA(Value, ALDefaultFormatSettingsA);
+end;
+
 {*****************************************************************************************}
 function  ALCurrToStrW(Value: Currency; const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.CurrToStr(Value, AFormatSettings);
+end;
+
+{******************}
+function ALCurrToStrW(Value: Currency): string;
+begin
+  Result := ALCurrToStrW(Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6766,6 +7008,12 @@ begin
       {, False}));
 end;
 
+{******************}
+function ALFormatFloatA(const Format: AnsiString; Value: Extended): AnsiString;
+begin
+  Result := ALFormatFloatA(Format, Value, ALDefaultFormatSettingsA);
+end;
+
 {***********************}
 function  ALFormatFloatW(
             const Format: string;
@@ -6775,12 +7023,10 @@ begin
   result := system.sysutils.FormatFloat(Format, Value, AFormatSettings);
 end;
 
-{***********************}
-function  ALFormatFloatW(
-            const Format: string;
-            Value: Extended): string;
+{******************}
+function ALFormatFloatW(const Format: string; Value: Extended): string;
 begin
-  result := system.sysutils.FormatFloat(Format, Value);
+  Result := ALFormatFloatW(Format, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6807,6 +7053,12 @@ begin
       {, False}));
 end;
 
+{******************}
+function ALFormatCurrA(const Format: AnsiString; Value: Currency): AnsiString;
+begin
+  Result := ALFormatCurrA(Format, Value, ALDefaultFormatSettingsA);
+end;
+
 {**********************}
 function  ALFormatCurrW(
             const Format: string;
@@ -6816,12 +7068,10 @@ begin
   result := system.sysutils.FormatCurr(Format, Value, AFormatSettings);
 end;
 
-{**********************}
-function  ALFormatCurrW(
-            const Format: string;
-            Value: Currency): string;
+{******************}
+function ALFormatCurrW(const Format: string; Value: Currency): string;
 begin
-  result := system.sysutils.FormatCurr(Format, Value);
+  Result := ALFormatCurrW(Format, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6834,10 +7084,22 @@ begin
     ALConvertErrorFmt(@SInvalidFloat, [S]);
 end;
 
+{******************}
+function ALStrToFloat(const S: AnsiString): Extended;
+begin
+  Result := ALStrToFloat(S, ALDefaultFormatSettingsA);
+end;
+
 {*******************************************************************************************}
 function  ALStrToFloat(const S: string; const AFormatSettings: TALFormatSettingsW): Extended;
 begin
   result := system.sysutils.StrToFloat(S, AFormatSettings);
+end;
+
+{******************}
+function ALStrToFloat(const S: string): Extended;
+begin
+  Result := ALStrToFloat(S, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6850,10 +7112,22 @@ begin
     Result := Default;
 end;
 
+{******************}
+function ALStrToFloatDef(const S: AnsiString; const Default: Extended): Extended;
+begin
+  Result := ALStrToFloatDef(S, Default, ALDefaultFormatSettingsA);
+end;
+
 {***********************************************************************************************************************}
 function  ALStrToFloatDef(const S: string; const Default: Extended; const AFormatSettings: TALFormatSettingsW): Extended;
 begin
   result := system.sysutils.StrToFloatDef(S, Default, AFormatSettings);
+end;
+
+{******************}
+function ALStrToFloatDef(const S: string; const Default: Extended): Extended;
+begin
+  Result := ALStrToFloatDef(S, Default, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6865,10 +7139,22 @@ begin
   Result := ALTextToFloat(PansiChar(S), Value, fvExtended, AFormatSettings);
 end;
 
+{******************}
+function ALTryStrToFloat(const S: AnsiString; out Value: Extended): Boolean;
+begin
+  Result := ALTryStrToFloat(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {******************************************************************************************************************}
 function  ALTryStrToFloat(const S: String; out Value: Extended; const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   Result := System.sysutils.TryStrToFloat(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToFloat(const S: String; out Value: Extended): Boolean;
+begin
+  Result := ALTryStrToFloat(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6888,10 +7174,22 @@ begin
     Value := LValue;
 end;
 
+{******************}
+function ALTryStrToFloat(const S: AnsiString; out Value: Double): Boolean;
+begin
+  Result := ALTryStrToFloat(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {****************************************************************************************************************}
 function  ALTryStrToFloat(const S: String; out Value: Double; const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   Result := System.sysutils.TryStrToFloat(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToFloat(const S: String; out Value: Double): Boolean;
+begin
+  Result := ALTryStrToFloat(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6911,10 +7209,22 @@ begin
     Value := LValue;
 end;
 
+{******************}
+function ALTryStrToFloat(const S: AnsiString; out Value: Single): Boolean;
+begin
+  Result := ALTryStrToFloat(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {****************************************************************************************************************}
 function  ALTryStrToFloat(const S: String; out Value: Single; const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   Result := System.sysutils.TryStrToFloat(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToFloat(const S: String; out Value: Single): Boolean;
+begin
+  Result := ALTryStrToFloat(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6927,10 +7237,22 @@ begin
     ALConvertErrorFmt(@SInvalidFloat, [S]);
 end;
 
+{******************}
+function ALStrToCurr(const S: AnsiString): Currency;
+begin
+  Result := ALStrToCurr(S, ALDefaultFormatSettingsA);
+end;
+
 {******************************************************************************************}
 function  ALStrToCurr(const S: string; const AFormatSettings: TALFormatSettingsW): Currency;
 begin
   result := system.sysutils.StrToCurr(S, AFormatSettings);
+end;
+
+{******************}
+function ALStrToCurr(const S: string): Currency;
+begin
+  Result := ALStrToCurr(S, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6943,10 +7265,22 @@ begin
     Result := Default;
 end;
 
+{******************}
+function ALStrToCurrDef(const S: AnsiString; const Default: Currency): Currency;
+begin
+  Result := ALStrToCurrDef(S, Default, ALDefaultFormatSettingsA);
+end;
+
 {**********************************************************************************************************************}
 function  ALStrToCurrDef(const S: string; const Default: Currency; const AFormatSettings: TALFormatSettingsW): Currency;
 begin
   result := system.sysutils.StrToCurrDef(S, Default, AFormatSettings);
+end;
+
+{******************}
+function ALStrToCurrDef(const S: string; const Default: Currency): Currency;
+begin
+  Result := ALStrToCurrDef(S, Default, ALDefaultFormatSettingsW);
 end;
 
 {*************************************}
@@ -6958,10 +7292,22 @@ begin
   Result := ALTextToFloat(PAnsiChar(S), Value, fvCurrency, AFormatSettings);
 end;
 
+{******************}
+function ALTryStrToCurr(const S: AnsiString; out Value: Currency): Boolean;
+begin
+  Result := ALTryStrToCurr(S, Value, ALDefaultFormatSettingsA);
+end;
+
 {*****************************************************************************************************************}
 function  ALTryStrToCurr(const S: string; out Value: Currency; const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToCurr(S, Value, AFormatSettings);
+end;
+
+{******************}
+function ALTryStrToCurr(const S: string; out Value: Currency): Boolean;
+begin
+  Result := ALTryStrToCurr(S, Value, ALDefaultFormatSettingsW);
 end;
 
 {**********************************************************************************}

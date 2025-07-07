@@ -620,7 +620,7 @@ end;
  231 list of new newsgroups follows}
 Function TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWGROUPS ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
+  Result := SendCmd('NEWGROUPS ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
 end;
 
 {*************************************************************************************************************}
@@ -686,7 +686,7 @@ end;
  230 list of new articles by message-id follows}
 Function TAlNNTPClient.NewNews(const Newsgroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
+  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
 end;
 
 {****************************************************************************************************************************************}

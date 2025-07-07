@@ -358,7 +358,7 @@ begin
     if not Confetti.isRunning then LText := 'Pause - '
     else LText := 'Running - ';
     LText := LText + ALIntToStrW(Confetti.ParticuleCount) + ' particules - ';
-    LText := LText + ALFormatFloatW('0.##', LAverageFPS, ALDefaultFormatSettingsW) + ' fps';
+    LText := LText + ALFormatFloatW('0.##', LAverageFPS) + ' fps';
     StatusBarLabel.Text := LText;
   end;
 end;

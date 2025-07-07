@@ -700,7 +700,7 @@ procedure ALDrawMultiLineText(
   Function _TryStrPxValueToFloat(const AValueStr: String; out AValueFloat: Single): boolean;
   begin
     if AlPosW('px', AValueStr) <= 0 then exit(False)
-    else result := ALTryStrToFloat(ALStringReplaceW(AValueStr, 'px', '', []), AValueFloat, ALDefaultFormatSettingsW);
+    else result := ALTryStrToFloat(ALStringReplaceW(AValueStr, 'px', '', []), AValueFloat);
   end;
   {$ENDREGION}
 
@@ -864,7 +864,7 @@ procedure ALDrawMultiLineText(
       //--
       If ADecorationThicknessMultipliers <> nil then begin
         var LDecorationThicknessMultiplierFloat: Single;
-        if ALTryStrToFloat(LParamList.Values['text-decoration-thickness'], LDecorationThicknessMultiplierFloat, ALDefaultFormatSettingsW) then ADecorationThicknessMultipliers.Add(LDecorationThicknessMultiplierFloat) // <span text-decoration-thickness="3">
+        if ALTryStrToFloat(LParamList.Values['text-decoration-thickness'], LDecorationThicknessMultiplierFloat) then ADecorationThicknessMultipliers.Add(LDecorationThicknessMultiplierFloat) // <span text-decoration-thickness="3">
         else if ADecorationThicknessMultipliers.Count > 0 then ADecorationThicknessMultipliers.Add(ADecorationThicknessMultipliers[ADecorationThicknessMultipliers.Count - 1])
         else ADecorationThicknessMultipliers.Add(LOptions.DecorationThicknessMultiplier);
       end;
@@ -885,7 +885,7 @@ procedure ALDrawMultiLineText(
       //--
       If ALineHeightMultipliers <> nil then begin
         var LLineHeightMultiplierFloat: Single;
-        if ALTryStrToFloat(LParamList.Values['line-height'], LLineHeightMultiplierFloat, ALDefaultFormatSettingsW) then ALineHeightMultipliers.Add(LLineHeightMultiplierFloat) // <span line-height="1.6">
+        if ALTryStrToFloat(LParamList.Values['line-height'], LLineHeightMultiplierFloat) then ALineHeightMultipliers.Add(LLineHeightMultiplierFloat) // <span line-height="1.6">
         else if ALineHeightMultipliers.Count > 0 then ALineHeightMultipliers.Add(ALineHeightMultipliers[ALineHeightMultipliers.Count - 1])
         else ALineHeightMultipliers.Add(LOptions.LineHeightMultiplier);
       end;
@@ -899,8 +899,8 @@ procedure ALDrawMultiLineText(
       //--
       AImgSrc := LParamList.Values['src'];
       if AImgSrc <> '' then begin
-        AImgWidth := ALStrToFloatDef(LParamList.Values['width'], 0, ALDefaultFormatSettingsW) * LScale;
-        AImgHeight := ALStrToFloatDef(LParamList.Values['height'], 0, ALDefaultFormatSettingsW) * LScale;
+        AImgWidth := ALStrToFloatDef(LParamList.Values['width'], 0) * LScale;
+        AImgHeight := ALStrToFloatDef(LParamList.Values['height'], 0) * LScale;
         AImgTintColor := LParamList.Values['color'];
       end
       else begin
@@ -1528,13 +1528,13 @@ procedure ALDrawMultiLineText(
         //ALLog(
         //  'ALCreateMultiLineTextDrawable._BreakText',
         //  'Text: '+ Atext + ' | '+
-        //  'MaxWidth: '+ ALFloatToStrW(AMaxWidth, ALDefaultFormatSettingsW) + ' | '+
+        //  'MaxWidth: '+ ALFloatToStrW(AMaxWidth) + ' | '+
         //  'Result: ' + ALInttoStrW(Result) + ' | '+
-        //  'MeasuredWidth: ' + ALFloatToStrW(AMeasuredWidth, ALDefaultFormatSettingsW) + ' | '+
-        //  'MeasuredHeight: ' + ALFloatToStrW(AMeasuredHeight, ALDefaultFormatSettingsW) + ' | '+
-        //  'TrailingWhitespaceWidth: ' + ALFloatToStrW(LTrailingWhitespaceWidth, ALDefaultFormatSettingsW) + ' | '+
-        //  'Metrics.ascent: ' + ALFloatToStrW(Lmetrics.Ascent, ALDefaultFormatSettingsW) + ' | '+
-        //  'Metrics.descent: ' + ALFloatToStrW(Lmetrics.descent, ALDefaultFormatSettingsW));
+        //  'MeasuredWidth: ' + ALFloatToStrW(AMeasuredWidth) + ' | '+
+        //  'MeasuredHeight: ' + ALFloatToStrW(AMeasuredHeight) + ' | '+
+        //  'TrailingWhitespaceWidth: ' + ALFloatToStrW(LTrailingWhitespaceWidth) + ' | '+
+        //  'Metrics.ascent: ' + ALFloatToStrW(Lmetrics.Ascent) + ' | '+
+        //  'Metrics.descent: ' + ALFloatToStrW(Lmetrics.descent));
         {$ENDIF}
 
       finally

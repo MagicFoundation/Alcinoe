@@ -3078,7 +3078,7 @@ begin
   LStopWatch.stop;
   ALLog(
     'ALRttiInitialization',
-    'TimeTaken: ' + ALFormatfloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms' + ' | '+
+    'TimeTaken: ' + ALFormatfloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms' + ' | '+
     'Total RttiType Cached: ' + ALinttostrW(ALRttiTypeCache.Count));
   var LLst := TALStringListW.Create;
   try

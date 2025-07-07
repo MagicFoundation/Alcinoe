@@ -85,13 +85,13 @@ TALJSONDocumentW.ParseJSONString(
       procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^, ALDefaultFormatSettingsW));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
           nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsW));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
           nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
@@ -3182,8 +3182,8 @@ function TALJSONNodeA.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
   {~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetDateTime;
   begin
-    if SkipNodeSubTypeHelper then result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsA)
-    else result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsA)
+    if SkipNodeSubTypeHelper then result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime)
+    else result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime)
   end;
 
   {~~~~~~~~~~~~~~~~~~}
@@ -4096,7 +4096,7 @@ Var Buffer: AnsiString;
   var LNode: TALJSONNodeA;
       LDouble: Double;
   begin
-    if ALTryStrToFloat(value, LDouble, ALDefaultFormatSettingsA) then begin
+    if ALTryStrToFloat(value, LDouble) then begin
       result := true;
       if NotSaxMode then begin
         if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
@@ -7103,14 +7103,14 @@ begin
     if not (nvInt64 in fRawNodeValueDefined) then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStrA(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsA);
+      nstFloat: ALFloatToStrA(GetFloat, fRawNodeValueStr);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
       nstBoolean: ALBoolToStrA(fRawNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStrA(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettingsA);
+      nstDateTime: ALDateTimeToStrA(GetDateTime, fRawNodeValueStr);
       nstNull: fRawNodeValueStr := 'null';
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
@@ -7141,7 +7141,7 @@ begin
 
     case fNodeSubType of
       nstFloat: begin
-                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble, ALDefaultFormatSettingsA) then AlJSONDocErrorA('%s is not a valid Float', [fRawNodeValueStr]);
+                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble) then AlJSONDocErrorA('%s is not a valid Float', [fRawNodeValueStr]);
                   fRawNodeValueInt64 := Pint64(@LDouble)^;
                 end;
       //nstText: can not be retrieve from int64
@@ -7154,7 +7154,7 @@ begin
                     fRawNodeValueInt64 := ALBoolToInt(LBool);
                   end;
       nstDateTime: begin
-                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime, ALDefaultFormatSettingsA) then AlJSONDocErrorA('%s is not a valid Datetime', [fRawNodeValueStr]);
+                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime) then AlJSONDocErrorA('%s is not a valid Datetime', [fRawNodeValueStr]);
                      fRawNodeValueInt64 := Pint64(@LDateTime)^;
                    end;
       nstNull:  begin
@@ -8054,7 +8054,7 @@ end;
 {*********************************************************************************}
 function ALJsonEncodeFloatWithNodeSubTypeHelperA(const aValue: double): AnsiString;
 begin
-  result := ALFloatToStrA(aValue, ALDefaultFormatSettingsA);
+  result := ALFloatToStrA(aValue);
 end;
 
 {************************************************************************************}
@@ -8085,7 +8085,7 @@ end;
 {***************************************************************************************}
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperA(const aValue: TdateTime): AnsiString;
 begin
-  result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsA);
+  result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue);
 end;
 
 {******************************************************************************************}
@@ -9858,8 +9858,8 @@ function TALJSONNodeW.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
   {~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetDateTime;
   begin
-    if SkipNodeSubTypeHelper then result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsW)
-    else result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsW)
+    if SkipNodeSubTypeHelper then result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime)
+    else result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime)
   end;
 
   {~~~~~~~~~~~~~~~~~~}
@@ -10725,7 +10725,7 @@ Var BufferLength: Integer;
   var LNode: TALJSONNodeW;
       LDouble: Double;
   begin
-    if ALTryStrToFloat(value, LDouble, ALDefaultFormatSettingsW) then begin
+    if ALTryStrToFloat(value, LDouble) then begin
       result := true;
       if NotSaxMode then begin
         if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
@@ -13591,14 +13591,14 @@ begin
     if not (nvInt64 in fRawNodeValueDefined) then ALJSONDocErrorW(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStrW(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsW);
+      nstFloat: ALFloatToStrW(GetFloat, fRawNodeValueStr);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
       nstBoolean: ALBoolToStrW(fRawNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStrW(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettingsW);
+      nstDateTime: ALDateTimeToStrW(GetDateTime, fRawNodeValueStr);
       nstNull: fRawNodeValueStr := 'null';
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
@@ -13629,7 +13629,7 @@ begin
 
     case fNodeSubType of
       nstFloat: begin
-                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble, ALDefaultFormatSettingsW) then ALJSONDocErrorW('%s is not a valid Float', [fRawNodeValueStr]);
+                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble) then ALJSONDocErrorW('%s is not a valid Float', [fRawNodeValueStr]);
                   fRawNodeValueInt64 := Pint64(@LDouble)^;
                 end;
       //nstText: can not be retrieve from int64
@@ -13642,7 +13642,7 @@ begin
                     fRawNodeValueInt64 := ALBoolToInt(LBool);
                   end;
       nstDateTime: begin
-                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime, ALDefaultFormatSettingsW) then ALJSONDocErrorW('%s is not a valid Datetime', [fRawNodeValueStr]);
+                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime) then ALJSONDocErrorW('%s is not a valid Datetime', [fRawNodeValueStr]);
                      fRawNodeValueInt64 := Pint64(@LDateTime)^;
                    end;
       nstNull:  begin
@@ -14505,7 +14505,7 @@ end;
 {*****************************************************************************}
 function ALJsonEncodeFloatWithNodeSubTypeHelperW(const aValue: double): String;
 begin
-  result := ALFloatToStrW(aValue, ALDefaultFormatSettingsW);
+  result := ALFloatToStrW(aValue);
 end;
 
 {****************************************************************************}
@@ -14536,7 +14536,7 @@ end;
 {***********************************************************************************}
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperW(const aValue: TdateTime): String;
 begin
-  result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsW);
+  result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue);
 end;
 
 {**********************************************************************************}

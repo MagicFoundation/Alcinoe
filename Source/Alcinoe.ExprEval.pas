@@ -1781,7 +1781,7 @@ begin
         { evaluate number }
         if EvalTok then begin
           SetString(FTokenAsString, start, cp - start);
-          FTokenAsNumber := ALStrToFloat(FTokenAsString, ALDefaultFormatSettingsA);
+          FTokenAsNumber := ALStrToFloat(FTokenAsString);
         end;
 
         FCurrTok := etNumber;

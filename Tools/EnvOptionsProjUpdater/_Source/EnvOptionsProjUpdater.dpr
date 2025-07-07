@@ -47,7 +47,7 @@ begin
             LRegistry.GetKeyNames(LSubKeyNames);
             var LBDSVersionFloat: Double := 0;
             for var LName in LSubKeyNames do begin
-              var LTmpCompilerVersionFloat := ALStrToFloatDef(LName, 0, ALDefaultFormatSettingsW);
+              var LTmpCompilerVersionFloat := ALStrToFloatDef(LName, 0);
               if LTmpCompilerVersionFloat > LBDSVersionFloat then begin
                 LBDSVersionStr := LName;
                 LBDSVersionFloat := LTmpCompilerVersionFloat;

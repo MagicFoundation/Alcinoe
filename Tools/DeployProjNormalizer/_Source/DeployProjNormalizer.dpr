@@ -395,7 +395,7 @@ begin
         //    (LProjectVersionNode.Text <> '19.5' {Alexandria})) then
         //  raise Exception.Create('Unsupported Delphi compiler. Please consult Readme.txt');
         if LProjectVersionNode = nil then raise Exception.Create('ProjectVersion node not found!');
-        LProjectVersion := ALStrToFloat(LProjectVersionNode.Text, ALDefaultFormatSettingsA);
+        LProjectVersion := ALStrToFloat(LProjectVersionNode.Text);
         var LFrameworkTypeNode := LPropertyGroupNode.ChildNodes.FindNode('FrameworkType');
         if LFrameworkTypeNode = nil then raise Exception.Create('FrameworkType node not found!');
         if ALSameTextA(LFrameworkTypeNode.Text, 'VCL') or

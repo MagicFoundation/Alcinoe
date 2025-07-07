@@ -2592,7 +2592,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.MouseDown',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position:' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
@@ -2612,7 +2612,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.internalMouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position:' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if FHandleMouseEvents then begin
     if (not fScrollCapturedByMe) and
@@ -2646,7 +2646,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.internalMouseUp',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position:' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     {$IF defined(ANDROID) or defined(IOS)}

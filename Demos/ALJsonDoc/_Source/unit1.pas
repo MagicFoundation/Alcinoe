@@ -122,13 +122,13 @@ begin
       procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFloatToStrA(Args[0].VExtended^, ALDefaultFormatSettingsA)));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFloatToStrA(Args[0].VExtended^)));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstObject: ;
           nstArray: ;
           nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'ObjectId("'+string(ALBinToHexA(ansiString(Args[0].VAnsiString)))+'")');
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + String(ALBoolToStrA(Args[0].VBoolean,'true','false')));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsA)));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^)));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
@@ -185,13 +185,13 @@ begin
       procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^, ALDefaultFormatSettingsW));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
           nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsW));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
           nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
@@ -395,13 +395,13 @@ begin
       procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFloatToStrA(Args[0].VExtended^, ALDefaultFormatSettingsA)));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFloatToStrA(Args[0].VExtended^)));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstObject: ;
           nstArray: ;
           nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'ObjectId("'+string(ALBinToHexA(ansiString(Args[0].VAnsiString)))+'")');
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + String(ALBoolToStrA(Args[0].VBoolean,'true','false')));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsA)));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^)));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
           nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
@@ -456,13 +456,13 @@ begin
       procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^, ALDefaultFormatSettingsW));
+          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
           nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
           nstObject: ;
           nstArray: ;
           nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
           nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsW));
+          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
           nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
           nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
           nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');

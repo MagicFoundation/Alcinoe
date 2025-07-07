@@ -1749,8 +1749,8 @@ begin
     //ALLog(
     //  'TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath',
     //  'presentationSize | ' +
-    //  'width: ' + ALFloatToStrW(LNewSizeValue.width, AlDefaultFormatSettingsW) + ' | ' +
-    //  'height: ' + ALFloatToStrW(LNewSizeValue.height, AlDefaultFormatSettingsW));
+    //  'width: ' + ALFloatToStrW(LNewSizeValue.width) + ' | ' +
+    //  'height: ' + ALFloatToStrW(LNewSizeValue.height));
     {$ENDIF}
     if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
       fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, round(LNewSizeValue.width), round(LNewSizeValue.height));
@@ -4156,7 +4156,7 @@ begin
      (ALIsHttpOrHttpsUrl(PreviewResourceName)) then begin
 
     {$IFDEF debug}
-    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
     {$endif}
 
     FPreviewDownloadContext := TPreviewDownloadContext.Create(Self);
@@ -4179,7 +4179,7 @@ begin
   end;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   CreateBufDrawable(

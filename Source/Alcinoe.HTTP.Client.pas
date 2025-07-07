@@ -1529,7 +1529,7 @@ begin
                LDay,
                ALRfc822MonthOfTheYearNames[LMonth],
                LYear,
-               ALFormatDateTimeA('hh":"nn":"ss', aValue, ALDefaultFormatSettingsA),
+               ALFormatDateTimeA('hh":"nn":"ss', aValue),
                'GMT']);
 end;
 

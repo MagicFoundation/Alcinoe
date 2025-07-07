@@ -438,7 +438,7 @@ begin
   var LValueF: Single := AValue;
   {$IF defined(ALDPK)}
   While True do begin
-    var LValueStr := InputBox(ACaption, '', ALFloatToStrW(ADefaultValue, ALDefaultFormatSettingsW));
+    var LValueStr := InputBox(ACaption, '', ALFloatToStrW(ADefaultValue));
     if ALTryStrToFloat(LValueStr,LValueF,ALDefaultFormatSettingsW) then break;
   end;
   {$ENDIF}

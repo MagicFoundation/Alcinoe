@@ -992,7 +992,7 @@ begin
      (ALIsHttpOrHttpsUrl(PreviewResourceName)) then begin
 
     {$IFDEF debug}
-    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
     {$endif}
 
     FPreviewDownloadContext := TPreviewDownloadContext.Create(Self);
@@ -1015,7 +1015,7 @@ begin
   end;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   CreateBufDrawable(

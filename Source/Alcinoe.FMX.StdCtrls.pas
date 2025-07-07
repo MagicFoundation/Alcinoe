@@ -3569,7 +3569,7 @@ begin
      (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   FBufDrawableRect := LocalRect;
@@ -4317,7 +4317,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALCustomTrack.MouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position:' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if Pressed then begin
 
@@ -4420,7 +4420,7 @@ begin
   try
 
     {$IFDEF debug}
-    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
     {$endif}
 
     // Create the BufDrawable
@@ -5753,7 +5753,7 @@ begin
   try
 
     {$IFDEF debug}
-    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
     {$endif}
 
     // Create the BufDrawable
@@ -8888,7 +8888,7 @@ procedure TALBaseCheckBox.MakeBufDrawable;
     try
 
       {$IFDEF debug}
-      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
       {$endif}
 
       CreateBufDrawable(
@@ -10692,7 +10692,7 @@ procedure TALSwitch.TTrack.MakeBufDrawable;
     try
 
       {$IFDEF debug}
-      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
       {$endif}
 
       CreateBufDrawable(
@@ -11739,7 +11739,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALSwitch.MouseMove',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position:' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if Pressed then begin
 
@@ -12811,7 +12811,7 @@ begin
   try
 
     {$IFDEF debug}
-    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
     {$endif}
 
     // Create the BufDrawable
@@ -14324,7 +14324,7 @@ procedure TALToggleButton.MakeBufDrawable;
     try
 
       {$IFDEF debug}
-      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
       {$endif}
 
       // Create the BufDrawable

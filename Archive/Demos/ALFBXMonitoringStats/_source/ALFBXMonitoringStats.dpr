@@ -67,8 +67,8 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
   var aInt: Int64;
   begin
     aInt := ALStrToInt64(aStr);
-    if aInt >= 1000000 then result := ALFormatFloatA('0.0M', aInt / 1000000, ALDefaultFormatSettingsA)
-    else if aInt >= 1000 then result := ALFormatFloatA('0K', aInt / 1000, ALDefaultFormatSettingsA)
+    if aInt >= 1000000 then result := ALFormatFloatA('0.0M', aInt / 1000000)
+    else if aInt >= 1000 then result := ALFormatFloatA('0K', aInt / 1000)
     else result := astr;
   end;
 
@@ -236,10 +236,10 @@ Begin
                   InternalRightPad(axmlrec.childnodes['mon$remote_address'].text,15) + ' ' +
                   InternalRightPad(axmlrec.childnodes['mon$timestamp'].text,22) + ' ' +
                   InternalRightPad(ALExtractFileName(axmlrec.childnodes['mon$remote_process'].text), 25) + ' ' +
-                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$memory_used'].text) / 1024 / 1024, ALDefaultFormatSettingsA),6) + ' ' +
-                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$memory_allocated'].text) / 1024 / 1024, ALDefaultFormatSettingsA),11) + ' ' +
-                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$max_memory_used'].text) / 1024 / 1024, ALDefaultFormatSettingsA),10) + ' ' +
-                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$max_memory_allocated'].text) / 1024 / 1024, ALDefaultFormatSettingsA),15) + ' ' +
+                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$memory_used'].text) / 1024 / 1024),6) + ' ' +
+                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$memory_allocated'].text) / 1024 / 1024),11) + ' ' +
+                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$max_memory_used'].text) / 1024 / 1024),10) + ' ' +
+                  InternalRightPad(ALFormatFloatA('0.00', ALStrToInt(axmlrec.childnodes['mon$max_memory_allocated'].text) / 1024 / 1024),15) + ' ' +
                   InternalRightPad(InternalFormatNumber(axmlrec.childnodes['mon$page_reads'].text),7) + ' ' +
                   InternalRightPad(InternalFormatNumber(axmlrec.childnodes['mon$page_writes'].text),8) + ' ' +
                   InternalRightPad(InternalFormatNumber(axmlrec.childnodes['mon$page_fetches'].text),9) + ' ' +

@@ -213,11 +213,11 @@ procedure TForm1.OnGeoLocationSensorGeoLocationUpdate(
             Const ADateTime: TdateTime);
 begin
   Memo1.Lines.add('OnGeoLocationUpdate');
-  Memo1.Lines.add('  Latitude: ' + ALFloatToStrW(ALatitude, ALDefaultFormatSettingsW));
-  Memo1.Lines.add('  Longitude: ' + ALFloatToStrW(ALongitude, ALDefaultFormatSettingsW));
-  Memo1.Lines.add('  Altitude: ' + ALFloatToStrW(AAltitude, ALDefaultFormatSettingsW));
-  Memo1.Lines.add('  Accuracy: ' + ALFloatToStrW(AAccuracy, ALDefaultFormatSettingsW));
-  Memo1.Lines.add('  DateTime: ' + ALDateTimeToStrW(ADateTime, ALDefaultFormatSettingsW));
+  Memo1.Lines.add('  Latitude: ' + ALFloatToStrW(ALatitude));
+  Memo1.Lines.add('  Longitude: ' + ALFloatToStrW(ALongitude));
+  Memo1.Lines.add('  Altitude: ' + ALFloatToStrW(AAltitude));
+  Memo1.Lines.add('  Accuracy: ' + ALFloatToStrW(AAccuracy));
+  Memo1.Lines.add('  DateTime: ' + ALDateTimeToStrW(ADateTime));
   Memo1.Lines.add('');
   Memo1.Lines.add('************');
   Memo1.Lines.add('');

@@ -1015,7 +1015,7 @@ begin
 
 
         ALMemoResult.Clear;
-        ALMemoResult.Lines.Add('Time Taken: ' + string(ALFormatFloatA('0.#####', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsA)) + ' ms');
+        ALMemoResult.Lines.Add('Time Taken: ' + string(ALFormatFloatA('0.#####', LStopWatch.Elapsed.TotalMilliseconds)) + ' ms');
         LSphinxClient.SelectData(
           'SHOW META',
           'rec',
@@ -1602,7 +1602,7 @@ begin
           TForm1(fOwner).ALButtonSqlite3LoopUpdate.Caption := 'Loop UPDATE';
           TForm1(fOwner).Sqlite3ConnectionPoolClient.Free;
           TForm1(fOwner).Sqlite3ConnectionPoolClient := nil;
-          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime, ALDefaultFormatSettingsA));
+          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime));
         end;
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
@@ -1627,7 +1627,7 @@ begin
           TForm1(fOwner).ALButtonSqlite3LoopSelect.Caption := 'Loop SELECT';
           TForm1(fOwner).Sqlite3ConnectionPoolClient.Free;
           TForm1(fOwner).Sqlite3ConnectionPoolClient := nil;
-          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime, ALDefaultFormatSettingsA));
+          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime));
         end;
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
@@ -1779,7 +1779,7 @@ begin
           TForm1(fOwner).ALButtonSphinxLoopUpdate.Caption := 'Loop UPDATE';
           TForm1(fOwner).MySqlConnectionPoolClient.Free;
           TForm1(fOwner).MySqlConnectionPoolClient := nil;
-          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime, ALDefaultFormatSettingsA));
+          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime));
         end;
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
@@ -1806,7 +1806,7 @@ begin
           TForm1(fOwner).ALButtonSphinxLoopSelect.Caption := 'Loop SELECT';
           TForm1(fOwner).MySqlConnectionPoolClient.Free;
           TForm1(fOwner).MySqlConnectionPoolClient := nil;
-          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime, ALDefaultFormatSettingsA));
+          TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime));
         end;
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
@@ -1961,7 +1961,7 @@ begin
         end;
         TForm1(fOwner).MemcachedConnectionPoolClient.Free;
         TForm1(fOwner).MemcachedConnectionPoolClient := nil;
-        TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime, ALDefaultFormatSettingsA));
+        TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime));
       end;
     end;
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
@@ -2166,7 +2166,7 @@ begin
         end;
         TForm1(fOwner).MongoDBConnectionPoolClient.Free;
         TForm1(fOwner).MongoDBConnectionPoolClient := nil;
-        TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime, ALDefaultFormatSettingsA));
+        TForm1(fOwner).StatusBar1.Panels[2].Text := 'Total time taken: ' + String(ALFormatDateTimeA('hh:nn:ss.zzz',Now-TForm1(fOwner).LoopStartDateTime));
       end;
     end;
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);

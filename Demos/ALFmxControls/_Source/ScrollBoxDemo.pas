@@ -97,7 +97,7 @@ begin
   //   (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds > 18) then begin
   //  ALLog(
   //    'FramePaint',
-  //    'Slow frame detected | '  + ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW),
+  //    'Slow frame detected | '  + ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds),
   //    TalLogType.warn);
   //end;
   //--
@@ -114,11 +114,11 @@ begin
       inc(fDebugAverageFpsCount);
       ALLog(
         'FramePaint.fps',
-        ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' + ' | ' +
-        'average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps',
+        ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000) + ' fps' + ' | ' +
+        'average: ' + ALFormatFloatW('0.##', fDebugAverageFps) + ' fps',
         TalLogType.verbose);
-      HeaderText.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
-                         ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps)';
+      HeaderText.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000) + ' fps' +
+                         ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps) + ' fps)';
       fDebugFpsCount := 0;
       fDebugFpsStopWatch := TstopWatch.StartNew;
     end;

@@ -267,7 +267,7 @@ begin
   var LAutoInitObject3 := TAutoInitObject3.create(self, True);
   LAutoInitObject3.Free;
   LStopWatch.stop;
-  Showmessage('1 000 000 TAutoInitObject created in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms');
+  Showmessage('1 000 000 TAutoInitObject created in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
 {********************************************************************}
@@ -283,7 +283,7 @@ begin
   var LAutoInitObject3 := TAutoInitObject3.create(self, false);
   LAutoInitObject3.Free;
   LStopWatch.stop;
-  Showmessage('1 000 000 TAutoInitObject created in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms');
+  Showmessage('1 000 000 TAutoInitObject created in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
 {*********************************************************************}
@@ -295,7 +295,7 @@ begin
   for var I := 0 to 500000 do
     LRTTIType.GetFields(mvPublished);
   LStopWatch.stop;
-  Showmessage('500 000 GetFields in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms');
+  Showmessage('500 000 GetFields in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
 {*******************************************************************}
@@ -311,7 +311,7 @@ begin
     ctx.Free;
   end;
   LStopWatch.stop;
-  Showmessage('500 000 GetFields in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms');
+  Showmessage('500 000 GetFields in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
 {********************************************************************}
@@ -323,7 +323,7 @@ begin
   for var I := 0 to 500000 do
     LRTTIType.GetField('Action', mvPublished);
   LStopWatch.stop;
-  Showmessage('500 000 GetField in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms');
+  Showmessage('500 000 GetField in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
 {******************************************************************}
@@ -339,7 +339,7 @@ begin
     ctx.Free;
   end;
   LStopWatch.stop;
-  Showmessage('500 000 GetField in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms');
+  Showmessage('500 000 GetField in '+AlformatFloatW('0.##', LStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
 {******************************************}

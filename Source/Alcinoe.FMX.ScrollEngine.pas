@@ -776,7 +776,7 @@ begin
   for var i{: size_t} := 0 to length(a) - 1 do begin
     if i > 0 then
       str := str + ',';
-    str := str + ' ' + ALFloatToStrW(a[i], ALDefaultFormatSettingsW);
+    str := str + ' ' + ALFloatToStrW(a[i]);
   end;
   str := str + ' ]';
   Result := str;
@@ -796,7 +796,7 @@ begin
         for var j{: size_t} := 0 to length(a[i]) - 1 do begin
           if j > 0 then
             str := str + ',';
-          str := str + ALFloatToStrW(a[i][j], ALDefaultFormatSettingsW)
+          str := str + ALFloatToStrW(a[i][j])
         end;
         str := str + ' ]';
       end;
@@ -809,7 +809,7 @@ begin
         for var j{: size_t} := 0 to length(a) - 1 do begin
           if j > 0 then
             str := str + ',';
-          str := str + ALFloatToStrW(a[j][i], ALDefaultFormatSettingsW)
+          str := str + ALFloatToStrW(a[j][i])
         end;
         str := str + ' ]';
       end;
@@ -1753,8 +1753,8 @@ begin
   {$IFDEF DEBUG}
   ALLog(
     'Alcinoe.FMX.ScrollEngine.TALSplineOverScroller.Create',
-    'PixelsPerInch:' + ALFormatFloatW('0.##', PixelsPerInch, ALDefaultFormatSettingsW) + ' | ' +
-    'PhysicalCoeff:' + ALFormatFloatW('0.##', FPhysicalCoeff, ALDefaultFormatSettingsW));
+    'PixelsPerInch:' + ALFormatFloatW('0.##', PixelsPerInch) + ' | ' +
+    'PhysicalCoeff:' + ALFormatFloatW('0.##', FPhysicalCoeff));
   {$ENDIF}
 end;
 
@@ -2860,7 +2860,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'Alcinoe.FMX.ScrollEngine.TALScrollEngine.DoChanged',
-  //  'ViewPortPosition:' + ALFormatFloatW('0.##', ViewPortPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', ViewPortPosition.y, ALDefaultFormatSettingsW));
+  //  'ViewPortPosition:' + ALFormatFloatW('0.##', ViewPortPosition.x) + ',' + ALFormatFloatW('0.##', ViewPortPosition.y));
   {$ENDIF}
   if Assigned(FOnChanged) then
     FOnChanged(self);
@@ -3527,7 +3527,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseWheel',
-  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position:' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
 
   if not FOverScroller.isFinished then begin

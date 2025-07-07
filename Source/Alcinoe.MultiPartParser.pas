@@ -750,7 +750,7 @@ end;
 {*****************************************************************}
 function TAlMultiPartBaseStream.GenerateUniqueBoundary: AnsiString;
 begin
-  Result := '---------------------------' + ALFormatDateTimeA('mmddyyhhnnsszzz', Now, ALDefaultFormatSettingsA);
+  Result := '---------------------------' + ALFormatDateTimeA('mmddyyhhnnsszzz', Now);
 end;
 
 {*********************************************}

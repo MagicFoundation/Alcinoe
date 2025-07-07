@@ -84,7 +84,7 @@ begin
                 TThread.Synchronize(nil,
                 procedure
                 begin
-                  Memo1.Lines.Add(ALFloatToStrW(LDouble2, ALDefaultFormatSettingsW) + ' | ' + ALFloatToStrW(LMinDelta, ALDefaultFormatSettingsW));
+                  Memo1.Lines.Add(ALFloatToStrW(LDouble2) + ' | ' + ALFloatToStrW(LMinDelta));
                 end);
                 sleep(100);
             end;
@@ -103,7 +103,7 @@ begin
                 TThread.Synchronize(nil,
                 procedure
                 begin
-                  Memo1.Lines.Add(ALFloatToStrW(LRect1.Left, ALDefaultFormatSettingsW) + ' | ' + ALFloatToStrW(LMinDelta, ALDefaultFormatSettingsW));
+                  Memo1.Lines.Add(ALFloatToStrW(LRect1.Left) + ' | ' + ALFloatToStrW(LMinDelta));
                 end);
                 sleep(100);
             end;
@@ -121,7 +121,7 @@ begin
                 TThread.Synchronize(nil,
                 procedure
                 begin
-                  Memo1.Lines.Add(ALFloatToStrW(LRect1.right, ALDefaultFormatSettingsW) + ' | ' + ALFloatToStrW(LMinDelta, ALDefaultFormatSettingsW));
+                  Memo1.Lines.Add(ALFloatToStrW(LRect1.right) + ' | ' + ALFloatToStrW(LMinDelta));
                 end);
                 sleep(100);
             end;
@@ -146,7 +146,7 @@ begin
   FlistValues := TList<Double>.create;
   for Var I := 1 to 1000 do begin
     var LValue: Double := Random(maxint) * random;
-    Memo1.Lines.Add(ALFloatToStrW(LValue, ALDefaultFormatSettingsW));
+    Memo1.Lines.Add(ALFloatToStrW(LValue));
     FlistValues.Add(LValue);
   end;
   Memo1.Lines.Add('');

@@ -2367,7 +2367,7 @@ begin
      (ALIsHttpOrHttpsUrl(ResourceName)) then begin
 
     {$IFDEF debug}
-    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Starting download | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
     {$endif}
 
     FResourceDownloadContext := TResourceDownloadContext.Create(Self);
@@ -2395,7 +2395,7 @@ begin
          (CacheEngine.HasEntry(LoadingCacheIndex{AIndex}, GetLoadingCacheSubIndex{ASubIndex})) then Exit;
 
       {$IFDEF debug}
-      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Creating loading content | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Creating loading content | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
       {$endif}
 
       CreateBufDrawable(
@@ -2431,7 +2431,7 @@ begin
   end;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   CreateBufDrawable(
@@ -3046,9 +3046,9 @@ begin
   ALLog(
     'TALDynamicAnimatedImage.CreateCodec',
     'ResourceName: '+ FResourceName + ' | '+
-    'Duration: '+ALFloatTostrW(LDuration, ALDefaultFormatSettingsW) + ' | '+
-    'Width: ' + ALFloatTostrW(LSize.Width, ALDefaultFormatSettingsW) + ' | '+
-    'Height: ' + ALFloatTostrW(LSize.Height, ALDefaultFormatSettingsW),
+    'Duration: '+ALFloatTostrW(LDuration) + ' | '+
+    'Width: ' + ALFloatTostrW(LSize.Width) + ' | '+
+    'Height: ' + ALFloatTostrW(LSize.Height),
     TalLogType.debug);
   {$ENDIF}
 
@@ -3543,7 +3543,7 @@ begin
      (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   CreateBufDrawable(
@@ -3848,7 +3848,7 @@ begin
      (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   CreateBufDrawable(
@@ -4073,7 +4073,7 @@ begin
      (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   //init fBufDrawableRect / LRect
@@ -5578,7 +5578,7 @@ begin
      (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   {$IFDEF debug}
-  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width)+ ' | Height: ' + ALFloatToStrW(Height));
   {$endif}
 
   CreateBufDrawable(

@@ -2645,7 +2645,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.MouseDown',
-  //  'Position: ' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position: ' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if (Button = TMouseButton.mbLeft) then begin
     FHandleMouseEvents := true;
@@ -2670,7 +2670,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.InternalMouseMove',
-  //  'Position: ' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position: ' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if FHandleMouseEvents then begin
     if (not fScrollCapturedByMe) and
@@ -2704,7 +2704,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  ClassName + '.InternalMouseUp',
-  //  'Position: ' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW));
+  //  'Position: ' + ALFormatFloatW('0.##', x) + ',' + ALFormatFloatW('0.##', y));
   {$ENDIF}
   if FHandleMouseEvents and (Button = TMouseButton.mbLeft) then begin
     {$IF (not defined(ALUIAutomationEnabled)) and (defined(ANDROID) or defined(IOS))}
@@ -3063,8 +3063,8 @@ begin
     ALLog(
       classname + '.fps',
       'Drop frame detected | '  +
-      ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW) + ' | '+
-      'Velocity: ' + ALFormatFloatW('0', ScrollEngine.CurrentVelocity.y, ALDefaultFormatSettingsW),
+      ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds) + ' | '+
+      'Velocity: ' + ALFormatFloatW('0', ScrollEngine.CurrentVelocity.y),
       TalLogType.warn);
   end;
 
@@ -3086,9 +3086,9 @@ begin
       inc(fDebugAverageFpsCount);
       ALLog(
         classname + '.fps',
-        ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' + ' | ' +
-        'Average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps' + ' | ' +
-        'System default: ' + ALFormatFloatW('0.##', DisplayDefaultRefreshRate, ALDefaultFormatSettingsW) + ' fps',
+        ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000) + ' fps' + ' | ' +
+        'Average: ' + ALFormatFloatW('0.##', fDebugAverageFps) + ' fps' + ' | ' +
+        'System default: ' + ALFormatFloatW('0.##', DisplayDefaultRefreshRate) + ' fps',
         TalLogType.verbose);
     end;
     fDebugFpsStarted := False;
@@ -4116,7 +4116,7 @@ begin
     {$IFDEF DEBUG}
     finally
       LStopWatch.Stop;
-      ALLog(ClassName+'.DownloadItemsProcessItems', 'timeTaken: ' + ALFloatToStrW(LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW));
+      ALLog(ClassName+'.DownloadItemsProcessItems', 'timeTaken: ' + ALFloatToStrW(LStopWatch.Elapsed.TotalMilliseconds));
     end;
     {$ENDIF}
 

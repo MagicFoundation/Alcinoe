@@ -313,11 +313,11 @@ begin
       inc(fDebugAverageFpsCount);
       ALLog(
         'FramePaint.fps',
-        ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' + ' | ' +
-        'average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps',
+        ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000) + ' fps' + ' | ' +
+        'average: ' + ALFormatFloatW('0.##', fDebugAverageFps) + ' fps',
         TalLogType.verbose);
-      StatusLabel1.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
-                           ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps)';
+      StatusLabel1.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000) + ' fps' +
+                           ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps) + ' fps)';
       StatusLabel1.Visible := True;
       OrderStatusLabels;
       fDebugFpsCount := 0;
@@ -384,7 +384,7 @@ begin
     end;
   end;
   LStopWatch.Stop;
-  StatusLabel1.Text := 'All images created in: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms';
+  StatusLabel1.Text := 'All images created in: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds) + ' ms';
   StatusLabel1.Visible := True;
   OrderStatusLabels;
 end;
@@ -637,7 +637,7 @@ begin
                     TThread.Synchronize(nil,
                     procedure
                     begin
-                      StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms';
+                      StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds) + ' ms';
                       StatusLabel3.Visible := True;
                       OrderStatusLabels;
                       Invalidate;
@@ -794,7 +794,7 @@ begin
                     TThread.Synchronize(nil,
                     procedure
                     begin
-                      StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds + LHtmlTextStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms';
+                      StatusLabel3.Text := ALInttostrW(i) + ' images created in: ' + ALFormatFloatW('0.00', LRawTextStopWatch.Elapsed.TotalMilliseconds + LHtmlTextStopWatch.Elapsed.TotalMilliseconds) + ' ms';
                       StatusLabel3.Visible := True;
                       OrderStatusLabels;
                       Invalidate;
@@ -814,9 +814,9 @@ begin
             TThread.Synchronize(nil,
             procedure
             begin
-              StatusLabel1.Text := '500 text images created in: ' + ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms ('+ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds / 500, ALDefaultFormatSettingsW) +' ms/image)';
+              StatusLabel1.Text := '500 text images created in: ' + ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds) + ' ms ('+ALFormatFloatW('0', LRawTextStopWatch.Elapsed.TotalMilliseconds / 500) +' ms/image)';
               StatusLabel1.Visible := True;
-              StatusLabel2.Text := '500 Html images created in: ' + ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' ms ('+ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds / 500, ALDefaultFormatSettingsW) +' ms/image)';
+              StatusLabel2.Text := '500 Html images created in: ' + ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds) + ' ms ('+ALFormatFloatW('0', LHtmlTextStopWatch.Elapsed.TotalMilliseconds / 500) +' ms/image)';
               StatusLabel2.Visible := True;
               OrderStatusLabels;
               ButtonTestMultilineText.Tag := 0;
@@ -868,7 +868,7 @@ begin
             begin
               MainScrollBox.Visible := False;
               ButtonStop.Visible := True;
-              StatusLabel2.Text := ALIntToStrW(Lcount)+' images created in: ' + ALFormatFloatW('0.00', LTotalMilliseconds, ALDefaultFormatSettingsW) + ' ms';
+              StatusLabel2.Text := ALIntToStrW(Lcount)+' images created in: ' + ALFormatFloatW('0.00', LTotalMilliseconds) + ' ms';
               StatusLabel2.Visible := True;
               OrderStatusLabels;
               ButtonTestFPS.Tag := 2;

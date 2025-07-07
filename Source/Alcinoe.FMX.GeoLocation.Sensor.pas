@@ -1659,10 +1659,10 @@ begin
     {$IFDEF DEBUG}
     ALLog(
       'TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations',
-      'Date: ' + ALDateTimeToStrW(ALNSDateToUTCDateTime(LLocation.timestamp), ALDefaultFormatSettingsW) + ' | ' +
-      'Latitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.latitude, ALDefaultFormatSettingsW) + ' | ' +
-      'Longitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.longitude, ALDefaultFormatSettingsW) + ' | ' +
-      'Accuracy: ' + ALFormatFloatW('#.##', LLocation.horizontalAccuracy, ALDefaultFormatSettingsW) + 'm');
+      'Date: ' + ALDateTimeToStrW(ALNSDateToUTCDateTime(LLocation.timestamp)) + ' | ' +
+      'Latitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.latitude) + ' | ' +
+      'Longitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.longitude) + ' | ' +
+      'Accuracy: ' + ALFormatFloatW('#.##', LLocation.horizontalAccuracy) + 'm');
     {$ENDIF}
     //The location’s latitude and longitude identify the center of the
     //circle, and this value indicates the radius of that circle.

@@ -190,10 +190,10 @@ begin
   if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
-    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsW) +' MB');
+    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000) +' MB');
   end;
   if TALTextureAccessPrivate(self).FBits <> nil then
-    ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatW('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsW) +' kB', TalLogType.Warn);
+    ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatW('0.##',(Width * Height * BytesPerPixel) / 1000) +' kB', TalLogType.Warn);
   {$WARNINGS ON}
   {$ENDIF}
 
@@ -283,7 +283,7 @@ begin
   if (Handle <> 0) and (PixelFormat <> TPixelFormat.None) then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
-    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsW) +' MB');
+    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000) +' MB');
   end;
   {$ENDIF}
 

@@ -3633,7 +3633,7 @@ begin
     {$ENDIF}
   end;
   case Style of
-    TGradientStyle.linear: result := ALFormatFloatW('linear-gradient(0.#####deg', Angle, ALDefaultFormatSettingsW);
+    TGradientStyle.linear: result := ALFormatFloatW('linear-gradient(0.#####deg', Angle);
     TGradientStyle.radial: Result := 'radial-gradient(circle';
     else raise Exception.Create('Error 591CBC8C-50A7-4444-A0D6-584EB45AD56A');
   end;
@@ -3641,7 +3641,7 @@ begin
     var LAphaColorRec := TAlphaColorRec.Create(Colors[i]);
     result := result + ', #' + ALInttoHexW(LAphaColorRec.R, 2) + ALInttoHexW(LAphaColorRec.G, 2) + ALInttoHexW(LAphaColorRec.B, 2) + ALInttoHexW(LAphaColorRec.A, 2);
     if length(Offsets) > 0 then
-      result := result + ALFormatFloatW(' 0.#####%', Offsets[i] * 100, ALDefaultFormatSettingsW);
+      result := result + ALFormatFloatW(' 0.#####%', Offsets[i] * 100);
   end;
   result := result + ')';
 end;
@@ -3743,7 +3743,7 @@ begin
         var P2 := P1;
         While (P2 <= Length(LValue)) and (CharInSet(LValue[P2], ['0'..'9','.'])) do inc(p2);
         if P2 = P1 then _RaiseException('CSS gradient format error: angle specification missing');
-        If not ALTryStrToFloat(ALCopyStr(LValue, P1, P2-P1), FAngle, ALDefaultFormatSettingsW) then
+        If not ALTryStrToFloat(ALCopyStr(LValue, P1, P2-P1), FAngle) then
           _RaiseException('CSS gradient format error: invalid angle value');
         P1 := P2; // deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
         if AlposW('deg,', LValue, P1) = P1 then
@@ -3807,7 +3807,7 @@ begin
             if (not ALTryStrToInt(LLst[0], R)) or (R < low(Byte)) or (R > high(Byte)) then _RaiseException('CSS gradient format error: Invalid red component');
             if (not ALTryStrToInt(LLst[1], G)) or (G < low(Byte)) or (G > high(Byte)) then _RaiseException('CSS gradient format error: Invalid green component');
             if (not ALTryStrToInt(LLst[2], B)) or (B < low(Byte)) or (B > high(Byte)) then _RaiseException('CSS gradient format error: Invalid blue component');
-            if (not ALTryStrToFloat(LLst[3], A, ALDefaultFormatSettingsW)) or (compareValue(A, 0, Tepsilon.Vector) < 0) or (compareValue(A, 1, Tepsilon.Vector) > 0) then _RaiseException('CSS gradient format error: Invalid alpha component');
+            if (not ALTryStrToFloat(LLst[3], A)) or (compareValue(A, 0, Tepsilon.Vector) < 0) or (compareValue(A, 1, Tepsilon.Vector) > 0) then _RaiseException('CSS gradient format error: Invalid alpha component');
             LColor := MakeColor(R, G, B, byte(round(A * High(Byte))));
           finally
             ALFreeAndNil(LLst);
@@ -3839,7 +3839,7 @@ begin
         else begin
           if LWithOffset = 0 then _RaiseException('CSS gradient format error: Inconsistent color stop definitions');
           LWithOffset := 1;
-          If not ALTryStrToFloat(ALCopyStr(LValue, P1, P2-P1), LOffset, ALDefaultFormatSettingsW) then
+          If not ALTryStrToFloat(ALCopyStr(LValue, P1, P2-P1), LOffset) then
             _RaiseException('CSS gradient format error: Invalid offset value');
           P1 := P2; // %,rgba(134,113,255,1) 100%
           if AlPosW('%', LValue, P1) = P1 then
@@ -6043,10 +6043,10 @@ begin
       ALLog(
         'ALGetFontMetrics',
         'FontFamily: '+ AFontFamily + ' | '+
-        'FontSize: '+ ALFloatToStrW(AFontSize, ALDefaultFormatSettingsW) + ' | '+
-        'Ascent: ' + ALFloatToStrW(Result.Ascent, ALDefaultFormatSettingsW) + ' | '+
-        'Descent: ' + ALFloatToStrW(Result.Descent, ALDefaultFormatSettingsW) + ' | '+
-        'Leading: ' + ALFloatToStrW(Result.Leading, ALDefaultFormatSettingsW));
+        'FontSize: '+ ALFloatToStrW(AFontSize) + ' | '+
+        'Ascent: ' + ALFloatToStrW(Result.Ascent) + ' | '+
+        'Descent: ' + ALFloatToStrW(Result.Descent) + ' | '+
+        'Leading: ' + ALFloatToStrW(Result.Leading));
       {$ENDIF}
     end;
   finally
@@ -6595,7 +6595,7 @@ begin
     else
       ALScreenScale := 1;
     {$IF defined(debug)}
-    ALLog('Screen Scale', ALFloatToStrW(ALScreenScale, ALDefaultFormatSettingsW));
+    ALLog('Screen Scale', ALFloatToStrW(ALScreenScale));
     {$ENDIF}
   end;
 end;

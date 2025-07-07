@@ -356,9 +356,9 @@ begin
               if (LHTTPResponse = nil) or
                  ((LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599)) then begin
                 if assigned(LNetHttpClientPoolRequest.OnErrorObjProc) then
-                  LNetHttpClientPoolRequest.OnErrorObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext)
+                  LNetHttpClientPoolRequest.OnErrorObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext)
                 else if assigned(LNetHttpClientPoolRequest.OnErrorRefProc) then
-                  LNetHttpClientPoolRequest.OnErrorRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode], ALDefaultFormatSettingsW), LNetHttpClientPoolRequest.FContext);
+                  LNetHttpClientPoolRequest.OnErrorRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext);
                 exit;
               end;
               ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);

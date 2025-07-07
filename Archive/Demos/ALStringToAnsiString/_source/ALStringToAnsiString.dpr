@@ -241,7 +241,7 @@ begin
     aDirectory := ALStringToAnsiString_ExtractParamValue('Directory');
     aSubDirectory := ALStringToAnsiString_ExtractParamValue('SubDirectory') = '1';
     aFileNameMask := ALStringToAnsiString_ExtractParamValue('FileNameMask');
-    aBackupDir := ALGetModulePathA + 'backup_'+ALFormatDateTimeA('yyyy.mm.dd.hh.nn.ss', now, ALDefaultFormatSettingsA) +'\';
+    aBackupDir := ALGetModulePathA + 'backup_'+ALFormatDateTimeA('yyyy.mm.dd.hh.nn.ss', now) +'\';
     createdir(String(aBackupDir));
 
     if (aDirectory = '') or

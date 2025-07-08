@@ -3871,10 +3871,11 @@ begin
    raise Exception.Create('Error C91D7557-4D88-4D07-8F68-023BFF0F65EA');
   {$ENDIF}
 
+  var LList := FCachedBitmaps.PList;
   for var I := FCachedBitmaps.Count - 1 downto 0 do begin
-    if (Length(FCachedBitmaps.List[i].Key) = Length(AHash)) and
-       (CompareMem(@FCachedBitmaps.List[i].Key[0], @AHash[0], Length(AHash))) then begin
-      Result := FCachedBitmaps.List[i].Value;
+    if (Length(LList^[i].Key) = Length(AHash)) and
+       (CompareMem(@LList^[i].Key[0], @AHash[0], Length(AHash))) then begin
+      Result := LList^[i].Value;
       Exit;
     end;
   end;
@@ -3896,7 +3897,7 @@ begin
   {$ENDIF}
 
   while FCachedBitmaps.Count >= MaxCachedBitmaps do begin
-    var LBitmap := TALDrawRectangleHelper.FCachedBitmaps.List[0].Value;
+    var LBitmap := TALDrawRectangleHelper.FCachedBitmaps.PList^[0].Value;
     ALFreeAndNilBitmap(LBitmap);
     FCachedBitmaps.Delete(0);
   end;
@@ -8328,8 +8329,9 @@ finalization
   ALLog('Alcinoe.FMX.Graphics','finalization');
   {$ENDIF}
   //--
+  var LList := TALDrawRectangleHelper.FCachedBitmaps.PList;
   for var I := 0 to TALDrawRectangleHelper.FCachedBitmaps.Count - 1 do begin
-    var LBitmap := TALDrawRectangleHelper.FCachedBitmaps.List[i].Value;
+    var LBitmap := LList^[i].Value;
     ALFreeAndNilBitmap(LBitmap);
   end;
   ALFreeAndNil(TALDrawRectangleHelper.FCachedBitmaps);

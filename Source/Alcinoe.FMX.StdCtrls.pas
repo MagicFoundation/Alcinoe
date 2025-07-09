@@ -9796,7 +9796,7 @@ begin
     else begin
       if (not value) and fMandatory then exit;
       inherited SetChecked(Value);
-      if Value then begin
+      if Value and (GroupName <> '') then begin
         var M := TRadioButtonGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
@@ -14062,7 +14062,7 @@ begin
     else begin
       if (not value) and fMandatory then exit;
       _doSetChecked;
-      if Value then begin
+      if Value and (GroupName <> '') then begin
         var M := TRadioButtonGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;

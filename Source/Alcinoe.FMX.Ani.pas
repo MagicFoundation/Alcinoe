@@ -1329,6 +1329,7 @@ end;
 {****************************************************************************}
 function ALInterpolateColor(Start, Stop: TAlphaColor; T: Single): TAlphaColor;
 begin
+  T := EnsureRange(T,0,1);
   // If start or stop is null, then perform the animation only on the alpha channel.
   if Start = TALphaColors.Null then begin
     TAlphaColorRec(Start).A := 0;

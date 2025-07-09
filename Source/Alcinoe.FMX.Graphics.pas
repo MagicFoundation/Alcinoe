@@ -689,7 +689,7 @@ var
   {$ENDIF}
   ALCachedMaskTBitmaps: TList<TALTriplet<TBytes, TBitmap, Integer>>;
 
-{*****************************}
+{****************************}
 function ALGetCachedBitmapKey(
            const AResourceName: String;
            const AResourceStream: TStream;
@@ -793,7 +793,7 @@ begin
 
 end;
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetCachedSkImage(
            const ACachedImages: TList<TALTriplet<TBytes, sk_image_t, Integer>>;
@@ -848,7 +848,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALCacheSkImage(
             const ACachedImages: TList<TALTriplet<TBytes, sk_image_t, Integer>>;
@@ -891,7 +891,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{********************}
 {$IF defined(ANDROID)}
 function ALGetCachedJBitmap(
            const ACachedBitmaps: TList<TALTriplet<TBytes, JBitmap, Integer>>;
@@ -946,7 +946,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{********************}
 {$IF defined(ANDROID)}
 procedure ALCacheJBitmap(
             const ACachedBitmaps: TList<TALTriplet<TBytes, JBitmap, Integer>>;
@@ -991,7 +991,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALGetCachedCGImageRef(
            const ACachedImages: TList<TALTriplet<TBytes, CGImageRef, Integer>>;
@@ -1046,7 +1046,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{**********************}
 {$IF defined(ALAppleOS)}
 procedure ALCacheCGImageRef(
             const ACachedImages: TList<TALTriplet<TBytes, CGImageRef, Integer>>;
@@ -1089,7 +1089,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{**************************}
 function ALGetCachedTBitmap(
            const ACachedBitmaps: TList<TALTriplet<TBytes, TBitmap, Integer>>;
            const AResourceName: String;
@@ -1142,7 +1142,7 @@ begin
 
 end;
 
-{*************************}
+{***********************}
 procedure ALCacheTBitmap(
             const ACachedBitmaps: TList<TALTriplet<TBytes, TBitmap, Integer>>;
             const AMaxCachedBitmaps: Integer;
@@ -3075,20 +3075,20 @@ begin
       // Create the MaskBitmap
       if (AMaskResourceName <> '') then begin
         LMaskBitmap := ALGetCachedJBitmap(
-                        ALCachedMaskJBitmaps, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
-                        AMaskResourceName, // const AResourceName: String;
-                        nil, // const AResourceStream: TStream;
-                        '', // const AMaskResourceName: String;
-                        AScale, // const AScale: Single;
-                        W, H, // const W, H: single;
-                        AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50, -50), // const ACropCenter: TpointF;
-                        TalphaColors.Null, // const ATintColor: TalphaColor;
-                        0, // const ABlurRadius: single;
-                        AXRadius, // const AXRadius: Single;
-                        AYRadius, // const AYRadius: Single)
-                        LKey, // out AKey: TBytes
-                        LHash); // out AHash: Integer)
+                         ALCachedMaskJBitmaps, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
+                         AMaskResourceName, // const AResourceName: String;
+                         nil, // const AResourceStream: TStream;
+                         '', // const AMaskResourceName: String;
+                         AScale, // const AScale: Single;
+                         W, H, // const W, H: single;
+                         AWrapMode, // const AWrapMode: TALImageWrapMode;
+                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         TalphaColors.Null, // const ATintColor: TalphaColor;
+                         0, // const ABlurRadius: single;
+                         AXRadius, // const AXRadius: Single;
+                         AYRadius, // const AYRadius: Single)
+                         LKey, // out AKey: TBytes
+                         LHash); // out AHash: Integer)
         if LMaskBitmap = nil then begin
           LIsCachedMaskBitmap := False;
           LMaskBitmap := ALCreateJbitmapFromResource(
@@ -3945,20 +3945,20 @@ begin
       // Create the MaskBitmap
       if (AMaskResourceName <> '') then begin
         LMaskBitmap := ALGetCachedTBitmap(
-                        ALCachedMaskTBitmaps, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
-                        AMaskResourceName, // const AResourceName: String;
-                        nil, // const AResourceStream: TStream;
-                        '', // const AMaskResourceName: String;
-                        AScale, // const AScale: Single;
-                        W, H, // const W, H: single;
-                        AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50, -50), // const ACropCenter: TpointF;
-                        TalphaColors.Null, // const ATintColor: TalphaColor;
-                        0, // const ABlurRadius: single;
-                        AXRadius, // const AXRadius: Single;
-                        AYRadius, // const AYRadius: Single)
-                        LKey, // out AKey: TBytes
-                        LHash); // out AHash: Integer)
+                         ALCachedMaskTBitmaps, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
+                         AMaskResourceName, // const AResourceName: String;
+                         nil, // const AResourceStream: TStream;
+                         '', // const AMaskResourceName: String;
+                         AScale, // const AScale: Single;
+                         W, H, // const W, H: single;
+                         AWrapMode, // const AWrapMode: TALImageWrapMode;
+                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         TalphaColors.Null, // const ATintColor: TalphaColor;
+                         0, // const ABlurRadius: single;
+                         AXRadius, // const AXRadius: Single;
+                         AYRadius, // const AYRadius: Single)
+                         LKey, // out AKey: TBytes
+                         LHash); // out AHash: Integer)
         if LMaskBitmap = nil then begin
           LIsCachedMaskBitmap := False;
           LMaskBitmap := ALCreateTBitmapFromResource(

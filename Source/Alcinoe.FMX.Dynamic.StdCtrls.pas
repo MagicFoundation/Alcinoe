@@ -1751,6 +1751,15 @@ type
     function CreatePadding: TALBounds; override;
   public
     type
+      // -------------
+      // TGroupMessage
+      TGroupMessage = class(TMessage)
+      private
+        FGroupName: string;
+      public
+        constructor Create(const AGroupName: string);
+        property GroupName: string read FGroupName;
+      end;
       // -----
       // TFill
       TFill = class(TALDynamicBaseText.TFill)
@@ -9416,6 +9425,13 @@ begin
 
 end;
 
+{********************************************************************************}
+constructor TALDynamicToggleButton.TGroupMessage.Create(const AGroupName: string);
+begin
+  inherited Create;
+  FGroupName := AGroupName;
+end;
+
 {*****************************************************************}
 function TALDynamicToggleButton.TFill.GetDefaultColor: TAlphaColor;
 begin
@@ -10219,7 +10235,7 @@ begin
   //--
   FGroupName := '';
   fMandatory := false;
-  TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
+  TMessageManager.DefaultManager.SubscribeToMessage(TGroupMessage, GroupMessageCall);
   //--
   FChecked := False;
   FOnChange := nil;
@@ -10258,11 +10274,11 @@ end;
 procedure TALDynamicToggleButton.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
-  // Unsubscribe from TRadioButtonGroupMessage to stop receiving messages.
+  // Unsubscribe from TGroupMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
-  TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
+  TMessageManager.DefaultManager.Unsubscribe(TGroupMessage, GroupMessageCall);
   inherited;
 end;
 
@@ -10360,7 +10376,7 @@ begin
       if (not value) and fMandatory then exit;
       _doSetChecked;
       if Value and (GroupName <> '') then begin
-        var M := TRadioButtonGroupMessage.Create(GroupName);
+        var M := TGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
     //**end;
@@ -10404,7 +10420,7 @@ end;
 {******************************************************************************************}
 procedure TALDynamicToggleButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
 begin
-  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Host <> nil) and
+  if SameText(TGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Host <> nil) and
      (not (Sender is TALDynamicControl) or ((Sender as TALDynamicControl).Host = Host)) then begin
     var LOldMandatory := fMandatory;
     fMandatory := False;

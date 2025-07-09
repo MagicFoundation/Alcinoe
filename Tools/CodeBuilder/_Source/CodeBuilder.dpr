@@ -757,6 +757,12 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '     (not (Sender is TALDynamicControl) or ((Sender as TALDynamicControl).Host = Host)) then begin');
     aSrc := FindAndReplace(
               aSrc,
+              '  if SameText(TGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Root <> nil) and'+#13#10+
+              '     (not (Sender is TControl) or ((Sender as TControl).Root = Root)) then begin',
+              '  if SameText(TGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Host <> nil) and'+#13#10+
+              '     (not (Sender is TALDynamicControl) or ((Sender as TALDynamicControl).Host = Host)) then begin');
+    aSrc := FindAndReplace(
+              aSrc,
               '  TALDynamicPageView = class(TALDynamicBaseRectangle)',
               '  TALDynamicPageController = class;'#13#10+
               #13#10+
@@ -840,8 +846,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
               '      _doSetChecked;'+#13#10+
-              '      if Value then begin'+#13#10+
-              '        var M := TRadioButtonGroupMessage.Create(GroupName);'+#13#10+
+              '      if Value and (GroupName <> '''') then begin'+#13#10+
+              '        var M := TGroupMessage.Create(GroupName);'+#13#10+
               '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
               '      end;'+#13#10+
               '    end;',
@@ -849,8 +855,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    //**else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
               '      _doSetChecked;'+#13#10+
-              '      if Value then begin'+#13#10+
-              '        var M := TRadioButtonGroupMessage.Create(GroupName);'+#13#10+
+              '      if Value and (GroupName <> '''') then begin'+#13#10+
+              '        var M := TGroupMessage.Create(GroupName);'+#13#10+
               '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
               '      end;'+#13#10+
               '    //**end;');

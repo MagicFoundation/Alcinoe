@@ -25352,7 +25352,16 @@ begin
   {$IF defined(ALDPK)}
   FIsDarkMode := False;
   {$ELSEIF defined(Android)}
-  FIsDarkMode := GetSystemIsDarkMode;
+  if TOSVersion.Check(12, 0) {API level >= 31 (Android S)} then FIsDarkMode := GetSystemIsDarkMode
+  else begin
+    var LSystemIsDarkMode := GetSystemIsDarkMode;
+    case DarkModeBehavior of
+      TDarkModeBehavior.FollowSystem: FIsDarkMode := LSystemIsDarkMode;
+      TDarkModeBehavior.AlwaysDark: FIsDarkMode := True;
+      TDarkModeBehavior.AlwaysLight: FIsDarkMode := False;
+      else raise Exception.Create('Error 94850C75-35C9-4DD4-8B53-A73A378964E6');
+    end;
+  end;
   {$ELSEIF defined(IOS)}
   var LSystemIsDarkMode := GetSystemIsDarkMode;
   case DarkModeBehavior of
@@ -26481,29 +26490,28 @@ begin
   // We use UiModeManager because it persists across app restarts.
   // AppCompatDelegate.setDefaultNightMode is not persistent and requires
   // calling activity.recreate(), which in our case would terminate the app.
+  var LUiModeManager: JUiModeManager := Nil;
   if TOSVersion.Check(12, 0) {API level >= 31 (Android S)} then begin
     var LUIModeService := TAndroidHelper.Activity.getSystemService(TJContext.JavaClass.UI_MODE_SERVICE);
-    if LUIModeService <> nil then begin
-      var LUiModeManager := TJUiModeManager.Wrap(TAndroidHelper.JObjectToID(LUIModeService));
-      case AValue of
-        TDarkModeBehavior.FollowSystem: begin
-          LUiModeManager.setApplicationNightMode(TJUiModeManager.Javaclass.MODE_NIGHT_AUTO);
-          TALUserPreferences.Instance.SetInt32('Alcinoe.DarkModeBehavior', integer(TDarkModeBehavior.FollowSystem));
-          FIsDarkMode := LUiModeManager.getNightMode = TJUiModeManager.Javaclass.MODE_NIGHT_YES;
-        end;
-        TDarkModeBehavior.AlwaysDark: begin
-          LUiModeManager.setApplicationNightMode(TJUiModeManager.Javaclass.MODE_NIGHT_YES);
-          TALUserPreferences.Instance.SetInt32('Alcinoe.DarkModeBehavior', integer(TDarkModeBehavior.AlwaysDark));
-          FIsDarkMode := True;
-        end;
-        TDarkModeBehavior.AlwaysLight: begin
-          LUiModeManager.setApplicationNightMode(TJUiModeManager.Javaclass.MODE_NIGHT_NO);
-          TALUserPreferences.Instance.SetInt32('Alcinoe.DarkModeBehavior', integer(TDarkModeBehavior.AlwaysLight));
-          FIsDarkMode := False;
-        end;
-        else Raise Exception.Create('Error C03E31E0-61CA-4C67-8A50-6765BED18013')
-      end;
+    if LUIModeService <> nil then LUiModeManager := TJUiModeManager.Wrap(TAndroidHelper.JObjectToID(LUIModeService));
+  end;
+  case AValue of
+    TDarkModeBehavior.FollowSystem: begin
+      If LUiModeManager <> nil then LUiModeManager.setApplicationNightMode(TJUiModeManager.Javaclass.MODE_NIGHT_AUTO);
+      TALUserPreferences.Instance.SetInt32('Alcinoe.DarkModeBehavior', integer(TDarkModeBehavior.FollowSystem));
+      FIsDarkMode := (LUiModeManager <> nil) and (LUiModeManager.getNightMode = TJUiModeManager.Javaclass.MODE_NIGHT_YES);
     end;
+    TDarkModeBehavior.AlwaysDark: begin
+      If LUiModeManager <> nil then LUiModeManager.setApplicationNightMode(TJUiModeManager.Javaclass.MODE_NIGHT_YES);
+      TALUserPreferences.Instance.SetInt32('Alcinoe.DarkModeBehavior', integer(TDarkModeBehavior.AlwaysDark));
+      FIsDarkMode := True;
+    end;
+    TDarkModeBehavior.AlwaysLight: begin
+      If LUiModeManager <> nil then LUiModeManager.setApplicationNightMode(TJUiModeManager.Javaclass.MODE_NIGHT_NO);
+      TALUserPreferences.Instance.SetInt32('Alcinoe.DarkModeBehavior', integer(TDarkModeBehavior.AlwaysLight));
+      FIsDarkMode := False;
+    end;
+    else Raise Exception.Create('Error C03E31E0-61CA-4C67-8A50-6765BED18013')
   end;
   {$ELSEIF defined(IOS)}
   var LWindow := TALUIView.Wrap(NSObjectToID(TiOSHelper.SharedApplication.keyWindow));

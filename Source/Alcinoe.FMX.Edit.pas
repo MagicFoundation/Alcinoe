@@ -14,7 +14,7 @@ uses
   Androidapi.JNIBridge,
   Androidapi.JNI.Widget,
   Androidapi.JNI.JavaTypes,
-  Alcinoe.AndroidApi.Common,
+  Alcinoe.AndroidApi.Widget,
   Alcinoe.FMX.NativeView.Android,
   {$ELSEIF defined(IOS)}
   System.TypInfo,
@@ -164,11 +164,10 @@ type
   {**********************************************}
   TALAndroidEditText = class(TALAndroidNativeView)
   private
-
     type
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALTextWatcher = class(TJavaLocal, JTextWatcher)
+      // ------------
+      // TTextWatcher
+      TTextWatcher = class(TJavaLocal, JTextWatcher)
       private
         FEditText: TALAndroidEditText;
       public
@@ -177,9 +176,9 @@ type
         procedure beforeTextChanged(s: JCharSequence; start: Integer; count: Integer; after: Integer); cdecl;
         procedure onTextChanged(s: JCharSequence; start: Integer; before: Integer; count: Integer); cdecl;
       end;
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALEditorActionListener = class(TJavaLocal, JTextView_OnEditorActionListener)
+      // ---------------------
+      // TEditorActionListener
+      TEditorActionListener = class(TJavaLocal, JTextView_OnEditorActionListener)
       private
         fIsMultiLineEditText: Boolean;
         FEditText: TALAndroidEditText;
@@ -187,33 +186,32 @@ type
         constructor Create(const aEditText: TALAndroidEditText; const aIsMultiLineEditText: Boolean = false);
         function onEditorAction(v: JTextView; actionId: Integer; event: JKeyEvent): Boolean; cdecl;
       end;
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALKeyPreImeListener = class(TJavaLocal, JALKeyPreImeListener)
+      // ------------------
+      // TKeyPreImeListener
+      TKeyPreImeListener = class(TJavaLocal, JALKeyPreImeListener)
       private
         FEditText: TALAndroidEditText;
       public
         constructor Create(const aEditText: TALAndroidEditText);
         function onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean; cdecl;
       end;
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALTouchListener = class(TJavaLocal, JView_OnTouchListener)
+      // --------------
+      // TTouchListener
+      TTouchListener = class(TJavaLocal, JView_OnTouchListener)
       private
         FEditText: TALAndroidEditText;
       public
         constructor Create(const aEditText: TALAndroidEditText);
         function onTouch(v: JView; event: JMotionEvent): Boolean; cdecl;
       end;
-
   private
     fIsMultiline: boolean;
     fDefStyleAttr: String;
     fDefStyleRes: String;
-    FTextWatcher: TALTextWatcher;
-    FEditorActionListener: TALEditorActionListener;
-    FKeyPreImeListener: TALKeyPreImeListener;
-    FTouchListener: TALTouchListener;
+    FTextWatcher: TTextWatcher;
+    FEditorActionListener: TEditorActionListener;
+    FKeyPreImeListener: TKeyPreImeListener;
+    FTouchListener: TTouchListener;
     FEditControl: TALAndroidEditControl;
     function GetView: JALEditText;
   protected
@@ -1572,25 +1570,25 @@ end;
 {$IF defined(android)}
 
 {**********************************************************************************************}
-constructor TALAndroidEditText.TALKeyPreImeListener.Create(const aEditText: TALAndroidEditText);
+constructor TALAndroidEditText.TKeyPreImeListener.Create(const aEditText: TALAndroidEditText);
 begin
   inherited Create;
   FEditText := aEditText;
 end;
 
 {********************************************************************************************************}
-function TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean;
+function TALAndroidEditText.TKeyPreImeListener.onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
   if event <> nil then
     ALLog(
-      'TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme',
+      'TALAndroidEditText.TKeyPreImeListener.onKeyPreIme',
       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
       'keyCode: ' + inttostr(keyCode) + ' | ' +
       'event: ' + JstringToString(event.toString))
   else
     ALLog(
-      'TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme',
+      'TALAndroidEditText.TKeyPreImeListener.onKeyPreIme',
       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
       'keyCode: ' + inttostr(keyCode));
   {$ENDIF}
@@ -1605,7 +1603,7 @@ begin
 end;
 
 {******************************************************************************************}
-constructor TALAndroidEditText.TALTouchListener.Create(const aEditText: TALAndroidEditText);
+constructor TALAndroidEditText.TTouchListener.Create(const aEditText: TALAndroidEditText);
 begin
   inherited Create;
   FEditText := aEditText;
@@ -1615,7 +1613,7 @@ end;
 {$IFNDEF ALCompilerVersionSupported123}
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.TAndroidNativeView.ProcessTouch was not updated and adjust the IFDEF'}
 {$ENDIF}
-function TALAndroidEditText.TALTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
+function TALAndroidEditText.TTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
 begin
   if (FEditText.Form <> nil) and
      (not FeditText.view.hasFocus) and
@@ -1666,35 +1664,35 @@ begin
 end;
 
 {****************************************************************************************}
-constructor TALAndroidEditText.TALTextWatcher.Create(const aEditText: TALAndroidEditText);
+constructor TALAndroidEditText.TTextWatcher.Create(const aEditText: TALAndroidEditText);
 begin
   inherited Create;
   FEditText := aEditText;
 end;
 
 {*************************************************************************}
-procedure TALAndroidEditText.TALTextWatcher.afterTextChanged(s: JEditable);
+procedure TALAndroidEditText.TTextWatcher.afterTextChanged(s: JEditable);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEditText.TALTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name);
+  ALLog('TALAndroidEditText.TTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name);
   {$ENDIF}
   FEditText.fEditControl.DoChange;
 end;
 
 {******************************************************************************************************************************}
-procedure TALAndroidEditText.TALTextWatcher.beforeTextChanged(s: JCharSequence; start: Integer; count: Integer; after: Integer);
+procedure TALAndroidEditText.TTextWatcher.beforeTextChanged(s: JCharSequence; start: Integer; count: Integer; after: Integer);
 begin
   // Nothing to do
 end;
 
 {***************************************************************************************************************************}
-procedure TALAndroidEditText.TALTextWatcher.onTextChanged(s: JCharSequence; start: Integer; before: Integer; count: Integer);
+procedure TALAndroidEditText.TTextWatcher.onTextChanged(s: JCharSequence; start: Integer; before: Integer; count: Integer);
 begin
   // Nothing to do
 end;
 
 {**********************************************************************************************************************************************}
-constructor TALAndroidEditText.TALEditorActionListener.Create(const aEditText: TALAndroidEditText; const aIsMultiLineEditText: Boolean = false);
+constructor TALAndroidEditText.TEditorActionListener.Create(const aEditText: TALAndroidEditText; const aIsMultiLineEditText: Boolean = false);
 begin
   inherited Create;
   fIsMultiLineEditText := aIsMultiLineEditText;
@@ -1702,18 +1700,18 @@ begin
 end;
 
 {*****************************************************************************************************************************}
-function TALAndroidEditText.TALEditorActionListener.onEditorAction(v: JTextView; actionId: Integer; event: JKeyEvent): Boolean;
+function TALAndroidEditText.TEditorActionListener.onEditorAction(v: JTextView; actionId: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
    if event <> nil then
      ALLog(
-       'TALAndroidEditText.TALEditorActionListener.onEditorAction',
+       'TALAndroidEditText.TEditorActionListener.onEditorAction',
        'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
        'actionId: ' + inttostr(actionId) + ' | ' +
        'event: ' + JstringToString(event.toString))
    else
      ALLog(
-       'TALAndroidEditText.TALEditorActionListener.onEditorAction',
+       'TALAndroidEditText.TEditorActionListener.onEditorAction',
        'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
        'actionId: ' + inttostr(actionId));
   {$ENDIF}
@@ -1747,11 +1745,11 @@ begin
   fIsMultiline := aIsMultiline;
   fDefStyleAttr := aDefStyleAttr;
   fDefStyleRes := aDefStyleRes;
-  FTextWatcher := TALTextWatcher.Create(self);
-  FEditorActionListener := TALEditorActionListener.Create(self, aIsMultiline);
-  FKeyPreImeListener := TALKeyPreImeListener.Create(self);
-  FTouchListener := TALTouchListener.Create(self);
-  fEditControl := TALAndroidEditControl(AControl);
+  FTextWatcher := TTextWatcher.Create(self);
+  FEditorActionListener := TEditorActionListener.Create(self, aIsMultiline);
+  FKeyPreImeListener := TKeyPreImeListener.Create(self);
+  FTouchListener := TTouchListener.Create(self);
+  fEditControl := AControl;
   inherited create(AControl);  // This will call InitView
 end;
 
@@ -2553,7 +2551,44 @@ end;
 {************************************************************}
 Function TALIosEditControl.CreateNativeView: TALIosNativeView;
 begin
+
+  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
+  // keyboard service) already instantiates a UITextField internally during app startup,
+  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
+  //
+  // Originally, we had to create a UITextField instance explicitly to force the Objective-C class
+  // (UITextField) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
+  // could raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TUITextField, TypeInfo(UITextField));
+  // also fails with:
+  //   Unhandled Exception | Method function someUITextFieldMethod of class TUITextField not found
+  //   At address: $00000001XXXXXXX
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class UITextField could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate a UITextField explicitly to force
+  // the UIKit framework to be loaded and the class to be registered:
+  //
+  //if not IsUITextFieldClassRegistered then begin
+  //  LoadFramework(libUIKit); // force load of the UIKit framework
+  //  var LUITextField := TUITextField.Wrap(TUITextField.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
+  //  LUITextField.release;
+  //  IsUITextFieldClassRegistered := True;
+  //end;
+
   result := TALIosEditTextField.create(self);
+
 end;
 
 {************************************************************}

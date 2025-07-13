@@ -11,6 +11,7 @@ interface
 uses
   system.Messaging,
   System.TypInfo,
+  System.Types,
   Macapi.ObjectiveC,
   iOSapi.UIKit,
   iOSapi.Foundation,
@@ -33,6 +34,7 @@ type
     procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure FormChangingFocusControlListener(const Sender: TObject; const AMessage: TMessage);
+    function ExtractFirstTouchPoint(touches: NSSet): TPointF;
   protected
     procedure InitView; virtual;
     function GetFormView(const AForm: TCommonCustomForm): UIView;
@@ -44,6 +46,12 @@ type
     procedure AncestorVisibleChanged; virtual; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); virtual; cdecl;
+    function canBecomeFirstResponder: Boolean; virtual; cdecl;
+    function becomeFirstResponder: Boolean; virtual; cdecl;
   protected
     function GetView<T: UIView>: T; overload;
   public
@@ -63,9 +71,12 @@ type
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
+  System.UITypes,
   Macapi.Helpers,
-  FMX.Platform.iOS;
+  FMX.Platform.iOS,
+  Alcinoe.Common;
 
 {**********************************}
 constructor TALIosNativeView.Create;
@@ -245,6 +256,155 @@ procedure TALIosNativeView.SetFocus;
 begin
   if not View.isFirstResponder then
     View.becomeFirstResponder;
+end;
+
+{***************************************************************************}
+function TALIosNativeView.ExtractFirstTouchPoint(touches: NSSet): TPointF;
+begin
+  var LPointer := touches.anyObject;
+  if LPointer=nil then
+    raise Exception.Create('Error 46450539-F150-45FC-BA01-0397F2A98B0C');
+  var LLocalTouch := TUITouch.Wrap(LPointer);
+  if Form=nil then
+    raise Exception.Create('Error 5F61EC6E-0C13-46CD-A0C0-8417AA32B62A');
+  var LTouchPoint := LLocalTouch.locationInView(GetFormView(Form));
+  Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
+end;
+
+{*****************************************************************************}
+procedure TALIosNativeView.touchesBegan(touches: NSSet; withEvent: UIEvent);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.touchesBegan');
+  {$ENDIF}
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
+    Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
+    Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALIosNativeView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.touchesCancelled');
+  {$ENDIF}
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    Form.MouseLeave;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALIosNativeView.touchesEnded(touches: NSSet; withEvent: UIEvent);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.touchesEnded');
+  {$ENDIF}
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    Form.MouseLeave;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALIosNativeView.touchesMoved(touches: NSSet; withEvent: UIEvent);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.touchesMoved');
+  {$ENDIF}
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+
+    var LHandle: TiOSWindowHandle;
+    if Form.IsHandleAllocated then
+      LHandle := WindowHandleToPlatform(Form.Handle)
+    else
+      LHandle := nil;
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := withEvent;
+
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+
+    if LHandle <> nil then
+      LHandle.CurrentTouchEvent := nil;
+
+  end;
+end;
+
+{************************************************************}
+function TALIosNativeView.canBecomeFirstResponder: Boolean;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.canBecomeFirstResponder', 'control.name: ' + Control.parent.Name);
+  {$ENDIF}
+  Result := UIView(Super).canBecomeFirstResponder and TControl(Control.Owner).canFocus;
+end;
+
+{*********************************************************}
+function TALIosNativeView.becomeFirstResponder: Boolean;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.becomeFirstResponder', 'control.name: ' + Control.parent.Name);
+  {$ENDIF}
+  Result := UIView(Super).becomeFirstResponder;
+  if (not TControl(Control.Owner).IsFocused) then
+    TControl(Control.Owner).SetFocus;
 end;
 
 end.

@@ -212,15 +212,16 @@ type
     FEditorActionListener: TEditorActionListener;
     FKeyPreImeListener: TKeyPreImeListener;
     FTouchListener: TTouchListener;
-    FEditControl: TALAndroidEditControl;
     function GetView: JALEditText;
+    function GetControl: TALAndroidEditControl;
   protected
     function CreateView: JView; override;
     procedure InitView; override;
   public
-    constructor Create(const AControl: TALAndroidEditControl; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = ''); reintroduce;
+    constructor Create(const AControl: TControl; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = ''); reintroduce;
     destructor Destroy; override;
     property View: JALEditText read GetView;
+    property Control: TALAndroidEditControl read GetControl;
   end;
 
   {***********************************************}
@@ -305,25 +306,18 @@ type
   {*******************************************}
   TALIosEditTextField = class(TALIosNativeView)
   private
-    FEditControl: TALIosEditControl;
     function GetView: UITextField;
-    function ExtractFirstTouchPoint(touches: NSSet): TPointF;
+    function GetControl: TALIosEditControl;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
     procedure SetEnabled(const value: Boolean); override;
   public
     constructor Create; overload; override;
-    constructor Create(const AControl: TControl); overload; override;
     destructor Destroy; override;
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure ControlEventEditingChanged; cdecl;
-    function canBecomeFirstResponder: Boolean; cdecl;
-    function becomeFirstResponder: Boolean; cdecl;
     property View: UITextField read GetView;
+    property Control: TALIosEditControl read GetControl;
   end;
 
   {****************************************************************}
@@ -405,18 +399,16 @@ type
   {*******************************************}
   TALMacEditTextField = class(TALMacNativeView)
   private
-    FEditControl: TALMacEditControl;
     function GetView: NSTextField;
+    function GetControl: TALMacEditControl;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
     procedure SetEnabled(const value: Boolean); override;
   public
     constructor Create; overload; override;
-    constructor Create(const AControl: TControl); overload; override;
-    function acceptsFirstResponder: Boolean; cdecl;
-    function becomeFirstResponder: Boolean; cdecl;
     property View: NSTextField read GetView;
+    property Control: TALMacEditControl read GetControl;
   end;
 
   {***********************************************************************************************}
@@ -500,7 +492,7 @@ type
   private
     FFontHandle: HFONT;
     FBackgroundBrush: HBRUSH;
-    FEditControl: TALWinEditControl;
+    function GetControl: TALWinEditControl;
     {$IF not defined(ALDPK)}
     procedure UpdateFontHandle;
     procedure UpdateBackgroundBrush;
@@ -522,7 +514,7 @@ type
   public
     constructor Create(const AControl: TControl); override;
     destructor Destroy; override;
-    property EditControl: TALWinEditControl read FEditControl;
+    property Control: TALWinEditControl read GetControl;
   end;
 
   {*******************************************}
@@ -578,6 +570,8 @@ type
 {$endif}
 {$ENDREGION}
 
+type
+
   {*********************************************}
   TALDummyEditControl = class(TALBaseEditControl)
   private
@@ -631,8 +625,6 @@ type
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
-
-type
 
   {*******************************************************************************************************}
   TALBaseEdit = class(TALBaseRectangle, IVirtualKeyboardControl, IControlTypeSupportable, IALNativeControl)
@@ -1583,20 +1575,20 @@ begin
   if event <> nil then
     ALLog(
       'TALAndroidEditText.TKeyPreImeListener.onKeyPreIme',
-      'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+      'control.name: ' + FEditText.Control.parent.Name + ' | ' +
       'keyCode: ' + inttostr(keyCode) + ' | ' +
       'event: ' + JstringToString(event.toString))
   else
     ALLog(
       'TALAndroidEditText.TKeyPreImeListener.onKeyPreIme',
-      'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+      'control.name: ' + FEditText.Control.parent.Name + ' | ' +
       'keyCode: ' + inttostr(keyCode));
   {$ENDIF}
   if ((event = nil) or (event.getAction = AKEY_EVENT_ACTION_UP)) and
      (keyCode = AKEYCODE_BACK) then begin
 
     result := true;
-    FEditText.FEditcontrol.resetfocus;
+    FEditText.control.resetfocus;
 
   end
   else result := false;
@@ -1618,7 +1610,7 @@ begin
   if (FEditText.Form <> nil) and
      (not FeditText.view.hasFocus) and
      ((not FeditText.fIsMultiline) or
-      (FeditText.FEditControl.getLineCount < FeditText.FeditControl.Height / FeditText.FeditControl.getLineHeight)) then begin
+      (FeditText.Control.getLineCount < FeditText.Control.Height / FeditText.Control.getLineHeight)) then begin
 
     var LHandle: TAndroidWindowHandle;
     if FEditText.Form.IsHandleAllocated then
@@ -1674,9 +1666,9 @@ end;
 procedure TALAndroidEditText.TTextWatcher.afterTextChanged(s: JEditable);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEditText.TTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name);
+  ALLog('TALAndroidEditText.TTextWatcher.afterTextChanged', 'control.name: ' + FEditText.Control.parent.Name);
   {$ENDIF}
-  FEditText.fEditControl.DoChange;
+  FEditText.Control.DoChange;
 end;
 
 {******************************************************************************************************************************}
@@ -1706,13 +1698,13 @@ begin
    if event <> nil then
      ALLog(
        'TALAndroidEditText.TEditorActionListener.onEditorAction',
-       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+       'control.name: ' + FEditText.Control.parent.Name + ' | ' +
        'actionId: ' + inttostr(actionId) + ' | ' +
        'event: ' + JstringToString(event.toString))
    else
      ALLog(
        'TALAndroidEditText.TEditorActionListener.onEditorAction',
-       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+       'control.name: ' + FEditText.Control.parent.Name + ' | ' +
        'actionId: ' + inttostr(actionId));
   {$ENDIF}
   //IME_ACTION_DONE: the action key performs a "done" operation, typically meaning there is nothing more to input and the IME will be closed.
@@ -1723,7 +1715,7 @@ begin
   //IME_ACTION_SEARCH: the action key performs a "search" operation, taking the user to the results of searching for the text they have typed (in whatever context is appropriate).
   //IME_ACTION_SEND: the action key performs a "send" operation, delivering the text to its target. This is typically used when composing a message in IM or SMS where sending is immediate.
   //IME_ACTION_UNSPECIFIED: no specific action has been associated with this editor, let the editor come up with its own if it can.
-  if (assigned(FEditText.FEditControl.OnReturnKey)) and
+  if (assigned(FEditText.Control.OnReturnKey)) and
      (((actionId = TJEditorInfo.javaClass.IME_ACTION_UNSPECIFIED) and // IME_ACTION_UNSPECIFIED = the return key
        (not fIsMultiLineEditText)) or
       (actionId = TJEditorInfo.javaClass.IME_ACTION_DONE) or
@@ -1733,14 +1725,14 @@ begin
       (actionId = TJEditorInfo.javaClass.IME_ACTION_SEND)) then begin
 
     result := true;
-    FEditText.FEditControl.DoReturnKey;
+    FEditText.Control.DoReturnKey;
 
   end
   else result := false;
 end;
 
-{***********************************************************************************************************************************************************************************}
-constructor TALAndroidEditText.Create(const AControl: TALAndroidEditControl; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
+{**********************************************************************************************************************************************************************}
+constructor TALAndroidEditText.Create(const AControl: TControl; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
 begin
   fIsMultiline := aIsMultiline;
   fDefStyleAttr := aDefStyleAttr;
@@ -1749,7 +1741,6 @@ begin
   FEditorActionListener := TEditorActionListener.Create(self, aIsMultiline);
   FKeyPreImeListener := TKeyPreImeListener.Create(self);
   FTouchListener := TTouchListener.Create(self);
-  fEditControl := AControl;
   inherited create(AControl);  // This will call InitView
 end;
 
@@ -1830,13 +1821,8 @@ end;
 procedure TALAndroidEditText.InitView;
 begin
   inherited;
-  //-----
   if fIsMultiline then View.setSingleLine(False)
   else View.setSingleLine(True);
-  View.setClickable(True);
-  View.setFocusable(True);
-  View.setFocusableInTouchMode(True);
-  //-----
   View.addTextChangedListener(fTextWatcher);
   View.setOnEditorActionListener(fEditorActionListener);
   View.SetKeyPreImeListener(fKeyPreImeListener);
@@ -1847,6 +1833,12 @@ end;
 function TALAndroidEditText.GetView: JALEditText;
 begin
   Result := inherited GetView<JALEditText>;
+end;
+
+{**************************************************************}
+function TALAndroidEditText.GetControl: TALAndroidEditControl;
+begin
+  Result := TALAndroidEditControl(inherited Control);
 end;
 
 {*************************************************************************************************************************************************************************}
@@ -2272,16 +2264,8 @@ end;
 constructor TALIosEditTextField.Create;
 begin
   inherited;
-  View.setExclusiveTouch(True);
   View.setBorderStyle(UITextBorderStyleNone);
   View.addTarget(GetObjectID, sel_getUid(MarshaledAString(TMarshal.AsAnsi('ControlEventEditingChanged'))), UIControlEventEditingChanged);
-end;
-
-{***************************************************************}
-constructor TALIosEditTextField.Create(const AControl: TControl);
-begin
-  fEditControl := TALIosEditControl(AControl);
-  inherited;
 end;
 
 {*************************************}
@@ -2298,150 +2282,13 @@ begin
   View.SetEnabled(value);
 end;
 
-{***************************************************************************}
-function TALIosEditTextField.ExtractFirstTouchPoint(touches: NSSet): TPointF;
-begin
-  var LPointer := touches.anyObject;
-  if LPointer=nil then
-    raise Exception.Create('Error 46450539-F150-45FC-BA01-0397F2A98B0C');
-  var LLocalTouch := TUITouch.Wrap(LPointer);
-  if Form=nil then
-    raise Exception.Create('Error 5F61EC6E-0C13-46CD-A0C0-8417AA32B62A');
-  var LTouchPoint := LLocalTouch.locationInView(GetFormView(Form));
-  Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
-end;
-
-{*****************************************************************************}
-procedure TALIosEditTextField.touchesBegan(touches: NSSet; withEvent: UIEvent);
-begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
-    Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
-    Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
-end;
-
-{*********************************************************************************}
-procedure TALIosEditTextField.touchesCancelled(touches: NSSet; withEvent: UIEvent);
-begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-    Form.MouseLeave;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
-end;
-
-{*****************************************************************************}
-procedure TALIosEditTextField.touchesEnded(touches: NSSet; withEvent: UIEvent);
-begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-    Form.MouseLeave;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
-end;
-
-{*****************************************************************************}
-procedure TALIosEditTextField.touchesMoved(touches: NSSet; withEvent: UIEvent);
-begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
-end;
-
-{************************************************************}
-function TALIosEditTextField.canBecomeFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextField.canBecomeFirstResponder', 'control.name: ' + fEditControl.parent.Name);
-  {$ENDIF}
-  Result := UITextField(Super).canBecomeFirstResponder and TControl(fEditControl.Owner).canFocus;
-end;
-
-{*********************************************************}
-function TALIosEditTextField.becomeFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name);
-  {$ENDIF}
-  Result := UITextField(Super).becomeFirstResponder;
-  if (not TControl(fEditControl.Owner).IsFocused) then
-    TControl(fEditControl.Owner).SetFocus;
-end;
-
 {*******************************************************}
 procedure TALIosEditTextField.ControlEventEditingChanged;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosEditTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name);
+  ALLog('TALIosEditTextField.ControlEventEditingChanged', 'control.name: ' + Control.parent.Name);
   {$ENDIF}
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {*********************************************************}
@@ -2454,6 +2301,12 @@ end;
 function TALIosEditTextField.GetView: UITextField;
 begin
   Result := inherited GetView<UITextField>;
+end;
+
+{************************************************}
+function TALIosEditTextField.GetControl: TALIosEditControl;
+begin
+  Result := TALIosEditControl(inherited Control);
 end;
 
 {************************************************************************************}
@@ -2581,7 +2434,6 @@ begin
   // the UIKit framework to be loaded and the class to be registered:
   //
   //if not IsUITextFieldClassRegistered then begin
-  //  LoadFramework(libUIKit); // force load of the UIKit framework
   //  var LUITextField := TUITextField.Wrap(TUITextField.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
   //  LUITextField.release;
   //  IsUITextFieldClassRegistered := True;
@@ -2902,38 +2754,11 @@ begin
   View.setFocusRingType(NSFocusRingTypeNone);
 end;
 
-{***************************************************************}
-constructor TALMacEditTextField.Create(const AControl: TControl);
-begin
-  fEditControl := TalMacEditControl(AControl);
-  inherited;
-end;
-
 {*************************************************************}
 procedure TALMacEditTextField.SetEnabled(const value: Boolean);
 begin
   inherited;
   View.SetEnabled(value);
-end;
-
-{**********************************************************}
-function TALMacEditTextField.acceptsFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALMacEditTextField.acceptsFirstResponder', 'control.name: ' + fEditControl.parent.Name);
-  {$ENDIF}
-  Result := NSTextField(Super).acceptsFirstResponder and TControl(fEditControl.Owner).canFocus;
-end;
-
-{*********************************************************}
-function TALMacEditTextField.becomeFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALMacEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name);
-  {$ENDIF}
-  Result := NSTextField(Super).becomeFirstResponder;
-  if (not TControl(fEditControl.Owner).IsFocused) then
-    TControl(fEditControl.Owner).SetFocus;
 end;
 
 {*********************************************************}
@@ -2946,6 +2771,12 @@ end;
 function TALMacEditTextField.GetView: NSTextField;
 begin
   Result := inherited GetView<NSTextField>;
+end;
+
+{************************************************}
+function TALMacEditTextField.GetControl: TALMacEditControl;
+begin
+  Result := TALMacEditControl(inherited Control);
 end;
 
 {************************************************************************************}
@@ -3310,7 +3141,6 @@ begin
   CheckCommonControl(ICC_STANDARD_CLASSES);
   FFontHandle := 0;
   FBackgroundBrush := 0;
-  fEditControl := TALWinEditControl(AControl);
   inherited Create(AControl);
 end;
 
@@ -3332,6 +3162,12 @@ begin
   inherited Destroy;
 end;
 
+{********************************}
+function TALWinEditView.GetControl: TALWinEditControl;
+begin
+  Result := TALWinEditControl(inherited Control);
+end;
+
 {**********************}
 {$IF not defined(ALDPK)}
 procedure TALWinEditView.UpdateFontHandle;
@@ -3343,20 +3179,20 @@ begin
     FFontHandle := 0;
   end;
   FFontHandle := CreateFont(
-                   -Round(FEditControl.TextSettings.Font.Size * ALGetScreenScale), // nHeight
+                   -Round(Control.TextSettings.Font.Size * ALGetScreenScale), // nHeight
                    0, // nWidth
                    0, // nEscapement
                    0, // nOrientaion
-                   FontWeightToWinapi(FEditControl.TextSettings.Font.Weight), // fnWeight
-                   DWORD(not FEditControl.TextSettings.Font.Slant.IsRegular), // fdwItalic
-                   DWORD(TALTextDecorationKind.Underline in FEditControl.TextSettings.Decoration.Kinds), // fdwUnderline
-                   DWORD(TALTextDecorationKind.LineThrough in FEditControl.TextSettings.Decoration.Kinds), // fdwStrikeOut
+                   FontWeightToWinapi(Control.TextSettings.Font.Weight), // fnWeight
+                   DWORD(not Control.TextSettings.Font.Slant.IsRegular), // fdwItalic
+                   DWORD(TALTextDecorationKind.Underline in Control.TextSettings.Decoration.Kinds), // fdwUnderline
+                   DWORD(TALTextDecorationKind.LineThrough in Control.TextSettings.Decoration.Kinds), // fdwStrikeOut
                    0, // fdwCharSet
                    0, // fdwOutputPrecision
                    0, // fdwClipPrecision
                    0, // fdwQuality
                    0, // fdwPitchAndFamily
-                   PChar(ALResolveFontFamily(ALExtractPrimaryFontFamily(FEditControl.TextSettings.Font.Family)))); // lpszFace
+                   PChar(ALResolveFontFamily(ALExtractPrimaryFontFamily(Control.TextSettings.Font.Family)))); // lpszFace
 
   SendMessage(Handle, WM_SETFONT, FFontHandle, 1);
 end;
@@ -3368,8 +3204,8 @@ procedure TALWinEditView.UpdateBackgroundBrush;
 begin
   if (fBackgroundBrush <> 0) and (not DeleteObject(fBackgroundBrush)) then
     RaiseLastOsError;
-  if FEditControl.FillColor <> TAlphaColors.Null then begin
-    fBackgroundBrush := CreateSolidBrush(TAlphaColors.ColorToRGB(FEditControl.FillColor));
+  if Control.FillColor <> TAlphaColors.Null then begin
+    fBackgroundBrush := CreateSolidBrush(TAlphaColors.ColorToRGB(Control.FillColor));
     if fBackgroundBrush = 0 then RaiseLastOsError;
   end
   else
@@ -3389,8 +3225,8 @@ begin
     PeekMessage(LMsg, Handle, 0, 0, PM_REMOVE);
   end;
   inherited;
-  if Message.CharCode = VK_RETURN then fEditControl.DoReturnKey
-  else if Message.CharCode = VK_DELETE then fEditControl.DoChange;
+  if Message.CharCode = VK_RETURN then Control.DoReturnKey
+  else if Message.CharCode = VK_DELETE then Control.DoChange;
 end;
 
 {******************************************************************}
@@ -3419,7 +3255,7 @@ procedure TALWinEditView.WMChar(var Message: TWMChar);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {**********************************************************}
@@ -3427,7 +3263,7 @@ procedure TALWinEditView.WMSetText(var Message: TWMSetText);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {******************************************************}
@@ -3435,7 +3271,7 @@ procedure TALWinEditView.WMPaste(var Message: TWMPaste);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {**************************************************}
@@ -3443,7 +3279,7 @@ procedure TALWinEditView.WMCut(var Message: TWMCut);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {******************************************************}
@@ -3451,7 +3287,7 @@ procedure TALWinEditView.WMClear(var Message: TWMClear);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {****************************************************}
@@ -3459,16 +3295,16 @@ procedure TALWinEditView.WMUndo(var Message: TWMUndo);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChange;
+  Control.DoChange;
 end;
 
 {**************************************************************************}
 procedure TALWinEditView.WMTextColor(var Message: WinApi.Messages.TMessage);
 begin
   inherited;
-  if SetTextColor(Message.wParam, TAlphaColors.ColorToRGB(FeditControl.TextSettings.Font.Color)) = CLR_INVALID then RaiseLastOSError;
+  if SetTextColor(Message.wParam, TAlphaColors.ColorToRGB(Control.TextSettings.Font.Color)) = CLR_INVALID then RaiseLastOSError;
   if fBackgroundBrush <> 0 then begin
-    if SetBkColor(Message.wParam, TAlphaColors.ColorToRGB(FEditControl.FillColor)) = CLR_INVALID then RaiseLastOSError;
+    if SetBkColor(Message.wParam, TAlphaColors.ColorToRGB(Control.FillColor)) = CLR_INVALID then RaiseLastOSError;
     Message.Result := LRESULT(FBackgroundBrush);
   end
   else
@@ -3478,17 +3314,17 @@ end;
 {******************************************************}
 procedure TALWinEditView.WMPaint(var Message: TWMPaint);
 begin
-  if (FEditControl.PromptText <> '') and
+  if (Control.PromptText <> '') and
      (GetWindowTextLength(Handle) = 0) then begin
     var LPS: PAINTSTRUCT;
     var LDC := BeginPaint(Handle, LPS);
     if LDC = 0 then raise Exception.Create('Error 3B053C24-4A18-497C-82B1-C540EF7C2A4B');
     Try
-      var LPromptTextColor := FeditControl.PromptTextColor;
+      var LPromptTextColor := Control.PromptTextColor;
       if LPromptTextColor = TAlphaColors.Null then
-        LPromptTextColor := ALBlendColor(FEditControl.fillColor, FeditControl.TextSettings.Font.Color, 0.3);
+        LPromptTextColor := ALBlendColor(Control.fillColor, Control.TextSettings.Font.Color, 0.3);
       if SetTextColor(LDC, TAlphaColors.ColorToRGB(LPromptTextColor)) = CLR_INVALID then RaiseLastOSError;
-      if SetBkColor(LDC, TAlphaColors.ColorToRGB(FeditControl.fillColor)) = CLR_INVALID then RaiseLastOSError;
+      if SetBkColor(LDC, TAlphaColors.ColorToRGB(Control.fillColor)) = CLR_INVALID then RaiseLastOSError;
       if FBackgroundBrush <> 0 then begin
         if FillRect(LDC, LPS.rcPaint, FBackgroundBrush) = 0 then raiseLastOsError;
       end
@@ -3500,20 +3336,20 @@ begin
       var LMargins := SendMessage(Handle, EM_GETMARGINS, 0, 0);
       //LOWORD(LMargins) = Left Margin
       //HIWORD(LMargins) = Right Margin
-      case FeditControl.TextSettings.HorzAlign of
+      case Control.TextSettings.HorzAlign of
         TALTextHorzAlign.Center: begin
           var LTextSize: TSize;
-          GetTextExtentPoint32(LDC, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText), LTextSize);
-          TextOut(LDC, round((FeditControl.Width - LtextSize.cx) / 2), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
+          GetTextExtentPoint32(LDC, Pchar(Control.PromptText), Length(Control.PromptText), LTextSize);
+          TextOut(LDC, round((Control.Width - LtextSize.cx) / 2), 0, Pchar(Control.PromptText), Length(Control.PromptText));
         end;
         TALTextHorzAlign.Leading,
         TALTextHorzAlign.Justify:  begin
-          TextOut(LDC, round(LOWORD(LMargins) * ALGetScreenScale), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
+          TextOut(LDC, round(LOWORD(LMargins) * ALGetScreenScale), 0, Pchar(Control.PromptText), Length(Control.PromptText));
         end;
         TALTextHorzAlign.Trailing: begin
           var LTextSize: TSize;
-          GetTextExtentPoint32(LDC, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText), LTextSize);
-          TextOut(LDC, round(FeditControl.Width - LtextSize.cx - HIWORD(LMargins)), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
+          GetTextExtentPoint32(LDC, Pchar(Control.PromptText), Length(Control.PromptText), LTextSize);
+          TextOut(LDC, round(Control.Width - LtextSize.cx - HIWORD(LMargins)), 0, Pchar(Control.PromptText), Length(Control.PromptText));
         end;
         else
           raise Exception.Create('Error 21CC0DF5-9030-4F6C-9830-112E17E1A392');

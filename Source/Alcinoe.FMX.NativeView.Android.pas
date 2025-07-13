@@ -174,6 +174,9 @@ end;
 {**************************************}
 procedure TALAndroidNativeView.InitView;
 begin
+  View.setClickable(True);
+  View.setFocusable(True);
+  View.setFocusableInTouchMode(True);
 end;
 
 {*******************************************************************************}

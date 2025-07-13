@@ -40,6 +40,8 @@ type
     procedure AncestorVisibleChanged; virtual; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
+    function acceptsFirstResponder: Boolean; virtual; cdecl;
+    function becomeFirstResponder: Boolean; virtual; cdecl;
   protected
     function GetView<T: NSView>: T; overload;
   public
@@ -60,6 +62,7 @@ implementation
 
 uses
   FMX.Platform.Mac,
+  Alcinoe.Common,
   Alcinoe.FMX.Common;
 
 {**********************************}
@@ -227,14 +230,41 @@ end;
 {**********************************}
 procedure TALMacNativeView.SetFocus;
 begin
-  if View.window.FirstResponder <> View then
-    View.becomeFirstResponder;
+  // See remarks in TALMacNativeView.ResetFocus;
+  //if View.window.FirstResponder <> View then
+  //  View.becomeFirstResponder;
+  if (View <> nil) and (View.window <> nil) and (View.window.FirstResponder <> View) then
+    View.window.makeFirstResponder(View);
 end;
 
 {************************************}
 procedure TALMacNativeView.ResetFocus;
 begin
-  View.resignFirstResponder;
+  // I have sometime this error with View.resignFirstResponder
+  // Project Project1 raised exception class 6.
+  //View.resignFirstResponder;
+  if (View <> nil) and (View.window <> nil) then
+    View.window.makeFirstResponder(nil);
+end;
+
+{**********************************************************}
+function TALMacNativeView.acceptsFirstResponder: Boolean;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.acceptsFirstResponder', 'control.name: ' + Control.parent.Name);
+  {$ENDIF}
+  Result := NSView(Super).acceptsFirstResponder and TControl(Control.Owner).canFocus;
+end;
+
+{*********************************************************}
+function TALMacNativeView.becomeFirstResponder: Boolean;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname + '.becomeFirstResponder', 'control.name: ' + Control.parent.Name);
+  {$ENDIF}
+  Result := NSView(Super).becomeFirstResponder;
+  if (not TControl(Control.Owner).IsFocused) then
+    TControl(Control.Owner).SetFocus;
 end;
 
 end.

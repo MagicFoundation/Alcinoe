@@ -72,23 +72,20 @@ type
   {******************************************}
   TALIosMemoTextView = class(TALIosNativeView)
   private
-    FMemoControl: TALIosMemoControl;
     function GetView: UITextView;
-    function ExtractFirstTouchPoint(touches: NSSet): TPointF;
+    function GetControl: TALIosMemoControl;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
     procedure SetEnabled(const value: Boolean); override;
   public
     constructor Create; overload; override;
-    constructor Create(const AControl: TControl); overload; override;
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
-    function canBecomeFirstResponder: Boolean; cdecl;
-    function becomeFirstResponder: Boolean; cdecl;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); override; cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); override; cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); override; cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); override; cdecl;
     property View: UITextView read GetView;
+    property Control: TALIosMemoControl read GetControl;
   end;
 
   {**************************************************************}
@@ -175,19 +172,17 @@ type
   {********************************************}
   TALMacMemoScrollView = class(TALMacNativeView)
   private
-    FMemoControl: TALMacMemoControl;
     function GetView: NSScrollView;
+    function GetControl: TALMacMemoControl;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
     procedure SetEnabled(const value: Boolean); override;
   public
     constructor Create; overload; override;
-    constructor Create(const AControl: TControl); overload; override;
     destructor Destroy; override;
-    function acceptsFirstResponder: Boolean; cdecl;
-    function becomeFirstResponder: Boolean; cdecl;
     property View: NSScrollView read GetView;
+    property Control: TALMacMemoControl read GetControl;
   end;
 
   {****************************************}
@@ -463,7 +458,6 @@ end;
 constructor TALIosMemoTextView.Create;
 begin
   inherited;
-  View.setExclusiveTouch(True);
   var LUIColor := AlphaColorToUIColor(TalphaColorRec.Null);
   View.setbackgroundColor(LUIColor);
   //NOTE: If I try to release the LUIColor I have an exception so it's seam something acquire it
@@ -476,13 +470,6 @@ begin
   TALUITextView.Wrap(NSObjectToID(View)).textContainer.setLineFragmentPadding(0);
 end;
 
-{**************************************************************}
-constructor TALIosMemoTextView.Create(const AControl: TControl);
-begin
-  fMemoControl := TALIosMemoControl(AControl);
-  inherited;
-end;
-
 {************************************************************}
 procedure TALIosMemoTextView.SetEnabled(const value: Boolean);
 begin
@@ -491,145 +478,32 @@ begin
   TALUITextView.Wrap(NSObjectToID(View)).setSelectable(value);
 end;
 
-{**************************************************************************}
-function TALIosMemoTextView.ExtractFirstTouchPoint(touches: NSSet): TPointF;
-begin
-  var LPointer := touches.anyObject;
-  if LPointer=nil then
-    raise Exception.Create('Error EB35596D-FDFB-43A6-AF16-02C3927F68C5');
-  var LLocalTouch := TUITouch.Wrap(LPointer);
-  if Form=nil then
-    raise Exception.Create('Error C7EE1922-BDBD-4710-A691-4F5DD6777C33');
-  var LTouchPoint := LLocalTouch.locationInView(GetFormView(Form));
-  Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
-end;
-
 {****************************************************************************}
 procedure TALIosMemoTextView.touchesBegan(touches: NSSet; withEvent: UIEvent);
 begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
-    Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
-    Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
+  if (Control.getLineCount < Control.Height / Control.getLineHeight) then
+    inherited;
 end;
 
 {********************************************************************************}
 procedure TALIosMemoTextView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
 begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-    Form.MouseLeave;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
+  if (Control.getLineCount < Control.Height / Control.getLineHeight) then
+    inherited;
 end;
 
 {****************************************************************************}
 procedure TALIosMemoTextView.touchesEnded(touches: NSSet; withEvent: UIEvent);
 begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-    Form.MouseLeave;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
+  if (Control.getLineCount < Control.Height / Control.getLineHeight) then
+    inherited;
 end;
 
 {****************************************************************************}
 procedure TALIosMemoTextView.touchesMoved(touches: NSSet; withEvent: UIEvent);
 begin
-  if (Form <> nil) and
-     (not view.isFirstResponder) and
-     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
-     (touches.count > 0) then begin
-
-    var LHandle: TiOSWindowHandle;
-    if Form.IsHandleAllocated then
-      LHandle := WindowHandleToPlatform(Form.Handle)
-    else
-      LHandle := nil;
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := withEvent;
-
-    var LTouchPoint := ExtractFirstTouchPoint(touches);
-    Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
-
-    if LHandle <> nil then
-      LHandle.CurrentTouchEvent := nil;
-
-  end;
-end;
-
-{***********************************************************}
-function TALIosMemoTextView.canBecomeFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALIosMemoTextView.canBecomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
-  {$ENDIF}
-  Result := UITextView(Super).canBecomeFirstResponder and TControl(fMemoControl.Owner).canFocus;
-end;
-
-{********************************************************}
-function TALIosMemoTextView.becomeFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALIosMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
-  {$ENDIF}
-  Result := UITextView(Super).becomeFirstResponder;
-  if (not TControl(FMemoControl.Owner).IsFocused) then
-    TControl(FMemoControl.Owner).SetFocus;
+  if (Control.getLineCount < Control.Height / Control.getLineHeight) then
+    inherited;
 end;
 
 {********************************************************}
@@ -642,6 +516,12 @@ end;
 function TALIosMemoTextView.GetView: UITextView;
 begin
   Result := inherited GetView<UITextView>;
+end;
+
+{************************************************}
+function TALIosMemoTextView.GetControl: TALIosMemoControl;
+begin
+  Result := TALIosMemoControl(inherited Control);
 end;
 
 {***********************************************************************************}
@@ -748,7 +628,43 @@ end;
 {************************************************************}
 Function TALIosMemoControl.CreateNativeView: TALIosNativeView;
 begin
+
+  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
+  // keyboard service) already instantiates a UITextView internally during app startup,
+  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
+  //
+  // Originally, we had to create a UITextView instance explicitly to force the Objective-C class
+  // (UITextView) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
+  // could raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TUITextView, TypeInfo(UITextView));
+  // also fails with:
+  //   Unhandled Exception | Method function someUITextViewMethod of class TUITextView not found
+  //   At address: $00000001XXXXXXX
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class UITextView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate a UITextView explicitly to force
+  // the UIKit framework to be loaded and the class to be registered:
+  //
+  //if not IsUITextViewClassRegistered then begin
+  //  var LUITextView := TUITextView.Wrap(TUITextView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
+  //  LUITextView.release;
+  //  IsUITextViewClassRegistered := True;
+  //end;
+
   result := TALIosMemoTextView.create(self);
+
 end;
 
 {***********************************************************}
@@ -1086,13 +1002,6 @@ begin
   View.setFocusRingType(NSFocusRingTypeNone);
 end;
 
-{****************************************************************}
-constructor TALMacMemoScrollView.Create(const AControl: TControl);
-begin
-  fMemoControl := TALMacMemoControl(AControl);
-  inherited;
-end;
-
 {**************************************}
 destructor TALMacMemoScrollView.Destroy;
 begin
@@ -1103,28 +1012,8 @@ end;
 procedure TALMacMemoScrollView.SetEnabled(const value: Boolean);
 begin
   inherited;
-  FMemocontrol.FTextView.View.setEditable(value);
-  FMemocontrol.FTextView.View.setSelectable(value);
-end;
-
-{***********************************************************}
-function TALMacMemoScrollView.acceptsFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALMacMemoScrollView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
-  {$ENDIF}
-  Result := NSScrollView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
-end;
-
-{**********************************************************}
-function TALMacMemoScrollView.becomeFirstResponder: Boolean;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALMacMemoScrollView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name);
-  {$ENDIF}
-  Result := NSScrollView(Super).becomeFirstResponder;
-  if (not TControl(FMemoControl.Owner).IsFocused) then
-    TControl(FMemoControl.Owner).SetFocus;
+  Control.FTextView.View.setEditable(value);
+  Control.FTextView.View.setSelectable(value);
 end;
 
 {**********************************************************}
@@ -1137,6 +1026,12 @@ end;
 function TALMacMemoScrollView.GetView: NSScrollView;
 begin
   Result := inherited GetView<NSScrollView>;
+end;
+
+{**************************************************}
+function TALMacMemoScrollView.GetControl: TALMacMemoControl;
+begin
+  Result := TALMacMemoControl(inherited Control);
 end;
 
 {***************************************************************************}
@@ -1604,8 +1499,8 @@ end;
 {****************************************************************}
 procedure TALWinMemoView.WMMouseWheel(var Message: TWMMouseWheel);
 begin
-  if (not TControl(EditControl.Owner).IsFocused) or
-     (EditControl.getLineCount < EditControl.Height / EditControl.getLineHeight)  then inherited
+  if (not TControl(Control.Owner).IsFocused) or
+     (Control.getLineCount < Control.Height / Control.getLineHeight)  then inherited
   else begin
     if (Message.WheelDelta > 0) then
       SendMessage(Handle, EM_LINESCROLL, 0, -1)

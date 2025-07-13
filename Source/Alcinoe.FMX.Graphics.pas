@@ -644,8 +644,8 @@ uses
   Androidapi.Bitmap,
   Androidapi.Gles2,
   FMX.Context.GLES,
-  Alcinoe.AndroidApi.Common,
-  Alcinoe.Androidapi.JNI.GraphicsContentViewText,
+  Alcinoe.AndroidApi.RenderScript,
+  Alcinoe.Androidapi.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(IOS)}
   Fmx.Utils,

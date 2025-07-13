@@ -429,7 +429,7 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.Os,
   FMX.platform.Android,
-  Alcinoe.AndroidApi.Firebase,
+  Alcinoe.AndroidApi.Firebase.Messaging,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.Helpers,

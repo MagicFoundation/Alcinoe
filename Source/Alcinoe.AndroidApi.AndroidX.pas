@@ -4,17 +4,6 @@ interface
 
 {$I Alcinoe.inc}
 
-//  Java Type    Delphi Type
-//  boolean      Boolean
-//  byte         ShortInt
-//  char         WideChar
-//  double       Double
-//  float        Single
-//  int          Integer
-//  long         Int64
-//  short        SmallInt
-//  void         N/A
-
 uses
   Androidapi.JNI.Widget,
   Androidapi.JNI.GraphicsContentViewText,

@@ -7,7 +7,7 @@ interface
 uses
   {$IF defined(android)}
   Androidapi.JNIBridge,
-  Alcinoe.AndroidApi.Common,
+  Alcinoe.AndroidApi.Widget,
   {$ENDIF}
   {$IF defined(ios)}
   System.TypInfo,

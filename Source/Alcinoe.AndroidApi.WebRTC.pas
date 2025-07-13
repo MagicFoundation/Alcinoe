@@ -35,8 +35,6 @@ type
     {class} property TLS_CERT_POLICY_INSECURE_NO_CHECK: JPeerConnection_TlsCertPolicy read _GetTLS_CERT_POLICY_INSECURE_NO_CHECK;
     {class} property TLS_CERT_POLICY_SECURE: JPeerConnection_TlsCertPolicy read _GetTLS_CERT_POLICY_SECURE;
   end;
-
-  {********************************************************}
   [JavaSignature('org/webrtc/PeerConnection$TlsCertPolicy')]
   JPeerConnection_TlsCertPolicy = interface(JEnum)
     ['{96BA5191-41C9-4968-98CA-38F71EF07FC0}']
@@ -53,8 +51,6 @@ type
     {class} function init(uri: JString; username: JString; password: JString; tlsCertPolicy: JPeerConnection_TlsCertPolicy): JPeerConnection_IceServer; cdecl; overload; deprecated;
     {class} function init(uri: JString; username: JString; password: JString; tlsCertPolicy: JPeerConnection_TlsCertPolicy; hostname: JString): JPeerConnection_IceServer; cdecl; overload; deprecated;
   end;
-
-  {****************************************************}
   [JavaSignature('org/webrtc/PeerConnection$IceServer')]
   JPeerConnection_IceServer = interface(JObject)
     ['{D31A3643-8680-4230-B255-D8E1E1220D2D}']
@@ -82,8 +78,6 @@ type
   JPeerConnection_IceServer_BuilderClass = interface(JObjectClass)
     ['{70F73023-A27C-4503-8EF6-794EB98332B4}']
   end;
-
-  {************************************************************}
   [JavaSignature('org/webrtc/PeerConnection$IceServer$Builder')]
   JPeerConnection_IceServer_Builder = interface(JObject)
     ['{F7153AF4-045D-42E7-BCB2-CA8B29A01160}']
@@ -117,8 +111,6 @@ type
     {class} property FAILED: JPeerConnection_IceConnectionState read _GetFAILED;
     {class} property NEW: JPeerConnection_IceConnectionState read _GetNEW;
   end;
-
-  {*************************************************************}
   [JavaSignature('org/webrtc/PeerConnection$IceConnectionState')]
   JPeerConnection_IceConnectionState = interface(JEnum)
     ['{8C929E60-7AE3-4881-867B-9D6041DF2467}']
@@ -130,8 +122,6 @@ type
     ['{A403A5B2-A9E4-4FC8-A0C9-F9EB2193F02B}']
     {class} function init(sdpMid: JString; sdpMLineIndex: Integer; sdp: JString): JIceCandidate; cdecl; overload;
   end;
-
-  {****************************************}
   [JavaSignature('org/webrtc/IceCandidate')]
   JIceCandidate = interface(JObject)
     ['{F35CB50D-E2AB-4C86-9877-B3B311C944C6}']
@@ -160,8 +150,6 @@ type
     {class} property OFFER: JSessionDescription_Type read _GetOFFER;
     {class} property PRANSWER: JSessionDescription_Type read _GetPRANSWER;
   end;
-
-  {***************************************************}
   [JavaSignature('org/webrtc/SessionDescription$Type')]
   JSessionDescription_Type = interface(JEnum)
     ['{D19319E6-779F-4468-AF80-48D0586F584E}']
@@ -175,8 +163,6 @@ type
     ['{0C213174-3BB0-44AE-AD47-325249363921}']
     {class} function init(&type: JSessionDescription_Type; description: JString): JSessionDescription; cdecl;
   end;
-
-  {**********************************************}
   [JavaSignature('org/webrtc/SessionDescription')]
   JSessionDescription = interface(JObject)
     ['{0AD8B7AA-9D94-42FC-98EA-5754BBB3CB32}']
@@ -191,8 +177,6 @@ type
   JALWebRTC_ListenerClass = interface(IJavaClass)
     ['{90F484CB-D786-42A5-BF8F-E2F1A4339D19}']
   end;
-
-  {********************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC$Listener')]
   JALWebRTC_Listener = interface(IJavaInstance)
     ['{C758A92B-AE93-4291-BFD5-1EBB83041CC9}']
@@ -211,8 +195,6 @@ type
     ['{0775B3FE-432A-41F5-BAC0-C9C2609AB4E1}']
     {class} function init: JALWebRTC_PeerConnectionParameters; cdecl;
   end;
-
-  {************************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC$PeerConnectionParameters')]
   JALWebRTC_PeerConnectionParameters = interface(JObject)
     ['{AF3349B3-C8B9-4CA4-8D64-7E8711E7A2F4}']
@@ -286,8 +268,6 @@ type
     {class} procedure finalizeLibrary; cdecl;
     {class} function init(appContext: JContext; eglContext: Jopengl_EGLContext; iceServers: JList; peerConnectionParameters: JALWebRTC_PeerConnectionParameters): JALWebRTC; cdecl;
   end;
-
-  {***********************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC')]
   JALWebRTC = interface(JObject)
     ['{45B6132D-E7E4-4D39-A150-E489495FC19D}']

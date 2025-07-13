@@ -74,6 +74,7 @@ contains
   Alcinoe.FMX.Types3D in 'Alcinoe.FMX.Types3D.pas',
   Alcinoe.FMX.UserPreferences in 'Alcinoe.FMX.UserPreferences.pas',
   Alcinoe.FMX.VideoPlayer in 'Alcinoe.FMX.VideoPlayer.pas',
+  Alcinoe.FMX.WebBrowser in 'Alcinoe.FMX.WebBrowser.pas',
   Alcinoe.Files in 'Alcinoe.Files.pas',
   Alcinoe.GuardianThread in 'Alcinoe.GuardianThread.pas',
   Alcinoe.HTML in 'Alcinoe.HTML.pas',

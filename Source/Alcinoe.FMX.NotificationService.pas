@@ -232,7 +232,7 @@ uses
   Androidapi.JNI.Embarcadero,
   Androidapi.JNI.Support,
   FMX.Platform.Android,
-  Alcinoe.Androidapi.JNI.App,
+  Alcinoe.Androidapi.App,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.Helpers,

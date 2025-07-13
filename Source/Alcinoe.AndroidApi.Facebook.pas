@@ -24,8 +24,7 @@ uses
   Androidapi.JNI.JavaTypes,
   Androidapi.JNI.Os,
   Androidapi.JNI.Net,
-  Androidapi.JNI.App,
-  Alcinoe.AndroidApi.Common;
+  Androidapi.JNI.App;
 
 type
 

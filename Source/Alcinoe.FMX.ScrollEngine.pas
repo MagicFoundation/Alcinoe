@@ -693,7 +693,7 @@ uses
   Androidapi.Input,
   FMX.Platform.Android,
   FMX.Platform.UI.Android,
-  Alcinoe.Androidapi.JNI.GraphicsContentViewText,
+  Alcinoe.Androidapi.GraphicsContentViewText,
   {$ENDIF}
   {$IFDEF IOS}
   iOSapi.UIKit,

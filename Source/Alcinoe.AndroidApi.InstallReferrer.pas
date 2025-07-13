@@ -19,8 +19,6 @@ type
   JALInstallReferrerListenerClass = interface(IJavaClass)
     ['{1BDEF5E8-0076-4FDE-965A-602B3D130724}']
   end;
-
-  {*************************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/installreferrer/ALInstallReferrerListener')]
   JALInstallReferrerListener = interface(IJavaInstance)
     ['{AA8674DA-EE8D-4324-97FB-4810EBDDD30B}']
@@ -34,8 +32,6 @@ type
     ['{0EB19261-0388-4FED-A8D9-9F581E214FE6}']
     {class} function init(context: JContext): JALInstallReferrer; cdecl;
   end;
-
-  {*****************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/installreferrer/ALInstallReferrer')]
   JALInstallReferrer = interface(JObject)
     ['{8E2550A4-C4B9-425F-A09A-5F397F1542AA}']
@@ -52,8 +48,8 @@ uses
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrerListener', TypeInfo(Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrerListener));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrer', TypeInfo(Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrerListener', TypeInfo(Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrerListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrer', TypeInfo(Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrer));
 end;
 
 initialization

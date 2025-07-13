@@ -32,7 +32,7 @@ uses
   {$IF defined(ANDROID)}
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.JavaTypes,
-  Alcinoe.AndroidApi.Common,
+  Alcinoe.AndroidApi.RenderScript,
   Alcinoe.FMX.NativeView.Android,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
@@ -1431,7 +1431,7 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.App,
   FMX.forms,
-  Alcinoe.Androidapi.JNI.GraphicsContentViewText,
+  Alcinoe.Androidapi.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(ALMacOS)}
   Macapi.ObjectiveC,
@@ -6292,7 +6292,7 @@ procedure ALPlayClickSound;
 begin
   {$IF defined(ANDROID)}
   var LView := TJView.Wrap(TAndroidHelper.Activity.getWindow.getDecorView.getRootView);
-  LView.playSoundEffect(TJALSoundEffectConstants.JavaClass.CLICK);
+  LView.playSoundEffect(TJSoundEffectConstants.JavaClass.CLICK);
   {$ELSEIF defined(IOS)}
   // https://towardsdev.com/swiftui-sound-effect-2-ways-8ead163abe1b
   AudioServicesPlaySystemSound(1104); // key_press_click.caf

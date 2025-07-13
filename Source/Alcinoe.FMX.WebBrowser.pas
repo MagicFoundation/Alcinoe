@@ -393,28 +393,6 @@ type
 
 type
 
-  {*********************************************}
-  TALDummyWebBrowserControl = class(TALBaseWebBrowserControl)
-  protected
-    {$IF defined(android)}
-    Function CreateNativeView: TALAndroidNativeView; override;
-    {$ELSEIF defined(IOS)}
-    Function CreateNativeView: TALIosNativeView; override;
-    {$ELSEIF defined(ALMacOS)}
-    Function CreateNativeView: TALMacNativeView; override;
-    {$ELSEIF defined(MSWindows)}
-    Function CreateNativeView: TALWinNativeView; override;
-    {$ENDIF}
-  public
-    procedure LoadUrl(const AURL: string); override;
-    procedure LoadData(
-                const ABaseUrl: String;
-                const AData: string;
-                const AMimeType: String = '';
-                const AEncoding: String = '';
-                const AHistoryUrl: String = ''); override;
-  end;
-
   {*******************************************}
   [ComponentPlatforms($FFFF)]
   TALWebBrowser = class(TALControl, IControlTypeSupportable, IALNativeControl)
@@ -1617,57 +1595,6 @@ end;
 
 {$endif}
 {$ENDREGION}
-
-{********************}
-{$IF defined(android)}
-Function TALDummyWebBrowserControl.CreateNativeView: TALAndroidNativeView;
-begin
-  FNativeView := nil;
-  Result := nil;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-Function TALDummyWebBrowserControl.CreateNativeView: TALIosNativeView;
-begin
-  FNativeView := nil;
-  Result := nil;
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-Function TALDummyWebBrowserControl.CreateNativeView: TALMacNativeView;
-begin
-  FNativeView := nil;
-  Result := nil;
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-Function TALDummyWebBrowserControl.CreateNativeView: TALWinNativeView;
-begin
-  FNativeView := nil;
-  Result := nil;
-end;
-{$ENDIF}
-
-{**********************}
-procedure TALDummyWebBrowserControl.LoadUrl(const AURL: string);
-begin
-end;
-
-{**********************}
-procedure TALDummyWebBrowserControl.LoadData(
-            const ABaseUrl: String;
-            const AData: string;
-            const AMimeType: String = '';
-            const AEncoding: String = '';
-            const AHistoryUrl: String = '');
-begin
-end;
 
 {*************************************************}
 constructor TALWebBrowser.Create(AOwner: TComponent);

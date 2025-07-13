@@ -119,7 +119,6 @@ type
     function GetNativeView: TALIosMemoTextView;
   protected
     procedure DoChange; override;
-    Function CreateNativeView: TALIosNativeView; override;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -258,7 +257,6 @@ type
     function GetNativeView: TALMacMemoScrollView;
   protected
     procedure DoChange; override;
-    Function CreateNativeView: TALMacNativeView; override;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -311,8 +309,6 @@ type
   TALWinMemoControl = class(TALWinEditControl)
   private
     function GetNativeView: TALWinMemoView;
-  protected
-    Function CreateNativeView: TALWinNativeView; override;
   public
     function getLineCount: integer; override;
     property NativeView: TALWinMemoView read GetNativeView;
@@ -385,6 +381,13 @@ type
     function GetTextSettings: TTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
   protected
+    {$IF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; override;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; override;
+    {$ELSEIF defined(MSWindows)}
+    Function CreateNativeView: TALWinNativeView; override;
+    {$ENDIF}
     function GetDefaultSize: TSizeF; override;
     function GetAutoSize: TALAutoSizeMode; override;
     procedure SetAutosizeLineCount(const Value: Integer); virtual;
@@ -624,48 +627,6 @@ begin
   FPlaceholderLabel.removeFromSuperview;
   FPlaceholderLabel.release;
   inherited Destroy;
-end;
-
-{************************************************************}
-Function TALIosMemoControl.CreateNativeView: TALIosNativeView;
-begin
-
-  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
-  // keyboard service) already instantiates a UITextView internally during app startup,
-  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
-  //
-  // Originally, we had to create a UITextView instance explicitly to force the Objective-C class
-  // (UITextView) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
-  // could raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TUITextView, TypeInfo(UITextView));
-  // also fails with:
-  //   Unhandled Exception | Method function someUITextViewMethod of class TUITextView not found
-  //   At address: $00000001XXXXXXX
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class UITextView could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate a UITextView explicitly to force
-  // the UIKit framework to be loaded and the class to be registered:
-  //
-  //if not IsUITextViewClassRegistered then begin
-  //  var LUITextView := TUITextView.Wrap(TUITextView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
-  //  LUITextView.release;
-  //  IsUITextViewClassRegistered := True;
-  //end;
-
-  result := TALIosMemoTextView.create(self);
-
 end;
 
 {***********************************************************}
@@ -1213,12 +1174,6 @@ begin
   inherited Destroy;
 end;
 
-{************************************************************}
-Function TALMacMemoControl.CreateNativeView: TALMacNativeView;
-begin
-  result := TALMacMemoScrollView.create(self);
-end;
-
 {*************************************************************}
 function TALMacMemoControl.GetNativeView: TALMacMemoScrollView;
 begin
@@ -1510,16 +1465,6 @@ begin
   end;
 end;
 
-{************************************************************}
-Function TALWinMemoControl.CreateNativeView: TALWinNativeView;
-begin
-  {$IF defined(ALDPK)}
-  Result := nil;
-  {$ELSE}
-  Result := TALWinMemoView.create(self);
-  {$ENDIF}
-end;
-
 {*******************************************************}
 function TALWinMemoControl.GetNativeView: TALWinMemoView;
 begin
@@ -1621,6 +1566,70 @@ begin
     EndUpdate;
   End;
 end;
+
+{****************}
+{$IF defined(IOS)}
+Function TALMemo.CreateNativeView: TALIosNativeView;
+begin
+
+  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
+  // keyboard service) already instantiates a UITextView internally during app startup,
+  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
+  //
+  // Originally, we had to create a UITextView instance explicitly to force the Objective-C class
+  // (UITextView) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
+  // could raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TUITextView, TypeInfo(UITextView));
+  // also fails with:
+  //   Unhandled Exception | Method function someUITextViewMethod of class TUITextView not found
+  //   At address: $00000001XXXXXXX
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class UITextView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate a UITextView explicitly to force
+  // the UIKit framework to be loaded and the class to be registered:
+  //
+  //if not IsUITextViewClassRegistered then begin
+  //  var LUITextView := TUITextView.Wrap(TUITextView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
+  //  LUITextView.release;
+  //  IsUITextViewClassRegistered := True;
+  //end;
+
+  result := TALIosMemoTextView.create(self);
+
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+Function TALMemo.CreateNativeView: TALMacNativeView;
+begin
+  result := TALMacMemoScrollView.create(self);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+Function TALMemo.CreateNativeView: TALWinNativeView;
+begin
+  {$IF defined(ALDPK)}
+  Result := nil;
+  {$ELSE}
+  Result := TALWinMemoView.create(self);
+  {$ENDIF}
+end;
+{$ENDIF}
 
 {***********************************************************}
 function TALMemo.CreateStateStyles: TALBaseEdit.TStateStyles;

@@ -211,7 +211,6 @@ type
                 const aCheckSpelling: Boolean;
                 const aIsMultiline: Boolean); virtual;
     procedure DoSetReturnKeyType(const aReturnKeyType: TReturnKeyType); virtual;
-    Function CreateNativeView: TALAndroidNativeView; override;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -309,7 +308,6 @@ type
     function GetNativeView: TALIosEditTextField;
   protected
     procedure applyPromptTextWithColor(const aStr: String; const aColor: TAlphaColor); virtual;
-    Function CreateNativeView: TALIosNativeView; override;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -407,7 +405,6 @@ type
     function GetNativeView: TALMacEditTextField;
   protected
     procedure applyPromptTextWithColor(const aStr: String; const aColor: TAlphaColor); virtual;
-    Function CreateNativeView: TALMacNativeView; override;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -498,7 +495,6 @@ type
     {$ENDIF}
     function GetNativeView: TALWinEditView;
   protected
-    Function CreateNativeView: TALWinNativeView; override;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -995,6 +991,15 @@ type
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
   protected
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; override;
+    {$ELSEIF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; override;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; override;
+    {$ELSEIF defined(MSWindows)}
+    Function CreateNativeView: TALWinNativeView; override;
+    {$ENDIF}
     function CreateStroke: TALStrokeBrush; override;
     function CreateTextSettings: TTextSettings; virtual;
     function CreateLabelTextSettings: TLabelTextSettings; virtual;
@@ -1621,6 +1626,9 @@ end;
 procedure TALAndroidEditText.InitView;
 begin
   inherited;
+  view.setBackgroundColor(TJColor.JavaClass.TRANSPARENT);
+  view.setBackground(nil);
+  view.setPadding(0, 0, 0, 0);
   if fIsMultiline then View.setSingleLine(False)
   else View.setSingleLine(True);
   View.addTextChangedListener(fTextWatcher);
@@ -1666,15 +1674,6 @@ destructor TALAndroidEditControl.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
   inherited Destroy;
-end;
-
-{********************************************************************}
-Function TALAndroidEditControl.CreateNativeView: TALAndroidNativeView;
-begin
-  result := TALAndroidEditText.create(self, FIsMultiline, FDefStyleAttr, FDefStyleRes);
-  result.view.setBackgroundColor(TJColor.JavaClass.TRANSPARENT);
-  result.view.setBackground(nil);
-  result.view.setPadding(0, 0, 0, 0);
 end;
 
 {***************************************************************}
@@ -2202,48 +2201,6 @@ begin
 end;
 
 {************************************************************}
-Function TALIosEditControl.CreateNativeView: TALIosNativeView;
-begin
-
-  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
-  // keyboard service) already instantiates a UITextField internally during app startup,
-  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
-  //
-  // Originally, we had to create a UITextField instance explicitly to force the Objective-C class
-  // (UITextField) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
-  // could raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TUITextField, TypeInfo(UITextField));
-  // also fails with:
-  //   Unhandled Exception | Method function someUITextFieldMethod of class TUITextField not found
-  //   At address: $00000001XXXXXXX
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class UITextField could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate a UITextField explicitly to force
-  // the UIKit framework to be loaded and the class to be registered:
-  //
-  //if not IsUITextFieldClassRegistered then begin
-  //  var LUITextField := TUITextField.Wrap(TUITextField.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
-  //  LUITextField.release;
-  //  IsUITextFieldClassRegistered := True;
-  //end;
-
-  result := TALIosEditTextField.create(self);
-
-end;
-
-{************************************************************}
 function TALIosEditControl.GetNativeView: TALIosEditTextField;
 begin
   result := TALIosEditTextField(inherited NativeView);
@@ -2658,12 +2615,6 @@ begin
   NativeView.View.setDelegate(nil);
   ALFreeAndNil(FTextFieldDelegate);
   inherited Destroy;
-end;
-
-{************************************************************}
-Function TALMacEditControl.CreateNativeView: TALMacNativeView;
-begin
-  result := TALMacEditTextField.create(self);
 end;
 
 {************************************************************}
@@ -3183,16 +3134,6 @@ begin
   SetPassword(false);
 end;
 
-{************************************************************}
-Function TALWinEditControl.CreateNativeView: TALWinNativeView;
-begin
-  {$IF defined(ALDPK)}
-  Result := nil;
-  {$ELSE}
-  result := TALWinEditView.create(self);
-  {$ENDIF}
-end;
-
 {*******************************************************}
 function TALWinEditControl.GetNativeView: TALWinEditView;
 begin
@@ -3463,7 +3404,6 @@ end;
 {$IF defined(android)}
 Function TALDummyEditControl.CreateNativeView: TALAndroidNativeView;
 begin
-  FNativeView := nil;
   Result := nil;
 end;
 {$ENDIF}
@@ -3472,7 +3412,6 @@ end;
 {$IF defined(IOS)}
 Function TALDummyEditControl.CreateNativeView: TALIosNativeView;
 begin
-  FNativeView := nil;
   Result := nil;
 end;
 {$ENDIF}
@@ -3481,7 +3420,6 @@ end;
 {$IF defined(ALMacOS)}
 Function TALDummyEditControl.CreateNativeView: TALMacNativeView;
 begin
-  FNativeView := nil;
   Result := nil;
 end;
 {$ENDIF}
@@ -5025,9 +4963,61 @@ end;
 
 {********************}
 {$IF defined(android)}
+Function TALBaseEdit.CreateNativeView: TALAndroidNativeView;
+begin
+  result := TALAndroidEditText.create(self, FIsMultiline, FDefStyleAttr, FDefStyleRes);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(android)}
 function TALBaseEdit.GetNativeView: TALAndroidEditView;
 begin
   result := TALAndroidEditView(inherited NativeView);
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+Function TALBaseEdit.CreateNativeView: TALIosNativeView;
+begin
+
+  // [NOTE] This workaround is no longer necessary, as the delphi framework (e.g., the virtual
+  // keyboard service) already instantiates a UITextField internally during app startup,
+  // which ensures that the Objective-C class is properly loaded and registered by the Delphi runtime.
+  //
+  // Originally, we had to create a UITextField instance explicitly to force the Objective-C class
+  // (UITextField) to be registered. Without this, calling `TALIosWebView(inherited GetNativeView)`
+  // could raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TUITextField, TypeInfo(UITextField));
+  // also fails with:
+  //   Unhandled Exception | Method function someUITextFieldMethod of class TUITextField not found
+  //   At address: $00000001XXXXXXX
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class UITextField could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate a UITextField explicitly to force
+  // the UIKit framework to be loaded and the class to be registered:
+  //
+  //if not IsUITextFieldClassRegistered then begin
+  //  var LUITextField := TUITextField.Wrap(TUITextField.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0)));
+  //  LUITextField.release;
+  //  IsUITextFieldClassRegistered := True;
+  //end;
+
+  result := TALIosEditTextField.create(self);
+
 end;
 {$ENDIF}
 
@@ -5065,6 +5055,14 @@ end;
 
 {********************}
 {$IF defined(ALMacOS)}
+Function TALBaseEdit.CreateNativeView: TALMacNativeView;
+begin
+  result := TALMacEditTextField.create(self);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
 function TALBaseEdit.GetNativeView: TALMacEditView;
 begin
   result := TALMacEditView(inherited NativeView);
@@ -5080,6 +5078,18 @@ begin
     InitEditControl;
   end;
   Result := FEditControl;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+Function TALBaseEdit.CreateNativeView: TALWinNativeView;
+begin
+  {$IF defined(ALDPK)}
+  Result := nil;
+  {$ELSE}
+  result := TALWinEditView.create(self);
+  {$ENDIF}
 end;
 {$ENDIF}
 

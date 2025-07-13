@@ -125,8 +125,6 @@ type
   TALAndroidWebBrowserControl = class(TALBaseWebBrowserControl)
   private
     function GetNativeView: TALAndroidWebView;
-  protected
-    Function CreateNativeView: TALAndroidNativeView; override;
   public
     property NativeView: TALAndroidWebView read GetNativeView;
     procedure LoadUrl(const AURL: string); override;
@@ -209,8 +207,6 @@ type
   private
     class var IsWKWebViewClassRegistered: Boolean;
     function GetNativeView: TALIosWebView;
-  protected
-    Function CreateNativeView: TALIosNativeView; override;
   public
     property NativeView: TALIosWebView read GetNativeView;
     procedure LoadUrl(const AURL: string); override;
@@ -288,8 +284,6 @@ type
   private
     class var IsWKWebViewClassRegistered: Boolean;
     function GetNativeView: TALMacWebView;
-  protected
-    Function CreateNativeView: TALMacNativeView; override;
   public
     property NativeView: TALMacWebView read GetNativeView;
     procedure LoadUrl(const AURL: string); override;
@@ -376,8 +370,6 @@ type
   TALWinWebBrowserControl = class(TALBaseWebBrowserControl)
   private
     function GetNativeView: TALWinWebBrowserView;
-  protected
-    Function CreateNativeView: TALWinNativeView; override;
   public
     constructor Create(AOwner: TComponent); override;
     property NativeView: TALWinWebBrowserView read GetNativeView;
@@ -415,6 +407,15 @@ type
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
   protected
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; override;
+    {$ELSEIF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; override;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; override;
+    {$ELSEIF defined(MSWindows)}
+    Function CreateNativeView: TALWinNativeView; override;
+    {$ENDIF}
     function CreateWebBrowserControl: TALBaseWebBrowserControl; virtual;
     function GetWebBrowserControl: TALBaseWebBrowserControl; virtual;
     property WebBrowserControl: TALBaseWebBrowserControl read GetWebBrowserControl;
@@ -715,12 +716,6 @@ begin
   Result := TALAndroidWebBrowserControl(inherited Control)
 end;
 
-{********************************************************************}
-Function TALAndroidWebBrowserControl.CreateNativeView: TALAndroidNativeView;
-begin
-  result := TALAndroidWebView.create(self);
-end;
-
 {***************************************************************}
 function TALAndroidWebBrowserControl.GetNativeView: TALAndroidWebView;
 begin
@@ -961,50 +956,6 @@ begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewWebContentProcessDidTerminate');
   {$ENDIF}
-end;
-
-{************************************************************}
-Function TALIosWebBrowserControl.CreateNativeView: TALIosNativeView;
-begin
-
-  // We must create a WKWebView instance explicitly here to ensure that the underlying
-  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
-  // Without this, calling `TALIosWebView(inherited GetNativeView)` will raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
-  // also fails with:
-  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
-  //   At address: $0000000102A2011C
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class WKWebView could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate the WKWebView explicitly to force
-  // the WebKit framework to be loaded and the class to be registered:
-
-  if not IsWKWebViewClassRegistered then begin
-    LoadFramework(libWebKit); // force load framework
-    var LConfiguration := TWKWebViewConfiguration.Create;
-    try
-      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
-      LWKWebView.release;
-    finally
-      LConfiguration.release;
-    end;
-    IsWKWebViewClassRegistered := True;
-  end;
-
-  result := TALIosWebView.create(self);
-
 end;
 
 {************************************************************}
@@ -1283,50 +1234,6 @@ begin
 end;
 
 {************************************************************}
-Function TALMacWebBrowserControl.CreateNativeView: TALMacNativeView;
-begin
-
-  // We must create a WKWebView instance explicitly here to ensure that the underlying
-  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
-  // Without this, calling `TALMacWebView(inherited GetNativeView)` will raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
-  // also fails with:
-  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
-  //   At address: $0000000102A2011C
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALMacWebView, TypeInfo(IALMacWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class WKWebView could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate the WKWebView explicitly to force
-  // the WebKit framework to be loaded and the class to be registered:
-
-  if not IsWKWebViewClassRegistered then begin
-    LoadFramework(libWebKit); // force load framework
-    var LConfiguration := TWKWebViewConfiguration.Create;
-    try
-      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
-      LWKWebView.release;
-    finally
-      LConfiguration.release;
-    end;
-    IsWKWebViewClassRegistered := True;
-  end;
-
-  result := TALMacWebView.create(self);
-
-end;
-
-{************************************************************}
 function TALMacWebBrowserControl.GetNativeView: TALMacWebView;
 begin
   result := TALMacWebView(inherited NativeView);
@@ -1558,16 +1465,6 @@ begin
   inherited create(AOwner);
 end;
 
-{************************************************************}
-Function TALWinWebBrowserControl.CreateNativeView: TALWinNativeView;
-begin
-  {$IF defined(ALDPK)}
-  Result := nil;
-  {$ELSE}
-  result := TALWinWebBrowserView.create(self);
-  {$ENDIF}
-end;
-
 {*******************************************************}
 function TALWinWebBrowserControl.GetNativeView: TALWinWebBrowserView;
 begin
@@ -1685,6 +1582,14 @@ end;
 
 {********************}
 {$IF defined(android)}
+Function TALWebBrowser.CreateNativeView: TALAndroidNativeView;
+begin
+  result := TALAndroidWebView.create(self);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(android)}
 function TALWebBrowser.GetNativeView: TALAndroidWebBrowserView;
 begin
   result := TALAndroidWebBrowserView(inherited NativeView);
@@ -1700,6 +1605,52 @@ begin
     InitWebBrowserControl;
   end;
   Result := FWebBrowserControl;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+Function TALWebBrowser.CreateNativeView: TALIosNativeView;
+begin
+
+  // We must create a WKWebView instance explicitly here to ensure that the underlying
+  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
+  // Without this, calling `TALIosWebView(inherited GetNativeView)` will raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
+  // also fails with:
+  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
+  //   At address: $0000000102A2011C
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class WKWebView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate the WKWebView explicitly to force
+  // the WebKit framework to be loaded and the class to be registered:
+
+  if not IsWKWebViewClassRegistered then begin
+    LoadFramework(libWebKit); // force load framework
+    var LConfiguration := TWKWebViewConfiguration.Create;
+    try
+      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
+      LWKWebView.release;
+    finally
+      LConfiguration.release;
+    end;
+    IsWKWebViewClassRegistered := True;
+  end;
+
+  result := TALIosWebView.create(self);
+
 end;
 {$ENDIF}
 
@@ -1725,6 +1676,52 @@ end;
 
 {********************}
 {$IF defined(ALMacOS)}
+Function TALWebBrowser.CreateNativeView: TALMacNativeView;
+begin
+
+  // We must create a WKWebView instance explicitly here to ensure that the underlying
+  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
+  // Without this, calling `TALMacWebView(inherited GetNativeView)` will raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
+  // also fails with:
+  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
+  //   At address: $0000000102A2011C
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALMacWebView, TypeInfo(IALMacWebView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class WKWebView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate the WKWebView explicitly to force
+  // the WebKit framework to be loaded and the class to be registered:
+
+  if not IsWKWebViewClassRegistered then begin
+    LoadFramework(libWebKit); // force load framework
+    var LConfiguration := TWKWebViewConfiguration.Create;
+    try
+      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
+      LWKWebView.release;
+    finally
+      LConfiguration.release;
+    end;
+    IsWKWebViewClassRegistered := True;
+  end;
+
+  result := TALMacWebView.create(self);
+
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
 function TALWebBrowser.GetNativeView: TALMacWebBrowserView;
 begin
   result := TALMacWebBrowserView(inherited NativeView);
@@ -1740,6 +1737,18 @@ begin
     InitWebBrowserControl;
   end;
   Result := FWebBrowserControl;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+Function TALWebBrowser.CreateNativeView: TALWinNativeView;
+begin
+  {$IF defined(ALDPK)}
+  Result := nil;
+  {$ELSE}
+  result := TALWinWebBrowserView.create(self);
+  {$ENDIF}
 end;
 {$ENDIF}
 

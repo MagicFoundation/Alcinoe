@@ -22,8 +22,8 @@ uses
 
 type
 
-  {*******************************************}
-  TALNativeControl = class(TALBaseRectangle(*, IControlTypeSupportable*), IALNativeControl)
+  {***********************************************************************************}
+  TALNativeControl = class(TALBaseRectangle, IControlTypeSupportable, IALNativeControl)
   private
     {$IF defined(android)}
     FNativeView: TALAndroidNativeView;
@@ -38,6 +38,9 @@ type
     FNativeView: TALWinNativeView;
     function GetNativeView: TALWinNativeView;
     {$ENDIF}
+    { IControlTypeSupportable }
+    function GetControlType: TControlType;
+    procedure SetControlType(const Value: TControlType);
   protected
     {$IF defined(android)}
     Function CreateNativeView: TALAndroidNativeView; virtual; abstract;
@@ -57,6 +60,9 @@ type
     procedure VisibleChanged; override;
     procedure ChangeOrder; override;
     procedure DoEndUpdate; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -85,7 +91,6 @@ uses
 constructor TALNativeControl.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  CanFocus := True;
   FNativeView := CreateNativeView;
 end;
 
@@ -94,6 +99,34 @@ destructor TALNativeControl.Destroy;
 begin
   ALFreeAndNil(FNativeView);
   inherited Destroy;
+end;
+
+{********************************}
+procedure TALNativeControl.Loaded;
+begin
+  inherited;
+  {$IF not defined(ALDPK)}
+  if (NativeView <> nil) and (NativeView.visible) then begin
+    // Because AncestorParentChanged is not called during loading,
+    // we must call NativeView.SetVisible(true) in Loaded
+    // to hide the NativeView in case a parent control is hidden.
+    NativeView.SetVisible(true);
+  end;
+  {$ENDIF}
+end;
+
+{*****************************************************}
+function TALNativeControl.GetControlType: TControlType;
+begin
+  // We need ControlType because in function TFMXViewBase.canBecomeFirstResponder: Boolean;
+  // we use it in IsNativeControl to determine if it's a native control or not
+  Result := TControlType.Platform;
+end;
+
+{*******************************************************************}
+procedure TALNativeControl.SetControlType(const Value: TControlType);
+begin
+  // The ControlType cannot be changed
 end;
 
 {********************}
@@ -228,6 +261,7 @@ begin
   {$IF not defined(ALDPK)}
   if NativeView = nil then exit;
   if not NativeView.visible then exit;
+  ResetFocus;
   NativeView.ResetFocus;
   NativeView.SetVisible(False);
   {$ENDIF}
@@ -278,5 +312,32 @@ begin
     NativeView.UpdateFrame;
   {$ENDIF}
 end;
+
+{****************************}
+procedure TALNativeControl.DoEnter;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname+'.DoEnter', 'control.name: ' + Name);
+  {$ENDIF}
+  inherited DoEnter;
+  {$IF not defined(ALDPK)}
+  if HasNativeView then
+    NativeView.SetFocus;
+  {$ENDIF}
+end;
+
+{***************************}
+procedure TALNativeControl.DoExit;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(classname+'.DoExit', 'control.name: ' + Name);
+  {$ENDIF}
+  inherited DoExit;
+  {$IF not defined(ALDPK)}
+  if HasNativeView then
+    NativeView.ResetFocus;
+  {$ENDIF}
+end;
+
 
 end.

@@ -52,6 +52,9 @@ uses
 
 Type
 
+  {******************}
+  TALBaseEdit = class;
+
   {***************************}
   TALAutoCapitalizationType = (
     acNone, // Specifies that there is no automatic text capitalization.
@@ -119,7 +122,6 @@ Type
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-type
 
   {****************************}
   TALAndroidEditControl = class;
@@ -176,7 +178,7 @@ type
     FKeyPreImeListener: TKeyPreImeListener;
     FTouchListener: TTouchListener;
     function GetView: JALEditText;
-    function GetControl: TALAndroidEditControl;
+    function GetControl: TALBaseEdit;
   protected
     function CreateView: JView; override;
     procedure InitView; override;
@@ -184,7 +186,7 @@ type
     constructor Create(const AControl: TControl; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = ''); reintroduce;
     destructor Destroy; override;
     property View: JALEditText read GetView;
-    property Control: TALAndroidEditControl read GetControl;
+    property Control: TALBaseEdit read GetControl;
   end;
 
   {***********************************************}
@@ -248,7 +250,6 @@ type
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
-type
 
   {************************}
   TALIosEditControl = class;
@@ -269,7 +270,7 @@ type
   TALIosEditTextField = class(TALIosNativeView)
   private
     function GetView: UITextField;
-    function GetControl: TALIosEditControl;
+    function GetControl: TALBaseEdit;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
@@ -279,7 +280,7 @@ type
     destructor Destroy; override;
     procedure ControlEventEditingChanged; cdecl;
     property View: UITextField read GetView;
-    property Control: TALIosEditControl read GetControl;
+    property Control: TALBaseEdit read GetControl;
   end;
 
   {****************************************************************}
@@ -345,7 +346,6 @@ type
 
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
-type
 
   {************************}
   TALMacEditControl = class;
@@ -361,7 +361,7 @@ type
   TALMacEditTextField = class(TALMacNativeView)
   private
     function GetView: NSTextField;
-    function GetControl: TALMacEditControl;
+    function GetControl: TALBaseEdit;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
@@ -369,7 +369,7 @@ type
   public
     constructor Create; overload; override;
     property View: NSTextField read GetView;
-    property Control: TALMacEditControl read GetControl;
+    property Control: TALBaseEdit read GetControl;
   end;
 
   {***********************************************************************************************}
@@ -442,7 +442,6 @@ type
 
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
-type
 
   {************************}
   TALWinEditControl = class;
@@ -452,7 +451,7 @@ type
   private
     FFontHandle: HFONT;
     FBackgroundBrush: HBRUSH;
-    function GetControl: TALWinEditControl;
+    function GetControl: TALBaseEdit;
     {$IF not defined(ALDPK)}
     procedure UpdateFontHandle;
     procedure UpdateBackgroundBrush;
@@ -474,7 +473,7 @@ type
   public
     constructor Create(const AControl: TControl); override;
     destructor Destroy; override;
-    property Control: TALWinEditControl read GetControl;
+    property Control: TALBaseEdit read GetControl;
   end;
 
   {*******************************************}
@@ -528,8 +527,6 @@ type
 
 {$endif}
 {$ENDREGION}
-
-type
 
   {*********************************************}
   TALDummyEditControl = class(TALBaseEditControl)
@@ -585,8 +582,8 @@ type
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 
-  {*************************************************************************************}
-  TALBaseEdit = class(TALNativeControl, IVirtualKeyboardControl, IControlTypeSupportable)
+  {************************************************************}
+  TALBaseEdit = class(TALNativeControl, IVirtualKeyboardControl)
   public
     type
       // -------
@@ -973,11 +970,11 @@ type
     function HasTranslationLabelTextAnimation: Boolean;
     procedure UpdateEditControlStyle;
     {$IF defined(android)}
-    function GetNativeView: TALAndroidEditView;
+    function GetNativeView: TALAndroidEditText;
     {$ELSEIF defined(IOS)}
-    function GetNativeView: TALIosEditView;
+    function GetNativeView: TALIosEditTextField;
     {$ELSEIF defined(ALMacOS)}
-    function GetNativeView: TALMacEditView;
+    function GetNativeView: TALMacEditTextField;
     {$ELSEIF defined(MSWindows)}
     function GetNativeView: TALWinEditView;
     {$ENDIF}
@@ -987,9 +984,6 @@ type
     procedure SetReturnKeyType(Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
     function IVirtualKeyboardControl.IsPassword = GetPassword;
-    { IControlTypeSupportable }
-    function GetControlType: TControlType;
-    procedure SetControlType(const Value: TControlType);
   protected
     {$IF defined(android)}
     Function CreateNativeView: TALAndroidNativeView; override;
@@ -1065,11 +1059,11 @@ type
     procedure AlignToPixel; override;
     procedure ApplyColorScheme; override;
     {$IF defined(android)}
-    property NativeView: TALAndroidEditView read GetNativeView;
+    property NativeView: TALAndroidEditText read GetNativeView;
     {$ELSEIF defined(IOS)}
-    property NativeView: TALIosEditView read GetNativeView;
+    property NativeView: TALIosEditTextField read GetNativeView;
     {$ELSEIF defined(ALMacOS)}
-    property NativeView: TALMacEditView read GetNativeView;
+    property NativeView: TALMacEditTextField read GetNativeView;
     {$ELSEIF defined(MSWindows)}
     property NativeView: TALWinEditView read GetNativeView;
     {$ENDIF}
@@ -1644,9 +1638,9 @@ begin
 end;
 
 {**************************************************************}
-function TALAndroidEditText.GetControl: TALAndroidEditControl;
+function TALAndroidEditText.GetControl: TALBaseEdit;
 begin
-  Result := TALAndroidEditControl(inherited Control);
+  Result := TALBaseEdit(inherited Control);
 end;
 
 {*************************************************************************************************************************************************************************}
@@ -2103,9 +2097,9 @@ begin
 end;
 
 {************************************************}
-function TALIosEditTextField.GetControl: TALIosEditControl;
+function TALIosEditTextField.GetControl: TALBaseEdit;
 begin
-  Result := TALIosEditControl(inherited Control);
+  Result := TALBaseEdit(inherited Control);
 end;
 
 {************************************************************************************}
@@ -2531,9 +2525,9 @@ begin
 end;
 
 {************************************************}
-function TALMacEditTextField.GetControl: TALMacEditControl;
+function TALMacEditTextField.GetControl: TALBaseEdit;
 begin
-  Result := TALMacEditControl(inherited Control);
+  Result := TALBaseEdit(inherited Control);
 end;
 
 {************************************************************************************}
@@ -2914,9 +2908,9 @@ begin
 end;
 
 {********************************}
-function TALWinEditView.GetControl: TALWinEditControl;
+function TALWinEditView.GetControl: TALBaseEdit;
 begin
-  Result := TALWinEditControl(inherited Control);
+  Result := TALBaseEdit(inherited Control);
 end;
 
 {**********************}
@@ -4911,14 +4905,6 @@ begin
   //--
   UpdateEditControlPromptText;
   UpdateNativeViewVisibility;
-  {$IF not defined(ALDPK)}
-  if (NativeView <> nil) and (NativeView.visible) then begin
-    // Because AncestorParentChanged is not called during loading,
-    // we must call NativeView.SetVisible(true) in TALBaseEdit.Loaded
-    // to hide the NativeView in case a parent control is hidden.
-    NativeView.SetVisible(true);
-  end;
-  {$ENDIF}
 end;
 
 {*********************************************************}
@@ -4965,15 +4951,15 @@ end;
 {$IF defined(android)}
 Function TALBaseEdit.CreateNativeView: TALAndroidNativeView;
 begin
-  result := TALAndroidEditText.create(self, FIsMultiline, FDefStyleAttr, FDefStyleRes);
+  result := TALAndroidEditText.create(self, false{FIsMultiline}, DefStyleAttr, DefStyleRes);
 end;
 {$ENDIF}
 
 {********************}
 {$IF defined(android)}
-function TALBaseEdit.GetNativeView: TALAndroidEditView;
+function TALBaseEdit.GetNativeView: TALAndroidEditText;
 begin
-  result := TALAndroidEditView(inherited NativeView);
+  result := TALAndroidEditText(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -5035,9 +5021,9 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-function TALBaseEdit.GetNativeView: TALIosEditView;
+function TALBaseEdit.GetNativeView: TALIosEditTextField;
 begin
-  result := TALIosEditView(inherited NativeView);
+  result := TALIosEditTextField(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -5063,9 +5049,9 @@ end;
 
 {********************}
 {$IF defined(ALMacOS)}
-function TALBaseEdit.GetNativeView: TALMacEditView;
+function TALBaseEdit.GetNativeView: TALMacEditTextField;
 begin
-  result := TALMacEditView(inherited NativeView);
+  result := TALMacEditTextField(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -5105,7 +5091,7 @@ end;
 procedure TALBaseEdit.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALBaseEdit.DoEnter', 'control.name: ' + Name);
+  //ALLog('TALBaseEdit.DoEnter', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoEnter;
   StateStyles.Transition.start;
@@ -5118,10 +5104,6 @@ begin
     FLabelTextAnimation.Start;
   end;
   //--
-  {$IF not defined(ALDPK)}
-  if HasNativeView then
-    NativeView.SetFocus;
-  {$ENDIF}
   {$IF defined(android)}
   if (NativeView <> nil) and (IsFocused) then begin
     ALVirtualKeyboardVisible := True;
@@ -5137,7 +5119,7 @@ end;
 procedure TALBaseEdit.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALBaseEdit.DoExit', 'control.name: ' + Name);
+  //ALLog('TALBaseEdit.DoExit', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoExit;
   StateStyles.Transition.start;
@@ -5151,10 +5133,6 @@ begin
     FLabelTextAnimation.Start;
   end;
   //--
-  {$IF not defined(ALDPK)}
-  if HasNativeView then
-    NativeView.ResetFocus;
-  {$ENDIF}
   {$IF defined(android)}
   if NativeView <> nil then begin
     ALVirtualKeyboardVisible := False;
@@ -5207,20 +5185,6 @@ begin
 
   repaint;
 
-end;
-
-{************************************************}
-function TALBaseEdit.GetControlType: TControlType;
-begin
-  // We need ControlType because in function TFMXViewBase.canBecomeFirstResponder: Boolean;
-  // we use it in IsNativeControl to determine if it's a native control or not
-  Result := TControlType.Platform;
-end;
-
-{**************************************************************}
-procedure TALBaseEdit.SetControlType(const Value: TControlType);
-begin
-  // The ControlType cannot be changed
 end;
 
 {***************************************************************}

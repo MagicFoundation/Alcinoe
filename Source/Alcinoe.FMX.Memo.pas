@@ -38,9 +38,13 @@ uses
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Common;
 
+Type
+
+  {**************}
+  TALMemo = class;
+
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-type
 
   {**************************************************}
   TALAndroidMemoControl = class(TALAndroidEditControl)
@@ -53,7 +57,6 @@ type
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
-type
 
   {************************}
   TALIosMemoControl = class;
@@ -73,7 +76,7 @@ type
   TALIosMemoTextView = class(TALIosNativeView)
   private
     function GetView: UITextView;
-    function GetControl: TALIosMemoControl;
+    function GetControl: TALMemo;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
@@ -85,7 +88,7 @@ type
     procedure touchesEnded(touches: NSSet; withEvent: UIEvent); override; cdecl;
     procedure touchesMoved(touches: NSSet; withEvent: UIEvent); override; cdecl;
     property View: UITextView read GetView;
-    property Control: TALIosMemoControl read GetControl;
+    property Control: TALMemo read GetControl;
   end;
 
   {**************************************************************}
@@ -156,7 +159,6 @@ type
 
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
-type
 
   {************************}
   TALMacMemoControl = class;
@@ -172,7 +174,7 @@ type
   TALMacMemoScrollView = class(TALMacNativeView)
   private
     function GetView: NSScrollView;
-    function GetControl: TALMacMemoControl;
+    function GetControl: TALMemo;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
@@ -181,7 +183,7 @@ type
     constructor Create; overload; override;
     destructor Destroy; override;
     property View: NSScrollView read GetView;
-    property Control: TALMacMemoControl read GetControl;
+    property Control: TALMemo read GetControl;
   end;
 
   {****************************************}
@@ -295,7 +297,6 @@ type
 
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
-type
 
   {************************************}
   TALWinMemoView = class(TALWinEditView)
@@ -316,8 +317,6 @@ type
 
 {$endif}
 {$ENDREGION}
-
-type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
@@ -381,7 +380,9 @@ type
     function GetTextSettings: TTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
   protected
-    {$IF defined(IOS)}
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; override;
+    {$ELSEIF defined(IOS)}
     Function CreateNativeView: TALIosNativeView; override;
     {$ELSEIF defined(ALMacOS)}
     Function CreateNativeView: TALMacNativeView; override;
@@ -523,9 +524,9 @@ begin
 end;
 
 {************************************************}
-function TALIosMemoTextView.GetControl: TALIosMemoControl;
+function TALIosMemoTextView.GetControl: TALMemo;
 begin
-  Result := TALIosMemoControl(inherited Control);
+  Result := TALMemo(inherited Control);
 end;
 
 {***********************************************************************************}
@@ -991,9 +992,9 @@ begin
 end;
 
 {**************************************************}
-function TALMacMemoScrollView.GetControl: TALMacMemoControl;
+function TALMacMemoScrollView.GetControl: TALMemo;
 begin
-  Result := TALMacMemoControl(inherited Control);
+  Result := TALMemo(inherited Control);
 end;
 
 {***************************************************************************}
@@ -1566,6 +1567,14 @@ begin
     EndUpdate;
   End;
 end;
+
+{********************}
+{$IF defined(android)}
+Function TALMemo.CreateNativeView: TALAndroidNativeView;
+begin
+  result := TALAndroidEditText.create(self, True{FIsMultiline}, DefStyleAttr, DefStyleRes);
+end;
+{$ENDIF}
 
 {****************}
 {$IF defined(IOS)}

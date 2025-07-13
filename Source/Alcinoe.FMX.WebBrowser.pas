@@ -123,9 +123,10 @@ type
 
   {***********************************************}
   TALAndroidWebBrowserControl = class(TALBaseWebBrowserControl)
+  private
+    function GetNativeView: TALAndroidWebView;
   protected
     Function CreateNativeView: TALAndroidNativeView; override;
-    function GetNativeView: TALAndroidWebView; reintroduce; virtual;
   public
     property NativeView: TALAndroidWebView read GetNativeView;
     procedure LoadUrl(const AURL: string); override;
@@ -207,9 +208,9 @@ type
   TALIosWebBrowserControl = class(TALBaseWebBrowserControl)
   private
     class var IsWKWebViewClassRegistered: Boolean;
+    function GetNativeView: TALIosWebView;
   protected
     Function CreateNativeView: TALIosNativeView; override;
-    function GetNativeView: TALIosWebView; reintroduce; virtual;
   public
     property NativeView: TALIosWebView read GetNativeView;
     procedure LoadUrl(const AURL: string); override;
@@ -286,9 +287,9 @@ type
   TALMacWebBrowserControl = class(TALBaseWebBrowserControl)
   private
     class var IsWKWebViewClassRegistered: Boolean;
+    function GetNativeView: TALMacWebView;
   protected
     Function CreateNativeView: TALMacNativeView; override;
-    function GetNativeView: TALMacWebView; reintroduce; virtual;
   public
     property NativeView: TALMacWebView read GetNativeView;
     procedure LoadUrl(const AURL: string); override;
@@ -373,9 +374,10 @@ type
 
   {*******************************************}
   TALWinWebBrowserControl = class(TALBaseWebBrowserControl)
+  private
+    function GetNativeView: TALWinWebBrowserView;
   protected
     Function CreateNativeView: TALWinNativeView; override;
-    function GetNativeView: TALWinWebBrowserView; reintroduce; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     property NativeView: TALWinWebBrowserView read GetNativeView;
@@ -395,11 +397,20 @@ type
 
   {*******************************************}
   [ComponentPlatforms($FFFF)]
-  TALWebBrowser = class(TALControl, IControlTypeSupportable, IALNativeControl)
+  TALWebBrowser = class(TALNativeControl, IControlTypeSupportable, IALNativeControl)
   private
     FWebBrowserControl: TALBaseWebBrowserControl;
     FOnShouldStartLoadUrl: TALShouldStartLoadUrl;
     procedure OnShouldStartLoadUrlImpl(ASender: TObject; const AURL: string; var AAllow: Boolean);
+    {$IF defined(android)}
+    function GetNativeView: TALAndroidWebBrowserView;
+    {$ELSEIF defined(IOS)}
+    function GetNativeView: TALIosWebBrowserView;
+    {$ELSEIF defined(ALMacOS)}
+    function GetNativeView: TALMacWebBrowserView;
+    {$ELSEIF defined(MSWindows)}
+    function GetNativeView: TALWinWebBrowserView;
+    {$ENDIF}
     { IControlTypeSupportable }
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
@@ -407,15 +418,6 @@ type
     function CreateWebBrowserControl: TALBaseWebBrowserControl; virtual;
     function GetWebBrowserControl: TALBaseWebBrowserControl; virtual;
     property WebBrowserControl: TALBaseWebBrowserControl read GetWebBrowserControl;
-    {$IF defined(android)}
-    function GetNativeView: TALAndroidNativeView; virtual;
-    {$ELSEIF defined(IOS)}
-    function GetNativeView: TALIosNativeView; virtual;
-    {$ELSEIF defined(ALMacOS)}
-    function GetNativeView: TALMacNativeView; virtual;
-    {$ELSEIF defined(MSWindows)}
-    function GetNativeView: TALWinNativeView; virtual;
-    {$ENDIF}
     procedure InitWebBrowserControl; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -425,13 +427,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     {$IF defined(android)}
-    property NativeView: TALAndroidNativeView read GetNativeView;
+    property NativeView: TALAndroidWebBrowserView read GetNativeView;
     {$ELSEIF defined(IOS)}
-    property NativeView: TALIosNativeView read GetNativeView;
+    property NativeView: TALIosWebBrowserView read GetNativeView;
     {$ELSEIF defined(ALMacOS)}
-    property NativeView: TALMacNativeView read GetNativeView;
+    property NativeView: TALMacWebBrowserView read GetNativeView;
     {$ELSEIF defined(MSWindows)}
-    property NativeView: TALWinNativeView read GetNativeView;
+    property NativeView: TALWinWebBrowserView read GetNativeView;
     {$ENDIF}
     function HasNativeView: boolean;
     Procedure AddNativeView;
@@ -722,7 +724,7 @@ end;
 {***************************************************************}
 function TALAndroidWebBrowserControl.GetNativeView: TALAndroidWebView;
 begin
-  result := TALAndroidWebView(inherited GetNativeView);
+  result := TALAndroidWebView(inherited NativeView);
 end;
 
 {******************************************************************}
@@ -1008,7 +1010,7 @@ end;
 {************************************************************}
 function TALIosWebBrowserControl.GetNativeView: TALIosWebView;
 begin
-  result := TALIosWebView(inherited GetNativeView);
+  result := TALIosWebView(inherited NativeView);
 end;
 
 {************************************************************}
@@ -1327,7 +1329,7 @@ end;
 {************************************************************}
 function TALMacWebBrowserControl.GetNativeView: TALMacWebView;
 begin
-  result := TALMacWebView(inherited GetNativeView);
+  result := TALMacWebView(inherited NativeView);
 end;
 
 {************************************************************}
@@ -1569,7 +1571,7 @@ end;
 {*******************************************************}
 function TALWinWebBrowserControl.GetNativeView: TALWinWebBrowserView;
 begin
-  result := TALWinWebBrowserView(inherited GetNativeView);
+  result := TALWinWebBrowserView(inherited NativeView);
 end;
 
 {*************************************************}
@@ -1683,9 +1685,9 @@ end;
 
 {********************}
 {$IF defined(android)}
-function TALWebBrowser.GetNativeView: TALAndroidNativeView;
+function TALWebBrowser.GetNativeView: TALAndroidWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALAndroidWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -1703,9 +1705,9 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-function TALWebBrowser.GetNativeView: TALIosNativeView;
+function TALWebBrowser.GetNativeView: TALIosWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALIosWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -1723,9 +1725,9 @@ end;
 
 {********************}
 {$IF defined(ALMacOS)}
-function TALWebBrowser.GetNativeView: TALMacNativeView;
+function TALWebBrowser.GetNativeView: TALMacWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALMacWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -1743,9 +1745,9 @@ end;
 
 {**********************}
 {$IF defined(MSWindows)}
-function TALWebBrowser.GetNativeView: TALWinNativeView;
+function TALWebBrowser.GetNativeView: TALWinWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALWinWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
@@ -1855,6 +1857,9 @@ initialization
   ALLog('Alcinoe.FMX.WebBrowser','initialization');
   {$ENDIF}
   {$IF defined(IOS)}
+  TALIosWebBrowserControl.IsWKWebViewClassRegistered := False;
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
   TALIosWebBrowserControl.IsWKWebViewClassRegistered := False;
   {$ENDIF}
   RegisterFmxClasses([TALWebBrowser]);

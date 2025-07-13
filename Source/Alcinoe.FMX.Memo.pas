@@ -116,10 +116,10 @@ type
     FFillColor: TAlphaColor;
     fMaxLength: integer;
     fPromptTextColor: TalphaColor;
+    function GetNativeView: TALIosMemoTextView;
   protected
     procedure DoChange; override;
     Function CreateNativeView: TALIosNativeView; override;
-    function GetNativeView: TALIosMemoTextView; reintroduce; virtual;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -255,10 +255,10 @@ type
     fCheckSpelling: boolean;
     fPromptTextColor: TalphaColor;
     fTintColor: TalphaColor;
+    function GetNativeView: TALMacMemoScrollView;
   protected
     procedure DoChange; override;
     Function CreateNativeView: TALMacNativeView; override;
-    function GetNativeView: TALMacMemoScrollView; reintroduce; virtual;
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
     function GetAutoCapitalizationType: TALAutoCapitalizationType; override;
@@ -309,9 +309,10 @@ type
 
   {******************************************}
   TALWinMemoControl = class(TALWinEditControl)
+  private
+    function GetNativeView: TALWinMemoView;
   protected
     Function CreateNativeView: TALWinNativeView; override;
-    function GetNativeView: TALWinMemoView; reintroduce; virtual;
   public
     function getLineCount: integer; override;
     property NativeView: TALWinMemoView read GetNativeView;
@@ -670,7 +671,7 @@ end;
 {***********************************************************}
 function TALIosMemoControl.GetNativeView: TALIosMemoTextView;
 begin
-  result := TALIosMemoTextView(inherited GetNativeView);
+  result := TALIosMemoTextView(inherited NativeView);
 end;
 
 {*****************************************************************************}
@@ -1221,7 +1222,7 @@ end;
 {*************************************************************}
 function TALMacMemoControl.GetNativeView: TALMacMemoScrollView;
 begin
-  result := TALMacMemoScrollView(inherited GetNativeView);
+  result := TALMacMemoScrollView(inherited NativeView);
 end;
 
 {*****************************************************************************}
@@ -1522,7 +1523,7 @@ end;
 {*******************************************************}
 function TALWinMemoControl.GetNativeView: TALWinMemoView;
 begin
-  Result := TALWinMemoView(inherited GetNativeView);
+  Result := TALWinMemoView(inherited NativeView);
 end;
 
 {***********************************************}

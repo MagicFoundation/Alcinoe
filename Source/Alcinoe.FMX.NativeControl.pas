@@ -16,30 +16,37 @@ uses
   {$ELSEIF defined(MSWINDOWS)}
   Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
+  Alcinoe.FMX.Objects,
   Alcinoe.FMX.Common,
-  Alcinoe.fmx.Controls;
+  Alcinoe.FMX.Controls;
 
 type
 
   {*******************************************}
-  TALNativeControl = class(TALControl(*, IControlTypeSupportable, IALNativeControl*))
-  protected
+  TALNativeControl = class(TALBaseRectangle(*, IControlTypeSupportable*), IALNativeControl)
+  private
     {$IF defined(android)}
     FNativeView: TALAndroidNativeView;
-    Function CreateNativeView: TALAndroidNativeView; virtual; abstract;
-    function GetNativeView: TALAndroidNativeView; virtual;
+    function GetNativeView: TALAndroidNativeView;
     {$ELSEIF defined(IOS)}
     FNativeView: TALIosNativeView;
-    Function CreateNativeView: TALIosNativeView; virtual; abstract;
-    function GetNativeView: TALIosNativeView; virtual;
+    function GetNativeView: TALIosNativeView;
     {$ELSEIF defined(ALMacOS)}
     FNativeView: TALMacNativeView;
-    Function CreateNativeView: TALMacNativeView; virtual; abstract;
-    function GetNativeView: TALMacNativeView; virtual;
+    function GetNativeView: TALMacNativeView;
     {$ELSEIF defined(MSWindows)}
     FNativeView: TALWinNativeView;
+    function GetNativeView: TALWinNativeView;
+    {$ENDIF}
+  protected
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; virtual; abstract;
+    {$ELSEIF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; virtual; abstract;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; virtual; abstract;
+    {$ELSEIF defined(MSWindows)}
     Function CreateNativeView: TALWinNativeView; virtual; abstract;
-    function GetNativeView: TALWinNativeView; virtual;
     {$ENDIF}
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;

@@ -34,7 +34,7 @@ uses
   Fmx.controls,
   FMX.types,
   fmx.Graphics,
-  Alcinoe.fmx.Controls,
+  Alcinoe.FMX.Controls,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Common;
 

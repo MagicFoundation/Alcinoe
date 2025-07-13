@@ -50,6 +50,7 @@ uses
   {$ENDIF}
   Fmx.controls,
   Alcinoe.FMX.Controls,
+  Alcinoe.FMX.NativeControl,
   Alcinoe.FMX.Common;
 
 Type
@@ -57,55 +58,14 @@ Type
   {*****************************************************************************************************}
   TALShouldStartLoadUrl = procedure(ASender: TObject; const AURL: string; var AAllow: Boolean) of object;
 
-  {************************************}
-  TALBaseWebBrowserControl = class(TALControl)
+  {************************************************}
+  TALBaseWebBrowserControl = class(TALNativeControl)
   strict private
     FOnShouldStartLoadUrl: TALShouldStartLoadUrl;
   protected
-    {$IF defined(android)}
-    FNativeView: TALAndroidNativeView;
-    Function CreateNativeView: TALAndroidNativeView; virtual; abstract;
-    function GetNativeView: TALAndroidNativeView; virtual;
-    {$ELSEIF defined(IOS)}
-    FNativeView: TALIosNativeView;
-    Function CreateNativeView: TALIosNativeView; virtual; abstract;
-    function GetNativeView: TALIosNativeView; virtual;
-    {$ELSEIF defined(ALMacOS)}
-    FNativeView: TALMacNativeView;
-    Function CreateNativeView: TALMacNativeView; virtual; abstract;
-    function GetNativeView: TALMacNativeView; virtual;
-    {$ELSEIF defined(MSWindows)}
-    FNativeView: TALWinNativeView;
-    Function CreateNativeView: TALWinNativeView; virtual; abstract;
-    function GetNativeView: TALWinNativeView; virtual;
-    {$ENDIF}
-    procedure AncestorVisibleChanged(const Visible: Boolean); override;
-    procedure AncestorParentChanged; override;
-    procedure ParentChanged; override;
-    procedure DoAbsoluteChanged; override;
-    procedure DoRootChanged; override;
-    procedure Resize; override;
-    procedure VisibleChanged; override;
-    procedure ChangeOrder; override;
-    procedure DoEndUpdate; override;
     function ShouldStartLoadUrl(const AURL: string): Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure RecalcOpacity; override;
-    procedure RecalcEnabled; override;
-    function HasNativeView: boolean; virtual;
-    Procedure AddNativeView; virtual;
-    Procedure RemoveNativeView; virtual;
-    {$IF defined(android)}
-    property NativeView: TALAndroidNativeView read GetNativeView;
-    {$ELSEIF defined(IOS)}
-    property NativeView: TALIosNativeView read GetNativeView;
-    {$ELSEIF defined(ALMacOS)}
-    property NativeView: TALMacNativeView read GetNativeView;
-    {$ELSEIF defined(MSWindows)}
-    property NativeView: TALWinNativeView read GetNativeView;
-    {$ENDIF}
     procedure LoadUrl(const AURL: string); virtual; abstract;
     procedure LoadData(
                 const ABaseUrl: String;
@@ -626,208 +586,11 @@ uses
   {$ENDIF}
   Alcinoe.Common;
 
-{**}
-Type
-  _TALBaseStateStyleProtectedAccess = class(TALBaseStateStyle);
-
 {********************************************************}
 constructor TALBaseWebBrowserControl.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  CanFocus := True;
   FOnShouldStartLoadUrl := nil;
-  FNativeView := CreateNativeView;
-end;
-
-{************************************}
-destructor TALBaseWebBrowserControl.Destroy;
-begin
-  ALFreeAndNil(FNativeView);
-  inherited Destroy;
-end;
-
-{********************}
-{$IF defined(android)}
-function TALBaseWebBrowserControl.GetNativeView: TALAndroidNativeView;
-begin
-  Result := FNativeView;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-function TALBaseWebBrowserControl.GetNativeView: TALIosNativeView;
-begin
-  Result := FNativeView;
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
-function TALBaseWebBrowserControl.GetNativeView: TALMacNativeView;
-begin
-  Result := FNativeView;
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWindows)}
-function TALBaseWebBrowserControl.GetNativeView: TALWinNativeView;
-begin
-  Result := FNativeView;
-end;
-{$ENDIF}
-
-{*****************************************}
-procedure TALBaseWebBrowserControl.DoRootChanged;
-begin
-  inherited;
-  if csDestroying in ComponentState then exit;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.RootChanged(Root);
-  {$ENDIF}
-end;
-
-{**********************************}
-procedure TALBaseWebBrowserControl.Resize;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
-end;
-
-{*********************************************}
-procedure TALBaseWebBrowserControl.DoAbsoluteChanged;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if (not (csLoading in ComponentState)) and
-     (NativeView <> nil) then
-    NativeView.UpdateFrame;
-  {$ENDIF}
-end;
-
-{******************************************}
-procedure TALBaseWebBrowserControl.VisibleChanged;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.SetVisible(Visible);
-  {$ENDIF}
-end;
-
-{***************************************}
-procedure TALBaseWebBrowserControl.ChangeOrder;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.ChangeOrder;
-  {$ENDIF}
-end;
-
-{*****************************************}
-procedure TALBaseWebBrowserControl.RecalcOpacity;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.setAlpha(AbsoluteOpacity);
-  {$ENDIF}
-end;
-
-{*****************************************}
-procedure TALBaseWebBrowserControl.RecalcEnabled;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.SetEnabled(AbsoluteEnabled);
-  {$ENDIF}
-end;
-
-{*************************************************}
-function TALBaseWebBrowserControl.HasNativeView: boolean;
-begin
-  {$IF not defined(ALDPK)}
-  Result := (NativeView <> nil) and (NativeView.Visible);
-  {$ELSE}
-  Result := false;
-  {$ENDIF}
-end;
-
-{*****************************************}
-Procedure TALBaseWebBrowserControl.AddNativeView;
-begin
-  {$IF not defined(ALDPK)}
-  if NativeView = nil then exit;
-  if NativeView.visible then exit;
-  NativeView.SetVisible(true);
-  if Parentcontrol.IsFocused then begin
-    NativeView.SetFocus;
-  end;
-  {$ENDIF}
-end;
-
-{********************************************}
-Procedure TALBaseWebBrowserControl.RemoveNativeView;
-begin
-  {$IF not defined(ALDPK)}
-  if NativeView = nil then exit;
-  if not NativeView.visible then exit;
-  NativeView.ResetFocus;
-  NativeView.SetVisible(False);
-  {$ENDIF}
-end;
-
-{**************************************************************************}
-procedure TALBaseWebBrowserControl.AncestorVisibleChanged(const Visible: Boolean);
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.AncestorVisibleChanged;
-  {$ENDIF}
-end;
-
-{*************************************************}
-procedure TALBaseWebBrowserControl.AncestorParentChanged;
-begin
-  inherited;
-  if csDestroying in ComponentState then exit;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
-end;
-
-{*****************************************}
-procedure TALBaseWebBrowserControl.ParentChanged;
-begin
-  inherited;
-  if csDestroying in ComponentState then exit;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
-end;
-
-{***************************************}
-procedure TALBaseWebBrowserControl.DoEndUpdate;
-begin
-  inherited;
-  if csDestroying in ComponentState then exit;
-  // Without this, in some case when we are doing beginupdate to the TWebBrowser
-  // (because in android for exemple we would like to not refresh the position of the control during calculation)
-  // then when we do endupdate the control is not paint or lost somewhere
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
 end;
 
 {***************************************}

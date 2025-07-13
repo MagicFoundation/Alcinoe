@@ -98,8 +98,6 @@ Type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    Procedure AddNativeView; override;
-    Procedure RemoveNativeView; override;
     function getLineCount: integer; virtual;
     function getLineHeight: Single; virtual; abstract; // It includes the line spacing
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
@@ -1006,6 +1004,8 @@ Type
     function GetEditControl: TALBaseEditControl; virtual;
     property EditControl: TALBaseEditControl read GetEditControl;
     procedure InitEditControl; virtual;
+    procedure DoChange; virtual;
+    procedure DoReturnKey; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure IsMouseOverChanged; override;
@@ -1305,50 +1305,6 @@ procedure TALBaseEditControl.DoReturnKey;
 begin
   if assigned(fOnReturnKey) then
     fOnReturnKey(self);
-end;
-
-{*****************************************}
-Procedure TALBaseEditControl.AddNativeView;
-begin
-  {$IF not defined(ALDPK)}
-  if NativeView = nil then exit;
-  if NativeView.visible then exit;
-  inherited;
-  {$IF defined(android)}
-  if Parentcontrol.IsFocused then begin
-    ALVirtualKeyboardVisible := True;
-    {$IF defined(DEBUG)}
-    ALLog('TALBaseEditControl.showVirtualKeyboard', 'control.name: ' + Name);
-    {$ENDIF}
-    MainActivity.getVirtualKeyboard.showFor(NativeView.View);
-  end;
-  {$ENDIF}
-  {$ENDIF}
-end;
-
-{********************************************}
-Procedure TALBaseEditControl.RemoveNativeView;
-begin
-  {$IF not defined(ALDPK)}
-  if NativeView = nil then exit;
-  if not NativeView.visible then exit;
-  {$IF defined(android)}
-  if Parentcontrol.IsFocused then begin
-    ALVirtualKeyboardVisible := False;
-    TThread.ForceQueue(nil,
-      procedure
-      begin
-        If not ALVirtualKeyboardVisible then begin
-          {$IF defined(DEBUG)}
-          ALLog('TALBaseEditControl.hideVirtualKeyboard');
-          {$ENDIF}
-          MainActivity.getVirtualKeyboard.hide;
-        end;
-      end);
-  end;
-  {$ENDIF}
-  inherited;
-  {$ENDIF}
 end;
 
 {************************************************}
@@ -2949,8 +2905,8 @@ procedure TALWinEditView.UpdateBackgroundBrush;
 begin
   if (fBackgroundBrush <> 0) and (not DeleteObject(fBackgroundBrush)) then
     RaiseLastOsError;
-  if Control.FillColor <> TAlphaColors.Null then begin
-    fBackgroundBrush := CreateSolidBrush(TAlphaColors.ColorToRGB(Control.FillColor));
+  if Control.Fill.Color <> TAlphaColors.Null then begin
+    fBackgroundBrush := CreateSolidBrush(TAlphaColors.ColorToRGB(Control.Fill.Color));
     if fBackgroundBrush = 0 then RaiseLastOsError;
   end
   else
@@ -3049,7 +3005,7 @@ begin
   inherited;
   if SetTextColor(Message.wParam, TAlphaColors.ColorToRGB(Control.TextSettings.Font.Color)) = CLR_INVALID then RaiseLastOSError;
   if fBackgroundBrush <> 0 then begin
-    if SetBkColor(Message.wParam, TAlphaColors.ColorToRGB(Control.FillColor)) = CLR_INVALID then RaiseLastOSError;
+    if SetBkColor(Message.wParam, TAlphaColors.ColorToRGB(Control.Fill.Color)) = CLR_INVALID then RaiseLastOSError;
     Message.Result := LRESULT(FBackgroundBrush);
   end
   else
@@ -3067,9 +3023,9 @@ begin
     Try
       var LPromptTextColor := Control.PromptTextColor;
       if LPromptTextColor = TAlphaColors.Null then
-        LPromptTextColor := ALBlendColor(Control.fillColor, Control.TextSettings.Font.Color, 0.3);
+        LPromptTextColor := ALBlendColor(Control.fill.Color, Control.TextSettings.Font.Color, 0.3);
       if SetTextColor(LDC, TAlphaColors.ColorToRGB(LPromptTextColor)) = CLR_INVALID then RaiseLastOSError;
-      if SetBkColor(LDC, TAlphaColors.ColorToRGB(Control.fillColor)) = CLR_INVALID then RaiseLastOSError;
+      if SetBkColor(LDC, TAlphaColors.ColorToRGB(Control.fill.Color)) = CLR_INVALID then RaiseLastOSError;
       if FBackgroundBrush <> 0 then begin
         if FillRect(LDC, LPS.rcPaint, FBackgroundBrush) = 0 then raiseLastOsError;
       end
@@ -5087,6 +5043,20 @@ begin
 end;
 {$ENDIF}
 
+{*****************************}
+procedure TALBaseEdit.DoChange;
+begin
+  if assigned(fOnChange) then
+    fOnChange(self);
+end;
+
+{********************************}
+procedure TALBaseEdit.DoReturnKey;
+begin
+  if assigned(fOnReturnKey) then
+    fOnReturnKey(self);
+end;
+
 {****************************}
 procedure TALBaseEdit.DoEnter;
 begin
@@ -6751,6 +6721,23 @@ Procedure TALBaseEdit.AddNativeView;
 begin
   FNativeViewRemoved := False;
   UpdateNativeViewVisibility;
+
+(*
+  {$IF not defined(ALDPK)}
+  if NativeView = nil then exit;
+  if NativeView.visible then exit;
+  inherited;
+  {$IF defined(android)}
+  if Parentcontrol.IsFocused then begin
+    ALVirtualKeyboardVisible := True;
+    {$IF defined(DEBUG)}
+    ALLog('TALBaseEditControl.showVirtualKeyboard', 'control.name: ' + Name);
+    {$ENDIF}
+    MainActivity.getVirtualKeyboard.showFor(NativeView.View);
+  end;
+  {$ENDIF}
+  {$ENDIF}
+*)
 end;
 
 {*************************************}
@@ -6759,6 +6746,29 @@ begin
   FNativeViewRemoved := True;
   ResetFocus;
   EditControl.RemoveNativeView;
+
+(*
+  {$IF not defined(ALDPK)}
+  if NativeView = nil then exit;
+  if not NativeView.visible then exit;
+  {$IF defined(android)}
+  if Parentcontrol.IsFocused then begin
+    ALVirtualKeyboardVisible := False;
+    TThread.ForceQueue(nil,
+      procedure
+      begin
+        If not ALVirtualKeyboardVisible then begin
+          {$IF defined(DEBUG)}
+          ALLog('TALBaseEditControl.hideVirtualKeyboard');
+          {$ENDIF}
+          MainActivity.getVirtualKeyboard.hide;
+        end;
+      end);
+  end;
+  {$ENDIF}
+  inherited;
+  {$ENDIF}
+*)
 end;
 
 {******************************************************************************}

@@ -6,8 +6,11 @@ interface
 
 uses
   System.Classes,
+  System.Types,
+  system.UITypes,
   FMX.Controls,
   {$IF defined(android)}
+  System.Messaging,
   Alcinoe.FMX.NativeView.Android,
   {$ELSEIF defined(IOS)}
   Alcinoe.FMX.NativeView.iOS,
@@ -17,60 +20,115 @@ uses
   Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
   Alcinoe.FMX.Objects,
-  Alcinoe.FMX.Common,
-  Alcinoe.FMX.Controls;
+  Alcinoe.FMX.Common;
 
 type
 
-  {***********************************************************************************}
-  TALNativeControl = class(TALBaseRectangle, IControlTypeSupportable, IALNativeControl)
-  private
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  IALNativeControl = interface
+    ['{EB2063C4-CA1F-4415-97C3-4C161907F244}']
     {$IF defined(android)}
-    FNativeView: TALAndroidNativeView;
     function GetNativeView: TALAndroidNativeView;
     {$ELSEIF defined(IOS)}
-    FNativeView: TALIosNativeView;
     function GetNativeView: TALIosNativeView;
     {$ELSEIF defined(ALMacOS)}
-    FNativeView: TALMacNativeView;
     function GetNativeView: TALMacNativeView;
     {$ELSEIF defined(MSWindows)}
-    FNativeView: TALWinNativeView;
     function GetNativeView: TALWinNativeView;
     {$ENDIF}
+  end;
+
+  {***********************************************************************************}
+  TALNativeControl = class(TALBaseRectangle, IControlTypeSupportable, IALNativeControl)
+  public
+    type
+      // -----
+      // TFill
+      TFill = class(TALBrush)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
+      // -------
+      // TStroke
+      TStroke = class(TALStrokeBrush)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
+  private
+    fDefStyleAttr: String;
+    fDefStyleRes: String;
+    FNativeViewMargins: TALBounds;
+    FNativeViewScreenshot: TALDrawable;
+    FIsNativeViewFrozen: Boolean;
+    {$IF defined(android)}
+    function GetNativeView: TALAndroidNativeView;
+    procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
+    {$ELSEIF defined(IOS)}
+    function GetNativeView: TALIosNativeView;
+    {$ELSEIF defined(ALMacOS)}
+    function GetNativeView: TALMacNativeView;
+    {$ELSEIF defined(MSWindows)}
+    function GetNativeView: TALWinNativeView;
+    {$ENDIF}
+    procedure SetDefStyleAttr(const Value: String);
+    procedure SetDefStyleRes(const Value: String);
+    procedure SetNativeViewMargins(const Value: TALBounds);
+    procedure NativeViewMarginsChanged(Sender: TObject);
     { IControlTypeSupportable }
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
   protected
     {$IF defined(android)}
+    FNativeView: TALAndroidNativeView;
     Function CreateNativeView: TALAndroidNativeView; virtual; abstract;
     {$ELSEIF defined(IOS)}
+    FNativeView: TALIosNativeView;
     Function CreateNativeView: TALIosNativeView; virtual; abstract;
     {$ELSEIF defined(ALMacOS)}
+    FNativeView: TALMacNativeView;
     Function CreateNativeView: TALMacNativeView; virtual; abstract;
     {$ELSEIF defined(MSWindows)}
+    FNativeView: TALWinNativeView;
     Function CreateNativeView: TALWinNativeView; virtual; abstract;
     {$ENDIF}
+    procedure InitNativeView; virtual;
+    procedure RecreateNativeView; Virtual;
+    function CreateFill: TALBrush; override;
+    function CreateStroke: TALStrokeBrush; override;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
     procedure ParentChanged; override;
     procedure DoAbsoluteChanged; override;
     procedure DoRootChanged; override;
-    procedure Resize; override;
+    procedure DoResized; override;
     procedure VisibleChanged; override;
     procedure ChangeOrder; override;
     procedure DoEndUpdate; override;
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure Loaded; override;
+    procedure DoPaint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    // Android only - the name of an attribute in the current theme that contains a reference to
+    // a style resource that supplies defaults style values
+    // Exemple of use: https://stackoverflow.com/questions/5051753/how-do-i-apply-a-style-programmatically
+    // NOTE: !!IMPORTANT!! This properties must be defined the very first in the published section because
+    // the stream system must load it the very first
+    property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr;
+    // Android only - the name of a style resource that supplies default style values
+    // NOTE: !!IMPORTANT!! This properties must be defined the very first in the published section because
+    // the stream system must load it the very first
+    property DefStyleRes: String read fDefStyleRes write SetDefStyleRes;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
     function HasNativeView: boolean; virtual;
     Procedure AddNativeView; virtual;
     Procedure RemoveNativeView; virtual;
+    Procedure FreezeNativeView; virtual;
+    Procedure UnFreezeNativeView; virtual;
+    property IsNativeViewFrozen: Boolean read FIsNativeViewFrozen;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -80,24 +138,78 @@ type
     {$ELSEIF defined(MSWindows)}
     property NativeView: TALWinNativeView read GetNativeView;
     {$ENDIF}
+    property NativeViewMargins: TALBounds read FNativeViewMargins write SetNativeViewMargins;
+    function GetNativeViewAbsoluteRect: TRectF; virtual;
+    function GetNativeViewBoundsRect: TRectF;
+    function GetNativeViewPosition: TPointF;
+    function GetNativeViewWidth: Single;
+    function GetNativeViewHeight: Single;
   end;
 
 implementation
 
 uses
+  system.SysUtils,
+  {$IF defined(android)}
+  FMX.Platform,
+  {$ENDIF}
+  {$IF defined(ALSkiaCanvas)}
+  System.Skia.API,
+  {$ENDIF}
+  FMX.Types,
+  FMX.Graphics,
+  Alcinoe.FMX.Graphics,
   Alcinoe.Common;
+
+{********************************************************}
+function TALNativeControl.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.null;
+end;
+
+{********************************************************}
+function TALNativeControl.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.null;
+end;
 
 {********************************************************}
 constructor TALNativeControl.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  fDefStyleAttr := '';
+  fDefStyleRes := '';
+  FNativeViewMargins := TALBounds.Create;
+  FNativeViewMargins.OnChanged := NativeViewMarginsChanged;
+  FNativeViewScreenshot := ALNullDrawable;
+  FIsNativeViewFrozen := False;
+  {$IF defined(android)}
+  // In Android we must first know the value of DefStyleAttr/DefStyleRes
+  // before to create the FNativeView. I use this way to know that the compoment
+  // will load it's properties from the dfm
+  if not IsOwnerLoading then begin
+    FNativeView := CreateNativeView;
+    InitNativeView;
+  end
+  else FNativeView := nil;
+  {$ELSE}
   FNativeView := CreateNativeView;
+  InitNativeView;
+  {$ENDIF}
+  {$IF defined(android)}
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+  {$ENDIF}
 end;
 
 {************************************}
 destructor TALNativeControl.Destroy;
 begin
+  {$IF defined(android)}
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  {$ENDIF}
   ALFreeAndNil(FNativeView);
+  ALFreeAndNil(FNativeViewMargins);
+  ALFreeAndNilDrawable(FNativeViewScreenshot);
   inherited Destroy;
 end;
 
@@ -105,14 +217,141 @@ end;
 procedure TALNativeControl.Loaded;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if (NativeView <> nil) and (NativeView.visible) then begin
+  if FNativeView = nil then begin
+    FNativeView := CreateNativeView;
+    InitNativeView;
+  end;
+  if HasNativeView then
     // Because AncestorParentChanged is not called during loading,
     // we must call NativeView.SetVisible(true) in Loaded
     // to hide the NativeView in case a parent control is hidden.
-    NativeView.SetVisible(true);
+    FNativeView.SetVisible(true);
+end;
+
+{********************}
+{$IF defined(android)}
+procedure TALNativeControl.ApplicationEventHandler(const Sender: TObject; const M: TMessage);
+begin
+  // Problem is that as we play with view, the WillBecomeInactive - BecameActive will be call everytime we toggle the
+  // view under the MainActivity.getViewStack. so we can't use these event to know that the application resume from
+  // background. most easy is to close the virtual keyboard when the application entere in background (EnteredBackground
+  // event is call ONLY when application entered in the background so everything is fine
+  if isfocused and
+     (M is TApplicationEventMessage) and
+     ((M as TApplicationEventMessage).Value.Event = TApplicationEvent.EnteredBackground) then resetfocus;
+end;
+{$ENDIF}
+
+{*************************************}
+function TALNativeControl.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
+{********************************}
+function TALNativeControl.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{*********************************************************}
+procedure TALNativeControl.SetDefStyleAttr(const Value: String);
+begin
+  if Value <> fDefStyleAttr then begin
+    fDefStyleAttr := Value;
+    {$IFDEF ANDROID}
+    if (not (csLoading in componentState)) and (FNativeView <> nil) then
+      RecreateNativeView;
+    {$ENDIF}
   end;
-  {$ENDIF}
+end;
+
+{********************************************************}
+procedure TALNativeControl.SetDefStyleRes(const Value: String);
+begin
+  if Value <> fDefStyleRes then begin
+    fDefStyleRes := Value;
+    {$IFDEF ANDROID}
+    if (not (csLoading in componentState)) and (FNativeView <> nil) then
+      RecreateNativeView;
+    {$ENDIF}
+  end;
+end;
+
+{************************************************************}
+procedure TALNativeControl.SetNativeViewMargins(const Value: TALBounds);
+begin
+  FNativeViewMargins.Assign(Value);
+end;
+
+{************************************************************}
+procedure TALNativeControl.NativeViewMarginsChanged(Sender: TObject);
+begin
+  if FNativeView <> nil then
+    FNativeView.UpdateFrame;
+end;
+
+{************************************************************}
+function TALNativeControl.GetNativeViewAbsoluteRect: TRectF;
+begin
+  Result := Padding.PaddingRect(AbsoluteRect);
+  for var I := 0 to ControlsCount - 1 do begin
+    var LControl := Controls[i];
+    case Lcontrol.Align of
+      TAlignLayout.None,
+      TAlignLayout.Center,
+      TAlignLayout.Client,
+      TAlignLayout.Contents,
+      TAlignLayout.VertCenter,
+      TAlignLayout.HorzCenter,
+      TAlignLayout.Horizontal,
+      TAlignLayout.Vertical,
+      TAlignLayout.Scale,
+      TAlignLayout.Fit,
+      TAlignLayout.FitLeft,
+      TAlignLayout.FitRight:;
+      //--
+      TAlignLayout.Top,
+      TAlignLayout.MostTop: Result.Top := Result.top + LControl.Height + LControl.Margins.top + LControl.Margins.bottom;
+      //--
+      TAlignLayout.Left,
+      TAlignLayout.MostLeft: Result.Left := Result.Left + LControl.width + LControl.Margins.left + LControl.Margins.right;
+      //--
+      TAlignLayout.Right,
+      TAlignLayout.MostRight: Result.Right := Result.Right - LControl.width - LControl.Margins.left - LControl.Margins.right;
+      //--
+      TAlignLayout.Bottom,
+      TAlignLayout.MostBottom: Result.Bottom := Result.Bottom - LControl.Height - LControl.Margins.top - LControl.Margins.bottom;
+      //--
+      else
+        Raise Exception.Create('Error 0B27A512-250E-4D84-9EA5-C852AE80DAA0')
+    end;
+  end;
+  Result := NativeViewMargins.PaddingRect(Result);
+end;
+
+{************************************************************}
+function TALNativeControl.GetNativeViewBoundsRect: TRectF;
+begin
+  Result := AbsoluteToLocal(GetNativeViewAbsoluteRect);
+end;
+
+{*******************************************************}
+function TALNativeControl.GetNativeViewPosition: TPointF;
+begin
+  Result := GetNativeViewBoundsRect.TopLeft;
+end;
+
+{***************************************************}
+function TALNativeControl.GetNativeViewWidth: Single;
+begin
+  Result := GetNativeViewAbsoluteRect.Width;
+end;
+
+{****************************************************}
+function TALNativeControl.GetNativeViewHeight: Single;
+begin
+  Result := GetNativeViewAbsoluteRect.Height;
 end;
 
 {*****************************************************}
@@ -133,6 +372,10 @@ end;
 {$IF defined(android)}
 function TALNativeControl.GetNativeView: TALAndroidNativeView;
 begin
+  if FNativeView = nil then begin
+    FNativeView := CreateNativeView;
+    InitNativeView;
+  end;
   Result := FNativeView;
 end;
 {$ENDIF}
@@ -141,6 +384,10 @@ end;
 {$IF defined(IOS)}
 function TALNativeControl.GetNativeView: TALIosNativeView;
 begin
+  if FNativeView = nil then begin
+    FNativeView := CreateNativeView;
+    InitNativeView;
+  end;
   Result := FNativeView;
 end;
 {$ENDIF}
@@ -149,6 +396,10 @@ end;
 {$IF defined(ALMacOS)}
 function TALNativeControl.GetNativeView: TALMacNativeView;
 begin
+  if FNativeView = nil then begin
+    FNativeView := CreateNativeView;
+    InitNativeView;
+  end;
   Result := FNativeView;
 end;
 {$ENDIF}
@@ -157,6 +408,10 @@ end;
 {$IF defined(MSWindows)}
 function TALNativeControl.GetNativeView: TALWinNativeView;
 begin
+  if FNativeView = nil then begin
+    FNativeView := CreateNativeView;
+    InitNativeView;
+  end;
   Result := FNativeView;
 end;
 {$ENDIF}
@@ -166,115 +421,128 @@ procedure TALNativeControl.DoRootChanged;
 begin
   inherited;
   if csDestroying in ComponentState then exit;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.RootChanged(Root);
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.RootChanged(Root);
 end;
 
-{**********************************}
-procedure TALNativeControl.Resize;
+{***********************************}
+procedure TALNativeControl.DoResized;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.UpdateFrame;
 end;
 
 {*********************************************}
 procedure TALNativeControl.DoAbsoluteChanged;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
   if (not (csLoading in ComponentState)) and
-     (NativeView <> nil) then
-    NativeView.UpdateFrame;
-  {$ENDIF}
+     (FNativeView <> nil) then
+    FNativeView.UpdateFrame;
 end;
 
 {******************************************}
 procedure TALNativeControl.VisibleChanged;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.SetVisible(Visible);
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.SetVisible(Visible);
 end;
 
 {***************************************}
 procedure TALNativeControl.ChangeOrder;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.ChangeOrder;
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.ChangeOrder;
 end;
 
 {*****************************************}
 procedure TALNativeControl.RecalcOpacity;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.setAlpha(AbsoluteOpacity);
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.setAlpha(AbsoluteOpacity);
 end;
 
 {*****************************************}
 procedure TALNativeControl.RecalcEnabled;
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.SetEnabled(AbsoluteEnabled);
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.SetEnabled(AbsoluteEnabled);
+end;
+
+{****************************************}
+procedure TALNativeControl.InitNativeView;
+begin
+  // Virtual
+end;
+
+{********************************************}
+procedure TALNativeControl.RecreateNativeView;
+begin
+  if fNativeView = nil then exit;
+  ALFreeAndNil(fNativeView);
+  FNativeView := CreateNativeView;
+  InitNativeView;
 end;
 
 {*************************************************}
 function TALNativeControl.HasNativeView: boolean;
 begin
-  {$IF not defined(ALDPK)}
-  Result := (NativeView <> nil) and (NativeView.Visible);
-  {$ELSE}
-  Result := false;
-  {$ENDIF}
+  Result := (FNativeView <> nil) and (FNativeView.Visible);
 end;
 
 {*****************************************}
 Procedure TALNativeControl.AddNativeView;
 begin
-  {$IF not defined(ALDPK)}
-  if NativeView = nil then exit;
-  if NativeView.visible then exit;
-  NativeView.SetVisible(true);
-  if Parentcontrol.IsFocused then
-    NativeView.SetFocus;
-  {$ENDIF}
+  if FNativeView = nil then exit;
+  if FNativeView.visible then exit;
+  if FIsNativeViewFrozen then exit;
+  FNativeView.SetVisible(true);
+  if IsFocused then
+    FNativeView.SetFocus;
 end;
 
 {********************************************}
 Procedure TALNativeControl.RemoveNativeView;
 begin
-  {$IF not defined(ALDPK)}
-  if NativeView = nil then exit;
-  if not NativeView.visible then exit;
+  if FNativeView = nil then exit;
+  if not FNativeView.visible then exit;
   ResetFocus;
-  NativeView.ResetFocus;
-  NativeView.SetVisible(False);
-  {$ENDIF}
+  FNativeView.ResetFocus;
+  FNativeView.SetVisible(False);
+end;
+
+{******************************************}
+Procedure TALNativeControl.FreezeNativeView;
+begin
+  if FNativeView = nil then exit;
+  if not FNativeView.visible then exit;
+  if FIsNativeViewFrozen then exit;
+  FIsNativeViewFrozen := True;
+  ALFreeAndNilDrawable(FNativeViewScreenshot);
+  FNativeViewScreenshot := FNativeView.CaptureScreenshot;
+  RemoveNativeView;
+end;
+
+{********************************************}
+Procedure TALNativeControl.UnFreezeNativeView;
+begin
+  if not FIsNativeViewFrozen then exit;
+  FIsNativeViewFrozen := False;
+  ALFreeAndNilDrawable(FNativeViewScreenshot);
+  AddNativeView;
 end;
 
 {**************************************************************************}
 procedure TALNativeControl.AncestorVisibleChanged(const Visible: Boolean);
 begin
   inherited;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.AncestorVisibleChanged;
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.AncestorVisibleChanged;
 end;
 
 {*************************************************}
@@ -282,10 +550,8 @@ procedure TALNativeControl.AncestorParentChanged;
 begin
   inherited;
   if csDestroying in ComponentState then exit;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.UpdateFrame;
 end;
 
 {*****************************************}
@@ -293,10 +559,8 @@ procedure TALNativeControl.ParentChanged;
 begin
   inherited;
   if csDestroying in ComponentState then exit;
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.UpdateFrame;
 end;
 
 {***************************************}
@@ -307,10 +571,8 @@ begin
   // Without this, in some case when we are doing beginupdate to the TEdit
   // (because in android for exemple we would like to not refresh the position of the control during calculation)
   // then when we do endupdate the control is not paint or lost somewhere
-  {$IF not defined(ALDPK)}
-  if NativeView <> nil then
-    NativeView.UpdateFrame;
-  {$ENDIF}
+  if FNativeView <> nil then
+    FNativeView.UpdateFrame;
 end;
 
 {****************************}
@@ -320,10 +582,8 @@ begin
   //ALLog(classname+'.DoEnter', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoEnter;
-  {$IF not defined(ALDPK)}
   if HasNativeView then
-    NativeView.SetFocus;
-  {$ENDIF}
+    FNativeView.SetFocus;
 end;
 
 {***************************}
@@ -333,11 +593,24 @@ begin
   //ALLog(classname+'.DoExit', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoExit;
-  {$IF not defined(ALDPK)}
   if HasNativeView then
-    NativeView.ResetFocus;
-  {$ENDIF}
+    FNativeView.ResetFocus;
 end;
 
+{*********************************}
+procedure TALNativeControl.DoPaint;
+begin
+  // DoPaint instead of paint to paint the FNativeViewScreenshot
+  // After everything have been already painted (paint method already
+  // called and PaintChildren too
+  if FIsNativeViewFrozen then begin
+    var LRect := GetNativeViewBoundsRect;
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FNativeViewScreenshot, // const ADrawable: TALDrawable;
+      LRect.TopLeft, // const ATopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single);
+  end;
+end;
 
 end.

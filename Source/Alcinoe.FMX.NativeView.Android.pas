@@ -9,6 +9,7 @@ interface
 {$ENDIF}
 
 uses
+  System.Types,
   system.Messaging,
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,
@@ -16,7 +17,9 @@ uses
   FMX.Types,
   FMX.Forms,
   FMX.Controls,
-  FMX.ZOrder.Android;
+  FMX.ZOrder.Android,
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.Graphics;
 
 type
 
@@ -26,12 +29,13 @@ type
   {**************************}
   TALAndroidNativeView = class
   private
-    FControl: TControl;
+    FControl: TALControl;
     FForm: TCommonCustomForm;
     FView: JView;
     FLayout: JViewGroup;
     FVisible: Boolean;
     FFocusChangedListener: TALAndroidFocusChangedListener;
+    function GetAbsoluteRect: TRectF;
     procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
   protected
@@ -47,16 +51,16 @@ type
     function GetView<T: JView>: T; overload;
     function CreateView: JView; virtual;
     function CreateLayout: JViewGroup; virtual;
-    procedure InitView; virtual;
   public
     constructor Create; overload; virtual;
-    constructor Create(const AControl: TControl); overload; virtual;
+    constructor Create(const AControl: TALControl); overload; virtual;
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
-    procedure UpdateFrame;
+    procedure UpdateFrame; virtual;
+    function CaptureScreenshot: TALDrawable; virtual;
     property Form: TCommonCustomForm read FForm;
-    property Control: TControl read FControl;
+    property Control: TALControl read FControl;
     property Layout: JViewGroup read FLayout;
     property View: JView read FView;
     property Visible: Boolean read FVisible;
@@ -88,14 +92,14 @@ implementation
 uses
   System.Classes,
   System.SysUtils,
-  System.Types,
   Androidapi.Helpers,
   Androidapi.JNI.App,
   FMX.Platform.Android,
   FMX.Platform.UI.Android,
   FMX.Consts,
   Alcinoe.StringUtils,
-  Alcinoe.Common;
+  Alcinoe.Common,
+  Alcinoe.FMX.NativeControl;
 
 {**************************************}
 constructor TALAndroidNativeView.Create;
@@ -108,13 +112,15 @@ begin
   FView.setClipToOutline(False);
 
   FFocusChangedListener := TALAndroidFocusChangedListener.Create(Self);
-  View.setOnFocusChangeListener(FFocusChangedListener);
+  FView.setOnFocusChangeListener(FFocusChangedListener);
 
   { Tree view structure }
   LayoutParams := TJRelativeLayout_LayoutParams.JavaClass.init(TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT, TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT);
   FLayout.addView(FView, LayoutParams);
 
-  InitView;
+  FView.setClickable(True);
+  FView.setFocusable(True);
+  FView.setFocusableInTouchMode(True);
 
   FVisible := True;
 
@@ -123,7 +129,7 @@ begin
 end;
 
 {****************************************************************}
-constructor TALAndroidNativeView.Create(const AControl: TControl);
+constructor TALAndroidNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
   Create;
@@ -133,20 +139,13 @@ end;
 {**************************************}
 destructor TALAndroidNativeView.Destroy;
 begin
+  View.setVisibility(TJView.JavaClass.INVISIBLE);
   TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
   TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
   RootChanged(nil);
   View.setOnFocusChangeListener(nil);
   ALFreeAndNil(FFocusChangedListener);
   inherited;
-end;
-
-{********************************************************************************************************}
-procedure TALAndroidNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
-begin
-  // This event is called only when the window's handle is recreated.
-  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
-    RootChanged(Form);
 end;
 
 {**********************************************************************************************************}
@@ -159,6 +158,14 @@ begin
   end;
 end;
 
+{********************************************************************************************************}
+procedure TALAndroidNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  // This event is called only when the window's handle is recreated.
+  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
+    RootChanged(Form);
+end;
+
 {*****************************************************}
 function TALAndroidNativeView.CreateLayout: JViewGroup;
 begin
@@ -169,14 +176,6 @@ end;
 function TALAndroidNativeView.CreateView: JView;
 begin
   Result := TJView.JavaClass.init(TAndroidHelper.Activity);
-end;
-
-{**************************************}
-procedure TALAndroidNativeView.InitView;
-begin
-  View.setClickable(True);
-  View.setFocusable(True);
-  View.setFocusableInTouchMode(True);
 end;
 
 {*******************************************************************************}
@@ -192,6 +191,12 @@ begin
   Result := T(FView);
 end;
 
+{*************************************}
+function TALAndroidNativeView.GetAbsoluteRect: TRectF;
+begin
+  Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
+end;
+
 {*****************************************}
 procedure TALAndroidNativeView.UpdateFrame;
 begin
@@ -201,13 +206,13 @@ begin
   // because it updates not only the bounds but also the visibility! Code below is taken from
   // TAndroidZOrderManager.UpdateBounds
   if FForm = nil then exit;
-  var LBounds := Control.AbsoluteRect;
+  var LAbsoluteRect := GetAbsoluteRect;
   var LScreenScale: Single := FForm.Handle.Scale;
   var R := TRectF.Create(
-             LBounds.Left * LScreenScale,
-             LBounds.Top * LScreenScale,
-             LBounds.Right * LScreenScale,
-             LBounds.Bottom * LScreenScale).Round;
+             LAbsoluteRect.Left * LScreenScale,
+             LAbsoluteRect.Top * LScreenScale,
+             LAbsoluteRect.Right * LScreenScale,
+             LAbsoluteRect.Bottom * LScreenScale).Round;
   If (R.Width <> Layout.getWidth) or (R.Height <> Layout.getHeight) then begin
     var LParam: JRelativeLayout_LayoutParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
     LParam.width := R.Width;
@@ -218,6 +223,29 @@ begin
     Layout.setX(R.Left);
   if Layout.getTop <> R.Top then
     Layout.setY(R.Top);
+end;
+
+{*****************************************}
+function TALAndroidNativeView.CaptureScreenshot: TALDrawable;
+begin
+  var LOldCacheEnabledValue := View.isDrawingCacheEnabled;
+  var LOldCacheQualityValue := View.getDrawingCacheQuality;
+  View.setDrawingCacheEnabled(True);
+  View.setDrawingCacheQuality(TJView.JavaClass.DRAWING_CACHE_QUALITY_HIGH);
+  try
+    var LBitmap := View.getDrawingCache;
+    if LBitmap <> nil then
+      {$IF defined(ALSkiaCanvas)}
+      Result := ALCreateSkImageFromJBitmap(LBitmap)
+      {$ELSE}
+      Result := ALCreateTextureFromJBitmap(LBitmap)
+      {$ENDIF}
+    else
+      Result := ALNullDrawable;
+  finally
+    View.setDrawingCacheEnabled(LOldCacheEnabledValue);
+    View.setDrawingCacheQuality(LOldCacheQualityValue);
+  end;
 end;
 
 {*****************************************}
@@ -238,7 +266,7 @@ procedure TALAndroidNativeView.SetVisible(const Value: Boolean);
 begin
   FVisible := Value;
   if not Visible or not Control.ParentedVisible then
-    Layout.setVisibility(TJView.JavaClass.GONE)
+    Layout.setVisibility(TJView.JavaClass.INVISIBLE)
   else
     Layout.setVisibility(TJView.JavaClass.VISIBLE);
 end;
@@ -305,11 +333,11 @@ procedure TALAndroidFocusChangedListener.onFocusChange(view: JView; hasFocus: Bo
 begin
 
   {$IF defined(DEBUG)}
-  ALLog(
-    'TALAndroidFocusChangedListener.onFocusChange',
-    'control.parent.name: ' + self.view.Control.parent.Name + ' | ' + // control is TALAndroidEdit and Control.parent is TalEdit
-    'hasFocus: ' + ALBoolToStrW(hasFocus) + ' | ' +
-    'control.IsFocused: ' + ALBoolToStrW(self.View.Control.IsFocused));
+  //ALLog(
+  //  Classname + '.onFocusChange',
+  //  'control.name: ' + self.view.Control.Name + ' | ' +
+  //  'hasFocus: ' + ALBoolToStrW(hasFocus) + ' | ' +
+  //  'control.IsFocused: ' + ALBoolToStrW(self.View.Control.IsFocused));
   {$ENDIF}
 
   // Since view can get focus without us, we synchronize native focus and fmx focus. For example, when user makes a tap

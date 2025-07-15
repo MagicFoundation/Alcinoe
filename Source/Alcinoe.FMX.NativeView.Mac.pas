@@ -9,23 +9,27 @@ interface
 {$ENDIF}
 
 uses
+  System.Types,
   system.Messaging,
   System.TypInfo,
   Macapi.ObjectiveC,
   MacApi.AppKit,
   FMX.Controls,
   FMX.Forms,
-  FMX.Types;
+  FMX.Types,
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.Graphics;
 
 type
 
   {********************************}
   TALMacNativeView = class(TOCLocal)
   private
-    FControl: TControl;
+    FControl: TALControl;
     FForm: TCommonCustomForm;
     FVisible: Boolean;
     function GetView: NSView; overload;
+    function GetAbsoluteRect: TRectF;
     procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure FormSizeChanged(const Sender: TObject; const AMessage: TMessage);
@@ -46,13 +50,14 @@ type
     function GetView<T: NSView>: T; overload;
   public
     constructor Create; overload; virtual;
-    constructor Create(const AControl: TControl); overload; virtual;
+    constructor Create(const AControl: TALControl); overload; virtual;
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
-    procedure UpdateFrame;
+    procedure UpdateFrame; virtual;
+    function CaptureScreenshot: TALDrawable; virtual;
     property Form: TCommonCustomForm read FForm;
-    property Control: TControl read FControl;
+    property Control: TALControl read FControl;
     property View: NSView read GetView;
     property Visible: Boolean read FVisible;
   end;
@@ -63,7 +68,8 @@ implementation
 uses
   FMX.Platform.Mac,
   Alcinoe.Common,
-  Alcinoe.FMX.Common;
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.NativeControl;
 
 {**********************************}
 constructor TALMacNativeView.Create;
@@ -77,7 +83,7 @@ begin
 end;
 
 {************************************************************}
-constructor TALMacNativeView.Create(const AControl: TControl);
+constructor TALMacNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
   Create;
@@ -94,19 +100,19 @@ begin
   inherited;
 end;
 
+{******************************************************************************************************}
+procedure TALMacNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
+    View.removeFromSuperview;
+end;
+
 {****************************************************************************************************}
 procedure TALMacNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   // This event is called only when the window's handle is recreated.
   if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
     RootChanged(Form);
-end;
-
-{******************************************************************************************************}
-procedure TALMacNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
-begin
-  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
-    View.removeFromSuperview;
 end;
 
 {******************************************************************************************}
@@ -121,7 +127,7 @@ end;
 {**********************************}
 procedure TALMacNativeView.InitView;
 begin
-  var LAbsoluteRect := Control.AbsoluteRect;
+  var LAbsoluteRect := GetAbsoluteRect;
   var LGridHeight: Single;
   if FForm <> nil then LGridHeight := GetFormView(FForm).frame.size.height
   else LGridHeight := 0;
@@ -161,16 +167,28 @@ begin
 end;
 
 {*************************************}
+function TALMacNativeView.GetAbsoluteRect: TRectF;
+begin
+  Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
+end;
+
+{*************************************}
 procedure TALMacNativeView.UpdateFrame;
 begin
   if FForm = nil then exit;
-  var LAbsoluteRect := Control.AbsoluteRect;
+  var LAbsoluteRect := GetAbsoluteRect;
   View.setFrame(
     ALLowerLeftCGRect(
       LAbsoluteRect.TopLeft,
       LAbsoluteRect.Width,
       LAbsoluteRect.Height,
       GetFormView(FForm).frame.size.height));
+end;
+
+{*****************************************}
+function TALMacNativeView.CaptureScreenshot: TALDrawable;
+begin
+  Result := AlNullDrawable;
 end;
 
 {*************************************}
@@ -251,20 +269,20 @@ end;
 function TALMacNativeView.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  //ALLog(classname + '.acceptsFirstResponder', 'control.name: ' + Control.parent.Name);
+  //ALLog(classname + '.acceptsFirstResponder', 'control.name: ' + Control.Name);
   {$ENDIF}
-  Result := NSView(Super).acceptsFirstResponder and TControl(Control.Owner).canFocus;
+  Result := NSView(Super).acceptsFirstResponder and Control.canFocus;
 end;
 
 {*********************************************************}
 function TALMacNativeView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  //ALLog(classname + '.becomeFirstResponder', 'control.name: ' + Control.parent.Name);
+  //ALLog(classname + '.becomeFirstResponder', 'control.name: ' + Control.Name);
   {$ENDIF}
   Result := NSView(Super).becomeFirstResponder;
-  if (not TControl(Control.Owner).IsFocused) then
-    TControl(Control.Owner).SetFocus;
+  if (not Control.IsFocused) then
+    Control.SetFocus;
 end;
 
 end.

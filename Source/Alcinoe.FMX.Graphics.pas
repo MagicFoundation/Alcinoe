@@ -147,9 +147,14 @@ procedure ALUpdateTextureFromSkImage(Const AImage: sk_image_t; const ATexture: T
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
+procedure ALReleaseMemPixelBufferProc(const pixels: Pointer; context: Pointer); cdecl;
 {$ENDIF}
 
 {$IF defined(ANDROID)}
+{$IF defined(ALSkiaAvailable)}
+procedure ALReleaseJavaPixelBufferProc(const pixels: Pointer; context: Pointer); cdecl;
+function ALCreateSkImageFromJBitmap(const aBitmap: Jbitmap): sk_image_t;
+{$ENDIF}
 function ALCreateTextureFromJBitmap(const aBitmap: Jbitmap): TTexture;
 procedure ALUpdateTextureFromJBitmap(const aBitmap: Jbitmap; const ATexture: TTexture);
 {$ENDIF}
@@ -1296,6 +1301,64 @@ function TALRefCountBitmap.IncreaseRefCount: TALRefCountBitmap;
 begin
   result := TALRefCountBitmap(inherited IncreaseRefCount);
 end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+procedure ALReleaseMemPixelBufferProc(const pixels: Pointer; context: Pointer);
+begin
+  FreeMem(context);
+end;
+{$ENDIF}
+
+{*************************************************}
+{$IF defined(ANDROID) and defined(ALSkiaAvailable)}
+procedure ALReleaseJavaPixelBufferProc(const pixels: Pointer; context: Pointer);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('ALCreateSkImageFromJBitmap.ReleaseJavaPixelBufferProc');
+  {$ENDIF}
+  TJavaArray<Integer>(context).Free;
+end;
+{$ENDIF}
+
+{*************************************************}
+{$IF defined(ANDROID) and defined(ALSkiaAvailable)}
+function ALCreateSkImageFromJBitmap(const aBitmap: Jbitmap): sk_image_t;
+begin
+  var LWidth: Integer := ABitmap.getWidth;
+  var LHeight: Integer := ABitmap.getHeight;
+  var LPixelBuffer: TJavaArray<Integer> := TJavaArray<Integer>.Create(LWidth * LHeight);
+  try
+    ABitmap.getPixels(
+      LPixelBuffer, // pixels: TJavaArray<Integer>;
+      0, // offset: Integer;
+      LWidth, // stride: Integer;
+      0, // x: Integer;
+      0, // y: Integer;
+      LWidth, // width: Integer;
+      LHeight); // height: Integer
+    var LImageInfo := ALGetSkImageinfo(LWidth, LHeight);
+    LImageInfo.color_type := sk_colortype_t.BGRA8888_SK_COLORTYPE;
+    var LPixmap: sk_pixmap_t := ALSkCheckHandle(
+                                  sk4d_pixmap_create(
+                                    @LImageInfo,
+                                    LPixelBuffer.Data,
+                                    LWidth * 4));
+    try
+      Result := ALSkCheckHandle(
+                  sk4d_image_make_from_raster(
+                    LPixmap, // const pixmap: sk_pixmap_t;
+                    @ALReleaseJavaPixelBufferProc, // proc: sk_image_raster_release_proc;
+                    LPixelBuffer)); // proc_context: Pointer
+    finally
+      sk4d_refcnt_unref(LPixmap);
+    end;
+  except
+    ALFreeAndNil(LPixelBuffer);
+    raise;
+  end;
+end;
+{$ENDIF}
 
 {********************}
 {$IF defined(ANDROID)}

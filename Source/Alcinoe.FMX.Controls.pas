@@ -1295,8 +1295,8 @@ function TALControl.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (not Visible) or (form = nil) then Exit(TRectF.Empty);
   var LAbsoluteIntersectionRect := AbsoluteRect;
-  var LControlTmp := Tcontrol(Self);
-  while LControlTmp.ParentControl <> nil do begin
+  var LControlTmp := ParentControl;
+  while LControlTmp <> nil do begin
     if not LControlTmp.Visible then Exit(TRectF.Empty);
     if LControlTmp.ClipChildren then begin
       var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);

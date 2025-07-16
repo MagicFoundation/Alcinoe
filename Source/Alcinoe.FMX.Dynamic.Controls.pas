@@ -15,6 +15,7 @@ uses
   FMX.Graphics,
   Alcinoe.Common,
   Alcinoe.fmx.Common,
+  Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.CacheEngines,
   Alcinoe.fmx.Controls;
 
@@ -171,6 +172,7 @@ Type
     class function GetDownloadPriority(const AContext: Tobject): Int64; virtual;
     function GetDoubleBuffered: boolean; virtual; abstract;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual; abstract;
+    function GetScrollEngine: TALScrollEngine; Virtual;
     function FillTextFlags: TFillTextFlags; virtual; // [TControl] function FillTextFlags: TFillTextFlags; virtual;
     procedure PaddingChanged; virtual; // [TControl] procedure PaddingChanged; overload; virtual;
     procedure MarginsChanged; virtual;
@@ -200,6 +202,7 @@ Type
     procedure ChildrenMouseLeave(const AObject: TALDynamicControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
     procedure Click; virtual; // [TControl] procedure Click; virtual;
     procedure DblClick; virtual; // [TControl] procedure DblClick; virtual;
+    function IsInMotion: Boolean; virtual; abstract;
     procedure Capture; // [TControl] procedure Capture;
     procedure ReleaseCapture; // [TControl] procedure ReleaseCapture;
     procedure PaintInternal(const ACanvas: TCanvas); virtual; // [TControl] procedure PaintInternal;
@@ -289,6 +292,7 @@ Type
     procedure SetSize(const ASize: TSizeF); overload;
     procedure SetSize(const AWidth, AHeight: Double); overload;
     property DefaultSize: TSizeF read GetDefaultSize; // [TControl] property DefaultSize: TSizeF read GetDefaultSize;
+    property ScrollEngine: TALScrollEngine read GetScrollEngine;
     property HitTest: Boolean read FHitTest write FHitTest; // [TControl] property HitTest: Boolean read FHitTest write SetHitTest default True;
     property Cursor: TCursor read GetCursor write SetCursor; // [TControl] property Cursor: TCursor read GetCursor write SetCursor default crDefault;
     property AbsoluteCursor: TCursor read GetAbsoluteCursor; // [TControl] property InheritedCursor: TCursor read GetInheritedCursor default crDefault;
@@ -333,7 +337,7 @@ type
     //**FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     //**FFocusOnMouseDown: Boolean; // 1 byte
     //**FFocusOnMouseUp: Boolean; // 1 byte
-    FMouseDownAtLowVelocity: Boolean; // 1 byte
+    FMouseDownAtRest: Boolean; // 1 byte
     FDoubleClick: Boolean; // 1 byte
     FAutoAlignToPixel: Boolean; // 1 byte
     //**FAlign: TALAlignLayout; // 1 byte
@@ -376,6 +380,7 @@ type
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoClickSound; virtual;
     procedure Click; override;
+    function IsInMotion: Boolean; override;
     //**function GetParentedVisible: Boolean; override;
     //**procedure DoMatrixChanged(Sender: TObject); override;
     //**procedure DoRootChanged; override;
@@ -514,7 +519,6 @@ uses
   System.Math,
   System.Math.Vectors,
   Fmx.utils,
-  Alcinoe.FMX.ScrollEngine,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.Localization,
   Alcinoe.StringUtils;
@@ -1583,6 +1587,12 @@ begin
 
 end;
 
+{**********************************************************}
+function TALDynamicControl.GetScrollEngine: TALScrollEngine;
+begin
+  Result := Nil;
+end;
+
 {*******************************************************}
 function TALDynamicControl.FillTextFlags: TFillTextFlags;
 begin
@@ -2617,7 +2627,7 @@ begin
   //**FScale.OnChange := ScaleChangedHandler;
   //**FFocusOnMouseDown := False;
   //**FFocusOnMouseUp := False;
-  FMouseDownAtLowVelocity := True;
+  FMouseDownAtRest := True;
   FDoubleClick := False;
   FAutoAlignToPixel := True;
   //**FAlign := TALAlignLayout.None;
@@ -3603,8 +3613,8 @@ end;
 //**begin
 //**  if (not Visible) or (form = nil) then Exit(TRectF.Empty);
 //**  var LAbsoluteIntersectionRect := AbsoluteRect;
-//**  var LControlTmp := Tcontrol(Self);
-//**  while LControlTmp.Owner <> nil do begin
+//**  var LControlTmp := Owner;
+//**  while LControlTmp <> nil do begin
 //**    if not LControlTmp.Visible then Exit(TRectF.Empty);
 //**    if LControlTmp.ClipChildren then begin
 //**      var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
@@ -3714,7 +3724,7 @@ begin
   var LPrevPressed := Pressed;
   //--
   FControlAbsolutePosAtMouseDown := LocalToAbsolute(TPointF.Zero);
-  FMouseDownAtLowVelocity := True;
+  FMouseDownAtRest := not IsInMotion;
   //--
   FDoubleClick := ssDouble in Shift;
   if FDoubleClick then begin
@@ -3725,20 +3735,7 @@ begin
     Shift := Shift - [ssDouble];
   end;
   //--
-  var LScrollableControl: IALScrollableControl;
-  var LOwner := Owner;
-  while LOwner <> nil do begin
-    if Supports(LOwner, IALScrollableControl, LScrollableControl) then begin
-      if not LScrollableControl.GetScrollEngine.IsVelocityLow then begin
-        FMouseDownAtLowVelocity := False;
-        Break;
-      end
-      else LOwner := LOwner.Owner;
-    end
-    else LOwner := LOwner.Owner;
-  end;
-  //--
-  //**if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin
+  //**if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtRest) then begin
   //**  Var LOldIsfocused := FIsfocused;
   //**  FIsfocused := True;
   //**  Try
@@ -3765,7 +3762,7 @@ begin
   FDoubleClick := False;
   //**var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
   //**if (FFocusOnMouseUp) and
-  //**   (FMouseDownAtLowVelocity) and
+  //**   (FMouseDownAtRest) and
   //**   (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and
   //**   (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and
   //**   (not (csDesigning in ComponentState)) and
@@ -3777,11 +3774,11 @@ end;
 procedure TALDynamicExtendedControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
-  if (not FMouseDownAtLowVelocity) or
+  if (not FMouseDownAtRest) or
      (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) or
      (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then begin
     {$IF defined(debug)}
-    if (not FMouseDownAtLowVelocity) then
+    if (not FMouseDownAtRest) then
       ALLog(Classname+'.MouseClick', 'Skipped | Mouse Down was not made at Low Velocity')
     else if (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) then
       ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x)) + ' horizontally')
@@ -3819,6 +3816,19 @@ begin
     DblClick;
     FDoubleClick := False;
   end;
+end;
+
+{*****************************************************}
+function TALDynamicExtendedControl.IsInMotion: Boolean;
+begin
+  If (Owner <> nil) then begin
+    //**var LScrollableControl: IALScrollableControl;
+    //**if (Supports(Owner, IALScrollableControl, LScrollableControl)) and
+    //**   (not LScrollableControl.GetScrollEngine.IsVelocityLow) then result := True
+    if (Owner.ScrollEngine <> nil) and (not Owner.ScrollEngine.IsVelocityLow) then result := True
+    else result := Owner.IsInMotion;
+  end
+  else result := False;
 end;
 
 {*************************************}

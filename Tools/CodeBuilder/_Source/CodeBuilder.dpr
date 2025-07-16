@@ -603,6 +603,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'OnKeyDown := TALDynamicControl(Source).OnKeyDown;','//**OnKeyDown := TALDynamicControl(Source).OnKeyDown;');
     aSrc := FindAndReplace(aSrc, 'OnKeyUp := TALDynamicControl(Source).OnKeyUp;','//**OnKeyUp := TALDynamicControl(Source).OnKeyUp;');
     aSrc := FindAndReplace(aSrc, 'OnDblClick := TALDynamicControl(Source).OnDblClick;','//**OnDblClick := TALDynamicControl(Source).OnDblClick;');
+    aSrc := FindAndReplace(aSrc, 'function IsInMotion: Boolean; virtual;','function IsInMotion: Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'OnCanFocus := TALDynamicControl(Source).OnCanFocus;','//**OnCanFocus := TALDynamicControl(Source).OnCanFocus;');
     aSrc := FindAndReplace(aSrc, 'OnEnter := TALDynamicControl(Source).OnEnter;','//**OnEnter := TALDynamicControl(Source).OnEnter;');
     aSrc := FindAndReplace(aSrc, 'OnExit := TALDynamicControl(Source).OnExit;','//**OnExit := TALDynamicControl(Source).OnExit;');
@@ -777,22 +778,15 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  TALDynamicPageController = class(TALDynamicBaseRectangle)');
     aSrc := FindAndReplace(
               aSrc,
-              '    if Supports(LOwner, IALScrollableControl, LScrollableControl) then begin'#13#10+
-              '      if not LScrollableControl.GetScrollEngine.IsVelocityLow then begin'#13#10+
-              '        FMouseDownAtLowVelocity := False;'#13#10+
-              '        Break;'#13#10+
-              '      end'#13#10+
-              '      else LOwner := LOwner.Owner;'#13#10+
-              '    end'#13#10+
-              '    else LOwner := LOwner.Owner;',
-              '    //**if Supports(LOwner, IALScrollableControl, LScrollableControl) then begin'#13#10+
-              '      if (LOwner.ScrollEngine <> nil) and (not LOwner.ScrollEngine.IsVelocityLow) then begin'#13#10+
-              '        FMouseDownAtLowVelocity := False;'#13#10+
-              '        Break;'#13#10+
-              '      end'#13#10+
-              '      else LOwner := LOwner.Owner;'#13#10+
-              '    //**end'#13#10+
-              '    //**else LOwner := LOwner.Owner;');
+              '    var LScrollableControl: IALScrollableControl;'#13#10+
+              '    if (Supports(Owner, IALScrollableControl, LScrollableControl)) and'#13#10+
+              '       (not LScrollableControl.GetScrollEngine.IsVelocityLow) then result := True'#13#10+
+              '    else result := Owner.IsInMotion;',
+              '    //**var LScrollableControl: IALScrollableControl;'#13#10+
+              '    //**if (Supports(Owner, IALScrollableControl, LScrollableControl)) and'#13#10+
+              '    //**   (not LScrollableControl.GetScrollEngine.IsVelocityLow) then result := True'#13#10+
+              '    if (Owner.ScrollEngine <> nil) and (not Owner.ScrollEngine.IsVelocityLow) then result := True'#13#10+
+              '    else result := Owner.IsInMotion;');
     aSrc := FindAndReplace(
               aSrc,
               '    { IALScrollableControl }'#13#10+
@@ -1094,7 +1088,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               aSrc,
               '  var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);'+#13#10+
               '  if (FFocusOnMouseUp) and'+#13#10+
-              '     (FMouseDownAtLowVelocity) and'+#13#10+
+              '     (FMouseDownAtRest) and'+#13#10+
               '     (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
               '     (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
               '     (not (csDesigning in ComponentState)) and'+#13#10+
@@ -1102,7 +1096,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    SetFocus;',
               '  //**var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);'+#13#10+
               '  //**if (FFocusOnMouseUp) and'+#13#10+
-              '  //**   (FMouseDownAtLowVelocity) and'+#13#10+
+              '  //**   (FMouseDownAtRest) and'+#13#10+
               '  //**   (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
               '  //**   (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and'+#13#10+
               '  //**   (not (csDesigning in ComponentState)) and'+#13#10+
@@ -1212,8 +1206,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
           end;
         end
         //--
-        else if ALSameTextA(ALTrim(LSrcLine), 'if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin') then begin
-          var P1 := ALPosA('if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin', LSrcLine);
+        else if ALSameTextA(ALTrim(LSrcLine), 'if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtRest) then begin') then begin
+          var P1 := ALPosA('if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtRest) then begin', LSrcLine);
           While I <= LSrcLst.Count - 1 do begin
             LSrcLine := LSrcLst[i];
             LSrcLst[i] := AlCopyStr(LSrcLine, 1, P1-1) + '//**' + AlCopyStr(LSrcLine, P1, MAxint);

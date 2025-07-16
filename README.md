@@ -1178,6 +1178,18 @@ undesired conversions.
 History
 =======
 
+#### 16/07/2025 – Z-Order Simulation for Native Controls
+
+- Added `TALWebBrowser`.
+- Introduced `FreezeNativeView` and `UnFreezeNativeView` methods 
+  to `TALNativeControl`-based controls such as `TALEdit`, `TALMemo`, 
+  and `TALWebBrowser`. These methods capture a screenshot of the 
+  underlying native view (`FNativeView`), hide the actual native 
+  control, and draw the captured bitmap in its place. This allows 
+  simulating z-order (e.g., displaying a popup dialog above the 
+  control) without altering the native view hierarchy.
+- Refactored `Alcinoe.FMX.Edit` and `Alcinoe.FMX.Memo` units.
+
 #### 06/07/2025 – Renamed Material Interpolation Types
 
 - **Renamed** the following `TALInterpolationType` entries to use 

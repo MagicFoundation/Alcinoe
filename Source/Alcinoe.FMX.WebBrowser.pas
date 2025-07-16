@@ -13,7 +13,6 @@ interface
 
 uses
   system.Classes,
-  system.SysUtils,
   {$IF defined(android)}
   Androidapi.JNI.Net,
   Androidapi.JNI.Os,
@@ -35,13 +34,10 @@ uses
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
   Macapi.Foundation,
-  Macapi.AppKit,
   Macapi.WebKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
-  Macapi.CocoaTypes,
   FMX.DialogService.Async,
-  Alcinoe.Macapi.AppKit,
   Alcinoe.FMX.NativeView.Mac,
   {$ELSEIF defined(MSWindows)}
   Winapi.WebView2,
@@ -49,51 +45,30 @@ uses
   Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
   Fmx.controls,
-  Alcinoe.FMX.Controls,
-  Alcinoe.FMX.NativeControl,
-  Alcinoe.FMX.Common;
+  Alcinoe.FMX.NativeControl;
 
 Type
+
+  {********************}
+  TALWebBrowser = class;
 
   {*****************************************************************************************************}
   TALShouldStartLoadUrl = procedure(ASender: TObject; const AURL: string; var AAllow: Boolean) of object;
 
-  {************************************************}
-  TALBaseWebBrowserControl = class(TALNativeControl)
-  strict private
-    FOnShouldStartLoadUrl: TALShouldStartLoadUrl;
-  protected
-    function ShouldStartLoadUrl(const AURL: string): Boolean; virtual;
-  public
-    constructor Create(AOwner: TComponent); override;
-    procedure LoadUrl(const AURL: string); virtual; abstract;
-    procedure LoadData(
-                const ABaseUrl: String;
-                const AData: string;
-                const AMimeType: String = '';
-                const AEncoding: String = '';
-                const AHistoryUrl: String = ''); virtual; abstract;
-    property OnShouldStartLoadUrl: TALShouldStartLoadUrl read FOnShouldStartLoadUrl write FOnShouldStartLoadUrl;
-  end;
-
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-type
 
-  {**********************************}
-  TALAndroidWebBrowserControl = class;
-
-  {**********************************************}
-  TALAndroidWebView = class(TALAndroidNativeView)
+  {****************************************************}
+  TALAndroidWebBrowserView = class(TALAndroidNativeView)
   private
     type
       // ----------------
       // TWebViewListener
       TWebViewListener = class(TJavaLocal, JALWebViewListener)
       private
-        FWebView: TALAndroidWebView;
+        FWebBrowserView: TALAndroidWebBrowserView;
       public
-        constructor Create(const AWebView: TALAndroidWebView);
+        constructor Create(const AWebBrowserView: TALAndroidWebBrowserView);
         procedure doUpdateVisitedHistory(view: JWebView; url: JString; isReload: Boolean); cdecl;
         procedure onFormResubmission(view: JWebView; dontResend: JMessage; resend: JMessage); cdecl;
         procedure onLoadResource(view: JWebView; url: JString); cdecl;
@@ -110,31 +85,21 @@ type
   private
     FWebViewListener: TWebViewListener;
     function GetView: JALWebView;
-    function GetControl: TALAndroidWebBrowserControl;
+    function GetControl: TALWebBrowser;
   protected
     function CreateView: JView; override;
-    procedure InitView; override;
   public
-    constructor Create(const AControl: TControl); override;
+    constructor Create; override;
     destructor Destroy; override;
     property View: JALWebView read GetView;
-    property Control: TALAndroidWebBrowserControl read GetControl;
-  end;
-
-  {***********************************************}
-  TALAndroidWebBrowserControl = class(TALBaseWebBrowserControl)
-  protected
-    Function CreateNativeView: TALAndroidNativeView; override;
-    function GetNativeView: TALAndroidWebView; reintroduce; virtual;
-  public
-    property NativeView: TALAndroidWebView read GetNativeView;
-    procedure LoadUrl(const AURL: string); override;
+    property Control: TALWebBrowser read GetControl;
+    procedure LoadUrl(const AURL: string); virtual;
     procedure LoadData(
                 const ABaseUrl: String;
                 const AData: string;
                 const AMimeType: String = '';
                 const AEncoding: String = '';
-                const AHistoryUrl: String = ''); override;
+                const AHistoryUrl: String = ''); virtual;
   end;
 
 {$endif}
@@ -142,13 +107,9 @@ type
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
-type
 
-  {******************************}
-  TALIosWebBrowserControl = class;
-
-  {**********************************}
-  IALIosWebView = interface(WKWebView)
+  {*****************************************}
+  IALIosWebBrowserView = interface(WKWebView)
     ['{F6E522FD-2CB4-4718-870A-4E1A29540D39}']
     procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
@@ -158,17 +119,19 @@ type
     function becomeFirstResponder: Boolean; cdecl;
   end;
 
-  {*******************************************}
-  TALIosWebView = class(TALIosNativeView)
+  {********************************************}
+  TALIosWebBrowserView = class(TALIosNativeView)
+  private
+    class var IsWKWebViewClassRegistered: Boolean;
   private
     type
       // -------------------
       // TNavigationDelegate
       TNavigationDelegate = class(TOCLocal, WKNavigationDelegate)
       private
-        FWebView: TALIosWebView;
+        FWebBrowserView: TALIosWebBrowserView;
       public
-        constructor Create(const AWebView: TALIosWebView);
+        constructor Create(const AWebBrowserView: TALIosWebBrowserView);
         [MethodName('webView:decidePolicyForNavigationAction:decisionHandler:')]
         procedure webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction; decisionHandler: Pointer); overload; cdecl; // TWKNavigationDelegateBlockMethod1
         [MethodName('webView:decidePolicyForNavigationResponse:decisionHandler:')]
@@ -192,33 +155,22 @@ type
   private
     FNavigationDelegate: TNavigationDelegate;
     function GetView: WKWebView;
-    function GetControl: TALIosWebBrowserControl;
+    function GetControl: TALWebBrowser;
   protected
     procedure InitView; override;
     function GetObjectiveCClass: PTypeInfo; override;
   public
-    constructor Create(const AControl: TControl); override;
+    constructor Create; override;
     destructor Destroy; override;
     property View: WKWebView read GetView;
-    property Control: TALIosWebBrowserControl read GetControl;
-  end;
-
-  {*******************************************}
-  TALIosWebBrowserControl = class(TALBaseWebBrowserControl)
-  private
-    class var IsWKWebViewClassRegistered: Boolean;
-  protected
-    Function CreateNativeView: TALIosNativeView; override;
-    function GetNativeView: TALIosWebView; reintroduce; virtual;
-  public
-    property NativeView: TALIosWebView read GetNativeView;
-    procedure LoadUrl(const AURL: string); override;
+    property Control: TALWebBrowser read GetControl;
+    procedure LoadUrl(const AURL: string); virtual;
     procedure LoadData(
                 const ABaseUrl: String;
                 const AData: string;
                 const AMimeType: String = '';
                 const AEncoding: String = '';
-                const AHistoryUrl: String = ''); override;
+                const AHistoryUrl: String = ''); virtual;
   end;
 
 {$endif}
@@ -226,29 +178,27 @@ type
 
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
-type
 
-  {******************************}
-  TALMacWebBrowserControl = class;
-
-  {**********************************}
-  IALMacWebView = interface(WKWebView)
+  {*****************************************}
+  IALMacWebBrowserView = interface(WKWebView)
     ['{22B2CD52-0DF9-4645-8359-4DDAE64A5CA1}']
     function acceptsFirstResponder: Boolean; cdecl;
     function becomeFirstResponder: Boolean; cdecl;
   end;
 
-  {*******************************************}
-  TALMacWebView = class(TALMacNativeView)
+  {********************************************}
+  TALMacWebBrowserView = class(TALMacNativeView)
+  private
+    class var IsWKWebViewClassRegistered: Boolean;
   private
     type
       // -------------------
       // TNavigationDelegate
       TNavigationDelegate = class(TOCLocal, WKNavigationDelegate)
       private
-        FWebView: TALMacWebView;
+        FWebBrowserView: TALMacWebBrowserView;
       public
-        constructor Create(const AWebView: TALMacWebView);
+        constructor Create(const AWebBrowserView: TALMacWebBrowserView);
         [MethodName('webView:decidePolicyForNavigationAction:decisionHandler:')]
         procedure webViewDecidePolicyForNavigationActionDecisionHandler(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer); cdecl;
         [MethodName('webView:decidePolicyForNavigationResponse:decisionHandler:')]
@@ -271,33 +221,22 @@ type
   private
     FNavigationDelegate: TNavigationDelegate;
     function GetView: WKWebView;
-    function GetControl: TALMacWebBrowserControl;
+    function GetControl: TALWebBrowser;
   protected
     procedure InitView; override;
     function GetObjectiveCClass: PTypeInfo; override;
   public
-    constructor Create(const AControl: TControl); override;
+    constructor Create; override;
     destructor Destroy; override;
     property View: WKWebView read GetView;
-    property Control: TALMacWebBrowserControl read GetControl;
-  end;
-
-  {*******************************************}
-  TALMacWebBrowserControl = class(TALBaseWebBrowserControl)
-  private
-    class var IsWKWebViewClassRegistered: Boolean;
-  protected
-    Function CreateNativeView: TALMacNativeView; override;
-    function GetNativeView: TALMacWebView; reintroduce; virtual;
-  public
-    property NativeView: TALMacWebView read GetNativeView;
-    procedure LoadUrl(const AURL: string); override;
+    property Control: TALWebBrowser read GetControl;
+    procedure LoadUrl(const AURL: string); virtual;
     procedure LoadData(
                 const ABaseUrl: String;
                 const AData: string;
                 const AMimeType: String = '';
                 const AEncoding: String = '';
-                const AHistoryUrl: String = ''); override;
+                const AHistoryUrl: String = ''); virtual;
   end;
 
 {$endif}
@@ -305,12 +244,8 @@ type
 
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
-type
 
-  {************************}
-  TALWinWebBrowserControl = class;
-
-  {**************************************}
+  {********************************************}
   TALWinWebBrowserView = class(TALWinNativeView)
   private
     type
@@ -342,18 +277,18 @@ type
       // TNavigationStartingEventHandler
       TNavigationStartingEventHandler = class(TInterfacedObject, ICoreWebView2NavigationStartingEventHandler)
       private
-        FWebBrowserControl: TALWinWebBrowserControl;
+        FWebBrowserView: TALWinWebBrowserView;
       public
-        constructor Create(const AControl: TALWinWebBrowserControl);
+        constructor Create(const AWebBrowserView: TALWinWebBrowserView);
         function Invoke(const sender: ICoreWebView2; const args: ICoreWebView2NavigationStartingEventArgs): HResult; stdcall;
       end;
       // ---------------------------------
       // TWebResourceRequestedEventHandler
       TWebResourceRequestedEventHandler = class(TInterfacedObject, ICoreWebView2WebResourceRequestedEventHandler)
       private
-        FWebBrowserControl: TALWinWebBrowserControl;
+        FWebBrowserView: TALWinWebBrowserView;
       public
-        constructor Create(const AControl: TALWinWebBrowserControl);
+        constructor Create(const AWebBrowserView: TALWinWebBrowserView);
         function Invoke(const sender: ICoreWebView2; const args: ICoreWebView2WebResourceRequestedEventArgs): HResult; stdcall;
       end;
   private
@@ -362,80 +297,62 @@ type
     FReferrer: String;
     FWebView2Controller: ICoreWebView2Controller;
     FWebView2: ICoreWebView2;
-    function GetControl: TALWinWebBrowserControl;
+    function GetControl: TALWebBrowser;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   public
-    constructor Create(const AControl: TControl); override;
+    constructor Create; override;
     destructor Destroy; override;
-    property Control: TALWinWebBrowserControl read GetControl;
-  end;
-
-  {*******************************************}
-  TALWinWebBrowserControl = class(TALBaseWebBrowserControl)
-  protected
-    Function CreateNativeView: TALWinNativeView; override;
-    function GetNativeView: TALWinWebBrowserView; reintroduce; virtual;
-  public
-    constructor Create(AOwner: TComponent); override;
-    property NativeView: TALWinWebBrowserView read GetNativeView;
-    procedure LoadUrl(const AURL: string); override;
+    property Control: TALWebBrowser read GetControl;
+    procedure LoadUrl(const AURL: string); virtual;
     procedure LoadData(
                 const ABaseUrl: String;
                 const AData: string;
                 const AMimeType: String = '';
                 const AEncoding: String = '';
-                const AHistoryUrl: String = ''); override;
+                const AHistoryUrl: String = ''); virtual;
   end;
 
 {$endif}
 {$ENDREGION}
 
-type
-
-  {*******************************************}
+  {*************************}
   [ComponentPlatforms($FFFF)]
-  TALWebBrowser = class(TALControl, IControlTypeSupportable, IALNativeControl)
+  TALWebBrowser = class(TALNativeControl, IControlTypeSupportable, IALNativeControl)
   private
-    FWebBrowserControl: TALBaseWebBrowserControl;
     FOnShouldStartLoadUrl: TALShouldStartLoadUrl;
-    procedure OnShouldStartLoadUrlImpl(ASender: TObject; const AURL: string; var AAllow: Boolean);
-    { IControlTypeSupportable }
-    function GetControlType: TControlType;
-    procedure SetControlType(const Value: TControlType);
-  protected
-    function CreateWebBrowserControl: TALBaseWebBrowserControl; virtual;
-    function GetWebBrowserControl: TALBaseWebBrowserControl; virtual;
-    property WebBrowserControl: TALBaseWebBrowserControl read GetWebBrowserControl;
     {$IF defined(android)}
-    function GetNativeView: TALAndroidNativeView; virtual;
+    function GetNativeView: TALAndroidWebBrowserView;
     {$ELSEIF defined(IOS)}
-    function GetNativeView: TALIosNativeView; virtual;
+    function GetNativeView: TALIosWebBrowserView;
     {$ELSEIF defined(ALMacOS)}
-    function GetNativeView: TALMacNativeView; virtual;
+    function GetNativeView: TALMacWebBrowserView;
     {$ELSEIF defined(MSWindows)}
-    function GetNativeView: TALWinNativeView; virtual;
+    function GetNativeView: TALWinWebBrowserView;
     {$ENDIF}
-    procedure InitWebBrowserControl; virtual;
-    procedure DoEnter; override;
-    procedure DoExit; override;
-    procedure Loaded; override;
+  protected
+    {$IF defined(android)}
+    Function CreateNativeView: TALAndroidNativeView; override;
+    {$ELSEIF defined(IOS)}
+    Function CreateNativeView: TALIosNativeView; override;
+    {$ELSEIF defined(ALMacOS)}
+    Function CreateNativeView: TALMacNativeView; override;
+    {$ELSEIF defined(MSWindows)}
+    Function CreateNativeView: TALWinNativeView; override;
+    {$ENDIF}
+    function ShouldStartLoadUrl(const AURL: string): Boolean; virtual;
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     {$IF defined(android)}
-    property NativeView: TALAndroidNativeView read GetNativeView;
+    property NativeView: TALAndroidWebBrowserView read GetNativeView;
     {$ELSEIF defined(IOS)}
-    property NativeView: TALIosNativeView read GetNativeView;
+    property NativeView: TALIosWebBrowserView read GetNativeView;
     {$ELSEIF defined(ALMacOS)}
-    property NativeView: TALMacNativeView read GetNativeView;
+    property NativeView: TALMacWebBrowserView read GetNativeView;
     {$ELSEIF defined(MSWindows)}
-    property NativeView: TALWinNativeView read GetNativeView;
+    property NativeView: TALWinWebBrowserView read GetNativeView;
     {$ENDIF}
-    function HasNativeView: boolean;
-    Procedure AddNativeView;
-    Procedure RemoveNativeView;
     /// <summary>
     ///   Loads raw HTML or other content into the web view.
     /// </summary>
@@ -531,6 +448,7 @@ procedure Register;
 implementation
 
 uses
+  System.SysUtils,
   FMX.types,
   {$IF defined(android)}
   Androidapi.Helpers,
@@ -541,22 +459,20 @@ uses
   System.RTLConsts,
   Macapi.Helpers,
   iOSapi.CoreGraphics,
-  iOSapi.CoreText,
-  FMX.Helpers.iOS,
   FMX.Consts,
+  Alcinoe.StringUtils,
   {$ELSEIF defined(ALMacOS)}
   System.UITypes,
   System.Net.URLClient,
   System.RTLConsts,
-  Macapi.CoreFoundation,
   Macapi.Helpers,
   Macapi.CoreGraphics,
-  FMX.Helpers.Mac,
   FMX.Consts,
-  Alcinoe.Macapi.Foundation,
+  Alcinoe.StringUtils,
   {$ELSEIF defined(MSWindows)}
+  {$IF not defined(ALDPK)}
   Winapi.Ole2,
-  Winapi.CommCtrl,
+  {$ENDIF}
   Winapi.EdgeUtils,
   {$endif}
   {$IFDEF ALDPK}
@@ -564,130 +480,93 @@ uses
   {$ENDIF}
   Alcinoe.Common;
 
-{********************************************************}
-constructor TALBaseWebBrowserControl.Create(AOwner: TComponent);
-begin
-  inherited create(AOwner);
-  FOnShouldStartLoadUrl := nil;
-end;
-
-{***************************************}
-function TALBaseWebBrowserControl.ShouldStartLoadUrl(const AURL: string): Boolean;
-begin
-  if assigned(fOnShouldStartLoadUrl) then
-    fOnShouldStartLoadUrl(Self, AURL, Result)
-  else
-    Result := True;
-end;
-
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
-{*************************************************************************************}
-constructor TALAndroidWebView.TWebViewListener.Create(const AWebView: TALAndroidWebView);
+{************************************************************************************************************}
+constructor TALAndroidWebBrowserView.TWebViewListener.Create(const AWebBrowserView: TALAndroidWebBrowserView);
 begin
   inherited Create;
-  FWebView := AWebView;
+  FWebBrowserView := AWebBrowserView;
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.doUpdateVisitedHistory(view: JWebView; url: JString; isReload: Boolean);
+{**************************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.doUpdateVisitedHistory(view: JWebView; url: JString; isReload: Boolean);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onFormResubmission(view: JWebView; dontResend: JMessage; resend: JMessage);
+{*****************************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onFormResubmission(view: JWebView; dontResend: JMessage; resend: JMessage);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onLoadResource(view: JWebView; url: JString);
+{***********************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onLoadResource(view: JWebView; url: JString);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onPageFinished(view: JWebView; url: JString);
+{***********************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onPageFinished(view: JWebView; url: JString);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onPageStarted(view: JWebView; url: JString; favicon: JBitmap);
+{****************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onPageStarted(view: JWebView; url: JString; favicon: JBitmap);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onReceivedError(view: JWebView; errorCode: Integer; description: JString; failingUrl: JString);
+{*************************************************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onReceivedError(view: JWebView; errorCode: Integer; description: JString; failingUrl: JString);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onReceivedHttpAuthRequest(view: JWebView; handler: JHttpAuthHandler; host: JString; realm: JString);
+{******************************************************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onReceivedHttpAuthRequest(view: JWebView; handler: JHttpAuthHandler; host: JString; realm: JString);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onReceivedSslError(view: JWebView; handler: JSslErrorHandler; error: JSslError);
+{**********************************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onReceivedSslError(view: JWebView; handler: JSslErrorHandler; error: JSslError);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onScaleChanged(view: JWebView; oldScale: Single; newScale: Single);
+{*********************************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onScaleChanged(view: JWebView; oldScale: Single; newScale: Single);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-procedure TALAndroidWebView.TWebViewListener.onUnhandledKeyEvent(view: JWebView; event: JKeyEvent);
+{********************************************************************************************************}
+procedure TALAndroidWebBrowserView.TWebViewListener.onUnhandledKeyEvent(view: JWebView; event: JKeyEvent);
 begin
   // Nothing
 end;
 
-{*************************************************************************************}
-function TALAndroidWebView.TWebViewListener.shouldOverrideKeyEvent(view: JWebView; event: JKeyEvent): Boolean;
+{*******************************************************************************************************************}
+function TALAndroidWebBrowserView.TWebViewListener.shouldOverrideKeyEvent(view: JWebView; event: JKeyEvent): Boolean;
 begin
   Result := False;
 end;
 
-{*************************************************************************************}
-function TALAndroidWebView.TWebViewListener.shouldOverrideUrlLoading(view: JWebView; url: JString): Boolean;
+{*****************************************************************************************************************}
+function TALAndroidWebBrowserView.TWebViewListener.shouldOverrideUrlLoading(view: JWebView; url: JString): Boolean;
 begin
-  Result := not FWebView.Control.ShouldStartLoadUrl(JStringToString(url));
+  Result := not FWebBrowserView.Control.ShouldStartLoadUrl(JStringToString(url));
 end;
 
-{*************************************************************}
-constructor TALAndroidWebView.Create(const AControl: TControl);
+{******************************************}
+constructor TALAndroidWebBrowserView.Create;
 begin
+  inherited; // This will call CreateView
   FWebViewListener := TWebViewListener.Create(self);
-  inherited create(AControl);  // This will call InitView
-end;
-
-{************************************}
-destructor TALAndroidWebView.Destroy;
-begin
-  View.setVisibility(TJView.JavaClass.INVISIBLE);
-  View.setListener(nil);
-  alfreeandNil(FWebViewListener);
-  inherited;
-end;
-
-{********************************************}
-function TALAndroidWebView.CreateView: JView;
-begin
-  Result := TJALWebView.JavaClass.init(TAndroidHelper.Activity)
-end;
-
-{************************************}
-procedure TALAndroidWebView.InitView;
-begin
-  inherited;
   view.setListener(FWebViewListener);
   view.getSettings.setJavaScriptEnabled(true);
   // This method was deprecated in API level 35.
@@ -701,45 +580,47 @@ begin
   view.getSettings.setAllowFileAccess(True);
 end;
 
-{***********************************************}
-function TALAndroidWebView.GetView: JALWebView;
+{******************************************}
+destructor TALAndroidWebBrowserView.Destroy;
+begin
+  View.setListener(nil);
+  alfreeandNil(FWebViewListener);
+  inherited;
+end;
+
+{**************************************************}
+function TALAndroidWebBrowserView.CreateView: JView;
+begin
+  Result := TJALWebView.JavaClass.init(TAndroidHelper.Activity)
+end;
+
+{****************************************************}
+function TALAndroidWebBrowserView.GetView: JALWebView;
 begin
   Result := inherited GetView<JALWebView>;
 end;
 
-{***********************************************}
-function TALAndroidWebView.GetControl: TALAndroidWebBrowserControl;
+{**********************************************************}
+function TALAndroidWebBrowserView.GetControl: TALWebBrowser;
 begin
-  Result := TALAndroidWebBrowserControl(inherited Control)
+  Result := TALWebBrowser(inherited Control)
 end;
 
-{********************************************************************}
-Function TALAndroidWebBrowserControl.CreateNativeView: TALAndroidNativeView;
+{*************************************************************}
+procedure TALAndroidWebBrowserView.LoadUrl(const AURL: string);
 begin
-  result := TALAndroidWebView.create(self);
+  View.loadUrl(StringToJString(AUrl));
 end;
 
-{***************************************************************}
-function TALAndroidWebBrowserControl.GetNativeView: TALAndroidWebView;
-begin
-  result := TALAndroidWebView(inherited GetNativeView);
-end;
-
-{******************************************************************}
-procedure TALAndroidWebBrowserControl.LoadUrl(const AURL: string);
-begin
-  NativeView.View.loadUrl(StringToJString(AUrl));
-end;
-
-{**********************}
-procedure TALAndroidWebBrowserControl.LoadData(
+{******************************************}
+procedure TALAndroidWebBrowserView.LoadData(
             const ABaseUrl: String;
             const AData: string;
             const AMimeType: String = '';
             const AEncoding: String = '';
             const AHistoryUrl: String = '');
 begin
-  NativeView.View.loadDataWithBaseURL(
+  View.loadDataWithBaseURL(
     StringToJString(ABaseUrl), // baseUrl: JString;
     StringToJString(AData), // data: JString;
     StringToJString(AMimeType), // mimeType: JString;
@@ -753,78 +634,78 @@ end;
 {$REGION ' IOS'}
 {$IF defined(ios)}
 
-{*******************************************************}
-constructor TALIosWebView.Create(const AControl: TControl);
+{**************************************}
+constructor TALIosWebBrowserView.Create;
 begin
+  inherited; // This will call InitView
   FNavigationDelegate := TNavigationDelegate.Create(Self);
-  inherited create(AControl);
+  View.setNavigationDelegate(FNavigationDelegate.GetObjectID);
 end;
 
-{***********************************}
-destructor TALIosWebView.Destroy;
+{**************************************}
+destructor TALIosWebBrowserView.Destroy;
 begin
   View.setNavigationDelegate(nil);
   ALFreeAndNil(FNavigationDelegate);
   inherited Destroy;
 end;
 
-{*********************************************************}
-procedure TALIosWebView.InitView;
+{**************************************}
+procedure TALIosWebBrowserView.InitView;
 begin
   var LConfiguration := TWKWebViewConfiguration.Create;
   try
     LConfiguration.setAllowsInlineMediaPlayback(True);
-    var V: Pointer := WKWebView(Super).initWithFrame(CGRectFromRect(Control.AbsoluteRect), LConfiguration);
+    var V: Pointer := WKWebView(Super).initWithFrame(CGRectFromRect(Control.GetNativeViewAbsoluteRect), LConfiguration);
     if GetObjectID <> V then
       UpdateObjectID(V);
   finally
     LConfiguration.release;
   end;
-  View.setNavigationDelegate(FNavigationDelegate.GetObjectID);
 end;
 
-{*********************************************************}
-function TALIosWebView.GetObjectiveCClass: PTypeInfo;
+{**********************************************************}
+function TALIosWebBrowserView.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(IALIosWebView);
+  Result := TypeInfo(IALIosWebBrowserView);
 end;
 
-{************************************************}
-function TALIosWebView.GetView: WKWebView;
+{***********************************************}
+function TALIosWebBrowserView.GetView: WKWebView;
 begin
   Result := inherited GetView<WKWebView>;
 end;
 
-{************************************************}
-function TALIosWebView.GetControl: TALIosWebBrowserControl;
+{******************************************************}
+function TALIosWebBrowserView.GetControl: TALWebBrowser;
 begin
-  Result := TALIosWebBrowserControl(inherited Control);
+  Result := TALWebBrowser(inherited Control);
 end;
 
-{************************************************************************************}
-constructor TALIosWebView.TNavigationDelegate.Create(const AWebView: TALIosWebView);
+{*******************************************************************************************************}
+constructor TALIosWebBrowserView.TNavigationDelegate.Create(const AWebBrowserView: TALIosWebBrowserView);
 begin
   inherited Create;
-  FWebView := AWebView;
+  FWebBrowserView := AWebBrowserView;
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction; decisionHandler: Pointer); // TWKNavigationDelegateBlockMethod1
+{*****************************************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction; decisionHandler: Pointer); // TWKNavigationDelegateBlockMethod1
 var
   LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDecidePolicyForNavigationAction');
   {$ENDIF}
-  var LShouldStartLoadUrl := FWebView.Control.ShouldStartLoadUrl(NSStrToStr(navigationAction.request.URL.absoluteString));
+  var LShouldStartLoadUrl := FWebBrowserView.Control.ShouldStartLoadUrl(NSStrToStr(navigationAction.request.URL.absoluteString));
   @LBlockImp := imp_implementationWithBlock(decisionHandler);
   if LShouldStartLoadUrl then LBlockImp(WKNavigationActionPolicyAllow)
   else LBlockImp(WKNavigationActionPolicyCancel);
   imp_removeBlock(@LBlockImp);
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView: WKWebView; navigationResponse: WKNavigationResponse; decisionHandler: Pointer); // TWKNavigationDelegateBlockMethod3
+{***********************************************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView: WKWebView; navigationResponse: WKNavigationResponse; decisionHandler: Pointer); // TWKNavigationDelegateBlockMethod3
 var
   LDecisionHandlerBlock: procedure(policy: WKNavigationResponsePolicy); cdecl;
 begin
@@ -836,40 +717,40 @@ begin
   imp_removeBlock(@LDecisionHandlerBlock);
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; navigation: WKNavigation);
+{**************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; navigation: WKNavigation);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDidCommitNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidFailNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
+{****************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFailNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDidFailNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidFailProvisionalNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
+{***************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFailProvisionalNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDidFailProvisionalNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; navigation: WKNavigation);
+{**************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; navigation: WKNavigation);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDidFinishNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidReceiveAuthenticationChallenge(webView: WKWebView; challenge: NSURLAuthenticationChallenge; completionHandler: Pointer); // TWKNavigationDelegateBlockMethod4
+{************************************************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidReceiveAuthenticationChallenge(webView: WKWebView; challenge: NSURLAuthenticationChallenge; completionHandler: Pointer); // TWKNavigationDelegateBlockMethod4
 
 type
   TAuthenticationResponseProc = reference to procedure(const ACredential: NSURLCredential);
@@ -890,7 +771,7 @@ type
     LPrompts[0] := SUsername;
     {$ENDIF IOS}
     LPrompts[1] := #1 + SPassword;
-    LTitle := Format(SHostRequiresAuthentication, [NSStrToStr(AHost)]);
+    LTitle := ALFormatW(SHostRequiresAuthentication, [NSStrToStr(AHost)]);
     TDialogServiceAsync.InputQuery(
       LTitle,
       LPrompts,
@@ -937,82 +818,32 @@ begin
   end;
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; navigation: WKNavigation);
+{*******************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; navigation: WKNavigation);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewDidStartProvisionalNavigation(webView: WKWebView; navigation: WKNavigation);
+{************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidStartProvisionalNavigation(webView: WKWebView; navigation: WKNavigation);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewDidStartProvisionalNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALIosWebView.TNavigationDelegate.webViewWebContentProcessDidTerminate(webView: WKWebView);
+{**********************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewWebContentProcessDidTerminate(webView: WKWebView);
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webViewWebContentProcessDidTerminate');
   {$ENDIF}
 end;
 
-{************************************************************}
-Function TALIosWebBrowserControl.CreateNativeView: TALIosNativeView;
-begin
-
-  // We must create a WKWebView instance explicitly here to ensure that the underlying
-  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
-  // Without this, calling `TALIosWebView(inherited GetNativeView)` will raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
-  // also fails with:
-  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
-  //   At address: $0000000102A2011C
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALIosWebView, TypeInfo(IALIosWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class WKWebView could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate the WKWebView explicitly to force
-  // the WebKit framework to be loaded and the class to be registered:
-
-  if not IsWKWebViewClassRegistered then begin
-    LoadFramework(libWebKit); // force load framework
-    var LConfiguration := TWKWebViewConfiguration.Create;
-    try
-      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
-      LWKWebView.release;
-    finally
-      LConfiguration.release;
-    end;
-    IsWKWebViewClassRegistered := True;
-  end;
-
-  result := TALIosWebView.create(self);
-
-end;
-
-{************************************************************}
-function TALIosWebBrowserControl.GetNativeView: TALIosWebView;
-begin
-  result := TALIosWebView(inherited GetNativeView);
-end;
-
-{************************************************************}
-procedure TALIosWebBrowserControl.LoadUrl(const AURL: string);
+{*********************************************************}
+procedure TALIosWebBrowserView.LoadUrl(const AURL: string);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function TryGetFileNSUrl(const AURI: TURI; var AUrl: NSUrl): Boolean;
@@ -1059,11 +890,11 @@ begin
     LNSNewURL := TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(StrToNSStr(LNormalizedUri)));
 
   var LRequest := TNSURLRequest.Wrap(TNSURLRequest.OCClass.requestWithURL(LNSNewURL, NSURLRequestReloadRevalidatingCacheData, 0{timeoutInterval}));
-  NativeView.View.loadRequest(LRequest);
+  View.loadRequest(LRequest);
 end;
 
-{******************************************}
-procedure TALIosWebBrowserControl.LoadData(
+{**************************************}
+procedure TALIosWebBrowserView.LoadData(
             const ABaseUrl: String;
             const AData: string;
             const AMimeType: String = '';
@@ -1073,7 +904,7 @@ begin
   var LData := StrToNSStr(AData);
   var LBaseUrl := StrToNSStr(ABaseUrl);
   var LURL := TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(LBaseUrl));
-  NativeView.View.loadHTMLString(LData, LURL);
+  View.loadHTMLString(LData, LURL);
 end;
 
 {$endif}
@@ -1082,77 +913,77 @@ end;
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
 
-{*******************************************************}
-constructor TALMacWebView.Create(const AControl: TControl);
+{**************************************}
+constructor TALMacWebBrowserView.Create;
 begin
+  inherited; // This will call InitView
   FNavigationDelegate := TNavigationDelegate.Create(Self);
-  inherited create(AControl);
+  View.setNavigationDelegate(FNavigationDelegate.GetObjectID);
 end;
 
-{***********************************}
-destructor TALMacWebView.Destroy;
+{**************************************}
+destructor TALMacWebBrowserView.Destroy;
 begin
   View.setNavigationDelegate(nil);
   ALFreeAndNil(FNavigationDelegate);
   inherited Destroy;
 end;
 
-{*********************************************************}
-procedure TALMacWebView.InitView;
+{**************************************}
+procedure TALMacWebBrowserView.InitView;
 begin
   var LConfiguration := TWKWebViewConfiguration.Create;
   try
-    var V: Pointer := WKWebView(Super).initWithFrame(CGRectFromRect(Control.AbsoluteRect), LConfiguration);
+    var V: Pointer := WKWebView(Super).initWithFrame(CGRectFromRect(Control.GetNativeViewAbsoluteRect), LConfiguration);
     if GetObjectID <> V then
       UpdateObjectID(V);
   finally
     LConfiguration.release;
   end;
-  View.setNavigationDelegate(FNavigationDelegate.GetObjectID);
 end;
 
-{*********************************************************}
-function TALMacWebView.GetObjectiveCClass: PTypeInfo;
+{**********************************************************}
+function TALMacWebBrowserView.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(IALMacWebView);
+  Result := TypeInfo(IALMacWebBrowserView);
 end;
 
-{************************************************}
-function TALMacWebView.GetView: WKWebView;
+{***********************************************}
+function TALMacWebBrowserView.GetView: WKWebView;
 begin
   Result := inherited GetView<WKWebView>;
 end;
 
-{************************************************}
-function TALMacWebView.GetControl: TALMacWebBrowserControl;
+{******************************************************}
+function TALMacWebBrowserView.GetControl: TALWebBrowser;
 begin
-  Result := TALMacWebBrowserControl(inherited Control);
+  Result := TALWebBrowser(inherited Control);
 end;
 
-{************************************************************************************}
-constructor TALMacWebView.TNavigationDelegate.Create(const AWebView: TALMacWebView);
+{*******************************************************************************************************}
+constructor TALMacWebBrowserView.TNavigationDelegate.Create(const AWebBrowserView: TALMacWebBrowserView);
 begin
   inherited Create;
-  FWebView := AWebView;
+  FWebBrowserView := AWebBrowserView;
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDecidePolicyForNavigationActionDecisionHandler(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer); cdecl;
+{*****************************************************************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDecidePolicyForNavigationActionDecisionHandler(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer); cdecl;
 var
   LDecisionHandlerBlock: procedure(policy: WKNavigationResponsePolicy); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDecidePolicyForNavigationActionDecisionHandler');
   {$ENDIF}
-  var LShouldStartLoadUrl := FWebView.Control.ShouldStartLoadUrl(NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString));
+  var LShouldStartLoadUrl := FWebBrowserView.Control.ShouldStartLoadUrl(NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString));
   @LDecisionHandlerBlock := imp_implementationWithBlock(decisionHandler);
   if LShouldStartLoadUrl then LDecisionHandlerBlock(WKNavigationActionPolicyAllow)
   else LDecisionHandlerBlock(WKNavigationActionPolicyCancel);
   imp_removeBlock(@LDecisionHandlerBlock);
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView: WKWebView; decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer); cdecl;
+{***********************************************************************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView: WKWebView; decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer); cdecl;
 var
   LDecisionHandlerBlock: procedure(policy: WKNavigationResponsePolicy); cdecl;
 begin
@@ -1164,56 +995,56 @@ begin
   imp_removeBlock(@LDecisionHandlerBlock);
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidStartProvisionalNavigation(webView: WKWebView; didStartProvisionalNavigation: WKNavigation); cdecl;
+{**************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidStartProvisionalNavigation(webView: WKWebView; didStartProvisionalNavigation: WKNavigation); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDidStartProvisionalNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; didReceiveServerRedirectForProvisionalNavigation: WKNavigation); cdecl;
+{****************************************************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; didReceiveServerRedirectForProvisionalNavigation: WKNavigation); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidFailProvisionalNavigationWithError(webView: WKWebView; didFailProvisionalNavigation: WKNavigation; withError: NSError); cdecl;
+{*****************************************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidFailProvisionalNavigationWithError(webView: WKWebView; didFailProvisionalNavigation: WKNavigation; withError: NSError); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDidFailProvisionalNavigationWithError');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation); cdecl;
+{******************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDidCommitNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation); cdecl;
+{******************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDidFinishNavigation');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidFailNavigationWithError(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError); cdecl;
+{*******************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidFailNavigationWithError(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError); cdecl;
 begin
   {$IF defined(DEBUG)}
   ALLog('TNavigationDelegate.webViewDidFailNavigationWithError');
   {$ENDIF}
 end;
 
-{*******************************************************}
-procedure TALMacWebView.TNavigationDelegate.webViewDidReceiveAuthenticationChallengeCompletionHandler(webView: WKWebView; didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge; completionHandler: Pointer); cdecl;
+{***********************************************************************************************************************************************************************************************************************************}
+procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidReceiveAuthenticationChallengeCompletionHandler(webView: WKWebView; didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge; completionHandler: Pointer); cdecl;
 
 type
   TAuthenticationResponseProc = reference to procedure(const ACredential: NSURLCredential);
@@ -1234,7 +1065,7 @@ type
     LPrompts[0] := SUsername;
     {$ENDIF IOS}
     LPrompts[1] := #1 + SPassword;
-    LTitle := Format(SHostRequiresAuthentication, [NSStrToStr(AHost)]);
+    LTitle := ALFormatW(SHostRequiresAuthentication, [NSStrToStr(AHost)]);
     TDialogServiceAsync.InputQuery(
       LTitle,
       LPrompts,
@@ -1263,7 +1094,8 @@ begin
   LAuthMethod := didReceiveAuthenticationChallenge.protectionSpace.authenticationMethod;
   if LAuthMethod.isEqualToString(NSURLAuthenticationMethodDefault) or LAuthMethod.isEqualToString(NSURLAuthenticationMethodHTTPBasic) or
     LAuthMethod.isEqualToString(NSURLAuthenticationMethodHTTPDigest) then begin
-    AuthenticateForHost(webView.URL.host,
+    AuthenticateForHost(
+      webView.URL.host,
       procedure(const ACredential: NSURLCredential)
       begin
         LCompletionHandlerBlock(NSURLSessionAuthChallengeUseCredential, nil, NSObjectToID(ACredential));
@@ -1280,58 +1112,8 @@ begin
   end;
 end;
 
-{************************************************************}
-Function TALMacWebBrowserControl.CreateNativeView: TALMacNativeView;
-begin
-
-  // We must create a WKWebView instance explicitly here to ensure that the underlying
-  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
-  // Without this, calling `TALMacWebView(inherited GetNativeView)` will raise the following error:
-  //   Unhandled Exception | Item not found
-  //   At address: $0000000100365670
-  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
-  //
-  // Attempting to register the class manually like this:
-  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
-  // also fails with:
-  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
-  //   At address: $0000000102A2011C
-  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
-  //
-  // Attempting to register our own wrapper class:
-  //   RegisterObjectiveCClass(TALMacWebView, TypeInfo(IALMacWebView));
-  // fails as well, with:
-  //   Unhandled Exception | Objective-C class WKWebView could not be found
-  //   At address: $00000001046CA014
-  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
-  //
-  // The only reliable workaround is to instantiate the WKWebView explicitly to force
-  // the WebKit framework to be loaded and the class to be registered:
-
-  if not IsWKWebViewClassRegistered then begin
-    LoadFramework(libWebKit); // force load framework
-    var LConfiguration := TWKWebViewConfiguration.Create;
-    try
-      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
-      LWKWebView.release;
-    finally
-      LConfiguration.release;
-    end;
-    IsWKWebViewClassRegistered := True;
-  end;
-
-  result := TALMacWebView.create(self);
-
-end;
-
-{************************************************************}
-function TALMacWebBrowserControl.GetNativeView: TALMacWebView;
-begin
-  result := TALMacWebView(inherited GetNativeView);
-end;
-
-{************************************************************}
-procedure TALMacWebBrowserControl.LoadUrl(const AURL: string);
+{*********************************************************}
+procedure TALMacWebBrowserView.LoadUrl(const AURL: string);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function TryGetFileNSUrl(const AURI: TURI; var AUrl: NSUrl): Boolean;
@@ -1378,11 +1160,11 @@ begin
     LNSNewURL := TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(StrToNSStr(LNormalizedUri)));
 
   var LRequest := TNSURLRequest.Wrap(TNSURLRequest.OCClass.requestWithURL(LNSNewURL, NSURLRequestReloadRevalidatingCacheData, 0{timeoutInterval}));
-  NativeView.View.loadRequest(LRequest);
+  View.loadRequest(LRequest);
 end;
 
-{******************************************}
-procedure TALMacWebBrowserControl.LoadData(
+{**************************************}
+procedure TALMacWebBrowserView.LoadData(
             const ABaseUrl: String;
             const AData: string;
             const AMimeType: String = '';
@@ -1392,7 +1174,7 @@ begin
   var LData := StrToNSStr(AData);
   var LBaseUrl := StrToNSStr(ABaseUrl);
   var LURL := TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(LBaseUrl));
-  NativeView.View.loadHTMLString(LData, LURL);
+  View.loadHTMLString(LData, LURL);
 end;
 
 {$endif}
@@ -1401,60 +1183,42 @@ end;
 {$REGION ' MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
 
-{***********************************************}
-function InitCommonControl(CC: Integer): Boolean;
-var
-  ICC: TInitCommonControlsEx;
-begin
-  ICC.dwSize := SizeOf(TInitCommonControlsEx);
-  ICC.dwICC := CC;
-  Result := InitCommonControlsEx(ICC);
-  if not Result then InitCommonControls;
-end;
-
-{****************************************}
-procedure CheckCommonControl(CC: Integer);
-begin
-  if not InitCommonControl(CC) then
-    raise EComponentError.Create('This control requires version 4.70 or greater of COMCTL32.DLL');
-end;
-
-{**********************************************************}
+{************************************************************************************************************************}
 constructor TALWinWebBrowserView.TCreateCoreWebView2EnvironmentCompletedHandler.Create(const AProc: TEnvironmentCallback);
 begin
   inherited Create;
   FProc := AProc;
 end;
 
-{**********************************************************}
+{****************************************************************************************************************************************************************************}
 function TALWinWebBrowserView.TCreateCoreWebView2EnvironmentCompletedHandler.Invoke(errorCode: HResult; const createdEnvironment: ICoreWebView2Environment): HResult; stdcall;
 begin
   FProc(errorCode, createdEnvironment);
   Result := S_OK;
 end;
 
-{**********************************************************}
+{**********************************************************************************************************************}
 constructor TALWinWebBrowserView.TCreateCoreWebView2ControllerCompletedHandler.Create(const AProc: TControllerCallback);
 begin
   inherited Create;
   FProc := AProc;
 end;
 
-{**********************************************************}
+{****************************************************************************************************************************************************************}
 function TALWinWebBrowserView.TCreateCoreWebView2ControllerCompletedHandler.Invoke(errorCode: HResult; const createdController: ICoreWebView2Controller): HResult;
 begin
   FProc(errorCode, createdController);
   Result := S_OK;
 end;
 
-{***********************************************}
-constructor TALWinWebBrowserView.TNavigationStartingEventHandler.Create(const AControl: TALWinWebBrowserControl);
+{*******************************************************************************************************************}
+constructor TALWinWebBrowserView.TNavigationStartingEventHandler.Create(const AWebBrowserView: TALWinWebBrowserView);
 begin
   inherited Create;
-  FWebBrowserControl := AControl;
+  FWebBrowserView := AWebBrowserView;
 end;
 
-{**********************************************************}
+{***************************************************************************************************************************************************************}
 function TALWinWebBrowserView.TNavigationStartingEventHandler.Invoke(const sender: ICoreWebView2; const args: ICoreWebView2NavigationStartingEventArgs): HResult;
 var
   uri: PWideChar;
@@ -1462,203 +1226,131 @@ var
 begin
   args.Get_Uri(uri);
   url := uri;
-  var LShouldStartLoadUrl := FWebBrowserControl.ShouldStartLoadUrl(url);
+  var LShouldStartLoadUrl := FWebBrowserView.Control.ShouldStartLoadUrl(url);
   if not LShouldStartLoadUrl then
     args.Set_Cancel(1);
   Result := S_OK;
 end;
 
-{**********************************************************}
-constructor TALWinWebBrowserView.TWebResourceRequestedEventHandler.Create(const AControl: TALWinWebBrowserControl);
+{*********************************************************************************************************************}
+constructor TALWinWebBrowserView.TWebResourceRequestedEventHandler.Create(const AWebBrowserView: TALWinWebBrowserView);
 begin
   inherited Create;
-  FWebBrowserControl := AControl;
+  FWebBrowserView := AWebBrowserView;
 end;
 
-{**********************************************************}
+{*******************************************************************************************************************************************************************}
 function TALWinWebBrowserView.TWebResourceRequestedEventHandler.Invoke(const sender: ICoreWebView2; const args: ICoreWebView2WebResourceRequestedEventArgs): HResult;
+{$IF not defined(ALDPK)}
 var
   Request: ICoreWebView2WebResourceRequest;
   Headers: ICoreWebView2HttpRequestHeaders;
+{$ENDIF}
 begin
-  if (FWebBrowserControl.NativeView.FReferrer <> '') and
+  {$IF not defined(ALDPK)}
+  if (FWebBrowserView.FReferrer <> '') and
      Succeeded(args.Get_Request(Request)) and
      Succeeded(Request.Get_Headers(Headers)) then
   begin
     Headers.RemoveHeader('Referer');
-    Headers.SetHeader(PWideChar('Referer'), PWideChar(FWebBrowserControl.NativeView.FReferrer));
+    Headers.SetHeader(PWideChar('Referer'), PWideChar(FWebBrowserView.FReferrer));
   end;
+  {$ENDIF}
   Result := S_OK;
 end;
 
-{**********************************************************}
-constructor TALWinWebBrowserView.Create(const AControl: TControl);
+{**************************************}
+constructor TALWinWebBrowserView.Create;
 var
   EnvCompletedHandler: ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler;
 begin
-  inherited Create(AControl);
+  inherited;
+
   FPendingUrl := '';
   FPendingHtml := '';
   FReferrer := '';
 
-  // Initialize COM environment
+  {$IF not defined(ALDPK)}
   CoInitialize(nil);
+  {$ENDIF}
 
   EnvCompletedHandler := TCreateCoreWebView2EnvironmentCompletedHandler.Create(
-    procedure(Result: HRESULT; const Env: ICoreWebView2Environment)
-    begin
-      Env.CreateCoreWebView2Controller(Handle,
-        TCreateCoreWebView2ControllerCompletedHandler.Create(
-          procedure(Result: HRESULT; const Controller: ICoreWebView2Controller)
-          begin
-            FWebView2Controller := Controller;
-            Controller.get_CoreWebView2(FWebView2);
-            Controller.Set_IsVisible(1);
-            var Bounds: tagRECT;
-            Bounds.Left := 0;
-            Bounds.Top := 0;
-            Bounds.Right := round(Control.Width);
-            Bounds.Bottom := round(Control.Height);
-            Controller.Set_Bounds(Bounds);
-            var Token: EventRegistrationToken;
-            FWebView2.add_NavigationStarting(TNavigationStartingEventHandler.Create(Control), Token);
-            FWebView2.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
-            FWebView2.add_WebResourceRequested(TWebResourceRequestedEventHandler.Create(Control), Token);
-            if FPendingUrl <> '' then FWebView2.Navigate(PWideChar(FPendingUrl))
-            else if FPendingHtml <> '' then FWebView2.NavigateToString(PWideChar(FPendingHtml));
-          end));
-    end);
+                           procedure(Result: HRESULT; const Env: ICoreWebView2Environment)
+                           begin
+                             Env.CreateCoreWebView2Controller(
+                               Handle,
+                               TCreateCoreWebView2ControllerCompletedHandler.Create(
+                                 procedure(Result: HRESULT; const Controller: ICoreWebView2Controller)
+                                 begin
+                                   FWebView2Controller := Controller;
+                                   Controller.get_CoreWebView2(FWebView2);
+                                   Controller.Set_IsVisible(1);
+                                   var Bounds: tagRECT;
+                                   Bounds.Left := round(Control.GetNativeViewPosition.X);
+                                   Bounds.Top := round(Control.GetNativeViewPosition.Y);
+                                   Bounds.Right := round(Control.GetNativeViewWidth);
+                                   Bounds.Bottom := round(Control.GetNativeViewHeight);
+                                   Controller.Set_Bounds(Bounds);
+                                   var Token: EventRegistrationToken;
+                                   FWebView2.add_NavigationStarting(TNavigationStartingEventHandler.Create(Self), Token);
+                                   FWebView2.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
+                                   FWebView2.add_WebResourceRequested(TWebResourceRequestedEventHandler.Create(Self), Token);
+                                   if FPendingUrl <> '' then FWebView2.Navigate(PWideChar(FPendingUrl))
+                                   else if FPendingHtml <> '' then FWebView2.NavigateToString(PWideChar(FPendingHtml));
+                                 end));
+                           end);
 
   CreateCoreWebView2EnvironmentWithOptions(nil, nil, nil, EnvCompletedHandler);
 end;
 
-{***************************************************************}
+{*********************************************************************}
 procedure TALWinWebBrowserView.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
 end;
 
-{********************************}
+{**************************************}
 destructor TALWinWebBrowserView.Destroy;
 begin
   inherited Destroy;
 end;
 
-{********************************}
-function TALWinWebBrowserView.GetControl: TALWinWebBrowserControl;
+{******************************************************}
+function TALWinWebBrowserView.GetControl: TALWebBrowser;
 begin
-  Result := TALWinWebBrowserControl(Inherited Control);
+  Result := TALWebBrowser(Inherited Control);
 end;
 
-{*******************************************************}
-constructor TALWinWebBrowserControl.Create(AOwner: TComponent);
+{*********************************************************}
+procedure TALWinWebBrowserView.LoadUrl(const AURL: string);
 begin
-  inherited create(AOwner);
+  FReferrer := '';
+  if FWebView2 <> nil then FWebView2.Navigate(PWideChar(AURL))
+  else FPendingUrl := AURL;
 end;
 
-{************************************************************}
-Function TALWinWebBrowserControl.CreateNativeView: TALWinNativeView;
-begin
-  {$IF defined(ALDPK)}
-  Result := nil;
-  {$ELSE}
-  result := TALWinWebBrowserView.create(self);
-  {$ENDIF}
-end;
-
-{*******************************************************}
-function TALWinWebBrowserControl.GetNativeView: TALWinWebBrowserView;
-begin
-  result := TALWinWebBrowserView(inherited GetNativeView);
-end;
-
-{*************************************************}
-procedure TALWinWebBrowserControl.LoadUrl(const AURL: string);
-begin
-  NativeView.FReferrer := '';
-  if NativeView.FWebView2 <> nil then NativeView.FWebView2.Navigate(PWideChar(AURL))
-  else NativeView.FPendingUrl := AURL;
-end;
-
-{*****************************************}
-procedure TALWinWebBrowserControl.LoadData(
+{**************************************}
+procedure TALWinWebBrowserView.LoadData(
             const ABaseUrl: String;
             const AData: string;
             const AMimeType: String = '';
             const AEncoding: String = '';
             const AHistoryUrl: String = '');
 begin
-  NativeView.FReferrer := ABaseUrl;
-  if NativeView.FWebView2 <> nil then NativeView.FWebView2.NavigateToString(PWideChar(AData))
-  else NativeView.FPendingHtml := AData;
+  FReferrer := ABaseUrl;
+  if FWebView2 <> nil then FWebView2.NavigateToString(PWideChar(AData))
+  else FPendingHtml := AData;
 end;
 
 {$endif}
 {$ENDREGION}
 
-{*************************************************}
+{***************************************************}
 constructor TALWebBrowser.Create(AOwner: TComponent);
 begin
   inherited;
   CanFocus := True;
   FOnShouldStartLoadUrl := Nil;
-  {$IF defined(DEBUG)}
-  if FWebBrowserControl <> nil then
-    raise Exception.Create('Error CE2932F6-E44A-4A4B-AAE3-71FE4077FCF2');
-  {$ENDIF}
-  FWebBrowserControl := CreateWebBrowserControl;
-  InitWebBrowserControl;
-end;
-
-{*****************************}
-destructor TALWebBrowser.Destroy;
-begin
-  ALFreeAndNil(FWebBrowserControl);
-  inherited Destroy;
-end;
-
-{*********************************************************}
-function TALWebBrowser.CreateWebBrowserControl: TALBaseWebBrowserControl;
-begin
-  {$IF defined(android)}
-  Result := TALAndroidWebBrowserControl.Create(self);
-  {$ELSEIF defined(ios)}
-  Result := TALIosWebBrowserControl.Create(self);
-  {$ELSEIF defined(ALMacOS)}
-  Result := TALMacWebBrowserControl.Create(self);
-  {$ELSEIF defined(MSWindows)}
-  Result := TALWinWebBrowserControl.Create(self);
-  {$ELSE}
-    Not implemented
-  {$ENDIF}
-end;
-
-{************************************}
-procedure TALWebBrowser.InitWebBrowserControl;
-begin
-  FWebBrowserControl.Parent := self;
-  FWebBrowserControl.Stored := False;
-  FWebBrowserControl.SetSubComponent(True);
-  FWebBrowserControl.Locked := True;
-  FWebBrowserControl.Align := TALAlignLayout.Client;
-  FWebBrowserControl.CanFocus := False;
-  FWebBrowserControl.CanParentFocus := True;
-  FWebBrowserControl.HitTest := False;
-  FWebBrowserControl.OnShouldStartLoadUrl := OnShouldStartLoadUrlImpl;
-end;
-
-{***************************}
-procedure TALWebBrowser.Loaded;
-begin
-  inherited;
-  {$IF not defined(ALDPK)}
-  if (NativeView <> nil) and (NativeView.visible) then begin
-    // Because AncestorParentChanged is not called during loading,
-    // we must call NativeView.SetVisible(true) in TALBaseWebBrowser.Loaded
-    // to hide the NativeView in case a parent control is hidden.
-    NativeView.SetVisible(true);
-  end;
-  {$ENDIF}
 end;
 
 {****************************}
@@ -1671,150 +1363,165 @@ end;
 
 {********************}
 {$IF defined(android)}
-function TALWebBrowser.GetWebBrowserControl: TALBaseWebBrowserControl;
+Function TALWebBrowser.CreateNativeView: TALAndroidNativeView;
 begin
-  if FWebBrowserControl = nil then begin
-    FWebBrowserControl := CreateWebBrowserControl;
-    InitWebBrowserControl;
-  end;
-  Result := FWebBrowserControl;
+  result := TALAndroidWebBrowserView.create(self);
 end;
 {$ENDIF}
 
 {********************}
 {$IF defined(android)}
-function TALWebBrowser.GetNativeView: TALAndroidNativeView;
+function TALWebBrowser.GetNativeView: TALAndroidWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALAndroidWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
 {****************}
 {$IF defined(IOS)}
-function TALWebBrowser.GetWebBrowserControl: TALBaseWebBrowserControl;
+Function TALWebBrowser.CreateNativeView: TALIosNativeView;
 begin
-  if FWebBrowserControl = nil then begin
-    FWebBrowserControl := CreateWebBrowserControl;
-    InitWebBrowserControl;
+
+  // We must create a WKWebView instance explicitly here to ensure that the underlying
+  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
+  // Without this, calling `TALIosWebBrowserView(inherited GetNativeView)` will raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
+  // also fails with:
+  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
+  //   At address: $0000000102A2011C
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALIosWebBrowserView, TypeInfo(IALIosWebBrowserView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class WKWebView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate the WKWebView explicitly to force
+  // the WebKit framework to be loaded and the class to be registered:
+
+  if not TALIosWebBrowserView.IsWKWebViewClassRegistered then begin
+    LoadFramework(libWebKit); // force load framework
+    var LConfiguration := TWKWebViewConfiguration.Create;
+    try
+      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
+      LWKWebView.release;
+    finally
+      LConfiguration.release;
+    end;
+    TALIosWebBrowserView.IsWKWebViewClassRegistered := True;
   end;
-  Result := FWebBrowserControl;
+
+  result := TALIosWebBrowserView.create(self);
+
 end;
 {$ENDIF}
 
 {****************}
 {$IF defined(IOS)}
-function TALWebBrowser.GetNativeView: TALIosNativeView;
+function TALWebBrowser.GetNativeView: TALIosWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALIosWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
 {********************}
 {$IF defined(ALMacOS)}
-function TALWebBrowser.GetWebBrowserControl: TALBaseWebBrowserControl;
+Function TALWebBrowser.CreateNativeView: TALMacNativeView;
 begin
-  if FWebBrowserControl = nil then begin
-    FWebBrowserControl := CreateWebBrowserControl;
-    InitWebBrowserControl;
+
+  // We must create a WKWebView instance explicitly here to ensure that the underlying
+  // Objective-C class (WKWebView) is properly loaded and registered by the Delphi runtime.
+  // Without this, calling `TALMacWebBrowserView(inherited GetNativeView)` will raise the following error:
+  //   Unhandled Exception | Item not found
+  //   At address: $0000000100365670
+  //   (Generics.Collections.TDictionary<TTypeInfo*, TRegisteredDelphiClass*>.GetItem)
+  //
+  // Attempting to register the class manually like this:
+  //   RegisterObjectiveCClass(TWKWebView, TypeInfo(WKWebView));
+  // also fails with:
+  //   Unhandled Exception | Method function allowsLinkPreview: Boolean of class TWKWebView not found
+  //   At address: $0000000102A2011C
+  //   (Macapi.Objectivec.TRegisteredDelphiClass.RegisterClass)
+  //
+  // Attempting to register our own wrapper class:
+  //   RegisterObjectiveCClass(TALMacWebBrowserView, TypeInfo(IALMacWebBrowserView));
+  // fails as well, with:
+  //   Unhandled Exception | Objective-C class WKWebView could not be found
+  //   At address: $00000001046CA014
+  //   (Macapi.Objectivec.ObjectiveCClassNotFound)
+  //
+  // The only reliable workaround is to instantiate the WKWebView explicitly to force
+  // the WebKit framework to be loaded and the class to be registered:
+
+  if not TALMacWebBrowserView.IsWKWebViewClassRegistered then begin
+    LoadFramework(libWebKit); // force load framework
+    var LConfiguration := TWKWebViewConfiguration.Create;
+    try
+      var LWKWebView := TWKWebView.Wrap(TWKWebView.Alloc.initWithFrame(CGRectMake(0, 0, 0, 0), LConfiguration));
+      LWKWebView.release;
+    finally
+      LConfiguration.release;
+    end;
+    TALMacWebBrowserView.IsWKWebViewClassRegistered := True;
   end;
-  Result := FWebBrowserControl;
+
+  result := TALMacWebBrowserView.create(self);
+
 end;
 {$ENDIF}
 
 {********************}
 {$IF defined(ALMacOS)}
-function TALWebBrowser.GetNativeView: TALMacNativeView;
+function TALWebBrowser.GetNativeView: TALMacWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALMacWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
 {**********************}
 {$IF defined(MSWindows)}
-function TALWebBrowser.GetWebBrowserControl: TALBaseWebBrowserControl;
+Function TALWebBrowser.CreateNativeView: TALWinNativeView;
 begin
-  if FWebBrowserControl = nil then begin
-    FWebBrowserControl := CreateWebBrowserControl;
-    InitWebBrowserControl;
-  end;
-  Result := FWebBrowserControl;
+  {$IF defined(ALDPK)}
+  Result := nil;
+  {$ELSE}
+  result := TALWinWebBrowserView.create(self);
+  {$ENDIF}
 end;
 {$ENDIF}
 
 {**********************}
 {$IF defined(MSWindows)}
-function TALWebBrowser.GetNativeView: TALWinNativeView;
+function TALWebBrowser.GetNativeView: TALWinWebBrowserView;
 begin
-  result := WebBrowserControl.NativeView;
+  result := TALWinWebBrowserView(inherited NativeView);
 end;
 {$ENDIF}
 
-{****************************}
-procedure TALWebBrowser.DoEnter;
+{*********************************************************************}
+function TALWebBrowser.ShouldStartLoadUrl(const AURL: string): Boolean;
 begin
-  {$IF defined(DEBUG)}
-  ALLog(classname+'.DoEnter', 'control.name: ' + Name);
-  {$ENDIF}
-  inherited DoEnter;
-  {$IF not defined(ALDPK)}
-  if HasNativeView then
-    NativeView.SetFocus;
-  {$ENDIF}
+  if assigned(fOnShouldStartLoadUrl) then
+    fOnShouldStartLoadUrl(Self, AURL, Result)
+  else
+    Result := True;
 end;
 
-{***************************}
-procedure TALWebBrowser.DoExit;
-begin
-  {$IF defined(DEBUG)}
-  ALLog(classname+'.DoExit', 'control.name: ' + Name);
-  {$ENDIF}
-  inherited DoExit;
-  {$IF not defined(ALDPK)}
-  if HasNativeView then
-    NativeView.ResetFocus;
-  {$ENDIF}
-end;
-
-{************************************************}
-function TALWebBrowser.GetControlType: TControlType;
-begin
-  // We need ControlType because in function TFMXViewBase.canBecomeFirstResponder: Boolean;
-  // we use it in IsNativeControl to determine if it's a native control or not
-  Result := TControlType.Platform;
-end;
-
-{**************************************************************}
-procedure TALWebBrowser.SetControlType(const Value: TControlType);
-begin
-  // The ControlType cannot be changed
-end;
-
-{******************************************}
-function TALWebBrowser.HasNativeView: Boolean;
-begin
-  result := WebBrowserControl.HasNativeView;
-end;
-
-{**********************************}
-Procedure TALWebBrowser.AddNativeView;
-begin
-  WebBrowserControl.AddNativeView;
-end;
-
-{*************************************}
-Procedure TALWebBrowser.RemoveNativeView;
-begin
-  ResetFocus;
-  WebBrowserControl.RemoveNativeView;
-end;
-
-{*********************************************}
+{**************************************************}
 procedure TALWebBrowser.LoadUrl(const AURL: string);
 begin
-  WebBrowserControl.LoadUrl(AURL);
+  if NativeView <> nil then
+    NativeView.LoadUrl(AURL);
 end;
 
-{*********************************************}
+{*******************************}
 procedure TALWebBrowser.LoadData(
             const ABaseUrl: String;
             const AData: string;
@@ -1822,21 +1529,13 @@ procedure TALWebBrowser.LoadData(
             const AEncoding: String = '';
             const AHistoryUrl: String = '');
 begin
-  WebBrowserControl.LoadData(
-    ABaseUrl, // const ABaseUrl: String;
-    AData, // const AData: string;
-    AMimeType, // const AMimeType: String = '';
-    AEncoding, // const AEncoding: String = '';
-    AHistoryUrl); // const AHistoryUrl: String = ''
-end;
-
-{*********************************************************************}
-procedure TALWebBrowser.OnShouldStartLoadUrlImpl(ASender: TObject; const AURL: string; var AAllow: Boolean);
-begin
-  if assigned(FOnShouldStartLoadUrl) then
-    FOnShouldStartLoadUrl(self, AURL, AAllow)
-  else
-    AAllow := True;
+  if NativeView <> nil then
+    NativeView.LoadData(
+      ABaseUrl, // const ABaseUrl: String;
+      AData, // const AData: string;
+      AMimeType, // const AMimeType: String = '';
+      AEncoding, // const AEncoding: String = '';
+      AHistoryUrl); // const AHistoryUrl: String = ''
 end;
 
 {*****************}
@@ -1855,7 +1554,10 @@ initialization
   ALLog('Alcinoe.FMX.WebBrowser','initialization');
   {$ENDIF}
   {$IF defined(IOS)}
-  TALIosWebBrowserControl.IsWKWebViewClassRegistered := False;
+  TALIosWebBrowserView.IsWKWebViewClassRegistered := False;
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
+  TALMacWebBrowserView.IsWKWebViewClassRegistered := False;
   {$ENDIF}
   RegisterFmxClasses([TALWebBrowser]);
 

@@ -95,7 +95,7 @@ type
     FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
-    FMouseDownAtLowVelocity: Boolean; // 1 byte
+    FMouseDownAtRest: Boolean; // 1 byte
     FDoubleClick: Boolean; // 1 byte
     FAutoAlignToPixel: Boolean; // 1 byte
     FAlign: TALAlignLayout; // 1 byte
@@ -138,6 +138,7 @@ type
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoClickSound; virtual;
     procedure Click; override;
+    function IsInMotion: Boolean; virtual;
     function GetParentedVisible: Boolean; override;
     procedure DoMatrixChanged(Sender: TObject); override;
     procedure DoRootChanged; override;
@@ -312,7 +313,7 @@ begin
   FScale.OnChange := ScaleChangedHandler;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
-  FMouseDownAtLowVelocity := True;
+  FMouseDownAtRest := True;
   FDoubleClick := False;
   FAutoAlignToPixel := True;
   FAlign := TALAlignLayout.None;
@@ -1295,8 +1296,8 @@ function TALControl.GetAbsoluteDisplayedRect: TRectF;
 begin
   if (not Visible) or (form = nil) then Exit(TRectF.Empty);
   var LAbsoluteIntersectionRect := AbsoluteRect;
-  var LControlTmp := Tcontrol(Self);
-  while LControlTmp.ParentControl <> nil do begin
+  var LControlTmp := ParentControl;
+  while LControlTmp <> nil do begin
     if not LControlTmp.Visible then Exit(TRectF.Empty);
     if LControlTmp.ClipChildren then begin
       var LAbsoluteClipRect := LControlTmp.LocalToAbsolute(LControlTmp.ClipRect);
@@ -1406,7 +1407,7 @@ begin
   var LPrevPressed := Pressed;
   //--
   FControlAbsolutePosAtMouseDown := LocalToAbsolute(TPointF.Zero);
-  FMouseDownAtLowVelocity := True;
+  FMouseDownAtRest := not IsInMotion;
   //--
   FDoubleClick := ssDouble in Shift;
   if FDoubleClick then begin
@@ -1417,20 +1418,7 @@ begin
     Shift := Shift - [ssDouble];
   end;
   //--
-  var LScrollableControl: IALScrollableControl;
-  var LParentControl := ParentControl;
-  while LParentControl <> nil do begin
-    if Supports(LParentControl, IALScrollableControl, LScrollableControl) then begin
-      if not LScrollableControl.GetScrollEngine.IsVelocityLow then begin
-        FMouseDownAtLowVelocity := False;
-        Break;
-      end
-      else LParentControl := LParentControl.ParentControl;
-    end
-    else LParentControl := LParentControl.ParentControl;
-  end;
-  //--
-  if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin
+  if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtRest) then begin
     Var LOldIsfocused := FIsfocused;
     FIsfocused := True;
     Try
@@ -1457,7 +1445,7 @@ begin
   FDoubleClick := False;
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
   if (FFocusOnMouseUp) and
-     (FMouseDownAtLowVelocity) and
+     (FMouseDownAtRest) and
      (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) <= TALScrollEngine.DefaultTouchSlop) and
      (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) <= TALScrollEngine.DefaultTouchSlop) and
      (not (csDesigning in ComponentState)) and
@@ -1469,11 +1457,11 @@ end;
 procedure TALControl.MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   var LControlAbsolutePos := LocalToAbsolute(TPointF.Zero);
-  if (not FMouseDownAtLowVelocity) or
+  if (not FMouseDownAtRest) or
      (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) or
      (abs(FControlAbsolutePosAtMouseDown.y - LControlAbsolutePos.y) > TALScrollEngine.DefaultTouchSlop) then begin
     {$IF defined(debug)}
-    if (not FMouseDownAtLowVelocity) then
+    if (not FMouseDownAtRest) then
       ALLog(Classname+'.MouseClick', 'Skipped | Mouse Down was not made at Low Velocity')
     else if (abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x) > TALScrollEngine.DefaultTouchSlop) then
       ALLog(Classname+'.MouseClick', 'Skipped | Control moved by '+ALFormatFloatW('0.##', abs(FControlAbsolutePosAtMouseDown.x - LControlAbsolutePos.x)) + ' horizontally')
@@ -1511,6 +1499,18 @@ begin
     DblClick;
     FDoubleClick := False;
   end;
+end;
+
+{**************************************}
+function TALControl.IsInMotion: Boolean;
+begin
+  If (ALParentControl <> nil) then begin
+    var LScrollableControl: IALScrollableControl;
+    if (Supports(ALParentControl, IALScrollableControl, LScrollableControl)) and
+       (not LScrollableControl.GetScrollEngine.IsVelocityLow) then result := True
+    else result := ALParentControl.IsInMotion;
+  end
+  else result := False;
 end;
 
 {*************************************}

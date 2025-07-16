@@ -19,18 +19,21 @@ uses
   FMX.Controls,
   FMX.Forms,
   FMX.ZOrder.iOS,
-  FMX.Types;
+  FMX.Types,
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.Graphics;
 
 type
 
   {********************************}
   TALIosNativeView = class(TOCLocal)
   private
-    FControl: TControl;
+    FControl: TALControl;
     FForm: TCommonCustomForm;
     FVisible: Boolean;
     FIgnoreResetFocus: Boolean;
     function GetView: UIView; overload;
+    function GetAbsoluteRect: TRectF;
     procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure FormChangingFocusControlListener(const Sender: TObject; const AMessage: TMessage);
@@ -56,13 +59,14 @@ type
     function GetView<T: UIView>: T; overload;
   public
     constructor Create; overload; virtual;
-    constructor Create(const AControl: TControl); overload; virtual;
+    constructor Create(const AControl: TALControl); overload; virtual;
     destructor Destroy; override;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
-    procedure UpdateFrame;
+    procedure UpdateFrame; virtual;
+    function CaptureScreenshot: TALDrawable; virtual;
     property Form: TCommonCustomForm read FForm;
-    property Control: TControl read FControl;
+    property Control: TALControl read FControl;
     property View: UIView read GetView;
     property Visible: Boolean read FVisible;
   end;
@@ -71,12 +75,17 @@ type
 implementation
 
 uses
+  System.Math.Vectors,
   System.Classes,
   System.SysUtils,
   System.UITypes,
+  {$IF defined(ALSkiaCanvas)}
+  System.Skia.API,
+  {$ENDIF}
   Macapi.Helpers,
   FMX.Platform.iOS,
-  Alcinoe.Common;
+  Alcinoe.Common,
+  Alcinoe.FMX.NativeControl;
 
 {**********************************}
 constructor TALIosNativeView.Create;
@@ -91,8 +100,8 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TFormChangingFocusControl, FormChangingFocusControlListener);
 end;
 
-{************************************************************}
-constructor TALIosNativeView.Create(const AControl: TControl);
+{**************************************************************}
+constructor TALIosNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
   Create;
@@ -107,6 +116,13 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TFormChangingFocusControl, FormChangingFocusControlListener);
   RootChanged(nil);
   inherited;
+end;
+
+{******************************************************************************************************}
+procedure TALIosNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
+    View.removeFromSuperview;
 end;
 
 {****************************************************************************************************}
@@ -153,17 +169,10 @@ begin
   FIgnoreResetFocus := (not LMessage.IsChanged) and Supports(LMessage.NewFocusedControl, IVirtualKeyboardControl);
 end;
 
-{******************************************************************************************************}
-procedure TALIosNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
-begin
-  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
-    View.removeFromSuperview;
-end;
-
 {**********************************}
 procedure TALIosNativeView.InitView;
 begin
-  var V: Pointer := UIView(Super).initWithFrame(CGRectFromRect(Control.AbsoluteRect));
+  var V: Pointer := UIView(Super).initWithFrame(CGRectFromRect(GetAbsoluteRect));
   if GetObjectID <> V then
     UpdateObjectID(V);
 end;
@@ -193,11 +202,112 @@ begin
   Result := T(Super);
 end;
 
+{************************************************}
+function TALIosNativeView.GetAbsoluteRect: TRectF;
+begin
+  Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
+end;
+
 {*************************************}
 procedure TALIosNativeView.UpdateFrame;
 begin
   if FForm = nil then exit;
-  View.setFrame(CGRectFromRect(Control.AbsoluteRect));
+  View.setFrame(CGRectFromRect(GetAbsoluteRect));
+end;
+
+{*******************************************************}
+function TALIosNativeView.CaptureScreenshot: TALDrawable;
+begin
+  UIGraphicsBeginImageContextWithOptions(View.bounds.size, View.isOpaque, 0{scale});
+  try
+    View.drawViewHierarchyInRectAfterScreenUpdates(View.bounds, False{afterUpdates});
+    var LUIImage := TUIImage.Wrap(UIGraphicsGetImageFromCurrentImageContext);
+    if LUIImage = nil then exit(ALNullDrawable);
+    //try
+
+      {$IF defined(ALSkiaCanvas)}
+      var LCGImage := ALOSImageGetCgImage(LUIImage);
+      var LWidth: Integer := CGImageGetWidth(LCGImage);
+      var LHeight: Integer := CGImageGetHeight(LCGImage);
+      var LRect := TrectF.Create(0, 0, LWidth, LHeight);
+      var LBufferSize := LWidth * LHeight * 4;
+      var LPixelData := AllocMem(LBufferSize);
+      try
+        var LCGContextRef := ALCreateCGContextRef(Round(LRect.Width), Round(LRect.Height), LPixelData);
+        try
+
+          ALDrawCGImageRef(
+            LCGContextRef, // const ACanvas: CGContextRef;
+            LCGImage, // const AImage: CGImageRef;
+            1, // const AScale: Single;
+            false, // const AAlignToPixel: Boolean;
+            LRect, // const ASrcRect: TrectF;
+            LRect, // const ADstRect: TrectF;
+            1, // const AOpacity: Single;
+            nil, // const AMaskImage: CGImageRef;
+            TpointF.create(-50,-50), // const ACropCenter: TpointF;
+            TalphaColors.null, // const ATintColor: TalphaColor;
+            0, // const ABlurRadius: single;
+            0, // const AXRadius: Single;
+            0); // const AYRadius: Single)
+
+          var LImageInfo := ALGetSkImageinfo(LWidth, LHeight);
+          var LPixmap: sk_pixmap_t := ALSkCheckHandle(
+                                        sk4d_pixmap_create(
+                                          @LImageInfo,
+                                          LPixelData,
+                                          LWidth * 4));
+          try
+            Result := ALSkCheckHandle(
+                        sk4d_image_make_from_raster(
+                          LPixmap, // const pixmap: sk_pixmap_t;
+                          @ALReleaseMemPixelBufferProc, // proc: sk_image_raster_release_proc;
+                          LPixelData)); // proc_context: Pointer
+          finally
+            sk4d_refcnt_unref(LPixmap);
+          end;
+
+        finally
+          CGContextRelease(LCGContextRef);
+        end;
+      except
+        FreeMem(LPixelData);
+        raise;
+      end;
+      {$ELSE}
+      var LCGImage := ALOSImageGetCgImage(LUIImage);
+      var LRect := TrectF.Create(0, 0, CGImageGetWidth(LCGImage), CGImageGetHeight(LCGImage));
+      var LCGContextRef := ALCreateCGContextRef(Round(LRect.Width), Round(LRect.Height));
+      try
+
+        ALDrawCGImageRef(
+          LCGContextRef, // const ACanvas: CGContextRef;
+          LCGImage, // const AImage: CGImageRef;
+          1, // const AScale: Single;
+          false, // const AAlignToPixel: Boolean;
+          LRect, // const ASrcRect: TrectF;
+          LRect, // const ADstRect: TrectF;
+          1, // const AOpacity: Single;
+          nil, // const AMaskImage: CGImageRef;
+          TpointF.create(-50,-50), // const ACropCenter: TpointF;
+          TalphaColors.null, // const ATintColor: TalphaColor;
+          0, // const ABlurRadius: single;
+          0, // const AXRadius: Single;
+          0); // const AYRadius: Single)
+
+        result := ALCreateTextureFromCGContextRef(LCGContextRef);
+
+      finally
+        CGContextRelease(LCGContextRef);
+      end;
+      {$ENDIF}
+
+    //finally
+    //  LUIImage.release;
+    //end;
+  finally
+    UIGraphicsEndImageContext;
+  end;
 end;
 
 {*************************************}
@@ -258,7 +368,7 @@ begin
     View.becomeFirstResponder;
 end;
 
-{***************************************************************************}
+{************************************************************************}
 function TALIosNativeView.ExtractFirstTouchPoint(touches: NSSet): TPointF;
 begin
   var LPointer := touches.anyObject;
@@ -271,7 +381,7 @@ begin
   Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosNativeView.touchesBegan(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -301,7 +411,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{******************************************************************************}
 procedure TALIosNativeView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -330,7 +440,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosNativeView.touchesEnded(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -359,7 +469,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosNativeView.touchesMoved(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -387,24 +497,24 @@ begin
   end;
 end;
 
-{************************************************************}
+{*********************************************************}
 function TALIosNativeView.canBecomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  //ALLog(classname + '.canBecomeFirstResponder', 'control.name: ' + Control.parent.Name);
+  //ALLog(classname + '.canBecomeFirstResponder', 'control.name: ' + Control.Name);
   {$ENDIF}
-  Result := UIView(Super).canBecomeFirstResponder and TControl(Control.Owner).canFocus;
+  Result := UIView(Super).canBecomeFirstResponder and Control.canFocus;
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALIosNativeView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
-  //ALLog(classname + '.becomeFirstResponder', 'control.name: ' + Control.parent.Name);
+  //ALLog(classname + '.becomeFirstResponder', 'control.name: ' + Control.Name);
   {$ENDIF}
   Result := UIView(Super).becomeFirstResponder;
-  if (not TControl(Control.Owner).IsFocused) then
-    TControl(Control.Owner).SetFocus;
+  if (not Control.IsFocused) then
+    Control.SetFocus;
 end;
 
 end.

@@ -15,7 +15,6 @@ uses
   Macapi.Foundation,
   Macapi.CoreGraphics,
   Macapi.CoreText,
-  Alcinoe.FMX.NativeView.Mac,
   {$ENDIF}
   {$IF defined(ios)}
   iOSapi.CocoaTypes,
@@ -27,16 +26,11 @@ uses
   FMX.Forms,
   FMX.Platform.iOS,
   FMX.MultiTouch.iOS,
-  Alcinoe.FMX.NativeView.iOS,
   {$ENDIF}
   {$IF defined(ANDROID)}
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.JavaTypes,
   Alcinoe.AndroidApi.RenderScript,
-  Alcinoe.FMX.NativeView.Android,
-  {$ENDIF}
-  {$IF defined(MSWINDOWS)}
-  Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
   {$IF defined(ALSkiaEngine)}
   System.Skia.API,
@@ -141,20 +135,6 @@ type
   IALScrollableControl = interface
     ['{6750E04D-8DB6-4F27-898A-B20AD55CAAF4}']
     function GetScrollEngine: TALScrollEngine;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  IALNativeControl = interface
-    ['{EB2063C4-CA1F-4415-97C3-4C161907F244}']
-    {$IF defined(android)}
-    function GetNativeView: TALAndroidNativeView;
-    {$ELSEIF defined(IOS)}
-    function GetNativeView: TALIosNativeView;
-    {$ELSEIF defined(ALMacOS)}
-    function GetNativeView: TALMacNativeView;
-    {$ELSEIF defined(MSWindows)}
-    function GetNativeView: TALWinNativeView;
-    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}

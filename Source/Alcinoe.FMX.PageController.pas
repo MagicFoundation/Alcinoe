@@ -628,7 +628,8 @@ uses
   {$IFDEF ALDPK}
   DesignIntf,
   {$ENDIF}
-  FMX.Utils;
+  FMX.Utils,
+  Alcinoe.FMX.NativeControl;
 
 {***********************************************************}
 function TALPageIndicator.TFill.GetDefaultColor: TAlphaColor;

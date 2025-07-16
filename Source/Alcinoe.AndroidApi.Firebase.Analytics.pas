@@ -14,7 +14,7 @@ interface
   //https://maven.google.com/web/index.html#com.google.firebase:firebase-analytics) and gave also the path to
   //<Alcinoe>\Source\Alcinoe.AndroidApi.Firebase.Analytics.pas to build the compare source file. Then make a diff
   //compare between the new generated Alcinoe.AndroidApi.Firebase.Analytics.pas and this one to see if the api
-  //signature is still the same. 
+  //signature is still the same.
   {$MESSAGE WARN 'Check if the api signature of the last version of firebase sdk (android) is still the same'}
 {$ENDIF}
 

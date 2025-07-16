@@ -167,6 +167,9 @@ type
         FOnCreateMainContent: TCreateMainContentEvent; // 16 bytes
         FOnCreateLoadingContent: TCreateLoadingContentEvent; // 16 bytes
         FOnCreateErrorContent: TCreateErrorContentEvent; // 16 bytes
+        FOnShowLoadingContent: TNotifyEvent; // 16 bytes
+        FOnShowMainContent: TNotifyEvent; // 16 bytes
+        FOnShowErrorContent: TNotifyEvent; // 16 bytes
         //--
         function GetCacheEngine: TALBufDrawableCacheEngine;
         Function _GetHost: TALDynamicListBox;
@@ -229,6 +232,9 @@ type
         property OnCreateMainContent: TCreateMainContentEvent read FOnCreateMainContent write FOnCreateMainContent; // [MultiThread]
         property OnCreateLoadingContent: TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent; // [MultiThread]
         property OnCreateErrorContent: TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
+        property OnShowLoadingContent: TNotifyEvent read FOnShowLoadingContent write FOnShowLoadingContent;
+        property OnShowMainContent: TNotifyEvent read FOnShowMainContent write FOnShowMainContent;
+        property OnShowErrorContent: TNotifyEvent read FOnShowErrorContent write FOnShowErrorContent;
       end;
       // -----
       // TView
@@ -308,6 +314,7 @@ type
             FhidesOnScroll: Boolean;
           protected
             procedure VisibleChanged; override;
+            function IsInMotion: boolean; override;
           public
             constructor Create(const AOwner: TItem); override;
             property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
@@ -319,6 +326,7 @@ type
             FhidesOnScroll: Boolean;
           protected
             procedure VisibleChanged; override;
+            function IsInMotion: boolean; override;
           public
             constructor Create(const AOwner: TItem); override;
             property hidesOnScroll: Boolean read FhidesOnScroll write FhidesOnScroll;
@@ -422,6 +430,7 @@ type
           TContentBuilderContext = Class(TItem.TContentBuilderContext)
           private
             OwnerIsMainView: Boolean;
+            Padding: TRectF;
             NewBackgroundContent: TItem.TContent;
             NewForegroundContent: TItem.TContent;
             NewTopBar: TItem.TContent;
@@ -507,6 +516,7 @@ type
         FOnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent; // 16 bytes
         FOnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent; // 16 bytes
         FOnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent; // 16 bytes
+        FOnShowNoItemsContent: TNotifyEvent; // 16 bytes
         FOnRealignItems: TView.TMainContent.TRealignEvent; // 16 bytes
         FOnViewportPositionChange: TViewportPositionChangeEvent; // 16 bytes
         function GetItemByIndex(Const AIndex: Integer): TItem;
@@ -557,6 +567,7 @@ type
         procedure ChildrenMouseLeave(const AObject: TALDynamicControl); override;
         function GetViewportPosition: TALPointD; virtual;
         procedure SetViewportPosition(const AValue: TALPointD); virtual;
+        function GetScrollEngine: TALScrollEngine; override;
         procedure ScrollEngineChanged(Sender: TObject); virtual;
         procedure ScrollEngineStart(Sender: TObject); virtual;
         procedure ScrollEngineStop(Sender: TObject); virtual;
@@ -586,7 +597,6 @@ type
         property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
         property Items[const Index: Integer]: TItem read GetItemByIndex;
         property ItemsCount: integer read GetItemsCount;
-        property ScrollEngine: TALScrollEngine read FScrollEngine;
         property ViewportPosition: TALPointD read GetViewportPosition;
         property ItemIdNodeName: String read FItemIdNodeName write FItemIdNodeName;
         property MaxItems: integer read FMaxItems write FMaxItems;
@@ -614,6 +624,7 @@ type
         property OnCreatePullToRefreshIndicator: TCreatePullToRefreshIndicatorEvent read FOnCreatePullToRefreshIndicator write FOnCreatePullToRefreshIndicator; // [MultiThread]
         property OnCreateLoadMoreIndicator: TCreateLoadMoreIndicatorEvent read FOnCreateLoadMoreIndicator write FOnCreateLoadMoreIndicator; // [MultiThread]
         property OnCreateLoadMoreRetryButton: TCreateLoadMoreRetryButtonEvent read FOnCreateLoadMoreRetryButton write FOnCreateLoadMoreRetryButton; // [MultiThread]
+        property OnShowNoItemsContent: TNotifyEvent read FOnShowNoItemsContent write FOnShowNoItemsContent;
         property OnRealignItems: TView.TMainContent.TRealignEvent read FOnRealignItems write FOnRealignItems;
         property OnViewportPositionChange: TViewportPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
       end;
@@ -645,6 +656,10 @@ type
     FOnCreateItemMainContent: TItem.TCreateMainContentEvent; // [MultiThread]
     FOnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent; // [MultiThread]
     FOnCreateItemErrorContent: TItem.TCreateErrorContentEvent; // [MultiThread]
+    FOnShowLoadingContent: TNotifyEvent;
+    FOnShowMainContent: TNotifyEvent;
+    FOnShowErrorContent: TNotifyEvent;
+    FOnShowNoItemsContent: TNotifyEvent;
     FOnRealignItems: TView.TMainContent.TRealignEvent;
     FOnViewportPositionChange: TView.TViewportPositionChangeEvent;
     function GetHasActiveScrollEngines: Boolean;
@@ -691,7 +706,7 @@ type
     property Locked;
     property Margins;
     property Opacity;
-    //property Padding;
+    property Padding;
     property PopupMenu;
     property Position;
     property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount default TView.DefaultPreloadItemCount;
@@ -727,6 +742,11 @@ type
     property OnDownloadItems: TView.TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
     property OnRealignItems: TView.TMainContent.TRealignEvent read FOnRealignItems write FOnRealignItems;
     property OnViewportPositionChange: TView.TViewportPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
+    //--
+    property OnShowLoadingContent: TNotifyEvent read FOnShowLoadingContent write FOnShowLoadingContent;
+    property OnShowMainContent: TNotifyEvent read FOnShowMainContent write FOnShowMainContent;
+    property OnShowErrorContent: TNotifyEvent read FOnShowErrorContent write FOnShowErrorContent;
+    property OnShowNoItemsContent: TNotifyEvent read FOnShowNoItemsContent write FOnShowNoItemsContent;
     //--
     //property OnCanFocus;
     //property OnDragEnter;
@@ -1161,6 +1181,9 @@ begin
   FOnCreateMainContent := nil;
   FOnCreateLoadingContent := nil;
   FOnCreateErrorContent := nil;
+  FOnShowLoadingContent := nil;
+  FOnShowMainContent := nil;
+  FOnShowErrorContent := nil;
 end;
 
 {*****************************************}
@@ -1564,10 +1587,12 @@ begin
     ALMonitorExit(AContext.FLock);
   End;
   //--
-  if Result.Align = TALAlignLayout.None then
-    Result.Align := AContext.GetContentAlign(AContentType);
-  Result.EndUpdate;
-  ALDynamicListBoxMakeBufDrawables(Result, true{AEnsureDoubleBuffered});
+  if Result <> nil then begin
+    if Result.Align = TALAlignLayout.None then
+      Result.Align := AContext.GetContentAlign(AContentType);
+    Result.EndUpdate;
+    ALDynamicListBoxMakeBufDrawables(Result, true{AEnsureDoubleBuffered});
+  end;
 end;
 
 {**************}
@@ -1742,18 +1767,21 @@ begin
       if FLoadingContent <> nil then _HideContent(FLoadingContent);
       if FErrorContent <> nil then _HideContent(FErrorContent);
       FMainContent.Visible := true;
+      if assigned(FOnShowMainContent) then FOnShowMainContent(FMainContent);
     end;
     LoadingContentType: begin
       if (FLoadingContent = nil) or (FLoadingContent.Visible) then exit;
       if FMainContent <> nil then _HideContent(FMainContent);
       if FErrorContent <> nil then _HideContent(FErrorContent);
       FLoadingContent.Visible := true;
+      if assigned(FOnShowLoadingContent) then FOnShowLoadingContent(FLoadingContent);
     end;
     ErrorContentType: begin
       if (FErrorContent = nil) or (FErrorContent.Visible) then exit;
       if FMainContent <> nil then _HideContent(FMainContent);
       if FLoadingContent <> nil then _HideContent(FLoadingContent);
       FErrorContent.Visible := true;
+      if assigned(FOnShowErrorContent) then FOnShowErrorContent(FErrorContent);
     end;
     else
       Raise Exception.Create('Error 2BDD1C9D-E4D9-420C-8F3E-5A2BAEED7F9D')
@@ -1993,30 +2021,30 @@ begin
     else begin
       if (Owner <> nil) and (Owner.Orientation = TOrientation.Horizontal) then begin
         var LCurrX: double;
-        if AStartIndex <= 0 then LCurrX := GetTopBarSize
+        if AStartIndex <= 0 then LCurrX := GetTopBarSize + Padding.Left
         else LCurrX := Controls[AStartIndex - 1].Right + Controls[AStartIndex - 1].margins.Right;
 
         for var I := AStartIndex to ControlsCount - 1 do begin
           var LControl := Controls[i];
           LControl.SetBounds(
             LCurrX + LControl.margins.left, // X
-            LControl.margins.top, // Y
+            Padding.Top + LControl.margins.top, // Y
             LControl.Width, // AWidth
-            Height - LControl.margins.Top - LControl.margins.Bottom); // AHeight
+            Height - Padding.Top - LControl.margins.Top - LControl.margins.Bottom - Padding.bottom); // AHeight
           LCurrX := LControl.left + LControl.Width + LControl.margins.right;
         end;
       end
       else begin
         var LCurrY: double;
-        if AStartIndex <= 0 then LCurrY := GetTopBarSize
+        if AStartIndex <= 0 then LCurrY := GetTopBarSize + Padding.Top
         else LCurrY := Controls[AStartIndex - 1].bottom + Controls[AStartIndex - 1].margins.bottom;
 
         for var I := AStartIndex to ControlsCount - 1 do begin
           var LControl := Controls[i];
           LControl.SetBounds(
-            LControl.margins.left, // X
+            Padding.Left + LControl.margins.left, // X
             LCurrY + LControl.margins.top, // Y
-            Width - LControl.margins.left - LControl.margins.right, // AWidth
+            Width - Padding.Left - LControl.margins.left - LControl.margins.right - Padding.Right, // AWidth
             LControl.Height); // AHeight
           LCurrY := LControl.top + LControl.Height + LControl.margins.bottom;
         end;
@@ -2070,13 +2098,15 @@ begin
         if Owner.Orientation = TOrientation.Horizontal then begin
           var LWidth: Double := LLastActiveItem.Left + LLastActiveItem.Width + LLastActiveItem.Margins.Right;
           if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = 0) then LWidth := LWidth + Owner.FLoadMoreIndicator.width + Owner.FLoadMoreIndicator.Margins.Left + Owner.FLoadMoreIndicator.Margins.right
-          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LWidth := LWidth + Owner.FLoadMoreRetryButton.width + Owner.FLoadMoreRetryButton.Margins.Left + Owner.FLoadMoreRetryButton.Margins.right;
+          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LWidth := LWidth + Owner.FLoadMoreRetryButton.width + Owner.FLoadMoreRetryButton.Margins.Left + Owner.FLoadMoreRetryButton.Margins.right
+          else LWidth := LWidth + Padding.Right;
           Width := LWidth;
         end
         else begin
           var LHeight: Double := LLastActiveItem.Top + LLastActiveItem.height + LLastActiveItem.Margins.bottom;
           if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = 0) then LHeight := LHeight + Owner.FLoadMoreIndicator.Height + Owner.FLoadMoreIndicator.Margins.Top + Owner.FLoadMoreIndicator.Margins.Bottom
-          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LHeight := LHeight + Owner.FLoadMoreRetryButton.Height + Owner.FLoadMoreRetryButton.Margins.Top + Owner.FLoadMoreRetryButton.Margins.Bottom;
+          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LHeight := LHeight + Owner.FLoadMoreRetryButton.Height + Owner.FLoadMoreRetryButton.Margins.Top + Owner.FLoadMoreRetryButton.Margins.Bottom
+          else LHeight := LHeight + Padding.bottom;
           Height := LHeight;
         end;
       end;
@@ -2183,6 +2213,12 @@ begin
   end;
 end;
 
+{***********************************************************}
+function TALDynamicListBox.TView.TTopBar.IsInMotion: boolean;
+begin
+  result := False;
+end;
+
 {*************************************************************************}
 constructor TALDynamicListBox.TView.TBottomBar.Create(const AOwner: TItem);
 begin
@@ -2200,6 +2236,12 @@ begin
     if Owner.Orientation = TOrientation.Horizontal then left := Owner.Width - width
     else Top := Owner.Height - height;
   end;
+end;
+
+{**************************************************************}
+function TALDynamicListBox.TView.TBottomBar.IsInMotion: boolean;
+begin
+  result := False;
 end;
 
 {******************************************************************************************}
@@ -2312,6 +2354,8 @@ begin
   inherited create(AOwner, AContentType);
   //-
   OwnerIsMainView := AOwner.IsMainView;
+  if (OwnerIsMainView) and (AContentType = MainContentType) and (AOwner.Host <> nil) then Padding := AOwner.Host.Padding.Rect
+  else Padding := TRectF.Empty;
   //-
   if (AContentType = MainContentType) and
      (not assigned(FOnCreateMainContent)) then
@@ -2483,6 +2527,7 @@ begin
   FOnCreatePullToRefreshIndicator := nil;
   FOnCreateLoadMoreIndicator := nil;
   FOnCreateLoadMoreRetryButton := nil;
+  FOnShowNoItemsContent := nil;
   FOnRealignItems := nil;
   FOnViewportPositionChange := nil;
 end;
@@ -2822,6 +2867,12 @@ procedure TALDynamicListBox.TView.ChildrenMouseLeave(const AObject: TALDynamicCo
 begin
   InternalMouseLeave;
   inherited;
+end;
+
+{****************************************************************}
+function TALDynamicListBox.TView.GetScrollEngine: TALScrollEngine;
+begin
+  Result := FScrollEngine;
 end;
 
 {*********************************************************************}
@@ -3246,7 +3297,7 @@ begin
         {$ENDREGION}
 
         {$REGION 'Handle TopBar with HidesOnScroll'}
-        if (FTopBar <> nil) and (FTopBar.HidesOnScroll) then begin
+        if (FTopBar <> nil) and (FTopBar.HidesOnScroll) and (FMainContent.Visible) then begin
 
           // (*) When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
           // Example from TALScrollEngine.DoMouseUp:
@@ -3364,7 +3415,7 @@ begin
         {$ENDREGION}
 
         {$REGION 'Handle BottomBar with HidesOnScroll'}
-        if (FBottomBar <> nil) and (FBottomBar.HidesOnScroll) then begin
+        if (FBottomBar <> nil) and (FBottomBar.HidesOnScroll) and (FMainContent.Visible) then begin
 
           // (*) When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
           // Example from TALScrollEngine.DoMouseUp:
@@ -3555,7 +3606,7 @@ begin
 
         {$REGION 'Handle FLoadMoreIndicator'}
         if (FLoadMoreIndicator <> nil) then begin
-          If (FMainContent <> nil) and (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0) then begin
+          If (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0) then begin
             If Orientation = TOrientation.horizontal then begin
               var LLeft: Double := FMainContent.Width - AValue.X - FLoadMoreIndicator.Width - FLoadMoreIndicator.Margins.Right;
               if LLeft > Width then FLoadMoreIndicator.Visible := False
@@ -3579,7 +3630,7 @@ begin
 
         {$REGION 'Handle FLoadMoreRetryButton'}
         if (FLoadMoreRetryButton <> nil) then begin
-          If (FMainContent <> nil) and (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0) then begin
+          If (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0) then begin
             If Orientation = TOrientation.horizontal then begin
               var LLeft: Double := FMainContent.Width - AValue.X - FLoadMoreRetryButton.Width - FLoadMoreRetryButton.Margins.Right;
               if LLeft > Width then FLoadMoreRetryButton.Visible := False
@@ -4238,6 +4289,7 @@ function TALDynamicListBox.TView.CreateDefaultMainContent(const AContext: TItem.
 begin
   Result := TMainContent.Create(nil);
   Result.SetBoundsRect(AContext.TargetRect);
+  Result.Padding.Rect := TALDynamicListBox.TView.TContentBuilderContext(AContext).Padding;
 end;
 
 {*******************************************************************************************}
@@ -4295,6 +4347,7 @@ begin
       if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0);
       if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0);
       SetViewportPosition(ViewportPosition);
+      if assigned(FOnShowMainContent) then FOnShowMainContent(FMainContent);
     end;
     //--
     LoadingContentType: begin
@@ -4310,6 +4363,7 @@ begin
       if FPullToRefreshIndicator <> nil then FPullToRefreshIndicator.Visible := False;
       if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := False;
       if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := False;
+      if assigned(FOnShowLoadingContent) then FOnShowLoadingContent(FLoadingContent);
     end;
     //--
     ErrorContentType: begin
@@ -4325,6 +4379,7 @@ begin
       if FPullToRefreshIndicator <> nil then FPullToRefreshIndicator.Visible := False;
       if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := False;
       if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := False;
+      if assigned(FOnShowErrorContent) then FOnShowErrorContent(FErrorContent);
     end;
     //--
     NoItemsContentType: begin
@@ -4340,6 +4395,7 @@ begin
       if FPullToRefreshIndicator <> nil then FPullToRefreshIndicator.Visible := False;
       if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := False;
       if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := False;
+      if assigned(FOnShowNoItemsContent) then FOnShowNoItemsContent(FNoItemsContent);
     end;
     //--
     else
@@ -4436,6 +4492,10 @@ begin
   FOnCreateItemMainContent := nil;
   FOnCreateItemLoadingContent := nil;
   FOnCreateItemErrorContent := nil;
+  FOnShowLoadingContent := nil;
+  FOnShowMainContent := nil;
+  FOnShowErrorContent := nil;
+  FOnShowNoItemsContent := nil;
   FOnRealignItems := nil;
   FOnViewportPositionChange := nil;
   FMainView := nil;
@@ -4475,6 +4535,10 @@ begin
     Result.OnCreatePullToRefreshIndicator := OnCreatePullToRefreshIndicator;
     Result.OnCreateLoadMoreIndicator := OnCreateLoadMoreIndicator;
     Result.OnCreateLoadMoreRetryButton := OnCreateLoadMoreRetryButton;
+    Result.OnShowLoadingContent := OnShowLoadingContent;
+    Result.OnShowMainContent := OnShowMainContent;
+    Result.OnShowErrorContent := OnShowErrorContent;
+    Result.OnShowNoItemsContent := OnShowNoItemsContent;
     Result.OnRealignItems := OnRealignItems;
     Result.OnViewportPositionChange := OnViewportPositionChange;
   end;

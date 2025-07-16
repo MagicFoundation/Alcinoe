@@ -65,6 +65,7 @@ contains
   Alcinoe.FMX.Layouts in 'Alcinoe.FMX.Layouts.pas',
   Alcinoe.FMX.Materials.Canvas in 'Alcinoe.FMX.Materials.Canvas.pas',
   Alcinoe.FMX.Memo in 'Alcinoe.FMX.Memo.pas',
+  Alcinoe.FMX.NativeControl in 'Alcinoe.FMX.NativeControl.pas',
   Alcinoe.FMX.NativeView.Win in 'Alcinoe.FMX.NativeView.Win.pas',
   Alcinoe.FMX.Objects in 'Alcinoe.FMX.Objects.pas',
   Alcinoe.FMX.PageController in 'Alcinoe.FMX.PageController.pas',

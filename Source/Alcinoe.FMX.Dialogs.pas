@@ -14,7 +14,8 @@ uses
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.Controls;
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.NativeControl;
 
 type
 
@@ -173,10 +174,10 @@ type
     FScrimAnimation: TALFloatAnimation;
     FContainerAnimation: TALFloatAnimation;
     FQueue: TQueue<TALDialog>;
-    FDeactivatedEdits: TArray<TALBaseEdit>;
+    FFrozenNativeControls: TArray<TALNativeControl>;
   protected
-    procedure DeactivateEdits;
-    procedure ReactivateEdits;
+    procedure FreezeNativeViews;
+    procedure UnfreezeNativeViews;
     procedure ScrimAnimationProcess(Sender: TObject);
     procedure ContainerAnimationProcess(Sender: TObject);
     procedure ScrimAnimationFinish(Sender: TObject);
@@ -923,7 +924,7 @@ begin
   FContainerAnimation.OnProcess := ContainerAnimationProcess;
   FContainerAnimation.OnFinish := ContainerAnimationFinish;
   FQueue := TQueue<TALDialog>.create;
-  Setlength(FDeactivatedEdits, 0);
+  Setlength(FFrozenNativeControls, 0);
 end;
 
 {**********************************}
@@ -1000,19 +1001,19 @@ begin
   result := min(560, LForm.ClientWidth / 100 * 85);
 end;
 
-{*****************************************}
-procedure TALDialogManager.DeactivateEdits;
+{*******************************************}
+procedure TALDialogManager.FreezeNativeViews;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DeactivateEdits(const AControl: TControl);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _FreezeNativeViews(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i] is TALBaseEdit) and (TALBaseEdit(AControl.Controls[i]).HasNativeView) then begin
-        setlength(FDeactivatedEdits, Length(FDeactivatedEdits) + 1);
-        FDeactivatedEdits[High(FDeactivatedEdits)] := TALBaseEdit(AControl.Controls[i]);
-        TALBaseEdit(AControl.Controls[i]).RemoveNativeView;
+      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).IsNativeViewVisible) then begin
+        setlength(FFrozenNativeControls, Length(FFrozenNativeControls) + 1);
+        FFrozenNativeControls[High(FFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
+        TALNativeControl(AControl.Controls[i]).FreezeNativeView;
       end
-      else _DeactivateEdits(AControl.Controls[i]);
+      else _FreezeNativeViews(AControl.Controls[i]);
     end;
   end;
 
@@ -1022,15 +1023,15 @@ begin
   if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
   For var I := 0 to LForm.ChildrenCount - 1 do
     if LForm.Children[i] is TControl then
-      _DeactivateEdits(TControl(LForm.Children[i]));
+      _FreezeNativeViews(TControl(LForm.Children[i]));
 end;
 
-{*****************************************}
-procedure TALDialogManager.ReactivateEdits;
+{*********************************************}
+procedure TALDialogManager.UnfreezeNativeViews;
 begin
-  For var I := low(FDeactivatedEdits) to high(FDeactivatedEdits) do
-    FDeactivatedEdits[I].AddNativeView;
-  setlength(FDeactivatedEdits, 0);
+  For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    FFrozenNativeControls[I].UnFreezeNativeView;
+  setlength(FFrozenNativeControls, 0);
 end;
 
 {*************************************************}
@@ -1089,7 +1090,7 @@ begin
   FContainerAnimation.Enabled := False;
   ProcessPendingDialogs;
   if not IsShowingDialog then
-    ReactivateEdits
+    UnfreezeNativeViews
   else begin
     FScrimAnimation.Stop;
     if assigned(FCurrentDialog.CustomDialogRefProc) or
@@ -1207,7 +1208,7 @@ begin
     // CustomContainer
     else if ADialog.HasCustomContainer then begin
       LForm.Focused := nil;
-      DeactivateEdits;
+      FreezeNativeViews;
       if ADialog.HasContainer then
         ADialog.Container.Visible := False;
     end
@@ -1216,7 +1217,7 @@ begin
     else begin
 
       LForm.Focused := nil;
-      DeactivateEdits;
+      FreezeNativeViews;
       var LCurrY: Single := 0;
       var LContainerWidth: Single := 0;
       var LContentHeight: Single := 0;

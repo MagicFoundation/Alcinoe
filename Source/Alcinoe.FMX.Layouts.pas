@@ -23,7 +23,8 @@ uses
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.ScrollEngine;
+  Alcinoe.FMX.ScrollEngine,
+  Alcinoe.FMX.NativeControl;
 
 type
 

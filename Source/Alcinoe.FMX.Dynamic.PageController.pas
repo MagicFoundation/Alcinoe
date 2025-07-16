@@ -475,10 +475,10 @@ type
     { IItemContainer }
     //**function GetItemsCount: Integer;
     //**function GetItem(const AIndex: Integer): TFmxObject;
-    { IALScrollableControl }
-    function GetScrollEngine: TALScrollEngine;
-    procedure SetScrollEngine(const Value: TALScrollEngine);
   protected
+    { IALScrollableControl }
+    function GetScrollEngine: TALScrollEngine; override;
+    procedure SetScrollEngine(const Value: TALScrollEngine);
     function CreateStroke: TALStrokeBrush; override;
     function CreateContent: TContent; virtual;
     function CreateScrollEngine: TScrollEngine; virtual;

@@ -2598,7 +2598,8 @@ end;
 {*************************************}
 destructor TALAsyncVideoPlayer.Destroy;
 begin
-  TALVideoPlayerControllerThread.Instance.ReleaseEngine(FEngineIndex);
+  if TALVideoPlayerControllerThread.HasInstance then
+    TALVideoPlayerControllerThread.Instance.ReleaseEngine(FEngineIndex);
   inherited;
 end;
 
@@ -2704,7 +2705,8 @@ end;
 {*********************************}
 procedure TALAsyncVideoPlayer.Stop;
 begin
-  TALVideoPlayerControllerThread.Instance.Stop(FEngineIndex);
+  if TALVideoPlayerControllerThread.HasInstance then
+    TALVideoPlayerControllerThread.Instance.Stop(FEngineIndex);
 end;
 
 {******************************************************}

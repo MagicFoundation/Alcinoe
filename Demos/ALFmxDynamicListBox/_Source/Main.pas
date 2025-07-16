@@ -809,6 +809,7 @@ begin
     LLikeCountText.AutoSize := TALAutoSizeMode.Both;
     LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
 
+    {$IF not defined(IOS)}
     var LCommentCountBtn := TALDynamicButton.Create(LLayout3);
     LCommentCountBtn.Fill.Color := TalphaColors.Null;
     LCommentCountBtn.Fill.ResourceName := 'comments';
@@ -848,6 +849,7 @@ begin
     LReshareCountText.TextSettings.Font.Color := $FF0d1014;
     LReshareCountText.AutoSize := TALAutoSizeMode.Both;
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
+    {$ENDIF}
 
     var LBookmarkBtn := TALDynamicToggleButton.Create(LLayout3);
     LBookmarkBtn.StateStyles.Unchecked.Default.Fill.Inherit := False;
@@ -1169,6 +1171,11 @@ begin
         if AData.ChildNodes[i].GetChildNodeValueText('type', '') = 'stories' then
           AData.ChildNodes.Delete(i);
     end;
+    {$IF defined(IOS)}
+    For var I := AData.ChildNodes.Count - 1 downto 0 do
+      if AData.ChildNodes[i].GetChildNodeValueText('type', '') = 'stories' then
+        AData.ChildNodes.Delete(i);
+    {$ENDIF}
 
   Except
     On E: Exception do begin

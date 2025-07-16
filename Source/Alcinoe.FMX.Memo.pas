@@ -46,7 +46,7 @@ Type
 {$REGION ' IOS'}
 {$IF defined(ios)}
 
-  {****************************************}
+  {************************************}
   IALIosMemoView = interface(UITextView)
     ['{EEF3FCE4-9755-48D7-B896-2C662EFDE9FC}']
     procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
@@ -57,7 +57,7 @@ Type
     function becomeFirstResponder: Boolean; cdecl;
   end;
 
-  {******************************************}
+  {****************************************}
   TALIosMemoView = class(TALIosBaseEditView)
   private
     type
@@ -140,7 +140,7 @@ Type
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
 
-  {****************************************}
+  {**************************************}
   IALMacMemoView = interface(NSScrollView)
     ['{00A5F139-8A09-43CA-AF31-05B3480DD657}']
     function acceptsFirstResponder: Boolean; cdecl;
@@ -424,12 +424,12 @@ begin
   FMemoView := AMemoView;
 end;
 
-{*********************************************************************************}
+{***************************************************************************************}
 procedure TALIosMemoView.TTextViewDelegate.TextViewDidBeginEditing(TextView: UITextView);
 begin
 end;
 
-{***************************************************************************}
+{*********************************************************************************}
 procedure TALIosMemoView.TTextViewDelegate.textViewDidChange(textView: UITextView);
 begin
   {$IF defined(DEBUG)}
@@ -439,24 +439,24 @@ begin
   FMemoView.Control.DoChange;
 end;
 
-{************************************************************************************}
+{******************************************************************************************}
 procedure TALIosMemoView.TTextViewDelegate.textViewDidChangeSelection(textView: UITextView);
 begin
 end;
 
-{*******************************************************************************}
+{*************************************************************************************}
 procedure TALIosMemoView.TTextViewDelegate.textViewDidEndEditing(textView: UITextView);
 begin
   FMemoView.Control.ResetFocus;
 end;
 
-{********************************************************************************************}
+{**************************************************************************************************}
 function TALIosMemoView.TTextViewDelegate.textViewShouldBeginEditing(textView: UITextView): Boolean;
 begin
   Result := True;
 end;
 
-{*****************************************************************************************************************************************************************************}
+{***********************************************************************************************************************************************************************************}
 function TALIosMemoView.TTextViewDelegate.textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -470,25 +470,25 @@ begin
   else Result := True;
 end;
 
-{******************************************************************************************}
+{************************************************************************************************}
 function TALIosMemoView.TTextViewDelegate.textViewShouldEndEditing(textView: UITextView): Boolean;
 begin
   Result := True;
 end;
 
-{***************************************************************************************************************************************************************************************}
+{*********************************************************************************************************************************************************************************************}
 function TALIosMemoView.TTextViewDelegate.textViewShouldInteractWithTextAttachmentInRange(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean;
 begin
   Result := True;
 end;
 
-{******************************************************************************************************************************************************}
+{************************************************************************************************************************************************************}
 function TALIosMemoView.TTextViewDelegate.textViewShouldInteractWithURLInRange(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange): Boolean;
 begin
   Result := True;
 end;
 
-{************************************}
+{********************************}
 constructor TALIosMemoView.Create;
 begin
   inherited; // This will call InitView
@@ -519,7 +519,7 @@ begin
   SetCheckSpelling(True);
 end;
 
-{***********************************}
+{********************************}
 destructor TALIosMemoView.Destroy;
 begin
   View.setDelegate(nil);
@@ -530,7 +530,7 @@ begin
   inherited Destroy;
 end;
 
-{************************************************************}
+{********************************************************}
 procedure TALIosMemoView.SetEnabled(const value: Boolean);
 begin
   inherited;
@@ -538,53 +538,53 @@ begin
   TALUITextView.Wrap(NSObjectToID(View)).setSelectable(value);
 end;
 
-{****************************************************************************}
+{************************************************************************}
 procedure TALIosMemoView.touchesBegan(touches: NSSet; withEvent: UIEvent);
 begin
   if (getLineCount < Control.GetNativeViewHeight / getLineHeight) then
     inherited;
 end;
 
-{********************************************************************************}
+{****************************************************************************}
 procedure TALIosMemoView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
 begin
   if (getLineCount < Control.GetNativeViewHeight / getLineHeight) then
     inherited;
 end;
 
-{****************************************************************************}
+{************************************************************************}
 procedure TALIosMemoView.touchesEnded(touches: NSSet; withEvent: UIEvent);
 begin
   if (getLineCount < Control.GetNativeViewHeight / getLineHeight) then
     inherited;
 end;
 
-{****************************************************************************}
+{************************************************************************}
 procedure TALIosMemoView.touchesMoved(touches: NSSet; withEvent: UIEvent);
 begin
   if (getLineCount < Control.GetNativeViewHeight / getLineHeight) then
     inherited;
 end;
 
-{********************************************************}
+{****************************************************}
 function TALIosMemoView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IALIosMemoView);
 end;
 
-{**********************************************}
+{******************************************}
 function TALIosMemoView.GetView: UITextView;
 begin
   Result := inherited GetView<UITextView>;
 end;
 
-{************************************************}
+{******************************************}
 function TALIosMemoView.GetControl: TALMemo;
 begin
   Result := TALMemo(inherited Control);
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosMemoView.SetKeyboardType(const Value: TVirtualKeyboardType);
 begin
   var LUIKeyboardType: UIKeyboardType;
@@ -601,7 +601,7 @@ begin
   View.setKeyboardType(LUIKeyboardType);
 end;
 
-{***************************************************************}
+{************************************************************}
 function TALIosMemoView.GetKeyboardType: TVirtualKeyboardType;
 begin
   var LUIKeyboardType := View.KeyboardType;
@@ -616,7 +616,7 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************}
 procedure TALIosMemoView.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
@@ -629,7 +629,7 @@ begin
   View.setAutoCapitalizationType(LUITextAutoCapitalizationType);
 end;
 
-{******************************************************************************}
+{***************************************************************************}
 function TALIosMemoView.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   var LUITextAutoCapitalizationType := View.AutoCapitalizationType;
@@ -641,19 +641,19 @@ begin
   end;
 end;
 
-{************************************************************}
+{*********************************************************}
 procedure TALIosMemoView.SetPassword(const Value: Boolean);
 begin
   View.setSecureTextEntry(Value);
 end;
 
-{**********************************************}
+{*******************************************}
 function TALIosMemoView.GetPassword: Boolean;
 begin
   result := View.isSecureTextEntry;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALIosMemoView.SetCheckSpelling(const Value: Boolean);
 begin
   if Value then begin
@@ -666,13 +666,13 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALIosMemoView.GetCheckSpelling: Boolean;
 begin
   result := View.SpellCheckingType = UITextSpellCheckingTypeYes;
 end;
 
-{************************************************************************}
+{*********************************************************************}
 procedure TALIosMemoView.setReturnKeyType(const Value: TReturnKeyType);
 begin
   var LUIReturnKeyType: UIReturnKeyType;
@@ -687,7 +687,7 @@ begin
   View.setReturnKeyType(LUIReturnKeyType);
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALIosMemoView.GetReturnKeyType: TReturnKeyType;
 begin
   var LUIReturnKeyType := View.ReturnKeyType;
@@ -701,13 +701,13 @@ begin
   end;
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosMemoView.GetPromptText: String;
 begin
   Result := NSStrToStr(FPlaceholderLabel.text);
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALIosMemoView.setPromptText(const Value: String);
 begin
   FPlaceholderLabel.setText(StrToNSStr(Value));
@@ -715,13 +715,13 @@ begin
   TextSettingsChanged(nil);
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALIosMemoView.GetPromptTextColor: TAlphaColor;
 begin
   Result := fPromptTextColor;
 end;
 
-{***********************************************************************}
+{********************************************************************}
 procedure TALIosMemoView.setPromptTextColor(const Value: TAlphaColor);
 begin
   if Value <> fPromptTextColor then begin
@@ -730,7 +730,7 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALIosMemoView.GetTintColor: TAlphaColor;
 begin
   var red: CGFloat;
@@ -741,50 +741,50 @@ begin
   else result := TAlphaColorF.Create(red, green, blue, alpha).ToAlphaColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALIosMemoView.setTintColor(const Value: TAlphaColor);
 begin
   if Value <> TalphaColors.Null then
     View.setTintColor(AlphaColorToUIColor(Value));
 end;
 
-{*****************************************}
+{**************************************}
 function TALIosMemoView.getText: String;
 begin
   result := NSStrToStr(View.text);
 end;
 
-{*******************************************************}
+{****************************************************}
 procedure TALIosMemoView.SetText(const Value: String);
 begin
   View.setText(StrToNSStr(Value));
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosMemoView.GetMaxLength: integer;
 begin
   Result := FMaxLength;
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALIosMemoView.SetMaxLength(const Value: integer);
 begin
   FMaxLength := Value;
 end;
 
-{*****************************************************************************}
+{***********************************************************}
 function TALIosMemoView.GetTextSettings: TALBaseTextSettings;
 begin
   result := FTextSettings;
 end;
 
-{*****************************************************************************}
+{*************************************************************************}
 procedure TALIosMemoView.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
 
-{***************************************************************}
+{************************************************************}
 procedure TALIosMemoView.TextSettingsChanged(Sender: TObject);
 begin
   var LFontRef := ALCreateCTFontRef(ALResolveFontFamily(TextSettings.Font.Family), TextSettings.Font.Size, TextSettings.Font.Weight, TextSettings.Font.Slant);
@@ -851,19 +851,19 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALIosMemoView.GetFillColor: TAlphaColor;
 begin
   Result := FFillColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALIosMemoView.SetFillColor(const Value: TAlphaColor);
 begin
   FFillColor := Value;
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosMemoView.getLineCount: integer;
 begin
   Result := 0;
@@ -882,7 +882,7 @@ begin
   if Result = 0 then result := 1;
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosMemoView.getLineHeight: Single;
 begin
   if View.font = nil then
@@ -892,13 +892,13 @@ begin
     result := result * textsettings.LineHeightMultiplier;
 end;
 
-{************************************************************************************}
+{*********************************************************************************}
 Procedure TALIosMemoView.setSelection(const AStart: integer; const AStop: Integer);
 begin
   View.setSelectedRange(NSMakeRange(AStart, AStop-AStart));
 end;
 
-{**************************************************************}
+{***********************************************************}
 Procedure TALIosMemoView.setSelection(const AIndex: integer);
 begin
   View.setSelectedRange(NSMakeRange(AIndex, 0));
@@ -917,19 +917,19 @@ begin
   FMemoView := AMemoView;
 end;
 
-{**********************************************}
+{****************************************************}
 function TALMacMemoView.TTextView.GetView: NSTextView;
 begin
   Result := NSTextView(Super);
 end;
 
-{********************************************************}
+{**************************************************************}
 function TALMacMemoView.TTextView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(ITextView);
 end;
 
-{*********************************************************}
+{***************************************************************}
 function TALMacMemoView.TTextView.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -938,7 +938,7 @@ begin
   Result := NSTextView(Super).acceptsFirstResponder and FMemoView.Control.canFocus;
 end;
 
-{********************************************************}
+{**************************************************************}
 function TALMacMemoView.TTextView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -956,12 +956,12 @@ begin
   FMemoView := AMemoView;
 end;
 
-{*************************************************************************************}
+{*******************************************************************************************}
 procedure TALMacMemoView.TTextViewDelegate.textDidBeginEditing(notification: NSNotification);
 begin
 end;
 
-{*******************************************************************************}
+{*************************************************************************************}
 procedure TALMacMemoView.TTextViewDelegate.textDidChange(notification: NSNotification);
 begin
   {$IF defined(DEBUG)}
@@ -971,19 +971,19 @@ begin
   FMemoView.Control.DoChange;
 end;
 
-{***********************************************************************************}
+{*****************************************************************************************}
 procedure TALMacMemoView.TTextViewDelegate.textDidEndEditing(notification: NSNotification);
 begin
   FMemoView.Control.ResetFocus;
 end;
 
-{**************************************************************************************}
+{********************************************************************************************}
 function TALMacMemoView.TTextViewDelegate.textShouldBeginEditing(textObject: NSText): Boolean;
 begin
   Result := True;
 end;
 
-{*********************************************************************************************************************************************************************************}
+{***************************************************************************************************************************************************************************************}
 function TALMacMemoView.TTextViewDelegate.textViewShouldChangeTextInRangeReplacementString(textView: NSTextView; shouldChangeTextInRange: NSRange; replacementString: NSString): boolean;
 begin
   {$IF defined(DEBUG)}
@@ -997,7 +997,7 @@ begin
   else Result := True;
 end;
 
-{************************************************************************************}
+{******************************************************************************************}
 function TALMacMemoView.TTextViewDelegate.textShouldEndEditing(textObject: NSText): Boolean;
 begin
   Result := True;
@@ -1010,19 +1010,19 @@ begin
   FMemoView := AMemoView;
 end;
 
-{**************************************************}
+{********************************************************}
 function TALMacMemoView.TPlaceHolder.GetView: NSTextField;
 begin
   Result := NSTextField(Super);
 end;
 
-{***********************************************************}
+{*****************************************************************}
 function TALMacMemoView.TPlaceHolder.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IPlaceHolder);
 end;
 
-{************************************************************}
+{******************************************************************}
 function TALMacMemoView.TPlaceHolder.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -1032,7 +1032,7 @@ begin
   FMemoView.View.becomeFirstResponder;
 end;
 
-{**************************************}
+{********************************}
 constructor TALMacMemoView.Create;
 begin
   inherited; // This will call InitView
@@ -1080,7 +1080,7 @@ begin
   FTintColor := TalphaColors.Null;
 end;
 
-{**************************************}
+{********************************}
 destructor TALMacMemoView.Destroy;
 begin
   FPlaceholderLabel.View.removeFromSuperview;
@@ -1093,7 +1093,7 @@ begin
   inherited;
 end;
 
-{**************************************************************}
+{********************************************************}
 procedure TALMacMemoView.SetEnabled(const value: Boolean);
 begin
   inherited;
@@ -1101,91 +1101,91 @@ begin
   FTextView.View.setSelectable(value);
 end;
 
-{**********************************************************}
+{****************************************************}
 function TALMacMemoView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IALMacMemoView);
 end;
 
-{**************************************************}
+{********************************************}
 function TALMacMemoView.GetView: NSScrollView;
 begin
   Result := inherited GetView<NSScrollView>;
 end;
 
-{**************************************************}
+{******************************************}
 function TALMacMemoView.GetControl: TALMemo;
 begin
   Result := TALMemo(inherited Control);
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALMacMemoView.SetKeyboardType(const Value: TVirtualKeyboardType);
 begin
   FKeyboardType := Value;
 end;
 
-{***************************************************************}
+{************************************************************}
 function TALMacMemoView.GetKeyboardType: TVirtualKeyboardType;
 begin
   Result := FKeyboardType;
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************}
 procedure TALMacMemoView.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   FAutoCapitalizationType := Value;
 end;
 
-{******************************************************************************}
+{***************************************************************************}
 function TALMacMemoView.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   Result := FAutoCapitalizationType;
 end;
 
-{************************************************************}
+{*********************************************************}
 procedure TALMacMemoView.SetPassword(const Value: Boolean);
 begin
   FPassword := Value;
 end;
 
-{**********************************************}
+{*******************************************}
 function TALMacMemoView.GetPassword: Boolean;
 begin
   Result := FPassword;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALMacMemoView.SetCheckSpelling(const Value: Boolean);
 begin
   FCheckSpelling := Value;
 end;
 
-{***************************************************}
+{************************************************}
 function TALMacMemoView.GetCheckSpelling: Boolean;
 begin
   Result := FCheckSpelling;
 end;
 
-{************************************************************************}
+{*********************************************************************}
 procedure TALMacMemoView.setReturnKeyType(const Value: TReturnKeyType);
 begin
   FReturnKeyType := Value;
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALMacMemoView.GetReturnKeyType: TReturnKeyType;
 begin
   Result := FReturnKeyType;
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacMemoView.GetPromptText: String;
 begin
   Result := NSStrToStr(FPlaceholderLabel.view.stringValue);
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALMacMemoView.setPromptText(const Value: String);
 begin
   FPlaceholderLabel.view.setStringValue(StrToNSStr(Value));
@@ -1193,13 +1193,13 @@ begin
   TextSettingsChanged(nil);
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALMacMemoView.GetPromptTextColor: TAlphaColor;
 begin
   Result := fPromptTextColor;
 end;
 
-{***********************************************************************}
+{********************************************************************}
 procedure TALMacMemoView.setPromptTextColor(const Value: TAlphaColor);
 begin
   if Value <> fPromptTextColor then begin
@@ -1208,55 +1208,55 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALMacMemoView.GetTintColor: TAlphaColor;
 begin
   Result := FTintColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALMacMemoView.setTintColor(const Value: TAlphaColor);
 begin
   FTintColor := Value;
 end;
 
-{*****************************************}
+{**************************************}
 function TALMacMemoView.getText: String;
 begin
   result := NSStrToStr(TALNSText.wrap(NSObjectToID(FtextView.View)).&String);
 end;
 
-{*******************************************************}
+{****************************************************}
 procedure TALMacMemoView.SetText(const Value: String);
 begin
   FtextView.View.setString(StrToNSStr(Value));
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacMemoView.GetMaxLength: integer;
 begin
   Result := FMaxLength;
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALMacMemoView.SetMaxLength(const Value: integer);
 begin
   FMaxLength := Value;
 end;
 
-{*****************************************************************************}
+{***********************************************************}
 function TALMacMemoView.GetTextSettings: TALBaseTextSettings;
 begin
   result := FTextSettings;
 end;
 
-{*****************************************************************************}
+{*************************************************************************}
 procedure TALMacMemoView.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
 
-{***************************************************************}
+{************************************************************}
 procedure TALMacMemoView.TextSettingsChanged(Sender: TObject);
 begin
   var LFontRef := ALCreateCTFontRef(ALResolveFontFamily(TextSettings.Font.Family), TextSettings.Font.Size, TextSettings.Font.Weight, TextSettings.Font.Slant);
@@ -1326,19 +1326,19 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALMacMemoView.GetFillColor: TAlphaColor;
 begin
   Result := FFillColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALMacMemoView.SetFillColor(const Value: TAlphaColor);
 begin
   FFillColor := Value;
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacMemoView.getLineCount: integer;
 begin
   Result := 0;
@@ -1357,7 +1357,7 @@ begin
   if Result = 0 then result := 1;
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacMemoView.getLineHeight: Single;
 begin
   var LfontMetrics := ALGetFontMetrics(
@@ -1370,13 +1370,13 @@ begin
     result := result * textsettings.LineHeightMultiplier;
 end;
 
-{************************************************************************************}
+{*********************************************************************************}
 Procedure TALMacMemoView.setSelection(const AStart: integer; const AStop: Integer);
 begin
   FTextView.View.setSelectedRange(NSMakeRange(AStart, AStop-AStart));
 end;
 
-{**************************************************************}
+{***********************************************************}
 Procedure TALMacMemoView.setSelection(const AIndex: integer);
 begin
   FTextView.View.setSelectedRange(NSMakeRange(AIndex, 0));
@@ -1409,7 +1409,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{********************************************}
 function TALWinMemoView.getLineCount: integer;
 begin
   Result := SendMessage(Handle, EM_GETLINECOUNT, 0, 0);

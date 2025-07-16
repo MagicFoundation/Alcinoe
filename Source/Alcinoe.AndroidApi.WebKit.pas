@@ -18,7 +18,7 @@ type
   JALWebViewListener = interface;
   JALWebView = interface;
 
-  {*************************************}
+  {*********************************************}
   JALWebViewListenerClass = interface(IJavaClass)
     ['{FDC3C9EF-E372-454A-843A-976D51257DF1}']
   end;
@@ -40,7 +40,7 @@ type
   end;
   TJALWebViewListener = class(TJavaGenericImport<JALWebViewListenerClass, JALWebViewListener>) end;
 
-  {*************************************}
+  {****************************************}
   JALWebViewClass = interface(JWebViewClass)
     ['{CB7206B2-5DF9-4270-8963-B4730A1A8ED9}']
     {class} function init(context: JContext): JALWebView; cdecl;

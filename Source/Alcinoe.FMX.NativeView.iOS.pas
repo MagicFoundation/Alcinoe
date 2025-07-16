@@ -100,7 +100,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TFormChangingFocusControl, FormChangingFocusControlListener);
 end;
 
-{************************************************************}
+{**************************************************************}
 constructor TALIosNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
@@ -202,7 +202,7 @@ begin
   Result := T(Super);
 end;
 
-{*************************************}
+{************************************************}
 function TALIosNativeView.GetAbsoluteRect: TRectF;
 begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
@@ -215,7 +215,7 @@ begin
   View.setFrame(CGRectFromRect(GetAbsoluteRect));
 end;
 
-{*****************************************}
+{*******************************************************}
 function TALIosNativeView.CaptureScreenshot: TALDrawable;
 begin
   UIGraphicsBeginImageContextWithOptions(View.bounds.size, View.isOpaque, 0{scale});
@@ -368,7 +368,7 @@ begin
     View.becomeFirstResponder;
 end;
 
-{***************************************************************************}
+{************************************************************************}
 function TALIosNativeView.ExtractFirstTouchPoint(touches: NSSet): TPointF;
 begin
   var LPointer := touches.anyObject;
@@ -381,7 +381,7 @@ begin
   Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosNativeView.touchesBegan(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -411,7 +411,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{******************************************************************************}
 procedure TALIosNativeView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -440,7 +440,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosNativeView.touchesEnded(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -469,7 +469,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosNativeView.touchesMoved(touches: NSSet; withEvent: UIEvent);
 begin
   {$IF defined(DEBUG)}
@@ -497,7 +497,7 @@ begin
   end;
 end;
 
-{************************************************************}
+{*********************************************************}
 function TALIosNativeView.canBecomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -506,7 +506,7 @@ begin
   Result := UIView(Super).canBecomeFirstResponder and Control.canFocus;
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALIosNativeView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}

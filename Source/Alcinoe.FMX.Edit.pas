@@ -230,7 +230,7 @@ Type
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling;
   end;
 
-  {******************************************}
+  {*************************************}
   IALIosEditView = interface(UITextField)
     ['{E4E67240-F15A-444F-8CE1-A3A830C023E8}']
     procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
@@ -242,7 +242,7 @@ Type
     function becomeFirstResponder: Boolean; cdecl;
   end;
 
-  {***************************************}
+  {****************************************}
   TALIosEditView = class(TALIosBaseEditView)
   private
     type
@@ -364,14 +364,14 @@ Type
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling;
   end;
 
-  {******************************************}
+  {*************************************}
   IALMacEditView = interface(NSTextField)
     ['{8FA87FC0-77FB-4451-8F92-52EE1AFDD94C}']
     function acceptsFirstResponder: Boolean; cdecl;
     function becomeFirstResponder: Boolean; cdecl;
   end;
 
-  {***************************************}
+  {****************************************}
   TALMacEditView = class(TALMacBaseEditView)
   private
     type
@@ -1187,7 +1187,11 @@ uses
   System.Math,
   System.Math.Vectors,
   FMX.Utils,
+  FMX.Types3D,
   Fmx.controls,
+  {$IF defined(ALBackwardCompatible)}
+  System.UIConsts,
+  {$endif}
   {$IF defined(android)}
   Androidapi.Helpers,
   Androidapi.Input,
@@ -1234,14 +1238,14 @@ Type
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
-{**********************************************************************************************}
+{********************************************************************************************}
 constructor TALAndroidEditView.TKeyPreImeListener.Create(const aEditView: TALAndroidEditView);
 begin
   inherited Create;
   FEditView := aEditView;
 end;
 
-{********************************************************************************************************}
+{******************************************************************************************************}
 function TALAndroidEditView.TKeyPreImeListener.onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -1267,7 +1271,7 @@ begin
   else result := false;
 end;
 
-{******************************************************************************************}
+{****************************************************************************************}
 constructor TALAndroidEditView.TTouchListener.Create(const aEditView: TALAndroidEditView);
 begin
   inherited Create;
@@ -1328,14 +1332,14 @@ begin
   end
 end;
 
-{****************************************************************************************}
+{**************************************************************************************}
 constructor TALAndroidEditView.TTextWatcher.Create(const aEditView: TALAndroidEditView);
 begin
   inherited Create;
   FEditView := aEditView;
 end;
 
-{*************************************************************************}
+{***********************************************************************}
 procedure TALAndroidEditView.TTextWatcher.afterTextChanged(s: JEditable);
 begin
   {$IF defined(DEBUG)}
@@ -1344,19 +1348,19 @@ begin
   FEditView.Control.DoChange;
 end;
 
-{******************************************************************************************************************************}
+{****************************************************************************************************************************}
 procedure TALAndroidEditView.TTextWatcher.beforeTextChanged(s: JCharSequence; start: Integer; count: Integer; after: Integer);
 begin
   // Nothing to do
 end;
 
-{***************************************************************************************************************************}
+{*************************************************************************************************************************}
 procedure TALAndroidEditView.TTextWatcher.onTextChanged(s: JCharSequence; start: Integer; before: Integer; count: Integer);
 begin
   // Nothing to do
 end;
 
-{**********************************************************************************************************************************************}
+{********************************************************************************************************************************************}
 constructor TALAndroidEditView.TEditorActionListener.Create(const aEditView: TALAndroidEditView; const aIsMultiLineEditText: Boolean = false);
 begin
   inherited Create;
@@ -1364,7 +1368,7 @@ begin
   FEditView := aEditView;
 end;
 
-{*****************************************************************************************************************************}
+{***************************************************************************************************************************}
 function TALAndroidEditView.TEditorActionListener.onEditorAction(v: JTextView; actionId: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -1404,7 +1408,7 @@ begin
   else result := false;
 end;
 
-{**********************************************************************************************************************************************************************}
+{************************************************************************************************************************************************************************}
 constructor TALAndroidEditView.Create(const AControl: TALControl; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
 begin
   fDefStyleAttr := aDefStyleAttr;
@@ -1523,7 +1527,7 @@ begin
   Result := inherited GetView<JALEditText>;
 end;
 
-{**************************************************************}
+{**************************************************}
 function TALAndroidEditView.GetControl: TALBaseEdit;
 begin
   Result := TALBaseEdit(inherited Control);
@@ -1536,7 +1540,7 @@ begin
   else Result := 1;
 end;
 
-{*********************************************}
+{******************************************}
 procedure TALAndroidEditView.DoSetInputType(
             const aKeyboardType: TVirtualKeyboardType;
             const aAutoCapitalizationType: TALAutoCapitalizationType;
@@ -1635,13 +1639,13 @@ begin
 
 end;
 
-{*******************************************************************}
+{****************************************************************}
 function TALAndroidEditView.GetKeyboardType: TVirtualKeyboardType;
 begin
   Result := fKeyboardType;
 end;
 
-{*********************************************************************************}
+{******************************************************************************}
 procedure TALAndroidEditView.setKeyboardType(const Value: TVirtualKeyboardType);
 begin
   if (value <> fKeyboardType) then begin
@@ -1650,13 +1654,13 @@ begin
   end;
 end;
 
-{**********************************************************************************}
+{*******************************************************************************}
 function TALAndroidEditView.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   result := fAutoCapitalizationType;
 end;
 
-{************************************************************************************************}
+{*********************************************************************************************}
 procedure TALAndroidEditView.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   if (value <> fAutoCapitalizationType) then begin
@@ -1665,13 +1669,13 @@ begin
   end;
 end;
 
-{**************************************************}
+{***********************************************}
 function TALAndroidEditView.GetPassword: Boolean;
 begin
   Result := fPassword;
 end;
 
-{****************************************************************}
+{*************************************************************}
 procedure TALAndroidEditView.setPassword(const Value: Boolean);
 begin
   if (value <> fPassword) then begin
@@ -1680,13 +1684,13 @@ begin
   end;
 end;
 
-{*******************************************************}
+{****************************************************}
 function TALAndroidEditView.GetCheckSpelling: Boolean;
 begin
   result := fCheckSpelling;
 end;
 
-{*********************************************************************}
+{******************************************************************}
 procedure TALAndroidEditView.SetCheckSpelling(const Value: Boolean);
 begin
   if (value <> fCheckSpelling) then begin
@@ -1695,7 +1699,7 @@ begin
   end;
 end;
 
-{***************************************************************************************}
+{************************************************************************************}
 procedure TALAndroidEditView.DoSetReturnKeyType(const aReturnKeyType: TReturnKeyType);
 begin
   var LImeOptions: integer;
@@ -1710,13 +1714,13 @@ begin
   view.setImeOptions(LImeOptions);
 end;
 
-{**************************************************************}
+{***********************************************************}
 function TALAndroidEditView.GetReturnKeyType: TReturnKeyType;
 begin
   Result := fReturnKeyType;
 end;
 
-{****************************************************************************}
+{*************************************************************************}
 procedure TALAndroidEditView.setReturnKeyType(const Value: TReturnKeyType);
 begin
   if (value <> fReturnKeyType) then begin
@@ -1725,13 +1729,13 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALAndroidEditView.GetMaxLength: integer;
 begin
   Result := FMaxLength;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALAndroidEditView.SetMaxLength(const Value: integer);
 begin
   if value <> FMaxLength then begin
@@ -1740,38 +1744,38 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALAndroidEditView.GetPromptText: String;
 begin
   result := JCharSequenceToStr(View.getHint);
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALAndroidEditView.setPromptText(const Value: String);
 begin
   View.setHint(StrToJCharSequence(Value));
 end;
 
-{*************************************************************}
+{**********************************************************}
 function TALAndroidEditView.GetPromptTextColor: TAlphaColor;
 begin
   result := TAlphaColor(View.getCurrentHintTextColor);
 end;
 
-{***************************************************************************}
+{************************************************************************}
 procedure TALAndroidEditView.setPromptTextColor(const Value: TAlphaColor);
 begin
   if Value <> TalphaColors.null then
     View.setHintTextColor(integer(Value));
 end;
 
-{*********************************************}
+{******************************************}
 function TALAndroidEditView.getText: String;
 begin
   result := JCharSequenceToStr(View.gettext);
 end;
 
-{***********************************************************}
+{********************************************************}
 procedure TALAndroidEditView.SetText(const Value: String);
 begin
   View.setText(StrToJCharSequence(Value), TJTextView_BufferType.javaClass.EDITABLE);
@@ -1784,7 +1788,7 @@ begin
   FTextSettings.Assign(Value);
 end;
 
-{*******************************************************************}
+{****************************************************************}
 procedure TALAndroidEditView.TextSettingsChanged(Sender: TObject);
 begin
 
@@ -1843,43 +1847,43 @@ begin
 
 end;
 
-{*******************************************************}
+{****************************************************}
 function TALAndroidEditView.GetTintColor: TAlphaColor;
 begin
   Result := FTintColor;
 end;
 
-{*********************************************************************}
+{******************************************************************}
 procedure TALAndroidEditView.setTintColor(const Value: TAlphaColor);
 begin
   FTintColor := Value;
 end;
 
-{*******************************************************}
+{****************************************************}
 function TALAndroidEditView.GetFillColor: TAlphaColor;
 begin
   Result := FFillColor;
 end;
 
-{*********************************************************************}
+{******************************************************************}
 procedure TALAndroidEditView.SetFillColor(const Value: TAlphaColor);
 begin
   FFillColor := Value;
 end;
 
-{***************************************************}
+{************************************************}
 function TALAndroidEditView.getLineHeight: Single;
 begin
   result := view.getLineHeight / ALGetScreenScale;
 end;
 
-{****************************************************************************************}
+{*************************************************************************************}
 Procedure TALAndroidEditView.setSelection(const AStart: integer; const AStop: Integer);
 begin
   View.setSelection(aStart, aStop);
 end;
 
-{******************************************************************}
+{***************************************************************}
 Procedure TALAndroidEditView.setSelection(const AIndex: integer);
 begin
   view.setSelection(aindex);
@@ -1898,7 +1902,7 @@ begin
   FEditView := AEditView;
 end;
 
-{***************************************************************************************************************************************************}
+{*********************************************************************************************************************************************************}
 function TALIosEditView.TTextFieldDelegate.textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -1915,36 +1919,36 @@ begin
   else Result := True;
 end;
 
-{*************************************************************************************}
+{*******************************************************************************************}
 procedure TALIosEditView.TTextFieldDelegate.textFieldDidBeginEditing(textField: UITextField);
 begin
 end;
 
-{***********************************************************************************}
+{*****************************************************************************************}
 procedure TALIosEditView.TTextFieldDelegate.textFieldDidEndEditing(textField: UITextField);
 begin
   FEditView.Control.ResetFocus;
 end;
 
-{************************************************************************************************}
+{******************************************************************************************************}
 function TALIosEditView.TTextFieldDelegate.textFieldShouldBeginEditing(textField: UITextField): Boolean;
 begin
   Result := True;
 end;
 
-{*****************************************************************************************}
+{***********************************************************************************************}
 function TALIosEditView.TTextFieldDelegate.textFieldShouldClear(textField: UITextField): Boolean;
 begin
   Result := true;
 end;
 
-{**********************************************************************************************}
+{****************************************************************************************************}
 function TALIosEditView.TTextFieldDelegate.textFieldShouldEndEditing(textField: UITextField): Boolean;
 begin
   Result := True;
 end;
 
-{******************************************************************************************}
+{************************************************************************************************}
 function TALIosEditView.TTextFieldDelegate.textFieldShouldReturn(textField: UITextField): Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -1957,7 +1961,7 @@ begin
   else Result := true; // return YES if the text field should implement its default behavior for the return button; otherwise, NO.
 end;
 
-{*************************************}
+{********************************}
 constructor TALIosEditView.Create;
 begin
   inherited; // This will call InitView
@@ -1977,7 +1981,7 @@ begin
   View.addTarget(GetObjectID, sel_getUid(MarshaledAString(TMarshal.AsAnsi('ControlEventEditingChanged'))), UIControlEventEditingChanged);
 end;
 
-{*************************************}
+{********************************}
 destructor TALIosEditView.Destroy;
 begin
   View.removeTarget(GetObjectID, sel_getUid(MarshaledAString(TMarshal.AsAnsi('ControlEventEditingChanged'))), UIControlEventEditingChanged);
@@ -1988,14 +1992,14 @@ begin
 end;
 
 
-{*************************************************************}
+{********************************************************}
 procedure TALIosEditView.SetEnabled(const value: Boolean);
 begin
   inherited;
   View.SetEnabled(value);
 end;
 
-{*******************************************************}
+{**************************************************}
 procedure TALIosEditView.ControlEventEditingChanged;
 begin
   {$IF defined(DEBUG)}
@@ -2004,31 +2008,31 @@ begin
   Control.DoChange;
 end;
 
-{*********************************************************}
+{****************************************************}
 function TALIosEditView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IALIosEditView);
 end;
 
-{************************************************}
+{*******************************************}
 function TALIosEditView.GetView: UITextField;
 begin
   Result := inherited GetView<UITextField>;
 end;
 
-{************************************************}
+{**********************************************}
 function TALIosEditView.GetControl: TALBaseEdit;
 begin
   Result := TALBaseEdit(inherited Control);
 end;
 
-{************************************************}
+{********************************************}
 function TALIosEditView.getLineCount: integer;
 begin
   Result := 1;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALIosEditView.SetKeyboardType(const Value: TVirtualKeyboardType);
 begin
   var LUIKeyboardType: UIKeyboardType;
@@ -2045,7 +2049,7 @@ begin
   View.setKeyboardType(LUIKeyboardType);
 end;
 
-{***************************************************************}
+{************************************************************}
 function TALIosEditView.GetKeyboardType: TVirtualKeyboardType;
 begin
   var LUIKeyboardType := View.KeyboardType;
@@ -2060,7 +2064,7 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************}
 procedure TALIosEditView.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
@@ -2073,7 +2077,7 @@ begin
   View.setAutoCapitalizationType(LUITextAutoCapitalizationType);
 end;
 
-{******************************************************************************}
+{***************************************************************************}
 function TALIosEditView.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   var LUITextAutoCapitalizationType := View.AutoCapitalizationType;
@@ -2085,19 +2089,19 @@ begin
   end;
 end;
 
-{************************************************************}
+{*********************************************************}
 procedure TALIosEditView.SetPassword(const Value: Boolean);
 begin
   View.setSecureTextEntry(Value);
 end;
 
-{**********************************************}
+{*******************************************}
 function TALIosEditView.GetPassword: Boolean;
 begin
   result := View.isSecureTextEntry;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALIosEditView.SetCheckSpelling(const Value: Boolean);
 begin
   if Value then begin
@@ -2110,13 +2114,13 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALIosEditView.GetCheckSpelling: Boolean;
 begin
   result := View.SpellCheckingType = UITextSpellCheckingTypeYes;
 end;
 
-{************************************************************************}
+{*********************************************************************}
 procedure TALIosEditView.setReturnKeyType(const Value: TReturnKeyType);
 begin
   var LUIReturnKeyType: UIReturnKeyType;
@@ -2131,7 +2135,7 @@ begin
   View.setReturnKeyType(LUIReturnKeyType);
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALIosEditView.GetReturnKeyType: TReturnKeyType;
 begin
   var LUIReturnKeyType := View.ReturnKeyType;
@@ -2145,7 +2149,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosEditView.GetPromptText: String;
 begin
   var LAttributedString := TALNSAttributedString.wrap(NSObjectToID(TUITextField.Wrap(NSObjectToID(View)).AttributedPlaceholder));
@@ -2153,19 +2157,19 @@ begin
   else result := NSStrToStr(LAttributedString.&String);
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALIosEditView.setPromptText(const Value: String);
 begin
   applyPromptTextWithColor(Value, fPromptTextColor);
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALIosEditView.GetPromptTextColor: TAlphaColor;
 begin
   Result := fPromptTextColor;
 end;
 
-{***********************************************************************}
+{********************************************************************}
 procedure TALIosEditView.setPromptTextColor(const Value: TAlphaColor);
 begin
   if Value <> fPromptTextColor then begin
@@ -2174,7 +2178,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
+{***********************************************************************************************}
 procedure TALIosEditView.applyPromptTextWithColor(const aStr: String; const aColor: TAlphaColor);
 begin
   //Using `setPlaceholderString` is not suitable here because it does not allow customizing the placeholder text color,
@@ -2211,7 +2215,7 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALIosEditView.GetTintColor: TAlphaColor;
 begin
   var red: CGFloat;
@@ -2222,50 +2226,50 @@ begin
   else result := TAlphaColorF.Create(red, green, blue, alpha).ToAlphaColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALIosEditView.setTintColor(const Value: TAlphaColor);
 begin
   if Value <> TalphaColors.Null then
     View.setTintColor(AlphaColorToUIColor(Value));
 end;
 
-{*****************************************}
+{**************************************}
 function TALIosEditView.getText: String;
 begin
   result := NSStrToStr(TNSString.Wrap(View.text));
 end;
 
-{*******************************************************}
+{****************************************************}
 procedure TALIosEditView.SetText(const Value: String);
 begin
   View.setText(StrToNSStr(Value));
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosEditView.GetMaxLength: integer;
 begin
   Result := FMaxLength;
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALIosEditView.SetMaxLength(const Value: integer);
 begin
   FMaxLength := Value;
 end;
 
-{*****************************************************************************}
+{***********************************************************}
 function TALIosEditView.GetTextSettings: TALBaseTextSettings;
 begin
   result := FTextSettings;
 end;
 
-{*****************************************************************************}
+{*************************************************************************}
 procedure TALIosEditView.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
 
-{***************************************************************}
+{************************************************************}
 procedure TALIosEditView.TextSettingsChanged(Sender: TObject);
 begin
   // Font
@@ -2290,19 +2294,19 @@ begin
   View.setTextColor(AlphaColorToUIColor(TextSettings.Font.Color));
 end;
 
-{***************************************************}
+{************************************************}
 function TALIosEditView.GetFillColor: TAlphaColor;
 begin
   Result := FFillColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALIosEditView.SetFillColor(const Value: TAlphaColor);
 begin
   FFillColor := Value;
 end;
 
-{***********************************************}
+{********************************************}
 function TALIosEditView.getLineHeight: Single;
 begin
   if View.font = nil then
@@ -2312,7 +2316,7 @@ begin
     result := result * textsettings.LineHeightMultiplier;
 end;
 
-{************************************************************************************}
+{*********************************************************************************}
 Procedure TALIosEditView.setSelection(const AStart: integer; const AStop: Integer);
 begin
   var LStartPosition: UITextPosition := View.positionFromPosition(View.beginningOfDocument, AStart);
@@ -2320,7 +2324,7 @@ begin
   View.setSelectedTextRange(View.textRangeFromPosition(LStartPosition, LEndPosition));
 end;
 
-{**************************************************************}
+{***********************************************************}
 Procedure TALIosEditView.setSelection(const AIndex: integer);
 begin
   var LStartPosition := View.positionFromPosition(View.beginningOfDocument, AIndex);
@@ -2334,25 +2338,25 @@ end;
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
 
-{************************************************************************************}
+{**************************************************************************************}
 constructor TALMacEditView.TTextEditingDelegate.Create(const AEditView: TALMacEditView);
 begin
   inherited Create;
   FEditView := AEditView;
 end;
 
-{************************************************************************************}
+{********************************************************************************************}
 procedure TALMacEditView.TTextEditingDelegate.controlTextDidBeginEditing(obj: NSNotification);
 begin
 end;
 
-{**********************************************************************************}
+{******************************************************************************************}
 procedure TALMacEditView.TTextEditingDelegate.controlTextDidEndEditing(obj: NSNotification);
 begin
   FEditView.Control.ResetFocus;
 end;
 
-{******************************************************************************}
+{**************************************************************************************}
 procedure TALMacEditView.TTextEditingDelegate.controlTextDidChange(obj: NSNotification);
 begin
   if FEditView.maxLength > 0 then begin
@@ -2365,19 +2369,19 @@ begin
   fEditView.Control.DoChange;
 end;
 
-{******************************************************************************************************************************}
+{**************************************************************************************************************************************}
 function TALMacEditView.TTextEditingDelegate.controlTextShouldBeginEditing(control: NSControl; textShouldBeginEditing: NSText): Boolean;
 begin
   Result := True;
 end;
 
-{**************************************************************************************************************************}
+{**********************************************************************************************************************************}
 function TALMacEditView.TTextEditingDelegate.controlTextShouldEndEditing(control: NSControl; textShouldEndEditing: NSText): Boolean;
 begin
   Result := True;
 end;
 
-{***************************************************************************************************************************************************}
+{***********************************************************************************************************************************************************}
 function TALMacEditView.TTextEditingDelegate.controlTextViewDoCommandBySelector(control: NSControl; textView: NSTextView; doCommandBySelector: SEL): Boolean;
 begin
   if assigned(fEditView.Control.OnReturnKey) and (sel_getName(doCommandBySelector) = 'insertNewline:') then begin
@@ -2388,7 +2392,7 @@ begin
     result := False;
 end;
 
-{*************************************}
+{********************************}
 constructor TALMacEditView.Create;
 begin
   inherited; // This will call InitView
@@ -2412,7 +2416,7 @@ begin
   FTintColor := TalphaColors.Null;
 end;
 
-{***********************************}
+{********************************}
 destructor TALMacEditView.Destroy;
 begin
   View.setDelegate(nil);
@@ -2421,98 +2425,98 @@ begin
   inherited Destroy;
 end;
 
-{*************************************************************}
+{********************************************************}
 procedure TALMacEditView.SetEnabled(const value: Boolean);
 begin
   inherited;
   View.SetEnabled(value);
 end;
 
-{*********************************************************}
+{****************************************************}
 function TALMacEditView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IALMacEditView);
 end;
 
-{************************************************}
+{*******************************************}
 function TALMacEditView.GetView: NSTextField;
 begin
   Result := inherited GetView<NSTextField>;
 end;
 
-{************************************************}
+{**********************************************}
 function TALMacEditView.GetControl: TALBaseEdit;
 begin
   Result := TALBaseEdit(inherited Control);
 end;
 
-{************************************************}
+{********************************************}
 function TALMacEditView.getLineCount: integer;
 begin
   Result := 1;
 end;
 
-{***************************************************************}
+{************************************************************}
 function TALMacEditView.GetKeyboardType: TVirtualKeyboardType;
 begin
   Result := FKeyboardType;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALMacEditView.setKeyboardType(const Value: TVirtualKeyboardType);
 begin
   FKeyboardType := Value;
 end;
 
-{******************************************************************************}
+{***************************************************************************}
 function TALMacEditView.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   Result := FAutoCapitalizationType;
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************}
 procedure TALMacEditView.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   FAutoCapitalizationType := Value;
 end;
 
-{**********************************************}
+{*******************************************}
 function TALMacEditView.GetPassword: Boolean;
 begin
   Result := FPassword;
 end;
 
-{************************************************************}
+{*********************************************************}
 procedure TALMacEditView.setPassword(const Value: Boolean);
 begin
   FPassword := Value;
 end;
 
-{***************************************************}
+{************************************************}
 function TALMacEditView.GetCheckSpelling: Boolean;
 begin
   Result := FCheckSpelling;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALMacEditView.setCheckSpelling(const Value: Boolean);
 begin
   FCheckSpelling := Value;
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALMacEditView.GetReturnKeyType: TReturnKeyType;
 begin
   Result := FReturnKeyType;
 end;
 
-{************************************************************************}
+{*********************************************************************}
 procedure TALMacEditView.setReturnKeyType(const Value: TReturnKeyType);
 begin
   FReturnKeyType := Value;
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacEditView.GetPromptText: String;
 begin
   var LAttributedString := TALNSTextField.Wrap(NSObjectToID(View)).placeholderAttributedString;
@@ -2520,19 +2524,19 @@ begin
   else result := NSStrToStr(TALNSAttributedString.wrap(NSObjectToID(LAttributedString)).&String);
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALMacEditView.setPromptText(const Value: String);
 begin
   applyPromptTextWithColor(Value, fPromptTextColor);
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALMacEditView.GetPromptTextColor: TAlphaColor;
 begin
   result := fPromptTextColor;
 end;
 
-{***********************************************************************}
+{********************************************************************}
 procedure TALMacEditView.setPromptTextColor(const Value: TAlphaColor);
 begin
   if Value <> fPromptTextColor then begin
@@ -2541,7 +2545,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
+{***********************************************************************************************}
 procedure TALMacEditView.applyPromptTextWithColor(const aStr: String; const aColor: TAlphaColor);
 begin
   //Using `setPlaceholderString` is not suitable here because it does not allow customizing the placeholder text color,
@@ -2596,55 +2600,55 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALMacEditView.GetTintColor: TAlphaColor;
 begin
   Result := FTintColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALMacEditView.setTintColor(const Value: TAlphaColor);
 begin
   FTintColor := Value;
 end;
 
-{***************************************************}
+{************************************************}
 function TALMacEditView.GetFillColor: TAlphaColor;
 begin
   Result := FFillColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALMacEditView.SetFillColor(const Value: TAlphaColor);
 begin
   FFillColor := Value;
 end;
 
-{*****************************************}
+{**************************************}
 function TALMacEditView.getText: String;
 begin
   result := NSStrToStr(View.StringValue);
 end;
 
-{*******************************************************}
+{****************************************************}
 procedure TALMacEditView.SetText(const Value: String);
 begin
   View.setStringValue(StrToNSStr(Value));
 end;
 
-{*****************************************************************************}
+{***********************************************************}
 function TALMacEditView.GetTextSettings: TALBaseTextSettings;
 begin
   result := FTextSettings;
 end;
 
-{*****************************************************************************}
+{*************************************************************************}
 procedure TALMacEditView.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
 
-{***************************************************************}
+{************************************************************}
 procedure TALMacEditView.TextSettingsChanged(Sender: TObject);
 begin
   // Font
@@ -2666,19 +2670,19 @@ begin
   applyPromptTextWithColor(PromptText, PromptTextColor);
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacEditView.GetMaxLength: integer;
 begin
   Result := FMaxLength;
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALMacEditView.SetMaxLength(const Value: integer);
 begin
   FMaxLength := Value;
 end;
 
-{***********************************************}
+{********************************************}
 function TALMacEditView.getLineHeight: Single;
 begin
   var LfontMetrics := ALGetFontMetrics(
@@ -2691,13 +2695,13 @@ begin
     result := result * textsettings.LineHeightMultiplier;
 end;
 
-{************************************************************************************}
+{*********************************************************************************}
 Procedure TALMacEditView.setSelection(const AStart: integer; const AStop: Integer);
 begin
   View.currentEditor.setSelectedRange(NSMakeRange(AStart, AStop-AStart));
 end;
 
-{**************************************************************}
+{***********************************************************}
 Procedure TALMacEditView.setSelection(const AIndex: integer);
 begin
   View.currentEditor.setSelectedRange(NSMakeRange(AIndex, 0));
@@ -2766,13 +2770,13 @@ begin
   inherited Destroy;
 end;
 
-{********************************}
+{**********************************************}
 function TALWinEditView.GetControl: TALBaseEdit;
 begin
   Result := TALBaseEdit(inherited Control);
 end;
 
-{**********************}
+{****************************************}
 procedure TALWinEditView.UpdateFontHandle;
 begin
   SendMessage(Handle, WM_SETFONT, 0, 0);
@@ -2800,7 +2804,7 @@ begin
   SendMessage(Handle, WM_SETFONT, FFontHandle, 1);
 end;
 
-{**********************}
+{*********************************************}
 procedure TALWinEditView.UpdateBackgroundBrush;
 begin
   if (fBackgroundBrush <> 0) and (not DeleteObject(fBackgroundBrush)) then
@@ -2963,31 +2967,31 @@ begin
     inherited;
 end;
 
-{************************************************}
+{********************************************}
 function TALWinEditView.getLineCount: integer;
 begin
   Result := 1;
 end;
 
-{***************************************************************}
+{************************************************************}
 function TALWinEditView.GetKeyboardType: TVirtualKeyboardType;
 begin
   Result := FKeyboardType;
 end;
 
-{*****************************************************************************}
+{**************************************************************************}
 procedure TALWinEditView.setKeyboardType(const Value: TVirtualKeyboardType);
 begin
   FKeyboardType := Value;
 end;
 
-{******************************************************************************}
+{***************************************************************************}
 function TALWinEditView.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   result := fAutoCapitalizationType;
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************}
 procedure TALWinEditView.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   if (value <> fAutoCapitalizationType) then begin
@@ -3005,7 +3009,7 @@ begin
   end;
 end;
 
-{************************************************************}
+{*********************************************************}
 procedure TALWinEditView.setPassword(const Value: Boolean);
 begin
   if (value <> Password) then begin
@@ -3015,56 +3019,56 @@ begin
   end;
 end;
 
-{**********************************************}
+{*******************************************}
 function TALWinEditView.GetPassword: Boolean;
 begin
   Result := SendMessage(Handle, EM_GETPASSWORDCHAR, 0, 0) <> 0;
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALWinEditView.SetMaxLength(const Value: integer);
 begin
   SendMessage(Handle, EM_LIMITTEXT, Value, 0);
 end;
 
-{***********************************************}
+{********************************************}
 function TALWinEditView.GetMaxLength: integer;
 begin
   Result := SendMessage(Handle, EM_GETLIMITTEXT, 0, 0);
   if Result = $7FFFFFFE {2147483646} then Result := 0;
 end;
 
-{***************************************************}
+{************************************************}
 function TALWinEditView.GetCheckSpelling: Boolean;
 begin
   result := FCheckSpelling
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALWinEditView.setCheckSpelling(const Value: Boolean);
 begin
   FCheckSpelling := Value;
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALWinEditView.GetReturnKeyType: TReturnKeyType;
 begin
   Result := FReturnKeyType;
 end;
 
-{************************************************************************}
+{*********************************************************************}
 procedure TALWinEditView.setReturnKeyType(const Value: TReturnKeyType);
 begin
   FReturnKeyType := Value;
 end;
 
-{***********************************************}
+{********************************************}
 function TALWinEditView.GetPromptText: String;
 begin
   Result := FPromptText;
 end;
 
-{*************************************************************}
+{**********************************************************}
 procedure TALWinEditView.setPromptText(const Value: String);
 begin
   if FPromptText <> Value then begin
@@ -3073,13 +3077,13 @@ begin
   end;
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALWinEditView.GetPromptTextColor: TAlphaColor;
 begin
   Result := FPromptTextColor;
 end;
 
-{***********************************************************************}
+{********************************************************************}
 procedure TALWinEditView.setPromptTextColor(const Value: TAlphaColor);
 begin
   if Value <> FPromptTextColor then begin
@@ -3088,25 +3092,25 @@ begin
   end;
 end;
 
-{***************************************************}
+{************************************************}
 function TALWinEditView.GetTintColor: TAlphaColor;
 begin
   Result := FTintColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALWinEditView.setTintColor(const Value: TAlphaColor);
 begin
   FTintColor := Value;
 end;
 
-{***************************************************}
+{************************************************}
 function TALWinEditView.GetFillColor: TAlphaColor;
 begin
   Result := FFillColor;
 end;
 
-{*****************************************************************}
+{**************************************************************}
 procedure TALWinEditView.SetFillColor(const Value: TAlphaColor);
 begin
   if FFillColor <> Value then begin
@@ -3116,25 +3120,25 @@ begin
   end;
 end;
 
-{*****************************************}
+{**************************************}
 function TALWinEditView.getText: String;
 begin
   Result := GetHWNDText(Handle);
 end;
 
-{*******************************************************}
+{****************************************************}
 procedure TALWinEditView.SetText(const Value: String);
 begin
   SetWindowText(Handle, PChar(Value));
 end;
 
-{*****************************************************************************}
+{*************************************************************************}
 procedure TALWinEditView.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
 
-{***************************************************************}
+{************************************************************}
 procedure TALWinEditView.TextSettingsChanged(Sender: TObject);
 begin
   UpdateFontHandle;
@@ -3154,7 +3158,7 @@ begin
   Invalidate;
 end;
 
-{***********************************************}
+{********************************************}
 function TALWinEditView.getLineHeight: Single;
 begin
   var LfontMetrics := ALGetFontMetrics(
@@ -3168,13 +3172,13 @@ begin
   //   result := result * textsettings.LineHeightMultiplier;
 end;
 
-{************************************************************************************}
+{*********************************************************************************}
 Procedure TALWinEditView.SetSelection(const AStart: integer; const AStop: Integer);
 begin
   SendMessage(Handle, EM_SETSEL, AStart, AStop);
 end;
 
-{**************************************************************}
+{***********************************************************}
 Procedure TALWinEditView.SetSelection(const AIndex: integer);
 begin
   SendMessage(Handle, EM_SETSEL, AIndex, AIndex);
@@ -3183,7 +3187,7 @@ end;
 {$endif}
 {$ENDREGION}
 
-{********************************************************}
+{******************************************************}
 function TALBaseEdit.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.white;
@@ -4351,7 +4355,7 @@ begin
   end;
 end;
 
-{*************************************}
+{****************************************}
 function TALBaseEdit.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
@@ -4387,7 +4391,7 @@ begin
   Result := TStateStyles.Create(Self);
 end;
 
-{************************************}
+{***********************************}
 procedure TALBaseEdit.InitNativeView;
 begin
   if FNativeView = nil then exit;
@@ -4402,7 +4406,7 @@ begin
   NativeView.FillColor := $ffffffff; // noops operation
 end;
 
-{***************************}
+{***************************************}
 procedure TALBaseEdit.RecreateNativeView;
 begin
   if FNativeView = nil then exit;
@@ -4669,7 +4673,7 @@ begin
   {$ENDIF}
 end;
 
-{*******************************************}
+{******************************************}
 procedure TALBaseEdit.UpdateNativeViewStyle;
 begin
 
@@ -4980,7 +4984,7 @@ begin
     result := FDummyText;
 end;
 
-{***********************************************}
+{*************************************************}
 function TALBaseEdit.ShouldHideNativeView: Boolean;
 begin
   result := {$IF defined(ALDPK)}true or{$ENDIF}
@@ -6296,7 +6300,7 @@ begin
 
 end;
 
-{**********************************}
+{***********************************}
 Procedure TALBaseEdit.ShowNativeView;
 begin
   if NativeView = nil then exit;
@@ -6315,7 +6319,7 @@ begin
   {$ENDIF}
 end;
 
-{*************************************}
+{***********************************}
 Procedure TALBaseEdit.HideNativeView;
 begin
   if NativeView = nil then exit;

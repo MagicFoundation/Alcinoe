@@ -1001,10 +1001,10 @@ begin
   result := min(560, LForm.ClientWidth / 100 * 85);
 end;
 
-{*****************************************}
+{*******************************************}
 procedure TALDialogManager.FreezeNativeViews;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _FreezeNativeViews(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do begin
@@ -1026,7 +1026,7 @@ begin
       _FreezeNativeViews(TControl(LForm.Children[i]));
 end;
 
-{*****************************************}
+{*********************************************}
 procedure TALDialogManager.UnfreezeNativeViews;
 begin
   For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do

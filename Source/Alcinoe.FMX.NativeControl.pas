@@ -168,19 +168,19 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
 
-{********************************************************}
+{***********************************************************}
 function TALNativeControl.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.null;
 end;
 
-{********************************************************}
+{*************************************************************}
 function TALNativeControl.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := Talphacolors.null;
 end;
 
-{********************************************************}
+{******************************************************}
 constructor TALNativeControl.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
@@ -208,7 +208,7 @@ begin
   {$ENDIF}
 end;
 
-{************************************}
+{**********************************}
 destructor TALNativeControl.Destroy;
 begin
   {$IF defined(android)}
@@ -249,19 +249,19 @@ begin
 end;
 {$ENDIF}
 
-{*************************************}
+{*********************************************}
 function TALNativeControl.CreateFill: TALBrush;
 begin
   Result := TFill.Create;
 end;
 
-{********************************}
+{*****************************************************}
 function TALNativeControl.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
 end;
 
-{*********************************************************}
+{**************************************************************}
 procedure TALNativeControl.SetDefStyleAttr(const Value: String);
 begin
   if Value <> fDefStyleAttr then begin
@@ -273,7 +273,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{*************************************************************}
 procedure TALNativeControl.SetDefStyleRes(const Value: String);
 begin
   if Value <> fDefStyleRes then begin
@@ -285,20 +285,20 @@ begin
   end;
 end;
 
-{************************************************************}
+{**********************************************************************}
 procedure TALNativeControl.SetNativeViewMargins(const Value: TALBounds);
 begin
   FNativeViewMargins.Assign(Value);
 end;
 
-{************************************************************}
+{*******************************************************************}
 procedure TALNativeControl.NativeViewMarginsChanged(Sender: TObject);
 begin
   if FNativeView <> nil then
     FNativeView.UpdateFrame;
 end;
 
-{************************************************************}
+{**********************************************************}
 function TALNativeControl.GetNativeViewAbsoluteRect: TRectF;
 begin
   Result := Padding.PaddingRect(AbsoluteRect);
@@ -337,7 +337,7 @@ begin
   Result := NativeViewMargins.PaddingRect(Result);
 end;
 
-{************************************************************}
+{********************************************************}
 function TALNativeControl.GetNativeViewBoundsRect: TRectF;
 begin
   Result := AbsoluteToLocal(GetNativeViewAbsoluteRect);
@@ -423,7 +423,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************************************}
+{***************************************}
 procedure TALNativeControl.DoRootChanged;
 begin
   inherited;
@@ -440,7 +440,7 @@ begin
     FNativeView.UpdateFrame;
 end;
 
-{*********************************************}
+{*******************************************}
 procedure TALNativeControl.DoAbsoluteChanged;
 begin
   inherited;
@@ -449,7 +449,7 @@ begin
     FNativeView.UpdateFrame;
 end;
 
-{******************************************}
+{****************************************}
 procedure TALNativeControl.VisibleChanged;
 begin
   inherited;
@@ -457,7 +457,7 @@ begin
     FNativeView.SetVisible(Visible);
 end;
 
-{***************************************}
+{*************************************}
 procedure TALNativeControl.ChangeOrder;
 begin
   inherited;
@@ -465,7 +465,7 @@ begin
     FNativeView.ChangeOrder;
 end;
 
-{*****************************************}
+{***************************************}
 procedure TALNativeControl.RecalcOpacity;
 begin
   inherited;
@@ -473,7 +473,7 @@ begin
     FNativeView.setAlpha(AbsoluteOpacity);
 end;
 
-{*****************************************}
+{***************************************}
 procedure TALNativeControl.RecalcEnabled;
 begin
   inherited;
@@ -496,13 +496,13 @@ begin
   InitNativeView;
 end;
 
-{*************************************************}
+{*****************************************************}
 function TALNativeControl.IsNativeViewVisible: boolean;
 begin
   Result := (FNativeView <> nil) and (FNativeView.Visible);
 end;
 
-{*****************************************}
+{****************************************}
 Procedure TALNativeControl.ShowNativeView;
 begin
   if FNativeView = nil then exit;
@@ -513,7 +513,7 @@ begin
     FNativeView.SetFocus;
 end;
 
-{********************************************}
+{****************************************}
 Procedure TALNativeControl.HideNativeView;
 begin
   if FNativeView = nil then exit;
@@ -544,7 +544,7 @@ begin
   ShowNativeView;
 end;
 
-{**************************************************************************}
+{************************************************************************}
 procedure TALNativeControl.AncestorVisibleChanged(const Visible: Boolean);
 begin
   inherited;
@@ -552,7 +552,7 @@ begin
     FNativeView.AncestorVisibleChanged;
 end;
 
-{*************************************************}
+{***********************************************}
 procedure TALNativeControl.AncestorParentChanged;
 begin
   inherited;
@@ -561,7 +561,7 @@ begin
     FNativeView.UpdateFrame;
 end;
 
-{*****************************************}
+{***************************************}
 procedure TALNativeControl.ParentChanged;
 begin
   inherited;
@@ -570,7 +570,7 @@ begin
     FNativeView.UpdateFrame;
 end;
 
-{***************************************}
+{*************************************}
 procedure TALNativeControl.DoEndUpdate;
 begin
   inherited;
@@ -582,7 +582,7 @@ begin
     FNativeView.UpdateFrame;
 end;
 
-{****************************}
+{*********************************}
 procedure TALNativeControl.DoEnter;
 begin
   {$IF defined(DEBUG)}
@@ -593,7 +593,7 @@ begin
     FNativeView.SetFocus;
 end;
 
-{***************************}
+{********************************}
 procedure TALNativeControl.DoExit;
 begin
   {$IF defined(DEBUG)}

@@ -43,7 +43,7 @@ type
   end;
   TJALBroadcastReceiver = class(TJavaGenericImport<JALBroadcastReceiverClass, JALBroadcastReceiver>) end;
 
-  {****************************************************}
+  {**************************************************}
   JSoundEffectConstantsClass = interface(JObjectClass)
     ['{B19777B1-340A-4288-BC9A-4D74CF831E25}']
     {class} function _GetCLICK: Integer; cdecl;

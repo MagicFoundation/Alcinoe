@@ -199,7 +199,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateMessageListener);
 end;
 
-{************************************************************}
+{**************************************************************}
 constructor TALWinNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
@@ -401,7 +401,7 @@ begin
   end;
 end;
 
-{*************************************}
+{************************************************}
 function TALWinNativeView.GetAbsoluteRect: TRectF;
 begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
@@ -424,7 +424,7 @@ begin
   SetWindowPos(Handle, 0, LWinBounds.Left, LWinBounds.Top, LWinBounds.Width, LWinBounds.Height, SWP_NOZORDER or SWP_NOACTIVATE);
 end;
 
-{*****************************************}
+{*******************************************************}
 function TALWinNativeView.CaptureScreenshot: TALDrawable;
 begin
   Result := AlNullDrawable;

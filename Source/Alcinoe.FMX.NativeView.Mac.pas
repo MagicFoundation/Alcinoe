@@ -82,7 +82,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TSizeChangedMessage, FormSizeChanged);
 end;
 
-{************************************************************}
+{**************************************************************}
 constructor TALMacNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
@@ -166,7 +166,7 @@ begin
   Result := T(Super);
 end;
 
-{*************************************}
+{************************************************}
 function TALMacNativeView.GetAbsoluteRect: TRectF;
 begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
@@ -185,7 +185,7 @@ begin
       GetFormView(FForm).frame.size.height));
 end;
 
-{*****************************************}
+{*******************************************************}
 function TALMacNativeView.CaptureScreenshot: TALDrawable;
 begin
   Result := AlNullDrawable;
@@ -265,7 +265,7 @@ begin
     View.window.makeFirstResponder(nil);
 end;
 
-{**********************************************************}
+{*******************************************************}
 function TALMacNativeView.acceptsFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}
@@ -274,7 +274,7 @@ begin
   Result := NSView(Super).acceptsFirstResponder and Control.canFocus;
 end;
 
-{*********************************************************}
+{******************************************************}
 function TALMacNativeView.becomeFirstResponder: Boolean;
 begin
   {$IF defined(DEBUG)}

@@ -128,7 +128,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
 end;
 
-{****************************************************************}
+{******************************************************************}
 constructor TALAndroidNativeView.Create(const AControl: TALControl);
 begin
   FControl := AControl;
@@ -191,7 +191,7 @@ begin
   Result := T(FView);
 end;
 
-{*************************************}
+{****************************************************}
 function TALAndroidNativeView.GetAbsoluteRect: TRectF;
 begin
   Result := TALNativeControl(Control).GetNativeViewAbsoluteRect;
@@ -225,7 +225,7 @@ begin
     Layout.setY(R.Top);
 end;
 
-{*****************************************}
+{***********************************************************}
 function TALAndroidNativeView.CaptureScreenshot: TALDrawable;
 begin
   var LOldCacheEnabledValue := View.isDrawingCacheEnabled;

@@ -93,6 +93,8 @@ type
     {$ENDIF}
     procedure InitNativeView; virtual;
     procedure RecreateNativeView; Virtual;
+    Procedure ShowNativeView; virtual;
+    Procedure HideNativeView; virtual;
     function CreateFill: TALBrush; override;
     function CreateStroke: TALStrokeBrush; override;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
@@ -123,12 +125,16 @@ type
     property DefStyleRes: String read fDefStyleRes write SetDefStyleRes;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
-    function HasNativeView: boolean; virtual;
-    Procedure AddNativeView; virtual;
-    Procedure RemoveNativeView; virtual;
+    /// <summary>
+    ///   This method takes a screenshot of the underlying FNativeView, hides the actual native
+    ///   control, and then draws the captured bitmap in its place. Use this to simulate z-order
+    ///   (for example, to display a popup dialog above the control) without reordering or
+    ///   disrupting the native view itself.
+    /// </summary>
     Procedure FreezeNativeView; virtual;
     Procedure UnFreezeNativeView; virtual;
     property IsNativeViewFrozen: Boolean read FIsNativeViewFrozen;
+    function IsNativeViewVisible: boolean; virtual;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -157,6 +163,7 @@ uses
   System.Skia.API,
   {$ENDIF}
   FMX.Types,
+  FMX.Types3D,
   FMX.Graphics,
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
@@ -221,7 +228,7 @@ begin
     FNativeView := CreateNativeView;
     InitNativeView;
   end;
-  if HasNativeView then
+  if IsNativeViewVisible then
     // Because AncestorParentChanged is not called during loading,
     // we must call NativeView.SetVisible(true) in Loaded
     // to hide the NativeView in case a parent control is hidden.
@@ -490,13 +497,13 @@ begin
 end;
 
 {*************************************************}
-function TALNativeControl.HasNativeView: boolean;
+function TALNativeControl.IsNativeViewVisible: boolean;
 begin
   Result := (FNativeView <> nil) and (FNativeView.Visible);
 end;
 
 {*****************************************}
-Procedure TALNativeControl.AddNativeView;
+Procedure TALNativeControl.ShowNativeView;
 begin
   if FNativeView = nil then exit;
   if FNativeView.visible then exit;
@@ -507,7 +514,7 @@ begin
 end;
 
 {********************************************}
-Procedure TALNativeControl.RemoveNativeView;
+Procedure TALNativeControl.HideNativeView;
 begin
   if FNativeView = nil then exit;
   if not FNativeView.visible then exit;
@@ -525,7 +532,7 @@ begin
   FIsNativeViewFrozen := True;
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   FNativeViewScreenshot := FNativeView.CaptureScreenshot;
-  RemoveNativeView;
+  HideNativeView;
 end;
 
 {********************************************}
@@ -534,7 +541,7 @@ begin
   if not FIsNativeViewFrozen then exit;
   FIsNativeViewFrozen := False;
   ALFreeAndNilDrawable(FNativeViewScreenshot);
-  AddNativeView;
+  ShowNativeView;
 end;
 
 {**************************************************************************}
@@ -582,7 +589,7 @@ begin
   //ALLog(classname+'.DoEnter', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoEnter;
-  if HasNativeView then
+  if IsNativeViewVisible then
     FNativeView.SetFocus;
 end;
 
@@ -593,7 +600,7 @@ begin
   //ALLog(classname+'.DoExit', 'control.name: ' + Name);
   {$ENDIF}
   inherited DoExit;
-  if HasNativeView then
+  if IsNativeViewVisible then
     FNativeView.ResetFocus;
 end;
 

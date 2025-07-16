@@ -1008,7 +1008,7 @@ procedure TALDialogManager.FreezeNativeViews;
   procedure _FreezeNativeViews(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).HasNativeView) then begin
+      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).IsNativeViewVisible) then begin
         setlength(FFrozenNativeControls, Length(FFrozenNativeControls) + 1);
         FFrozenNativeControls[High(FFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
         TALNativeControl(AControl.Controls[i]).FreezeNativeView;

@@ -38,7 +38,6 @@ uses
   Androidapi.JNI.Os,
   Androidapi.JNI.Media,
   Androidapi.JNI.JavaTypes,
-  Alcinoe.AndroidApi.Common,
   Alcinoe.FMX.Graphics,
   {$ENDIF}
   {$IF defined(IOS)}

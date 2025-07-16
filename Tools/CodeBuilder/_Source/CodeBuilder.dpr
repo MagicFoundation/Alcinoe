@@ -777,6 +777,34 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '  TALDynamicPageController = class(TALDynamicBaseRectangle)');
     aSrc := FindAndReplace(
               aSrc,
+              '    if Supports(LOwner, IALScrollableControl, LScrollableControl) then begin'#13#10+
+              '      if not LScrollableControl.GetScrollEngine.IsVelocityLow then begin'#13#10+
+              '        FMouseDownAtLowVelocity := False;'#13#10+
+              '        Break;'#13#10+
+              '      end'#13#10+
+              '      else LOwner := LOwner.Owner;'#13#10+
+              '    end'#13#10+
+              '    else LOwner := LOwner.Owner;',
+              '    //**if Supports(LOwner, IALScrollableControl, LScrollableControl) then begin'#13#10+
+              '      if (LOwner.ScrollEngine <> nil) and (not LOwner.ScrollEngine.IsVelocityLow) then begin'#13#10+
+              '        FMouseDownAtLowVelocity := False;'#13#10+
+              '        Break;'#13#10+
+              '      end'#13#10+
+              '      else LOwner := LOwner.Owner;'#13#10+
+              '    //**end'#13#10+
+              '    //**else LOwner := LOwner.Owner;');
+    aSrc := FindAndReplace(
+              aSrc,
+              '    { IALScrollableControl }'#13#10+
+              '    function GetScrollEngine: TALScrollEngine;'#13#10+
+              '    procedure SetScrollEngine(const Value: TALScrollEngine);'#13#10+
+              '  protected',
+              '  protected'#13#10+
+              '    { IALScrollableControl }'#13#10+
+              '    function GetScrollEngine: TALScrollEngine; override;'#13#10+
+              '    procedure SetScrollEngine(const Value: TALScrollEngine);');
+    aSrc := FindAndReplace(
+              aSrc,
               '        var LALChildControl: TALDynamicControl;'+#13#10+
               '        var LALChildControlAlign: TALAlignLayout;'+#13#10+
               '        If (LChildControl is TALDynamicControl) then begin'+#13#10+

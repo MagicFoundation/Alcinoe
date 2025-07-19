@@ -590,6 +590,8 @@ type
         procedure Unprepare; override;
         function HasMoreItemsToDownload: Boolean; virtual;
         function RetryDownloadItems: boolean; virtual;
+        function ScrollToItem(const AId: String; Const ADuration: integer): Boolean; overload; virtual;
+        function ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean; overload; virtual;
         procedure Refresh; virtual;
         property RefreshTransitionKind: TRefreshTransitionKind read FRefreshTransitionKind write FRefreshTransitionKind;
         property PaginationToken: String read FPaginationToken;
@@ -679,6 +681,8 @@ type
                out AControlPos: TALPointD; // AControlPos is local to the founded control
                const ACheckHitTest: Boolean = true): TALDynamicControl; overload; override;
     procedure Prepare; virtual;
+    function ScrollToItem(const AId: String; Const ADuration: integer): Boolean; overload;
+    function ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean; overload;
     property MainView: TView read FMainView write SetMainView;
     property OnCreateMainView: TCreateMainViewEvent read FOnCreateMainView write FOnCreateMainView;
   published
@@ -3741,6 +3745,38 @@ begin
   if result then SetViewportPosition(ViewportPosition);
 end;
 
+{***********************************************************}
+function TALDynamicListBox.TView.ScrollToItem(const AId: String; Const ADuration: integer): Boolean;
+begin
+  for var I := low(FItems^) to High(FItems^) do
+    if (FItems^[i].Visible) and (FItems^[i].Data.GetChildNodeValueText(FItemIdNodeName, '') = AId) then begin
+      scrollengine.startScroll(
+        scrollengine.ViewportPosition.x,// startX: Double;
+        scrollengine.ViewportPosition.y, // startY: Double;
+        FItems^[i].left - scrollengine.ViewportPosition.x, // dx: Double;
+        FItems^[i].Top - scrollengine.ViewportPosition.y, // dy: Double;
+        ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
+      exit(true);
+    end;
+  Result := False;
+end;
+
+{***********************************************************}
+function TALDynamicListBox.TView.ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean;
+begin
+  for var I := low(FItems^) to High(FItems^) do
+    if (FItems^[i].Visible) and (FItems^[i].Data.GetChildNodeValueInt64(FItemIdNodeName, 0) = AId) then begin
+      scrollengine.startScroll(
+        scrollengine.ViewportPosition.x,// startX: Double;
+        scrollengine.ViewportPosition.y, // startY: Double;
+        FItems^[i].left - scrollengine.ViewportPosition.x, // dx: Double;
+        FItems^[i].Top - scrollengine.ViewportPosition.y, // dy: Double;
+        ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
+      exit(true);
+    end;
+  Result := False;
+end;
+
 {****************************************}
 procedure TALDynamicListBox.TView.Refresh;
 begin
@@ -4049,14 +4085,14 @@ begin
         var LItemNode := AData.ChildNodes[i];
         if AContext.ItemIdType = TItemIdType.Int64 then begin
           var LItemId := LItemNode.getChildNodeValueInt64(AContext.ItemIdNodeName, 0);
-          if (LItemID = 0) or (not LOwner.FUniqueInt64ItemIds.TryAdd(LItemID, true)) then begin
+          if (LItemID <> 0) and (not LOwner.FUniqueInt64ItemIds.TryAdd(LItemID, true)) then begin
             AData.ChildNodes.Delete(i);
             continue;
           end;
         end
         else begin
           var LItemId := LItemNode.getChildNodeValueText(AContext.ItemIdNodeName, '');
-          if (LItemID = '') or (not LOwner.FUniqueTextItemIds.TryAdd(LItemID, true)) then begin
+          if (LItemID <> '') and (not LOwner.FUniqueTextItemIds.TryAdd(LItemID, true)) then begin
             AData.ChildNodes.Delete(i);
             continue;
           end;
@@ -4580,6 +4616,18 @@ begin
     MainView.Prepare;
     FHasBeenPrepared := True;
   end;
+end;
+
+{**********************************}
+function TALDynamicListBox.ScrollToItem(const AId: String; Const ADuration: integer): Boolean;
+begin
+  Result := MainView.ScrollToItem(AId, ADuration);
+end;
+
+{**********************************}
+function TALDynamicListBox.ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean;
+begin
+  Result := MainView.ScrollToItem(AId, ADuration);
 end;
 
 {*****************************************}

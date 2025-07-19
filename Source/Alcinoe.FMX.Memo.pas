@@ -492,9 +492,7 @@ end;
 constructor TALIosMemoView.Create;
 begin
   inherited; // This will call InitView
-  var LUIColor := AlphaColorToUIColor(TalphaColorRec.Null);
-  View.setbackgroundColor(LUIColor);
-  //NOTE: If I try to release the LUIColor I have an exception so it's seam something acquire it
+  View.setbackgroundColor(TUIColor.Wrap(TUIColor.OCClass.clearColor));
   var LUIEdgeInsets: UIEdgeInsets;
   LUIEdgeInsets.top := 0;
   LUIEdgeInsets.left := 0;

@@ -459,6 +459,7 @@ uses
   System.RTLConsts,
   Macapi.Helpers,
   iOSapi.CoreGraphics,
+  FMX.Helpers.iOS,
   FMX.Consts,
   Alcinoe.StringUtils,
   {$ELSEIF defined(ALMacOS)}
@@ -567,6 +568,8 @@ constructor TALAndroidWebBrowserView.Create;
 begin
   inherited; // This will call CreateView
   FWebViewListener := TWebViewListener.Create(self);
+  view.setBackgroundColor(TJColor.JavaClass.TRANSPARENT);
+  view.setBackground(nil);
   view.setListener(FWebViewListener);
   view.getSettings.setJavaScriptEnabled(true);
   // This method was deprecated in API level 35.
@@ -640,6 +643,8 @@ begin
   inherited; // This will call InitView
   FNavigationDelegate := TNavigationDelegate.Create(Self);
   View.setNavigationDelegate(FNavigationDelegate.GetObjectID);
+  View.setOpaque(False);
+  View.setbackgroundColor(TUIColor.Wrap(TUIColor.OCClass.clearColor));
 end;
 
 {**************************************}

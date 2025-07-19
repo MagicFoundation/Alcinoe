@@ -666,6 +666,7 @@ function ALTryRGBAHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlp
 function ALRGBAHexToAlphaColor(const aHexValue: String): TAlphaColor;
 function ALTryARGBHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlphaColor): Boolean;
 function ALARGBHexToAlphaColor(const aHexValue: String): TAlphaColor;
+function ALAlphaColorToRGBHex(const aAlphaColor: TAlphaColor): String;
 function ALCeil(const X: Single; const Epsilon: Single = 0): Integer; overload;
 function ALCeil(const X: Double; const Epsilon: Double = 0): Integer; overload;
 function ALCeil(const X: Extended; const Epsilon: Extended = 0): Integer; overload;
@@ -3196,6 +3197,15 @@ function ALARGBHexToAlphaColor(const aHexValue: String): TAlphaColor;
 begin
   if not ALTryARGBHexToAlphaColor(aHexValue, Result) then
     raise Exception.Create('Invalid ARGB hex color format');
+end;
+
+{*******************************************************************}
+function ALAlphaColorToRGBHex(const aAlphaColor: TAlphaColor): String;
+begin
+  var R := TAlphaColorRec(aAlphaColor).R;
+  var G := TAlphaColorRec(aAlphaColor).G;
+  var B := TAlphaColorRec(aAlphaColor).B;
+  Result := Format('%.2x%.2x%.2x', [R, G, B]);
 end;
 
 {*******************************************************************}

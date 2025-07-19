@@ -165,6 +165,7 @@ uses
   Alcinoe.FMX.FilterEffects,
   Alcinoe.FMX.Firebase.Core,
   Alcinoe.FMX.Firebase.Messaging,
+  Alcinoe.FMX.Forms,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Layouts,

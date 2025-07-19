@@ -392,6 +392,8 @@ Type
     function GetDialogStyleNames: TArray<String>;
   end;
 
+function ALEstimateLineHeightMultiplier(Const AFontSize: Single): Single;
+
 implementation
 
 uses

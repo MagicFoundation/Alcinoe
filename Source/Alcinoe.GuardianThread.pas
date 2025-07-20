@@ -308,6 +308,25 @@ end;
 
 {**************************************}
 procedure TALGuardianThread.FreeObjects;
+
+  {***********************************************}
+  procedure _FreeInMainThread(const AObj: Tobject);
+  begin
+    TThread.Queue(nil,
+      procedure
+      begin
+        Try
+          AObj.free;
+        except
+          on e: Exception do begin
+            // Object could not be freed. Logging the
+            // exception and continuing execution.
+            ALLog('TALGuardianThread.FreeObjects._FreeInMainThread', E)
+          end;
+        end;
+      end);
+  end;
+
 begin
 
   // Temporary list to store objects to be freed
@@ -332,55 +351,40 @@ begin
 
       var LObj := LFreeObjectsWorkList[I];
       LFreeObjectsWorkList.delete(I);
-      if LObj is TComponent then begin
-        tthread.Queue(nil,
-          procedure
-          begin
-            Try
-              // Unfortunately, TFmxObject.BeforeDestruction is not thread-safe
-              // because it sends notifications to linked controls.
-              //
-              //procedure TFmxObject.BeforeDestruction;
-              //var
-              //  I: Integer;
-              //  L2: TList<Pointer>;
-              //begin
-              //  { NotifyList }
-              //  if FNotifyList <> nil then
-              //  begin
-              //    ...
-              //    IFreeNotification(L2[I]).FreeNotification(Self);
-              //    ...
-              //  end;
-              //  inherited;
-              //end;
-              //
-              // Additionally, TControl.Destroy is also not thread-safe
-              // as it accesses the global variable TStyleCache.Current
-              // without any synchronization mechanism.
-              //
-              //destructor TControl.Destroy;
-              //begin
-              // ...
-              //  if TStyleCache.Initialized then
-              //    TStyleCache.Current.Remove(Self);
-              // ...
-              //end;
-              //
-              // Due to these limitations, we must ensure that components
-              // are freed in the main thread.
-              AlFreeAndNil(LObj);
-            except
-              on e: Exception do begin
-                // Object could not be freed. Logging the
-                // exception and continuing execution.
-                ALLog('TALGuardianThread.FreeObjects.Queue', E)
-              end;
-            end;
-          end);
-      end
-      else
-        AlFreeAndNil(LObj);
+      // Unfortunately, TFmxObject.BeforeDestruction is not thread-safe
+      // because it sends notifications to linked controls.
+      //
+      //procedure TFmxObject.BeforeDestruction;
+      //var
+      //  I: Integer;
+      //  L2: TList<Pointer>;
+      //begin
+      //  { NotifyList }
+      //  if FNotifyList <> nil then
+      //  begin
+      //    ...
+      //    IFreeNotification(L2[I]).FreeNotification(Self);
+      //    ...
+      //  end;
+      //  inherited;
+      //end;
+      //
+      // Additionally, TControl.Destroy is also not thread-safe
+      // as it accesses the global variable TStyleCache.Current
+      // without any synchronization mechanism.
+      //
+      //destructor TControl.Destroy;
+      //begin
+      // ...
+      //  if TStyleCache.Initialized then
+      //    TStyleCache.Current.Remove(Self);
+      // ...
+      //end;
+      //
+      // Due to these limitations, we must ensure that components
+      // are freed in the main thread.
+      if LObj is TComponent then _FreeInMainThread(LObj)
+      else LObj.free;
 
     except
       on e: Exception do begin

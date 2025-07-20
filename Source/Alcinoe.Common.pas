@@ -698,7 +698,7 @@ function ALElapsedTimeSecondsAsDouble: Double;
 function ALElapsedTimeSecondsAsInt64: int64;
 
 function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
-function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): integer; // in meters
+function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): Double{meters};
 
 {$IFDEF MSWINDOWS}
 {$IFNDEF ALCompilerVersionSupported123}
@@ -3379,14 +3379,14 @@ begin
             (ALongitude >= -180) and (ALongitude <= 180);
 end;
 
-{*************************************************************************************************************************}
-function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): integer; // in meters
+{*******************************************************************************************************************}
+function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): Double{meters};
 begin
-  //http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
-  var LCosAngle: Double := sin(aLatitude1 * (PI/180)) * sin(alatitude2 * (PI/180)) + cos(aLatitude1 * (PI/180)) * cos(alatitude2 * (PI/180)) *  cos((aLongitude2 * (PI/180)) - (aLongitude1 * (PI/180)));
-  if LCosAngle > 1 then LCosAngle := 1
-  else if LCosAngle < -1 then LCosAngle := -1;
-  result := round(6371 * arccos(LCosAngle) * 1000);
+  // Haversine formula
+  var dLat: Double := (ALatitude2 - ALatitude1) * (PI / 180); // Difference in latitude (radians)
+  var dLon: Double := (ALongitude2 - ALongitude1) * (PI / 180); // Difference in longitude (radians)
+  var a: Double := Sqr(Sin(dLat / 2)) + Cos(ALatitude1 * (PI / 180)) * Cos(ALatitude2 * (PI / 180)) * Sqr(Sin(dLon / 2));
+  Result := 2 * 6371{Earth's mean radius in km} * ArcTan2(Sqrt(a), Sqrt(1 - a)) * 1000; // Distance in meters
 end;
 
 {****************}

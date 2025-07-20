@@ -590,6 +590,7 @@ type
         procedure Unprepare; override;
         function HasMoreItemsToDownload: Boolean; virtual;
         function RetryDownloadItems: boolean; virtual;
+        function ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean; virtual;
         function ScrollToItem(const AId: String; Const ADuration: integer): Boolean; overload; virtual;
         function ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean; overload; virtual;
         procedure Refresh; virtual;
@@ -681,6 +682,7 @@ type
                out AControlPos: TALPointD; // AControlPos is local to the founded control
                const ACheckHitTest: Boolean = true): TALDynamicControl; overload; override;
     procedure Prepare; virtual;
+    function ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
     function ScrollToItem(const AId: String; Const ADuration: integer): Boolean; overload;
     function ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean; overload;
     property MainView: TView read FMainView write SetMainView;
@@ -1591,12 +1593,15 @@ begin
     ALMonitorExit(AContext.FLock);
   End;
   //--
-  if Result <> nil then begin
-    if Result.Align = TALAlignLayout.None then
-      Result.Align := AContext.GetContentAlign(AContentType);
-    Result.EndUpdate;
-    ALDynamicListBoxMakeBufDrawables(Result, true{AEnsureDoubleBuffered});
-  end;
+  // We must not allow CreateContent to return nil, because if we do,
+  // the framework will attempt to recreate the content on every scroll,
+  // since the assigned method is still present.
+  if Result = nil then
+    Raise Exception.Create('Return value of a CreateContent function cannot be nil');
+  if Result.Align = TALAlignLayout.None then
+    Result.Align := AContext.GetContentAlign(AContentType);
+  Result.EndUpdate;
+  ALDynamicListBoxMakeBufDrawables(Result, true{AEnsureDoubleBuffered});
 end;
 
 {**************}
@@ -3746,17 +3751,68 @@ begin
 end;
 
 {***********************************************************}
+function TALDynamicListBox.TView.ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
+begin
+  if not FItems^[AIndex].Visible then Exit(False);
+
+  var LStopX: single := FItems^[AIndex].left;
+  var LStopY: single := FItems^[AIndex].Top;
+  If Orientation = TOrientation.horizontal then LStopX := LStopX - FMainContent.Padding.Left
+  else LStopY := LStopY - FMainContent.Padding.Top;
+
+  If FTopBar.Visible then begin
+    if not FTopBar.hidesOnScroll then begin
+      If Orientation = TOrientation.horizontal then LStopX := LStopX - FTopBar.Height
+      else LStopY := LStopY - FTopBar.Height;
+    end
+    else begin
+      If Orientation = TOrientation.horizontal then begin
+        // Scrolling up (from right to left) — hide the top bar
+        if LStopX - scrollengine.ViewportPosition.X > 0 then begin
+          FTopBar.Visible := False;
+          FTopBar.Left := -FTopBar.Width;
+        end
+        // Scrolling down (from left to right) — show the top bar
+        else begin
+          FTopBar.Visible := True;
+          FTopBar.Left := 0;
+          LStopX := LStopX - FTopBar.Width;
+        end;
+      end
+      else begin
+        // Scrolling up (from bottom to top) — hide the top bar
+        if LStopY - scrollengine.ViewportPosition.Y > 0 then begin
+          FTopBar.Visible := False;
+          FTopBar.Top := -FTopBar.Height;
+        end
+        // Scrolling down (from top to bottom) — show the top bar
+        else begin
+          FTopBar.Visible := True;
+          FTopBar.Top := 0;
+          LStopY := LStopY - FTopBar.Height;
+        end;
+      end;
+    end;
+  end;
+
+  scrollengine.startScroll(
+    scrollengine.ViewportPosition.x,// startX: Double;
+    scrollengine.ViewportPosition.y, // startY: Double;
+    min(LStopX, scrollengine.MaxScrollLimit.x) - scrollengine.ViewportPosition.x, // dx: Double;
+    min(LStopY, scrollengine.MaxScrollLimit.Y) - scrollengine.ViewportPosition.y, // dy: Double;
+    ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
+
+  Result := true;
+
+end;
+
+{***********************************************************}
 function TALDynamicListBox.TView.ScrollToItem(const AId: String; Const ADuration: integer): Boolean;
 begin
   for var I := low(FItems^) to High(FItems^) do
     if (FItems^[i].Visible) and (FItems^[i].Data.GetChildNodeValueText(FItemIdNodeName, '') = AId) then begin
-      scrollengine.startScroll(
-        scrollengine.ViewportPosition.x,// startX: Double;
-        scrollengine.ViewportPosition.y, // startY: Double;
-        FItems^[i].left - scrollengine.ViewportPosition.x, // dx: Double;
-        FItems^[i].Top - scrollengine.ViewportPosition.y, // dy: Double;
-        ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
-      exit(true);
+      result := ScrollToItemIndex(i, ADuration);
+      Exit;
     end;
   Result := False;
 end;
@@ -3766,13 +3822,8 @@ function TALDynamicListBox.TView.ScrollToItem(const AId: Int64; Const ADuration:
 begin
   for var I := low(FItems^) to High(FItems^) do
     if (FItems^[i].Visible) and (FItems^[i].Data.GetChildNodeValueInt64(FItemIdNodeName, 0) = AId) then begin
-      scrollengine.startScroll(
-        scrollengine.ViewportPosition.x,// startX: Double;
-        scrollengine.ViewportPosition.y, // startY: Double;
-        FItems^[i].left - scrollengine.ViewportPosition.x, // dx: Double;
-        FItems^[i].Top - scrollengine.ViewportPosition.y, // dy: Double;
-        ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
-      exit(true);
+      result := ScrollToItemIndex(i, ADuration);
+      Exit;
     end;
   Result := False;
 end;
@@ -4616,6 +4667,12 @@ begin
     MainView.Prepare;
     FHasBeenPrepared := True;
   end;
+end;
+
+{**********************************}
+function TALDynamicListBox.ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
+begin
+  Result := MainView.ScrollToItemIndex(AIndex, ADuration);
 end;
 
 {**********************************}

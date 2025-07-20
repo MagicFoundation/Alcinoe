@@ -1949,6 +1949,7 @@ begin
   //--
   if FPlayerItem <> nil then begin
     FPlayerItem.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('status'));
+    FPlayerItem.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('presentationSize'));
     FPlayerItem.release;
     FPlayerItem := nil;
   end;
@@ -3628,7 +3629,6 @@ begin
         LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
         LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
         LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
-        //--
         ALFreeAndNil(fVideoPlayerEngine);
         fVideoPlayerEngine := LVideoPlayerEngine;
       end;

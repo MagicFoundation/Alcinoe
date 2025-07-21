@@ -47,19 +47,19 @@ type
 
 implementation
 
-{******************************************************}
+{***************************************************}
 function TALFrame.TFill.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{********************************************************}
+{*****************************************************}
 function TALFrame.TStroke.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.Null;
 end;
 
-{*********************************}
+{**********************************************}
 constructor TALFrame.Create(AOwner: TComponent);
 begin
   inherited;
@@ -67,19 +67,19 @@ begin
     raise EResNotFound.CreateFmt('Resource %s not found', [ClassName]);
 end;
 
-{****************************************}
+{*************************************}
 function TALFrame.CreateFill: TALBrush;
 begin
   result := TFill.Create;
 end;
 
-{************************************************}
+{*********************************************}
 function TALFrame.CreateStroke: TALStrokeBrush;
 begin
   result := TStroke.Create;
 end;
 
-{*********************************}
+{*************************************************}
 procedure TALFrame.DefineProperties(Filer: TFiler);
 begin
   inherited;

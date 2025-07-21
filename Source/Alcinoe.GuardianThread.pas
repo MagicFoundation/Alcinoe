@@ -309,7 +309,7 @@ end;
 {**************************************}
 procedure TALGuardianThread.FreeObjects;
 
-  {***********************************************}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _FreeInMainThread(const AObj: Tobject);
   begin
     TThread.Queue(nil,

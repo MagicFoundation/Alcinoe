@@ -3199,7 +3199,7 @@ begin
     raise Exception.Create('Invalid ARGB hex color format');
 end;
 
-{*******************************************************************}
+{********************************************************************}
 function ALAlphaColorToRGBHex(const aAlphaColor: TAlphaColor): String;
 begin
   var R := TAlphaColorRec(aAlphaColor).R;

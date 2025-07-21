@@ -1666,7 +1666,7 @@ begin
     Owner.Realign;
 end;
 
-{************************************************}
+{**************************************************************************}
 procedure TALDynamicControl.AncestorVisibleChanged(const AVisible: Boolean);
 begin
   for var I := 0 to FControlsCount - 1 do

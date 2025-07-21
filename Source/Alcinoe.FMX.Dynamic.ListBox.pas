@@ -3751,7 +3751,7 @@ begin
   if result then SetViewportPosition(ViewportPosition);
 end;
 
-{***********************************************************}
+{***********************************************************************************************************}
 function TALDynamicListBox.TView.ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
 begin
   if not FItems^[AIndex].Visible then Exit(False);
@@ -3807,7 +3807,7 @@ begin
 
 end;
 
-{***********************************************************}
+{**************************************************************************************************}
 function TALDynamicListBox.TView.ScrollToItem(const AId: String; Const ADuration: integer): Boolean;
 begin
   for var I := low(FItems^) to High(FItems^) do
@@ -3818,7 +3818,7 @@ begin
   Result := False;
 end;
 
-{***********************************************************}
+{*************************************************************************************************}
 function TALDynamicListBox.TView.ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean;
 begin
   for var I := low(FItems^) to High(FItems^) do
@@ -4670,19 +4670,19 @@ begin
   end;
 end;
 
-{**********************************}
+{*****************************************************************************************************}
 function TALDynamicListBox.ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
 begin
   Result := MainView.ScrollToItemIndex(AIndex, ADuration);
 end;
 
-{**********************************}
+{********************************************************************************************}
 function TALDynamicListBox.ScrollToItem(const AId: String; Const ADuration: integer): Boolean;
 begin
   Result := MainView.ScrollToItem(AId, ADuration);
 end;
 
-{**********************************}
+{*******************************************************************************************}
 function TALDynamicListBox.ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean;
 begin
   Result := MainView.ScrollToItem(AId, ADuration);
@@ -4715,7 +4715,7 @@ begin
   Result := FActiveScrollEnginesCount > 0;
 end;
 
-{************************************************************}
+{*************************************************************************}
 procedure TALDynamicListBox.AncestorVisibleChanged(const Visible: Boolean);
 begin
   inherited;

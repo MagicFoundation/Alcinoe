@@ -150,6 +150,7 @@ Type
     function GetAbsoluteRect: TALRectD; virtual; // [TControl] function GetAbsoluteRect: TRectF; virtual;
     function GetAbsoluteDisplayedRect: TRectF; virtual;
     function GetExpandedBoundsRect: TALRectD;
+    function GetAbsoluteVisible: Boolean; // [TControl] function GetParentedVisible: Boolean; virtual;
     function GetPosition: TALPointD;
     procedure SetPosition(const AValue: TALPointD); overload;
     procedure SetPosition(const AValue: TPointf); overload;
@@ -178,6 +179,7 @@ Type
     procedure MarginsChanged; virtual;
     procedure EnabledChanged; virtual; // [TControl] procedure EnabledChanged; virtual;
     procedure VisibleChanged; virtual; // [TControl] procedure VisibleChanged; virtual;
+    procedure AncestorVisibleChanged(const AVisible: Boolean); virtual; // [TControl] procedure AncestorVisibleChanged(const Visible: Boolean); virtual;
     procedure ParentChanged; virtual; // [TControl] procedure ParentChanged; virtual;
     procedure AncestorParentChanged; virtual; // [TControl] procedure AncestorParentChanged; virtual;
     procedure PositionChanged; virtual;
@@ -263,7 +265,7 @@ Type
     property DisabledOpacity: Single read FDisabledOpacity write SetDisabledOpacity; // [TControl] property DisabledOpacity: Single read FDisabledOpacity write SetDisabledOpacity stored DisabledOpacityStored nodefault;
     property AbsoluteOpacity: Single read FAbsoluteOpacity; // [TControl] property AbsoluteOpacity: Single read GetAbsoluteOpacity;
     property Visible: Boolean read FVisible write SetVisible; // [TControl] property Visible: Boolean read FVisible write SetVisible stored VisibleStored default True;
-    property AbsoluteVisible: Boolean read FAbsoluteVisible;
+    property AbsoluteVisible: Boolean read GetAbsoluteVisible; // [TControl] property ParentedVisible: Boolean read GetParentedVisible;
     property Owner: TALDynamicControl read FOwner write SetOwner; // [TControl] property Owner: TComponent read FOwner;
     property Host: TALDynamicControlHost read FHost;
     property Form: TCommonCustomForm read GetForm;
@@ -1162,7 +1164,7 @@ end;
 {**********************************************************}
 function TALDynamicControl.GetAbsoluteDisplayedRect: TRectF;
 begin
-  if (FIsDestroying) or (not AbsoluteVisible) or (Host = nil) then Exit(TRectF.Empty);
+  if (FIsDestroying) or (not FAbsoluteVisible) or (Host = nil) then Exit(TRectF.Empty);
   // This function assumes that ClipChildren is not implemented.
   // If this changes, use the implementation found in TALControl.GetAbsoluteDisplayedRect.
   Result := TRectF.Intersect(Host.LocalToAbsolute(Host.DisplayedRect), AbsoluteRect.ReducePrecision);
@@ -1176,6 +1178,12 @@ begin
               top-TouchTargetExpansion.top,
               Right+TouchTargetExpansion.right,
               Bottom+TouchTargetExpansion.bottom);
+end;
+
+{*****************************************************}
+function TALDynamicControl.GetAbsoluteVisible: Boolean;
+begin
+  Result := (FAbsoluteVisible) and (Host <> nil) and (Host.GetParentedVisible);
 end;
 
 {************************************************}
@@ -1403,7 +1411,7 @@ end;
 procedure TALDynamicControl.RefreshAbsoluteVisible;
 begin
   var LNewAbsoluteVisible: Boolean;
-  if (Owner <> nil) and (not FOwner.AbsoluteVisible) then LNewAbsoluteVisible := False
+  if (Owner <> nil) and (not FOwner.FAbsoluteVisible) then LNewAbsoluteVisible := False
   else LNewAbsoluteVisible := Visible;
   if LNewAbsoluteVisible <> FAbsoluteVisible then begin
     FAbsoluteVisible := LNewAbsoluteVisible;
@@ -1653,8 +1661,16 @@ end;
 procedure TALDynamicControl.VisibleChanged;
 begin
   RefreshAbsoluteVisible;
+  AncestorVisibleChanged(FVisible);
   if (Align <> TALAlignLayout.None) and (Owner <> nil) then
     Owner.Realign;
+end;
+
+{************************************************}
+procedure TALDynamicControl.AncestorVisibleChanged(const AVisible: Boolean);
+begin
+  for var I := 0 to FControlsCount - 1 do
+    FControls[I].AncestorVisibleChanged(AVisible);
 end;
 
 {****************************************}

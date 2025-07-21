@@ -641,7 +641,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'FActiveIndicatorControl.HitTest := False;','//**FActiveIndicatorControl.HitTest := False;');
     aSrc := FindAndReplace(aSrc, 'SetAcceptsControls(False);', '//**SetAcceptsControls(False);');
     aSrc := FindAndReplace(aSrc, 'SetAcceptsControls(True);', '//**SetAcceptsControls(True);');
-    aSrc := FindAndReplace(aSrc, 'function GetParentedVisible: Boolean; override;','//**function GetParentedVisible: Boolean; override;');
+    aSrc := FindAndReplace(aSrc, 'function GetParentedVisible: Boolean;','//**function GetParentedVisible: Boolean;');
     aSrc := FindAndReplace(aSrc, 'procedure DoRootChanged; override;','//**procedure DoRootChanged; override;');
     aSrc := FindAndReplace(aSrc, 'procedure Loaded; override;', '//**procedure Loaded; override;');
     aSrc := FindAndReplace(aSrc, 'Create(AOwner: TComponent)', 'Create(const AOwner: TObject)');
@@ -1105,45 +1105,17 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(
               aSrc,
               '    if not (csLoading in ComponentState) then begin'+#13#10+
-              '      if FInternalState <> vpsIdle then begin'+#13#10+
-              '        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;'+#13#10+
-              '        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;'+#13#10+
-              '        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;'+#13#10+
-              '        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;'+#13#10+
-              '        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;'+#13#10+
-              '        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;'+#13#10+
-              '        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;'+#13#10+
-              '        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;'+#13#10+
-              '        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;'+#13#10+
-              '        //--'+#13#10+
-              '        ALFreeAndNil(fVideoPlayerEngine);'+#13#10+
-              '        fVideoPlayerEngine := LVideoPlayerEngine;'+#13#10+
-              '      end;'+#13#10+
-              '      if FDataSource <> '''' then begin'+#13#10+
-              '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
-              '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
-              '          FVideoPlayerEngine.Start;'+#13#10+
+              '      Unprepare;'+#13#10+
+              '      if (FAutoStartMode <> TAutoStartMode.WhenDisplayed) then begin'+#13#10+
+              '        Prepare;'+#13#10+
+              '        if AutoStartMode = TAutoStartMode.WhenPrepared then Start;'+#13#10+
               '      end;'+#13#10+
               '    end;',
               '    //**if not (csLoading in ComponentState) then begin'+#13#10+
-              '      if FInternalState <> vpsIdle then begin'+#13#10+
-              '        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;'+#13#10+
-              '        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;'+#13#10+
-              '        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;'+#13#10+
-              '        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;'+#13#10+
-              '        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;'+#13#10+
-              '        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;'+#13#10+
-              '        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;'+#13#10+
-              '        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;'+#13#10+
-              '        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;'+#13#10+
-              '        //--'+#13#10+
-              '        ALFreeAndNil(fVideoPlayerEngine);'+#13#10+
-              '        fVideoPlayerEngine := LVideoPlayerEngine;'+#13#10+
-              '      end;'+#13#10+
-              '      if FDataSource <> '''' then begin'+#13#10+
-              '        FVideoPlayerEngine.Prepare(FDataSource);'+#13#10+
-              '        if AutoStartMode = TAutoStartMode.WhenPrepared then'+#13#10+
-              '          FVideoPlayerEngine.Start;'+#13#10+
+              '      Unprepare;'+#13#10+
+              '      if (FAutoStartMode <> TAutoStartMode.WhenDisplayed) then begin'+#13#10+
+              '        Prepare;'+#13#10+
+              '        if AutoStartMode = TAutoStartMode.WhenPrepared then Start;'+#13#10+
               '      end;'+#13#10+
               '    //**end;');
     //--

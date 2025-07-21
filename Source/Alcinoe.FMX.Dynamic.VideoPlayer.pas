@@ -23,7 +23,20 @@ type
   TALDynamicVideoPlayerSurface = class(TALDynamicExtendedControl)
   public
     type
-      TAutoStartMode = (None, WhenPrepared, WhenDisplayed);
+      TAutoStartMode = (
+        /// <summary>
+        ///   Only prepare is called when a data source is set.
+        /// </summary>
+        None,
+        /// <summary>
+        ///   Prepare and start are called automatically as soon as a data source is set.
+        /// </summary>
+        WhenPrepared,
+        /// <summary>
+        ///   Prepare and start are called when the control is displayed,
+        ///   and unprepare is called when the control is no longer visible.
+        /// </summary>
+        WhenDisplayed);
   protected
     type
       TPreviewDownloadContext = Class(TALDownloadContext)
@@ -123,6 +136,8 @@ type
     procedure Paint; override;
     //**procedure Loaded; override;
     procedure DoResized; override;
+    procedure Prepare; virtual;
+    procedure Unprepare; virtual;
     property VideoPlayerEngine: TALBaseVideoPlayer read fVideoPlayerEngine;
   public
     constructor Create(const AOwner: TObject); override;
@@ -333,7 +348,7 @@ begin
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
-  Stop;
+  ALFreeAndNil(fVideoPlayerEngine);
   inherited;
 end;
 
@@ -350,8 +365,8 @@ end;
 //**procedure TALDynamicVideoPlayerSurface.Loaded;
 //**begin
 //**  inherited;
-//**  If FDataSource <> '' then begin
-//**    FVideoPlayerEngine.Prepare(FDataSource);
+//**  If (FAutoStartMode <> TAutoStartMode.WhenDisplayed) then begin
+//**    Prepare;
 //**    if FAutoStartMode = TAutoStartMode.WhenPrepared then start;
 //**  end;
 //**end;
@@ -452,24 +467,10 @@ begin
     FDataSource := Value;
     {$IF not defined(ALDPK)}
     //**if not (csLoading in ComponentState) then begin
-      if FInternalState <> vpsIdle then begin
-        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;
-        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;
-        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;
-        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;
-        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;
-        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;
-        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
-        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
-        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
-        //--
-        ALFreeAndNil(fVideoPlayerEngine);
-        fVideoPlayerEngine := LVideoPlayerEngine;
-      end;
-      if FDataSource <> '' then begin
-        FVideoPlayerEngine.Prepare(FDataSource);
-        if AutoStartMode = TAutoStartMode.WhenPrepared then
-          FVideoPlayerEngine.Start;
+      Unprepare;
+      if (FAutoStartMode <> TAutoStartMode.WhenDisplayed) then begin
+        Prepare;
+        if AutoStartMode = TAutoStartMode.WhenPrepared then Start;
       end;
     //**end;
     {$ENDIF}
@@ -500,8 +501,7 @@ begin
     {$IF not defined(ALDPK)}
     If //**(not (csLoading in ComponentState)) and
        (FAutoStartMode = TAutoStartMode.WhenPrepared) and
-       (DataSource <> '') and
-       (FInternalState = VPSIdle) then Start;
+       (FInternalState = vpsPreparing) then Start;
     {$ENDIF}
   end;
 end;
@@ -575,7 +575,8 @@ end;
 {*******************************************}
 procedure TALDynamicVideoPlayerSurface.Start;
 begin
-  if FInternalState = VPSStarted then exit;
+  if FInternalState = vpsIdle then Prepare;
+  if FInternalState in [vpsIdle, VPSStarted] then exit;
   FInternalState := VPSStarted;
   fVideoPlayerEngine.Start;
 end;
@@ -583,19 +584,16 @@ end;
 {*******************************************}
 procedure TALDynamicVideoPlayerSurface.Pause;
 begin
-  if FInternalState = VPSPaused then exit;
-  FInternalState := VPSPaused;
   if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  if FInternalState in [vpsIdle, VPSPaused] then exit;
+  FInternalState := VPSPaused;
   fVideoPlayerEngine.Pause;
 end;
 
 {******************************************}
 procedure TALDynamicVideoPlayerSurface.Stop;
 begin
-  if FInternalState = VPSStopped then exit;
-  FInternalState := VPSStopped;
-  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
-  fVideoPlayerEngine.Stop;
+  Unprepare;
 end;
 
 {***************************************************************}
@@ -743,6 +741,35 @@ procedure TALDynamicVideoPlayerSurface.DoResized;
 begin
   ClearBufDrawable;
   inherited;
+end;
+
+{*********************************************}
+procedure TALDynamicVideoPlayerSurface.Prepare;
+begin
+  if (FInternalState = vpsIdle) and (FDataSource <> '') then begin
+    FInternalState := vpsPreparing;
+    FVideoPlayerEngine.Prepare(FDataSource);
+  end;
+end;
+
+{***********************************************}
+procedure TALDynamicVideoPlayerSurface.UnPrepare;
+begin
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  if FInternalState <> vpsIdle then begin
+    var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;
+    LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;
+    LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;
+    LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;
+    LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;
+    LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;
+    LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
+    LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
+    LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
+    ALFreeAndNil(fVideoPlayerEngine);
+    fVideoPlayerEngine := LVideoPlayerEngine;
+  end;
+  FInternalState := vpsIdle;
 end;
 
 {******************************************************}
@@ -1037,7 +1064,7 @@ begin
     if (M is TApplicationEventMessage) then begin
       case (M as TApplicationEventMessage).Value.Event of
         TApplicationEvent.EnteredBackground,
-        TApplicationEvent.WillTerminate: Pause;
+        TApplicationEvent.WillTerminate: Stop;
       end;
     end;
   end;
@@ -1050,7 +1077,7 @@ begin
   If FAutoStartMode = TAutoStartMode.WhenDisplayed then begin
     // If less than 20% of the surface is visible, then pause this video.
     If (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.2, TEpsilon.position) <= 0) then
-      Pause;
+      Stop;
   end;
 
   if not LAbsoluteDisplayedRect.IsEmpty then
@@ -1095,7 +1122,7 @@ begin
     If (AutoStartedVideoPlayerSurface <> nil) and
        (AutoStartedVideoPlayerSurface <> self) and
        (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.8, TEpsilon.position) > 0) then begin
-      AutoStartedVideoPlayerSurface.Pause;
+      AutoStartedVideoPlayerSurface.Stop;
       Start;
       AutoStartedVideoPlayerSurface := Self;
     end

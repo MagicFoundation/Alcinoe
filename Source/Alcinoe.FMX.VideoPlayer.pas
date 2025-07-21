@@ -64,9 +64,8 @@ const
   vpsPrepared = 2;
   vpsStarted = 3;
   vpsPaused = 4;
-  vpsStopped = 5;
-  vpsPlaybackCompleted = 6;
-  vpsError = 7;
+  vpsPlaybackCompleted = 5;
+  vpsError = 6;
 
 type
 
@@ -98,7 +97,6 @@ type
     procedure Prepare(Const ADataSource: String); virtual; abstract;
     procedure Start; virtual; abstract;
     procedure Pause; virtual; abstract;
-    procedure Stop; virtual; abstract;
     procedure SeekTo(const msec: Int64); virtual; abstract;
     property State: Integer read GetState;
     property IsPlaying: boolean read GetIsPlaying;
@@ -138,7 +136,6 @@ type
     procedure Prepare(Const ADataSource: String); override;
     procedure Start; override;
     procedure Pause; override;
-    procedure Stop; override;
     procedure SeekTo(const msec: Int64); override;
   end;
 
@@ -243,7 +240,6 @@ type
     procedure Prepare(Const ADataSource: String); override;
     procedure Start; override;
     procedure Pause; override;
-    procedure Stop; override;
     procedure SeekTo(const msec: Int64); override;
   end;
   {$endIF}
@@ -364,7 +360,6 @@ type
     procedure Prepare(Const ADataSource: String); override;
     procedure Start; override;
     procedure Pause; override;
-    procedure Stop; override;
     procedure SeekTo(const msec: Int64); override;
   end;
   {$endIF}
@@ -400,6 +395,9 @@ type
   private
     FEngineIndex: Integer;
     FCoreVideoPlayer: TALBaseVideoPlayer;
+    FLooping: Boolean;
+    FPlaybackSpeed: single;
+    FVolume: Single;
   protected
     function GetState: Integer; override;
     function GetIsPlaying: boolean; override;
@@ -420,7 +418,6 @@ type
     procedure Prepare(Const ADataSource: String); override;
     procedure Start; override;
     procedure Pause; override;
-    procedure Stop; override;
     procedure SeekTo(const msec: Int64); override;
   end;
 
@@ -475,7 +472,6 @@ type
         Prepare,
         Start,
         Pause,
-        Stop,
         SeekTo);
       // --------
       // TRequest
@@ -564,7 +560,6 @@ type
     procedure Prepare(const AEngineIndex: Integer; Const ADataSource: String);
     procedure Start(const AEngineIndex: Integer); overload;
     procedure Pause(const AEngineIndex: Integer);
-    procedure Stop(const AEngineIndex: Integer);
     procedure SeekTo(const AEngineIndex: Integer; const msec: Int64);
   end;
 
@@ -573,7 +568,20 @@ type
   TALVideoPlayerSurface = class(TALControl)
   public
     type
-      TAutoStartMode = (None, WhenPrepared, WhenDisplayed);
+      TAutoStartMode = (
+        /// <summary>
+        ///   Only prepare is called when a data source is set.
+        /// </summary>
+        None,
+        /// <summary>
+        ///   Prepare and start are called automatically as soon as a data source is set.
+        /// </summary>
+        WhenPrepared,
+        /// <summary>
+        ///   Prepare and start are called when the control is displayed,
+        ///   and unprepare is called when the control is no longer visible.
+        /// </summary>
+        WhenDisplayed);
   protected
     type
       TPreviewDownloadContext = Class(TALDownloadContext)
@@ -673,6 +681,8 @@ type
     procedure Paint; override;
     procedure Loaded; override;
     procedure DoResized; override;
+    procedure Prepare; virtual;
+    procedure Unprepare; virtual;
     property VideoPlayerEngine: TALBaseVideoPlayer read fVideoPlayerEngine;
   public
     constructor Create(AOwner: TComponent); override;
@@ -955,11 +965,6 @@ end;
 
 {**********************************}
 procedure TALDummyVideoPlayer.Pause;
-begin
-end;
-
-{*********************************}
-procedure TALDummyVideoPlayer.Stop;
 begin
 end;
 
@@ -1477,7 +1482,7 @@ end;
 {***************************************}
 destructor TALAndroidVideoPlayer.Destroy;
 begin
-  Stop;
+  fExoPlayer.stop;
   //--
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
   fOnFrameAvailableListener.FVideoPlayerEngine := nil;
@@ -1598,7 +1603,7 @@ end;
 {*******************************************************}
 function TALAndroidVideoPlayer.GetCurrentPosition: Int64;
 begin
-  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -1609,7 +1614,7 @@ end;
 {************************************************}
 function TALAndroidVideoPlayer.GetDuration: Int64;
 begin
-  if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -1621,7 +1626,7 @@ end;
 {*****************************************************}
 function TALAndroidVideoPlayer.GetVideoHeight: Integer;
 begin
-  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -1631,7 +1636,7 @@ end;
 {****************************************************}
 function TALAndroidVideoPlayer.GetVideoWidth: Integer;
 begin
-  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -1678,23 +1683,6 @@ begin
   // If the player is already in the ready state then this method can be used to pause and resume
   // playback
   fExoPlayer.setPlayWhenReady(false);
-end;
-
-{***********************************}
-procedure TALAndroidVideoPlayer.stop;
-begin
-  FAutoStartWhenPrepared := False;
-  if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.stop');
-  {$ENDIF}
-  // Stops playback. Use setPlayWhenReady(false) rather than this method if the intention
-  // is to pause playback.
-  // Calling this method will cause the playback state to transition to STATE_IDLE. The
-  // player instance can still be used, and release() must still be called on the player if
-  // it's no longer required.
-  // Calling this method does not reset the playback position.
-  fExoPlayer.stop;
 end;
 
 {********************************************************}
@@ -1927,8 +1915,6 @@ end;
 {***********************************}
 destructor TALIOSVideoPlayer.Destroy;
 begin
-  Stop;
-  //--
   // Removes the display link from all run loop modes.
   // Removing the display link from all run loop modes causes it to be released by the run loop. The display link also releases the target.
   // invalidate is thread safe meaning that it can be called from a thread separate to the one in which the display link is running.
@@ -1942,7 +1928,9 @@ begin
   end;
   //--
   if FPlayer <> nil then begin
+    FPlayer.Pause;
     FPlayer.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('status'));
+    FPlayer.replaceCurrentItemWithPlayerItem(nil);
     FPlayer.release;
     FPlayer := nil;
   end;
@@ -2434,7 +2422,7 @@ end;
 //Returns the current time of the current player item.
 function TALIOSVideoPlayer.GetCurrentPosition: Int64;
 begin
-  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -2445,7 +2433,7 @@ end;
 {********************************************}
 function TALIOSVideoPlayer.GetDuration: Int64;
 begin
-  if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -2456,7 +2444,7 @@ end;
 {*************************************************}
 function TALIOSVideoPlayer.GetVideoHeight: Integer;
 begin
-  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -2467,7 +2455,7 @@ end;
 {************************************************}
 function TALIOSVideoPlayer.GetVideoWidth: Integer;
 begin
-  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted]) then begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
     result := 0;
     exit;
   end;
@@ -2564,20 +2552,6 @@ begin
   fDisplayLink.setPaused(True);
 end;
 
-{*******************************}
-procedure TALIOSVideoPlayer.Stop;
-begin
-  FAutoStartWhenPrepared := False;
-  if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
-  {$IF defined(DEBUG)}
-  ALLog('TALIOSVideoPlayer.Stop');
-  {$ENDIF}
-  // Pauses playback of the current item.
-  // Calling this method is the same as setting the rate to 0.0.
-  FPlayer.Pause;
-  fDisplayLink.setPaused(True);
-end;
-
 {****************************************************}
 procedure TALIOSVideoPlayer.SeekTo(const msec: Int64);
 begin
@@ -2594,6 +2568,9 @@ begin
   inherited;
   FEngineIndex := TALVideoPlayerControllerThread.Instance.AcquireEngine(Self);
   FCoreVideoPlayer := nil;
+  FLooping := False;
+  FPlaybackSpeed := 1;
+  FVolume := 1;
 end;
 
 {*************************************}
@@ -2619,36 +2596,39 @@ end;
 {***********************************************}
 function TALAsyncVideoPlayer.GetLooping: Boolean;
 begin
-  Result := TALVideoPlayerControllerThread.Instance.GetLooping(FEngineIndex);
+  Result := FLooping;
 end;
 
 {*************************************************************}
 procedure TALAsyncVideoPlayer.SetLooping(const Value: Boolean);
 begin
+  FLooping := Value;
   TALVideoPlayerControllerThread.Instance.SetLooping(FEngineIndex, Value);
 end;
 
 {*********************************************}
 function TALAsyncVideoPlayer.GetVolume: Single;
 begin
-  Result := TALVideoPlayerControllerThread.Instance.GetVolume(FEngineIndex);
+  Result := FVolume;
 end;
 
 {***********************************************************}
 procedure TALAsyncVideoPlayer.SetVolume(const Value: Single);
 begin
+  FVolume := Value;
   TALVideoPlayerControllerThread.Instance.SetVolume(FEngineIndex, Value);
 end;
 
 {****************************************************}
 function TALAsyncVideoPlayer.GetPlaybackSpeed: single;
 begin
-  Result := TALVideoPlayerControllerThread.Instance.GetPlaybackSpeed(FEngineIndex);
+  Result := FPlaybackSpeed;
 end;
 
 {******************************************************************}
 procedure TALAsyncVideoPlayer.SetPlaybackSpeed(const Value: single);
 begin
+  FPlaybackSpeed := Value;
   TALVideoPlayerControllerThread.Instance.SetPlaybackSpeed(FEngineIndex, Value);
 end;
 
@@ -2701,13 +2681,6 @@ end;
 procedure TALAsyncVideoPlayer.Pause;
 begin
   TALVideoPlayerControllerThread.Instance.Pause(FEngineIndex);
-end;
-
-{*********************************}
-procedure TALAsyncVideoPlayer.Stop;
-begin
-  if TALVideoPlayerControllerThread.HasInstance then
-    TALVideoPlayerControllerThread.Instance.Stop(FEngineIndex);
 end;
 
 {******************************************************}
@@ -2949,9 +2922,6 @@ begin
 
         TOperation.Pause:
           LEngine.CoreVideoPlayer.Pause;
-
-        TOperation.Stop:
-          LEngine.CoreVideoPlayer.Stop;
 
         TOperation.SeekTo:
           LEngine.CoreVideoPlayer.SeekTo(LCommand.Request.Param1Int64);
@@ -3418,12 +3388,6 @@ begin
   EnqueueCommand(AEngineIndex, TOperation.Pause, False{AWaitResponse});
 end;
 
-{*************************************************************************}
-procedure TALVideoPlayerControllerThread.Stop(const AEngineIndex: Integer);
-begin
-  EnqueueCommand(AEngineIndex, TOperation.Stop, False{AWaitResponse});
-end;
-
 {**********************************************************************************************}
 procedure TALVideoPlayerControllerThread.SeekTo(const AEngineIndex: Integer; const msec: Int64);
 begin
@@ -3500,7 +3464,7 @@ begin
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
-  Stop;
+  ALFreeAndNil(fVideoPlayerEngine);
   inherited;
 end;
 
@@ -3517,8 +3481,8 @@ end;
 procedure TALVideoPlayerSurface.Loaded;
 begin
   inherited;
-  If FDataSource <> '' then begin
-    FVideoPlayerEngine.Prepare(FDataSource);
+  If (FAutoStartMode <> TAutoStartMode.WhenDisplayed) then begin
+    Prepare;
     if FAutoStartMode = TAutoStartMode.WhenPrepared then start;
   end;
 end;
@@ -3619,23 +3583,10 @@ begin
     FDataSource := Value;
     {$IF not defined(ALDPK)}
     if not (csLoading in ComponentState) then begin
-      if FInternalState <> vpsIdle then begin
-        var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;
-        LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;
-        LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;
-        LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;
-        LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;
-        LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;
-        LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
-        LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
-        LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
-        ALFreeAndNil(fVideoPlayerEngine);
-        fVideoPlayerEngine := LVideoPlayerEngine;
-      end;
-      if FDataSource <> '' then begin
-        FVideoPlayerEngine.Prepare(FDataSource);
-        if AutoStartMode = TAutoStartMode.WhenPrepared then
-          FVideoPlayerEngine.Start;
+      Unprepare;
+      if (FAutoStartMode <> TAutoStartMode.WhenDisplayed) then begin
+        Prepare;
+        if AutoStartMode = TAutoStartMode.WhenPrepared then Start;
       end;
     end;
     {$ENDIF}
@@ -3666,8 +3617,7 @@ begin
     {$IF not defined(ALDPK)}
     If (not (csLoading in ComponentState)) and
        (FAutoStartMode = TAutoStartMode.WhenPrepared) and
-       (DataSource <> '') and
-       (FInternalState = VPSIdle) then Start;
+       (FInternalState = vpsPreparing) then Start;
     {$ENDIF}
   end;
 end;
@@ -3741,7 +3691,8 @@ end;
 {************************************}
 procedure TALVideoPlayerSurface.Start;
 begin
-  if FInternalState = VPSStarted then exit;
+  if FInternalState = vpsIdle then Prepare;
+  if FInternalState in [vpsIdle, VPSStarted] then exit;
   FInternalState := VPSStarted;
   fVideoPlayerEngine.Start;
 end;
@@ -3749,19 +3700,16 @@ end;
 {************************************}
 procedure TALVideoPlayerSurface.Pause;
 begin
-  if FInternalState = VPSPaused then exit;
-  FInternalState := VPSPaused;
   if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  if FInternalState in [vpsIdle, VPSPaused] then exit;
+  FInternalState := VPSPaused;
   fVideoPlayerEngine.Pause;
 end;
 
 {***********************************}
 procedure TALVideoPlayerSurface.Stop;
 begin
-  if FInternalState = VPSStopped then exit;
-  FInternalState := VPSStopped;
-  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
-  fVideoPlayerEngine.Stop;
+  Unprepare;
 end;
 
 {********************************************************}
@@ -3909,6 +3857,35 @@ procedure TALVideoPlayerSurface.DoResized;
 begin
   ClearBufDrawable;
   inherited;
+end;
+
+{**************************************}
+procedure TALVideoPlayerSurface.Prepare;
+begin
+  if (FInternalState = vpsIdle) and (FDataSource <> '') then begin
+    FInternalState := vpsPreparing;
+    FVideoPlayerEngine.Prepare(FDataSource);
+  end;
+end;
+
+{****************************************}
+procedure TALVideoPlayerSurface.UnPrepare;
+begin
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
+  if FInternalState <> vpsIdle then begin
+    var LVideoPlayerEngine: TALBaseVideoPlayer := TALAsyncVideoPlayer.create;
+    LVideoPlayerEngine.Looping := fVideoPlayerEngine.Looping;
+    LVideoPlayerEngine.PlaybackSpeed := fVideoPlayerEngine.PlaybackSpeed;
+    LVideoPlayerEngine.Volume := fVideoPlayerEngine.Volume;
+    LVideoPlayerEngine.OnError := fVideoPlayerEngine.OnError;
+    LVideoPlayerEngine.OnPrepared := fVideoPlayerEngine.OnPrepared;
+    LVideoPlayerEngine.OnCompletion := fVideoPlayerEngine.OnCompletion;
+    LVideoPlayerEngine.OnVideoSizeChanged := fVideoPlayerEngine.OnVideoSizeChanged;
+    LVideoPlayerEngine.OnFrameAvailable := DoOnFrameAvailable;
+    ALFreeAndNil(fVideoPlayerEngine);
+    fVideoPlayerEngine := LVideoPlayerEngine;
+  end;
+  FInternalState := vpsIdle;
 end;
 
 {***********************************************}
@@ -4203,7 +4180,7 @@ begin
     if (M is TApplicationEventMessage) then begin
       case (M as TApplicationEventMessage).Value.Event of
         TApplicationEvent.EnteredBackground,
-        TApplicationEvent.WillTerminate: Pause;
+        TApplicationEvent.WillTerminate: Stop;
       end;
     end;
   end;
@@ -4216,7 +4193,7 @@ begin
   If FAutoStartMode = TAutoStartMode.WhenDisplayed then begin
     // If less than 20% of the surface is visible, then pause this video.
     If (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.2, TEpsilon.position) <= 0) then
-      Pause;
+      Stop;
   end;
 
   if not LAbsoluteDisplayedRect.IsEmpty then
@@ -4261,7 +4238,7 @@ begin
     If (AutoStartedVideoPlayerSurface <> nil) and
        (AutoStartedVideoPlayerSurface <> self) and
        (CompareValue(LAbsoluteDisplayedRect.Width * LAbsoluteDisplayedRect.Height, Width * Height * 0.8, TEpsilon.position) > 0) then begin
-      AutoStartedVideoPlayerSurface.Pause;
+      AutoStartedVideoPlayerSurface.Stop;
       Start;
       AutoStartedVideoPlayerSurface := Self;
     end

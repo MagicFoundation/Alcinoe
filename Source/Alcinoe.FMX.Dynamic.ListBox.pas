@@ -670,6 +670,7 @@ type
   protected
     function CreateMainView: TView;
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
+    procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure DoResized; override;
     procedure Paint; override;
     property HasActiveScrollEngines: Boolean read GetHasActiveScrollEngines;
@@ -4712,6 +4713,14 @@ end;
 function TALDynamicListBox.GetHasActiveScrollEngines: Boolean;
 begin
   Result := FActiveScrollEnginesCount > 0;
+end;
+
+{************************************************************}
+procedure TALDynamicListBox.AncestorVisibleChanged(const Visible: Boolean);
+begin
+  inherited;
+  if MainView <> nil then
+    MainView.AncestorVisibleChanged(Visible);
 end;
 
 {************************************}

@@ -264,6 +264,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure Assign(Source: TPersistent{TALControl}); override;
     function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
     procedure AlignToPixel; override;
@@ -1605,6 +1606,14 @@ begin
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{***********************************}
+procedure TALImage.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  CancelResourceDownload;
+  inherited;
 end;
 
 {*********************************************************}

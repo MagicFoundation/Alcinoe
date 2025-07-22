@@ -232,6 +232,7 @@ type
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     procedure Assign(Source: TALDynamicControl); override;
     function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;
     procedure AlignToPixel; override;
@@ -1438,6 +1439,14 @@ begin
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
   inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{******************************************}
+procedure TALDynamicImage.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  CancelResourceDownload;
+  inherited;
 end;
 
 {**********************************************************}

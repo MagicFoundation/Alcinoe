@@ -837,6 +837,9 @@ uses
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.Common;
 
+var
+  ALVideoPlayerEventLock: TLightweightMREW;
+
 {************************************}
 constructor TALBaseVideoPlayer.Create;
 begin
@@ -987,95 +990,111 @@ end;
 procedure TALAndroidVideoPlayer.TFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
 begin
 
-  {$IF defined(DEBUG)}
-  //ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.onFrameAvailable');
-  {$ENDIF}
-
-  // https://developer.android.com/reference/android/graphics/SurfaceTexture.html
-  // SurfaceTexture objects may be created on any thread. However, updateTexImage() may only be called on the
-  // thread with the OpenGL ES context that contains the texture object. The frame-available callback is
-  // called on an arbitrary thread, so unless special care is taken, updateTexImage() should not be called
-  // directly from the callback.
+  // The TALAndroidVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always executed on the main thread (since the handler
+  // passed to setOnFrameAvailableListener is bound to the main looper).
   //
-  // Based on this, it appears that updateTexImage can be invoked from a thread other than the current thread.
-  // This operation seems to be thread safe—multithreaded OpenGL usage is already in place; however, since
-  // updateTexImage takes only about 1ms, there is little advantage in running it on a different thread than
-  // the main thread (which already holds the OpenGL ES context).
+  // This creates a potential race condition: `Destroy` could be executing in parallel
+  // with this callback, leading to access of a half-freed object.
   //
-  // NOTE: Since setOnFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener listener, Handler handler)
-  // is called with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()), this event will always be
-  // dispatched on the main UI thread.
+  // To guard against that, we acquire a read lock here. The `Destroy` method must
+  // acquire a write lock to ensure exclusive access before releasing resources.
+  ALVideoPlayerEventLock.BeginRead;
+  try
 
-  //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
-  if fVideoPlayerEngine = nil then begin
-    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.onFrameAvailable', 'fVideoPlayerEngine = nil', TALLogType.warn);
-    exit;
-  end;
+    {$IF defined(DEBUG)}
+    //ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.onFrameAvailable');
+    {$ENDIF}
 
-  fVideoPlayerEngine.fSurfaceTexture.updateTexImage;
+    // https://developer.android.com/reference/android/graphics/SurfaceTexture.html
+    // SurfaceTexture objects may be created on any thread. However, updateTexImage() may only be called on the
+    // thread with the OpenGL ES context that contains the texture object. The frame-available callback is
+    // called on an arbitrary thread, so unless special care is taken, updateTexImage() should not be called
+    // directly from the callback.
+    //
+    // Based on this, it appears that updateTexImage can be invoked from a thread other than the current thread.
+    // This operation seems to be thread safe—multithreaded OpenGL usage is already in place; however, since
+    // updateTexImage takes only about 1ms, there is little advantage in running it on a different thread than
+    // the main thread (which already holds the OpenGL ES context).
+    //
+    // NOTE: Since setOnFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener listener, Handler handler)
+    // is called with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()), this event will always be
+    // dispatched on the main UI thread.
 
-  {$IF defined(ALSkiaCanvas)}
-  if GlobalUseVulkan then begin
-    // not yet supported
-    // https://stackoverflow.com/questions/78854486/how-to-create-a-vulkan-vkimage-from-an-android-surfacetexture-bound-to-exoplayer
-  end
-  else begin
-    if (fVideoPlayerEngine.fGrBackEndTexture = 0) or
-       (gr4d_backendtexture_get_width(fVideoPlayerEngine.fGrBackEndTexture) <> fVideoPlayerEngine.fVideoWidth) or
-       (gr4d_backendtexture_get_height(fVideoPlayerEngine.fGrBackEndTexture) <> fVideoPlayerEngine.fVideoHeight) then begin
-      if fVideoPlayerEngine.fGrBackEndTexture <> 0 then
-        gr4d_backendtexture_destroy(fVideoPlayerEngine.fGrBackEndTexture);
-      var LGLTextureinfo: gr_gl_textureinfo_t;
-      LGLTextureinfo.target := GL_TEXTURE_EXTERNAL_OES;
-      LGLTextureinfo.id := fVideoPlayerEngine.FTexture.Handle;
-      LGLTextureinfo.format := GL_RGBA8_OES;
-      fVideoPlayerEngine.fGrBackEndTexture := ALSkCheckHandle(
-                                                gr4d_backendtexture_create_gl(
-                                                  fVideoPlayerEngine.fVideoWidth, // width,
-                                                  fVideoPlayerEngine.fVideoHeight, // height: int32_t;
-                                                  false, // is_mipmapped: _bool;
-                                                  @LGLTextureinfo)); // const texture_info: pgr_gl_textureinfo_t
+    //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.onFrameAvailable', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
     end;
-    var LImageInfo := ALGetSkImageinfo(0, 0);
-    ALFreeAndNilDrawable(fVideoPlayerEngine.fDrawable);
-    fVideoPlayerEngine.fDrawable := sk4d_image_make_from_texture(
-                                      TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
-                                      fVideoPlayerEngine.fGrBackEndTexture, // const texture: gr_backendtexture_t;
-                                      gr_surfaceorigin_t.TOP_LEFT_GR_SURFACEORIGIN, // origin: gr_surfaceorigin_t;
-                                      LImageInfo.color_type, // color_type: sk_colortype_t;
-                                      LImageInfo.alpha_type, //: sk_alphatype_t;
-                                      LImageInfo.color_space, // color_space: sk_colorspace_t): sk_image_t; cdecl;
-                                      nil, // proc: sk_image_texture_release_proc;
-                                      nil); // proc_context: Pointer
+
+    fVideoPlayerEngine.fSurfaceTexture.updateTexImage;
+
+    {$IF defined(ALSkiaCanvas)}
+    if GlobalUseVulkan then begin
+      // not yet supported
+      // https://stackoverflow.com/questions/78854486/how-to-create-a-vulkan-vkimage-from-an-android-surfacetexture-bound-to-exoplayer
+    end
+    else begin
+      if (fVideoPlayerEngine.fGrBackEndTexture = 0) or
+         (gr4d_backendtexture_get_width(fVideoPlayerEngine.fGrBackEndTexture) <> fVideoPlayerEngine.fVideoWidth) or
+         (gr4d_backendtexture_get_height(fVideoPlayerEngine.fGrBackEndTexture) <> fVideoPlayerEngine.fVideoHeight) then begin
+        if fVideoPlayerEngine.fGrBackEndTexture <> 0 then
+          gr4d_backendtexture_destroy(fVideoPlayerEngine.fGrBackEndTexture);
+        var LGLTextureinfo: gr_gl_textureinfo_t;
+        LGLTextureinfo.target := GL_TEXTURE_EXTERNAL_OES;
+        LGLTextureinfo.id := fVideoPlayerEngine.FTexture.Handle;
+        LGLTextureinfo.format := GL_RGBA8_OES;
+        fVideoPlayerEngine.fGrBackEndTexture := ALSkCheckHandle(
+                                                  gr4d_backendtexture_create_gl(
+                                                    fVideoPlayerEngine.fVideoWidth, // width,
+                                                    fVideoPlayerEngine.fVideoHeight, // height: int32_t;
+                                                    false, // is_mipmapped: _bool;
+                                                    @LGLTextureinfo)); // const texture_info: pgr_gl_textureinfo_t
+      end;
+      var LImageInfo := ALGetSkImageinfo(0, 0);
+      ALFreeAndNilDrawable(fVideoPlayerEngine.fDrawable);
+      fVideoPlayerEngine.fDrawable := sk4d_image_make_from_texture(
+                                        TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
+                                        fVideoPlayerEngine.fGrBackEndTexture, // const texture: gr_backendtexture_t;
+                                        gr_surfaceorigin_t.TOP_LEFT_GR_SURFACEORIGIN, // origin: gr_surfaceorigin_t;
+                                        LImageInfo.color_type, // color_type: sk_colortype_t;
+                                        LImageInfo.alpha_type, //: sk_alphatype_t;
+                                        LImageInfo.color_space, // color_space: sk_colorspace_t): sk_image_t; cdecl;
+                                        nil, // proc: sk_image_texture_release_proc;
+                                        nil); // proc_context: Pointer
+      fVideoPlayerEngine.FDrawableReady := (fVideoPlayerEngine.fVideoWidth > 0) and
+                                           (fVideoPlayerEngine.fVideoHeight > 0);
+    end;
+    {$ELSE}
+    if (fVideoPlayerEngine.fDrawable.Width <> fVideoPlayerEngine.fVideoWidth) or
+       (fVideoPlayerEngine.fDrawable.Height <> fVideoPlayerEngine.fVideoHeight) then begin
+      {$IFNDEF ALCompilerVersionSupported123}
+        {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
+      {$ENDIF}
+      // we can't use setsize because it's will finalise the texture
+      // but with/height are used only in
+      // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
+      // begin
+      //   ...
+      //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
+      //   ...
+      //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
+      //   ...
+      // end
+      // so i don't need to finalize the texture !!
+      TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FWidth := fVideoPlayerEngine.fVideoWidth;
+      TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FHeight := fVideoPlayerEngine.fVideoHeight;
+    end;
     fVideoPlayerEngine.FDrawableReady := (fVideoPlayerEngine.fVideoWidth > 0) and
                                          (fVideoPlayerEngine.fVideoHeight > 0);
-  end;
-  {$ELSE}
-  if (fVideoPlayerEngine.fDrawable.Width <> fVideoPlayerEngine.fVideoWidth) or
-     (fVideoPlayerEngine.fDrawable.Height <> fVideoPlayerEngine.fVideoHeight) then begin
-    {$IFNDEF ALCompilerVersionSupported123}
-      {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
     {$ENDIF}
-    // we can't use setsize because it's will finalise the texture
-    // but with/height are used only in
-    // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
-    // begin
-    //   ...
-    //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
-    //   ...
-    //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
-    //   ...
-    // end
-    // so i don't need to finalize the texture !!
-    TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FWidth := fVideoPlayerEngine.fVideoWidth;
-    TALTextureAccessPrivate(fVideoPlayerEngine.fDrawable).FHeight := fVideoPlayerEngine.fVideoHeight;
-  end;
-  fVideoPlayerEngine.FDrawableReady := (fVideoPlayerEngine.fVideoWidth > 0) and
-                                       (fVideoPlayerEngine.fVideoHeight > 0);
-  {$ENDIF}
 
-  if assigned(fVideoPlayerEngine.fOnFrameAvailableEvent) then
-    fVideoPlayerEngine.fOnFrameAvailableEvent(fVideoPlayerEngine);
+    if assigned(fVideoPlayerEngine.fOnFrameAvailableEvent) then
+      fVideoPlayerEngine.fOnFrameAvailableEvent(fVideoPlayerEngine);
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
+  end;
 
 end;
 
@@ -1170,34 +1189,51 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlayerStateChanged(playWhenReady: boolean; playbackState: Integer);
 begin
 
-  //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
-  if fVideoPlayerEngine = nil then begin
-    ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerStateChanged', 'fVideoPlayerEngine = nil', TALLogType.warn);
-    exit;
+  // The TALAndroidVideoPlayer instance may be destroyed from a background thread,
+  // and this callback may also be invoked from a non-main thread — it executes on
+  // the same thread (Looper) that was used to create the ExoPlayer instance.
+  //
+  // This introduces a potential race condition: the player might be in the process
+  // of being destroyed while this callback accesses its members, leading to unsafe
+  // memory access.
+  //
+  // To prevent this, we acquire a read lock here. The Destroy method acquires a
+  // write lock to ensure exclusive access before freeing any shared resources.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerStateChanged', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    //int STATE_IDLE = 1;  => The player does not have any media to play.
+    //int STATE_BUFFERING = 2; => The player is not able to immediately play from its current position. This state typically occurs when more data needs to be loaded.
+    //int STATE_READY = 3; => The player is able to immediately play from its current position. The player will be playing if getPlayWhenReady() is true, and paused otherwise.
+    //int STATE_ENDED = 4; => The player has finished playing the media.
+
+    {$IF defined(DEBUG)}
+    //ALLog(
+    //  'TALAndroidVideoPlayer.TPlayerListener.onPlayerStateChanged',
+    //  'playWhenReady: ' + ALBoolToStrW(playWhenReady) + ' | ' +
+    //  'playbackState: ' + ALIntToStrW(playbackState));
+    {$ENDIF}
+
+    if (playbackState = TJPlayer.JavaClass.STATE_READY) and
+       (fVideoPlayerEngine.SetState(vpsPrepared, vpsPreparing)) and
+       (assigned(fVideoPlayerEngine.fOnPreparedEvent)) then begin
+      fVideoPlayerEngine.fOnPreparedEvent(fVideoPlayerEngine);
+      If fVideoPlayerEngine.FAutoStartWhenPrepared then fVideoPlayerEngine.start;
+    end;
+
+    if (playbackState = TJPlayer.JavaClass.STATE_ENDED) and
+       (fVideoPlayerEngine.SetState(vpsPlaybackCompleted, vpsStarted)) and
+        assigned(fVideoPlayerEngine.fOnCompletionEvent) then fVideoPlayerEngine.fOnCompletionEvent(fVideoPlayerEngine);
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
   end;
-
-  //int STATE_IDLE = 1;  => The player does not have any media to play.
-  //int STATE_BUFFERING = 2; => The player is not able to immediately play from its current position. This state typically occurs when more data needs to be loaded.
-  //int STATE_READY = 3; => The player is able to immediately play from its current position. The player will be playing if getPlayWhenReady() is true, and paused otherwise.
-  //int STATE_ENDED = 4; => The player has finished playing the media.
-
-  {$IF defined(DEBUG)}
-  //ALLog(
-  //  'TALAndroidVideoPlayer.TPlayerListener.onPlayerStateChanged',
-  //  'playWhenReady: ' + ALBoolToStrW(playWhenReady) + ' | ' +
-  //  'playbackState: ' + ALIntToStrW(playbackState));
-  {$ENDIF}
-
-  if (playbackState = TJPlayer.JavaClass.STATE_READY) and
-     (fVideoPlayerEngine.SetState(vpsPrepared, vpsPreparing)) and
-     (assigned(fVideoPlayerEngine.fOnPreparedEvent)) then begin
-    fVideoPlayerEngine.fOnPreparedEvent(fVideoPlayerEngine);
-    If fVideoPlayerEngine.FAutoStartWhenPrepared then fVideoPlayerEngine.start;
-  end;
-
-  if (playbackState = TJPlayer.JavaClass.STATE_ENDED) and
-     (fVideoPlayerEngine.SetState(vpsPlaybackCompleted, vpsStarted)) and
-      assigned(fVideoPlayerEngine.fOnCompletionEvent) then fVideoPlayerEngine.fOnCompletionEvent(fVideoPlayerEngine);
 
 end;
 
@@ -1253,18 +1289,34 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onPlayerError(error: JPlaybackException);
 begin
 
-  //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
-  if fVideoPlayerEngine = nil then begin
-    ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerError', 'fVideoPlayerEngine = nil', TALLogType.warn);
-    exit;
+  // The TALAndroidVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always executed on the main thread (since the handler
+  // passed to setOnFrameAvailableListener is bound to the main looper).
+  //
+  // This creates a potential race condition: `Destroy` could be executing in parallel
+  // with this callback, leading to access of a half-freed object.
+  //
+  // To guard against that, we acquire a read lock here. The `Destroy` method must
+  // acquire a write lock to ensure exclusive access before releasing resources.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerError', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    {$IF defined(DEBUG)}
+    ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerError', TalLogType.error);
+    {$ENDIF}
+
+    if fVideoPlayerEngine.SetState(vpsError) and
+       assigned(fVideoPlayerEngine.fOnErrorEvent) then fVideoPlayerEngine.fOnErrorEvent(fVideoPlayerEngine);
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
   end;
-
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerError', TalLogType.error);
-  {$ENDIF}
-
-  if fVideoPlayerEngine.SetState(vpsError) and
-     assigned(fVideoPlayerEngine.fOnErrorEvent) then fVideoPlayerEngine.fOnErrorEvent(fVideoPlayerEngine);
 
 end;
 
@@ -1376,23 +1428,39 @@ end;
 procedure TALAndroidVideoPlayer.TPlayerListener.onVideoSizeChanged(videoSize: JVideoSize);
 begin
 
-  //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
-  if fVideoPlayerEngine = nil then begin
-    ALLog('TALAndroidVideoPlayer.TPlayerListener.onVideoSizeChanged', 'fVideoPlayerEngine = nil', TALLogType.warn);
-    exit;
+  // The TALAndroidVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always executed on the main thread (since the handler
+  // passed to setOnFrameAvailableListener is bound to the main looper).
+  //
+  // This creates a potential race condition: `Destroy` could be executing in parallel
+  // with this callback, leading to access of a half-freed object.
+  //
+  // To guard against that, we acquire a read lock here. The `Destroy` method must
+  // acquire a write lock to ensure exclusive access before releasing resources.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALAndroidVideoPlayer.TPlayerListener.onVideoSizeChanged', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    {$IF defined(DEBUG)}
+    //ALLog(
+    //  'TALAndroidVideoPlayer.TPlayerListener.onVideoSizeChanged',
+    //  'width: ' + ALIntToStrW(videoSize.width) + ' | ' +
+    //  'height: ' + ALIntToStrW(videoSize.height));
+    {$ENDIF}
+
+    fVideoPlayerEngine.FVideoWidth := videoSize.width;
+    fVideoPlayerEngine.fVideoHeight := videoSize.height;
+    if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
+      fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, videoSize.width, videoSize.height);
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
   end;
-
-  {$IF defined(DEBUG)}
-  //ALLog(
-  //  'TALAndroidVideoPlayer.TPlayerListener.onVideoSizeChanged',
-  //  'width: ' + ALIntToStrW(videoSize.width) + ' | ' +
-  //  'height: ' + ALIntToStrW(videoSize.height));
-  {$ENDIF}
-
-  fVideoPlayerEngine.FVideoWidth := videoSize.width;
-  fVideoPlayerEngine.fVideoHeight := videoSize.height;
-  if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
-    fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, videoSize.width, videoSize.height);
 
 end;
 
@@ -1484,9 +1552,14 @@ destructor TALAndroidVideoPlayer.Destroy;
 begin
   fExoPlayer.stop;
   //--
-  //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
-  fOnFrameAvailableListener.FVideoPlayerEngine := nil;
-  FPlayerListener.FVideoPlayerEngine := nil;
+  ALVideoPlayerEventLock.BeginWrite;
+  try
+    //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
+    fOnFrameAvailableListener.FVideoPlayerEngine := nil;
+    FPlayerListener.FVideoPlayerEngine := nil;
+  finally
+    ALVideoPlayerEventLock.endWrite;
+  end;
   fSurfaceTexture.setOnFrameAvailableListener(nil);
   fExoPlayer.removeListener(FPlayerListener);
   //--
@@ -1708,10 +1781,37 @@ end;
 {******************************************************************}
 procedure TALIOSVideoPlayer.TDisplayLinkListener.displayLinkUpdated;
 begin
-  {$IFDEF DEBUG}
-  //ALLog('TALIOSVideoPlayer.TDisplayLinkListener.displayLinkUpdated');
-  {$ENDIF}
-  fVideoPlayerEngine.DoOnFrameRefresh;
+
+  // The TALIOSVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always invoked on the main thread.
+  //
+  // This introduces a potential race condition: the object might be partially
+  // destroyed while this method is still executing, leading to unsafe access.
+  //
+  // To prevent that, we acquire a read lock here. The Destroy method must acquire
+  // a write lock to ensure exclusive access before releasing resources.
+  //
+  // This mirrors the same protective mechanism used on Android. In practice,
+  // iOS may already internally synchronize access (as we’ve never observed
+  // a concurrent destroy during this callback), but applying the lock here
+  // is inexpensive and adds an extra layer of safety.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALIOSVideoPlayer.TDisplayLinkListener.displayLinkUpdated', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    {$IFDEF DEBUG}
+    //ALLog('TALIOSVideoPlayer.TDisplayLinkListener.displayLinkUpdated');
+    {$ENDIF}
+    fVideoPlayerEngine.DoOnFrameRefresh;
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
+  end;
+
 end;
 
 {****************************************************************************}
@@ -1730,25 +1830,52 @@ end;
 {********************************************************************************************************************************************}
 procedure TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer);
 begin
-  var LkeyPath := NSStrToStr(keyPath);
-  if LkeyPath = 'presentationSize' then begin
-    var LNewSizeValue := iOSapi.UIKit.TNSValue.Wrap(change.objectForKey((NSKeyValueChangeNewKey as ILocalObject).GetObjectID)).CGSizeValue;
-    {$IF defined(DEBUG)}
-    //ALLog(
-    //  'TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath',
-    //  'presentationSize | ' +
-    //  'width: ' + ALFloatToStrW(LNewSizeValue.width) + ' | ' +
-    //  'height: ' + ALFloatToStrW(LNewSizeValue.height));
-    {$ENDIF}
-    if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
-      fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, round(LNewSizeValue.width), round(LNewSizeValue.height));
-  end
-  else if LkeyPath = 'status' then begin
-    {$IF defined(DEBUG)}
-    //ALLog('TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath', 'status');
-    {$ENDIF}
-    fVideoPlayerEngine.DoOnReady;
+
+  // The TALIOSVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always invoked on the main thread.
+  //
+  // This introduces a potential race condition: the object might be partially
+  // destroyed while this method is still executing, leading to unsafe access.
+  //
+  // To prevent that, we acquire a read lock here. The Destroy method must acquire
+  // a write lock to ensure exclusive access before releasing resources.
+  //
+  // This mirrors the same protective mechanism used on Android. In practice,
+  // iOS may already internally synchronize access (as we’ve never observed
+  // a concurrent destroy during this callback), but applying the lock here
+  // is inexpensive and adds an extra layer of safety.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    var LkeyPath := NSStrToStr(keyPath);
+    if LkeyPath = 'presentationSize' then begin
+      var LNewSizeValue := iOSapi.UIKit.TNSValue.Wrap(change.objectForKey((NSKeyValueChangeNewKey as ILocalObject).GetObjectID)).CGSizeValue;
+      {$IF defined(DEBUG)}
+      //ALLog(
+      //  'TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath',
+      //  'presentationSize | ' +
+      //  'width: ' + ALFloatToStrW(LNewSizeValue.width) + ' | ' +
+      //  'height: ' + ALFloatToStrW(LNewSizeValue.height));
+      {$ENDIF}
+      if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
+        fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, round(LNewSizeValue.width), round(LNewSizeValue.height));
+    end
+    else if LkeyPath = 'status' then begin
+      {$IF defined(DEBUG)}
+      //ALLog('TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath', 'status');
+      {$ENDIF}
+      fVideoPlayerEngine.DoOnReady;
+    end;
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
   end;
+
 end;
 
 {*******************************************************************************************************}
@@ -1762,10 +1889,37 @@ end;
 //Posted when the item has played to its end time.
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemDidPlayToEndTime;
 begin
-  {$IF defined(DEBUG)}
-  //allog('TALIOSVideoPlayer.ItemDidPlayToEndTime');
-  {$ENDIF}
-  fVideoPlayerEngine.DoOnItemDidPlayToEndTime;
+
+  // The TALIOSVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always invoked on the main thread.
+  //
+  // This introduces a potential race condition: the object might be partially
+  // destroyed while this method is still executing, leading to unsafe access.
+  //
+  // To prevent that, we acquire a read lock here. The Destroy method must acquire
+  // a write lock to ensure exclusive access before releasing resources.
+  //
+  // This mirrors the same protective mechanism used on Android. In practice,
+  // iOS may already internally synchronize access (as we’ve never observed
+  // a concurrent destroy during this callback), but applying the lock here
+  // is inexpensive and adds an extra layer of safety.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALIOSVideoPlayer.TNotificationsDelegate.ItemDidPlayToEndTime', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    {$IF defined(DEBUG)}
+    //allog('TALIOSVideoPlayer.ItemDidPlayToEndTime');
+    {$ENDIF}
+    fVideoPlayerEngine.DoOnItemDidPlayToEndTime;
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
+  end;
+
 end;
 
 {****************************************************}
@@ -1774,10 +1928,37 @@ end;
 //the problem—see AVPlayerItemFailedToPlayToEndTimeErrorKey.
 procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemFailedToPlayToEndTime;
 begin
-  {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.ItemFailedToPlayToEndTime', TALLogType.Error);
-  {$ENDIF}
-  fVideoPlayerEngine.DoOnItemFailedToPlayToEndTime;
+
+  // The TALIOSVideoPlayer instance may be destroyed from a background thread,
+  // while this callback is always invoked on the main thread.
+  //
+  // This introduces a potential race condition: the object might be partially
+  // destroyed while this method is still executing, leading to unsafe access.
+  //
+  // To prevent that, we acquire a read lock here. The Destroy method must acquire
+  // a write lock to ensure exclusive access before releasing resources.
+  //
+  // This mirrors the same protective mechanism used on Android. In practice,
+  // iOS may already internally synchronize access (as we’ve never observed
+  // a concurrent destroy during this callback), but applying the lock here
+  // is inexpensive and adds an extra layer of safety.
+  ALVideoPlayerEventLock.BeginRead;
+  try
+
+    if fVideoPlayerEngine = nil then begin
+      ALLog('TALIOSVideoPlayer.TNotificationsDelegate.ItemFailedToPlayToEndTime', 'fVideoPlayerEngine = nil', TALLogType.warn);
+      exit;
+    end;
+
+    {$IF defined(DEBUG)}
+    allog('TALIOSVideoPlayer.ItemFailedToPlayToEndTime', TALLogType.Error);
+    {$ENDIF}
+    fVideoPlayerEngine.DoOnItemFailedToPlayToEndTime;
+
+  finally
+    ALVideoPlayerEventLock.EndRead;
+  end;
+
 end;
 
 {****************************************************************}
@@ -1915,6 +2096,17 @@ end;
 {***********************************}
 destructor TALIOSVideoPlayer.Destroy;
 begin
+  ALVideoPlayerEventLock.BeginWrite;
+  try
+    fDisplayLinkListener.FVideoPlayerEngine := nil;
+    if FNotificationsDelegate <> nil then
+      FNotificationsDelegate.FVideoPlayerEngine := nil;
+    if FKVODelegate <> nil then
+      FKVODelegate.FVideoPlayerEngine := nil;
+  finally
+    ALVideoPlayerEventLock.endWrite;
+  end;
+  //--
   // Removes the display link from all run loop modes.
   // Removing the display link from all run loop modes causes it to be released by the run loop. The display link also releases the target.
   // invalidate is thread safe meaning that it can be called from a thread separate to the one in which the display link is running.
@@ -3459,11 +3651,13 @@ end;
 procedure TALVideoPlayerSurface.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
+  if AutoStartedVideoPlayerSurface = self then AutoStartedVideoPlayerSurface := nil;
   // Unsubscribe from TALScrollCapturedMessage to stop receiving messages.
   // This must be done in BeforeDestruction rather than in Destroy,
   // because the control might be freed in the background via ALFreeAndNil(..., delayed),
   // and BeforeDestruction is guaranteed to execute on the main thread.
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  CancelPreviewDownload;
   ALFreeAndNil(fVideoPlayerEngine);
   inherited;
 end;
@@ -4453,6 +4647,7 @@ initialization
   TALVideoPlayerControllerThread.FInstance := nil;
   TALVideoPlayerControllerThread.CreateInstanceFunc := @TALVideoPlayerControllerThread.CreateInstance;
   TALVideoPlayerSurface.AutoStartedVideoPlayerSurface := Nil;
+  //ALVideoPlayerEventLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}

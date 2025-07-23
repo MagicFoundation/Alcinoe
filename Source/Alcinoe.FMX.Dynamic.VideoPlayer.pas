@@ -803,7 +803,7 @@ begin
       FPreviewDownloadContext.FOwner := nil;
       FPreviewDownloadContext := nil;
     Finally
-      ALMonitorExit(LLock);
+      ALMonitorExit(LLock{$IF defined(DEBUG)}, 'TALDynamicVideoPlayerSurface.CancelPreviewDownload'{$ENDIF});
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -845,7 +845,7 @@ begin
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    ALMonitorExit(LContext.FLock);
+    ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicVideoPlayerSurface.HandlePreviewDownloadError (1)'{$ENDIF});
   end;
   exit;
   {$ENDIF}
@@ -862,7 +862,7 @@ begin
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      ALMonitorExit(LContext.FLock);
+      ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicVideoPlayerSurface.HandlePreviewDownloadError (2)'{$ENDIF});
     end;
     exit;
   end;

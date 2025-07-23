@@ -218,7 +218,7 @@ end;
 {*******************************************************}
 function TALIosNativeView.CaptureScreenshot: TALDrawable;
 begin
-  UIGraphicsBeginImageContextWithOptions(View.bounds.size, View.isOpaque, 0{scale});
+  UIGraphicsBeginImageContextWithOptions(View.bounds.size, False{opaque}, 0{scale});
   try
     View.drawViewHierarchyInRectAfterScreenUpdates(View.bounds, False{afterUpdates});
     var LUIImage := TUIImage.Wrap(UIGraphicsGetImageFromCurrentImageContext);

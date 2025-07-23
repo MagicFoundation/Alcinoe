@@ -1341,7 +1341,7 @@ begin
         if (fQueue.Count > 0) then LProc := fQueue.Dequeue()
         else LProc := nil;
       finally
-        ALMonitorExit(fQueue);
+        ALMonitorExit(fQueue{$IF defined(DEBUG)}, 'TALiOSWebRTC.Execute'{$ENDIF});
       end;
       if assigned(LProc) then begin
         LProc();
@@ -1448,7 +1448,7 @@ begin
   try
     fQueue.Enqueue(aProc);
   finally
-    ALMonitorExit(fQueue);
+    ALMonitorExit(fQueue{$IF defined(DEBUG)}, 'TALiOSWebRTC.Enqueue'{$ENDIF});
   end;
   fSignal.SetEvent;
 end;

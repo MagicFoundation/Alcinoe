@@ -1416,7 +1416,7 @@ begin
           AContext := nil; // AContext will be free by CancelResourceDownload
         end;
       finally
-        ALMonitorExit(LContext.FLock);
+        ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProc'{$ENDIF});
       end;
     end;
   end;
@@ -1484,7 +1484,7 @@ begin
               (LOwner.Host = nil) or
               (not LOwner.Host.HasActiveScrollEngines);
   finally
-    ALMonitorExit(AContext.FLock);
+    ALMonitorExit(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProcCanProcessData'{$ENDIF});
   end;
 end;
 
@@ -1552,7 +1552,7 @@ begin
       FDownloadDataContext.FOwner := nil;
       FDownloadDataContext := nil;
     Finally
-      ALMonitorExit(LLock);
+      ALMonitorExit(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelDownloadData'{$ENDIF});
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -1591,7 +1591,7 @@ begin
     if AContext.FOwner = nil then Exit(nil);
     Result := TCreateContentEvent(LMethod)(AContext);
   finally
-    ALMonitorExit(AContext.FLock);
+    ALMonitorExit(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CreateContent'{$ENDIF});
   End;
   //--
   // We must not allow CreateContent to return nil, because if we do,
@@ -1677,7 +1677,7 @@ begin
           AContext := nil; // AContext will be free by CancelPreloadContent
         end;
       finally
-        ALMonitorExit(LContext.FLock);
+        ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DoPreloadContent'{$ENDIF});
       end;
     end;
   end;
@@ -1726,7 +1726,7 @@ begin
       FContentBuilderContext.FOwner := nil;
       FContentBuilderContext := nil;
     Finally
-      ALMonitorExit(LLock);
+      ALMonitorExit(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelPreloadContent'{$ENDIF});
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -3697,7 +3697,7 @@ end;
 {**********************************************}
 procedure TALDynamicListBox.TView.UnLockItemIds;
 begin
-  ALMonitorExit(FUniqueInt64ItemIds);
+  ALMonitorExit(FUniqueInt64ItemIds{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.LockItemIds'{$ENDIF});
 end;
 
 {*******************************************************************************************}
@@ -4051,7 +4051,7 @@ begin
           AContext := nil; // AContext will be free by CancelDownloadItems
         end;
       finally
-        ALMonitorExit(LContext.FLock);
+        ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProc'{$ENDIF});
       end;
     end;
   end;
@@ -4189,7 +4189,7 @@ begin
     end;
 
   finally
-    ALMonitorExit(AContext.FLock);
+    ALMonitorExit(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProcCreateItems'{$ENDIF});
   end;
 end;
 
@@ -4208,7 +4208,7 @@ begin
               ((not LOwner.IsPreloadingContent) and
                (not LOwner.Host.HasActiveScrollEngines));
   finally
-    ALMonitorExit(AContext.FLock);
+    ALMonitorExit(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProcCanProcessItems'{$ENDIF});
   end;
 end;
 
@@ -4306,7 +4306,7 @@ begin
       FDownloadItemsContext.FOwner := nil;
       FDownloadItemsContext := nil;
     Finally
-      ALMonitorExit(LLock);
+      ALMonitorExit(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.CancelDownloadItems'{$ENDIF});
     End;
     ALFreeAndNil(LContextToFree);
   end;

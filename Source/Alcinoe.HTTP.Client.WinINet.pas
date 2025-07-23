@@ -253,7 +253,7 @@ begin
     end
     else result := ALCreateWininetHTTPClient;
   finally
-    ALMonitorExit(_ALWininetHTTPClientKeepAlives);
+    ALMonitorExit(_ALWininetHTTPClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWininetHTTPClient'{$ENDIF});
   end;
 end;
 
@@ -281,7 +281,7 @@ begin
       end;
     end;
   finally
-    ALMonitorExit(_ALWininetHTTPClientKeepAlives);
+    ALMonitorExit(_ALWininetHTTPClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWininetHTTPClient'{$ENDIF});
   end;
 end;
 
@@ -292,7 +292,7 @@ begin
   try
     _ALWininetHTTPClientKeepAlives.Clear;
   finally
-    ALMonitorExit(_ALWininetHTTPClientKeepAlives);
+    ALMonitorExit(_ALWininetHTTPClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseAllKeepAliveWininetHTTPClients'{$ENDIF});
   end;
 end;
 

@@ -61,7 +61,7 @@ begin
     end
     else result := ALCreateNetHTTPClient;
   finally
-    ALMonitorExit(_ALNetHttpClientKeepAlives);
+    ALMonitorExit(_ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveNetHttpClient'{$ENDIF});
   end;
 end;
 
@@ -89,7 +89,7 @@ begin
       end;
     end;
   finally
-    ALMonitorExit(_ALNetHttpClientKeepAlives);
+    ALMonitorExit(_ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveNetHttpClient'{$ENDIF});
   end;
 end;
 
@@ -100,7 +100,7 @@ begin
   try
     _ALNetHttpClientKeepAlives.Clear;
   finally
-    ALMonitorExit(_ALNetHttpClientKeepAlives);
+    ALMonitorExit(_ALNetHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseAllKeepAliveNetHttpClients'{$ENDIF});
   end;
 end;
 

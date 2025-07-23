@@ -6557,7 +6557,7 @@ begin
       if _RenderScript = nil then
         _RenderScript := TJRenderScript.JavaClass.create(TandroidHelper.Context);
     finally
-      ALMonitorExit(Application);
+      ALMonitorExit(Application{$IF defined(DEBUG)}, 'getRenderScript'{$ENDIF});
     end;
   end;
   result := _RenderScript;

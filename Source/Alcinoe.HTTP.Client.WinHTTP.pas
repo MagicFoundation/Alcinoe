@@ -255,7 +255,7 @@ begin
     end
     else result := ALCreateWinHttpClient;
   finally
-    ALMonitorExit(_ALWinHttpClientKeepAlives);
+    ALMonitorExit(_ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALAcquireKeepAliveWinHttpClient'{$ENDIF});
   end;
 end;
 
@@ -283,7 +283,7 @@ begin
       end;
     end;
   finally
-    ALMonitorExit(_ALWinHttpClientKeepAlives);
+    ALMonitorExit(_ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseKeepAliveWinHttpClient'{$ENDIF});
   end;
 end;
 
@@ -294,7 +294,7 @@ begin
   try
     _ALWinHttpClientKeepAlives.Clear;
   finally
-    ALMonitorExit(_ALWinHttpClientKeepAlives);
+    ALMonitorExit(_ALWinHttpClientKeepAlives{$IF defined(DEBUG)}, 'ALReleaseAllKeepAliveWinHttpClients'{$ENDIF});
   end;
 end;
 

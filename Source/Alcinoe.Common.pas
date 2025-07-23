@@ -731,7 +731,7 @@ Function ALInc(var x: integer; Count: integer): Integer;
 procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
 procedure ALMove(const Source; var Dest; Count: NativeInt); inline;
 procedure ALMonitorEnter(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF}); inline;
-procedure ALMonitorExit(const AObject: TObject); inline;
+procedure ALMonitorExit(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF}); inline;
 {$IFDEF MSWINDOWS}
 type
   TALConsoleColor = (
@@ -3638,6 +3638,7 @@ end;
 procedure ALMonitorEnter(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF});
 begin
   {$IF defined(DEBUG)}
+  //ALLog('ALMonitorEnter', ATag, TALLogType.verbose);
   if not TMonitor.Enter(AObject, 1{Timeout}) then begin
     ALLog(ATag, 'Lock contention detected', TALLogType.WARN);
     TMonitor.Enter(AObject);
@@ -3647,9 +3648,12 @@ begin
   {$ENDIF}
 end;
 
-{**********************************************}
-procedure ALMonitorExit(const AObject: TObject);
+{****************************************************************************************************}
+procedure ALMonitorExit(const AObject: TObject {$IF defined(DEBUG)}; const ATag: string = ''{$ENDIF});
 begin
+  {$IF defined(DEBUG)}
+  //ALLog('ALMonitorExit', ATag, TALLogType.verbose);
+  {$ENDIF}
   TMonitor.Exit(AObject);
 end;
 

@@ -339,7 +339,7 @@ begin
     fFreeObjectsCurrList := fFreeObjectsEmptyList;
     fFreeObjectsEmptyList := LFreeObjectsWorkList;
   finally
-    ALMonitorExit(FFreeObjectsLock);
+    ALMonitorExit(FFreeObjectsLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeObjects'{$ENDIF});
   end;
 
   // Iterate through the objects in reverse order and free them
@@ -424,7 +424,7 @@ begin
       {$ENDIF}
       aObject := nil;
     finally
-      ALMonitorExit(FFreeObjectsLock);
+      ALMonitorExit(FFreeObjectsLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeObject'{$ENDIF});
     end;
 
     // Signal the event
@@ -447,7 +447,7 @@ begin
     fFreeDrawablesCurrList := fFreeDrawablesEmptyList;
     fFreeDrawablesEmptyList := LFreeDrawablesWorkList;
   finally
-    ALMonitorExit(FFreeDrawablesLock);
+    ALMonitorExit(FFreeDrawablesLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeDrawables'{$ENDIF});
   end;
 
   // Iterate through the drawables in reverse order and free them
@@ -485,7 +485,7 @@ begin
       fFreeDrawablesCurrList.Add(aDrawable);
       aDrawable := ALNullDrawable;
     finally
-      ALMonitorExit(FFreeDrawablesLock);
+      ALMonitorExit(FFreeDrawablesLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeDrawable'{$ENDIF});
     end;
 
     // Signal the event
@@ -508,7 +508,7 @@ begin
     fFreeBitmapsCurrList := fFreeBitmapsEmptyList;
     fFreeBitmapsEmptyList := LFreeBitmapsWorkList;
   finally
-    ALMonitorExit(FFreeBitmapsLock);
+    ALMonitorExit(FFreeBitmapsLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeBitmaps'{$ENDIF});
   end;
 
   // Iterate through the bitmaps in reverse order and free them
@@ -546,7 +546,7 @@ begin
       fFreeBitmapsCurrList.Add(aBitmap);
       aBitmap := ALNullBitmap;
     finally
-      ALMonitorExit(FFreeBitmapsLock);
+      ALMonitorExit(FFreeBitmapsLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeBitmap'{$ENDIF});
     end;
 
     // Signal the event
@@ -566,7 +566,7 @@ begin
         FreeObject(LRefCountObject);
       end;
   finally
-    ALMonitorExit(FRefCountObjectsList);
+    ALMonitorExit(FRefCountObjectsList{$IF defined(DEBUG)}, 'TALGuardianThread.PurgeRefCountObjectsList'{$ENDIF});
   end;
 end;
 
@@ -577,7 +577,7 @@ begin
   try
     fRefCountObjectsList.Add(ARefCountObject);
   finally
-    ALMonitorExit(FRefCountObjectsList);
+    ALMonitorExit(FRefCountObjectsList{$IF defined(DEBUG)}, 'TALGuardianThread.AddRefCountObject'{$ENDIF});
   end;
 end;
 

@@ -5366,7 +5366,7 @@ begin
     end;
 
   finally
-    ALMonitorExit(_GoogleOAuth2AccessTokens);
+    ALMonitorExit(_GoogleOAuth2AccessTokens{$IF defined(DEBUG)}, 'ALGenerateGoogleOAuth2AccessToken'{$ENDIF});
   end;
 
 end;

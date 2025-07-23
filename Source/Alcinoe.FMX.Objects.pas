@@ -2157,7 +2157,7 @@ begin
       FResourceDownloadContext.FOwner := nil;
       FResourceDownloadContext := nil;
     Finally
-      ALMonitorExit(LLock);
+      ALMonitorExit(LLock{$IF defined(DEBUG)}, 'TALImage.CancelResourceDownload'{$ENDIF});
     End;
     ALFreeAndNil(LContextToFree);
   end;
@@ -2199,7 +2199,7 @@ begin
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
-    ALMonitorExit(LContext.FLock);
+    ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALImage.HandleResourceDownloadError (1)'{$ENDIF});
   end;
   exit;
   {$ENDIF}
@@ -2216,7 +2216,7 @@ begin
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally
-      ALMonitorExit(LContext.FLock);
+      ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALImage.HandleResourceDownloadError (2)'{$ENDIF});
     end;
     exit;
   end;

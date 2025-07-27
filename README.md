@@ -474,6 +474,25 @@ Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/t
 <br/>
 
 
+Create Versatile Sheets with TALSheet
+=====================================
+
+**TALSheet** is a flexible sheet component designed for 
+mobile applications. It can appear from the top, bottom, 
+left, or right edge of the screen. Following modern 
+Material 3 design guidelines, TALSheet is perfect for 
+presenting contextual content, navigation panels, or 
+action menus with smooth, customizable animations.
+
+<p>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3bottomsheet.png?raw=true" alt="bottom sheet" width="380" style="width:380px;" />
+</p>
+
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
+<br/>
+<br/>
+
+
 Video Player for FireMonkey
 ===========================
 

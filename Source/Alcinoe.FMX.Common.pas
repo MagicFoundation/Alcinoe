@@ -23,7 +23,6 @@ uses
   iOSapi.CoreText,
   IOSApi.UIKit,
   Macapi.ObjectiveC,
-  FMX.Forms,
   FMX.Platform.iOS,
   FMX.MultiTouch.iOS,
   {$ENDIF}
@@ -35,6 +34,7 @@ uses
   {$IF defined(ALSkiaEngine)}
   System.Skia.API,
   {$ENDIF}
+  FMX.forms,
   Fmx.types3D,
   Fmx.types,
   FMX.TextLayout,
@@ -1406,9 +1406,6 @@ uses
   {$IF defined(ALBackwardCompatible)}
   System.TypInfo,
   {$ENDIF}
-  {$IF defined(DEBUG)}
-  FMX.forms,
-  {$ENDIF}
   FMX.Utils,
   Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
@@ -1419,7 +1416,6 @@ uses
   Androidapi.JNIBridge,
   Androidapi.Helpers,
   Androidapi.JNI.App,
-  FMX.forms,
   Alcinoe.Androidapi.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(ALMacOS)}

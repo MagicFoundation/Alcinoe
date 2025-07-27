@@ -485,7 +485,7 @@ presenting contextual content, navigation panels, or
 action menus with smooth, customizable animations.
 
 <p>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3bottomsheet.png?raw=true" alt="bottom sheet" width="380" style="width:380px;" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3bottomsheet.png?raw=true" alt="bottom sheet" width="580" style="width:580px;" />
 </p>
 
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 

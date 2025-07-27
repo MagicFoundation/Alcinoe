@@ -5175,12 +5175,43 @@ Index: Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas
 diff --git a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas
 --- a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
-@@ -218,8 +218,15 @@
+@@ -22,7 +22,8 @@
+   TKeyboardStateChangedListener = class(TJavaLocal, JOnKeyboardStateChangedListener)
+   private
+     [Weak] FKeyboardService: TAndroidVirtualKeyboard;
+-    FNeedNotifyAboutFrameChanges: Boolean;
++    // https://quality.embarcadero.com/browse/RSP-24737
++    //FNeedNotifyAboutFrameChanges: Boolean;
+     FPreviousVKRect: TRect;
+   public
+     constructor Create(const AService: TAndroidVirtualKeyboard);
+@@ -201,14 +202,16 @@
+ begin
+   inherited Create;
+   FKeyboardService := AService;
+-  FNeedNotifyAboutFrameChanges := False;
++  // https://quality.embarcadero.com/browse/RSP-24737
++  //FNeedNotifyAboutFrameChanges := False;
+   FPreviousVKRect := TRect.Empty;
+ end;
+ 
+ procedure TKeyboardStateChangedListener.onVirtualKeyboardWillShown;
+ begin
+-  FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
+-                                  not (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
++  // https://quality.embarcadero.com/browse/RSP-24737
++  //FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
++  //                                not (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
+ end;
+ 
+ procedure TKeyboardStateChangedListener.onVirtualKeyboardFrameChanged(newFrame: JRect);
+@@ -218,20 +221,35 @@
    VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
    VKRect.BottomRight := ConvertPixelToPoint(TPointF.Create(newFrame.Right, newFrame.Bottom)).Round;
  
 -  if (FNeedNotifyAboutFrameChanges or ((MainActivity.getVirtualKeyboard.isVirtualKeyboardShown) and (VKRect.Height > 0)))
 -     and (FPreviousVKRect <> VKRect) then
+-    try
 +  // https://quality.embarcadero.com/browse/RSP-24737
 +  // I made the conclusion that the event onVirtualKeyboardWillHidden and onVirtualKeyboardWillShown
 +  // are inconsistent. often the onVirtualKeyboardWillHidden is not fired (for exemple when you
@@ -5189,7 +5220,31 @@ diff --git a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcader
 +  // is the fire to this function onVirtualKeyboardFrameChanged with good value for VKRect
 +  // So I decide to only take care of this event
 +
-+  if (FPreviousVKRect <> VKRect) then
-     try
++  if (FPreviousVKRect <> VKRect) then begin
        FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
        FPreviousVKRect := VKRect;
+-    finally
+-      FNeedNotifyAboutFrameChanges := False;
+     end;
+ end;
+ 
+ procedure TKeyboardStateChangedListener.onVirtualKeyboardWillHidden;
+ begin
+-  FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
+-                                  (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
++  // https://quality.embarcadero.com/browse/RSP-24737
++  //FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
++  //                                (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
++
++  // https://quality.embarcadero.com/browse/RSP-24737
++  // To synchronize our UI animation with the keyboard hide animation, we need
++  // to know precisely when the keyboard is about to be hidden so that we can
++  // start our animation at the same time.
++  var VKRect := TRect.Empty;
++  if (FPreviousVKRect <> VKRect) then begin
++    FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
++    FPreviousVKRect := VKRect;
++  end;
+ end;
+ 
+ end.

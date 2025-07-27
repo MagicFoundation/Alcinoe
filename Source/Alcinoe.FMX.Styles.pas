@@ -13379,7 +13379,7 @@ begin
   end;
 end;
 
-{************************************************************************************}
+{***********************************************************************************}
 //https://m3.material.io/components/Sheets/specs#8e0c5daf-d82a-4963-8759-94769997de9f
 procedure ALApplyMaterial3SheetManagerStyle(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
 begin
@@ -25506,7 +25506,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{**********************************************************************************************************************************************}
+{********************************************************************************************************************************************}
 constructor TALStyleManager.TSheetManagerStyleInfo.create(const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -25514,7 +25514,7 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{********************************************************************************************************************************}
+{******************************************************************************************************************************}
 constructor TALStyleManager.TSheetStyleInfo.create(const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
 begin
   SortOrder := TALStyleManager.GetNextSortOrder;
@@ -26989,13 +26989,13 @@ begin
   FDialogStyles.AddOrSetValue(AName, TDialogStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{*************************************************************************************************************************************************************}
+{***********************************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetSheetManagerStyle(const AName: String; const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FSheetManagerStyles.AddOrSetValue(AName, TSheetManagerStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
-{***********************************************************************************************************************************************}
+{*********************************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetSheetStyle(const AName: String; const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FSheetStyles.AddOrSetValue(AName, TSheetStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
@@ -27697,7 +27697,7 @@ begin
   {$ENDIF}
 end;
 
-{**************************************************************************************************************************************}
+{***********************************************************************************************************************************}
 procedure TALStyleManager.ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager; const AFontSize: Single);
 begin
   Var LApplySheetManagerStyleInfo: TSheetManagerStyleInfo;
@@ -27727,7 +27727,7 @@ begin
   {$ENDIF}
 end;
 
-{*************************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALStyleManager.ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager);
 begin
   {$IF defined(ALDPK)}
@@ -27740,7 +27740,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************************************************************************************}
+{**************************************************************************************************************}
 procedure TALStyleManager.ApplySheetStyle(const AName: String; const ASheet: TALSheet; const AFontSize: Single);
 begin
   Var LApplySheetStyleInfo: TSheetStyleInfo;
@@ -27762,7 +27762,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{*************************************************************************************}
 procedure TALStyleManager.ApplySheetStyle(const AName: String; const ASheet: TALSheet);
 begin
   {$IF defined(ALDPK)}
@@ -28425,7 +28425,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{******************************************************************}
+{*****************************************************************}
 function TALStyleManager.GetSheetManagerStyleNames: TArray<String>;
 begin
   var LArray := FSheetManagerStyles.ToArray;
@@ -28440,7 +28440,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{***********************************************************}
+{**********************************************************}
 function TALStyleManager.GetSheetStyleNames: TArray<String>;
 begin
   var LArray := FSheetStyles.ToArray;

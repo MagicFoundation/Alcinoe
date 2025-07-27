@@ -458,7 +458,7 @@ begin
   FVirtualKeyboardAnimation.Start;
 end;
 
-{************************************************************************}
+{*******************************************************************}
 procedure TALDialog.VirtualKeyboardAnimationProcess(Sender: TObject);
 begin
   margins.Bottom := FVirtualKeyboardAnimation.CurrentValue;
@@ -914,7 +914,7 @@ begin
     Result := nil;
 end;
 
-{***********************************************}
+{*****************************************************}
 procedure TALDialog.ActionButtonClick(Sender: TObject);
 begin
   var LCanClose: Boolean := True;

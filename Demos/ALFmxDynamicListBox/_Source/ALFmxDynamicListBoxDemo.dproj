@@ -1707,6 +1707,9 @@
     <JavaReference Include="Android\Merged\libs\r.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
+    <RcCompile Include="..\..\..\Source\Resources\AlcinoeResources.rc">
+      <Form>AlcinoeResources.res</Form>
+    </RcCompile>
     <RcCompile Include="Resources\Resources.rc">
       <Form>Resources.res</Form>
     </RcCompile>

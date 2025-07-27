@@ -1197,6 +1197,17 @@ undesired conversions.
 History
 =======
 
+### 27/07/2025 – New Components and Enhancements
+
+- Added **`TALLeftSheet`**, **`TALRightSheet`**, **`TALTopSheet`**, 
+  and **`TALBottomSheet`**.
+- Updated **`TALDialog`** to support right-to-left layouts (inherits 
+  the `BiDiMode` from the main application form).
+- Improved **`TALDialog`** with smooth upward animation when the 
+  virtual keyboard is displayed.
+- Renamed **`ALBrokenImageResourceName`** from `'broken_image'` to 
+  `'alcinoe_broken_image'`.
+
 #### 16/07/2025 – Z-Order Simulation for Native Controls
 
 - Added `TALWebBrowser`.

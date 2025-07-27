@@ -6635,7 +6635,7 @@ begin
   result := ALHasTouchScreen;
 end;
 
-{*****************************}
+{****************************}
 procedure ALInitFillTextFlags;
 begin
   if not ALFillTextFlagsInitialized then begin
@@ -6658,7 +6658,7 @@ begin
   end;
 end;
 
-{************************************}
+{******************************************}
 function ALGetFillTextFlags: TFillTextFlags;
 begin
   if not ALFillTextFlagsInitialized then

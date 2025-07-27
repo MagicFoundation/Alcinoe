@@ -669,6 +669,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, ' LocalRect;',' LocalRect.ReducePrecision;');
     aSrc := FindAndReplace(aSrc, '.LocalRect;','.LocalRect.ReducePrecision;');
     aSrc := FindAndReplace(aSrc, ' LocalRect'#13#10, 'LocalRect.ReducePrecision'#13#10);
+    aSrc := FindAndReplace(aSrc, 'function FillTextFlags: TFillTextFlags;','//**function FillTextFlags: TFillTextFlags;');
     aSrc := FindAndReplace(aSrc, 'Result := LPageViewClass.Create(Self);','Result := LPageViewClass.Create(nil);');
     aSrc := FindAndReplace(
               aSrc,
@@ -1155,6 +1156,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('.GetTabListClass: TTabListClass;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetTabStopController: ITabStopController;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.FillTextFlags: TFillTextFlags;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.DelayOnResize(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.DelayOnResized(Sender: TObject);', ALTrim(LSrcLine)) > 0) then begin
           While I <= LSrcLst.Count - 1 do begin

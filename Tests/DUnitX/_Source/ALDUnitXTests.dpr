@@ -177,6 +177,7 @@ uses
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.PageController,
+  Alcinoe.Fmx.Sheets,
   Alcinoe.FMX.Styles,
   Alcinoe.FMX.Types3D,
   Alcinoe.FMX.UserPreferences,

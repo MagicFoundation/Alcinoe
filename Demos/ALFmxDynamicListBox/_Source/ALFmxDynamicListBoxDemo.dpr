@@ -1,6 +1,7 @@
 program ALFmxDynamicListBoxDemo;
 
 {$R 'Resources.res' 'Resources\Resources.rc'}
+{$R 'AlcinoeResources.res' '..\..\..\Source\Resources\AlcinoeResources.rc'}
 
 {$I Alcinoe.inc}
 
@@ -8,10 +9,10 @@ uses
   System.StartUpCopy,
   {$IF defined(SKIA)}
   FMX.Skia,
-  {$ENDIF}
+  {$ENDIF }
   {$IF defined(ALAppleOS)}
   FMX.Context.Metal,
-  {$ENDIF}
+  {$ENDIF }
   FMX.Forms,
   FMX.Types,
   Main in 'Main.pas' {MainForm};

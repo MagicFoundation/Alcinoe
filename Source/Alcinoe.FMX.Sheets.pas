@@ -251,7 +251,7 @@ type
     constructor Create(const AOwner: TComponent); reintroduce; virtual;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRightSheet = class(TALHorizontalSheet)
   public
     type
@@ -368,7 +368,7 @@ begin
   FSheet.BeginUpdate;
 end;
 
-{************************************}
+{***********************************}
 destructor TALSheet.TBuilder.Destroy;
 begin
   ALFreeAndNil(FSheet);
@@ -389,21 +389,21 @@ begin
   Result := Self;
 end;
 
-{*****************************************************************************}
+{*******************************************************************************}
 function TALSheet.TBuilder.SetContainerCorners(const AValue: TCorners): TBuilder;
 begin
   FSheet.Container.Corners := AValue;
   Result := Self;
 end;
 
-{****************************************************************************************}
+{***************************************************************************************}
 function TALSheet.TBuilder.SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder;
 begin
   FSheet.OnActionRefProc := AValue;
   Result := Self;
 end;
 
-{****************************************************************************************}
+{***************************************************************************************}
 function TALSheet.TBuilder.SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder;
 begin
   FSheet.OnActionObjProc := AValue;
@@ -687,7 +687,7 @@ begin
 
 end;
 
-{************************************************}
+{***************************************}
 procedure TALSheet.TScrollEngine.DoStart;
 begin
   inherited DoStart;
@@ -696,7 +696,7 @@ begin
     FSheet.Scene.ChangeScrollingState(FSheet, True);
 end;
 
-{***********************************************}
+{**************************************}
 procedure TALSheet.TScrollEngine.DoStop;
 begin
   inherited DoStop;
@@ -705,7 +705,7 @@ begin
     FSheet.Scene.ChangeScrollingState(nil, False);
 end;
 
-{**************************************************}
+{*****************************************}
 procedure TALSheet.TScrollEngine.DoChanged;
 begin
 
@@ -867,14 +867,14 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
-{***********************************}
+{**************************}
 destructor TALSheet.Destroy;
 begin
   ALFreeAndNil(FScrollEngine);
   inherited;
 end;
 
-{********************************************}
+{***********************************}
 procedure TALSheet.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
@@ -887,19 +887,19 @@ begin
   inherited;
 end;
 
-{***********************************************************}
+{**************************************************}
 function TALSheet.CreateScrollEngine: TScrollEngine;
 begin
   Result := TScrollEngine.Create(Self);
 end;
 
-{**********************************************************}
+{*************************************************}
 function TALSheet.GetScrollEngine: TALScrollEngine;
 begin
   result := FScrollEngine;
 end;
 
-{************************************************************************}
+{***************************************************************}
 procedure TALSheet.SetScrollEngine(const Value: TALScrollEngine);
 begin
   FScrollEngine.Assign(Value);
@@ -978,7 +978,7 @@ begin
   TScrollEngine(ScrollEngine).DoChanged;
 end;
 
-{*************************************************************************************************}
+{****************************************************************************************}
 procedure TALSheet.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   if (Sender = self) then exit;
@@ -1000,7 +1000,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
+{*************}
 {$IFNDEF ALDPK}
 procedure TALSheet.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -1022,7 +1022,7 @@ begin
 end;
 {$ENDIF}
 
-{******************************************************************************}
+{*************}
 {$IFNDEF ALDPK}
 procedure TALSheet.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
@@ -1058,7 +1058,7 @@ begin
 end;
 {$ENDIF}
 
-{**************************************************************************************************}
+{*************}
 {$IFNDEF ALDPK}
 procedure TALSheet.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -1080,7 +1080,7 @@ begin
 end;
 {$ENDIF}
 
-{*********************************************}
+{*************}
 {$IFNDEF ALDPK}
 procedure TALSheet.internalMouseLeave;
 begin
@@ -1161,7 +1161,7 @@ begin
 end;
 {$ENDIF}
 
-{**************************}
+{*******************************}
 procedure TALSheet.PaintChildren;
 begin
   inherited;
@@ -1200,7 +1200,7 @@ begin
   end;
 end;
 
-{**********************************************************}
+{*************************************************************************************************}
 constructor TALVerticalSheet.Create(const AOwner: TComponent; const ADockEdge: TALSheet.TDockEdge);
 begin
   inherited;
@@ -1214,37 +1214,37 @@ begin
   FDragHandle.Name := 'ALSheetDragHandle';
 end;
 
-{************************************}
+{**************************************************}
 function TALTopSheet.TBuilder.CreateSheet: TALSheet;
 begin
   Result := TALTopSheet.Create(nil);
 end;
 
-{************************************}
+{**************************************************}
 function TALTopSheet.TBuilder.GetSheet: TALTopSheet;
 begin
   Result := TALTopSheet(inherited Sheet);
 end;
 
-{**********************************************************}
+{*******************************************************}
 constructor TALTopSheet.Create(const AOwner: TComponent);
 begin
   inherited create(AOwner, TALSheet.TDockEdge.Top);
 end;
 
-{*****************************************}
+{*******************************************}
 class function TALTopSheet.Builder: TBuilder;
 begin
   Result := TALTopSheet.TBuilder.Create;
 end;
 
-{************************************}
+{*****************************************************}
 function TALBottomSheet.TBuilder.CreateSheet: TALSheet;
 begin
   Result := TALBottomSheet.Create(nil);
 end;
 
-{************************************}
+{********************************************************}
 function TALBottomSheet.TBuilder.GetSheet: TALBottomSheet;
 begin
   Result := TALBottomSheet(inherited Sheet);
@@ -1278,13 +1278,13 @@ begin
   inherited;
 end;
 
-{*****************************************}
+{**********************************************}
 class function TALBottomSheet.Builder: TBuilder;
 begin
   Result := TALBottomSheet.TBuilder.Create;
 end;
 
-{************************************************************************************************************}
+{*****************************************************************************************************************}
 procedure TALBottomSheet.VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
 begin
   if FVirtualKeyboardAnimation = nil then begin
@@ -1317,14 +1317,14 @@ begin
   margins.Bottom := FVirtualKeyboardAnimation.CurrentValue;
 end;
 
-{**************************************************************************}
+{***********************************************************************************}
 function TALHorizontalSheet.TBuilder.SetHeadlineText(const AValue: String): TBuilder;
 begin
   TALHorizontalSheet(Sheet).Headline.Text := AValue;
   Result := Self;
 end;
 
-{**********************************************************}
+{***************************************************************************************************}
 constructor TALHorizontalSheet.Create(const AOwner: TComponent; const ADockEdge: TALSheet.TDockEdge);
 begin
   inherited;
@@ -1367,55 +1367,55 @@ begin
   FCloseButton.OnClick := ActionButtonClick;
 end;
 
-{************************************}
+{***************************************************}
 function TALLeftSheet.TBuilder.CreateSheet: TALSheet;
 begin
   Result := TALHorizontalSheet.Create(nil, TALSheet.TDockEdge.Left);
 end;
 
-{************************************}
+{****************************************************}
 function TALLeftSheet.TBuilder.GetSheet: TALLeftSheet;
 begin
   Result := TALLeftSheet(inherited Sheet);
 end;
 
-{***********************************************}
+{********************************************************}
 constructor TALLeftSheet.Create(const AOwner: TComponent);
 begin
   inherited create(AOwner, TALSheet.TDockEdge.Left);
 end;
 
-{*****************************************}
+{********************************************}
 class function TALLeftSheet.Builder: TBuilder;
 begin
   Result := TBuilder.Create;
 end;
 
-{************************************}
+{****************************************************}
 function TALRightSheet.TBuilder.CreateSheet: TALSheet;
 begin
   Result := TALHorizontalSheet.Create(nil, TALSheet.TDockEdge.Right);
 end;
 
-{************************************}
+{******************************************************}
 function TALRightSheet.TBuilder.GetSheet: TALRightSheet;
 begin
   Result := TALRightSheet(inherited Sheet);
 end;
 
-{***********************************************}
+{*********************************************************}
 constructor TALRightSheet.Create(const AOwner: TComponent);
 begin
   inherited create(AOwner, TALSheet.TDockEdge.Right);
 end;
 
-{*****************************************}
+{*********************************************}
 class function TALRightSheet.Builder: TBuilder;
 begin
   Result := TBuilder.Create;
 end;
 
-{**********************************}
+{*********************************}
 constructor TALSheetManager.Create;
 begin
   inherited;
@@ -1444,7 +1444,7 @@ begin
   Setlength(FFrozenNativeControls, 0);
 end;
 
-{**********************************}
+{*********************************}
 destructor TALSheetManager.Destroy;
 begin
   AlFreeAndNil(FDefaultScrim);
@@ -1467,14 +1467,14 @@ begin
   inherited;
 end;
 
-{*******************************************}
+{******************************************}
 procedure TALSheetManager.AfterConstruction;
 begin
   inherited;
   TALStyleManager.Instance.ApplySheetManagerStyle('Default', Self);
 end;
 
-{***************************************************************}
+{*************************************************************}
 class function TALSheetManager.CreateInstance: TALSheetManager;
 begin
   result := TALSheetManager.Create;
@@ -1498,7 +1498,7 @@ begin
   result := FInstance <> nil;
 end;
 
-{*******************************************}
+{******************************************}
 procedure TALSheetManager.FreezeNativeViews;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1523,7 +1523,7 @@ begin
       _FreezeNativeViews(TControl(LForm.Children[i]));
 end;
 
-{*********************************************}
+{********************************************}
 procedure TALSheetManager.UnfreezeNativeViews;
 begin
   For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
@@ -1531,7 +1531,7 @@ begin
   setlength(FFrozenNativeControls, 0);
 end;
 
-{*************************************************}
+{***********************************************}
 function TALSheetManager.IsShowingSheet: Boolean;
 begin
   Result := FCurrentSheet <> nil;
@@ -1582,7 +1582,7 @@ begin
   FContainerAnimation.Start;
 end;
 
-{**********************************************}
+{********************************************}
 procedure TALSheetManager.DoCloseCurrentSheet;
 begin
   if FCurrentSheet = nil then exit;
@@ -1624,13 +1624,13 @@ begin
     end);
 end;
 
-{***************************************************}
+{*************************************************}
 Function TALSheetManager.HasPendingSheets: Boolean;
 begin
   Result := FQueue.Count > 0;
 end;
 
-{***********************************************}
+{*********************************************}
 procedure TALSheetManager.ProcessPendingSheets;
 begin
   if (not IsShowingSheet) and
@@ -1645,7 +1645,7 @@ begin
   end;
 end;
 
-{**************************************************************}
+{**********************************************************}
 procedure TALSheetManager.ShowSheet(const ASheet: TALSheet);
 begin
 
@@ -1708,21 +1708,21 @@ begin
 
 end;
 
-{****************************************************************}
+{***************************************************************}
 procedure TALSheetManager.ScrimAnimationProcess(Sender: TObject);
 begin
   if FCurrentSheet = nil then exit;
   FCurrentSheet.Fill.Color := ALSetColorAlpha(FCurrentSheet.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
 end;
 
-{***************************************************************}
+{**************************************************************}
 procedure TALSheetManager.ScrimAnimationFinish(Sender: TObject);
 begin
   if FCurrentSheet = nil then exit;
   FCurrentSheet.FFillAlphaAtPeek := FScrimAnimation.TagFloat;
 end;
 
-{********************************************************************}
+{*******************************************************************}
 procedure TALSheetManager.ContainerAnimationProcess(Sender: TObject);
 begin
   if FCurrentSheet = nil then exit;
@@ -1744,7 +1744,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{******************************************************************}
 procedure TALSheetManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentSheet = nil then exit;

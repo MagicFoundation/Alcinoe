@@ -46,7 +46,8 @@ uses
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.Controls,
-  Alcinoe.FMX.FilterEffects;
+  Alcinoe.FMX.FilterEffects,
+  Alcinoe.FMX.NativeControl;
 
 type
 
@@ -402,6 +403,12 @@ type
     ALButton38: TALToggleButton;
     ALText69: TALText;
     ALToggleButton1: TALToggleButton;
+    ALText70: TALText;
+    ALText72: TALText;
+    ButtonShowBottomSheet: TALButton;
+    ButtonShowLeftSheet: TALButton;
+    ButtonShowTopSheet: TALButton;
+    ButtonShowRightSheet: TALButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
@@ -442,6 +449,10 @@ type
     procedure ButtonShowEditDialogClick(Sender: TObject);
     procedure ButtonShowMemoDialogClick(Sender: TObject);
     procedure ButtonShowActionDialogClick(Sender: TObject);
+    procedure ButtonShowBottomSheetClick(Sender: TObject);
+    procedure ButtonShowLeftSheetClick(Sender: TObject);
+    procedure ButtonShowTopSheetClick(Sender: TObject);
+    procedure ButtonShowRightSheetClick(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
@@ -482,6 +493,7 @@ uses
   {$ENDIF}
   fmx.DialogService,
   Alcinoe.FMX.Dialogs,
+  Alcinoe.Fmx.Sheets,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Stringutils,
   ScrollBoxDemo;
@@ -501,6 +513,7 @@ begin
   ALHasTouchScreen := true;
   {$ENDIF}
   TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
+  TALStyleManager.Instance.ApplySheetManagerStyle('Material3.SheetManager', TALSheetManager.Instance, 22{AFontSize});
   // We can not call RegisterTypefaceFromResource in FormCreate because FormCreate is
   // called in TCommonCustomForm.AfterConstruction once all child components are
   // already fully loaded.
@@ -1434,6 +1447,7 @@ procedure TMainForm.FormVirtualKeyboardShown(
 begin
   ALLog('FormVirtualKeyboardShown');
   if TALDialogManager.Instance.IsShowingDialog then exit;
+  if TALSheetManager.Instance.IsShowingSheet then exit;
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   if (Focused <> nil) and
      (AlVertScrollBox1.ScreenToLocal(Focused.LocalToScreen(TPointF.Create(0,0))).y > AlVertScrollBox1.Height - Tcontrol(Focused.GetObject).Height - 16) then
@@ -1541,6 +1555,202 @@ begin
                         'Paint: ' + FormatFloat('0.#####',fALRectangle.PaintMs) + ' ms';
         end);
     end).Start;
+end;
+
+{***********************************************************}
+procedure TMainForm.ButtonShowTopSheetClick(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _addIcon(const AParent: TALLayout; const AResName: String);
+  begin
+    var LIcon := TALRectangle.Create(AParent);
+    LIcon.Parent := AParent;
+    LIcon.Align := TALAlignLayout.LeftCenter;
+    LIcon.Width := 50;
+    LIcon.Height := 50;
+    LIcon.Fill.ResourceName := AResName;
+    LIcon.Fill.Color := TalphaColors.Null;
+    LIcon.Stroke.Color := TAlphaColors.Null;
+    LIcon.Margins.Left := (width - 150 - 25 - 25) / 6;
+    LIcon.Margins.right := LIcon.Margins.Left;
+  end;
+
+
+begin
+
+  // Build a sample content layout for demonstration purposes.
+  // In a real application, it is recommended to use a dedicated TFrame
+  // for better structure and reusability.
+  Var LContent := TALRectangle.Create(nil);
+  LContent.AutoSize := TALAutoSizeMode.Height;
+  LContent.Stroke.Color := TAlphaColors.Null;
+  LContent.Fill.Color := TAlphaColors.Null;
+
+  var LBar1 := TALLayout.Create(LContent);
+  LBar1.Parent := LContent;
+  LBar1.AutoSize := TALAutoSizeMode.Both;
+  LBar1.Align := TALAlignLayout.MosttopCenter;
+  LBar1.Margins.top := 32;
+  LBar1.Margins.Bottom := 48;
+  _addIcon(LBar1, 'tool1');
+  _addIcon(LBar1, 'tool2');
+  _addIcon(LBar1, 'tool3');
+
+  var LBar2 := TALLayout.Create(LContent);
+  LBar2.Parent := LContent;
+  LBar2.AutoSize := TALAutoSizeMode.Both;
+  LBar2.Align := TALAlignLayout.topCenter;
+  LBar2.Margins.Bottom := 8;
+  _addIcon(LBar2, 'tool4');
+  _addIcon(LBar2, 'tool5');
+  _addIcon(LBar2, 'tool6');
+
+  TALTopSheet.Builder
+    .Setcontent(LContent)
+    .SetContainerCorners(AllCorners)
+    .SetContainerMargins(TRectF.Create(25,25,25,25))
+    .Show;
+
+end;
+
+{**************************************************************}
+procedure TMainForm.ButtonShowBottomSheetClick(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _addIcon(const AParent: TALLayout; const AResName: String);
+  begin
+    var LIcon := TALRectangle.Create(AParent);
+    LIcon.Parent := AParent;
+    LIcon.Align := TALAlignLayout.LeftCenter;
+    LIcon.Width := 50;
+    LIcon.Height := 50;
+    LIcon.Fill.ResourceName := AResName;
+    LIcon.Fill.Color := TalphaColors.Null;
+    LIcon.Stroke.Color := TAlphaColors.Null;
+    LIcon.Margins.Left := (width - 150) / 6;
+    LIcon.Margins.right := LIcon.Margins.Left;
+  end;
+
+
+begin
+
+  // Build a sample content layout for demonstration purposes.
+  // In a real application, it is recommended to use a dedicated TFrame
+  // for better structure and reusability.
+  Var LContent := TALRectangle.Create(nil);
+  LContent.AutoSize := TALAutoSizeMode.Height;
+  LContent.Stroke.Color := TAlphaColors.Null;
+  LContent.Fill.Color := TAlphaColors.Null;
+
+  var LBar1 := TALLayout.Create(LContent);
+  LBar1.Parent := LContent;
+  LBar1.AutoSize := TALAutoSizeMode.Both;
+  LBar1.Align := TALAlignLayout.MosttopCenter;
+  LBar1.Margins.top := 8;
+  LBar1.Margins.Bottom := 48;
+  _addIcon(LBar1, 'tool1');
+  _addIcon(LBar1, 'tool2');
+  _addIcon(LBar1, 'tool3');
+
+  var LBar2 := TALLayout.Create(LContent);
+  LBar2.Parent := LContent;
+  LBar2.AutoSize := TALAutoSizeMode.Both;
+  LBar2.Align := TALAlignLayout.topCenter;
+  LBar2.Margins.Bottom := 32;
+  _addIcon(LBar2, 'tool4');
+  _addIcon(LBar2, 'tool5');
+  _addIcon(LBar2, 'tool6');
+
+  TALBottomSheet.Builder
+    .Setcontent(LContent)
+    .Show;
+
+end;
+
+{************************************************************}
+procedure TMainForm.ButtonShowLeftSheetClick(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _addIcon(const AParent: TALRectangle; const AResName: String);
+  begin
+    var LIcon := TALRectangle.Create(AParent);
+    LIcon.Parent := AParent;
+    LIcon.Align := TALAlignLayout.TopCenter;
+    LIcon.Width := 50;
+    LIcon.Height := 50;
+    LIcon.Fill.ResourceName := AResName;
+    LIcon.Fill.Color := TalphaColors.Null;
+    LIcon.Stroke.Color := TAlphaColors.Null;
+    LIcon.Margins.Top := (Height - (6*50) - 200) / 7;
+  end;
+
+begin
+
+  // Build a sample content layout for demonstration purposes.
+  // In a real application, it is recommended to use a dedicated TFrame
+  // for better structure and reusability.
+  Var LContent := TALRectangle.Create(nil);
+  LContent.Width := 250;
+  LContent.Stroke.Color := TAlphaColors.Null;
+  LContent.Fill.Color := TAlphaColors.Null;
+
+  _addIcon(LContent, 'tool1');
+  _addIcon(LContent, 'tool2');
+  _addIcon(LContent, 'tool3');
+  _addIcon(LContent, 'tool4');
+  _addIcon(LContent, 'tool5');
+  _addIcon(LContent, 'tool6');
+
+  TALLeftSheet.Builder
+    .SetHeadlineText('Title')
+    .Setcontent(LContent)
+    .SetContainerCorners(AllCorners)
+    .SetContainerMargins(TRectF.Create(15,15,15,15))
+    .Show;
+
+end;
+
+{*************************************************************}
+procedure TMainForm.ButtonShowRightSheetClick(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _addIcon(const AParent: TALRectangle; const AResName: String);
+  begin
+    var LIcon := TALRectangle.Create(AParent);
+    LIcon.Parent := AParent;
+    LIcon.Align := TALAlignLayout.TopCenter;
+    LIcon.Width := 50;
+    LIcon.Height := 50;
+    LIcon.Fill.ResourceName := AResName;
+    LIcon.Fill.Color := TalphaColors.Null;
+    LIcon.Stroke.Color := TAlphaColors.Null;
+    LIcon.Margins.Top := (Height - (6*50) - 200) / 7;
+  end;
+
+begin
+
+  // Build a sample content layout for demonstration purposes.
+  // In a real application, it is recommended to use a dedicated TFrame
+  // for better structure and reusability.
+  Var LContent := TALRectangle.Create(nil);
+  LContent.Width := 250;
+  LContent.Stroke.Color := TAlphaColors.Null;
+  LContent.Fill.Color := TAlphaColors.Null;
+
+  _addIcon(LContent, 'tool1');
+  _addIcon(LContent, 'tool2');
+  _addIcon(LContent, 'tool3');
+  _addIcon(LContent, 'tool4');
+  _addIcon(LContent, 'tool5');
+  _addIcon(LContent, 'tool6');
+
+  TALRightSheet.Builder
+    .SetHeadlineText('Title')
+    .Setcontent(LContent)
+    .SetContainerCorners(AllCorners)
+    .SetContainerMargins(TRectF.Create(15,15,15,15))
+    .Show;
+
 end;
 
 {************************************************************}

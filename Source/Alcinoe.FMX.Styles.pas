@@ -15,6 +15,7 @@ uses
   Alcinoe.FMX.Dynamic.StdCtrls,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Dialogs,
+  Alcinoe.FMX.Sheets,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.StdCtrls;
@@ -164,6 +165,26 @@ Type
         DefaultFontSize: Single;
         constructor create(const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
       end;
+      // -----------------------
+      // TSheetManagerStyleInfo
+      TSheetManagerApplyStyleProc = Procedure(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
+      TSheetManagerStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TSheetManagerApplyStyleProc;
+        DefaultFontSize: Single;
+        constructor create(const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
+      end;
+      // ----------------
+      // TSheetStyleInfo
+      TSheetApplyStyleProc = Procedure(const ASheet: TALSheet; const ARatio: Single = 1);
+      TSheetStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TSheetApplyStyleProc;
+        DefaultFontSize: Single;
+        constructor create(const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
+      end;
       // ----------------------------
       // TDynamicTextStyleInfo
       TDynamicTextApplyStyleProc = Procedure(const AText: TALDynamicBaseText; const ARatio: Single = 1);
@@ -265,6 +286,8 @@ Type
     FScrollBoxStyles: TDictionary<String, TScrollBoxStyleInfo>;
     FDialogManagerStyles: TDictionary<String, TDialogManagerStyleInfo>;
     FDialogStyles: TDictionary<String, TDialogStyleInfo>;
+    FSheetManagerStyles: TDictionary<String, TSheetManagerStyleInfo>;
+    FSheetStyles: TDictionary<String, TSheetStyleInfo>;
     //--
     FDynamicTextStyles: TDictionary<String, TDynamicTextStyleInfo>;
     FDynamicButtonStyles: TDictionary<String, TDynamicButtonStyleInfo>;
@@ -308,6 +331,8 @@ Type
     procedure AddOrSetScrollBoxStyle(const AName: String; const AApplyStyleProc: TScrollBoxApplyStyleProc);
     procedure AddOrSetDialogManagerStyle(const AName: String; const AApplyStyleProc: TDialogManagerApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetSheetManagerStyle(const AName: String; const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetSheetStyle(const AName: String; const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
     //--
     procedure AddOrSetDynamicTextStyle(const AName: String; const AApplyStyleProc: TDynamicTextApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetDynamicButtonStyle(const AName: String; const AApplyStyleProc: TDynamicButtonApplyStyleProc; const ADefaultFontSize: Single);
@@ -352,6 +377,10 @@ Type
     procedure ApplyDialogManagerStyle(const AName: String; const ADialogManager: TALDialogManager); overload;
     procedure ApplyDialogStyle(const AName: String; const ADialog: TALDialog; const AFontSize: Single); overload;
     procedure ApplyDialogStyle(const AName: String; const ADialog: TALDialog); overload;
+    procedure ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager; const AFontSize: Single); overload;
+    procedure ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager); overload;
+    procedure ApplySheetStyle(const AName: String; const ASheet: TALSheet; const AFontSize: Single); overload;
+    procedure ApplySheetStyle(const AName: String; const ASheet: TALSheet); overload;
     //--
     procedure ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText; const AFontSize: Single); overload;
     procedure ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText); overload;
@@ -390,6 +419,8 @@ Type
     function GetScrollBoxStyleNames: TArray<String>;
     function GetDialogManagerStyleNames: TArray<String>;
     function GetDialogStyleNames: TArray<String>;
+    function GetSheetManagerStyleNames: TArray<String>;
+    function GetSheetStyleNames: TArray<String>;
   end;
 
 function ALEstimateLineHeightMultiplier(Const AFontSize: Single): Single;
@@ -427,6 +458,7 @@ uses
   Alcinoe.Common,
   Alcinoe.Localization,
   Alcinoe.StringUtils,
+  Alcinoe.FMX.Common,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Memo,
@@ -13164,7 +13196,7 @@ begin
     // DefaultOptionLayout
 
     // DefaultRadioButton
-    var LRatio := (20 + ((14 * ARatio) - 14) / 2) / DefaultRadioButton.DefaultSize.Height;
+    var LRatio: Single := (20 + ((14 * ARatio) - 14) / 2) / DefaultRadioButton.DefaultSize.Height;
     ALApplyMaterial3RadioButtonStyle(DefaultRadioButton, LRatio);
 
     // DefaultCheckBox
@@ -13198,6 +13230,227 @@ begin
     // DefaultFooterButton
     LRatio := 14 / DefaultFooterButton.Textsettings.Font.DefaultSize;
     ALApplyMaterial3ButtonTextStyle(DefaultFooterButton, LRatio * ARatio);
+
+  end;
+end;
+
+//////////////////
+// SHEETMANAGER //
+//////////////////
+
+{*************************************************************************************************}
+procedure ALResetSheetManagerStyle(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
+begin
+  With ASheetManager do begin
+
+    // DefaultScrim
+    ALResetRectangleStyle(DefaultScrim{, ARatio});
+    DefaultScrim.Align := TALAlignLayout.Contents;
+    DefaultScrim.Fill.Color := $52000000; {Alpha = 32%}
+    DefaultScrim.Stroke.Color := TAlphaColors.Null;
+    DefaultScrim.Stroke.ColorKey := '';
+
+    // DefaultLeftSheetContainer
+    ALResetRectangleStyle(DefaultLeftSheetContainer{, ARatio});
+    DefaultLeftSheetContainer.AutoSize := TALAutoSizeMode.Width;
+    DefaultLeftSheetContainer.Align := TALAlignLayout.Vertical;
+    DefaultLeftSheetContainer.Fill.Color := $FFFFFFFF;
+    DefaultLeftSheetContainer.Fill.ColorKey := '';
+    DefaultLeftSheetContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultLeftSheetContainer.Stroke.ColorKey := '';
+    DefaultLeftSheetContainer.XRadius := RoundTo(16 {* ARatio}, -2);
+    DefaultLeftSheetContainer.YRadius := RoundTo(16 {* ARatio}, -2);
+    DefaultLeftSheetContainer.Corners := [TCorner.TopRight, TCorner.BottomRight];
+
+    // DefaultRightSheetContainer
+    ALResetRectangleStyle(DefaultRightSheetContainer{, ARatio});
+    DefaultRightSheetContainer.AutoSize := TALAutoSizeMode.Width;
+    DefaultRightSheetContainer.Align := TALAlignLayout.Vertical;
+    DefaultRightSheetContainer.Fill.Color := $FFFFFFFF;
+    DefaultRightSheetContainer.Fill.ColorKey := '';
+    DefaultRightSheetContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultRightSheetContainer.Stroke.ColorKey := '';
+    DefaultRightSheetContainer.XRadius := RoundTo(16 {* ARatio}, -2);
+    DefaultRightSheetContainer.YRadius := RoundTo(16 {* ARatio}, -2);
+    DefaultRightSheetContainer.Corners := [TCorner.TopLeft, TCorner.BottomLeft];
+
+    // DefaultTopSheetContainer
+    ALResetRectangleStyle(DefaultTopSheetContainer{, ARatio});
+    DefaultTopSheetContainer.AutoSize := TALAutoSizeMode.Height;
+    DefaultTopSheetContainer.Align := TALAlignLayout.Horizontal;
+    DefaultTopSheetContainer.Fill.Color := $FFFFFFFF;
+    DefaultTopSheetContainer.Fill.ColorKey := '';
+    DefaultTopSheetContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultTopSheetContainer.Stroke.ColorKey := '';
+    DefaultTopSheetContainer.XRadius := RoundTo(28 {* ARatio}, -2);
+    DefaultTopSheetContainer.YRadius := RoundTo(28 {* ARatio}, -2);
+    DefaultTopSheetContainer.Corners := [TCorner.BottomLeft, TCorner.BottomRight];
+
+    // DefaultBottomSheetContainer
+    ALResetRectangleStyle(DefaultBottomSheetContainer{, ARatio});
+    DefaultBottomSheetContainer.AutoSize := TALAutoSizeMode.Height;
+    DefaultBottomSheetContainer.Align := TALAlignLayout.Horizontal;
+    DefaultBottomSheetContainer.Fill.Color := $FFFFFFFF;
+    DefaultBottomSheetContainer.Fill.ColorKey := '';
+    DefaultBottomSheetContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultBottomSheetContainer.Stroke.ColorKey := '';
+    DefaultBottomSheetContainer.XRadius := RoundTo(28 {* ARatio}, -2);
+    DefaultBottomSheetContainer.YRadius := RoundTo(28 {* ARatio}, -2);
+    DefaultBottomSheetContainer.Corners := [TCorner.TopLeft, TCorner.TopRight];
+
+    // DefaultTopSheetDragHandle
+    ALResetRectangleStyle(DefaultTopSheetDragHandle{, ARatio});
+    DefaultTopSheetDragHandle.Width := RoundTo(32 {* ARatio}, -2);
+    DefaultTopSheetDragHandle.height := RoundTo(4 {* ARatio}, -2);
+    DefaultTopSheetDragHandle.margins.Rect := TRectF.Create(0{Left}, 22 {* ARatio}{Top}, 0{Right}, 22 {* ARatio}{Bottom}).RoundTo(-2);
+    DefaultTopSheetDragHandle.Align := TALAlignLayout.MostBottomCenter;
+    DefaultTopSheetDragHandle.Stroke.Color := TalphaColors.Null;
+    DefaultTopSheetDragHandle.Fill.Color := TalphaColors.gray;
+    DefaultTopSheetDragHandle.Opacity := 0.4;
+    DefaultTopSheetDragHandle.XRadius := -50;
+    DefaultTopSheetDragHandle.YRadius := -50;
+
+    // DefaultBottomSheetDragHandle
+    ALResetRectangleStyle(DefaultBottomSheetDragHandle{, ARatio});
+    DefaultBottomSheetDragHandle.Width := RoundTo(32 {* ARatio}, -2);
+    DefaultBottomSheetDragHandle.height := RoundTo(4 {* ARatio}, -2);
+    DefaultBottomSheetDragHandle.margins.Rect := TRectF.Create(0{Left}, 22 {* ARatio}{Top}, 0{Right}, 22 {* ARatio}{Bottom}).RoundTo(-2);
+    DefaultBottomSheetDragHandle.Align := TALAlignLayout.MostTopCenter;
+    DefaultBottomSheetDragHandle.Stroke.Color := TalphaColors.Null;
+    DefaultBottomSheetDragHandle.Fill.Color := TalphaColors.gray;
+    DefaultBottomSheetDragHandle.Opacity := 0.4;
+    DefaultBottomSheetDragHandle.XRadius := -50;
+    DefaultBottomSheetDragHandle.YRadius := -50;
+
+    // DefaultHorizontalSheetHeaderBar
+    ALResetRectangleStyle(DefaultHorizontalSheetHeaderBar, ARatio);
+    DefaultHorizontalSheetHeaderBar.Margins.Rect := TRectF.Create(0{Left}, 24 * ARatio{Top}, 0{Right}, 24 * ARatio{Bottom}).RoundTo(-2);
+    DefaultHorizontalSheetHeaderBar.AutoSize := TALAutoSizeMode.Height;
+    DefaultHorizontalSheetHeaderBar.Align := TALAlignLayout.Top;
+    DefaultHorizontalSheetHeaderBar.Fill.Color := TalphaColors.Null;
+    DefaultHorizontalSheetHeaderBar.Fill.ColorKey := '';
+    DefaultHorizontalSheetHeaderBar.Stroke.Color := TAlphaColors.Null;
+    DefaultHorizontalSheetHeaderBar.Stroke.ColorKey := '';
+
+    // DefaultLeftSheetBackButton
+    var LRatio := 22 / DefaultLeftSheetBackButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultLeftSheetBackButton, LRatio);
+    DefaultLeftSheetBackButton.Margins.Right := RoundTo(16 * ARatio, -2);
+    DefaultLeftSheetBackButton.Align := TALAlignLayout.MostRightCenter;
+    DefaultLeftSheetBackButton.Fill.ResourceName := ALLeftSheetBackButtonResourceName;
+
+    // DefaultRightSheetBackButton
+    LRatio := 22 / DefaultRightSheetBackButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultRightSheetBackButton, LRatio);
+    DefaultRightSheetBackButton.Margins.Left := RoundTo(16 * ARatio, -2);
+    DefaultRightSheetBackButton.Align := TALAlignLayout.MostLeftCenter;
+    DefaultRightSheetBackButton.Fill.ResourceName := ALRightSheetBackButtonResourceName;
+
+    // DefaultLeftSheetHeadline
+    LRatio := 22 / DefaultLeftSheetHeadline.Textsettings.Font.DefaultSize;
+    ALResetTextStyle(DefaultLeftSheetHeadline, LRatio);
+    if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultLeftSheetHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
+    DefaultLeftSheetHeadline.Margins.Rect := TRectF.Create(12 * ARatio{Left}, 0{Top}, 12 * ARatio{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultLeftSheetHeadline.AutoSize := TALAutoSizeMode.Both;
+    DefaultLeftSheetHeadline.Align := TALAlignLayout.RightCenter;
+
+    // DefaultRightSheetHeadline
+    LRatio := 22 / DefaultRightSheetHeadline.Textsettings.Font.DefaultSize;
+    ALResetTextStyle(DefaultRightSheetHeadline, LRatio);
+    if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultRightSheetHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
+    DefaultRightSheetHeadline.Margins.Rect := TRectF.Create(12 * ARatio{Left}, 0{Top}, 12 * ARatio{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultRightSheetHeadline.AutoSize := TALAutoSizeMode.Both;
+    DefaultRightSheetHeadline.Align := TALAlignLayout.LeftCenter;
+
+    // DefaultLeftSheetCloseButton
+    LRatio := 22 / DefaultLeftSheetCloseButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultLeftSheetCloseButton, LRatio);
+    DefaultLeftSheetCloseButton.Margins.Left := RoundTo(24 * ARatio, -2);
+    DefaultLeftSheetCloseButton.Align := TALAlignLayout.LeftCenter;
+    DefaultLeftSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
+
+    // DefaultRightSheetCloseButton
+    LRatio := 22 / DefaultRightSheetCloseButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultRightSheetCloseButton, LRatio);
+    DefaultRightSheetCloseButton.Margins.Right := RoundTo(24 * ARatio, -2);
+    DefaultRightSheetCloseButton.Align := TALAlignLayout.RightCenter;
+    DefaultRightSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
+
+  end;
+end;
+
+{************************************************************************************}
+//https://m3.material.io/components/Sheets/specs#8e0c5daf-d82a-4963-8759-94769997de9f
+procedure ALApplyMaterial3SheetManagerStyle(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
+begin
+  With ASheetManager do begin
+
+    // Default
+    ALResetSheetManagerStyle(ASheetManager, ARatio);
+
+    // DefaultScrim
+    // https://m3.material.io/styles/elevation/applying-elevation#eb0451aa-61b5-4c35-8d5f-f5b434f63654
+    DefaultScrim.Fill.ColorKey := 'Material3.Color.Scrim.Alpha32'; // Scrims use the scrim color role at an opacity of 32%.
+
+    // DefaultLeftSheetContainer
+    DefaultLeftSheetContainer.Fill.ColorKey := 'Material3.Color.SurfaceContainerLow'; // md.sys.color.surface-container-low / md.ref.palette.neutral96 / #F7F2FA
+    DefaultLeftSheetContainer.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultLeftSheetContainer.Shadow.blur := RoundTo(2 {* ARatio}, -2);
+    DefaultLeftSheetContainer.Shadow.OffsetY := RoundTo(1 {* ARatio}, -2);
+
+    // DefaultRightSheetContainer
+    DefaultRightSheetContainer.Fill.ColorKey := 'Material3.Color.SurfaceContainerLow'; // md.sys.color.surface-container-low / md.ref.palette.neutral96 / #F7F2FA
+    DefaultRightSheetContainer.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultRightSheetContainer.Shadow.blur := RoundTo(2 {* ARatio}, -2);
+    DefaultRightSheetContainer.Shadow.OffsetY := RoundTo(1 {* ARatio}, -2);
+
+    // DefaultTopSheetContainer
+    DefaultTopSheetContainer.Fill.ColorKey := 'Material3.Color.SurfaceContainerLow'; // md.sys.color.surface-container-low / md.ref.palette.neutral96 / #F7F2FA
+    DefaultTopSheetContainer.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultTopSheetContainer.Shadow.blur := RoundTo(2 {* ARatio}, -2);
+    DefaultTopSheetContainer.Shadow.OffsetY := RoundTo(1 {* ARatio}, -2);
+
+    // DefaultBottomSheetContainer
+    DefaultBottomSheetContainer.Fill.ColorKey := 'Material3.Color.SurfaceContainerLow'; // md.sys.color.surface-container-low / md.ref.palette.neutral96 / #F7F2FA
+    DefaultBottomSheetContainer.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultBottomSheetContainer.Shadow.blur := RoundTo(2 {* ARatio}, -2);
+    DefaultBottomSheetContainer.Shadow.OffsetY := RoundTo(1 {* ARatio}, -2);
+
+    // DefaultTopSheetDragHandle
+    DefaultTopSheetDragHandle.Fill.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+
+    // DefaultBottomSheetDragHandle
+    DefaultBottomSheetDragHandle.Fill.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+
+    // DefaultHorizontalSheetHeaderBar
+
+    // DefaultLeftSheetBackButton
+    ALApplyMaterial3ButtonIconStandardStyle(DefaultLeftSheetBackButton, (34 / 40) * ARatio);
+    DefaultLeftSheetBackButton.Fill.ResourceName := ALLeftSheetBackButtonResourceName;
+    DefaultLeftSheetBackButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+
+    // DefaultRightSheetBackButton
+    ALApplyMaterial3ButtonIconStandardStyle(DefaultRightSheetBackButton, (34 / 40) * ARatio);
+    DefaultRightSheetBackButton.Fill.ResourceName := ALRightSheetBackButtonResourceName;
+    DefaultRightSheetBackButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+
+    // DefaultLeftSheetHeadline
+    DefaultLeftSheetHeadline.TextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+
+    // DefaultRightSheetHeadline
+    DefaultRightSheetHeadline.TextSettings.Font.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+
+    // DefaultLeftSheetCloseButton
+    ALApplyMaterial3ButtonIconStandardStyle(DefaultLeftSheetCloseButton, (34 / 40) * ARatio);
+    DefaultLeftSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
+    DefaultLeftSheetCloseButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+    DefaultLeftSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(9 * ARatio{Left}, 9 * ARatio{Top}, 9 * ARatio{Right}, 9 * ARatio{Bottom}).RoundTo(-2);
+
+    // DefaultRightSheetCloseButton
+    ALApplyMaterial3ButtonIconStandardStyle(DefaultRightSheetCloseButton, (34 / 40) * ARatio);
+    DefaultRightSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
+    DefaultRightSheetCloseButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
+    DefaultRightSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(9 * ARatio{Right}, 9 * ARatio{Top}, 9 * ARatio{Right}, 9 * ARatio{Bottom}).RoundTo(-2);
 
   end;
 end;
@@ -25253,6 +25506,22 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
+{**********************************************************************************************************************************************}
+constructor TALStyleManager.TSheetManagerStyleInfo.create(const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
+{********************************************************************************************************************************}
+constructor TALStyleManager.TSheetStyleInfo.create(const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
 {******************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicTextStyleInfo.create(const AApplyStyleProc: TDynamicTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
@@ -25340,6 +25609,8 @@ begin
   FScrollBoxStyles := TDictionary<String, TScrollBoxStyleInfo>.create;
   FDialogManagerStyles := TDictionary<String, TDialogManagerStyleInfo>.create;
   FDialogStyles := TDictionary<String, TDialogStyleInfo>.create;
+  FSheetManagerStyles := TDictionary<String, TSheetManagerStyleInfo>.create;
+  FSheetStyles := TDictionary<String, TSheetStyleInfo>.create;
   //--
   FDynamicTextStyles := TDictionary<String, TDynamicTextStyleInfo>.create;
   FDynamicButtonStyles := TDictionary<String, TDynamicButtonStyleInfo>.create;
@@ -25418,6 +25689,8 @@ begin
   AlFreeAndNil(FScrollBoxStyles);
   AlFreeAndNil(FDialogManagerStyles);
   AlFreeAndNil(FDialogStyles);
+  AlFreeAndNil(FSheetManagerStyles);
+  AlFreeAndNil(FSheetStyles);
   //--
   AlFreeAndNil(FDynamicTextStyles);
   AlFreeAndNil(FDynamicButtonStyles);
@@ -26017,6 +26290,9 @@ begin
 
   AddOrSetDialogManagerStyle('Default', ALResetDialogManagerStyle, 14{ADefaultFontSize});
   AddOrSetDialogManagerStyle('Material3.DialogManager', ALApplyMaterial3DialogManagerStyle, 14{ADefaultFontSize});
+
+  AddOrSetSheetManagerStyle('Default', ALResetSheetManagerStyle, 22{ADefaultFontSize});
+  AddOrSetSheetManagerStyle('Material3.SheetManager', ALApplyMaterial3SheetManagerStyle, 22{ADefaultFontSize});
 
   AddOrSetDynamicTextStyle('Default', ALReseTDynamicTextStyle, 14{ADefaultFontSize});
   AddOrSetDynamicTextStyle('Material3.Text.Display.Large', ALApplyMaterial3DynamicTextDisplayLargeStyle, 0{ADefaultFontSize});
@@ -26711,6 +26987,18 @@ end;
 procedure TALStyleManager.AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FDialogStyles.AddOrSetValue(AName, TDialogStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+end;
+
+{*************************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetSheetManagerStyle(const AName: String; const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  FSheetManagerStyles.AddOrSetValue(AName, TSheetManagerStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+end;
+
+{***********************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetSheetStyle(const AName: String; const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  FSheetStyles.AddOrSetValue(AName, TSheetStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
 {*********************************************************************************************************************************************************}
@@ -27409,6 +27697,86 @@ begin
   {$ENDIF}
 end;
 
+{**************************************************************************************************************************************}
+procedure TALStyleManager.ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager; const AFontSize: Single);
+begin
+  Var LApplySheetManagerStyleInfo: TSheetManagerStyleInfo;
+  if not fSheetManagerStyles.TryGetValue(AName, LApplySheetManagerStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  LApplySheetManagerStyleInfo.ApplyStyleProc(ASheetManager, AFontSize / LApplySheetManagerStyleInfo.DefaultFontSize);
+  {$IF not defined(ALDPK)}
+  if ASheetManager.DefaultScrim.AutoAlignToPixel then ASheetManager.DefaultScrim.AlignToPixel;
+  if ASheetManager.DefaultLeftSheetContainer.AutoAlignToPixel then ASheetManager.DefaultLeftSheetContainer.AlignToPixel;
+  if ASheetManager.DefaultRightSheetContainer.AutoAlignToPixel then ASheetManager.DefaultRightSheetContainer.AlignToPixel;
+  if ASheetManager.DefaultTopSheetContainer.AutoAlignToPixel then ASheetManager.DefaultTopSheetContainer.AlignToPixel;
+  if ASheetManager.DefaultBottomSheetContainer.AutoAlignToPixel then ASheetManager.DefaultBottomSheetContainer.AlignToPixel;
+  if ASheetManager.DefaultTopSheetDragHandle.AutoAlignToPixel then ASheetManager.DefaultTopSheetDragHandle.AlignToPixel;
+  if ASheetManager.DefaultBottomSheetDragHandle.AutoAlignToPixel then ASheetManager.DefaultBottomSheetDragHandle.AlignToPixel;
+  if ASheetManager.DefaultHorizontalSheetHeaderBar.AutoAlignToPixel then ASheetManager.DefaultHorizontalSheetHeaderBar.AlignToPixel;
+  if ASheetManager.DefaultLeftSheetBackButton.AutoAlignToPixel then ASheetManager.DefaultLeftSheetBackButton.AlignToPixel;
+  if ASheetManager.DefaultRightSheetBackButton.AutoAlignToPixel then ASheetManager.DefaultRightSheetBackButton.AlignToPixel;
+  if ASheetManager.DefaultLeftSheetHeadline.AutoAlignToPixel then ASheetManager.DefaultLeftSheetHeadline.AlignToPixel;
+  if ASheetManager.DefaultRightSheetHeadline.AutoAlignToPixel then ASheetManager.DefaultRightSheetHeadline.AlignToPixel;
+  if ASheetManager.DefaultLeftSheetCloseButton.AutoAlignToPixel then ASheetManager.DefaultLeftSheetCloseButton.AlignToPixel;
+  if ASheetManager.DefaultRightSheetCloseButton.AutoAlignToPixel then ASheetManager.DefaultRightSheetCloseButton.AlignToPixel;
+  {$ENDIF}
+end;
+
+{*************************************************************************************************************}
+procedure TALStyleManager.ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplySheetManagerStyleInfo: TSheetManagerStyleInfo;
+  if not fSheetManagerStyles.TryGetValue(AName, LApplySheetManagerStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplySheetManagerStyleInfo.DefaultFontSize, LApplySheetManagerStyleInfo.DefaultFontSize);
+  ApplySheetManagerStyle(AName, ASheetManager, LApplySheetManagerStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplySheetManagerStyle(AName, ASheetManager, ASheetManager.DefaultLeftSheetHeadline.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************************************}
+procedure TALStyleManager.ApplySheetStyle(const AName: String; const ASheet: TALSheet; const AFontSize: Single);
+begin
+  Var LApplySheetStyleInfo: TSheetStyleInfo;
+  if not fSheetStyles.TryGetValue(AName, LApplySheetStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  ASheet.BeginUpdate;
+  try
+    LApplySheetStyleInfo.ApplyStyleProc(ASheet, AFontSize / LApplySheetStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if ASheet.AutoAlignToPixel then ASheet.AlignToPixel;
+    {$ENDIF}
+  finally
+    ASheet.EndUpdate;
+  end;
+end;
+
+{****************************************************************************************}
+procedure TALStyleManager.ApplySheetStyle(const AName: String; const ASheet: TALSheet);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplySheetStyleInfo: TSheetStyleInfo;
+  if not fSheetStyles.TryGetValue(AName, LApplySheetStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplySheetStyleInfo.DefaultFontSize, LApplySheetStyleInfo.DefaultFontSize);
+  ApplySheetStyle(AName, ASheet, LApplySheetStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  if (ASheet is TALHorizontalSheet) then
+    ApplySheetStyle(AName, ASheet, TALHorizontalSheet(ASheet).Headline.TextSettings.Font.Size)
+  else
+    ApplySheetStyle(AName, ASheet, 22{not used});
+  {$ENDIF}
+end;
 
 {*************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText; const AFontSize: Single);
@@ -28049,6 +28417,36 @@ begin
   TArray.Sort<TPair<String, TDialogStyleInfo>>(LArray,
     TComparer<TPair<String, TDialogStyleInfo>>.Construct(
       function(const Left, Right: TPair<String, TDialogStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{******************************************************************}
+function TALStyleManager.GetSheetManagerStyleNames: TArray<String>;
+begin
+  var LArray := FSheetManagerStyles.ToArray;
+  TArray.Sort<TPair<String, TSheetManagerStyleInfo>>(LArray,
+    TComparer<TPair<String, TSheetManagerStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TSheetManagerStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{***********************************************************}
+function TALStyleManager.GetSheetStyleNames: TArray<String>;
+begin
+  var LArray := FSheetStyles.ToArray;
+  TArray.Sort<TPair<String, TSheetStyleInfo>>(LArray,
+    TComparer<TPair<String, TSheetStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TSheetStyleInfo>): Integer
       begin
         Result := Left.value.SortOrder - Right.value.SortOrder;
       end));

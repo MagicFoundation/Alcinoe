@@ -69,6 +69,7 @@ contains
   Alcinoe.FMX.NativeView.Win in 'Alcinoe.FMX.NativeView.Win.pas',
   Alcinoe.FMX.Objects in 'Alcinoe.FMX.Objects.pas',
   Alcinoe.FMX.PageController in 'Alcinoe.FMX.PageController.pas',
+  Alcinoe.FMX.Sheets in 'Alcinoe.FMX.Sheets.pas',
   Alcinoe.FMX.ScrollEngine in 'Alcinoe.FMX.ScrollEngine.pas',
   Alcinoe.FMX.StdCtrls in 'Alcinoe.FMX.StdCtrls.pas',
   Alcinoe.FMX.Styles in 'Alcinoe.FMX.Styles.pas',

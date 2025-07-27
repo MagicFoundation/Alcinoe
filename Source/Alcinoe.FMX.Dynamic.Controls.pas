@@ -403,6 +403,7 @@ type
     procedure AdjustSize; override;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
     //**function GetAbsoluteDisplayedRect: TRectF; virtual;
+    //**function FillTextFlags: TFillTextFlags; override;
   public
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
@@ -1607,7 +1608,8 @@ begin
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl.FillTextFlags was not updated and adjust the IFDEF'}
   {$ENDIF}
-  if (Form <> nil) and (Form.BiDiMode = bdRightToLeft) then
+  if (Form = nil) then result := ALGetFillTextFlags
+  else if (Form.BiDiMode = bdRightToLeft) then
     Result := [TFillTextFlag.RightToLeft]
   else
     Result := [];
@@ -3641,6 +3643,13 @@ end;
 //**    LControlTmp := LControlTmp.Owner;
 //**  end;
 //**  Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
+//**end;
+
+{*******************************************************************}
+//**function TALDynamicExtendedControl.FillTextFlags: TFillTextFlags;
+//**begin
+//**  if (Root = nil) then result := ALGetFillTextFlags
+//**  else result := inherited;
 //**end;
 
 {******************************************************************}

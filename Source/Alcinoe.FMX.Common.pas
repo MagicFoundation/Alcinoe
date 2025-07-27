@@ -1388,6 +1388,12 @@ var
 procedure ALInitHasTouchScreen;
 function ALGetHasTouchScreen: Boolean; Inline;
 
+var
+  ALFillTextFlags: TFillTextFlags;
+  ALFillTextFlagsInitialized: Boolean;
+procedure ALInitFillTextFlags;
+function ALGetFillTextFlags: TFillTextFlags; Inline;
+
 implementation
 
 uses
@@ -1399,6 +1405,9 @@ uses
   System.Generics.Defaults,
   {$IF defined(ALBackwardCompatible)}
   System.TypInfo,
+  {$ENDIF}
+  {$IF defined(DEBUG)}
+  FMX.forms,
   {$ENDIF}
   FMX.Utils,
   Fmx.Platform,
@@ -6626,16 +6635,49 @@ begin
   result := ALHasTouchScreen;
 end;
 
+{*****************************}
+procedure ALInitFillTextFlags;
+begin
+  if not ALFillTextFlagsInitialized then begin
+    Var LForm := Screen.ActiveForm;
+    if LForm = nil then LForm := Application.MainForm;
+    if LForm = nil then Raise Exception.Create('Error FACEB7BC-8EF6-42EF-A916-AE50698EA944');
+    if LForm.BiDiMode = bdRightToLeft then begin
+      ALFillTextFlags := [TFillTextFlag.RightToLeft];
+      {$IF defined(debug)}
+      ALLog('Fill Text Flags', '[TFillTextFlag.RightToLeft]');
+      {$ENDIF}
+    end
+    else begin
+      ALFillTextFlags := [];
+      {$IF defined(debug)}
+      ALLog('Fill Text Flags', '[]');
+      {$ENDIF}
+    end;
+    ALFillTextFlagsInitialized := True;
+  end;
+end;
+
+{************************************}
+function ALGetFillTextFlags: TFillTextFlags;
+begin
+  if not ALFillTextFlagsInitialized then
+    ALInitFillTextFlags;
+  result := ALFillTextFlags;
+end;
+
 initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.FMX.Common','initialization');
   {$ENDIF}
-  ALBrokenImageResourceName := 'broken_image';
+  ALBrokenImageResourceName := 'alcinoe_broken_image';
   ALBrokenImageWidth := 16;
   ALBrokenImageHeight := 16;
   ALScreenScale := 0;
   ALHasTouchScreen := False;
   ALHasTouchScreenInitialized := False;
+  ALFillTextFlags := [];
+  ALFillTextFlagsInitialized := False;
   ALCustomGetResourceFilenameProc := nil;
   {$IFDEF ANDROID}
   ALViewStackCount := 0;

@@ -611,6 +611,8 @@ type
       DefaultTimerInterval = 10; // 100 fps
       // The default multiplier that dampens a drag movement at boundaries.
       DefaultDragResistanceFactor = 0.4;
+      // The velocity threshold (in virtual pixels per second) considered as "low".
+      DefaultLowVelocityThreshold = 10;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -2752,8 +2754,8 @@ function TALScrollEngine.GetIsVelocityLow: Boolean;
 begin
   var LCurrentVelocity := GetCurrentVelocity;
   // virtual pixels per second
-  result := (abs(LCurrentVelocity.X) < 10) and
-            (abs(LCurrentVelocity.Y) < 10);
+  result := (abs(LCurrentVelocity.X) < DefaultLowVelocityThreshold) and
+            (abs(LCurrentVelocity.Y) < DefaultLowVelocityThreshold);
 end;
 
 {************************************************}
@@ -3240,16 +3242,16 @@ begin
 
   FMoved := True;
 
-  if (FViewportPosition.x < FMinScrollLimit.x) or
-     (FViewportPosition.x > FMaxScrollLimit.x) then xDiff := xDiff * FDragResistanceFactor;
-  if (FViewportPosition.y < FMinScrollLimit.y) or
-     (FViewportPosition.y > FMaxScrollLimit.y) then yDiff := yDiff * FDragResistanceFactor;
+  if (FViewportPosition.x < FMinScrollLimit.x - TEpsilon.Position) or
+     (FViewportPosition.x > FMaxScrollLimit.x + TEpsilon.Position) then xDiff := xDiff * FDragResistanceFactor;
+  if (FViewportPosition.y < FMinScrollLimit.y - TEpsilon.Position) or
+     (FViewportPosition.y > FMaxScrollLimit.y + TEpsilon.Position) then yDiff := yDiff * FDragResistanceFactor;
 
   if FDragResistanceFactor = 0 then begin
-         if FViewportPosition.x + xDiff < FMinScrollLimit.x then xDiff := FMinScrollLimit.x - FViewportPosition.x
-    else if FViewportPosition.x + xDiff > FMaxScrollLimit.x then xDiff := FMaxScrollLimit.x - FViewportPosition.x;
-         if FViewportPosition.y + YDiff < FMinScrollLimit.y then yDiff := FMinScrollLimit.y - FViewportPosition.y
-    else if FViewportPosition.y + YDiff > FMaxScrollLimit.y then yDiff := FMaxScrollLimit.y - FViewportPosition.y;
+         if FViewportPosition.x + xDiff < FMinScrollLimit.x - TEpsilon.Position then xDiff := FMinScrollLimit.x - FViewportPosition.x
+    else if FViewportPosition.x + xDiff > FMaxScrollLimit.x + TEpsilon.Position then xDiff := FMaxScrollLimit.x - FViewportPosition.x;
+         if FViewportPosition.y + YDiff < FMinScrollLimit.y - TEpsilon.Position then yDiff := FMinScrollLimit.y - FViewportPosition.y
+    else if FViewportPosition.y + YDiff > FMaxScrollLimit.y + TEpsilon.Position then yDiff := FMaxScrollLimit.y - FViewportPosition.y;
   end;
 
   if sameValue(xDiff, 0, Tepsilon.Position) and

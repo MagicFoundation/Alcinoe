@@ -64,6 +64,7 @@ type
         function SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
         /// <summary>
+        ///   The Builder instance will be released during this operation.
         ///   If a dialog is already being shown and <c>AForceImmediateShow</c> is <c>false</c>,
         ///   the new dialog will be queued and displayed after the current one is closed.
         ///   If <c>AForceImmediateShow</c> is <c>true</c>, the current dialog will be closed
@@ -93,6 +94,7 @@ type
     FCustomDialogObjProc: TCustomDialogObjProc;
     FOnActionRefProc: TOnActionRefProc;
     FOnActionObjProc: TOnActionObjProc;
+    FVirtualKeyboardAnimation: TALFloatAnimation;
     function GetContainer: TALRectangle;
     function GetIcon: TALImage;
     function GetHeadline: TALText;
@@ -100,13 +102,14 @@ type
     function GetMessage: TALText;
     function GetButtonBar: TALRectangle;
     procedure SetCustomContainer(const AValue: TALControl);
-    procedure VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage); virtual;
+    procedure VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
+    procedure VirtualKeyboardAnimationProcess(Sender: TObject);
   protected
-    procedure ButtonClick(Sender: TObject); virtual;
     procedure LabelClick(Sender: TObject); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDestruction; override;
     function HasContainer: Boolean;
     function HasIcon: Boolean;
     function HasHeadline: Boolean;
@@ -128,6 +131,7 @@ type
     procedure AddEdit(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt);
     procedure AddMemo(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt);
     procedure AddButton(const ACaption: String; const ATag: NativeInt; Const AIsFooterButton: Boolean = True);
+    procedure ActionButtonClick(Sender: TObject); virtual;
     property Container: TALRectangle read GetContainer;
     property Icon: TALImage read GetIcon;
     property Headline: TALText read GetHeadline;
@@ -238,9 +242,9 @@ uses
 {************************************}
 constructor TALDialog.TBuilder.Create;
 begin
+  Inherited create;
   FDialog := TALDialog.Create(nil);
   FDialog.BeginUpdate;
-  Inherited create;
 end;
 
 {************************************}
@@ -386,6 +390,7 @@ end;
 {***********************************************}
 constructor TALDialog.Create(AOwner: TComponent);
 begin
+  inherited;
   FTouchBlocker := Nil;
   FContainer := nil;
   FIcon := nil;
@@ -398,28 +403,65 @@ begin
   FCustomDialogObjProc := nil;
   FOnActionRefProc := nil;
   FOnActionObjProc := nil;
+  FVirtualKeyboardAnimation := nil;
   TMessageManager.DefaultManager.SubscribeToMessage(TVKStateChangeMessage, VirtualKeyboardChangeHandler);
-  inherited;
   Assign(TALDialogManager.Instance.DefaultScrim);
   Name := 'ALDialogScrim';
   HitTest := True;
-  Onclick := ButtonClick;
+  Onclick := ActionButtonClick;
 end;
 
 {***************************}
 destructor TALDialog.Destroy;
 begin
+  ALFreeAndNil(FVirtualKeyboardAnimation);
+  inherited;
+end;
+
+{************************************}
+procedure TALDialog.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  if FVirtualKeyboardAnimation <> nil then FVirtualKeyboardAnimation.Enabled := False;
+  // Unsubscribe from TVKStateChangeMessage to stop receiving messages.
+  // This must be done in BeforeDestruction rather than in Destroy,
+  // because the control might be freed in the background via ALFreeAndNil(..., delayed),
+  // and BeforeDestruction is guaranteed to execute on the main thread.
   TMessageManager.DefaultManager.Unsubscribe(TVKStateChangeMessage, VirtualKeyboardChangeHandler);
-  inherited Destroy;
+  inherited;
 end;
 
 {************************************************************************************************************}
 procedure TALDialog.VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
 begin
-  if TVKStateChangeMessage(Msg).KeyboardVisible then
-    Padding.Bottom := TVKStateChangeMessage(Msg).KeyboardBounds.Height
-  else
-    Padding.Bottom := 0;
+  if FVirtualKeyboardAnimation = nil then begin
+    FVirtualKeyboardAnimation := TALFloatAnimation.Create;
+    FVirtualKeyboardAnimation.OnProcess := VirtualKeyboardAnimationProcess;
+  end;
+  FVirtualKeyboardAnimation.Enabled := False;
+  if TVKStateChangeMessage(Msg).KeyboardVisible then begin
+    {$IF defined(ANDROID)}
+    FVirtualKeyboardAnimation.Duration := 0.300;
+    {$ELSE}
+    FVirtualKeyboardAnimation.Duration := 0.500;
+    {$ENDIF}
+    FVirtualKeyboardAnimation.InterpolationType := TALInterpolationType.Material3StandardDefaultEffects;
+    FVirtualKeyboardAnimation.StartValue := margins.Bottom;
+    FVirtualKeyboardAnimation.StopValue := TVKStateChangeMessage(Msg).KeyboardBounds.Height;
+  end
+  else begin
+    FVirtualKeyboardAnimation.Duration := 0.200;
+    FVirtualKeyboardAnimation.InterpolationType := TALInterpolationType.Material3StandardDefaultEffects;
+    FVirtualKeyboardAnimation.StartValue := margins.Bottom;
+    FVirtualKeyboardAnimation.StopValue := 0;
+  end;
+  FVirtualKeyboardAnimation.Start;
+end;
+
+{************************************************************************}
+procedure TALDialog.VirtualKeyboardAnimationProcess(Sender: TObject);
+begin
+  margins.Bottom := FVirtualKeyboardAnimation.CurrentValue;
 end;
 
 {********************************************}
@@ -626,7 +668,7 @@ begin
     LButton.Assign(TALDialogManager.Instance.DefaultFooterButton);
     LButton.Text := ACaption;
     LButton.Tag := ATag;
-    LButton.OnClick := ButtonClick;
+    LButton.OnClick := ActionButtonClick;
     LButton.Name := 'ALDialogButton'+ALIntToStrW(ATag);
   end
   else begin
@@ -635,7 +677,7 @@ begin
     LButton.Assign(TALDialogManager.Instance.DefaultInlineButton);
     LButton.Text := ACaption;
     LButton.Tag := ATag;
-    LButton.OnClick := ButtonClick;
+    LButton.OnClick := ActionButtonClick;
     LButton.Name := 'ALDialogButton'+ALIntToStrW(ATag);
   end;
 end;
@@ -873,7 +915,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALDialog.ButtonClick(Sender: TObject);
+procedure TALDialog.ActionButtonClick(Sender: TObject);
 begin
   var LCanClose: Boolean := True;
   if Assigned(FOnActionRefProc) then FOnActionRefProc(self, TALControl(Sender).Tag, LCanClose)
@@ -1054,6 +1096,7 @@ begin
   if (not assigned(FCurrentDialog.CustomDialogRefProc)) and
      (not assigned(FCurrentDialog.CustomDialogObjProc)) then begin
 
+    FCurrentDialog.FTouchBlocker.Visible := True;
     FCurrentDialog.Container.Align := TALAlignlayout.None;
 
     FScrimAnimation.Enabled := False;
@@ -1193,210 +1236,207 @@ begin
 
   // Align all elements properly.
   ADialog.BeginUpdate;
-  try
 
-    // CustomDialogRefProc
-    if assigned(ADialog.CustomDialogRefProc) then begin
-      ADialog.Fill.Color := TALphaColors.Null;
-    end
+  // CustomDialogRefProc
+  if assigned(ADialog.CustomDialogRefProc) then begin
+    ADialog.Fill.Color := TALphaColors.Null;
+  end
 
-    // CustomDialogObjProc
-    else if assigned(ADialog.CustomDialogObjProc) then begin
-      ADialog.Fill.Color := TALphaColors.Null;
-    end
+  // CustomDialogObjProc
+  else if assigned(ADialog.CustomDialogObjProc) then begin
+    ADialog.Fill.Color := TALphaColors.Null;
+  end
 
-    // CustomContainer
-    else if ADialog.HasCustomContainer then begin
-      LForm.Focused := nil;
-      FreezeNativeViews;
-      if ADialog.HasContainer then
-        ADialog.Container.Visible := False;
-    end
+  // CustomContainer
+  else if ADialog.HasCustomContainer then begin
+    LForm.Focused := nil;
+    FreezeNativeViews;
+    if ADialog.HasContainer then
+      ADialog.Container.Visible := False;
+  end
 
-    // Regular dialog
-    else begin
+  // Regular dialog
+  else begin
 
-      LForm.Focused := nil;
-      FreezeNativeViews;
-      var LCurrY: Single := 0;
-      var LContainerWidth: Single := 0;
-      var LContentHeight: Single := 0;
-      var LContentWidth: Single := 0;
-      var LMarginTopAdjustment: Single := 0;
+    LForm.Focused := nil;
+    FreezeNativeViews;
+    var LCurrY: Single := 0;
+    var LContainerWidth: Single := 0;
+    var LContentHeight: Single := 0;
+    var LContentWidth: Single := 0;
+    var LMarginTopAdjustment: Single := 0;
 
-      // Icon
-      if ADialog.HasIcon then begin
-        if ADialog.Icon.ResourceName = '' then ADialog.Icon.Visible := False
-        else begin
-          ADialog.Icon.Position.Y := LCurrY + ADialog.Icon.Margins.top;
-          LCurrY := ADialog.Icon.Position.Y + ADialog.Icon.Height + ADialog.Icon.Margins.Bottom;
-          LContainerWidth := max(
-                               LContainerWidth,
-                               ADialog.Container.Padding.Right +
-                               ADialog.Container.Padding.Left +
-                               ADialog.Icon.Margins.Right +
-                               ADialog.Icon.Margins.Left +
-                               ADialog.Icon.Width);
-        end;
-      end;
-
-      // Headline
-      if ADialog.HasHeadline then begin
-        if ADialog.Headline.Text = '' then ADialog.Headline.Visible := False
-        else begin
-          if (not ADialog.HasIcon) or (not ADialog.Icon.IsVisible) then
-            ADialog.Headline.Margins.top := 0;
-          ADialog.Headline.Position.Y := LCurrY + ADialog.Headline.Margins.top;
-          LCurrY := ADialog.Headline.Position.Y + ADialog.Headline.Height + ADialog.Headline.Margins.Bottom;
-          LContainerWidth := max(
-                               LContainerWidth,
-                               ADialog.Container.Padding.Right +
-                               ADialog.Container.Padding.Left +
-                               ADialog.Headline.Margins.Right +
-                               ADialog.Headline.Margins.Left +
-                               ADialog.Headline.Width);
-          if ADialog.HasIcon and ADialog.Icon.Visible then begin
-            ADialog.Headline.Align := TALAlignLayout.TopCenter;
-            ADialog.Headline.TextSettings.HorzAlign := TALTextHorzAlign.Center;
-          end;
-        end;
-      end;
-
-      // Content
-      if ADialog.HasContent then begin
-
-        if ((not ADialog.HasIcon) or (not ADialog.Icon.IsVisible)) and
-           ((not ADialog.HasHeadline) or (not ADialog.Headline.IsVisible)) then
-          ADialog.Content.Margins.top := 0;
-
-        if ADialog.HasMessage then begin
-          ADialog.Message.Index := 0;
-          if ADialog.Message.Text = '' then ADialog.Message.Visible := False;
-        end;
-
-        if ADialog.Content.Content.ControlsCount > 0 then begin
-          for var I := 0 to ADialog.Content.Content.ControlsCount - 1 do begin
-            var LItem := ADialog.Content.Content.Controls[i];
-            if not LItem.Visible then continue;
-            LItem.Margins.top := LItem.TagFloat;
-            break;
-          end;
-
-          for var I := ADialog.Content.Content.ControlsCount - 1 downto 0 do begin
-            var LItem := ADialog.Content.Content.Controls[i];
-            if not LItem.Visible then continue;
-            LItem.Margins.bottom := LItem.TagFloat;
-            LMarginTopAdjustment := -LItem.TagFloat;
-            break;
-          end;
-        end;
-
-        For var I := 0 to ADialog.Content.Content.ControlsCount - 1 do begin
-          var LItem := ADialog.Content.Content.Controls[i];
-          if not LItem.Visible then Continue;
-          LItem.Position.Y := LContentHeight + LItem.Margins.top;
-          LContentHeight := LItem.Position.Y + LItem.Height + LItem.Margins.bottom;
-          LContentWidth := max(
-                             LContentWidth,
-                             ADialog.content.Padding.Right +
-                             ADialog.content.Padding.Left +
-                             LItem.margins.Right +
-                             LItem.margins.Left +
-                             LItem.Width);
-        end;
-
-        ADialog.Content.Position.Y := LCurrY + ADialog.Content.Margins.Top;
-        LCurrY := ADialog.Content.Position.Y + LContentHeight + ADialog.Content.Margins.Bottom;
-        LContainerWidth := Max(
-                             LContainerWidth,
-                             ADialog.Container.Padding.Right +
-                             ADialog.Container.Padding.Left +
-                             ADialog.Content.Margins.Right +
-                             ADialog.Content.Margins.Left +
-                             LContentWidth);
-
-      end;
-
-      // Edits
-      For var I := low(LEdits) to high(LEdits) do begin
-        var LEdit := LEdits[i];
-        LEdit.Margins.top := LEdit.Margins.top + LMarginTopAdjustment;
-        LMarginTopAdjustment := 0;
-        LEdit.Position.Y := LCurrY + LEdit.Margins.top;
-        LCurrY := LEdit.Position.Y + LEdit.Height + LEdit.Margins.Bottom;
+    // Icon
+    if ADialog.HasIcon then begin
+      if ADialog.Icon.ResourceName = '' then ADialog.Icon.Visible := False
+      else begin
+        ADialog.Icon.Position.Y := LCurrY + ADialog.Icon.Margins.top;
+        LCurrY := ADialog.Icon.Position.Y + ADialog.Icon.Height + ADialog.Icon.Margins.Bottom;
         LContainerWidth := max(
                              LContainerWidth,
                              ADialog.Container.Padding.Right +
                              ADialog.Container.Padding.Left +
-                             LEdit.Margins.Right +
-                             LEdit.Margins.Left +
-                             LEdit.Width);
+                             ADialog.Icon.Margins.Right +
+                             ADialog.Icon.Margins.Left +
+                             ADialog.Icon.Width);
       end;
+    end;
 
-      // ButtonBar
-      if ADialog.HasButtonBar then begin
-        ADialog.ButtonBar.Margins.top := ADialog.ButtonBar.Margins.top + LMarginTopAdjustment;
-        //LMarginTopAdjustment := 0;
-        If ADialog.ButtonBar.Width > GetMaxDialogContainerWidth
-                                     - ADialog.ButtonBar.Margins.Right
-                                     - ADialog.ButtonBar.Margins.Left
-                                     - ADialog.Container.padding.Right
-                                     - ADialog.Container.padding.Left then begin
-          var LCurrButtonY: Single := 0;
-          For var I := 0 to ADialog.ButtonBar.ControlsCount - 1 do begin
-            if ADialog.ButtonBar.Controls[i] is TALControl then begin
-              var LButton := TALControl(ADialog.ButtonBar.Controls[i]);
-              LButton.Position.Y := LCurrButtonY + LButton.Margins.top;
-              LCurrButtonY := LButton.Position.Y + LButton.Height + LButton.Margins.bottom;
-              LButton.Align := TALAlignLayout.TopRight;
-            end;
-          end;
-          ADialog.ButtonBar.EndUpdate;
-          ADialog.ButtonBar.BeginUpdate;
-        end
-        else begin
-          var LCurrButtonX: Single := 0;
-          For var I := ADialog.ButtonBar.ControlsCount - 1 downto 0 do begin
-            var LButton := ADialog.ButtonBar.Controls[i];
-            LButton.Position.X := LCurrButtonX + LButton.Margins.left;
-            LCurrButtonX := LButton.Position.X + LButton.Width + LButton.Margins.Right;
-          end;
+    // Headline
+    if ADialog.HasHeadline then begin
+      if ADialog.Headline.Text = '' then ADialog.Headline.Visible := False
+      else begin
+        if (not ADialog.HasIcon) or (not ADialog.Icon.IsVisible) then
+          ADialog.Headline.Margins.top := 0;
+        ADialog.Headline.Position.Y := LCurrY + ADialog.Headline.Margins.top;
+        LCurrY := ADialog.Headline.Position.Y + ADialog.Headline.Height + ADialog.Headline.Margins.Bottom;
+        LContainerWidth := max(
+                             LContainerWidth,
+                             ADialog.Container.Padding.Right +
+                             ADialog.Container.Padding.Left +
+                             ADialog.Headline.Margins.Right +
+                             ADialog.Headline.Margins.Left +
+                             ADialog.Headline.Width);
+        if ADialog.HasIcon and ADialog.Icon.Visible then begin
+          ADialog.Headline.Align := TALAlignLayout.TopCenter;
+          ADialog.Headline.TextSettings.HorzAlign := TALTextHorzAlign.Center;
         end;
-        ADialog.ButtonBar.Position.Y := LCurrY + ADialog.ButtonBar.Margins.top;
-        LCurrY := ADialog.ButtonBar.Position.Y + ADialog.ButtonBar.Height + ADialog.ButtonBar.Margins.Bottom;
+      end;
+    end;
+
+    // Content
+    if ADialog.HasContent then begin
+
+      if ((not ADialog.HasIcon) or (not ADialog.Icon.IsVisible)) and
+         ((not ADialog.HasHeadline) or (not ADialog.Headline.IsVisible)) then
+        ADialog.Content.Margins.top := 0;
+
+      if ADialog.HasMessage then begin
+        ADialog.Message.Index := 0;
+        if ADialog.Message.Text = '' then ADialog.Message.Visible := False;
       end;
 
-      // Adjust the container Width
-      var LDummyControl := TALLayout.Create(ADialog.Container);
-      LDummyControl.Parent := ADialog.Container;
-      LDummyControl.Width := max(GetMinDialogContainerWidth, LContainerWidth)
-                             - ADialog.Container.padding.Right
-                             - ADialog.Container.padding.left;
-      LDummyControl.Height := 0;
-      LDummyControl.Align := TALAlignLayout.TopLeft;
+      if ADialog.Content.Content.ControlsCount > 0 then begin
+        for var I := 0 to ADialog.Content.Content.ControlsCount - 1 do begin
+          var LItem := ADialog.Content.Content.Controls[i];
+          if not LItem.Visible then continue;
+          LItem.Margins.top := LItem.TagFloat;
+          break;
+        end;
 
-      // Adjust the Content Height
-      if ADialog.HasContent then begin
-        // Alert dialogs should not exceed 2/3 (66%) of the screen height.
-        // This ensures the dialog remains readable and actionable without forcing excessive scrolling.
-        Var LMaxContentHeight := (LForm.ClientHeight * (2/3))
-                                 - ADialog.Container.Padding.Top
-                                 - ADialog.Container.Padding.bottom
-                                 - LCurrY + LContentHeight;
-        ADialog.Content.Height := min(LContentHeight, LMaxContentHeight);
-        ADialog.Content.Width := LDummyControl.Width +
-                                 + ADialog.Container.padding.Left +
-                                 + ADialog.Container.padding.Right;
+        for var I := ADialog.Content.Content.ControlsCount - 1 downto 0 do begin
+          var LItem := ADialog.Content.Content.Controls[i];
+          if not LItem.Visible then continue;
+          LItem.Margins.bottom := LItem.TagFloat;
+          LMarginTopAdjustment := -LItem.TagFloat;
+          break;
+        end;
       end;
+
+      For var I := 0 to ADialog.Content.Content.ControlsCount - 1 do begin
+        var LItem := ADialog.Content.Content.Controls[i];
+        if not LItem.Visible then Continue;
+        LItem.Position.Y := LContentHeight + LItem.Margins.top;
+        LContentHeight := LItem.Position.Y + LItem.Height + LItem.Margins.bottom;
+        LContentWidth := max(
+                           LContentWidth,
+                           ADialog.content.Padding.Right +
+                           ADialog.content.Padding.Left +
+                           LItem.margins.Right +
+                           LItem.margins.Left +
+                           LItem.Width);
+      end;
+
+      ADialog.Content.Position.Y := LCurrY + ADialog.Content.Margins.Top;
+      LCurrY := ADialog.Content.Position.Y + LContentHeight + ADialog.Content.Margins.Bottom;
+      LContainerWidth := Max(
+                           LContainerWidth,
+                           ADialog.Container.Padding.Right +
+                           ADialog.Container.Padding.Left +
+                           ADialog.Content.Margins.Right +
+                           ADialog.Content.Margins.Left +
+                           LContentWidth);
 
     end;
 
-    LForm.InsertComponent(ADialog);
-    ADialog.Parent := LForm;
+    // Edits
+    For var I := low(LEdits) to high(LEdits) do begin
+      var LEdit := LEdits[i];
+      LEdit.Margins.top := LEdit.Margins.top + LMarginTopAdjustment;
+      LMarginTopAdjustment := 0;
+      LEdit.Position.Y := LCurrY + LEdit.Margins.top;
+      LCurrY := LEdit.Position.Y + LEdit.Height + LEdit.Margins.Bottom;
+      LContainerWidth := max(
+                           LContainerWidth,
+                           ADialog.Container.Padding.Right +
+                           ADialog.Container.Padding.Left +
+                           LEdit.Margins.Right +
+                           LEdit.Margins.Left +
+                           LEdit.Width);
+    end;
 
-  finally
-    ADialog.EndUpdate;
+    // ButtonBar
+    if ADialog.HasButtonBar then begin
+      ADialog.ButtonBar.Margins.top := ADialog.ButtonBar.Margins.top + LMarginTopAdjustment;
+      //LMarginTopAdjustment := 0;
+      If ADialog.ButtonBar.Width > GetMaxDialogContainerWidth
+                                   - ADialog.ButtonBar.Margins.Right
+                                   - ADialog.ButtonBar.Margins.Left
+                                   - ADialog.Container.padding.Right
+                                   - ADialog.Container.padding.Left then begin
+        var LCurrButtonY: Single := 0;
+        For var I := 0 to ADialog.ButtonBar.ControlsCount - 1 do begin
+          if ADialog.ButtonBar.Controls[i] is TALControl then begin
+            var LButton := TALControl(ADialog.ButtonBar.Controls[i]);
+            LButton.Position.Y := LCurrButtonY + LButton.Margins.top;
+            LCurrButtonY := LButton.Position.Y + LButton.Height + LButton.Margins.bottom;
+            LButton.Align := TALAlignLayout.TopRight;
+          end;
+        end;
+        ADialog.ButtonBar.EndUpdate;
+        ADialog.ButtonBar.BeginUpdate;
+      end
+      else begin
+        var LCurrButtonX: Single := 0;
+        For var I := ADialog.ButtonBar.ControlsCount - 1 downto 0 do begin
+          var LButton := ADialog.ButtonBar.Controls[i];
+          LButton.Position.X := LCurrButtonX + LButton.Margins.left;
+          LCurrButtonX := LButton.Position.X + LButton.Width + LButton.Margins.Right;
+        end;
+      end;
+      ADialog.ButtonBar.Position.Y := LCurrY + ADialog.ButtonBar.Margins.top;
+      LCurrY := ADialog.ButtonBar.Position.Y + ADialog.ButtonBar.Height + ADialog.ButtonBar.Margins.Bottom;
+    end;
+
+    // Adjust the container Width
+    var LDummyControl := TALLayout.Create(ADialog.Container);
+    LDummyControl.Parent := ADialog.Container;
+    LDummyControl.Width := max(GetMinDialogContainerWidth, LContainerWidth)
+                           - ADialog.Container.padding.Right
+                           - ADialog.Container.padding.left;
+    LDummyControl.Height := 0;
+    LDummyControl.Align := TALAlignLayout.TopLeft;
+
+    // Adjust the Content Height
+    if ADialog.HasContent then begin
+      // Alert dialogs should not exceed 2/3 (66%) of the screen height.
+      // This ensures the dialog remains readable and actionable without forcing excessive scrolling.
+      Var LMaxContentHeight := (LForm.ClientHeight * (2/3))
+                               - ADialog.Container.Padding.Top
+                               - ADialog.Container.Padding.bottom
+                               - LCurrY + LContentHeight;
+      ADialog.Content.Height := min(LContentHeight, LMaxContentHeight);
+      ADialog.Content.Width := LDummyControl.Width +
+                               + ADialog.Container.padding.Left +
+                               + ADialog.Container.padding.Right;
+    end;
+
   end;
+
+  // This will defacto call ADialog.EndUpdate
+  // in TCustomForm.DoAddObject.SetUpdatingState
+  LForm.InsertComponent(ADialog);
+  ADialog.Parent := LForm;
 
   FCurrentDialog := ADialog;
 
@@ -1465,7 +1505,7 @@ begin
   if FContainerAnimation.StopValue < 0.5 then DoCloseCurrentDialog
   else begin
     FCurrentDialog.Container.Align := TalAlignLayout.Center;
-    ALFreeAndNil(FCurrentDialog.FTouchBlocker);
+    FCurrentDialog.FTouchBlocker.Visible := false;
   end;
 end;
 

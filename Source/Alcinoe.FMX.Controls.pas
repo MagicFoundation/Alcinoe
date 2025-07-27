@@ -10,7 +10,8 @@ uses
   System.Classes,
   FMX.Forms,
   FMX.Controls,
-  FMX.Types;
+  FMX.Types,
+  FMX.Graphics;
 
 type
 
@@ -159,6 +160,7 @@ type
     procedure AdjustSize; virtual;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
     function GetAbsoluteDisplayedRect: TRectF; virtual;
+    function FillTextFlags: TFillTextFlags; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1308,6 +1310,13 @@ begin
     LControlTmp := LControlTmp.ParentControl;
   end;
   Result := TRectF.Intersect(Form.ClientRect, LAbsoluteIntersectionRect)
+end;
+
+{************************************************}
+function TALControl.FillTextFlags: TFillTextFlags;
+begin
+  if (Root = nil) then result := ALGetFillTextFlags
+  else result := inherited;
 end;
 
 {***********************************************}

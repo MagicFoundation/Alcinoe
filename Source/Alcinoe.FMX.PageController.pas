@@ -1700,15 +1700,15 @@ begin
   if not FPageController.HasActivePage then exit;
 
   {$IFDEF DEBUG}
-  //ALLog('TALPageController.TScrollEngine.DoMouseUp', 'ScrollCapturedByMe:'+ALBooltoStrW(FPageController.fScrollCapturedByMe, 'True', 'False'));
+  //ALLog(ClassName + '.DoMouseUp', 'ScrollCapturedByMe:'+ALBooltoStrW(FPageController.fScrollCapturedByMe, 'True', 'False'));
   {$ENDIF}
 
   // Initialize the target page index with the current active page.
   var LTargetPageIndex := FPageController.ActivePageIndex;
   if (FPageController.fScrollCapturedByMe) and (LTargetPageIndex = FDownPageIndex) then begin
     var LCmpVelocity: TValueRelationship;
-    If FPageController.Orientation = TOrientation.Horizontal then LCmpVelocity := compareValue(UpVelocity.X, 0, Tepsilon.Position)
-    else LCmpVelocity := compareValue(UpVelocity.Y, 0, Tepsilon.Position);
+    If FPageController.Orientation = TOrientation.Horizontal then LCmpVelocity := compareValue(UpVelocity.X, 0, TALScrollEngine.DefaultLowVelocityThreshold)
+    else LCmpVelocity := compareValue(UpVelocity.Y, 0, TALScrollEngine.DefaultLowVelocityThreshold);
     if LCmpVelocity > 0 then begin
       if ((FPageController.Orientation = TOrientation.Horizontal) and
           (DownPosition.X > UpPosition.X)) or
@@ -1933,7 +1933,7 @@ begin
          (compareValue(LPageView.position.X + Content.Position.X + LPageView.Width, LCenterLine, TEpsilon.Position) > 0) then begin
         {$IF defined(debug)}
         //if FActivePageIndex <> LPageIndex then
-        //  Allog('TALPageController.RefreshActivePageIndex', AlInttostrW(I));
+        //  Allog(ClassName + '.RefreshActivePageIndex', AlInttostrW(I));
         {$ENDIF}
         FActivePageIndex := LPageIndex;
         Break;
@@ -1948,7 +1948,7 @@ begin
          (compareValue(LPageView.position.Y + Content.Position.Y + LPageView.Height, LCenterLine, TEpsilon.Position) > 0) then begin
         {$IF defined(debug)}
         //if FActivePageIndex <> LPageIndex then
-        //  Allog('TALPageController.RefreshActivePageIndex', AlInttostrW(I));
+        //  Allog(ClassName + '.RefreshActivePageIndex', AlInttostrW(I));
         {$ENDIF}
         FActivePageIndex := LPageIndex;
         Break;
@@ -2081,18 +2081,18 @@ end;
 {************************************************************************************************************************************}
 procedure TALPageController.SetActivePage(const AValue: TALPageView; const ATransition: TPageTransition; const AVelocity: Single = 0);
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    // Extracted from the distanceInfluenceForSnapDuration method in ViewPager.java.
-    // We want the duration of the page snap animation to be influenced by the distance that
-    // the screen has to travel, however, we don't want this duration to be effected in a
-    // purely linear fashion. Instead, we use this method to moderate the effect that the distance
-    // of travel has on the overall snap duration.
-    function distanceInfluenceForSnapDuration(f: Single): single;
-    begin
-      f := f - 0.5; // center the values about 0.
-      f := f * (0.3 * PI / 2.0);
-      Result := sin(f);
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // Extracted from the distanceInfluenceForSnapDuration method in ViewPager.java.
+  // We want the duration of the page snap animation to be influenced by the distance that
+  // the screen has to travel, however, we don't want this duration to be effected in a
+  // purely linear fashion. Instead, we use this method to moderate the effect that the distance
+  // of travel has on the overall snap duration.
+  function distanceInfluenceForSnapDuration(f: Single): single;
+  begin
+    f := f - 0.5; // center the values about 0.
+    f := f * (0.3 * PI / 2.0);
+    Result := sin(f);
+  end;
 
 begin
 
@@ -2109,11 +2109,8 @@ begin
     if Orientation = TOrientation.Horizontal then begin
 
       var sx: Single := -Content.Position.X;
-      var sy: Single := -Content.Position.Y;
       var dx: Single := AValue.Position.X - GetEndPadding - sx;
-      var dy: Single := AValue.Position.y - sy;
-      if SameValue(dx, 0, TEpsilon.Position) and
-         SameValue(dy, 0, TEpsilon.Position) then exit;
+      if SameValue(dx, 0, TEpsilon.Position) then exit;
 
       var LWidth := Width - Padding.Left - Padding.Right;
       var LHalfWidth: Single := LWidth / 2;
@@ -2145,24 +2142,21 @@ begin
         //   pageDelta would be 0.5, and duration would be (0.5+1)x100=150 milliseconds.
         //
         // In general, this calculation produces a duration between 100 and 150 ms, which is too fast.
-        // To mitigate this, I multiply the computed duration by 2.
+        // To mitigate this, I multiply the computed duration by 4.
         //
         LDuration := LDuration * 4;
       end;
       LDuration := Min(LDuration, MAX_SETTLE_DURATION);
 
       if HasActivePage then ActivePage.ResetFocus;
-      ScrollEngine.startScroll(sx, sy, dx, dy, LDuration);
+      ScrollEngine.startScroll(sx, ScrollEngine.ViewPortPosition.Y, dx, 0, LDuration);
 
     end
     else begin
 
-      var sx: Single := -Content.Position.X;
       var sy: Single := -Content.Position.Y;
-      var dx: Single := AValue.Position.X - sx;
       var dy: Single := AValue.Position.y - GetEndPadding - sy;
-      if SameValue(dx, 0, TEpsilon.Position) and
-         SameValue(dy, 0, TEpsilon.Position) then exit;
+      if SameValue(dy, 0, TEpsilon.Position) then exit;
 
       var LHeight := Height - Padding.Top - Padding.Bottom;
       var LHalfHeight: Single := LHeight / 2;
@@ -2194,14 +2188,14 @@ begin
         //   pageDelta would be 0.5, and duration would be (0.5+1)x100=150 milliseconds.
         //
         // In general, this calculation produces a duration between 100 and 150 ms, which is too fast.
-        // To mitigate this, I multiply the computed duration by 2.
+        // To mitigate this, I multiply the computed duration by 4.
         //
         LDuration := LDuration * 4;
       end;
       LDuration := Min(LDuration, MAX_SETTLE_DURATION);
 
       if HasActivePage then ActivePage.ResetFocus;
-      ScrollEngine.startScroll(sx, sy, dx, dy, LDuration);
+      ScrollEngine.startScroll(ScrollEngine.ViewPortPosition.X, sy, 0, dy, LDuration);
 
     end;
 
@@ -2524,6 +2518,7 @@ begin
   if fDisableAlign then exit;
   fDisableAlign := True;
   try
+
     If orientation = Torientation.Horizontal then begin
       var LPageSize: Single := GetPageSize;
       var LCurrX: Single := 0;

@@ -3309,7 +3309,7 @@ begin
         {$REGION 'Handle TopBar with HidesOnScroll'}
         if (FTopBar <> nil) and (FTopBar.HidesOnScroll) and (FMainContent.Visible) then begin
 
-          // (*) When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
+          // {*} When reaching the scroll boundary, aValue.x/y is truncated from FScrollEngine.MaxScrollLimit.x.
           // Example from TALScrollEngine.DoMouseUp:
           //   LMaxY := Trunc(FMaxScrollLimit.y * ALScreenScale);
           // This is by design and reflects how the scroll engine works

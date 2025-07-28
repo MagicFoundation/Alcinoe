@@ -1609,6 +1609,8 @@ end;
 procedure TALControl.DoRootChanged;
 begin
   inherited;
+  // At design time root is not a TCommonCustomForm but
+  // an opaque TFmxDesignSurface type
   if Root is TCommonCustomForm then FForm := TCommonCustomForm(Root)
   else FForm := Nil;
 end;

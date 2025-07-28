@@ -296,6 +296,7 @@ uses
 {**}
 Type
   _TControlProtectedAccess = class(Tcontrol);
+  _TCustomFormProtectedAccess = class(TCustomForm);
   _TStyledControlProtectedAccess = class(TStyledControl);
 
 {************************************************}
@@ -632,8 +633,8 @@ begin
       //TALAlignLayout.MostBottomRight
       If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
          (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-         (ParentControl <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-         (_TControlProtectedAccess(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+         (((ParentControl <> nil) and (_TControlProtectedAccess(ParentControl).FDisableAlign)) or            // FDisableAlign = true mean that SetBounds was called by
+          ((ParentControl = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign))) // AlignObjects procedure inside inherited DoRealign
       then begin
         case FAlign of
           TALAlignLayout.TopCenter,
@@ -727,8 +728,8 @@ begin
   //TALAlignLayout.MostBottomRight
   If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
      (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-     (ParentControl <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-     (_TControlProtectedAccess(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+     (((ParentControl <> nil) and (_TControlProtectedAccess(ParentControl).FDisableAlign)) or             // FDisableAlign = true mean that SetBounds was called by
+      ((ParentControl = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign)))  // AlignObjects procedure inside inherited DoRealign
   then begin
     case FAlign of
       TALAlignLayout.TopCenter,

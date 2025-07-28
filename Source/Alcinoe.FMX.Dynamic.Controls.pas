@@ -2962,8 +2962,8 @@ begin
       //TALAlignLayout.MostBottomRight
       //**If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
       //**   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-      //**   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-      //**   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+      //**   (((Owner <> nil) and (_TALDynamicControlProtectedAccess(Owner).FDisableAlign)) or            // FDisableAlign = true mean that SetBounds was called by
+      //**    ((Owner = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign))) // AlignObjects procedure inside inherited DoRealign
       //**then begin
       //**  case FAlign of
       //**    TALAlignLayout.TopCenter,
@@ -3057,8 +3057,8 @@ begin
   //TALAlignLayout.MostBottomRight
   //**If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
   //**   (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-  //**   (Owner <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
-  //**   (_TALDynamicControlProtectedAccess(Owner).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
+  //**   (((Owner <> nil) and (_TALDynamicControlProtectedAccess(Owner).FDisableAlign)) or             // FDisableAlign = true mean that SetBounds was called by
+  //**    ((Owner = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign)))  // AlignObjects procedure inside inherited DoRealign
   //**then begin
   //**  case FAlign of
   //**    TALAlignLayout.TopCenter,

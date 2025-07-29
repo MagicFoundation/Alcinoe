@@ -127,7 +127,7 @@ forced to apply patches to the original Delphi source files:
 * [ForceQueue with Delay Does Not Work on Android](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3206)
 * [FullScreenManager.showSystemUI Resets SystemUiVisibility](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207)
 * [TControl.SetBounds: Missing ParentContentChanged Call on Size-Only Updates](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264)
-
+* [AndroidManifest merge in Delphi does not respect tools:node="remove" directive for uses-permission](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3867)
 
 Install Alcinoe
 ---------------

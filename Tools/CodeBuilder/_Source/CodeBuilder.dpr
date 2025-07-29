@@ -488,7 +488,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'FForm: TCommonCustomForm;', '//**FForm: TCommonCustomForm;');
     aSrc := FindAndReplace(aSrc, 'property Form: TCommonCustomForm read FForm;', '//**property Form: TCommonCustomForm read FForm;');
     aSrc := FindAndReplace(aSrc, 'FForm := nil;','//**FForm := nil;');
-    aSrc := FindAndReplace(aSrc, 'else //**FForm := nil;','else FForm := nil;');
     aSrc := FindAndReplace(aSrc, 'procedure DelayOnResize(Sender: TObject);','//**procedure DelayOnResize(Sender: TObject);');
     aSrc := FindAndReplace(aSrc, 'procedure DelayOnResized(Sender: TObject);','//**procedure DelayOnResized(Sender: TObject);');
     aSrc := FindAndReplace(aSrc, 'DoMouseEnter','MouseEnter');
@@ -1206,6 +1205,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
       ALFreeAndNil(LSrcLst);
     End;
     //--
+    aSrc := FindAndReplace(aSrc, '//**    //**FForm := nil;','//**    FForm := nil;');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicSwitch.TThumb', 'Margins', '4,4,4,4');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicButton', 'Padding', '12{Left}, 6{Top}, 12{Right}, 6{Bottom}');
     aSrc := AddDefaultBoundsClass(aSrc, 'TALDynamicToggleButton', 'Padding', '12{Left}, 6{Top}, 12{Right}, 6{Bottom}');

@@ -6635,10 +6635,12 @@ end;
 procedure ALInitFillTextFlags;
 begin
   if not ALFillTextFlagsInitialized then begin
-    Var LForm := Screen.ActiveForm;
-    if LForm = nil then LForm := Application.MainForm;
-    if LForm = nil then Raise Exception.Create('Error FACEB7BC-8EF6-42EF-A916-AE50698EA944');
-    if LForm.BiDiMode = bdRightToLeft then begin
+    {$IF defined(ALDPK)}
+    ALFillTextFlags := [];
+    {$ELSE}
+    Var LForm := Application.MainForm;
+    if LForm = nil then Raise Exception.Create('Error FACEB7BC-8EF6-42EF-A916-AE50698EA944')
+    else if LForm.BiDiMode = bdRightToLeft then begin
       ALFillTextFlags := [TFillTextFlag.RightToLeft];
       {$IF defined(debug)}
       ALLog('Fill Text Flags', '[TFillTextFlag.RightToLeft]');
@@ -6650,6 +6652,7 @@ begin
       ALLog('Fill Text Flags', '[]');
       {$ENDIF}
     end;
+    {$ENDIF}
     ALFillTextFlagsInitialized := True;
   end;
 end;

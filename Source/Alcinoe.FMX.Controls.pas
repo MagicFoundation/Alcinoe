@@ -282,6 +282,9 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
+  {$IF defined(ALDPK)}
+  System.Rtti,
+  {$ENDIF}
   {$IF defined(IOS)}
   FMX.Platform.iOS,
   {$ENDIF}
@@ -1609,10 +1612,25 @@ end;
 procedure TALControl.DoRootChanged;
 begin
   inherited;
-  // At design time root is not a TCommonCustomForm but
-  // an opaque TFmxDesignSurface type
   if Root is TCommonCustomForm then FForm := TCommonCustomForm(Root)
-  else FForm := Nil;
+  else begin
+    FForm := Nil;
+    {$IF defined(ALDPK)}
+    // At design time, the root is not a TCommonCustomForm,
+    // but an opaque TFmxDesignSurface instance.
+    // I happen to know (don’t ask how) that TFmxDesignSurface has
+    // a private field named:
+    //   FForm: FMX.Forms.TCommonCustomForm;
+    if Root is TObject then begin
+      var LObj := TObject(Root);
+      var LContext: TRttiContext;
+      var LType: TRttiType := LContext.GetType(LObj.ClassType);
+      var LField: TRttiField := LType.GetField('FForm');
+      if Assigned(LField) then
+        FForm := TCommonCustomForm(LField.GetValue(LObj).AsObject);
+    end;
+    {$ENDIF}
+  end;
 end;
 
 {**************************************}

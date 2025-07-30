@@ -24,7 +24,7 @@ REM -----------------
 REM Main Instructions
 REM -----------------
 
-Call :DOWNLOAD_FACEBOOK_LIBRARY "https://github.com/facebook/facebook-ios-sdk/releases/download/v15.1.0/FacebookSDK-Static_XCFramework.zip" "%ALBaseDir%\Libraries\ios\facebook"
+Call :DOWNLOAD_FACEBOOK_LIBRARY "https://github.com/facebook/facebook-ios-sdk/releases/download/v18.0.0/FacebookSDK-Static_XCFramework.zip" "%ALBaseDir%\Libraries\ios\facebook"
 Call :DOWNLOAD_FIREBASE_LIBRARY "https://github.com/firebase/firebase-ios-sdk/releases/download/10.12.0/Firebase.zip" "%ALBaseDir%\Libraries\ios\firebase"
 
 goto FINISHED

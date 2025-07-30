@@ -23,7 +23,6 @@
     <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s ਵਜੋਂ ਜਾਰੀ ਰੱਖੋ</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_title">ਲੌਗ ਇਨ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ</string>
     <string gender="unknown" name="com_facebook_tooltip_default">ਤੁਸੀਂ ਨਿਯੰਤਰਣ ਵਿੱਚ ਹੋ - ਇਹ ਚੁਣੋ ਕਿ ਐਪਾਂ ਨਾਲ ਤੁਸੀਂ ਕਿਹੜੀ ਜਾਣਕਾਰੀ ਨੂੰ ਸਾਂਝਾ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ।</string>
-    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string msgid="7903180715631665059" name="abc_action_bar_home_description">"ਹੋਮ \'ਤੇ ਜਾਓ"</string>
     <string msgid="6794660482873516081" name="abc_action_bar_up_description">"ਉੱਪਰ ਜਾਓ"</string>
     <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"ਹੋਰ ਵਿਕਲਪ"</string>
@@ -52,4 +51,5 @@
     <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g> ਨਾਲ ਸਾਂਝਾ ਕਰੋ"</string>
     <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"ਸਮੇਟੋ"</string>
     <string msgid="730395136688082741" name="search_menu_title">"ਖੋਜ"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

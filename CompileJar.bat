@@ -235,13 +235,13 @@ REM --------------------------------
 echo [36mBuild alcinoe-facebook-share[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-Call :UPDATE_ClASSPATH "https://repo1.maven.org/maven2" "com.facebook.android" "facebook-common" "15.2.0"
-REM Mandatory dependencies of com.facebook.android:facebook-common:15.2.0 required to build the JAR
+Call :UPDATE_ClASSPATH "https://repo1.maven.org/maven2" "com.facebook.android" "facebook-common" "18.0.3"
+REM Mandatory dependencies of com.facebook.android:facebook-common:18.0.3 required to build the JAR
 REM Use Tools\AndroidLibScanner\AndroidLibScanner.bat to determine the required versions of those dependencies
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment" "fragment" "1.3.0"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.1.0"
 SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\facebook\share\*.java
-Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-facebook-share" "1.0.1"
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-facebook-share" "1.0.2"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 

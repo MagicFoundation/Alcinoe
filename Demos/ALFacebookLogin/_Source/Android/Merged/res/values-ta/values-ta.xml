@@ -23,7 +23,6 @@
     <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s ஆகத் தொடர்</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_title">உள்நுழைதலை உறுதிப்படுத்தவும்</string>
     <string gender="unknown" name="com_facebook_tooltip_default">கட்டுப்பாடு உங்களிடம் உள்ளது. பயன்பாடுகளுடன் நீங்கள் பகிர விரும்பும் தகவல்களைத் தேர்வுசெய்யவும்.</string>
-    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string msgid="7903180715631665059" name="abc_action_bar_home_description">"முகப்பிற்குச் செல்லும்"</string>
     <string msgid="6794660482873516081" name="abc_action_bar_up_description">"மேலே செல்லும்"</string>
     <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"மேலும் விருப்பங்கள்"</string>
@@ -52,4 +51,5 @@
     <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g> மூலம் பகிர்"</string>
     <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"சுருக்கும்"</string>
     <string msgid="730395136688082741" name="search_menu_title">"தேடல்"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

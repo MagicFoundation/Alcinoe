@@ -11,7 +11,7 @@ https://developers.facebook.com/docs/facebook-login/android/
 1) follow the step described in Alcinoe.FMX.Facebook.Core
 
 2) On android you just need to include the library
-     * com.facebook.android:facebook-login:15.2.0
+     * com.facebook.android:facebook-login:18.0.3
    in the project. You can do this with the help of AndroidMerger. You can see
    an exemple in <Alcinoe>\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
 

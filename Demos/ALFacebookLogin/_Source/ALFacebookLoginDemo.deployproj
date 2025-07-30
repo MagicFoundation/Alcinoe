@@ -5555,6 +5555,15 @@
       <RemoteDir>ALFacebookLoginDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\xml\ad_services_config.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFacebookLoginDemo\res\xml\</RemoteDir>
+      <RemoteName>ad_services_config.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -11108,6 +11117,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFacebookLoginDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\xml\ad_services_config.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFacebookLoginDemo\res\xml\</RemoteDir>
+      <RemoteName>ad_services_config.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
@@ -16665,6 +16683,15 @@
       <RemoteDir>ALFacebookLoginDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\xml\ad_services_config.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFacebookLoginDemo\res\xml\</RemoteDir>
+      <RemoteName>ad_services_config.xml</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -22218,6 +22245,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFacebookLoginDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\xml\ad_services_config.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFacebookLoginDemo\res\xml\</RemoteDir>
+      <RemoteName>ad_services_config.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">

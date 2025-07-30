@@ -23,7 +23,6 @@
     <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s ಎಂದು ಮುಂದುವರಿಸಿ</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_title">ಲಾಗಿನ್ ಖಚಿತಪಡಿಸಿ</string>
     <string gender="unknown" name="com_facebook_tooltip_default">ನೀವು ನಿಯಂತ್ರಣದಲ್ಲಿದ್ದಿರಿ- ಅಪ್ಲಿಕೇಶನ್‌ಗಳೊಂದಿಗೆ ನೀವು ಯಾವ ಮಾಹಿತಿಯನ್ನು ಹಂಚಿಕೊಳ್ಳಬೇಕೆಂದು ಆಯ್ಕೆಮಾಡಿ.</string>
-    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string msgid="7903180715631665059" name="abc_action_bar_home_description">"ಹೋಮ್‌ಗೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ"</string>
     <string msgid="6794660482873516081" name="abc_action_bar_up_description">"ಮೇಲಕ್ಕೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ"</string>
     <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳು"</string>
@@ -52,4 +51,5 @@
     <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g> ನೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಿ"</string>
     <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"ಕುಗ್ಗಿಸಿ"</string>
     <string msgid="730395136688082741" name="search_menu_title">"ಹುಡುಕಿ"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
 </resources>

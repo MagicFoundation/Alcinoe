@@ -570,6 +570,21 @@ begin
           LSrcChildNode.Attributes['android:name']); // const aKeyAttributeValue: AnsiString;
       end
 
+      //<property android:name="string" ... />
+      //https://developer.android.com/guide/topics/manifest/property-element
+      else if (ALSameTextA(ASrcNode.NodeName, 'activity') or
+               ALSameTextA(ASrcNode.NodeName, 'activity-alias') or
+               ALSameTextA(ASrcNode.NodeName, 'application') or
+               ALSameTextA(ASrcNode.NodeName, 'provider') or
+               ALSameTextA(ASrcNode.NodeName, 'receiver') or
+               ALSameTextA(ASrcNode.NodeName, 'service')) and
+              ALSameTextA(LSrcChildNode.NodeName, 'property') then begin
+        _SwapNodeToDest(
+          LSrcChildNode, // const ANode: TALXmlNode;
+          'android:name', // const aKeyAttributeName: AnsiString;
+          LSrcChildNode.Attributes['android:name']); // const aKeyAttributeValue: AnsiString;
+      end
+
       //<activity android:name="string" ... />
       //https://developer.android.com/guide/topics/manifest/activity-element
       else if ALSameTextA(ASrcNode.NodeName, 'application') and

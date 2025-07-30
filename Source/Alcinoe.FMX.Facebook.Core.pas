@@ -53,7 +53,7 @@ https://developers.facebook.com/docs/android/getting-started
     <application>
       ...
       <meta-data android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled"
-               android:value="false"/>
+                 android:value="false"/>
       ...
     </application>
 

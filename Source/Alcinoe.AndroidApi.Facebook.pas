@@ -1,5 +1,5 @@
 //
-// Made from Facebook SDK version 15.2.0
+// Made from Facebook SDK version 18.0.3
 //
 unit Alcinoe.AndroidApi.Facebook;
 

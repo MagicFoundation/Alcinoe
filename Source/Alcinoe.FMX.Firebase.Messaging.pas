@@ -5,7 +5,7 @@
 Setup (ANDROID)
 ---------------
 
-On android you just need to include the library io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.0
+On android you just need to include the library io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1
 in the project. You also need to include google-services.json. You can do all
 of this with the help of AndroidMerger. you can see an exemple in
 <Alcinoe>\Demos\ALNotificationService\_source\android\MergeLibraries.bat

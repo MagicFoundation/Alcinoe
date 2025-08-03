@@ -416,6 +416,7 @@ type
         function GetDefaultLoop: Boolean; override;
       public
         constructor Create(const AOwner: TALAnimatedImage); reintroduce; virtual;
+        procedure Assign(Source: TPersistent); override;
         procedure Start; override;
         property CurrentProgress: Single read FCurrentProgress;
         property CurrentTime: Single read GetCurrentTime;
@@ -446,23 +447,36 @@ type
         {$ENDIF}
       {$ENDIF}
     {$ENDIF}
-    FResourceName: String;
-    FWrapMode: TALImageWrapMode;
-    FOnAnimationFirstFrame: TNotifyEvent;
-    FOnAnimationProcess: TNotifyEvent;
-    FOnAnimationFinish: TNotifyEvent;
+    FResourceName: String; // 8 bytes
+    FTintColor: TAlphaColor; // 4 bytes
+    FTintColorKey: String; // 8 bytes
+    FWrapMode: TALImageWrapMode; // 1 byte
+    FOnAnimationFirstFrame: TNotifyEvent; // 16 bytes
+    FOnAnimationProcess: TNotifyEvent; // 16 bytes
+    FOnAnimationFinish: TNotifyEvent; // 16 bytes
     procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure setResourceName(const Value: String);
     procedure SetAnimation(const Value: TAnimation);
+    procedure SetTintColor(const Value: TAlphaColor);
+    procedure setTintColorKey(const Value: String);
+    function IsTintColorStored: Boolean;
+    function IsTintColorKeyStored: Boolean;
   protected
+    procedure ApplyTintColorScheme; virtual;
+    function GetDefaultTintColor: TAlphaColor; virtual;
+    function GetDefaultTintColorKey: String; virtual;
     procedure Paint; override;
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
+    procedure ApplyColorScheme; override;
     procedure CreateCodec; virtual;
     procedure ReleaseCodec; virtual;
+    property DefaultTintColor: TAlphaColor read GetDefaultTintColor;
+    property DefaultTintColorKey: String read GetDefaultTintColorKey;
   published
     //property Action;
     property Align;
@@ -503,6 +517,8 @@ type
     property Size;
     //property TabOrder;
     //property TabStop;
+    property TintColor: TAlphaColor read FTintColor write SetTintColor stored IsTintColorStored;
+    property TintColorKey: String read FTintColorKey write setTintColorKey Stored IsTintColorKeyStored;
     property TouchTargetExpansion;
     property Visible;
     property Width;
@@ -2872,6 +2888,20 @@ begin
   FEnabled := True;
 end;
 
+{*************************************************************}
+procedure TALAnimatedImage.TAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALAnimatedImage.TAnimation then begin
+    Speed := TALAnimatedImage.TAnimation(Source).Speed;
+    StartProgress := TALAnimatedImage.TAnimation(Source).StartProgress;
+    StopProgress := TALAnimatedImage.TAnimation(Source).StopProgress;
+    inherited Assign(Source);
+    Enabled := TALAnimatedImage.TAnimation(Source).Enabled;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
 {******************************************}
 procedure TALAnimatedImage.TAnimation.Start;
 begin
@@ -3049,6 +3079,8 @@ begin
     {$ENDIF}
   {$ENDIF}
   FResourceName := '';
+  FTintColor := DefaultTintColor;
+  FTintColorKey := DefaultTintColorKey;
   FWrapMode := TALImageWrapMode.Fit;
   FOnAnimationFirstFrame := nil;
   FOnAnimationProcess := nil;
@@ -3074,6 +3106,54 @@ begin
   inherited;
 end;
 
+{*****************************************************************}
+procedure TALAnimatedImage.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TALAnimatedImage then begin
+      Animation.Assign(TALAnimatedImage(Source).Animation);
+      ResourceName := TALAnimatedImage(Source).ResourceName;
+      TintColor := TALAnimatedImage(Source).TintColor;
+      TintColorKey := TALAnimatedImage(Source).TintColorKey;
+      WrapMode := TALAnimatedImage(Source).WrapMode;
+      OnAnimationFirstFrame := TALAnimatedImage(Source).OnAnimationFirstFrame;
+      OnAnimationProcess := TALAnimatedImage(Source).OnAnimationProcess;
+      OnAnimationFinish := TALAnimatedImage(Source).OnAnimationFinish;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{**************************************}
+procedure TALAnimatedImage.ApplyTintColorScheme;
+begin
+  if FTintColorKey <> '' then begin
+    var LTintColor := TALStyleManager.Instance.GetColor(FTintColorKey);
+    if FTintColor <> LTintColor then begin
+      FTintColor := LTintColor;
+      releaseCodec;
+      Repaint;
+    end;
+  end;
+end;
+
+{**********************************}
+procedure TALAnimatedImage.ApplyColorScheme;
+begin
+  beginUpdate;
+  try
+    inherited;
+    ApplyTintColorScheme;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {*************************************}
 procedure TALAnimatedImage.CreateCodec;
 begin
@@ -3092,16 +3172,93 @@ begin
 
   var LFileName := ALGetResourceFilename(FResourceName);
 
-  if LFileName <> '' then begin
+  if (LFileName <> '') and (FTintColor = TAlphaColors.Null) then begin
     fSkottieAnimation := sk4d_skottieanimation_make_from_file(MarshaledAString(UTF8String(LFileName)), TSkDefaultProviders.TypefaceFont.Handle)
   end
   else begin
     {$IFDEF ALDPK}
     fSkottieAnimation := 0
     {$ELSE}
-    var LResourceStream := ALCreateResourceStream(FResourceName);
+    var LStream: TStream;
+    if (FTintColor <> TAlphaColors.Null) then begin
+      LStream := TALStringStreamA.Create('');
+      try
+        if (LFileName <> '') then TALStringStreamA(LStream).LoadFromFile(LFileName)
+        else begin
+          var LResourceStream := ALCreateResourceStream(FResourceName);
+          try
+            TALStringStreamA(LStream).LoadFromStream(LResourceStream);
+          finally
+            ALFreeAndNil(LResourceStream);
+          end;
+        end;
+        var LDataString := TALStringStreamA(LStream).DataString;
+        // Note: The pattern '{"ty":"fl","c":{"a":0,"k":[' is likely too restrictive.
+        // It currently matches our needs, but may fail in future cases.
+        // If issues arise, the code below should be updated accordingly.
+        var P1 := ALPosA('{"ty":"fl","c":{"a":0,"k":[', LDataString); // ...{"ty":"fl","c":{"a":0,"k":[0.544964001225,0.42151740579,0.713083424288,1],"ix":4},"o":{"a":0,"k":100,"ix":5},"r":1,"bm":0,"nm":"Fill 1","mn":"ADBE Vector Graphic - Fill","hd":false}
+        //                                                                  ^P1
+        While P1 > 0 do begin
+          inc(P1, 27{length('{"ty":"fl","c":{"a":0,"k":[')}); // ...{"ty":"fl","c":{"a":0,"k":[0.544964001225,0.42151740579,0.713083424288,1],"ix":4},"o":{"a":0,"k":100,"ix":5},"r":1,"bm":0,"nm":"Fill 1","mn":"ADBE Vector Graphic - Fill","hd":false}
+          //                                                                                   ^P1
+          var P2 := ALPosA(']', LDataString, P1); // ...{"ty":"fl","c":{"a":0,"k":[0.544964001225,0.42151740579,0.713083424288,1],"ix":4},"o":{"a":0,"k":100,"ix":5},"r":1,"bm":0,"nm":"Fill 1","mn":"ADBE Vector Graphic - Fill","hd":false}
+          //                                                                       ^P1                                          ^P2
+          if P2 <= 0 then raise Exception.Create('Error 3D3E0DFB-E8E3-4A11-A91F-83A66F0F63FB');
+          var LAlphaColorRec := TAlphacolorRec.Create(FTintColor);
+          var LTotalAvailableLength := P2 - P1; // = length of 0.544964001225,0.42151740579,0.713083424288,1
+          var LAvailablePrecisionByChannel: Integer;
+          if LAlphaColorRec.A = 255 then
+            LAvailablePrecisionByChannel := (LTotalAvailableLength - 10{'0.' - ',0.' - ',0.' - ',1'}) div 3
+          else
+            LAvailablePrecisionByChannel := (LTotalAvailableLength - 11{'0.' - ',0.' - ',0.' - ',0.'}) div 4;
+          if LAvailablePrecisionByChannel >= 3 then begin
+            var LNewColorsStr: AnsiString;
+            if LAlphaColorRec.A = 255 then
+              LNewColorsStr := ALFormatA(
+                                 '%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,1',
+                                 [LAlphaColorRec.R / 255,
+                                  LAlphaColorRec.G / 255,
+                                  LAlphaColorRec.B / 255])
+            else
+              LNewColorsStr := ALFormatA(
+                                   '%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f',
+                                   [LAlphaColorRec.R / 255,
+                                    LAlphaColorRec.G / 255,
+                                    LAlphaColorRec.B / 255,
+                                    LAlphaColorRec.A / 255]);
+            {$IF defined(debug)}
+            if Length(LNewColorsStr) > P2 - P1 then
+             raise Exception.Create('Error DED1DB9C-A723-4240-AE50-4FBF02293B2F');
+            {$ENDIF}
+            if Length(LNewColorsStr) < P2 - P1 then begin
+              var LOldLength := Length(LNewColorsStr);
+              SetLength(LNewColorsStr, P2 - P1);
+              FillChar(PAnsiChar(LNewColorsStr)[LOldLength], (P2 - P1) - LOldLength, Ord(' '));
+            end;
+            ALMove(PAnsiChar(LNewColorsStr)^, PAnsiChar(LDataString)[P1-1], length(LNewColorsStr));
+          end
+          else begin
+            var LNewColorsStr := ALFormatA(
+                                   '%.6f,%.6f,%.6f,%.6f',
+                                   [LAlphaColorRec.R / 255,
+                                    LAlphaColorRec.G / 255,
+                                    LAlphaColorRec.B / 255,
+                                    LAlphaColorRec.A / 255]);
+            delete(LDataString,P1, P2-P1);
+            insert(LNewColorsStr, LDataString, P1);
+          end;
+          P1 := ALPosA('{"ty":"fl","c":{"a":0,"k":[', LDataString, P1);
+        end;
+        TALStringStreamA(LStream).DataString := LDataString;
+      except
+        ALFreeAndNil(LStream);
+        Raise;
+      end;
+    end
+    else LStream := ALCreateResourceStream(FResourceName);
     try
-      var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
+
+      var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LStream));
       try
         var LStreamadapterProcs: sk_streamadapter_procs_t;
         LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
@@ -3117,7 +3274,7 @@ begin
         sk4d_streamadapter_destroy(LSKStream);
       end;
     finally
-      ALfreeandNil(LResourceStream);
+      ALfreeandNil(LStream);
     end;
     {$ENDIF}
   end;
@@ -3378,6 +3535,18 @@ begin
 
 end;
 
+{*************************************************}
+function TALAnimatedImage.GetDefaultTintColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null;
+end;
+
+{***********************************************}
+function TALAnimatedImage.GetDefaulttintColorKey: String;
+begin
+  Result := '';
+end;
+
 {********************************************************************}
 procedure TALAnimatedImage.SetWrapMode(const Value: TALImageWrapMode);
 begin
@@ -3402,6 +3571,38 @@ end;
 procedure TALAnimatedImage.SetAnimation(const Value: TAnimation);
 begin
   FAnimation.Assign(Value);
+end;
+
+{********************************************************}
+procedure TALAnimatedImage.setTintColor(const Value: TAlphaColor);
+begin
+  if FTintColor <> Value then begin
+    FTintColor := Value;
+    FTintColorKey := '';
+    releaseCodec;
+    Repaint;
+  end;
+end;
+
+{******************************************************}
+procedure TALAnimatedImage.setTintColorKey(const Value: String);
+begin
+  if FTintColorKey <> Value then begin
+    FTintColorKey := Value;
+    ApplyTintColorScheme;
+  end;
+end;
+
+{*******************************************}
+function TALAnimatedImage.IsTintColorStored: Boolean;
+begin
+  Result := FTintColor <> DefaultTintColor;
+end;
+
+{**********************************************}
+function TALAnimatedImage.IsTintColorKeyStored: Boolean;
+begin
+  Result := FTintColorKey <> DefaultTintColorKey;
 end;
 
 {******************************************************}

@@ -65,6 +65,7 @@ type
         function GetDefaultStopValue: Single; override;
       public
         constructor Create(const AOwner: TALAniIndicator); reintroduce; virtual;
+        procedure Assign(Source: TPersistent); override;
         procedure Start; override;
       published
         property AutoReverse;
@@ -111,6 +112,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TPersistent{TALControl}); override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -3413,6 +3415,17 @@ begin
   FEnabled := True;
 end;
 
+{*************************************************************}
+procedure TALAniIndicator.TAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALAniIndicator.TAnimation then begin
+    inherited Assign(Source);
+    Enabled := TALAniIndicator.TAnimation(Source).Enabled;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
 {*****************************************}
 procedure TALAniIndicator.TAnimation.Start;
 begin
@@ -3504,6 +3517,30 @@ begin
   // AlFreeAndNil with the delayed flag
   FAnimation.Enabled := False;
   inherited;
+end;
+
+{*****************************************************************}
+procedure TALAniIndicator.Assign(Source: TPersistent{TALControl});
+begin
+  BeginUpdate;
+  Try
+    if Source is TALAniIndicator then begin
+      Animation.Assign(TALAniIndicator(Source).Animation);
+      ResourceName := TALAniIndicator(Source).ResourceName;
+      TintColorKey := TALAniIndicator(Source).TintColorKey;
+      TintColor := TALAniIndicator(Source).TintColor;
+      FrameCount := TALAniIndicator(Source).FrameCount;
+      RowCount := TALAniIndicator(Source).RowCount;
+      CacheIndex := TALAniIndicator(Source).CacheIndex;
+      CacheEngine := TALAniIndicator(Source).CacheEngine;
+      MotionMode := TALAniIndicator(Source).MotionMode;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {*********************************************}

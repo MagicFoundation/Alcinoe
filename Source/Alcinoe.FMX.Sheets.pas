@@ -310,8 +310,6 @@ type
     FQueue: TQueue<TALSheet>;
     FFrozenNativeControls: TArray<TALNativeControl>;
   protected
-    procedure FreezeNativeViews;
-    procedure UnfreezeNativeViews;
     procedure ScrimAnimationProcess(Sender: TObject);
     procedure ContainerAnimationProcess(Sender: TObject);
     procedure ScrimAnimationFinish(Sender: TObject);
@@ -1498,39 +1496,6 @@ begin
   result := FInstance <> nil;
 end;
 
-{******************************************}
-procedure TALSheetManager.FreezeNativeViews;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _FreezeNativeViews(const AControl: TControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).IsNativeViewVisible) then begin
-        setlength(FFrozenNativeControls, Length(FFrozenNativeControls) + 1);
-        FFrozenNativeControls[High(FFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
-        TALNativeControl(AControl.Controls[i]).FreezeNativeView;
-      end
-      else _FreezeNativeViews(AControl.Controls[i]);
-    end;
-  end;
-
-begin
-  Var LForm := Screen.ActiveForm;
-  if LForm = nil then LForm := Application.MainForm;
-  if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
-  For var I := 0 to LForm.ChildrenCount - 1 do
-    if LForm.Children[i] is TControl then
-      _FreezeNativeViews(TControl(LForm.Children[i]));
-end;
-
-{********************************************}
-procedure TALSheetManager.UnfreezeNativeViews;
-begin
-  For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
-    FFrozenNativeControls[I].UnFreezeNativeView;
-  setlength(FFrozenNativeControls, 0);
-end;
-
 {***********************************************}
 function TALSheetManager.IsShowingSheet: Boolean;
 begin
@@ -1593,7 +1558,7 @@ begin
   FContainerAnimation.Enabled := False;
   ProcessPendingSheets;
   if not IsShowingSheet then
-    UnfreezeNativeViews
+    ALUnfreezeNativeViews(FFrozenNativeControls)
   else
     FScrimAnimation.Stop;
   TThread.ForceQueue(nil,
@@ -1656,7 +1621,7 @@ begin
 
   // Layout the Sheet
   LForm.Focused := nil;
-  FreezeNativeViews;
+  ALFreezeNativeViews(FFrozenNativeControls);
   ASheet.Align := TALAlignLayout.Contents;
   // This will defacto call ASheet.EndUpdate
   // in TCustomForm.DoAddObject.SetUpdatingState

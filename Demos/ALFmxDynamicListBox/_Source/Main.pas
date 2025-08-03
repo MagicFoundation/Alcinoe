@@ -503,10 +503,6 @@ begin
     LTitle.Margins.left := 18;
     LTitle.Text := 'For you';
 
-    {$IF defined(IOS)}
-    EXIT;
-    {$ENDIF}
-
     var LMessageBtn := TALDynamicButton.Create(Result);
     LMessageBtn.Fill.Color := TalphaColors.Null;
     LMessageBtn.Fill.ResourceName := 'message';
@@ -537,10 +533,6 @@ begin
   Result := TALDynamicListBox.TView.TBottomBar.Create(nil);
   try
     Result.BoundsRect := AContext.TargetRect;
-    {$IF defined(IOS)}
-    Result.Height := 5;
-    EXIT;
-    {$ENDIF}
 
     {$IF defined(IOS)}
     var LhomeIndicatorBottom: CGFloat := 0;
@@ -641,7 +633,6 @@ begin
     LAvatar.LoadingCacheIndex := 2;
     LAvatar.CacheEngine := AContext.CacheEngine;
 
-    {$IF not defined(ios)}
     var LMenuBtn := TALDynamicButton.Create(LLayout1);
     LMenuBtn.Fill.Color := TalphaColors.Null;
     LMenuBtn.Fill.ResourceName := 'menu';
@@ -652,7 +643,6 @@ begin
     LMenuBtn.Width := 4;
     LMenuBtn.CacheIndex := 3;
     LMenuBtn.CacheEngine := AContext.CacheEngine;
-    {$ENDIF}
 
     Var LLayout2 := TALDynamicLayout.Create(LLayout1);
     LLayout2.Align := TALAlignLayout.LeftCenter;
@@ -764,11 +754,9 @@ begin
           LMedia1.AddControl(LLayout1);
           LUsername.TextSettings.Font.Color := $FFffffff;
           LGeotag.TextSettings.Font.Color := $FFffffff;
-          {$IF not defined(ios)}
           LMenuBtn.Fill.ResourceName := 'menu_dark';
           LMenuBtn.CacheIndex := 5;
           LMenuBtn.CacheEngine := AContext.CacheEngine;
-          {$ENDIF}
         end;
       end;
     end;
@@ -809,7 +797,6 @@ begin
     LLikeCountText.AutoSize := TALAutoSizeMode.Both;
     LLikeCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('like_count', 0));
 
-    {$IF not defined(IOS)}
     var LCommentCountBtn := TALDynamicButton.Create(LLayout3);
     LCommentCountBtn.Fill.Color := TalphaColors.Null;
     LCommentCountBtn.Fill.ResourceName := 'comments';
@@ -849,7 +836,6 @@ begin
     LReshareCountText.TextSettings.Font.Color := $FF0d1014;
     LReshareCountText.AutoSize := TALAutoSizeMode.Both;
     LReshareCountText.Text := AlIntToStrW(AContext.Owner.Data.GetChildNodeValueInt32('reshare_count', 0));
-    {$ENDIF}
 
     var LBookmarkBtn := TALDynamicToggleButton.Create(LLayout3);
     LBookmarkBtn.StateStyles.Unchecked.Default.Fill.Inherit := False;
@@ -1091,7 +1077,6 @@ begin
     LFollowButton.CacheEngine := AContext.CacheEngine;
     LFollowButton.OnClick := FollowButtonClick;
 
-    {$IF not defined(ios)}
     var LCloseButton := TALDynamicButton.Create(LBackground);
     LCloseButton.Fill.Color := TalphaColors.Null;
     LCloseButton.Fill.ResourceName := 'cross';
@@ -1102,7 +1087,6 @@ begin
     LCloseButton.Width := 11;
     LCloseButton.CacheIndex := 14;
     LCloseButton.CacheEngine := AContext.CacheEngine;
-    {$ENDIF}
 
   Except
     ALFreeAndNil(Result);
@@ -1171,11 +1155,6 @@ begin
         if AData.ChildNodes[i].GetChildNodeValueText('type', '') = 'stories' then
           AData.ChildNodes.Delete(i);
     end;
-    {$IF defined(IOS)}
-    For var I := AData.ChildNodes.Count - 1 downto 0 do
-      if AData.ChildNodes[i].GetChildNodeValueText('type', '') = 'stories' then
-        AData.ChildNodes.Delete(i);
-    {$ENDIF}
 
   Except
     On E: Exception do begin

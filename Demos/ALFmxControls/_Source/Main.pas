@@ -409,6 +409,9 @@ type
     ButtonShowLeftSheet: TALButton;
     ButtonShowTopSheet: TALButton;
     ButtonShowRightSheet: TALButton;
+    ALText73: TALText;
+    ALText74: TALText;
+    ButtonShowLoadingOverlay: TALButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
@@ -453,6 +456,7 @@ type
     procedure ButtonShowLeftSheetClick(Sender: TObject);
     procedure ButtonShowTopSheetClick(Sender: TObject);
     procedure ButtonShowRightSheetClick(Sender: TObject);
+    procedure ButtonShowLoadingOverlayClick(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
@@ -496,6 +500,7 @@ uses
   Alcinoe.Fmx.Sheets,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Stringutils,
+  Alcinoe.FMX.LoadingOverlay,
   ScrollBoxDemo;
 
 {$R *.fmx}
@@ -514,6 +519,7 @@ begin
   {$ENDIF}
   TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
   TALStyleManager.Instance.ApplySheetManagerStyle('Material3.SheetManager', TALSheetManager.Instance, 22{AFontSize});
+  TALStyleManager.Instance.ApplyLoadingOverlayManagerStyle('Material3.LoadingOverlayManager', TALLoadingOverlayManager.Instance);
   // We can not call RegisterTypefaceFromResource in FormCreate because FormCreate is
   // called in TCommonCustomForm.AfterConstruction once all child components are
   // already fully loaded.
@@ -1751,6 +1757,22 @@ begin
     .SetContainerMargins(TRectF.Create(15,15,15,15))
     .Show;
 
+end;
+
+{*****************************************************************}
+procedure TMainForm.ButtonShowLoadingOverlayClick(Sender: TObject);
+begin
+  TALLoadingOverlay.Builder.Show;
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+      sleep(5000);
+      TThread.Synchronize(nil,
+        Procedure
+        Begin
+          TALLoadingOverlayManager.Instance.CloseCurrentLoadingOverlay;
+        End);
+    end).Start;
 end;
 
 {************************************************************}

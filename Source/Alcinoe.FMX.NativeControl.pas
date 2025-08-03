@@ -152,6 +152,9 @@ type
     function GetNativeViewHeight: Single;
   end;
 
+procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
+procedure ALUnfreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
+
 implementation
 
 uses
@@ -165,8 +168,42 @@ uses
   FMX.Types,
   FMX.Types3D,
   FMX.Graphics,
+  FMX.Forms,
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
+
+{****************************}
+procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _FreezeNativeViews(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).IsNativeViewVisible) then begin
+        setlength(AFrozenNativeControls, Length(AFrozenNativeControls) + 1);
+        AFrozenNativeControls[High(AFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
+        TALNativeControl(AControl.Controls[i]).FreezeNativeView;
+      end
+      else _FreezeNativeViews(AControl.Controls[i]);
+    end;
+  end;
+
+begin
+  Var LForm := Screen.ActiveForm;
+  if LForm = nil then LForm := Application.MainForm;
+  if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+  For var I := 0 to LForm.ChildrenCount - 1 do
+    if LForm.Children[i] is TControl then
+      _FreezeNativeViews(TControl(LForm.Children[i]));
+end;
+
+{******************************}
+procedure ALUnfreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
+begin
+  For var I := low(AFrozenNativeControls) to high(AFrozenNativeControls) do
+    AFrozenNativeControls[I].UnFreezeNativeView;
+  setlength(AFrozenNativeControls, 0);
+end;
 
 {***********************************************************}
 function TALNativeControl.TFill.GetDefaultColor: TAlphaColor;

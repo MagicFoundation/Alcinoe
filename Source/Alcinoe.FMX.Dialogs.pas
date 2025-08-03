@@ -180,8 +180,6 @@ type
     FQueue: TQueue<TALDialog>;
     FFrozenNativeControls: TArray<TALNativeControl>;
   protected
-    procedure FreezeNativeViews;
-    procedure UnfreezeNativeViews;
     procedure ScrimAnimationProcess(Sender: TObject);
     procedure ContainerAnimationProcess(Sender: TObject);
     procedure ScrimAnimationFinish(Sender: TObject);
@@ -1043,39 +1041,6 @@ begin
   result := min(560, LForm.ClientWidth / 100 * 85);
 end;
 
-{*******************************************}
-procedure TALDialogManager.FreezeNativeViews;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _FreezeNativeViews(const AControl: TControl);
-  begin
-    for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).IsNativeViewVisible) then begin
-        setlength(FFrozenNativeControls, Length(FFrozenNativeControls) + 1);
-        FFrozenNativeControls[High(FFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
-        TALNativeControl(AControl.Controls[i]).FreezeNativeView;
-      end
-      else _FreezeNativeViews(AControl.Controls[i]);
-    end;
-  end;
-
-begin
-  Var LForm := Screen.ActiveForm;
-  if LForm = nil then LForm := Application.MainForm;
-  if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
-  For var I := 0 to LForm.ChildrenCount - 1 do
-    if LForm.Children[i] is TControl then
-      _FreezeNativeViews(TControl(LForm.Children[i]));
-end;
-
-{*********************************************}
-procedure TALDialogManager.UnfreezeNativeViews;
-begin
-  For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
-    FFrozenNativeControls[I].UnFreezeNativeView;
-  setlength(FFrozenNativeControls, 0);
-end;
-
 {*************************************************}
 function TALDialogManager.IsShowingDialog: Boolean;
 begin
@@ -1133,7 +1098,7 @@ begin
   FContainerAnimation.Enabled := False;
   ProcessPendingDialogs;
   if not IsShowingDialog then
-    UnfreezeNativeViews
+    ALUnfreezeNativeViews(FFrozenNativeControls)
   else begin
     FScrimAnimation.Stop;
     if assigned(FCurrentDialog.CustomDialogRefProc) or
@@ -1250,7 +1215,7 @@ begin
   // CustomContainer
   else if ADialog.HasCustomContainer then begin
     LForm.Focused := nil;
-    FreezeNativeViews;
+    ALFreezeNativeViews(FFrozenNativeControls);
     if ADialog.HasContainer then
       ADialog.Container.Visible := False;
   end
@@ -1259,7 +1224,7 @@ begin
   else begin
 
     LForm.Focused := nil;
-    FreezeNativeViews;
+    ALFreezeNativeViews(FFrozenNativeControls);
     var LCurrY: Single := 0;
     var LContainerWidth: Single := 0;
     var LContentHeight: Single := 0;
@@ -1456,7 +1421,7 @@ begin
     FCurrentDialog.Container.Pivot.Point := TpointF.Create(0,0);
 
     FScrimAnimation.Enabled := False;
-    FScrimAnimation.TagFloat := (TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255) * 100;
+    FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255;
     FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
     FScrimAnimation.Duration := 0.4;
     FScrimAnimation.StartValue := 0;
@@ -1478,7 +1443,7 @@ end;
 procedure TALDialogManager.ScrimAnimationProcess(Sender: TObject);
 begin
   if FCurrentDialog = nil then exit;
-  FCurrentDialog.Fill.Color := ALSetColorAlpha(FCurrentDialog.Fill.Color, (FScrimAnimation.CurrentValue / 100) * FScrimAnimation.TagFloat);
+  FCurrentDialog.Fill.Color := ALSetColorAlpha(FCurrentDialog.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
 end;
 
 {********************************************************************}

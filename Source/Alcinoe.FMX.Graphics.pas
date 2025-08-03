@@ -678,6 +678,7 @@ uses
   {$ENDIF}
   FMX.Effects,
   System.UIConsts,
+  Alcinoe.fmx.BreakText,
   Alcinoe.http.client,
   Alcinoe.FMX.Types3D;
 

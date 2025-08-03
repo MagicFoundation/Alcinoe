@@ -133,15 +133,15 @@ procedure libswiftObjectiveCLoader; cdecl; external '/usr/lib/swift/libswiftObje
 procedure libswiftQuartzCoreLoader; cdecl; external '/usr/lib/swift/libswiftQuartzCore.dylib';
 procedure libswiftosLoader; cdecl; external '/usr/lib/swift/libswiftos.dylib';
 procedure libswiftUniformTypeIdentifiersLoader; cdecl; external '/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib';
+procedure libswiftCoreAudioLoader; cdecl; external '/usr/lib/swift/libswiftCoreAudio.dylib';
+procedure libswiftCoreMIDILoader; cdecl; external '/usr/lib/swift/libswiftCoreMIDI.dylib';
+procedure libswiftAVFoundationLoader; cdecl; external '/usr/lib/swift/libswiftAVFoundation.dylib';
+procedure libswiftCoreMediaLoader; cdecl; external '/usr/lib/swift/libswiftCoreMedia.dylib';
+procedure libswiftsimdLoader; cdecl; external '/usr/lib/swift/libswiftsimd.dylib';
+procedure libswiftCoreLocationLoader; cdecl; external '/usr/lib/swift/libswiftCoreLocation.dylib';
 //procedure libswiftFileProviderLoader; cdecl; external '/usr/lib/swift/libswiftFileProvider.dylib';
 //procedure libswiftUIKitLoader; cdecl; external '/usr/lib/swift/libswiftUIKit.dylib';
-//procedure libswiftCoreAudioLoader; cdecl; external '/usr/lib/swift/libswiftCoreAudio.dylib';
-//procedure libswiftCoreMIDILoader; cdecl; external '/usr/lib/swift/libswiftCoreMIDI.dylib';
 //procedure libswiftPhotosLoader; cdecl; external '/usr/lib/swift/libswiftPhotos.dylib';
-//procedure libswiftAVFoundationLoader; cdecl; external '/usr/lib/swift/libswiftAVFoundation.dylib';
-//procedure libswiftCoreMediaLoader; cdecl; external '/usr/lib/swift/libswiftCoreMedia.dylib';
-//procedure libswiftsimdLoader; cdecl; external '/usr/lib/swift/libswiftsimd.dylib';
-//procedure libswiftCoreLocationLoader; cdecl; external '/usr/lib/swift/libswiftCoreLocation.dylib';
 //procedure libswiftCoreGraphicsLoader; cdecl; external '/usr/lib/swift/libswiftCoreGraphics.dylib';
 
 end.

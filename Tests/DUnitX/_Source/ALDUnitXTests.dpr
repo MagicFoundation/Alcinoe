@@ -169,6 +169,7 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.LoadingOverlay,
   Alcinoe.FMX.Materials.Canvas,
   Alcinoe.FMX.GeoLocation.Sensor,
   Alcinoe.FMX.Memo,

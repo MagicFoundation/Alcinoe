@@ -79,16 +79,19 @@ type
   private
     FDataString: AnsiString;
     FPosition: Integer;
+    procedure SetDataString(const AValue: AnsiString);
   protected
     procedure SetSize(NewSize: Longint); override;
   public
     constructor Create(const AString: AnsiString);
+    procedure LoadFromStream(Stream: TStream);
+    procedure LoadFromFile(const FileName: string);
     function Read(var Buffer; Count: Longint): Longint; override;
     function ReadString(Count: Longint): AnsiString;
     function Seek(Offset: Longint; Origin: Word): Longint; override;
     function Write(const Buffer; Count: Longint): Longint; override;
     procedure WriteString(const AString: AnsiString);
-    property DataString: AnsiString read FDataString;
+    property DataString: AnsiString read FDataString write SetDataString;
   end;
   TALStringStreamW = class(TStringStream);
 
@@ -649,6 +652,34 @@ constructor TALStringStreamA.Create(const AString: AnsiString);
 begin
   inherited Create;
   FDataString := AString;
+end;
+
+{*********************************************************}
+procedure TALStringStreamA.LoadFromStream(Stream: TStream);
+begin
+  Stream.Position := 0;
+  var LCount := Stream.Size;
+  SetSize(LCount);
+  if LCount <> 0 then
+    Stream.ReadBuffer(PAnsiChar(FDataString)^, LCount);
+end;
+
+{*************************************************************}
+procedure TALStringStreamA.LoadFromFile(const FileName: string);
+begin
+  var LFileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(LFileStream);
+  finally
+    ALFreeAndNil(LFileStream);
+  end;
+end;
+
+{*************************************************************}
+procedure TALStringStreamA.SetDataString(const AValue: AnsiString);
+begin
+  FDataString := AValue;
+  FPosition := 0;
 end;
 
 {******************************************************************}

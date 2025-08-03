@@ -474,6 +474,23 @@ Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/t
 <br/>
 
 
+Material-Inspired Loading Indicator
+===================================
+
+A modern loading indicator inspired by Material 3 design. 
+Ideal for signaling that an operation is in progress, it 
+uses subtle motion and minimal design to reassure users 
+that the app is working, even when results aren't immediate.
+
+<p>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3loadingindicator.png?raw=true" alt="Loading Indicator" width="480" style="width:480px;" />
+</p>
+
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
+<br/>
+<br/>
+
+
 Create Versatile Sheets with TALSheet
 =====================================
 
@@ -491,7 +508,7 @@ action menus with smooth, customizable animations.
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
 <br/>
 <br/>
-
+    
 
 Video Player for FireMonkey
 ===========================
@@ -931,89 +948,6 @@ Example :
 Learn more at [Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
 <br/>
 <br/>
-  
-
-Streamlining Object Initialization with TALInit
-===============================================
-
-In the constant evolution of software development, we often find ourselves
-seeking ways to reduce boilerplate code and enhance the maintainability of our
-projects. One such instance where boilerplate can become cumbersome is in the
-initialization of class fields. The traditional method involves explicitly
-setting each field's value in the constructor, which can be tedious, especially
-for classes with numerous fields. Enter TALInit—a feature that allows
-automatic initialization of object fields based on their attributes.
-
-#### The Traditional Way ####
-
-In the typical approach, developers manually initialize object fields in the
-constructor. Take the following class as an example:
-
-```
-    TAutoInitObject = class(TObject)
-    public
-      CharValue: Char;
-      ChildObject: TChildObject;
-    public
-      constructor Create; virtual;
-      destructor Destroy; override;
-    End;
-```
-
-Here, each field is initialized in the Create constructor:
-
-```
-  constructor TAutoInitObject.create(const aOwner: Tform1; const AAutoInit: Boolean);
-  begin
-    CharValue := 'A';
-    ChildObject := TChildObject.create;
-    ChildObject.Name := 'AnObject';
-    ChildObject.Value := 12.2;
-  end;
-
-  destructor TAutoInitObject.Destroy;
-  begin
-    ALFreeandNil(ChildObject);
-    inherited;
-  end;
-```
-
-While this method offers precise control, it can become tedious for large
-classes with numerous fields.
-
-#### The TALInit Way ####
-
-Imagine having a mechanism that not only automates this but is also as fast as
-the traditional way - yes, you read that right. TALInit achieves this
-remarkable feat.
-
-```
-  TAutoInitObject = class(TObject)
-  public
-    [TALInit('A')]
-    CharValue: Char;
-    [TALInit('Name:AnObject;Value:12.2')]
-    ChildObject: TChildObject;
-  End;
-```
-
-By using custom attributes, every field within the object can be automatically
-initialized based on its corresponding attribute. This eliminates the need for
-manually setting each field within the constructor. The above snippet showcases
-just how concise and readable object field initialization can become with
-TALInit.
-
-#### Performance - A Game Changer: ####
-
-One of the strongest advantages of using TALInit is its performance. When
-introducing automation, a natural concern is the overhead that might come with
-it. However, TALInit is designed to be as efficient as the traditional way
-of initializing fields. This means developers can enjoy the convenience
-without having to worry about any hidden costs in execution time.
-
-Learn more at [Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
-<br/>
-<br/>
 
 
 MongoDb client
@@ -1196,6 +1130,12 @@ undesired conversions.
 
 History
 =======
+
+### 03/08/2025 – Add Loading Indicator
+
+- Added **`TALLoadingOverlay`** component — a full-screen overlay 
+  designed to block user interaction while displaying a Material-inspired 
+  loading indicator.
 
 ### 27/07/2025 – New Components and Enhancements
 

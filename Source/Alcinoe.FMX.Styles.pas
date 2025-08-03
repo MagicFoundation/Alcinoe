@@ -16,6 +16,7 @@ uses
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Dialogs,
   Alcinoe.FMX.Sheets,
+  Alcinoe.FMX.LoadingOverlay,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.StdCtrls;
@@ -185,6 +186,24 @@ Type
         DefaultFontSize: Single;
         constructor create(const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
       end;
+      // -----------------------
+      // TLoadingOverlayManagerStyleInfo
+      TLoadingOverlayManagerApplyStyleProc = Procedure(const ALoadingOverlayManager: TALLoadingOverlayManager; const ARatio: Single = 1);
+      TLoadingOverlayManagerStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TLoadingOverlayManagerApplyStyleProc;
+        constructor create(const AApplyStyleProc: TLoadingOverlayManagerApplyStyleProc);
+      end;
+      // ----------------
+      // TLoadingOverlayStyleInfo
+      TLoadingOverlayApplyStyleProc = Procedure(const ALoadingOverlay: TALLoadingOverlay; const ARatio: Single = 1);
+      TLoadingOverlayStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TLoadingOverlayApplyStyleProc;
+        constructor create(const AApplyStyleProc: TLoadingOverlayApplyStyleProc);
+      end;
       // ----------------------------
       // TDynamicTextStyleInfo
       TDynamicTextApplyStyleProc = Procedure(const AText: TALDynamicBaseText; const ARatio: Single = 1);
@@ -288,6 +307,8 @@ Type
     FDialogStyles: TDictionary<String, TDialogStyleInfo>;
     FSheetManagerStyles: TDictionary<String, TSheetManagerStyleInfo>;
     FSheetStyles: TDictionary<String, TSheetStyleInfo>;
+    FLoadingOverlayManagerStyles: TDictionary<String, TLoadingOverlayManagerStyleInfo>;
+    FLoadingOverlayStyles: TDictionary<String, TLoadingOverlayStyleInfo>;
     //--
     FDynamicTextStyles: TDictionary<String, TDynamicTextStyleInfo>;
     FDynamicButtonStyles: TDictionary<String, TDynamicButtonStyleInfo>;
@@ -333,6 +354,8 @@ Type
     procedure AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetSheetManagerStyle(const AName: String; const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetSheetStyle(const AName: String; const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetLoadingOverlayManagerStyle(const AName: String; const AApplyStyleProc: TLoadingOverlayManagerApplyStyleProc);
+    procedure AddOrSetLoadingOverlayStyle(const AName: String; const AApplyStyleProc: TLoadingOverlayApplyStyleProc);
     //--
     procedure AddOrSetDynamicTextStyle(const AName: String; const AApplyStyleProc: TDynamicTextApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetDynamicButtonStyle(const AName: String; const AApplyStyleProc: TDynamicButtonApplyStyleProc; const ADefaultFontSize: Single);
@@ -381,6 +404,8 @@ Type
     procedure ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager); overload;
     procedure ApplySheetStyle(const AName: String; const ASheet: TALSheet; const AFontSize: Single); overload;
     procedure ApplySheetStyle(const AName: String; const ASheet: TALSheet); overload;
+    procedure ApplyLoadingOverlayManagerStyle(const AName: String; const ALoadingOverlayManager: TALLoadingOverlayManager);
+    procedure ApplyLoadingOverlayStyle(const AName: String; const ALoadingOverlay: TALLoadingOverlay);
     //--
     procedure ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText; const AFontSize: Single); overload;
     procedure ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText); overload;
@@ -421,6 +446,8 @@ Type
     function GetDialogStyleNames: TArray<String>;
     function GetSheetManagerStyleNames: TArray<String>;
     function GetSheetStyleNames: TArray<String>;
+    function GetLoadingOverlayManagerStyleNames: TArray<String>;
+    function GetLoadingOverlayStyleNames: TArray<String>;
   end;
 
 function ALEstimateLineHeightMultiplier(Const AFontSize: Single): Single;
@@ -709,6 +736,52 @@ begin
       Sides := ARectangle.DefaultSides;
       //CacheIndex
       //CacheEngine
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+///////////////////
+// ANIMATEDIMAGE //
+///////////////////
+
+{****************************************************************************************************}
+procedure ALResetAnimatedImageStyle(const AAnimatedImage: TALAnimatedImage; const ARatio: Single = 1);
+begin
+  With AAnimatedImage do begin
+    BeginUpdate;
+    Try
+      ALResetControlStyle(AAnimatedImage, ARatio);
+      //Animation
+      //ResourceName
+      TintColor := AAnimatedImage.DefaultTintColor;
+      TintColorKey := AAnimatedImage.DefaultTintColorKey;
+      //WrapMode
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+//////////////////
+// ANIINDICATOR //
+//////////////////
+
+{*************************************************************************************************}
+procedure ALResetAniIndicatorStyle(const AAniIndicator: TALAniIndicator; const ARatio: Single = 1);
+begin
+  With AAniIndicator do begin
+    BeginUpdate;
+    Try
+      ALResetControlStyle(AAniIndicator, ARatio);
+      //Animation
+      //ResourceName
+      //MotionMode
+      //FrameCount
+      //RowCount
+      TintColor := AAniIndicator.DefaultTintColor;
+      TintColorKey := AAniIndicator.DefaultTintColorKey;
     Finally
       EndUpdate;
     End;
@@ -13380,7 +13453,7 @@ begin
 end;
 
 {***********************************************************************************}
-//https://m3.material.io/components/Sheets/specs#8e0c5daf-d82a-4963-8759-94769997de9f
+//https://m3.material.io/components/bottom-sheets/specs#6b7994de-3840-44a0-bad8-c39818595a88
 procedure ALApplyMaterial3SheetManagerStyle(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
 begin
   With ASheetManager do begin
@@ -13451,6 +13524,74 @@ begin
     DefaultRightSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
     DefaultRightSheetCloseButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
     DefaultRightSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(9 * ARatio{Right}, 9 * ARatio{Top}, 9 * ARatio{Right}, 9 * ARatio{Bottom}).RoundTo(-2);
+
+  end;
+end;
+
+///////////////////////////
+// LOADINGOVERLAYMANAGER //
+///////////////////////////
+
+{*************************************************************************************************}
+procedure ALResetLoadingOverlayManagerStyle(const ALoadingOverlayManager: TALLoadingOverlayManager; const ARatio: Single = 1);
+begin
+  With ALoadingOverlayManager do begin
+
+    // DefaultScrim
+    ALResetRectangleStyle(DefaultScrim, ARatio);
+    DefaultScrim.Align := TALAlignLayout.Contents;
+    DefaultScrim.Fill.Color := $52000000; {Alpha = 32%}
+    DefaultScrim.Stroke.Color := TAlphaColors.Null;
+    DefaultScrim.Stroke.ColorKey := '';
+
+    // DefaultContainer
+    ALResetRectangleStyle(DefaultContainer, ARatio);
+    DefaultContainer.Width := RoundTo(136 * ARatio, -2);
+    DefaultContainer.Height := RoundTo(136 * ARatio, -2);
+    DefaultContainer.Align := TALAlignLayout.Center;
+    DefaultContainer.Fill.Color := $FFFFFFFF;
+    DefaultContainer.Fill.ColorKey := '';
+    DefaultContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultContainer.Stroke.ColorKey := '';
+    DefaultContainer.XRadius := -50;
+    DefaultContainer.YRadius := -50;
+
+    // DefaultAnimatedImage
+    ALResetAnimatedImageStyle(DefaultAnimatedImage, ARatio);
+
+    // DefaultAniIndicator
+    ALResetAniIndicatorStyle(DefaultAniIndicator, ARatio);
+
+  end;
+end;
+
+{***********************************************************************************}
+//https://m3.material.io/components/loading-indicator/specs#8786292a-e16b-4459-9efc-11cae4941166
+procedure ALApplyMaterial3LoadingOverlayManagerStyle(const ALoadingOverlayManager: TALLoadingOverlayManager; const ARatio: Single = 1);
+begin
+  With ALoadingOverlayManager do begin
+
+    // Default
+    ALResetLoadingOverlayManagerStyle(ALoadingOverlayManager, ARatio);
+
+    // DefaultScrim
+    // https://m3.material.io/styles/elevation/applying-elevation#eb0451aa-61b5-4c35-8d5f-f5b434f63654
+    //DefaultScrim.Fill.ColorKey := 'Material3.Color.Scrim.Alpha10';
+
+    // DefaultContainer
+    DefaultContainer.Fill.ColorKey := 'Material3.Color.PrimaryContainer'; // md.sys.color.primary-container / md.ref.palette.primary90 / #EADDFF
+    DefaultContainer.Padding.Rect := TRectF.Create(18*ARatio{Left}, 18*ARatio{Top}, 18*ARatio{Right}, 18*ARatio{Bottom}).RoundTo(-2);
+    DefaultContainer.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultContainer.Shadow.blur := RoundTo(6 * ARatio, -2);
+    DefaultContainer.Shadow.OffsetY := RoundTo(2 * ARatio, -2);
+
+    // DefaultAnimatedImage
+    DefaultAnimatedImage.Align := TALAlignLayout.Client;
+    DefaultAnimatedImage.ResourceName := 'alcinoe_loader';
+    // Switched from Material3.Color.OnPrimaryContainer to Material3.Color.Primary as it looks better in this context.
+    DefaultAnimatedImage.TintColorKey := 'Material3.Color.Primary'; // md.sys.color.on-primary-container / md.ref.palette.primary30 / #4F378B
+
+    // DefaultAniIndicator
 
   end;
 end;
@@ -25522,6 +25663,20 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
+{******************************************************************************************************************************}
+constructor TALStyleManager.TLoadingOverlayManagerStyleInfo.create(const AApplyStyleProc: TLoadingOverlayManagerApplyStyleProc);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+end;
+
+{****************************************************************************************************************}
+constructor TALStyleManager.TLoadingOverlayStyleInfo.create(const AApplyStyleProc: TLoadingOverlayApplyStyleProc);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+end;
+
 {******************************************************************************************************************************************}
 constructor TALStyleManager.TDynamicTextStyleInfo.create(const AApplyStyleProc: TDynamicTextApplyStyleProc; const ADefaultFontSize: Single);
 begin
@@ -25611,6 +25766,8 @@ begin
   FDialogStyles := TDictionary<String, TDialogStyleInfo>.create;
   FSheetManagerStyles := TDictionary<String, TSheetManagerStyleInfo>.create;
   FSheetStyles := TDictionary<String, TSheetStyleInfo>.create;
+  FLoadingOverlayManagerStyles := TDictionary<String, TLoadingOverlayManagerStyleInfo>.create;
+  FLoadingOverlayStyles := TDictionary<String, TLoadingOverlayStyleInfo>.create;
   //--
   FDynamicTextStyles := TDictionary<String, TDynamicTextStyleInfo>.create;
   FDynamicButtonStyles := TDictionary<String, TDynamicButtonStyleInfo>.create;
@@ -25691,6 +25848,8 @@ begin
   AlFreeAndNil(FDialogStyles);
   AlFreeAndNil(FSheetManagerStyles);
   AlFreeAndNil(FSheetStyles);
+  AlFreeAndNil(FLoadingOverlayManagerStyles);
+  AlFreeAndNil(FLoadingOverlayStyles);
   //--
   AlFreeAndNil(FDynamicTextStyles);
   AlFreeAndNil(FDynamicButtonStyles);
@@ -26293,6 +26452,9 @@ begin
 
   AddOrSetSheetManagerStyle('Default', ALResetSheetManagerStyle, 22{ADefaultFontSize});
   AddOrSetSheetManagerStyle('Material3.SheetManager', ALApplyMaterial3SheetManagerStyle, 22{ADefaultFontSize});
+
+  AddOrSetLoadingOverlayManagerStyle('Default', ALResetLoadingOverlayManagerStyle);
+  AddOrSetLoadingOverlayManagerStyle('Material3.LoadingOverlayManager', ALApplyMaterial3LoadingOverlayManagerStyle);
 
   AddOrSetDynamicTextStyle('Default', ALReseTDynamicTextStyle, 14{ADefaultFontSize});
   AddOrSetDynamicTextStyle('Material3.Text.Display.Large', ALApplyMaterial3DynamicTextDisplayLargeStyle, 0{ADefaultFontSize});
@@ -26999,6 +27161,18 @@ end;
 procedure TALStyleManager.AddOrSetSheetStyle(const AName: String; const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FSheetStyles.AddOrSetValue(AName, TSheetStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+end;
+
+{*********************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetLoadingOverlayManagerStyle(const AName: String; const AApplyStyleProc: TLoadingOverlayManagerApplyStyleProc);
+begin
+  FLoadingOverlayManagerStyles.AddOrSetValue(AName, TLoadingOverlayManagerStyleInfo.create(AApplyStyleProc));
+end;
+
+{*********************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetLoadingOverlayStyle(const AName: String; const AApplyStyleProc: TLoadingOverlayApplyStyleProc);
+begin
+  FLoadingOverlayStyles.AddOrSetValue(AName, TLoadingOverlayStyleInfo.create(AApplyStyleProc));
 end;
 
 {*********************************************************************************************************************************************************}
@@ -27778,6 +27952,48 @@ begin
   {$ENDIF}
 end;
 
+{***********************************************************************************************************************************}
+procedure TALStyleManager.ApplyLoadingOverlayManagerStyle(const AName: String; const ALoadingOverlayManager: TALLoadingOverlayManager);
+begin
+  Var LApplyLoadingOverlayManagerStyleInfo: TLoadingOverlayManagerStyleInfo;
+  if not fLoadingOverlayManagerStyles.TryGetValue(AName, LApplyLoadingOverlayManagerStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  LApplyLoadingOverlayManagerStyleInfo.ApplyStyleProc(ALoadingOverlayManager);
+  {$IF not defined(ALDPK)}
+  if ALoadingOverlayManager.DefaultScrim.AutoAlignToPixel then ALoadingOverlayManager.DefaultScrim.AlignToPixel;
+  if ALoadingOverlayManager.DefaultContainer.AutoAlignToPixel then ALoadingOverlayManager.DefaultContainer.AlignToPixel;
+  if ALoadingOverlayManager.DefaultAnimatedImage.AutoAlignToPixel then ALoadingOverlayManager.DefaultAnimatedImage.AlignToPixel;
+  if ALoadingOverlayManager.DefaultAniIndicator.AutoAlignToPixel then ALoadingOverlayManager.DefaultAniIndicator.AlignToPixel;
+  {$ENDIF}
+end;
+
+{**************************************************************************************************************}
+procedure TALStyleManager.ApplyLoadingOverlayStyle(const AName: String; const ALoadingOverlay: TALLoadingOverlay);
+begin
+  Var LApplyLoadingOverlayStyleInfo: TLoadingOverlayStyleInfo;
+  if not fLoadingOverlayStyles.TryGetValue(AName, LApplyLoadingOverlayStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  ALoadingOverlay.BeginUpdate;
+  try
+    LApplyLoadingOverlayStyleInfo.ApplyStyleProc(ALoadingOverlay);
+    {$IF not defined(ALDPK)}
+    if ALoadingOverlay.AutoAlignToPixel then ALoadingOverlay.AlignToPixel;
+    {$ENDIF}
+  finally
+    ALoadingOverlay.EndUpdate;
+  end;
+end;
+
 {*************************************************************************************************************************}
 procedure TALStyleManager.ApplyDynamicTextStyle(const AName: String; const AText: TALDynamicText; const AFontSize: Single);
 begin
@@ -28447,6 +28663,36 @@ begin
   TArray.Sort<TPair<String, TSheetStyleInfo>>(LArray,
     TComparer<TPair<String, TSheetStyleInfo>>.Construct(
       function(const Left, Right: TPair<String, TSheetStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{*****************************************************************}
+function TALStyleManager.GetLoadingOverlayManagerStyleNames: TArray<String>;
+begin
+  var LArray := FLoadingOverlayManagerStyles.ToArray;
+  TArray.Sort<TPair<String, TLoadingOverlayManagerStyleInfo>>(LArray,
+    TComparer<TPair<String, TLoadingOverlayManagerStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TLoadingOverlayManagerStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{**********************************************************}
+function TALStyleManager.GetLoadingOverlayStyleNames: TArray<String>;
+begin
+  var LArray := FLoadingOverlayStyles.ToArray;
+  TArray.Sort<TPair<String, TLoadingOverlayStyleInfo>>(LArray,
+    TComparer<TPair<String, TLoadingOverlayStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TLoadingOverlayStyleInfo>): Integer
       begin
         Result := Left.value.SortOrder - Right.value.SortOrder;
       end));

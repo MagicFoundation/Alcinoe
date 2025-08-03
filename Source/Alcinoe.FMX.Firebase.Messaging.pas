@@ -939,7 +939,11 @@ begin
   var LData := TNSJSONSerialization.OCClass.dataWithJSONObject(NSObjectToID(ADictionary), 0, Addr(LError));
   if (LData <> nil) and (LError = nil) then begin
     var LString := TNSString.Wrap(TNSString.Alloc.initWithData(LData, NSUTF8StringEncoding));
-    Result :=  NSStrToStr(LString);
+    try
+      Result :=  NSStrToStr(LString);
+    finally
+      LString.release;
+    end;
   end
   else Result := string.Empty;
 end;

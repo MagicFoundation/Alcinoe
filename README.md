@@ -483,7 +483,7 @@ uses subtle motion and minimal design to reassure users
 that the app is working, even when results aren't immediate.
 
 <p>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3loadingindicator.png?raw=true" alt="Loading Indicator" width="480" style="width:480px;" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3loadingindicator.gif?raw=true" alt="Loading Indicator" width="480" style="width:480px;" />
 </p>
 
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 

@@ -3415,7 +3415,7 @@ begin
   FEnabled := True;
 end;
 
-{*************************************************************}
+{***************************************************************}
 procedure TALAniIndicator.TAnimation.Assign(Source: TPersistent);
 begin
   if Source is TALAniIndicator.TAnimation then begin
@@ -3519,7 +3519,7 @@ begin
   inherited;
 end;
 
-{*****************************************************************}
+{****************************************************************}
 procedure TALAniIndicator.Assign(Source: TPersistent{TALControl});
 begin
   BeginUpdate;

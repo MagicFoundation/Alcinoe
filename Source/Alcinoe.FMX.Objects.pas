@@ -2888,7 +2888,7 @@ begin
   FEnabled := True;
 end;
 
-{*************************************************************}
+{****************************************************************}
 procedure TALAnimatedImage.TAnimation.Assign(Source: TPersistent);
 begin
   if Source is TALAnimatedImage.TAnimation then begin
@@ -3129,7 +3129,7 @@ begin
   End;
 end;
 
-{**************************************}
+{**********************************************}
 procedure TALAnimatedImage.ApplyTintColorScheme;
 begin
   if FTintColorKey <> '' then begin
@@ -3142,7 +3142,7 @@ begin
   end;
 end;
 
-{**********************************}
+{******************************************}
 procedure TALAnimatedImage.ApplyColorScheme;
 begin
   beginUpdate;
@@ -3221,11 +3221,11 @@ begin
                                   LAlphaColorRec.B / 255])
             else
               LNewColorsStr := ALFormatA(
-                                   '%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f',
-                                   [LAlphaColorRec.R / 255,
-                                    LAlphaColorRec.G / 255,
-                                    LAlphaColorRec.B / 255,
-                                    LAlphaColorRec.A / 255]);
+                                 '%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f,%.'+ALInttostrA(LAvailablePrecisionByChannel)+'f',
+                                 [LAlphaColorRec.R / 255,
+                                  LAlphaColorRec.G / 255,
+                                  LAlphaColorRec.B / 255,
+                                  LAlphaColorRec.A / 255]);
             {$IF defined(debug)}
             if Length(LNewColorsStr) > P2 - P1 then
              raise Exception.Create('Error DED1DB9C-A723-4240-AE50-4FBF02293B2F');
@@ -3535,13 +3535,13 @@ begin
 
 end;
 
-{*************************************************}
+{*********************************************************}
 function TALAnimatedImage.GetDefaultTintColor: TAlphaColor;
 begin
   Result := TAlphaColors.null;
 end;
 
-{***********************************************}
+{*******************************************************}
 function TALAnimatedImage.GetDefaulttintColorKey: String;
 begin
   Result := '';
@@ -3573,7 +3573,7 @@ begin
   FAnimation.Assign(Value);
 end;
 
-{********************************************************}
+{****************************************************************}
 procedure TALAnimatedImage.setTintColor(const Value: TAlphaColor);
 begin
   if FTintColor <> Value then begin
@@ -3584,7 +3584,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{**************************************************************}
 procedure TALAnimatedImage.setTintColorKey(const Value: String);
 begin
   if FTintColorKey <> Value then begin
@@ -3593,13 +3593,13 @@ begin
   end;
 end;
 
-{*******************************************}
+{***************************************************}
 function TALAnimatedImage.IsTintColorStored: Boolean;
 begin
   Result := FTintColor <> DefaultTintColor;
 end;
 
-{**********************************************}
+{******************************************************}
 function TALAnimatedImage.IsTintColorKeyStored: Boolean;
 begin
   Result := FTintColorKey <> DefaultTintColorKey;

@@ -13452,7 +13452,7 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{******************************************************************************************}
 //https://m3.material.io/components/bottom-sheets/specs#6b7994de-3840-44a0-bad8-c39818595a88
 procedure ALApplyMaterial3SheetManagerStyle(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
 begin
@@ -13532,7 +13532,7 @@ end;
 // LOADINGOVERLAYMANAGER //
 ///////////////////////////
 
-{*************************************************************************************************}
+{****************************************************************************************************************************}
 procedure ALResetLoadingOverlayManagerStyle(const ALoadingOverlayManager: TALLoadingOverlayManager; const ARatio: Single = 1);
 begin
   With ALoadingOverlayManager do begin
@@ -13565,7 +13565,7 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{**********************************************************************************************}
 //https://m3.material.io/components/loading-indicator/specs#8786292a-e16b-4459-9efc-11cae4941166
 procedure ALApplyMaterial3LoadingOverlayManagerStyle(const ALoadingOverlayManager: TALLoadingOverlayManager; const ARatio: Single = 1);
 begin
@@ -27169,7 +27169,7 @@ begin
   FLoadingOverlayManagerStyles.AddOrSetValue(AName, TLoadingOverlayManagerStyleInfo.create(AApplyStyleProc));
 end;
 
-{*********************************************************************************************************************************************}
+{*******************************************************************************************************************************}
 procedure TALStyleManager.AddOrSetLoadingOverlayStyle(const AName: String; const AApplyStyleProc: TLoadingOverlayApplyStyleProc);
 begin
   FLoadingOverlayStyles.AddOrSetValue(AName, TLoadingOverlayStyleInfo.create(AApplyStyleProc));
@@ -27952,7 +27952,7 @@ begin
   {$ENDIF}
 end;
 
-{***********************************************************************************************************************************}
+{*************************************************************************************************************************************}
 procedure TALStyleManager.ApplyLoadingOverlayManagerStyle(const AName: String; const ALoadingOverlayManager: TALLoadingOverlayManager);
 begin
   Var LApplyLoadingOverlayManagerStyleInfo: TLoadingOverlayManagerStyleInfo;
@@ -27972,7 +27972,7 @@ begin
   {$ENDIF}
 end;
 
-{**************************************************************************************************************}
+{****************************************************************************************************************}
 procedure TALStyleManager.ApplyLoadingOverlayStyle(const AName: String; const ALoadingOverlay: TALLoadingOverlay);
 begin
   Var LApplyLoadingOverlayStyleInfo: TLoadingOverlayStyleInfo;
@@ -28671,7 +28671,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{*****************************************************************}
+{**************************************************************************}
 function TALStyleManager.GetLoadingOverlayManagerStyleNames: TArray<String>;
 begin
   var LArray := FLoadingOverlayManagerStyles.ToArray;
@@ -28686,7 +28686,7 @@ begin
     Result[I] := LArray[I].Key;
 end;
 
-{**********************************************************}
+{*******************************************************************}
 function TALStyleManager.GetLoadingOverlayStyleNames: TArray<String>;
 begin
   var LArray := FLoadingOverlayStyles.ToArray;

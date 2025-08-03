@@ -130,7 +130,7 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
 
-{************************************}
+{********************************************}
 constructor TALLoadingOverlay.TBuilder.Create;
 begin
   Inherited create;
@@ -138,14 +138,14 @@ begin
   FLoadingOverlay.BeginUpdate;
 end;
 
-{************************************}
+{********************************************}
 destructor TALLoadingOverlay.TBuilder.Destroy;
 begin
   ALFreeAndNil(FLoadingOverlay);
   inherited;
 end;
 
-{******************************************************************************}
+{***********************************************************}
 function TALLoadingOverlay.TBuilder.SetStealthMode: TBuilder;
 begin
   FLoadingOverlay.Container.Visible := False;
@@ -153,98 +153,98 @@ begin
   Result := Self;
 end;
 
-{******************************************************************************}
+{***********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetAnimatedImageResourceName(const AValue: String): TBuilder;
 begin
   FLoadingOverlay.AnimatedImage.ResourceName := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{*************************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetAnimatedImageTintColor(const AValue: TalphaColor): TBuilder;
 begin
   FLoadingOverlay.AnimatedImage.TintColor := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{**********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetAniIndicatorResourceName(const AValue: String): TBuilder;
 begin
   FLoadingOverlay.AniIndicator.ResourceName := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{************************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetAniIndicatorTintColor(const AValue: TalphaColor): TBuilder;
 begin
   FLoadingOverlay.AniIndicator.TintColor := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{*************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetScrimColor(const AValue: TalphaColor): TBuilder;
 begin
   FLoadingOverlay.Fill.Color := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerSize(const AWidth, AHeight: Single): TBuilder;
 begin
   FLoadingOverlay.Container.Size.Size := TSizeF.Create(AWidth, AHeight);
   Result := Self;
 end;
 
-{******************************************************************************}
+{**************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerPadding(const AValue: TRectF): TBuilder;
 begin
   FLoadingOverlay.Container.Padding.Rect := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{*********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerFillColor(const AValue: TalphaColor): TBuilder;
 begin
   FLoadingOverlay.Container.Fill.Color := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{***********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerStrokeColor(const AValue: TalphaColor): TBuilder;
 begin
   FLoadingOverlay.Container.Stroke.Color := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{**********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerStrokeThickness(const AValue: Single): TBuilder;
 begin
   FLoadingOverlay.Container.Stroke.Thickness := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{***********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerShadowColor(const AValue: TalphaColor): TBuilder;
 begin
   FLoadingOverlay.Container.Shadow.Color := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{*****************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerShadowBlur(const AValue: Single): TBuilder;
 begin
   FLoadingOverlay.Container.Shadow.Blur := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerShadowOffsetX(const AValue: Single): TBuilder;
 begin
   FLoadingOverlay.Container.Shadow.OffsetX := AValue;
   Result := Self;
 end;
 
-{******************************************************************************}
+{********************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetContainerShadowOffsetY(const AValue: Single): TBuilder;
 begin
   FLoadingOverlay.Container.Shadow.OffsetY := AValue;
@@ -259,13 +259,13 @@ begin
   Free;
 end;
 
-{*****************************************}
+{*************************************************}
 class function TALLoadingOverlay.Builder: TBuilder;
 begin
   Result := TBuilder.Create;
 end;
 
-{***********************************************}
+{*******************************************************}
 constructor TALLoadingOverlay.Create(AOwner: TComponent);
 begin
   inherited;
@@ -283,7 +283,7 @@ begin
   HitTest := True;
 end;
 
-{***********************************}
+{************************************************************}
 function TALLoadingOverlay.GetAnimatedImage: TALAnimatedImage;
 begin
   If FAnimatedImage = nil then begin
@@ -295,7 +295,7 @@ begin
   Result := FAnimatedImage;
 end;
 
-{***********************************}
+{**********************************************************}
 function TALLoadingOverlay.GetAniIndicator: TALAniIndicator;
 begin
   If FAniIndicator = nil then begin
@@ -307,19 +307,19 @@ begin
   Result := FAniIndicator;
 end;
 
-{**********************************}
+{***************************************************}
 function TALLoadingOverlay.HasAnimatedImage: Boolean;
 begin
   result := FAnimatedImage <> nil;
 end;
 
-{**********************************}
+{**************************************************}
 function TALLoadingOverlay.HasAniIndicator: Boolean;
 begin
   result := FAniIndicator <> nil;
 end;
 
-{**********************************}
+{******************************************}
 constructor TALLoadingOverlayManager.Create;
 begin
   inherited;
@@ -338,7 +338,7 @@ begin
   Setlength(FFrozenNativeControls, 0);
 end;
 
-{**********************************}
+{******************************************}
 destructor TALLoadingOverlayManager.Destroy;
 begin
   AlFreeAndNil(FDefaultScrim);
@@ -351,14 +351,14 @@ begin
   inherited;
 end;
 
-{*******************************************}
+{***************************************************}
 procedure TALLoadingOverlayManager.AfterConstruction;
 begin
   inherited;
   TALStyleManager.Instance.ApplyLoadingOverlayManagerStyle('Default', Self);
 end;
 
-{***************************************************************}
+{*******************************************************************************}
 class function TALLoadingOverlayManager.CreateInstance: TALLoadingOverlayManager;
 begin
   result := TALLoadingOverlayManager.Create;
@@ -382,13 +382,13 @@ begin
   result := FInstance <> nil;
 end;
 
-{*************************************************}
+{*****************************************************************}
 function TALLoadingOverlayManager.IsShowingLoadingOverlay: Boolean;
 begin
   Result := FCurrentLoadingOverlay <> nil;
 end;
 
-{********************************************}
+{************************************************************}
 procedure TALLoadingOverlayManager.CloseCurrentLoadingOverlay;
 begin
   if FCurrentLoadingOverlay = nil then exit;
@@ -412,7 +412,7 @@ begin
   FContainerAnimation.Start;
 end;
 
-{**********************************************}
+{**************************************************************}
 procedure TALLoadingOverlayManager.DoCloseCurrentLoadingOverlay;
 begin
   if FCurrentLoadingOverlay = nil then exit;
@@ -454,13 +454,13 @@ begin
     end);
 end;
 
-{***************************************************}
+{*******************************************************************}
 Function TALLoadingOverlayManager.HasPendingLoadingOverlays: Boolean;
 begin
   Result := FQueue.Count > 0;
 end;
 
-{***********************************************}
+{***************************************************************}
 procedure TALLoadingOverlayManager.ProcessPendingLoadingOverlays;
 begin
   if (not IsShowingLoadingOverlay) and
@@ -475,7 +475,7 @@ begin
   end;
 end;
 
-{**************************************************************}
+{**********************************************************************************************}
 procedure TALLoadingOverlayManager.ShowLoadingOverlay(const ALoadingOverlay: TALLoadingOverlay);
 begin
 
@@ -523,27 +523,27 @@ begin
 
 end;
 
-{****************************************************************}
+{************************************************************************}
 procedure TALLoadingOverlayManager.ScrimAnimationProcess(Sender: TObject);
 begin
   if FCurrentLoadingOverlay = nil then exit;
   FCurrentLoadingOverlay.Fill.Color := ALSetColorAlpha(FCurrentLoadingOverlay.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
 end;
 
-{********************************************************************}
+{****************************************************************************}
 procedure TALLoadingOverlayManager.ContainerAnimationProcess(Sender: TObject);
 begin
   if FCurrentLoadingOverlay = nil then exit;
   FCurrentLoadingOverlay.Container.Scale.Y := FContainerAnimation.CurrentValue;
 end;
 
-{***************************************************************}
+{***********************************************************************}
 procedure TALLoadingOverlayManager.ScrimAnimationFinish(Sender: TObject);
 begin
   // Nothing to do
 end;
 
-{*******************************************************************}
+{***************************************************************************}
 procedure TALLoadingOverlayManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentLoadingOverlay = nil then exit;

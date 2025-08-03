@@ -664,7 +664,7 @@ begin
     Stream.ReadBuffer(PAnsiChar(FDataString)^, LCount);
 end;
 
-{*************************************************************}
+{**************************************************************}
 procedure TALStringStreamA.LoadFromFile(const FileName: string);
 begin
   var LFileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
@@ -675,7 +675,7 @@ begin
   end;
 end;
 
-{*************************************************************}
+{*****************************************************************}
 procedure TALStringStreamA.SetDataString(const AValue: AnsiString);
 begin
   FDataString := AValue;

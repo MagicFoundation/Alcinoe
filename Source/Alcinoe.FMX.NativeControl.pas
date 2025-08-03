@@ -172,7 +172,7 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
 
-{****************************}
+{*********************************************************************************}
 procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -197,7 +197,7 @@ begin
       _FreezeNativeViews(TControl(LForm.Children[i]));
 end;
 
-{******************************}
+{***********************************************************************************}
 procedure ALUnfreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
 begin
   For var I := low(AFrozenNativeControls) to high(AFrozenNativeControls) do

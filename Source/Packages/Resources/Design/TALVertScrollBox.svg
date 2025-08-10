@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left bar -->
+  <path d="M2 2h2v20H2V2z" fill="#787878"/>
+
+  <!-- Middle shape -->
+  <path d="M11 20h2v-2h2v-2h2v-2h-2v2h-2V8h2v2h2V8h-2V6h-2V4h-2v2H9v2H7v2h2V8h2v8H9v-2H7v2h2v2h2v2z" fill="#cb4c32"/>
+
+  <!-- Right bar -->
+  <path d="M22 2h-2v20h2V2z" fill="#787878"/>
+</svg>

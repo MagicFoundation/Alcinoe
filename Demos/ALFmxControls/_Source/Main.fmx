@@ -82,7 +82,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 10
+      TabOrder = 14
       Text = 'Launch ScrollBox Demo<br/>(Delphi Controls)'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -131,7 +131,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 11
+      TabOrder = 15
       Text = 'Launch TALScrollBox Demo<br/>(Alcinoe Controls)'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -180,7 +180,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 12
+      TabOrder = 16
       Text = 'Bench TALText'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -229,7 +229,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 13
+      TabOrder = 17
       Text = 'Bench TRectangle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -290,7 +290,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 15
+      TabOrder = 19
       Text = 'Bench TALRectangle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -339,7 +339,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 16
+      TabOrder = 20
       Text = 'Bench TText'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -403,7 +403,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 18
+      TabOrder = 22
       Text = 'Bench TLine'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -464,7 +464,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 20
+      TabOrder = 24
       Text = 'Bench TALline'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -481,7 +481,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 20047.000000000000000000
+      Position.Y = 20396.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 364.000000000000000000
       Size.PlatformDefault = False
@@ -556,7 +556,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 402
+      TabOrder = 410
       Text = 'Bench TCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -605,7 +605,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 431
+      TabOrder = 441
       Text = 'Bench TALCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -690,7 +690,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 464
+      TabOrder = 474
       Value = 25.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.Fill.ColorKey = 'Material3.Color.InverseSurface'
@@ -706,7 +706,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 21577.000000000000000000
+      Position.Y = 21926.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 416.000000000000000000
       Size.PlatformDefault = False
@@ -932,7 +932,7 @@ object MainForm: TMainForm
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 332
+      TabOrder = 340
       object ALText53: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -992,7 +992,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 318
+      TabOrder = 326
       object ALText49: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -1173,7 +1173,7 @@ object MainForm: TMainForm
       Padding.Right = 30.000000000000000000
       Padding.Bottom = 20.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 19796.000000000000000000
+      Position.Y = 20145.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 64.000000000000000000
       Size.PlatformDefault = False
@@ -1200,7 +1200,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 604
+      TabOrder = 628
       Text = 'Show Date Picker Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1249,7 +1249,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 613
+      TabOrder = 637
       Text = 'Apply Effect to the Video'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1267,7 +1267,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 620
+      TabOrder = 644
       object ALButton6: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -1369,7 +1369,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 634
+      TabOrder = 658
       object ALButton10: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1471,7 +1471,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 640
+      TabOrder = 664
       object ALButton11: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -1583,7 +1583,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 647
+      TabOrder = 671
       object ALButton14: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1667,7 +1667,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 653
+      TabOrder = 677
       object ALButton17: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -2095,7 +2095,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 43.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 729
+      TabOrder = 753
       object ALLayout33: TALLayout
         Align = Left
         AutoSize = Both
@@ -2236,7 +2236,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 19920.000000000000000000
+      Position.Y = 20269.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2278,7 +2278,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 19467.000000000000000000
+      Position.Y = 19816.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2299,7 +2299,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 21450.000000000000000000
+      Position.Y = 21799.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2342,7 +2342,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 771
+      TabOrder = 795
       object ALLayout36: TALLayout
         Align = Left
         AutoSize = Both
@@ -2464,7 +2464,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 19594.000000000000000000
+      Position.Y = 19943.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -2524,7 +2524,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 22025.000000000000000000
+      Position.Y = 22374.000000000000000000
       PromptTextColor = xFF49454F
       PromptTextColorKey = 'Material3.Color.OnSurfaceVariant'
       Sides = [Bottom]
@@ -2579,7 +2579,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material3.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 798
+      TabOrder = 822
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
@@ -2608,7 +2608,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 802
+      TabOrder = 826
       object ALButton21: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -2723,7 +2723,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 22227.000000000000000000
+      Position.Y = 22576.000000000000000000
       PromptTextColor = xFF49454F
       PromptTextColorKey = 'Material3.Color.OnSurfaceVariant'
       Sides = [Bottom]
@@ -2778,7 +2778,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material3.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 807
+      TabOrder = 831
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
@@ -2791,11 +2791,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = Both
       Margins.Top = 32.000000000000000000
-      Position.Y = 22126.000000000000000000
+      Position.Y = 22475.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 69.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 810
+      TabOrder = 834
       object ALLayout47: TALLayout
         Align = Left
         AutoSize = Both
@@ -3008,7 +3008,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 22369.242187500000000000
+      Position.Y = 22718.242187500000000000
       PromptTextColor = xFF49454F
       PromptTextColorKey = 'Material3.Color.OnSurfaceVariant'
       Size.Width = 348.000000000000000000
@@ -3063,7 +3063,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material3.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 814
+      TabOrder = 838
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
@@ -3088,11 +3088,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = Both
       Margins.Top = 40.000000000000000000
-      Position.Y = 22671.242187500000000000
+      Position.Y = 23020.242187500000000000
       Size.Width = 380.000000000000000000
       Size.Height = 60.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 815
+      TabOrder = 839
       object ALLayout49: TALLayout
         Align = Left
         AutoSize = Both
@@ -3293,7 +3293,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 22763.242187500000000000
+      Position.Y = 23112.242187500000000000
       PromptTextColor = xFF49454F
       PromptTextColorKey = 'Material3.Color.OnSurfaceVariant'
       Size.Width = 348.000000000000000000
@@ -3348,7 +3348,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material3.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 818
+      TabOrder = 842
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
@@ -3376,7 +3376,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 22461.242187500000000000
+      Position.Y = 22810.242187500000000000
       PromptTextColor = xFF49454F
       PromptTextColorKey = 'Material3.Color.OnSurfaceVariant'
       Size.Width = 348.000000000000000000
@@ -3431,7 +3431,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material3.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 820
+      TabOrder = 844
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
@@ -3518,7 +3518,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 415
+      TabOrder = 425
       object ALAutoSizeLayoutImage: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -3742,7 +3742,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 627
+      TabOrder = 651
       object ALAnimatedImage1: TALAnimatedImage
         Align = Left
         ResourceName = 'lottieloader1'
@@ -3961,7 +3961,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 286
+      TabOrder = 294
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = Both
@@ -6490,7 +6490,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 272
+      TabOrder = 280
       object ALImage14: TALImage
         Align = MostLeftTop
         Margins.Left = 16.000000000000000000
@@ -6541,7 +6541,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 22
+      TabOrder = 26
       object ALImage15: TALImage
         Align = MostLeftTop
         Margins.Left = 16.000000000000000000
@@ -6641,7 +6641,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 312
+      TabOrder = 316
       object ALButton25: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -6866,7 +6866,7 @@ object MainForm: TMainForm
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 49
+      TabOrder = 53
       object ALText40: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -6924,7 +6924,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 53
+      TabOrder = 57
       object ALText50: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -7058,7 +7058,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 74
+      TabOrder = 78
       object ALText71: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -7188,7 +7188,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 50
+      TabOrder = 54
       object ALText47: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -7314,7 +7314,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 64
+      TabOrder = 68
       object ALText78: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -7476,7 +7476,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 59
+      TabOrder = 63
       object ALText77: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -7639,7 +7639,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 62
+      TabOrder = 66
       object ALText80: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -7734,7 +7734,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 260
+      TabOrder = 264
       Thumb.Fill.Color = xFF6750A4
       Thumb.Fill.ColorKey = 'Material3.Color.Primary'
       Thumb.Margins.Left = 6.000000000000000000
@@ -7817,7 +7817,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 242
+      TabOrder = 246
       Thumb.Fill.Color = xFF6750A4
       Thumb.Fill.ColorKey = 'Material3.Color.Primary'
       Thumb.Margins.Left = 6.000000000000000000
@@ -7867,7 +7867,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 205
+      TabOrder = 209
       Thumb.Size.Width = 32.000000000000000000
       Thumb.Size.Height = 32.000000000000000000
       Thumb.Size.PlatformDefault = False
@@ -7977,7 +7977,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 207
+      TabOrder = 211
       Thumb.Fill.Color = xFF6750A4
       Thumb.Fill.ColorKey = 'Material3.Color.Primary'
       Thumb.Margins.Left = 6.000000000000000000
@@ -8125,7 +8125,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 221
+      TabOrder = 225
       Value = 10.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.Fill.ColorKey = 'Material3.Color.InverseSurface'
@@ -8224,7 +8224,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 567
+      TabOrder = 587
       Text = 'Scale-Out Effect'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -8377,7 +8377,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 20881.000000000000000000
+      Position.Y = 21230.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 104.000000000000000000
       Size.PlatformDefault = False
@@ -8396,7 +8396,7 @@ object MainForm: TMainForm
       Fill.Color = claNull
       Margins.Top = 16.000000000000000000
       PageIndicator = ALPageIndicator3
-      Position.Y = 21013.000000000000000000
+      Position.Y = 21362.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 355.000000000000000000
       Size.PlatformDefault = False
@@ -8488,7 +8488,7 @@ object MainForm: TMainForm
       Fill.Color = claNull
       Margins.Top = 16.000000000000000000
       PageIndicator = ALPageIndicator2
-      Position.Y = 20439.000000000000000000
+      Position.Y = 20788.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 396.000000000000000000
       Size.PlatformDefault = False
@@ -8594,7 +8594,7 @@ object MainForm: TMainForm
       Align = Top
       AnimationType = Worm
       Margins.Top = 8.000000000000000000
-      Position.Y = 20843.000000000000000000
+      Position.Y = 21192.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 14.000000000000000000
       Size.PlatformDefault = False
@@ -8607,7 +8607,7 @@ object MainForm: TMainForm
       Align = Top
       AnimationType = LinearSwap
       Margins.Top = 8.000000000000000000
-      Position.Y = 21376.000000000000000000
+      Position.Y = 21725.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 14.000000000000000000
       Size.PlatformDefault = False
@@ -8702,7 +8702,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 479
+      TabOrder = 498
       Text = 'Show Simple Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -8751,7 +8751,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 453
+      TabOrder = 459
       Text = 'Show Multiple Choice Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -8800,7 +8800,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 455
+      TabOrder = 461
       Text = 'Show Single Choice Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -8849,7 +8849,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 440
+      TabOrder = 446
       Text = 'Show Edit Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -8926,7 +8926,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 73
+      TabOrder = 77
       object ALText5: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -9060,7 +9060,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 72
+      TabOrder = 76
       object ALText6: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -9193,7 +9193,7 @@ object MainForm: TMainForm
       Size.Width = 340.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 71
+      TabOrder = 75
       object ALText7: TALText
         Align = LeftCenter
         AutoSize = Both
@@ -9317,11 +9317,11 @@ object MainForm: TMainForm
     end
     object ALLayout2: TALLayout
       Align = Top
-      Position.Y = 22862.484375000000000000
+      Position.Y = 23211.484375000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 687
+      TabOrder = 707
     end
     object ALRangeTrackBarCustomStyle: TALRangeTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
@@ -9352,7 +9352,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 213
+      TabOrder = 217
     end
     object ALEdit5: TALEdit
       DefStyleAttr = 'Material3Edit'
@@ -9374,7 +9374,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 22553.242187500000000000
+      Position.Y = 22902.242187500000000000
       PromptTextColor = xFF49454F
       PromptTextColorKey = 'Material3.Color.OnSurfaceVariant'
       Size.Width = 348.000000000000000000
@@ -9429,7 +9429,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.ColorKey = 'Material3.Color.OnSurfaceVariant'
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 693
+      TabOrder = 713
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
@@ -9489,7 +9489,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 418
+      TabOrder = 422
       Text = 'Show Memo Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -9538,7 +9538,7 @@ object MainForm: TMainForm
       Stroke.Color = xFF79747E
       Stroke.ColorKey = 'Material3.Color.Outline'
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 420
+      TabOrder = 424
       Text = 'Show Button Dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -9577,7 +9577,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 56.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 308
+      TabOrder = 312
       object ALButton3: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -9772,7 +9772,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 96.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 303
+      TabOrder = 307
       object ALButton15: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -9913,7 +9913,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 561
+      TabOrder = 578
       object ALButton20: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -9971,7 +9971,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 595
+      TabOrder = 613
       object ALButton24: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -10021,7 +10021,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 578
+      TabOrder = 596
       object ALButton30: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -10084,7 +10084,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 572
+      TabOrder = 590
       object ALButton34: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -10164,7 +10164,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 590
+      TabOrder = 608
       object ALButton2: TALButton
         Align = LeftCenter
         ClickSound = Always
@@ -10256,7 +10256,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 559
+      TabOrder = 576
       object ALButton1: TALToggleButton
         Align = LeftCenter
         ClickSound = Always
@@ -10345,7 +10345,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 591
+      TabOrder = 609
       object ALButton23: TALToggleButton
         Align = LeftCenter
         ClickSound = Always
@@ -10421,7 +10421,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 575
+      TabOrder = 593
       object ALButton31: TALToggleButton
         Align = LeftCenter
         ClickSound = Always
@@ -10516,7 +10516,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 62.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 569
+      TabOrder = 586
       object ALButton32: TALToggleButton
         Align = LeftCenter
         ClickSound = Always
@@ -10605,7 +10605,7 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 56.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 306
+      TabOrder = 310
       object ALButton35: TALToggleButton
         Align = LeftCenter
         ClickSound = Always
@@ -11063,7 +11063,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 473
+      TabOrder = 482
       Text = 'Show bottom sheet'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -11299,7 +11299,7 @@ object MainForm: TMainForm
       StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 471
+      TabOrder = 476
       Text = 'Show loading overlay'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -11308,6 +11308,97 @@ object MainForm: TMainForm
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonShowLoadingOverlayClick
+    end
+    object ALText75: TALText
+      Align = Top
+      AutoSize = Both
+      Fill.Color = xFFE6E0E9
+      Fill.ColorKey = 'Material3.Color.SurfaceContainerHighest'
+      Margins.Top = 60.000000000000000000
+      Margins.Bottom = 24.000000000000000000
+      Padding.Left = 16.000000000000000000
+      Padding.Top = 45.000000000000000000
+      Padding.Right = 16.000000000000000000
+      Padding.Bottom = 15.000000000000000000
+      Position.Y = 19467.000000000000000000
+      Size.Width = 380.000000000000000000
+      Size.Height = 103.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'TALSnackbar'
+      TextSettings.Font.Size = 32.000000000000000000
+      TextSettings.Font.Weight = Bold
+      TextSettings.Font.Color = xFF1D1B20
+      TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
+    end
+    object ALText76: TALText
+      Align = Top
+      AutoSize = Both
+      Margins.Left = 16.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 12.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 19594.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 78.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        '<span background-color="{Material3.Color.SurfaceContainerHigh}" ' +
+        'font-weight=500>TALSnackbar</span> is a '#13#10'lightweight, transient' +
+        ' message component for displaying brief '#13#10'notifications at the b' +
+        'ottom of the screen.'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.Color = xFF1D1B20
+      TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
+    end
+    object ButtonShowSnackbar: TALButton
+      Align = Top
+      Fill.Color = xFF6750A4
+      Fill.ColorKey = 'Material3.Color.Primary'
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 8.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Padding.Left = 30.000000000000000000
+      Padding.Top = 20.000000000000000000
+      Padding.Right = 30.000000000000000000
+      Padding.Bottom = 20.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 19692.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 64.000000000000000000
+      Size.PlatformDefault = False
+      StateStyles.Disabled.Fill.Color = x1F1D1B20
+      StateStyles.Disabled.Fill.ColorKey = 'Material3.Color.OnSurface.Alpha12'
+      StateStyles.Disabled.Fill.Inherit = False
+      StateStyles.Disabled.TextSettings.Inherit = False
+      StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
+      StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
+      StateStyles.Disabled.TextSettings.Font.ColorKey = 'Material3.Color.OnSurface.Alpha38'
+      StateStyles.Disabled.Opacity = 1.000000000000000000
+      StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+      StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
+      StateStyles.Hovered.Shadow.Color = x80000000
+      StateStyles.Hovered.Shadow.ColorKey = 'Material3.Color.Shadow.Alpha50'
+      StateStyles.Hovered.Shadow.Inherit = False
+      StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
+      StateStyles.Hovered.StateLayer.UseContentColor = True
+      StateStyles.Pressed.StateLayer.Opacity = 0.119999997317791000
+      StateStyles.Pressed.StateLayer.UseContentColor = True
+      StateStyles.Focused.StateLayer.Opacity = 0.119999997317791000
+      StateStyles.Focused.StateLayer.UseContentColor = True
+      StateStyles.Transition.Duration = 0.200000002980232200
+      StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
+      Stroke.Color = claNull
+      Stroke.Thickness = 1.289999961853027000
+      TabOrder = 473
+      Text = 'Show Snackbar'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.Font.Color = claWhite
+      TextSettings.Font.ColorKey = 'Material3.Color.OnPrimary'
+      TextSettings.LetterSpacing = 0.129999995231628400
+      XRadius = -50.000000000000000000
+      YRadius = -50.000000000000000000
+      OnClick = ButtonShowSnackbarClick
     end
   end
 end

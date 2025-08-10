@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 24 24"
+     xmlns="http://www.w3.org/2000/svg" data-name="Layer 1">
+  <!-- Bar with two holes where the circles go -->
+  <path fill="#787878" fill-rule="evenodd"
+        d="M21,11H19.81573a2.98208,2.98208,0,0,0-5.63146,0H9.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2H4.18433a2.982,2.982,0,0,0,5.6314,0h4.3686a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2Z
+           M7,9.01792a2.98208,2.98208,0,1,1,0,5.96416a2.98208,2.98208,0,1,1,0-5.96416Z
+           M17,9.01792a2.98208,2.98208,0,1,1,0,5.96416a2.98208,2.98208,0,1,1,0-5.96416Z"/>
+  
+  <!-- Full inner circles (perfectly fill the holes) -->
+  <circle cx="7"  cy="12" r="2.98208" fill="#cb4c32"/>
+  <circle cx="17" cy="12" r="2.98208" fill="#cb4c32"/>
+</svg>

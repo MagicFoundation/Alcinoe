@@ -4417,6 +4417,8 @@ begin
   var LCheckSpelling := NativeView.CheckSpelling;
   var LMaxLength := NativeView.MaxLength;
   var LText := NativeView.Text;
+  var LOnChange := fOnChange;
+  fOnChange := nil;
   inherited;
   UpdateNativeViewStyle;
   UpdateEditControlPromptText;
@@ -4428,6 +4430,7 @@ begin
   NativeView.MaxLength := LMaxLength;
   NativeView.Text := LText;
   UpdateNativeViewVisibility;
+  fOnChange := LOnChange;
 end;
 
 {***************************}
@@ -4965,8 +4968,10 @@ end;
 {*************************************************}
 procedure TALBaseEdit.SetText(const Value: String);
 begin
-  if NativeView <> nil then
-    NativeView.Text := Value
+  if NativeView <> nil then begin
+    NativeView.Text := Value;
+    UpdateNativeViewVisibility;
+  end
   else begin
     FDummyText := Value;
     ClearBufPromptTextDrawable;
@@ -5157,6 +5162,9 @@ begin
     NativeView.Password := Value
   else
     FDummyPassword := Value;
+  var LText := Text;
+  if LText <> '' then
+    setSelection(length(LText));
   clearBufPromptTextDrawable;
 end;
 

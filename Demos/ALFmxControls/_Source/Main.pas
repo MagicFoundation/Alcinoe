@@ -31,6 +31,7 @@ uses
   FMX.Platform,
   Alcinoe.Common,
   Alcinoe.FMX.Materials.Canvas,
+  Alcinoe.FMX.Snackbar,
   Alcinoe.FMX.Styles,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.Layouts,
@@ -412,6 +413,9 @@ type
     ALText73: TALText;
     ALText74: TALText;
     ButtonShowLoadingOverlay: TALButton;
+    ALText75: TALText;
+    ALText76: TALText;
+    ButtonShowSnackbar: TALButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
@@ -457,6 +461,7 @@ type
     procedure ButtonShowTopSheetClick(Sender: TObject);
     procedure ButtonShowRightSheetClick(Sender: TObject);
     procedure ButtonShowLoadingOverlayClick(Sender: TObject);
+    procedure ButtonShowSnackbarClick(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
@@ -518,6 +523,7 @@ begin
   ALHasTouchScreen := true;
   {$ENDIF}
   TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
+  TALStyleManager.Instance.ApplySnackbarManagerStyle('Material3.SnackbarManager', TALSnackbarManager.Instance, 18{AFontSize});
   TALStyleManager.Instance.ApplySheetManagerStyle('Material3.SheetManager', TALSheetManager.Instance, 22{AFontSize});
   TALStyleManager.Instance.ApplyLoadingOverlayManagerStyle('Material3.LoadingOverlayManager', TALLoadingOverlayManager.Instance);
   // We can not call RegisterTypefaceFromResource in FormCreate because FormCreate is
@@ -1437,6 +1443,15 @@ begin
     .Show;
 end;
 
+{***********************************************************}
+procedure TMainForm.ButtonShowSnackbarClick(Sender: TObject);
+begin
+  TALSnackBar.Builder
+    .SetMessageText('No internet connection')
+    .AddActionButton('Dismiss', 1)
+    .Show;
+end;
+
 {********************************************}
 procedure TMainForm.FormVirtualKeyboardHidden(
             Sender: TObject;
@@ -1708,6 +1723,8 @@ begin
   _addIcon(LContent, 'tool6');
 
   TALLeftSheet.Builder
+    .AddBackButton(0{ATag})
+    //.AddCloseButton(0{ATag})
     .SetHeadlineText('Title')
     .Setcontent(LContent)
     .SetContainerCorners(AllCorners)
@@ -1751,6 +1768,8 @@ begin
   _addIcon(LContent, 'tool6');
 
   TALRightSheet.Builder
+    .AddBackButton(0{ATag})
+    //.AddCloseButton(0{ATag})
     .SetHeadlineText('Title')
     .Setcontent(LContent)
     .SetContainerCorners(AllCorners)

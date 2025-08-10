@@ -3,6 +3,7 @@ unit Alcinoe.FMX.Dialogs;
 interface
 
 uses
+  System.SysUtils,
   system.Classes,
   System.Generics.Collections,
   System.Messaging,
@@ -26,19 +27,25 @@ type
   TALDialog = class(TALRectangle)
   public
     type
-      //-----------------
+      // ----------------
       // TOnActionRefProc
       TOnActionRefProc = reference to procedure(Const ADialog: TALDialog; const AAction: Integer; var ACanClose: Boolean);
-      //-----------------
+      // ----------------
       // TOnActionObjProc
       TOnActionObjProc = procedure(Const ADialog: TALDialog; const AAction: Integer; var ACanClose: Boolean) of object;
-      //---------------------
+      // --------------------
       // TCustomDialogRefProc
       TCustomDialogRefProc = reference to procedure;
-      //---------------------
+      // --------------------
       // TCustomDialogObjProc
       TCustomDialogObjProc = procedure of object;
-      //---------
+      // --------------
+      // TAnimateOption
+      TAnimateOption = (AnimateScrim, AnimateContainer);
+      // ---------------
+      // TAnimateOptions
+      TAnimateOptions = set of TAnimateOption;
+      // --------
       // TBuilder
       TBuilder = Class(TObject)
       private
@@ -58,6 +65,7 @@ type
         function AddEdit(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt): TBuilder;
         function AddMemo(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt): TBuilder;
         function AddButton(const ACaption: String; const ATag: NativeInt; Const AIsFooterButton: Boolean = True): TBuilder;
+        function SetCloseOnScrimClick(const AValue: boolean): TBuilder;
         function SetCustomContainer(const AValue: TALControl): TBuilder;
         function SetCustomDialogProc(const AValue: TCustomDialogRefProc): TBuilder; overload;
         function SetCustomDialogProc(const AValue: TCustomDialogObjProc): TBuilder; overload;
@@ -90,11 +98,16 @@ type
     FMessage: TALText;
     FButtonBar: TALRectangle;
     FCustomContainer: TALControl;
+    FShowAnimateOptions: TAnimateOptions;
+    FCloseAnimateOptions: TAnimateOptions;
     FCustomDialogRefProc: TCustomDialogRefProc;
     FCustomDialogObjProc: TCustomDialogObjProc;
     FOnActionRefProc: TOnActionRefProc;
     FOnActionObjProc: TOnActionObjProc;
+    FOnClosedRefProc: TProc;
     FVirtualKeyboardAnimation: TALFloatAnimation;
+    function GetCloseOnScrimClick: boolean;
+    procedure SetCloseOnScrimClick(const AValue: Boolean);
     function GetContainer: TALRectangle;
     function GetIcon: TALImage;
     function GetHeadline: TALText;
@@ -110,6 +123,9 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    class function Current: TALDialog;
+    class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    property CloseOnScrimClick: Boolean read GetCloseOnScrimClick write SetCloseOnScrimClick;
     function HasContainer: Boolean;
     function HasIcon: Boolean;
     function HasHeadline: Boolean;
@@ -139,10 +155,13 @@ type
     property &Message: TALText read GetMessage;
     property ButtonBar: TALRectangle read GetButtonBar;
     property CustomContainer: TALControl read FCustomContainer write SetCustomContainer;
+    property ShowAnimateOptions: TAnimateOptions read FShowAnimateOptions write FShowAnimateOptions;
+    property CloseAnimateOptions: TAnimateOptions read FCloseAnimateOptions write FCloseAnimateOptions;
     property CustomDialogRefProc: TCustomDialogRefProc read FCustomDialogRefProc write FCustomDialogRefProc;
     property CustomDialogObjProc: TCustomDialogObjProc read FCustomDialogObjProc write FCustomDialogObjProc;
     property OnActionRefProc: TOnActionRefProc read FOnActionRefProc write FOnActionRefProc;
     property OnActionObjProc: TOnActionObjProc read FOnActionObjProc write FOnActionObjProc;
+    property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~}
@@ -188,7 +207,6 @@ type
     procedure ProcessPendingDialogs;
     procedure ShowDialog(const ADialog: TALDialog);
     procedure DoCloseCurrentDialog;
-    procedure CloseCurrentDialog;
   public
     constructor Create;
     destructor Destroy; override;
@@ -221,12 +239,12 @@ type
     property DefaultFooterButton: TALButton read FDefaultFooterButton;
     property CurrentDialog: TALDialog read fCurrentDialog;
     function IsShowingDialog: Boolean;
+    procedure CloseCurrentDialog;
   end;
 
 implementation
 
 uses
-  system.SysUtils,
   System.Math,
   System.Types,
   Fmx.Controls,
@@ -235,6 +253,7 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
+  Alcinoe.fmx.LoadingOverlay,
   Alcinoe.Common;
 
 {************************************}
@@ -336,6 +355,13 @@ begin
   Result := Self;
 end;
 
+{********************************************************************************}
+function TALDialog.TBuilder.SetCloseOnScrimClick(const AValue: boolean): TBuilder;
+begin
+  FDialog.SetCloseOnScrimClick(AValue);
+  Result := Self;
+end;
+
 {*********************************************************************************}
 function TALDialog.TBuilder.SetCustomContainer(const AValue: TALControl): TBuilder;
 begin
@@ -397,15 +423,17 @@ begin
   FMessage := nil;
   FButtonBar := nil;
   FCustomContainer := nil;
+  FShowAnimateOptions := [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer];
+  FCloseAnimateOptions := [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer];
   FCustomDialogRefProc := nil;
   FCustomDialogObjProc := nil;
   FOnActionRefProc := nil;
   FOnActionObjProc := nil;
+  FOnClosedRefProc := nil;
   FVirtualKeyboardAnimation := nil;
   TMessageManager.DefaultManager.SubscribeToMessage(TVKStateChangeMessage, VirtualKeyboardChangeHandler);
   Assign(TALDialogManager.Instance.DefaultScrim);
   Name := 'ALDialogScrim';
-  HitTest := True;
   Onclick := ActionButtonClick;
 end;
 
@@ -427,6 +455,23 @@ begin
   // and BeforeDestruction is guaranteed to execute on the main thread.
   TMessageManager.DefaultManager.Unsubscribe(TVKStateChangeMessage, VirtualKeyboardChangeHandler);
   inherited;
+end;
+
+{******************************************}
+class function TALDialog.Current: TALDialog;
+begin
+  Result := TALDialogManager.Instance.CurrentDialog;
+end;
+
+{************************************************************************************************************************************************************************************}
+class procedure TALDialog.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+begin
+  var LCurrentDialog := TALDialogManager.Instance.CurrentDialog;
+  if LCurrentDialog <> nil then begin
+    LCurrentDialog.OnClosedRefProc := AOnClosedCallback;
+    LCurrentDialog.CloseAnimateOptions := AAnimateOptions;
+    TALDialogManager.Instance.CloseCurrentDialog;
+  end;
 end;
 
 {************************************************************************************************************}
@@ -460,6 +505,19 @@ end;
 procedure TALDialog.VirtualKeyboardAnimationProcess(Sender: TObject);
 begin
   margins.Bottom := FVirtualKeyboardAnimation.CurrentValue;
+end;
+
+{***********************************************}
+function TALDialog.GetCloseOnScrimClick: boolean;
+begin
+  result := Assigned(Onclick);
+end;
+
+{**************************************************************}
+procedure TALDialog.SetCloseOnScrimClick(const AValue: Boolean);
+begin
+  if AValue then Onclick := ActionButtonClick
+  else Onclick := nil;
 end;
 
 {********************************************}
@@ -1061,12 +1119,18 @@ begin
   if (not assigned(FCurrentDialog.CustomDialogRefProc)) and
      (not assigned(FCurrentDialog.CustomDialogObjProc)) then begin
 
+    If (not (TALDialog.TAnimateOption.AnimateContainer in FCurrentDialog.CloseAnimateOptions)) then begin
+      DoCloseCurrentDialog;
+      exit;
+    end;
+
     FCurrentDialog.FTouchBlocker.Visible := True;
     FCurrentDialog.Container.Align := TALAlignlayout.None;
 
     FScrimAnimation.Enabled := False;
-    if (not HasPendingDialogs) then begin
-      FScrimAnimation.Tag := TAlphaColorRec(FCurrentDialog.Fill.Color).A;
+    if (not HasPendingDialogs) and
+       (TALDialog.TAnimateOption.AnimateScrim in FCurrentDialog.CloseAnimateOptions) then begin
+      FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255;
       FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
       FScrimAnimation.Duration := 0.200;
       FScrimAnimation.StartValue := 1;
@@ -1096,6 +1160,8 @@ begin
   FCurrentDialog := nil;
   FScrimAnimation.Enabled := False;
   FContainerAnimation.Enabled := False;
+  if assigned(LCurrentDialog.FOnClosedRefProc) then
+    LCurrentDialog.FOnClosedRefProc();
   ProcessPendingDialogs;
   if not IsShowingDialog then
     ALUnfreezeNativeViews(FFrozenNativeControls)
@@ -1119,7 +1185,21 @@ begin
   TThread.queue(nil,
     procedure
     begin
-      if TALDialogManager.HasInstance then begin
+      if (TALLoadingOverlayManager.HasInstance) and
+         (TALLoadingOverlayManager.Instance.IsShowingLoadingOverlay) then begin
+        TALLoadingOverlay.CloseCurrent(
+          procedure
+          begin
+            if TALDialogManager.HasInstance then begin
+              ADialog.ShowAnimateOptions := ADialog.ShowAnimateOptions - [TALDialog.TAnimateOption.AnimateScrim];
+              TALDialogManager.Instance.RequestDialog(ADialog, AForceImmediateShow);
+            end
+            else
+              ALFreeAndNil(ADialog);
+          end,
+          TALLoadingOverlayManager.Instance.CurrentLoadingOverlay.CloseAnimateOptions - [TALLoadingOverlay.TAnimateOption.AnimateScrim])
+      end
+      else if TALDialogManager.HasInstance then begin
         with TALDialogManager.Instance do begin
           FQueue.Enqueue(ADialog);
           if AForceImmediateShow then begin
@@ -1409,32 +1489,41 @@ begin
   else if assigned(FCurrentDialog.CustomDialogObjProc) then FCurrentDialog.CustomDialogObjProc()
   else begin
 
-    FCurrentDialog.FTouchBlocker := TALLayout.Create(FCurrentDialog);
-    FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog;
-    FCurrentDialog.FTouchBlocker.Align := TALAlignLayout.Contents;
-    FCurrentDialog.FTouchBlocker.HitTest := True;
+    // ShowAnimateOptions
+    if TALDialog.TAnimateOption.AnimateContainer in FCurrentDialog.ShowAnimateOptions then begin
 
-    FCurrentDialog.Container.Align := TALAlignlayout.None;
-    Var LCurrentDialogCenteredPosY: Single := FCurrentDialog.Container.Position.y;
-    FCurrentDialog.Container.Position.y := LCurrentDialogCenteredPosY*0.8;
-    FCurrentDialog.Container.Scale.Y := 0;
-    FCurrentDialog.Container.Pivot.Point := TpointF.Create(0,0);
+      FCurrentDialog.FTouchBlocker := TALLayout.Create(FCurrentDialog);
+      FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog;
+      FCurrentDialog.FTouchBlocker.Align := TALAlignLayout.Contents;
+      FCurrentDialog.FTouchBlocker.HitTest := True;
 
-    FScrimAnimation.Enabled := False;
-    FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255;
-    FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
-    FScrimAnimation.Duration := 0.4;
-    FScrimAnimation.StartValue := 0;
-    FScrimAnimation.StopValue := 1;
-    FScrimAnimation.Start;
+      FCurrentDialog.Container.Align := TALAlignlayout.None;
+      Var LCurrentDialogCenteredPosY: Single := FCurrentDialog.Container.Position.y;
+      FCurrentDialog.Container.Position.y := LCurrentDialogCenteredPosY*0.8;
+      FCurrentDialog.Container.Scale.Y := 0;
+      FCurrentDialog.Container.Pivot.Point := TpointF.Create(0,0);
 
-    FContainerAnimation.Enabled := False;
-    FContainerAnimation.TagFloat := LCurrentDialogCenteredPosY;
-    FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
-    FContainerAnimation.Duration := 0.5;
-    FContainerAnimation.StartValue := 0;
-    FContainerAnimation.StopValue := 1;
-    FContainerAnimation.Start;
+      if (TALDialog.TAnimateOption.AnimateScrim in FCurrentDialog.ShowAnimateOptions) then begin
+        FScrimAnimation.Enabled := False;
+        FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentDialog.Fill.Color).A / 255;
+        FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
+        FScrimAnimation.Duration := 0.4;
+        FScrimAnimation.StartValue := 0;
+        FScrimAnimation.StopValue := 1;
+        FScrimAnimation.Start;
+      end;
+
+      FContainerAnimation.Enabled := False;
+      FContainerAnimation.TagFloat := LCurrentDialogCenteredPosY;
+      FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
+      FContainerAnimation.Duration := 0.5;
+      FContainerAnimation.StartValue := 0;
+      FContainerAnimation.StopValue := 1;
+      FContainerAnimation.Start;
+
+    end
+    else
+      ContainerAnimationFinish(nil);
 
   end;
 end;

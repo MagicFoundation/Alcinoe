@@ -203,6 +203,152 @@ type
     property PriorityDirection: TPriorityDirection read FPriorityDirection write FPriorityDirection;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // TALWorkerContext is an example of a context object
+  // that can be used with TALWorkerThread. However, using this
+  // specific class is not required—any object type can be used as a context.
+  TALWorkerContext = Class(TObject)
+  protected
+    // FLock is used to safely access FOwner members from a background thread.
+    // Since FOwner can only be set to nil while FLock is held,
+    // acquiring FLock guarantees that FOwner members remain valid during access.
+    FLock: TObject;
+    // If FManagedByWorkerThread is True (default), the instance's
+    // lifecycle is managed by the worker thread and will be automatically released.
+    // Otherwise, the initiator is responsible for releasing it.
+    FManagedByWorkerThread: Boolean;
+    // Reference to the object that initiated the task associated with this context.
+    FOwner: TObject;
+  public
+    constructor Create(const AOwner: TObject); virtual;
+    destructor Destroy; override;
+  End;
+
+  // Below a sample of how to use a TALWorkerContext:
+  // ------------------------------------------------
+  // type
+  //   TMyMap = class
+  //   private
+  //     type
+  //       TDownloadMarkersContext = Class(TALWorkerContext)
+  //       private
+  //         function GetOwner: TMyMap;
+  //       public
+  //         MapID: Int64;
+  //         constructor Create(const AOwner: TMyMap); reintroduce; virtual;
+  //         Property Owner: TMyMap read GetOwner;
+  //       End;
+  //   private
+  //     FMapID: Int64;
+  //     FDownloadMarkersContext: TDownloadMarkersContext; // [MultiThread]
+  //     class procedure DownloadMarkersBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
+  //     procedure DownloadMarkers;
+  //     procedure CancelDownloadMarkers;
+  //   public
+  //     constructor Create(const AMapID: Int64);
+  //     procedure BeforeDestruction; override;
+  //     property MapID: Int64 read FMapID;
+  //   end;
+  //
+  // constructor TMyMap.TDownloadMarkersContext.Create(const AOwner: TMyMap);
+  // begin
+  //   inherited Create(AOwner);
+  //   MapID := AOwner.MapID;
+  // end;
+  //
+  // function TMyMap.TDownloadMarkersContext.GetOwner: TMyMap;
+  // begin
+  //   Result := TMyMap(FOwner);
+  // end;
+  //
+  // constructor TMyMap.Create(const AMapID: Int64);
+  // begin
+  //   inherited create;
+  //   FMapID := AMapID;
+  //   DownloadMarkers;
+  // end;
+  //
+  // procedure TMyMap.BeforeDestruction;
+  // begin
+  //   if BeforeDestructionExecuted then exit;
+  //   CancelDownloadMarkers;
+  //   inherited;
+  // end;
+  //
+  // procedure TMyMap.DownloadMarkers;
+  // begin
+  //   FDownloadMarkersContext := TDownloadMarkersContext.Create(Self);
+  //   Try
+  //     TALNetHttpClientPool.Instance.ExecuteProc(
+  //       DownloadMarkersBackgroundProc, // const AProc: TALWorkerThreadObjProc;
+  //       FDownloadMarkersContext); // const AContext: Tobject; // Context will be free by the worker thread
+  //   except
+  //     ALFreeAndNil(FDownloadMarkersContext);
+  //     Raise;
+  //   End;
+  // end;
+  //
+  // class procedure TMyMap.DownloadMarkersBackgroundProc(var AContext: Tobject);
+  // begin
+  //   var LContext := TDownloadMarkersContext(AContext);
+  //   if LContext.FOwner = nil then exit;
+  //
+  //   var LHtml: String := '';
+  //   try
+  //     var LNetHttpClient := ALCreateNetHTTPClient;
+  //     try
+  //       LHtml := LNetHttpClient.Get('...MapID...');
+  //     finally
+  //       ALFreeAndNil(LNetHttpClient);
+  //     end;
+  //   Except
+  //     On E: Exception do begin
+  //       ALLog('TMyMap.DownloadMarkersBackgroundProc', E);
+  //       LHtml := '';
+  //     end;
+  //   end;
+  //
+  //   if LContext.FOwner = nil then exit;
+  //   TThread.queue(nil,
+  //     procedure
+  //     begin
+  //       Try
+  //         if LContext.FOwner <> nil then begin
+  //           var LOwner := LContext.owner;
+  //           LOwner.FDownloadMarkersContext := nil;
+  //           // Success
+  //           if LHtml <> '' then ...
+  //           // Error
+  //           else ...
+  //         end;
+  //       finally
+  //         ALFreeAndNil(LContext);
+  //       End;
+  //     end);
+  //   AContext := nil; // AContext will be free by TThread.queue
+  // end;
+  //
+  // procedure TMyMap.CancelDownloadMarkers;
+  // begin
+  //   // The FDownloadMarkersContext pointer can only be
+  //   // updated in the main thread, so there is no need
+  //   // to lock its access for reading or updating.
+  //   if FDownloadMarkersContext <> nil then begin
+  //     var LContextToFree: TDownloadMarkersContext;
+  //     var LLock := FDownloadMarkersContext.FLock;
+  //     ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TMyMap.CancelDownloadMarkers'{$ENDIF});
+  //     try
+  //       if not FDownloadMarkersContext.FManagedByWorkerThread then LContextToFree := FDownloadMarkersContext
+  //       else LContextToFree := nil;
+  //       FDownloadMarkersContext.FOwner := nil;
+  //       FDownloadMarkersContext := nil;
+  //     Finally
+  //       ALMonitorExit(LLock);
+  //     End;
+  //     ALFreeAndNil(LContextToFree);
+  //   end;
+  // end;
+
 {$IF CompilerVersion <= 25} // xe4
 type
   THorzRectAlign = (Center, Left, Right);
@@ -1371,6 +1517,22 @@ procedure TALWorkerThreadPool.ExecuteProc(
             Const AAsync: Boolean = True);
 begin
   ExecuteProc(AProc, nil{AContext}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
+end;
+
+{*********************************************************}
+constructor TALWorkerContext.Create(const AOwner: TObject);
+begin
+  inherited Create;
+  FLock := TObject.Create;
+  FManagedByWorkerThread := True;
+  FOwner := AOwner;
+end;
+
+{**********************************}
+destructor TALWorkerContext.Destroy;
+begin
+  ALFreeAndNil(FLock);
+  inherited
 end;
 
 {**************************}

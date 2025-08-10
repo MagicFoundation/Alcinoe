@@ -128,6 +128,8 @@ forced to apply patches to the original Delphi source files:
 * [FullScreenManager.showSystemUI Resets SystemUiVisibility](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207)
 * [TControl.SetBounds: Missing ParentContentChanged Call on Size-Only Updates](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264)
 * [AndroidManifest merge in Delphi does not respect tools:node="remove" directive for uses-permission](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3867)
+* [Uncomment missing init overloads in JCipher to enable standard Android Crypto API usage](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3921)
+* [Missing kSecValueData constant in iOSapi.Security](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3922)
 
 Install Alcinoe
 ---------------
@@ -503,6 +505,23 @@ action menus with smooth, customizable animations.
 
 <p>
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3bottomsheet.png?raw=true" alt="bottom sheet" width="580" style="width:580px;" />
+</p>
+
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
+<br/>
+<br/>
+  
+
+Create Clear, Timed Messages with TALSnackbar
+=============================================
+
+**TALSnackbar** is a lightweight, transient message bar 
+that follows Material 3. It’s ideal for brief status updates 
+or confirmations and can include an optional action 
+(e.g., “UNDO”).
+
+<p>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3snackbar.gif?raw=true" alt="Snackbar" width="800" style="width:800px;" />
 </p>
 
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
@@ -1130,6 +1149,15 @@ undesired conversions.
 
 History
 =======
+
+### 10/08/2025 – Added TALSnackbar Component
+
+- Added **`TALSnackbar`** component for displaying brief, 
+  informative messages to users with optional actions.
+- Renamed **`TALDownloadContext`** to **`TALWorkerContext`** 
+  to better reflect its broader purpose in managing background tasks.
+- Added **Secure** option to **`TALUserPreferences`** to 
+  enable encrypted storage of sensitive user data.
 
 ### 03/08/2025 – Add Loading Indicator
 

@@ -15,6 +15,7 @@ uses
   Alcinoe.FMX.Dynamic.StdCtrls,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Dialogs,
+  Alcinoe.FMX.SnackBar,
   Alcinoe.FMX.Sheets,
   Alcinoe.FMX.LoadingOverlay,
   Alcinoe.FMX.Objects,
@@ -167,6 +168,26 @@ Type
         constructor create(const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
       end;
       // -----------------------
+      // TSnackbarManagerStyleInfo
+      TSnackbarManagerApplyStyleProc = Procedure(const ASnackbarManager: TALSnackbarManager; const ARatio: Single = 1);
+      TSnackbarManagerStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TSnackbarManagerApplyStyleProc;
+        DefaultFontSize: Single;
+        constructor create(const AApplyStyleProc: TSnackbarManagerApplyStyleProc; const ADefaultFontSize: Single);
+      end;
+      // ----------------
+      // TSnackbarStyleInfo
+      TSnackbarApplyStyleProc = Procedure(const ASnackbar: TALSnackbar; const ARatio: Single = 1);
+      TSnackbarStyleInfo = record
+      public
+        SortOrder: Integer;
+        ApplyStyleProc: TSnackbarApplyStyleProc;
+        DefaultFontSize: Single;
+        constructor create(const AApplyStyleProc: TSnackbarApplyStyleProc; const ADefaultFontSize: Single);
+      end;
+      // -----------------------
       // TSheetManagerStyleInfo
       TSheetManagerApplyStyleProc = Procedure(const ASheetManager: TALSheetManager; const ARatio: Single = 1);
       TSheetManagerStyleInfo = record
@@ -305,6 +326,8 @@ Type
     FScrollBoxStyles: TDictionary<String, TScrollBoxStyleInfo>;
     FDialogManagerStyles: TDictionary<String, TDialogManagerStyleInfo>;
     FDialogStyles: TDictionary<String, TDialogStyleInfo>;
+    FSnackbarManagerStyles: TDictionary<String, TSnackbarManagerStyleInfo>;
+    FSnackbarStyles: TDictionary<String, TSnackbarStyleInfo>;
     FSheetManagerStyles: TDictionary<String, TSheetManagerStyleInfo>;
     FSheetStyles: TDictionary<String, TSheetStyleInfo>;
     FLoadingOverlayManagerStyles: TDictionary<String, TLoadingOverlayManagerStyleInfo>;
@@ -352,6 +375,8 @@ Type
     procedure AddOrSetScrollBoxStyle(const AName: String; const AApplyStyleProc: TScrollBoxApplyStyleProc);
     procedure AddOrSetDialogManagerStyle(const AName: String; const AApplyStyleProc: TDialogManagerApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetSnackbarManagerStyle(const AName: String; const AApplyStyleProc: TSnackbarManagerApplyStyleProc; const ADefaultFontSize: Single);
+    procedure AddOrSetSnackbarStyle(const AName: String; const AApplyStyleProc: TSnackbarApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetSheetManagerStyle(const AName: String; const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetSheetStyle(const AName: String; const AApplyStyleProc: TSheetApplyStyleProc; const ADefaultFontSize: Single);
     procedure AddOrSetLoadingOverlayManagerStyle(const AName: String; const AApplyStyleProc: TLoadingOverlayManagerApplyStyleProc);
@@ -400,6 +425,10 @@ Type
     procedure ApplyDialogManagerStyle(const AName: String; const ADialogManager: TALDialogManager); overload;
     procedure ApplyDialogStyle(const AName: String; const ADialog: TALDialog; const AFontSize: Single); overload;
     procedure ApplyDialogStyle(const AName: String; const ADialog: TALDialog); overload;
+    procedure ApplySnackbarManagerStyle(const AName: String; const ASnackbarManager: TALSnackbarManager; const AFontSize: Single); overload;
+    procedure ApplySnackbarManagerStyle(const AName: String; const ASnackbarManager: TALSnackbarManager); overload;
+    procedure ApplySnackbarStyle(const AName: String; const ASnackbar: TALSnackbar; const AFontSize: Single); overload;
+    procedure ApplySnackbarStyle(const AName: String; const ASnackbar: TALSnackbar); overload;
     procedure ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager; const AFontSize: Single); overload;
     procedure ApplySheetManagerStyle(const AName: String; const ASheetManager: TALSheetManager); overload;
     procedure ApplySheetStyle(const AName: String; const ASheet: TALSheet; const AFontSize: Single); overload;
@@ -444,6 +473,8 @@ Type
     function GetScrollBoxStyleNames: TArray<String>;
     function GetDialogManagerStyleNames: TArray<String>;
     function GetDialogStyleNames: TArray<String>;
+    function GetSnackbarManagerStyleNames: TArray<String>;
+    function GetSnackbarStyleNames: TArray<String>;
     function GetSheetManagerStyleNames: TArray<String>;
     function GetSheetStyleNames: TArray<String>;
     function GetLoadingOverlayManagerStyleNames: TArray<String>;
@@ -13307,6 +13338,87 @@ begin
   end;
 end;
 
+/////////////////////
+// SNACKBARMANAGER //
+/////////////////////
+
+{**********************************************************************************************************}
+procedure ALResetSnackbarManagerStyle(const ASnackbarManager: TALSnackbarManager; const ARatio: Single = 1);
+begin
+  With ASnackbarManager do begin
+
+    // DefaultContainer
+    ALResetRectangleStyle(DefaultContainer);
+    DefaultContainer.Padding.Rect := TRectF.Create(16*ARatio{Left}, 14*ARatio{Top}, 16*ARatio{Right}, 14*ARatio{Bottom}).RoundTo(-2);
+    DefaultContainer.Margins.Rect := TRectF.Create(24{*ARatio}{Left}, 0{Top}, 24{*ARatio}{Right}, 56{*ARatio}{Bottom}).RoundTo(-2);
+    DefaultContainer.AutoSize := TALAutoSizeMode.Both;
+    // TALSnackbarManager will convert TALAlignLayout.BottomCenter to TALAlignLayout.Bottom
+    // when the snackbar includes an Action button or a Close button
+    DefaultContainer.Align := TALAlignLayout.BottomCenter;
+    DefaultContainer.Fill.Color := $FFFFFFFF;
+    DefaultContainer.Fill.ColorKey := '';
+    DefaultContainer.Stroke.Color := TAlphaColors.Null;
+    DefaultContainer.Stroke.ColorKey := '';
+    DefaultContainer.XRadius := RoundTo(4 * ARatio, -2);
+    DefaultContainer.YRadius := RoundTo(4 * ARatio, -2);
+
+    // DefaultMessage
+    var LRatio: Single := 14 / DefaultMessage.Textsettings.Font.DefaultSize;
+    ALResetTextStyle(DefaultMessage, LRatio * ARatio);
+    DefaultMessage.AutoSize := TALAutoSizeMode.Both;
+    DefaultMessage.Align := TALAlignLayout.LeftCenter;
+
+    // DefaultActionButton
+    LRatio := 14 / DefaultActionButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultActionButton, LRatio * ARatio);
+    DefaultActionButton.Margins.Rect := TRectF.Create(8*ARatio{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultActionButton.Align := TALAlignLayout.RightCenter;
+
+    // DefaultCloseButton
+    LRatio := 14 / DefaultCloseButton.Textsettings.Font.DefaultSize;
+    ALResetButtonStyle(DefaultCloseButton, LRatio * ARatio);
+    DefaultCloseButton.Margins.Rect := TRectF.Create(8*ARatio{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultCloseButton.Align := TALAlignLayout.MostRightCenter;
+    DefaultCloseButton.Fill.ResourceName := ALSnackbarCloseButtonResourceName;
+
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/snackbar/specs#200c7ca0-830a-470e-afb4-4e3e3fef45c9
+procedure ALApplyMaterial3SnackbarManagerStyle(const ASnackbarManager: TALSnackbarManager; const ARatio: Single = 1);
+begin
+  With ASnackbarManager do begin
+
+    // Default
+    ALResetSnackbarManagerStyle(ASnackbarManager, ARatio);
+
+    // DefaultContainer
+    DefaultContainer.Fill.ColorKey := 'Material3.Color.InverseSurface'; // md.sys.color.inverse-surface / md.ref.palette.neutral20 / #322F35
+    DefaultContainer.Shadow.ColorKey := 'Material3.Color.Shadow.Alpha50'; // md.sys.color.shadow / md.ref.palette.neutral0 / #000000
+    DefaultContainer.Shadow.blur := RoundTo(6 * ARatio, -2);
+    DefaultContainer.Shadow.OffsetY := RoundTo(2 * ARatio, -2);
+
+    // DefaultMessage
+    DefaultMessage.TextSettings.Font.ColorKey := 'Material3.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+
+    // DefaultActionButton
+    var LRatio: Single := 14 / DefaultActionButton.Textsettings.Font.DefaultSize;
+    ALApplyMaterial3ButtonTextStyle(DefaultActionButton, LRatio * ARatio);
+    DefaultActionButton.TextSettings.Font.ColorKey := 'Material3.Color.InversePrimary'; // md.sys.color.inverse-primary / md.ref.palette.primary80 / #D0BCFF
+
+    // DefaultCloseButton
+    ALApplyMaterial3ButtonIconStandardStyle(DefaultCloseButton, (34 / 40) * ARatio);
+    DefaultCloseButton.Fill.ResourceName := ALSnackbarCloseButtonResourceName;
+    DefaultCloseButton.Fill.ImageMargins.Rect := TRectF.Create(12*ARatio,12*ARatio,12*ARatio,12*ARatio).RoundTo(-2);
+    DefaultCloseButton.Fill.ImageTintColorKey := 'Material3.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+    DefaultCloseButton.StateStyles.Hovered.StateLayer.ColorKey := 'Material3.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+    DefaultCloseButton.StateStyles.Pressed.StateLayer.ColorKey := 'Material3.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+    DefaultCloseButton.StateStyles.Focused.StateLayer.ColorKey := 'Material3.Color.InverseOnSurface'; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95 / #F5EFF7
+
+  end;
+end;
+
 //////////////////
 // SHEETMANAGER //
 //////////////////
@@ -13397,7 +13509,7 @@ begin
 
     // DefaultHorizontalSheetHeaderBar
     ALResetRectangleStyle(DefaultHorizontalSheetHeaderBar, ARatio);
-    DefaultHorizontalSheetHeaderBar.Margins.Rect := TRectF.Create(0{Left}, 24 * ARatio{Top}, 0{Right}, 24 * ARatio{Bottom}).RoundTo(-2);
+    DefaultHorizontalSheetHeaderBar.Margins.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
     DefaultHorizontalSheetHeaderBar.AutoSize := TALAutoSizeMode.Height;
     DefaultHorizontalSheetHeaderBar.Align := TALAlignLayout.Top;
     DefaultHorizontalSheetHeaderBar.Fill.Color := TalphaColors.Null;
@@ -13408,14 +13520,14 @@ begin
     // DefaultLeftSheetBackButton
     var LRatio := 22 / DefaultLeftSheetBackButton.Textsettings.Font.DefaultSize;
     ALResetButtonStyle(DefaultLeftSheetBackButton, LRatio);
-    DefaultLeftSheetBackButton.Margins.Right := RoundTo(16 * ARatio, -2);
+    DefaultLeftSheetBackButton.Margins.Left := RoundTo(16 * ARatio, -2);
     DefaultLeftSheetBackButton.Align := TALAlignLayout.MostRightCenter;
     DefaultLeftSheetBackButton.Fill.ResourceName := ALLeftSheetBackButtonResourceName;
 
     // DefaultRightSheetBackButton
     LRatio := 22 / DefaultRightSheetBackButton.Textsettings.Font.DefaultSize;
     ALResetButtonStyle(DefaultRightSheetBackButton, LRatio);
-    DefaultRightSheetBackButton.Margins.Left := RoundTo(16 * ARatio, -2);
+    DefaultRightSheetBackButton.Margins.Right := RoundTo(16 * ARatio, -2);
     DefaultRightSheetBackButton.Align := TALAlignLayout.MostLeftCenter;
     DefaultRightSheetBackButton.Fill.ResourceName := ALRightSheetBackButtonResourceName;
 
@@ -13423,7 +13535,7 @@ begin
     LRatio := 22 / DefaultLeftSheetHeadline.Textsettings.Font.DefaultSize;
     ALResetTextStyle(DefaultLeftSheetHeadline, LRatio);
     if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultLeftSheetHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
-    DefaultLeftSheetHeadline.Margins.Rect := TRectF.Create(12 * ARatio{Left}, 0{Top}, 12 * ARatio{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultLeftSheetHeadline.Margins.Rect := TRectF.Create(0{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
     DefaultLeftSheetHeadline.AutoSize := TALAutoSizeMode.Both;
     DefaultLeftSheetHeadline.Align := TALAlignLayout.RightCenter;
 
@@ -13431,21 +13543,21 @@ begin
     LRatio := 22 / DefaultRightSheetHeadline.Textsettings.Font.DefaultSize;
     ALResetTextStyle(DefaultRightSheetHeadline, LRatio);
     if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultRightSheetHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
-    DefaultRightSheetHeadline.Margins.Rect := TRectF.Create(12 * ARatio{Left}, 0{Top}, 12 * ARatio{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultRightSheetHeadline.Margins.Rect := TRectF.Create(0{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
     DefaultRightSheetHeadline.AutoSize := TALAutoSizeMode.Both;
     DefaultRightSheetHeadline.Align := TALAlignLayout.LeftCenter;
 
     // DefaultLeftSheetCloseButton
     LRatio := 22 / DefaultLeftSheetCloseButton.Textsettings.Font.DefaultSize;
     ALResetButtonStyle(DefaultLeftSheetCloseButton, LRatio);
-    DefaultLeftSheetCloseButton.Margins.Left := RoundTo(24 * ARatio, -2);
+    DefaultLeftSheetCloseButton.Margins.Right := RoundTo(24 * ARatio, -2);
     DefaultLeftSheetCloseButton.Align := TALAlignLayout.LeftCenter;
     DefaultLeftSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
 
     // DefaultRightSheetCloseButton
     LRatio := 22 / DefaultRightSheetCloseButton.Textsettings.Font.DefaultSize;
     ALResetButtonStyle(DefaultRightSheetCloseButton, LRatio);
-    DefaultRightSheetCloseButton.Margins.Right := RoundTo(24 * ARatio, -2);
+    DefaultRightSheetCloseButton.Margins.Left := RoundTo(24 * ARatio, -2);
     DefaultRightSheetCloseButton.Align := TALAlignLayout.RightCenter;
     DefaultRightSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
 
@@ -13517,13 +13629,13 @@ begin
     ALApplyMaterial3ButtonIconStandardStyle(DefaultLeftSheetCloseButton, (34 / 40) * ARatio);
     DefaultLeftSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
     DefaultLeftSheetCloseButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-    DefaultLeftSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(9 * ARatio{Left}, 9 * ARatio{Top}, 9 * ARatio{Right}, 9 * ARatio{Bottom}).RoundTo(-2);
+    DefaultLeftSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Left}, 10*ARatio{Top}, 10*ARatio{Right}, 10*ARatio{Bottom}).RoundTo(-2);
 
     // DefaultRightSheetCloseButton
     ALApplyMaterial3ButtonIconStandardStyle(DefaultRightSheetCloseButton, (34 / 40) * ARatio);
     DefaultRightSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
     DefaultRightSheetCloseButton.Fill.ImageTintColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
-    DefaultRightSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(9 * ARatio{Right}, 9 * ARatio{Top}, 9 * ARatio{Right}, 9 * ARatio{Bottom}).RoundTo(-2);
+    DefaultRightSheetCloseButton.Fill.ImageMargins.Rect := TRectF.Create(10*ARatio{Right}, 10*ARatio{Top}, 10*ARatio{Right}, 10*ARatio{Bottom}).RoundTo(-2);
 
   end;
 end;
@@ -25647,6 +25759,22 @@ begin
   DefaultFontSize := ADefaultFontSize;
 end;
 
+{**************************************************************************************************************************************************}
+constructor TALStyleManager.TSnackbarManagerStyleInfo.create(const AApplyStyleProc: TSnackbarManagerApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
+{************************************************************************************************************************************}
+constructor TALStyleManager.TSnackbarStyleInfo.create(const AApplyStyleProc: TSnackbarApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  SortOrder := TALStyleManager.GetNextSortOrder;
+  ApplyStyleProc := AApplyStyleProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
 {********************************************************************************************************************************************}
 constructor TALStyleManager.TSheetManagerStyleInfo.create(const AApplyStyleProc: TSheetManagerApplyStyleProc; const ADefaultFontSize: Single);
 begin
@@ -25764,6 +25892,8 @@ begin
   FScrollBoxStyles := TDictionary<String, TScrollBoxStyleInfo>.create;
   FDialogManagerStyles := TDictionary<String, TDialogManagerStyleInfo>.create;
   FDialogStyles := TDictionary<String, TDialogStyleInfo>.create;
+  FSnackbarManagerStyles := TDictionary<String, TSnackbarManagerStyleInfo>.create;
+  FSnackbarStyles := TDictionary<String, TSnackbarStyleInfo>.create;
   FSheetManagerStyles := TDictionary<String, TSheetManagerStyleInfo>.create;
   FSheetStyles := TDictionary<String, TSheetStyleInfo>.create;
   FLoadingOverlayManagerStyles := TDictionary<String, TLoadingOverlayManagerStyleInfo>.create;
@@ -25846,6 +25976,8 @@ begin
   AlFreeAndNil(FScrollBoxStyles);
   AlFreeAndNil(FDialogManagerStyles);
   AlFreeAndNil(FDialogStyles);
+  AlFreeAndNil(FSnackbarManagerStyles);
+  AlFreeAndNil(FSnackbarStyles);
   AlFreeAndNil(FSheetManagerStyles);
   AlFreeAndNil(FSheetStyles);
   AlFreeAndNil(FLoadingOverlayManagerStyles);
@@ -26449,6 +26581,9 @@ begin
 
   AddOrSetDialogManagerStyle('Default', ALResetDialogManagerStyle, 14{ADefaultFontSize});
   AddOrSetDialogManagerStyle('Material3.DialogManager', ALApplyMaterial3DialogManagerStyle, 14{ADefaultFontSize});
+
+  AddOrSetSnackbarManagerStyle('Default', ALResetSnackbarManagerStyle, 14{ADefaultFontSize});
+  AddOrSetSnackbarManagerStyle('Material3.SnackbarManager', ALApplyMaterial3SnackbarManagerStyle, 14{ADefaultFontSize});
 
   AddOrSetSheetManagerStyle('Default', ALResetSheetManagerStyle, 22{ADefaultFontSize});
   AddOrSetSheetManagerStyle('Material3.SheetManager', ALApplyMaterial3SheetManagerStyle, 22{ADefaultFontSize});
@@ -27149,6 +27284,18 @@ end;
 procedure TALStyleManager.AddOrSetDialogStyle(const AName: String; const AApplyStyleProc: TDialogApplyStyleProc; const ADefaultFontSize: Single);
 begin
   FDialogStyles.AddOrSetValue(AName, TDialogStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+end;
+
+{*****************************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetSnackbarManagerStyle(const AName: String; const AApplyStyleProc: TSnackbarManagerApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  FSnackbarManagerStyles.AddOrSetValue(AName, TSnackbarManagerStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
+end;
+
+{***************************************************************************************************************************************************}
+procedure TALStyleManager.AddOrSetSnackbarStyle(const AName: String; const AApplyStyleProc: TSnackbarApplyStyleProc; const ADefaultFontSize: Single);
+begin
+  FSnackbarStyles.AddOrSetValue(AName, TSnackbarStyleInfo.create(AApplyStyleProc, ADefaultFontSize));
 end;
 
 {***********************************************************************************************************************************************************}
@@ -27868,6 +28015,74 @@ begin
   ApplyDialogStyle(AName, ADialog, LApplyDialogStyleInfo.DefaultFontSize * LRatio);
   {$ELSE}
   ApplyDialogStyle(AName, ADialog, ADialog.Message.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{********************************************************************************************************************************************}
+procedure TALStyleManager.ApplySnackbarManagerStyle(const AName: String; const ASnackbarManager: TALSnackbarManager; const AFontSize: Single);
+begin
+  Var LApplySnackbarManagerStyleInfo: TSnackbarManagerStyleInfo;
+  if not fSnackbarManagerStyles.TryGetValue(AName, LApplySnackbarManagerStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  LApplySnackbarManagerStyleInfo.ApplyStyleProc(ASnackbarManager, AFontSize / LApplySnackbarManagerStyleInfo.DefaultFontSize);
+  {$IF not defined(ALDPK)}
+  if ASnackbarManager.DefaultContainer.AutoAlignToPixel then ASnackbarManager.DefaultContainer.AlignToPixel;
+  if ASnackbarManager.DefaultActionButton.AutoAlignToPixel then ASnackbarManager.DefaultActionButton.AlignToPixel;
+  if ASnackbarManager.DefaultCloseButton.AutoAlignToPixel then ASnackbarManager.DefaultCloseButton.AlignToPixel;
+  if ASnackbarManager.DefaultMessage.AutoAlignToPixel then ASnackbarManager.DefaultMessage.AlignToPixel;
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************************}
+procedure TALStyleManager.ApplySnackbarManagerStyle(const AName: String; const ASnackbarManager: TALSnackbarManager);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplySnackbarManagerStyleInfo: TSnackbarManagerStyleInfo;
+  if not fSnackbarManagerStyles.TryGetValue(AName, LApplySnackbarManagerStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplySnackbarManagerStyleInfo.DefaultFontSize, LApplySnackbarManagerStyleInfo.DefaultFontSize);
+  ApplySnackbarManagerStyle(AName, ASnackbarManager, LApplySnackbarManagerStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplySnackbarManagerStyle(AName, ASnackbarManager, ASnackbarManager.DefaultMessage.TextSettings.Font.Size);
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************************}
+procedure TALStyleManager.ApplySnackbarStyle(const AName: String; const ASnackbar: TALSnackbar; const AFontSize: Single);
+begin
+  Var LApplySnackbarStyleInfo: TSnackbarStyleInfo;
+  if not fSnackbarStyles.TryGetValue(AName, LApplySnackbarStyleInfo) then begin
+    {$IF not defined(ALDPK)}
+    ALLog('TALStyleManager', 'Style "%s" not found in style manager', [AName], TALLogType.ERROR);
+    {$ENDIF}
+    Exit;
+  end;
+
+  ASnackbar.BeginUpdate;
+  try
+    LApplySnackbarStyleInfo.ApplyStyleProc(ASnackbar, AFontSize / LApplySnackbarStyleInfo.DefaultFontSize);
+    {$IF not defined(ALDPK)}
+    if ASnackbar.AutoAlignToPixel then ASnackbar.AlignToPixel;
+    {$ENDIF}
+  finally
+    ASnackbar.EndUpdate;
+  end;
+end;
+
+{**********************************************************************************************}
+procedure TALStyleManager.ApplySnackbarStyle(const AName: String; const ASnackbar: TALSnackbar);
+begin
+  {$IF defined(ALDPK)}
+  Var LApplySnackbarStyleInfo: TSnackbarStyleInfo;
+  if not fSnackbarStyles.TryGetValue(AName, LApplySnackbarStyleInfo) then Exit;
+  var LRatio: Single := ALGetStyleRatio('Please enter the desired font size', LApplySnackbarStyleInfo.DefaultFontSize, LApplySnackbarStyleInfo.DefaultFontSize);
+  ApplySnackbarStyle(AName, ASnackbar, LApplySnackbarStyleInfo.DefaultFontSize * LRatio);
+  {$ELSE}
+  ApplySnackbarStyle(AName, ASnackbar, ASnackbar.Message.TextSettings.Font.Size);
   {$ENDIF}
 end;
 
@@ -28633,6 +28848,36 @@ begin
   TArray.Sort<TPair<String, TDialogStyleInfo>>(LArray,
     TComparer<TPair<String, TDialogStyleInfo>>.Construct(
       function(const Left, Right: TPair<String, TDialogStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{********************************************************************}
+function TALStyleManager.GetSnackbarManagerStyleNames: TArray<String>;
+begin
+  var LArray := FSnackbarManagerStyles.ToArray;
+  TArray.Sort<TPair<String, TSnackbarManagerStyleInfo>>(LArray,
+    TComparer<TPair<String, TSnackbarManagerStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TSnackbarManagerStyleInfo>): Integer
+      begin
+        Result := Left.value.SortOrder - Right.value.SortOrder;
+      end));
+  SetLength(Result, Length(LArray));
+  for var I := low(LArray) to High(LArray) do
+    Result[I] := LArray[I].Key;
+end;
+
+{*************************************************************}
+function TALStyleManager.GetSnackbarStyleNames: TArray<String>;
+begin
+  var LArray := FSnackbarStyles.ToArray;
+  TArray.Sort<TPair<String, TSnackbarStyleInfo>>(LArray,
+    TComparer<TPair<String, TSnackbarStyleInfo>>.Construct(
+      function(const Left, Right: TPair<String, TSnackbarStyleInfo>): Integer
       begin
         Result := Left.value.SortOrder - Right.value.SortOrder;
       end));

@@ -59,7 +59,7 @@ type
     fDefStyleRes: String;
     FNativeViewMargins: TALBounds;
     FNativeViewScreenshot: TALDrawable;
-    FIsNativeViewFrozen: Boolean;
+    FFreezeNativeViewCount: Integer;
     {$IF defined(android)}
     function GetNativeView: TALAndroidNativeView;
     procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
@@ -70,6 +70,7 @@ type
     {$ELSEIF defined(MSWindows)}
     function GetNativeView: TALWinNativeView;
     {$ENDIF}
+    function GetIsNativeViewFrozen: Boolean;
     procedure SetDefStyleAttr(const Value: String);
     procedure SetDefStyleRes(const Value: String);
     procedure SetNativeViewMargins(const Value: TALBounds);
@@ -131,9 +132,9 @@ type
     ///   (for example, to display a popup dialog above the control) without reordering or
     ///   disrupting the native view itself.
     /// </summary>
-    Procedure FreezeNativeView; virtual;
+    function FreezeNativeView: boolean;
     Procedure UnFreezeNativeView; virtual;
-    property IsNativeViewFrozen: Boolean read FIsNativeViewFrozen;
+    property IsNativeViewFrozen: Boolean read GetIsNativeViewFrozen;
     function IsNativeViewVisible: boolean; virtual;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
@@ -179,12 +180,13 @@ procedure ALFreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl
   procedure _FreezeNativeViews(const AControl: TControl);
   begin
     for var I := 0 to AControl.ControlsCount - 1 do begin
-      if (AControl.Controls[i] is TALNativeControl) and (TALNativeControl(AControl.Controls[i]).IsNativeViewVisible) then begin
+      if (AControl.Controls[i] is TALNativeControl) and
+         (TALNativeControl(AControl.Controls[i]).FreezeNativeView) then begin
         setlength(AFrozenNativeControls, Length(AFrozenNativeControls) + 1);
         AFrozenNativeControls[High(AFrozenNativeControls)] := TALNativeControl(AControl.Controls[i]);
-        TALNativeControl(AControl.Controls[i]).FreezeNativeView;
       end
-      else _FreezeNativeViews(AControl.Controls[i]);
+      else
+        _FreezeNativeViews(AControl.Controls[i]);
     end;
   end;
 
@@ -226,7 +228,7 @@ begin
   FNativeViewMargins := TALBounds.Create;
   FNativeViewMargins.OnChanged := NativeViewMarginsChanged;
   FNativeViewScreenshot := ALNullDrawable;
-  FIsNativeViewFrozen := False;
+  FFreezeNativeViewCount := 0;
   {$IF defined(android)}
   // In Android we must first know the value of DefStyleAttr/DefStyleRes
   // before to create the FNativeView. I use this way to know that the compoment
@@ -296,6 +298,12 @@ end;
 function TALNativeControl.CreateStroke: TALStrokeBrush;
 begin
   Result := TStroke.Create;
+end;
+
+{*******************************************************}
+function TALNativeControl.GetIsNativeViewFrozen: Boolean;
+begin
+  Result := FFreezeNativeViewCount > 0;
 end;
 
 {**************************************************************}
@@ -544,7 +552,7 @@ Procedure TALNativeControl.ShowNativeView;
 begin
   if FNativeView = nil then exit;
   if FNativeView.visible then exit;
-  if FIsNativeViewFrozen then exit;
+  if IsNativeViewFrozen then exit;
   FNativeView.SetVisible(true);
   if IsFocused then
     FNativeView.SetFocus;
@@ -560,25 +568,31 @@ begin
   FNativeView.SetVisible(False);
 end;
 
-{******************************************}
-Procedure TALNativeControl.FreezeNativeView;
+{**************************************************}
+function TALNativeControl.FreezeNativeView: boolean;
 begin
-  if FNativeView = nil then exit;
-  if not FNativeView.visible then exit;
-  if FIsNativeViewFrozen then exit;
-  FIsNativeViewFrozen := True;
+  if IsNativeViewFrozen then begin
+    inc(FFreezeNativeViewCount);
+    Exit(true);
+  end;
+  if FNativeView = nil then exit(false);
+  if not FNativeView.visible then exit(false);
+  inc(FFreezeNativeViewCount);
   ALFreeAndNilDrawable(FNativeViewScreenshot);
   FNativeViewScreenshot := FNativeView.CaptureScreenshot;
   HideNativeView;
+  Result := True;
 end;
 
 {********************************************}
 Procedure TALNativeControl.UnFreezeNativeView;
 begin
-  if not FIsNativeViewFrozen then exit;
-  FIsNativeViewFrozen := False;
-  ALFreeAndNilDrawable(FNativeViewScreenshot);
-  ShowNativeView;
+  if not IsNativeViewFrozen then exit;
+  dec(FFreezeNativeViewCount);
+  if FFreezeNativeViewCount = 0 then begin
+    ALFreeAndNilDrawable(FNativeViewScreenshot);
+    ShowNativeView;
+  end;
 end;
 
 {************************************************************************}
@@ -647,7 +661,7 @@ begin
   // DoPaint instead of paint to paint the FNativeViewScreenshot
   // After everything have been already painted (paint method already
   // called and PaintChildren too
-  if FIsNativeViewFrozen then begin
+  if IsNativeViewFrozen then begin
     var LRect := GetNativeViewBoundsRect;
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;

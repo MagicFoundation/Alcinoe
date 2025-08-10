@@ -45,6 +45,7 @@ uses
   System.Skia.API,
   {$ENDIF}
   FMX.Platform,
+  Alcinoe.Common,
   Alcinoe.FMX.CacheEngines,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Types3D,
@@ -584,7 +585,7 @@ type
         WhenDisplayed);
   protected
     type
-      TPreviewDownloadContext = Class(TALDownloadContext)
+      TPreviewDownloadContext = Class(TALWorkerContext)
       private
         function GetOwner: TALVideoPlayerSurface;
       public
@@ -834,8 +835,7 @@ uses
   Alcinoe.Localization,
   Alcinoe.StringUtils,
   Alcinoe.HTTP.Client,
-  Alcinoe.HTTP.Client.Net.Pool,
-  Alcinoe.Common;
+  Alcinoe.HTTP.Client.Net.Pool;
 
 {$IF defined(ANDROID) or defined(IOS)}
 var
@@ -4111,7 +4111,7 @@ begin
     var LLock := FPreviewDownloadContext.FLock;
     ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALVideoPlayerSurface.CancelPreviewDownload'{$ENDIF});
     try
-      if not FPreviewDownloadContext.FFreeByThread then LContextToFree := FPreviewDownloadContext
+      if not FPreviewDownloadContext.FManagedByWorkerThread then LContextToFree := FPreviewDownloadContext
       else LContextToFree := nil;
       FPreviewDownloadContext.FOwner := nil;
       FPreviewDownloadContext := nil;
@@ -4154,7 +4154,7 @@ begin
   ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALVideoPlayerSurface.HandlePreviewDownloadError (1)'{$ENDIF});
   try
     if LContext.Owner <> nil then begin
-      LContext.FFreeByThread := False;
+      LContext.FManagedByWorkerThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
@@ -4171,7 +4171,7 @@ begin
     ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALVideoPlayerSurface.HandlePreviewDownloadError (2)'{$ENDIF});
     try
       if LContext.FOwner <> nil then begin
-        LContext.FFreeByThread := False;
+        LContext.FManagedByWorkerThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally

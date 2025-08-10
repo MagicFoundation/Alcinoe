@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <!-- Inner screen area -->
+  <rect x="140.8" y="204.8" width="678.4" height="678.4" fill="none"/>
+  
+  <!-- Outer shape (border + arrow) -->
+  <path d="M396.8 543.808V627.2h83.392l371.2-371.2L768 172.608l-371.2 371.2zM320 512l448-448 192 192-448 448H320V512z" fill="#787878"/>
+  
+  <!-- Border frame -->
+  <path d="M819.2 883.2V512H896v448H64V128h448v76.8H140.8v678.4h678.4z" fill="#787878"/>
+</svg>

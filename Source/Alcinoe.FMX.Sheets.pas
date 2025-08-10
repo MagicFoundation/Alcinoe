@@ -3,6 +3,7 @@ unit Alcinoe.FMX.Sheets;
 interface
 
 uses
+  System.SysUtils,
   System.Types,
   System.Classes,
   System.Generics.Collections,
@@ -29,19 +30,25 @@ type
   TALSheet = class(TALRectangle, IALScrollableControl)
   public
     type
-      //----------
+      // ---------
       // TDockEdge
       TDockEdge = (Top, Bottom, Left, Right);
-      //-----------------
+      // ----------------
       // TOnActionRefProc
       TOnActionRefProc = reference to procedure(Const ASheet: TALSheet; const AAction: Integer; var ACanClose: Boolean);
-      //-----------------
+      // ----------------
       // TOnActionObjProc
       TOnActionObjProc = procedure(Const ASheet: TALSheet; const AAction: Integer; var ACanClose: Boolean) of object;
       // ------------------------
       // TViewportPositionChangeEvent
       TViewportPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TALPointD) of object;
-      //---------
+      // --------------
+      // TAnimateOption
+      TAnimateOption = (AnimateScrim, AnimateContainer);
+      // ---------------
+      // TAnimateOptions
+      TAnimateOptions = set of TAnimateOption;
+      // --------
       // TBuilder
       TBuilder = Class(TObject)
       private
@@ -54,6 +61,7 @@ type
         function SetContent(const AValue: TALControl): TBuilder;
         function SetContainerMargins(const AValue: TRectF): TBuilder;
         function SetContainerCorners(const AValue: TCorners): TBuilder;
+        function SetCloseOnScrimClick(const AValue: boolean): TBuilder;
         function SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
         /// <summary>
@@ -88,14 +96,18 @@ type
     fMouseDownPos: TPointF;
     FHandleMouseEvents: Boolean;
     fScrollCapturedByMe: boolean;
-    FPeekPosition: Single;
     FFillAlphaAtPeek: Single;
     FContainer: TALRectangle;
     FContent: TALControl;
     FTouchBlocker: TALLayout;
+    FShowAnimateOptions: TAnimateOptions;
+    FCloseAnimateOptions: TAnimateOptions;
     FOnActionRefProc: TALSheet.TOnActionRefProc;
     FOnActionObjProc: TALSheet.TOnActionObjProc;
     FOnViewportPositionChange: TViewportPositionChangeEvent;
+    FOnClosedRefProc: TProc;
+    function GetCloseOnScrimClick: boolean;
+    procedure SetCloseOnScrimClick(const AValue: Boolean);
     procedure SetContent(const AValue: TALControl);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     {$IFNDEF ALDPK}
@@ -122,14 +134,19 @@ type
     constructor Create(const AOwner: TComponent; const ADockEdge: TDockEdge); reintroduce; virtual;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    class function Current: TALSheet;
+    class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    property CloseOnScrimClick: Boolean read GetCloseOnScrimClick write SetCloseOnScrimClick;
     procedure ActionButtonClick(Sender: TObject); virtual;
     property Container: TALRectangle read FContainer;
     property Content: TALControl read FContent write SetContent;
     property ScrollEngine: TALScrollEngine read GetScrollEngine write SetScrollEngine;
-    property PeekPosition: Single read FPeekPosition write FPeekPosition;
+    property ShowAnimateOptions: TAnimateOptions read FShowAnimateOptions write FShowAnimateOptions;
+    property CloseAnimateOptions: TAnimateOptions read FCloseAnimateOptions write FCloseAnimateOptions;
     property OnActionRefProc: TALSheet.TOnActionRefProc read FOnActionRefProc write FOnActionRefProc;
     property OnActionObjProc: TALSheet.TOnActionObjProc read FOnActionObjProc write FOnActionObjProc;
     property OnViewportPositionChange: TViewportPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
+    property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -212,18 +229,30 @@ type
       TBuilder = Class(TALSheet.TBuilder)
       public
         function SetHeadlineText(const AValue: String): TBuilder;
+        function AddBackButton(const ATag: NativeInt): TBuilder;
+        function AddCloseButton(const ATag: NativeInt): TBuilder;
       End;
   private
     FHeaderBar: TALRectangle;
     FBackButton: TALButton;
     FCloseButton: TALButton;
     FHeadline: TALText;
+    function GetHeaderBar: TALRectangle;
+    function GetBackButton: TALButton;
+    function GetCloseButton: TALButton;
+    function GetHeadline: TALText;
   public
     constructor Create(const AOwner: TComponent; const ADockEdge: TALSheet.TDockEdge); override;
-    property HeaderBar: TALRectangle read FHeaderBar;
-    property BackButton: TALButton read FBackButton;
-    property CloseButton: TALButton read FCloseButton;
-    property Headline: TALText read FHeadline;
+    function HasHeadline: Boolean;
+    function HasBackButton: Boolean;
+    function HasCloseButton: Boolean;
+    function HasHeaderBar: Boolean;
+    procedure AddBackButton(const ATag: NativeInt);
+    procedure AddCloseButton(const ATag: NativeInt);
+    property HeaderBar: TALRectangle read GetHeaderBar;
+    property BackButton: TALButton read GetBackButton;
+    property CloseButton: TALButton read GetCloseButton;
+    property Headline: TALText read GetHeadline;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -318,7 +347,6 @@ type
     procedure ProcessPendingSheets;
     procedure ShowSheet(const ASheet: TALSheet);
     procedure DoCloseCurrentSheet;
-    procedure CloseCurrentSheet;
   public
     constructor Create;
     destructor Destroy; override;
@@ -340,6 +368,7 @@ type
     property DefaultRightSheetCloseButton: TALButton read FDefaultRightSheetCloseButton;
     property CurrentSheet: TALSheet read fCurrentSheet;
     function IsShowingSheet: Boolean;
+    procedure CloseCurrentSheet;
   end;
 
 var
@@ -350,13 +379,14 @@ var
 implementation
 
 uses
-  system.SysUtils,
   System.Math,
   System.Math.Vectors,
   FMX.Forms,
   FMX.Graphics,
   Alcinoe.FMX.Graphics,
-  Alcinoe.FMX.Styles;
+  Alcinoe.FMX.Styles,
+  Alcinoe.fmx.Dialogs,
+  Alcinoe.fmx.LoadingOverlay;
 
 {***********************************}
 constructor TALSheet.TBuilder.Create;
@@ -391,6 +421,13 @@ end;
 function TALSheet.TBuilder.SetContainerCorners(const AValue: TCorners): TBuilder;
 begin
   FSheet.Container.Corners := AValue;
+  Result := Self;
+end;
+
+{*******************************************************************************}
+function TALSheet.TBuilder.SetCloseOnScrimClick(const AValue: boolean): TBuilder;
+begin
+  FSheet.SetCloseOnScrimClick(AValue);
   Result := Self;
 end;
 
@@ -483,7 +520,7 @@ begin
       TDockEdge.Right:
         // show the sheet
         LTargetPosition := TALPointD.Create(
-                             FSheet.Container.Width + FSheet.Container.Margins.Right,
+                             FSheet.ScrollEngine.MaxScrollLimit.X,
                              FSheet.Container.Margins.Top);
       TDockEdge.Top:
         // Hide the sheet
@@ -494,7 +531,7 @@ begin
         // show the sheet
         LTargetPosition := TALPointD.Create(
                              FSheet.Container.Margins.Left,
-                             FSheet.Container.Height + FSheet.Container.Margins.Bottom);
+                             FSheet.ScrollEngine.MaxScrollLimit.Y);
       else
         Raise Exception.Create('Error 71322CB0-BD8F-416E-9CE6-55994AEE0CDC')
     end;
@@ -504,7 +541,7 @@ begin
       TDockEdge.Left:
         // show the sheet
         LTargetPosition := TALPointD.Create(
-                             -FSheet.Container.Width - FSheet.Container.Margins.Left,
+                             FSheet.ScrollEngine.MinScrollLimit.X,
                              FSheet.Container.Margins.Top);
       TDockEdge.Right:
         // Hide the sheet
@@ -515,7 +552,7 @@ begin
         // show the sheet
         LTargetPosition := TALPointD.Create(
                              FSheet.Container.Margins.Left,
-                             -FSheet.Container.Height - FSheet.Container.Margins.Top);
+                             FSheet.ScrollEngine.MinScrollLimit.Y);
       TDockEdge.Bottom:
         // Hide the sheet
         LTargetPosition := TALPointD.Create(
@@ -527,7 +564,7 @@ begin
   else begin
     case FSheet.DockEdge of
       TDockEdge.Left: begin
-        if ViewPortPosition.X > FSheet.FPeekPosition / 2 then
+        if ViewPortPosition.X > FSheet.ScrollEngine.MinScrollLimit.X / 2 then
           // Hide the sheet
           LTargetPosition := TALPointD.Create(
                                0,
@@ -535,11 +572,11 @@ begin
         else
           // show the sheet
           LTargetPosition := TALPointD.Create(
-                               -FSheet.Container.Width - FSheet.Container.Margins.Left,
+                               FSheet.ScrollEngine.MinScrollLimit.X,
                                FSheet.Container.Margins.Top);
       end;
       TDockEdge.Right: begin
-        if ViewPortPosition.X < FSheet.FPeekPosition / 2 then
+        if ViewPortPosition.X < FSheet.ScrollEngine.MaxScrollLimit.X / 2 then
           // Hide the sheet
           LTargetPosition := TALPointD.Create(
                                0,
@@ -547,11 +584,11 @@ begin
         else
           // show the sheet
           LTargetPosition := TALPointD.Create(
-                               FSheet.Container.Width + FSheet.Container.Margins.Right,
+                               FSheet.ScrollEngine.MaxScrollLimit.X,
                                FSheet.Container.Margins.Top);
       end;
       TDockEdge.Top: begin
-        if ViewPortPosition.Y > FSheet.FPeekPosition / 2 then
+        if ViewPortPosition.Y > FSheet.ScrollEngine.MinScrollLimit.Y / 2 then
           // Hide the sheet
           LTargetPosition := TALPointD.Create(
                                FSheet.Container.Margins.Left,
@@ -560,10 +597,10 @@ begin
           // show the sheet
           LTargetPosition := TALPointD.Create(
                                FSheet.Container.Margins.Left,
-                               -FSheet.Container.height - FSheet.Container.Margins.Top);
+                               FSheet.ScrollEngine.MinScrollLimit.Y);
       end;
       TDockEdge.Bottom: begin
-        if ViewPortPosition.Y < FSheet.FPeekPosition / 2 then
+        if ViewPortPosition.Y < FSheet.ScrollEngine.MaxScrollLimit.Y / 2 then
           // Hide the sheet
           LTargetPosition := TALPointD.Create(
                                FSheet.Container.Margins.Left,
@@ -572,7 +609,7 @@ begin
           // show the sheet
           LTargetPosition := TALPointD.Create(
                                FSheet.Container.Margins.Left,
-                               FSheet.Container.height + FSheet.Container.Margins.Bottom);
+                               FSheet.ScrollEngine.MaxScrollLimit.Y);
       end;
       else
         Raise Exception.Create('Error A847D0EA-6131-42FB-ABF3-E60B13DE9DCC')
@@ -774,30 +811,26 @@ begin
 
     case FSheet.FDockEdge of
       TDockEdge.Left: begin
-        var LDelta: Single := ViewPortPosition.X - FSheet.FPeekPosition;
-        if LDelta <= 0 then FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek)
-        else FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * (1 - (abs(LDelta / FSheet.FPeekPosition))));
+        var LProgress: Single := abs(ViewPortPosition.X) / Max(1, abs(FSheet.ScrollEngine.MinScrollLimit.X));
+        FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
         If compareValue(FSheet.Container.Position.X, -FSheet.Container.Width + 1{*}, TEpsilon.Position) <= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
       TDockEdge.Right: begin
-        var LDelta: Single := ViewPortPosition.X - FSheet.FPeekPosition;
-        if LDelta >= 0 then FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek)
-        else FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * (1 - (abs(LDelta / FSheet.FPeekPosition))));
+        var LProgress: Single := abs(ViewPortPosition.X) / Max(1, abs(FSheet.ScrollEngine.MaxScrollLimit.X));
+        FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
         If compareValue(FSheet.Container.Position.X, FSheet.Width - 1{*}, TEpsilon.Position) >= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
       TDockEdge.Top: begin
-        var LDelta: Single := ViewPortPosition.Y - FSheet.FPeekPosition;
-        if LDelta <= 0 then FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek)
-        else FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * (1 - (abs(LDelta / FSheet.FPeekPosition))));
+        var LProgress: Single := abs(ViewPortPosition.Y) / Max(1, abs(FSheet.ScrollEngine.MinScrollLimit.Y));
+        FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
         If compareValue(FSheet.Container.Position.Y, -FSheet.Container.Height + 1{*}, TEpsilon.Position) <= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
       TDockEdge.Bottom: begin
-        var LDelta: Single := ViewPortPosition.Y - FSheet.FPeekPosition;
-        if LDelta >= 0 then FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek)
-        else FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * (1 - (abs(LDelta / FSheet.FPeekPosition))));
+        var LProgress: Single := abs(ViewPortPosition.Y) / Max(1, abs(FSheet.ScrollEngine.MaxScrollLimit.Y));
+        FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
         If compareValue(FSheet.Container.Position.Y, FSheet.Height - 1{*}, TEpsilon.Position) >= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
@@ -822,7 +855,6 @@ begin
   fMouseDownPos := TpointF.Zero;
   FHandleMouseEvents := False;
   fScrollCapturedByMe := False;
-  FPeekPosition := 0;
   FFillAlphaAtPeek := 0;
   //--
   FContainer := TALRectangle.Create(Self);
@@ -843,9 +875,12 @@ begin
   FTouchBlocker.Align := TALAlignLayout.Contents;
   FTouchBlocker.HitTest := True;
   //--
+  FShowAnimateOptions := [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer];
+  FCloseAnimateOptions := [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer];
   FOnActionRefProc := nil;
   FOnActionObjProc := nil;
   FOnViewportPositionChange := nil;
+  FOnClosedRefProc := nil;
   //--
   case FDockEdge of
     TDockEdge.Left, TDockEdge.Right: begin
@@ -860,7 +895,6 @@ begin
   //--
   Assign(TALSheetManager.Instance.DefaultScrim);
   Name := 'ALSheetScrim';
-  HitTest := True;
   Onclick := ActionButtonClick;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
@@ -885,6 +919,23 @@ begin
   inherited;
 end;
 
+{****************************************}
+class function TALSheet.Current: TALSheet;
+begin
+  Result := TALSheetManager.Instance.CurrentSheet;
+end;
+
+{***********************************************************************************************************************************************************************************}
+class procedure TALSheet.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+begin
+  var LCurrentSheet := TALSheetManager.Instance.CurrentSheet;
+  if LCurrentSheet <> nil then begin
+    LCurrentSheet.OnClosedRefProc := AOnClosedCallback;
+    LCurrentSheet.CloseAnimateOptions := AAnimateOptions;
+    TALSheetManager.Instance.CloseCurrentSheet;
+  end;
+end;
+
 {**************************************************}
 function TALSheet.CreateScrollEngine: TScrollEngine;
 begin
@@ -901,6 +952,19 @@ end;
 procedure TALSheet.SetScrollEngine(const Value: TALScrollEngine);
 begin
   FScrollEngine.Assign(Value);
+end;
+
+{**********************************************}
+function TALSheet.GetCloseOnScrimClick: boolean;
+begin
+  result := Assigned(Onclick);
+end;
+
+{*************************************************************}
+procedure TALSheet.SetCloseOnScrimClick(const AValue: Boolean);
+begin
+  if AValue then Onclick := ActionButtonClick
+  else Onclick := nil;
 end;
 
 {******************************************************}
@@ -948,32 +1012,59 @@ begin
   case FDockEdge of
     TDockEdge.Left: begin
       ScrollEngine.SetScrollLimits(
-        TALPointD.Create(-Container.Width - Container.Margins.Left, 0), // const MinValue: TalPointD;
+        TALPointD.Create(Max(-Width, -Container.Width - Container.Margins.Left), 0), // const MinValue: TalPointD;
         TALPointD.Create(0, 0), // const MaxValue: TalPointD;
         True); // const EnforceLimits: Boolean = True
+      if not SameValue(Scrollengine.ViewportPosition.X, ScrollEngine.MinScrollLimit.X, TEpsilon.Position) then
+        ScrollEngine.SetViewportPosition(
+          TALPointD.Create(
+            ScrollEngine.MinScrollLimit.X,
+            Scrollengine.ViewportPosition.Y))
+      else
+        TScrollEngine(ScrollEngine).DoChanged;
     end;
     TDockEdge.Right: begin
       ScrollEngine.SetScrollLimits(
         TALPointD.Create(0, 0), // const MinValue: TalPointD;
-        TALPointD.Create(Container.Width + Container.Margins.Right, 0), // const MaxValue: TalPointD;
+        TALPointD.Create(Min(Width, Container.Width + Container.Margins.Right), 0), // const MaxValue: TalPointD;
         True); // const EnforceLimits: Boolean = True
+      if not SameValue(Scrollengine.ViewportPosition.X, ScrollEngine.MaxScrollLimit.X, TEpsilon.Position) then
+        ScrollEngine.SetViewportPosition(
+          TALPointD.Create(
+            ScrollEngine.MaxScrollLimit.X,
+            Scrollengine.ViewportPosition.Y))
+      else
+        TScrollEngine(ScrollEngine).DoChanged;
     end;
     TDockEdge.Top: begin
       ScrollEngine.SetScrollLimits(
-        TALPointD.Create(0, -Container.Height - Container.Margins.Top), // const MinValue: TalPointD;
+        TALPointD.Create(0, Max(-Height, -Container.Height - Container.Margins.Top)), // const MinValue: TalPointD;
         TALPointD.Create(0, 0), // const MaxValue: TalPointD;
         True); // const EnforceLimits: Boolean = True
+      if not SameValue(Scrollengine.ViewportPosition.Y, ScrollEngine.MinScrollLimit.Y, TEpsilon.Position) then
+        ScrollEngine.SetViewportPosition(
+          TALPointD.Create(
+            Scrollengine.ViewportPosition.X,
+            ScrollEngine.MinScrollLimit.Y))
+      else
+        TScrollEngine(ScrollEngine).DoChanged;
     end;
     TDockEdge.Bottom: begin
       ScrollEngine.SetScrollLimits(
         TALPointD.Create(0, 0), // const MinValue: TalPointD;
-        TALPointD.Create(0, Container.Height + Container.Margins.Bottom), // const MaxValue: TalPointD;
+        TALPointD.Create(0, Min(Height, Container.Height + Container.Margins.Bottom)), // const MaxValue: TalPointD;
         True); // const EnforceLimits: Boolean = True
+      if not SameValue(Scrollengine.ViewportPosition.Y, ScrollEngine.MaxScrollLimit.Y, TEpsilon.Position) then
+        ScrollEngine.SetViewportPosition(
+          TALPointD.Create(
+            Scrollengine.ViewportPosition.X,
+            ScrollEngine.MaxScrollLimit.Y))
+      else
+        TScrollEngine(ScrollEngine).DoChanged;
     end;
     else
       Raise Exception.Create('Error 9D640DF3-2F40-49A2-BF4D-F91909EC21DF')
   end;
-  TScrollEngine(ScrollEngine).DoChanged;
 end;
 
 {****************************************************************************************}
@@ -1322,47 +1413,130 @@ begin
   Result := Self;
 end;
 
+{**********************************************************************************}
+function TALHorizontalSheet.TBuilder.AddBackButton(const ATag: NativeInt): TBuilder;
+begin
+  TALHorizontalSheet(Sheet).AddBackButton(ATag);
+  Result := Self;
+end;
+
+{***********************************************************************************}
+function TALHorizontalSheet.TBuilder.AddCloseButton(const ATag: NativeInt): TBuilder;
+begin
+  TALHorizontalSheet(Sheet).AddCloseButton(ATag);
+  Result := Self;
+end;
+
 {***************************************************************************************************}
 constructor TALHorizontalSheet.Create(const AOwner: TComponent; const ADockEdge: TALSheet.TDockEdge);
 begin
   inherited;
-  //--
-  FHeaderBar := TALRectangle.Create(Container);
-  FHeaderBar.Parent := Container;
-  FHeaderBar.Assign(TALSheetManager.Instance.DefaultHorizontalSheetHeaderBar);
-  FHeaderBar.Name := 'ALSheetHeaderBar';
-  //--
-  FBackButton := TALButton.Create(FHeaderBar);
-  FBackButton.Parent := FHeaderBar;
-  FBackButton.Name := 'ALSheetBackButton';
-  //--
-  FCloseButton := TALButton.Create(FHeaderBar);
-  FCloseButton.Parent := FHeaderBar;
-  FCloseButton.Name := 'ALSheetCloseButton';
-  //--
-  FHeadline := TALText.Create(FHeaderBar);
-  FHeadline.Parent := FHeaderBar;
-  FHeaderBar.Name := 'ALSheetHeadline';
-  //--
-  case FDockEdge of
-    TDockEdge.Left: begin
-      FBackButton.Assign(TALSheetManager.Instance.DefaultLeftSheetBackButton);
-      FCloseButton.Assign(TALSheetManager.Instance.DefaultLeftSheetCloseButton);
-      FHeadline.Assign(TALSheetManager.Instance.DefaultLeftSheetHeadline);
-    end;
-    TDockEdge.Right: begin
-      FBackButton.Assign(TALSheetManager.Instance.DefaultRightSheetBackButton);
-      FCloseButton.Assign(TALSheetManager.Instance.DefaultRightSheetCloseButton);
-      FHeadline.Assign(TALSheetManager.Instance.DefaultRightSheetHeadline);
-    end;
-    else
-      Raise Exception.Create('Error 9AEB3A2F-8705-4C3C-A142-23F4F35FA74B')
+  FHeaderBar := nil;
+  FBackButton := nil;
+  FCloseButton := nil;
+  FHeadline := nil;
+end;
+
+{*****************************************************}
+function TALHorizontalSheet.GetHeaderBar: TALRectangle;
+begin
+  If FHeaderBar = nil then begin
+    FHeaderBar := TALRectangle.Create(Container);
+    FHeaderBar.Parent := Container;
+    FHeaderBar.Assign(TALSheetManager.Instance.DefaultHorizontalSheetHeaderBar);
+    FHeaderBar.Name := 'ALSheetHeaderBar';
   end;
-  //--
-  FBackButton.Tag := -1;
-  FBackButton.OnClick := ActionButtonClick;
-  FCloseButton.Tag := -2;
-  FCloseButton.OnClick := ActionButtonClick;
+  Result := FHeaderBar;
+end;
+
+{***************************************************}
+function TALHorizontalSheet.GetBackButton: TALButton;
+begin
+  If FBackButton = nil then begin
+    FBackButton := TALButton.Create(HeaderBar);
+    FBackButton.Parent := HeaderBar;
+    FBackButton.Name := 'ALSheetBackButton';
+    case FDockEdge of
+      TDockEdge.Left: FBackButton.Assign(TALSheetManager.Instance.DefaultLeftSheetBackButton);
+      TDockEdge.Right: FBackButton.Assign(TALSheetManager.Instance.DefaultRightSheetBackButton);
+      else Raise Exception.Create('Error 21FC306A-7C69-463E-A7E1-1A342B3FBBE1')
+    end;
+    FBackButton.Text := '';
+    FBackButton.OnClick := ActionButtonClick;
+  end;
+  Result := FBackButton;
+end;
+
+{****************************************************}
+function TALHorizontalSheet.GetCloseButton: TALButton;
+begin
+  If FCloseButton = nil then begin
+    FCloseButton := TALButton.Create(HeaderBar);
+    FCloseButton.Parent := HeaderBar;
+    FCloseButton.Name := 'ALSheetCloseButton';
+    case FDockEdge of
+      TDockEdge.Left: FCloseButton.Assign(TALSheetManager.Instance.DefaultLeftSheetCloseButton);
+      TDockEdge.Right: FCloseButton.Assign(TALSheetManager.Instance.DefaultRightSheetCloseButton);
+      else Raise Exception.Create('Error E3F5417D-E9E9-49C4-B53F-D677F98AF880')
+    end;
+    FCloseButton.Text := '';
+    FCloseButton.OnClick := ActionButtonClick;
+  end;
+  Result := FCloseButton;
+end;
+
+{***********************************************}
+function TALHorizontalSheet.GetHeadline: TALText;
+begin
+  If FHeadline = nil then begin
+    FHeadline := TALText.Create(HeaderBar);
+    FHeadline.Parent := HeaderBar;
+    FHeadline.Name := 'ALSheetHeadline';
+    case FDockEdge of
+      TDockEdge.Left: FHeadline.Assign(TALSheetManager.Instance.DefaultLeftSheetHeadline);
+      TDockEdge.Right: FHeadline.Assign(TALSheetManager.Instance.DefaultRightSheetHeadline);
+      else Raise Exception.Create('Error 8F32B838-A12C-44B2-85E9-5DB1A70002B5')
+    end;
+  end;
+  Result := FHeadline;
+end;
+
+{***********************************************}
+function TALHorizontalSheet.HasHeadline: Boolean;
+begin
+  result := FHeadline <> nil;
+end;
+
+{*************************************************}
+function TALHorizontalSheet.HasBackButton: Boolean;
+begin
+  result := FBackButton <> nil;
+end;
+
+{**************************************************}
+function TALHorizontalSheet.HasCloseButton: Boolean;
+begin
+  result := FCloseButton <> nil;
+end;
+
+{************************************************}
+function TALHorizontalSheet.HasHeaderBar: Boolean;
+begin
+  result := FHeaderBar <> nil;
+end;
+
+{****************************************************************}
+procedure TALHorizontalSheet.AddBackButton(const ATag: NativeInt);
+begin
+  if HasBackButton then raise Exception.Create('A sheet can only contain one back button');
+  BackButton.Tag := ATag;
+end;
+
+{*****************************************************************}
+procedure TALHorizontalSheet.AddCloseButton(const ATag: NativeInt);
+begin
+  if HasCloseButton then raise Exception.Create('A sheet can only contain one close button');
+  CloseButton.Tag := ATag;
 end;
 
 {***************************************************}
@@ -1507,12 +1681,19 @@ procedure TALSheetManager.CloseCurrentSheet;
 begin
   if FCurrentSheet = nil then exit;
 
-  FCurrentSheet.FTouchBlocker.Visible := True;
   FCurrentSheet.ScrollEngine.Stop(true{AAbruptly});
 
+  If (not (TALSheet.TAnimateOption.AnimateContainer in FCurrentSheet.CloseAnimateOptions)) then begin
+    DoCloseCurrentSheet;
+    exit;
+  end;
+
+  FCurrentSheet.FTouchBlocker.Visible := True;
+
   FScrimAnimation.Enabled := False;
-  if (not HasPendingSheets) then begin
-    FScrimAnimation.Tag := TAlphaColorRec(FCurrentSheet.Fill.Color).A;
+  if (not HasPendingSheets) and
+     (TALSheet.TAnimateOption.AnimateScrim in FCurrentSheet.CloseAnimateOptions) then begin
+    FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentSheet.Fill.Color).A / 255;
     FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
     FScrimAnimation.Duration := 0.200;
     FScrimAnimation.StartValue := 1;
@@ -1556,6 +1737,8 @@ begin
   FCurrentSheet := nil;
   FScrimAnimation.Enabled := False;
   FContainerAnimation.Enabled := False;
+  if assigned(LCurrentSheet.FOnClosedRefProc) then
+    LCurrentSheet.FOnClosedRefProc();
   ProcessPendingSheets;
   if not IsShowingSheet then
     ALUnfreezeNativeViews(FFrozenNativeControls)
@@ -1575,6 +1758,14 @@ begin
   TThread.queue(nil,
     procedure
     begin
+      if (TALLoadingOverlayManager.HasInstance) and
+         (TALLoadingOverlayManager.Instance.IsShowingLoadingOverlay) then
+        TALLoadingOverlay.CloseCurrent;
+
+      if (TALDialogManager.HasInstance) and
+         (TALDialogManager.Instance.IsShowingDialog) then
+        TALDialog.CloseCurrent;
+
       if TALSheetManager.HasInstance then begin
         with TALSheetManager.Instance do begin
           FQueue.Enqueue(ASheet);
@@ -1631,45 +1822,54 @@ begin
   // Init FCurrentSheet
   FCurrentSheet := ASheet;
 
-  // Start the ScrimAnimation
-  FScrimAnimation.Enabled := False;
-  FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentSheet.Fill.Color).A / 255;
-  FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
-  FScrimAnimation.Duration := 0.4;
-  FScrimAnimation.StartValue := 0;
-  FScrimAnimation.StopValue := 1;
-  FScrimAnimation.Start;
+  // ShowAnimateOptions
+  if TALSheet.TAnimateOption.AnimateContainer in FCurrentSheet.ShowAnimateOptions then begin
 
-  // Start the ContainerAnimation
-  FContainerAnimation.Enabled := False;
-  FContainerAnimation.Tag := Integer(False);
-  FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
-  FContainerAnimation.Duration := 0.500;
-  case FCurrentSheet.DockEdge of
-    TALSheet.TDockEdge.Left: begin
-      FContainerAnimation.StartValue := -FCurrentSheet.Container.Width;
-      FContainerAnimation.StopValue := FCurrentSheet.Container.Margins.Left;
-      FCurrentSheet.Container.Position.X := FContainerAnimation.StartValue;
+    // Start the ScrimAnimation
+    if (TALSheet.TAnimateOption.AnimateScrim in FCurrentSheet.ShowAnimateOptions) then begin
+      FScrimAnimation.Enabled := False;
+      FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentSheet.Fill.Color).A / 255;
+      FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
+      FScrimAnimation.Duration := 0.4;
+      FScrimAnimation.StartValue := 0;
+      FScrimAnimation.StopValue := 1;
+      FScrimAnimation.Start;
     end;
-    TALSheet.TDockEdge.Right: begin
-      FContainerAnimation.StartValue := FCurrentSheet.Width;
-      FContainerAnimation.StopValue := FCurrentSheet.Width - FCurrentSheet.Container.Width - FCurrentSheet.Container.Margins.Right;
-      FCurrentSheet.Container.Position.X := FContainerAnimation.StartValue;
+
+    // Start the ContainerAnimation
+    FContainerAnimation.Enabled := False;
+    FContainerAnimation.Tag := Integer(False);
+    FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
+    FContainerAnimation.Duration := 0.500;
+    case FCurrentSheet.DockEdge of
+      TALSheet.TDockEdge.Left: begin
+        FContainerAnimation.StartValue := -FCurrentSheet.Container.Width;
+        FContainerAnimation.StopValue := -FCurrentSheet.Container.Width - FCurrentSheet.ScrollEngine.MinScrollLimit.X;
+        FCurrentSheet.Container.Position.X := FContainerAnimation.StartValue;
+      end;
+      TALSheet.TDockEdge.Right: begin
+        FContainerAnimation.StartValue := FCurrentSheet.Width;
+        FContainerAnimation.StopValue := FCurrentSheet.Width - FCurrentSheet.ScrollEngine.MaxScrollLimit.X;
+        FCurrentSheet.Container.Position.X := FContainerAnimation.StartValue;
+      end;
+      TALSheet.TDockEdge.Top: begin
+        FContainerAnimation.StartValue := -FCurrentSheet.Container.Height;
+        FContainerAnimation.StopValue := -FCurrentSheet.Container.Height - FCurrentSheet.ScrollEngine.MinScrollLimit.Y;
+        FCurrentSheet.Container.Position.Y := FContainerAnimation.StartValue;
+      end;
+      TALSheet.TDockEdge.Bottom: begin
+        FContainerAnimation.StartValue := FCurrentSheet.Height;
+        FContainerAnimation.StopValue := FCurrentSheet.Height - FCurrentSheet.ScrollEngine.MaxScrollLimit.Y;
+        FCurrentSheet.Container.Position.Y := FContainerAnimation.StartValue;
+      end;
+      else
+        raise Exception.Create('Error 7D95B3F6-5787-425B-8C51-4471CFEE4C6B');
     end;
-    TALSheet.TDockEdge.Top: begin
-      FContainerAnimation.StartValue := -FCurrentSheet.Container.Height;
-      FContainerAnimation.StopValue := FCurrentSheet.Container.Margins.Top;
-      FCurrentSheet.Container.Position.Y := FContainerAnimation.StartValue;
-    end;
-    TALSheet.TDockEdge.Bottom: begin
-      FContainerAnimation.StartValue := FCurrentSheet.Height;
-      FContainerAnimation.StopValue := FCurrentSheet.Height - FCurrentSheet.Container.Height - FCurrentSheet.Container.Margins.Bottom;
-      FCurrentSheet.Container.Position.Y := FContainerAnimation.StartValue;
-    end;
-    else
-      raise Exception.Create('Error 7D95B3F6-5787-425B-8C51-4471CFEE4C6B');
-  end;
-  FContainerAnimation.Start;
+    FContainerAnimation.Start;
+
+  end
+  else
+    ContainerAnimationFinish(nil);
 
 end;
 
@@ -1717,24 +1917,20 @@ begin
   else begin
     case FCurrentSheet.FDockEdge of
       TALSheet.TDockEdge.Left: begin
-        FCurrentSheet.FPeekPosition := -FCurrentSheet.Container.Width - FCurrentSheet.Container.Position.X;
         FCurrentSheet.ScrollEngine.SetViewportPosition(
-          TALPointD.Create(FCurrentSheet.FPeekPosition, 0));
+          TALPointD.Create(-FCurrentSheet.Container.Width - FCurrentSheet.Container.Position.X, 0));
       end;
       TALSheet.TDockEdge.Right: begin
-        FCurrentSheet.FPeekPosition := FCurrentSheet.Width - FCurrentSheet.Container.Position.X;
         FCurrentSheet.ScrollEngine.SetViewportPosition(
-          TALPointD.Create(FCurrentSheet.FPeekPosition, 0));
+          TALPointD.Create(FCurrentSheet.Width - FCurrentSheet.Container.Position.X, 0));
       end;
       TALSheet.TDockEdge.Top: begin
-        FCurrentSheet.FPeekPosition := -FCurrentSheet.Container.Height - FCurrentSheet.Container.Position.Y;
         FCurrentSheet.ScrollEngine.SetViewportPosition(
-          TALPointD.Create(0, FCurrentSheet.FPeekPosition));
+          TALPointD.Create(0, -FCurrentSheet.Container.Height - FCurrentSheet.Container.Position.Y));
       end;
       TALSheet.TDockEdge.Bottom: begin
-        FCurrentSheet.FPeekPosition := FCurrentSheet.Height - FCurrentSheet.Container.Position.Y;
         FCurrentSheet.ScrollEngine.SetViewportPosition(
-          TALPointD.Create(0, FCurrentSheet.FPeekPosition));
+          TALPointD.Create(0, FCurrentSheet.Height - FCurrentSheet.Container.Position.Y));
       end;
       else
         Raise Exception.Create('Error DC611DF1-BDCC-4477-AF51-3D3578FBC8F9')

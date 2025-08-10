@@ -1138,7 +1138,7 @@ procedure ALDrawMultiLineText(
       if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
       LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
     end;
-    if TOSVersion.Check(9, 0) then begin
+    if TOSVersion.Check(9, 0) {API level >= 28 (Android P)} then begin
       var LfontWeightInt: Integer;
       case AFontWeight of
         TFontWeight.Thin: LfontWeightInt := 100; //	Thin;

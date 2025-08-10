@@ -528,7 +528,7 @@ uses
 
 
 type
-  _TALDownloadContextProtectedAccess = class(TALDownloadContext);
+  _TALWorkerContextProtectedAccess = class(TALWorkerContext);
 
 {***********************************************************}
 constructor TALDynamicControlHost.Create(aOwner: TComponent);
@@ -1571,7 +1571,7 @@ begin
   // but we still catch any exceptions just in case.
 
   Try
-    Var LOwner := TALDynamicControl(_TALDownloadContextProtectedAccess(AContext).FOwner);
+    Var LOwner := TALDynamicControl(_TALWorkerContextProtectedAccess(AContext).FOwner);
     if LOwner = nil then exit(_GetlowestPriority);
     if LOwner.Host = nil then begin
       if TALNetHttpClientPool.Instance.PriorityDirection = TALNetHttpClientPool.TPriorityDirection.lessThan then

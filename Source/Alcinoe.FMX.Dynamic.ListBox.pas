@@ -108,7 +108,7 @@ type
         type
           TDownloadDataContext = class;
           TDownloadDataEvent = procedure(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer) of object;
-          TDownloadDataContext = Class(TALDownloadContext)
+          TDownloadDataContext = Class(TALWorkerContext)
           private
             FOnDownloadData: TDownloadDataEvent;
             function GetOwner: TItem;
@@ -129,7 +129,7 @@ type
           TCreateMainContentEvent = function(const AContext: TContentBuilderContext): TMainContent of object;
           TCreateLoadingContentEvent = function(const AContext: TContentBuilderContext): TLoadingContent of object;
           TCreateErrorContentEvent = function(const AContext: TContentBuilderContext): TErrorContent of object;
-          TContentBuilderContext = Class(TALDownloadContext)
+          TContentBuilderContext = Class(TALWorkerContext)
           private
             FParentViewOrientation: TOrientation;
             FContentType: Integer;
@@ -388,7 +388,7 @@ type
           TDownloadItemsContext = class;
           TCreateItemEvent = function(const AContext: TDownloadItemsContext; var AData: TALJSONNodeW): TItem of object;
           TDownloadItemsEvent = procedure(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var APaginationToken: String; var AErrorCode: Integer) of object;
-          TDownloadItemsContext = Class(TALDownloadContext)
+          TDownloadItemsContext = Class(TALWorkerContext)
           private
             FOnDownloadItems: TDownloadItemsEvent;
             FOnCreateItem: TCreateItemEvent;
@@ -1412,7 +1412,7 @@ begin
       ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProc'{$ENDIF});
       try
         if LContext.FOwner <> nil then begin
-          LContext.FFreeByThread := False;
+          LContext.FManagedByWorkerThread := False;
           AContext := nil; // AContext will be free by CancelResourceDownload
         end;
       finally
@@ -1547,7 +1547,7 @@ begin
     var LLock := FDownloadDataContext.FLock;
     ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelDownloadData'{$ENDIF});
     try
-      if not FDownloadDataContext.FFreeByThread then LContextToFree := FDownloadDataContext
+      if not FDownloadDataContext.FManagedByWorkerThread then LContextToFree := FDownloadDataContext
       else LContextToFree := nil;
       FDownloadDataContext.FOwner := nil;
       FDownloadDataContext := nil;
@@ -1673,7 +1673,7 @@ begin
       ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DoPreloadContent'{$ENDIF});
       try
         if LContext.FOwner <> nil then begin
-          LContext.FFreeByThread := False;
+          LContext.FManagedByWorkerThread := False;
           AContext := nil; // AContext will be free by CancelPreloadContent
         end;
       finally
@@ -1721,7 +1721,7 @@ begin
     var LLock := FContentBuilderContext.FLock;
     ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelPreloadContent'{$ENDIF});
     try
-      if not FContentBuilderContext.FFreeByThread then LContextToFree := FContentBuilderContext
+      if not FContentBuilderContext.FManagedByWorkerThread then LContextToFree := FContentBuilderContext
       else LContextToFree := nil;
       FContentBuilderContext.FOwner := nil;
       FContentBuilderContext := nil;
@@ -4047,7 +4047,7 @@ begin
       ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.DownloadItemsBackgroundProc'{$ENDIF});
       try
         if LContext.FOwner <> nil then begin
-          LContext.FFreeByThread := False;
+          LContext.FManagedByWorkerThread := False;
           AContext := nil; // AContext will be free by CancelDownloadItems
         end;
       finally
@@ -4301,7 +4301,7 @@ begin
     var LLock := FDownloadItemsContext.FLock;
     ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TView.CancelDownloadItems'{$ENDIF});
     try
-      if not FDownloadItemsContext.FFreeByThread then LContextToFree := FDownloadItemsContext
+      if not FDownloadItemsContext.FManagedByWorkerThread then LContextToFree := FDownloadItemsContext
       else LContextToFree := nil;
       FDownloadItemsContext.FOwner := nil;
       FDownloadItemsContext := nil;

@@ -1,6 +1,7 @@
 package AlcinoeAthens;
 
 {$R *.res}
+{$R AlcinoeComponentIcons.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -63,14 +64,16 @@ contains
   Alcinoe.FMX.FilterEffects in 'Alcinoe.FMX.FilterEffects.pas',
   Alcinoe.FMX.Graphics in 'Alcinoe.FMX.Graphics.pas',
   Alcinoe.FMX.Layouts in 'Alcinoe.FMX.Layouts.pas',
+  Alcinoe.FMX.LoadingOverlay in 'Alcinoe.FMX.LoadingOverlay.pas',
   Alcinoe.FMX.Materials.Canvas in 'Alcinoe.FMX.Materials.Canvas.pas',
   Alcinoe.FMX.Memo in 'Alcinoe.FMX.Memo.pas',
   Alcinoe.FMX.NativeControl in 'Alcinoe.FMX.NativeControl.pas',
   Alcinoe.FMX.NativeView.Win in 'Alcinoe.FMX.NativeView.Win.pas',
   Alcinoe.FMX.Objects in 'Alcinoe.FMX.Objects.pas',
   Alcinoe.FMX.PageController in 'Alcinoe.FMX.PageController.pas',
-  Alcinoe.FMX.Sheets in 'Alcinoe.FMX.Sheets.pas',
   Alcinoe.FMX.ScrollEngine in 'Alcinoe.FMX.ScrollEngine.pas',
+  Alcinoe.FMX.Sheets in 'Alcinoe.FMX.Sheets.pas',
+  Alcinoe.FMX.Snackbar in 'Alcinoe.FMX.Snackbar.pas',
   Alcinoe.FMX.StdCtrls in 'Alcinoe.FMX.StdCtrls.pas',
   Alcinoe.FMX.Styles in 'Alcinoe.FMX.Styles.pas',
   Alcinoe.FMX.Types3D in 'Alcinoe.FMX.Types3D.pas',

@@ -526,8 +526,7 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
-  // This is only necessary for API level >= 33 (TIRAMISU)
-  if (TOSVersion.Check(13, 0)) and
+  if (TOSVersion.Check(13, 0) {API level >= 33 (TIRAMISU)}) and
      (MainActivity.checkSelfPermission(StringToJString('android.permission.POST_NOTIFICATIONS')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED) then begin
     var LPermissions := TJavaObjectArray<JString>.create(1);
     try
@@ -564,7 +563,7 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
   // Create the NotificationChannel, but only on API 26+ (Android 8.0 oreo)
-  if TOSVersion.Check(8) then begin
+  if TOSVersion.Check(8) {API level >= 26 (Android O)} then begin
     var LNotificationChannel := TJALNotificationChannel.Wrap(
                                   TJNotificationChannel.JavaClass.init(
                                     StringToJString(ANotificationChannel.FID),

@@ -51,6 +51,7 @@ type
         function GetDefaultStopValue: Single; override;
       public
         constructor Create(const AOwner: TALDynamicAniIndicator); reintroduce; virtual;
+        procedure Assign(Source: TPersistent); override;
         procedure Start; override;
       public
         property AutoReverse;
@@ -97,6 +98,7 @@ type
     constructor Create(const AOwner: TObject); override;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
+    procedure Assign(Source: TALDynamicControl); override;
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
@@ -3441,6 +3443,17 @@ begin
   FEnabled := True;
 end;
 
+{**********************************************************************}
+procedure TALDynamicAniIndicator.TAnimation.Assign(Source: TPersistent);
+begin
+  if Source is TALDynamicAniIndicator.TAnimation then begin
+    inherited Assign(Source);
+    Enabled := TALDynamicAniIndicator.TAnimation(Source).Enabled;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
 {************************************************}
 procedure TALDynamicAniIndicator.TAnimation.Start;
 begin
@@ -3532,6 +3545,30 @@ begin
   // AlFreeAndNil with the delayed flag
   FAnimation.Enabled := False;
   inherited;
+end;
+
+{*****************************************************************}
+procedure TALDynamicAniIndicator.Assign(Source: TALDynamicControl);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALDynamicAniIndicator then begin
+      Animation.Assign(TALDynamicAniIndicator(Source).Animation);
+      ResourceName := TALDynamicAniIndicator(Source).ResourceName;
+      TintColorKey := TALDynamicAniIndicator(Source).TintColorKey;
+      TintColor := TALDynamicAniIndicator(Source).TintColor;
+      FrameCount := TALDynamicAniIndicator(Source).FrameCount;
+      RowCount := TALDynamicAniIndicator(Source).RowCount;
+      CacheIndex := TALDynamicAniIndicator(Source).CacheIndex;
+      CacheEngine := TALDynamicAniIndicator(Source).CacheEngine;
+      MotionMode := TALDynamicAniIndicator(Source).MotionMode;
+    end
+    else
+      ALAssignError(Source{ASource}, Self{ADest});
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {****************************************************}

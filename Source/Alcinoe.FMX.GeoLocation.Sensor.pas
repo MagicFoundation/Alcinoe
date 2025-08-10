@@ -412,7 +412,7 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
-  if TJBuild_VERSION.JavaClass.SDK_INT >= 28 {android P} then begin
+  if TOSVersion.Check(9, 0) {API level >= 28 (Android P)} then begin
     var LLocationManager := TJLocationManager.Wrap(TAndroidHelper.Context.getSystemService(TJContext.JavaClass.LOCATION_SERVICE));
     result := LLocationManager.isLocationEnabled();
   end
@@ -469,7 +469,7 @@ begin
 
   ARestricted := False;
   //----
-  if (TJBuild_VERSION.JavaClass.SDK_INT >= 23 {marshmallow}) then begin
+  if TOSVersion.Check(6, 0) {API level >= 23 (Android M)} then begin
     ACoarseGeoLocation := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_COARSE_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED;
     APreciseGeoLocation := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_FINE_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED;
   end
@@ -478,7 +478,7 @@ begin
     APreciseGeoLocation := True;
   end;
   //----
-  if (TJBuild_VERSION.JavaClass.SDK_INT >= 29 {Android 10}) then
+  if TOSVersion.Check(10, 0) {API level >= 29 (Android Q)} then
     AAuthorizedAlways := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_BACKGROUND_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED
   else
     AAuthorizedAlways := true;
@@ -640,11 +640,11 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
   Result := False;
-  if (TJBuild_VERSION.JavaClass.SDK_INT >= 23 {marshmallow}) then begin
+  if TOSVersion.Check(6, 0) {API level >= 23 (Android M)} then begin
     if ACoarseGeoLocation then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_COARSE_LOCATION')));
     if APreciseGeoLocation then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_FINE_LOCATION')));
   end;
-  if (TJBuild_VERSION.JavaClass.SDK_INT >= 29 {Android 10}) then begin
+  if TOSVersion.Check(10, 0) {API level >= 29 (Android Q)} then begin
     if aAlwaysAuthorization then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_BACKGROUND_LOCATION')));
   end;
   {$ENDIF}
@@ -1042,7 +1042,7 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   if FLocationManager <> nil then begin
-    if (TJBuild_VERSION.JavaClass.SDK_INT >= 31 {Android 12}) and
+    if (TOSVersion.Check(12, 0) {API level >= 31 (Android S)}) and
        (FLocationManager.isProviderEnabled(TJLocationManager.javaclass.FUSED_PROVIDER)) then begin
       FLocationManager.requestLocationUpdates(
         TJLocationManager.javaclass.FUSED_PROVIDER, // provider: JString; - the listener to receive location updates This value cannot be null.

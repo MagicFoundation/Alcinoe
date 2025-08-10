@@ -678,7 +678,6 @@ uses
   {$ENDIF}
   FMX.Effects,
   System.UIConsts,
-  Alcinoe.fmx.BreakText,
   Alcinoe.http.client,
   Alcinoe.FMX.Types3D;
 
@@ -1538,7 +1537,7 @@ begin
   try
     AStream.ReadBuffer(LArray.Data^, LLength);
     var LOptions := TJBitmapFactory_Options.Javaclass.Init;
-    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    if TOSVersion.Check(8, 0) {API level >= 26 (Android O)} then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
     var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
     if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
     try
@@ -2869,7 +2868,7 @@ begin
       try
 
         // RenderEffect is approximately 2.5x slower than the deprecated RenderScript :(
-        if TOSVersion.Check(12, 0) and
+        if TOSVersion.Check(12, 0) {API level >= 31 (Android S)} and
            TJHardwareBuffer.javaclass.isSupported(
              LTmpBitmap.getWidth, // width: Integer;
              LTmpBitmap.getHeight, // height: Integer;
@@ -3089,7 +3088,7 @@ function ALCreateJBitmapFromResource(
     try
       AStream.ReadBuffer(LArray.Data^, LLength);
       var LOptions := TJBitmapFactory_Options.Javaclass.Init;
-      if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+      if TOSVersion.Check(8, 0) {API level >= 26 (Android O)} then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
       Result := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
       if Result = nil then raise Exception.create('Failed to decode bitmap from stream');
       LOptions := nil;
@@ -3102,7 +3101,7 @@ function ALCreateJBitmapFromResource(
   Function _CreateJBitmapFromFile(Const AFilename: String): JBitmap;
   begin
     var LOptions := TJBitmapFactory_Options.Javaclass.Init;
-    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    if TOSVersion.Check(8, 0) {API level >= 26 (Android O)} then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
     Result := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
     if Result = nil then raise Exception.create('Failed to load bitmap from file');
     LOptions := nil;
@@ -8507,7 +8506,7 @@ begin
     //
     //{$IF defined(ANDROID)}
     //
-    //if TOSVersion.Check(10, 0) and
+    //if TOSVersion.Check(10, 0) {API level >= 29 (Android Q)} and
     //   TAndroidHelper.Display.isWideColorGamut then begin
     //  LSKColorSpace := ALCreateDisplayP3SkColorSpace;
     //  {$IF defined(debug)}
@@ -8589,7 +8588,7 @@ begin
     var LColorSpace := TJColorSpace.JavaClass.get(TJColorSpace_Named.JavaClass.SRGB);
 
     //var LColorSpace: JColorSpace.;
-    //if TOSVersion.Check(10, 0) then LColorSpace := TAndroidHelper.Display.getPreferredWideGamutColorSpace;
+    //if TOSVersion.Check(10, 0) {API level >= 29 (Android Q)} then LColorSpace := TAndroidHelper.Display.getPreferredWideGamutColorSpace;
     //if LColorSpace = nil then LColorSpace := TJColorSpace.JavaClass.get(TJColorSpace_Named.JavaClass.SRGB);
 
     if LColorSpace = nil then raise Exception.Create('Failed to create JColorSpace');

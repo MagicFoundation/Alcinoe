@@ -1911,15 +1911,8 @@ procedure TALDisplayTimer.Start;
 begin
   If FPaused then Resume;
   if FRunning then Exit;
-  inherited;
-  FTime := 0;
   FIntervalTimeLeft := FInterval;
-  FDelayTimeLeft := FDelay;
-  if FDelay = 0 then begin
-    DoFirstFrame;
-    ProcessAnimation;
-    DoProcess;
-  end;
+  inherited;
 end;
 
 {*************************************************}

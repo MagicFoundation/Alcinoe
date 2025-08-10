@@ -34,13 +34,14 @@ uses
   FMX.types,
   FMX.graphics,
   FMX.objects,
+  Alcinoe.Common,
   Alcinoe.FMX.CacheEngines,
   Alcinoe.FMX.Types3D,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.BreakText,
-  Alcinoe.FMX.Common;
+  Alcinoe.fmx.Common;
 
 type
 
@@ -109,7 +110,7 @@ type
       end;
   protected
     type
-      TResourceDownloadContext = Class(TALDownloadContext)
+      TResourceDownloadContext = Class(TALWorkerContext)
       private
         function GetOwner: TALImage;
       public
@@ -1384,8 +1385,7 @@ uses
   Alcinoe.Http.Client,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.Localization,
-  Alcinoe.StringUtils,
-  Alcinoe.Common;
+  Alcinoe.StringUtils;
 
 {**********************************************}
 constructor TALShape.Create(AOwner: TComponent);
@@ -2168,7 +2168,7 @@ begin
     var LLock := FResourceDownloadContext.FLock;
     ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALImage.CancelResourceDownload'{$ENDIF});
     try
-      if not FResourceDownloadContext.FFreeByThread then LContextToFree := FResourceDownloadContext
+      if not FResourceDownloadContext.FManagedByWorkerThread then LContextToFree := FResourceDownloadContext
       else LContextToFree := nil;
       FResourceDownloadContext.FOwner := nil;
       FResourceDownloadContext := nil;
@@ -2211,7 +2211,7 @@ begin
   ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALImage.HandleResourceDownloadError (1)'{$ENDIF});
   try
     if LContext.Owner <> nil then begin
-      LContext.FFreeByThread := False;
+      LContext.FManagedByWorkerThread := False;
       AContext := nil; // AContext will be free by CancelResourceDownload
     end;
   finally
@@ -2228,7 +2228,7 @@ begin
     ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALImage.HandleResourceDownloadError (2)'{$ENDIF});
     try
       if LContext.FOwner <> nil then begin
-        LContext.FFreeByThread := False;
+        LContext.FManagedByWorkerThread := False;
         AContext := nil; // AContext will be free by CancelResourceDownload
       end;
     finally

@@ -3,6 +3,7 @@ unit Alcinoe.FMX.LoadingOverlay;
 interface
 
 uses
+  System.SysUtils,
   System.Classes,
   System.UITypes,
   System.Generics.Collections,
@@ -22,7 +23,13 @@ type
   TALLoadingOverlay = class(TALRectangle)
   public
     type
-      //---------
+      // --------------
+      // TAnimateOption
+      TAnimateOption = (AnimateScrim, AnimateContainer);
+      // ---------------
+      // TAnimateOptions
+      TAnimateOptions = set of TAnimateOption;
+      // --------
       // TBuilder
       TBuilder = Class(TObject)
       private
@@ -62,15 +69,24 @@ type
     FContainer: TALRectangle;
     FAnimatedImage: TALAnimatedImage;
     FAniIndicator: TALAniIndicator;
+    FShowAnimateOptions: TAnimateOptions;
+    FCloseAnimateOptions: TAnimateOptions;
+    FOnClosedRefProc: TProc;
     function GetAnimatedImage: TALAnimatedImage;
     function GetAniIndicator: TALAniIndicator;
   public
     constructor Create(AOwner: TComponent); override;
+    class function Current: TALLoadingOverlay;
+    class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    function IsStealthMode: Boolean;
     function HasAnimatedImage: Boolean;
     function HasAniIndicator: Boolean;
     property Container: TALRectangle read FContainer;
     property AnimatedImage: TALAnimatedImage read GetAnimatedImage;
     property AniIndicator: TALAniIndicator read GetAniIndicator;
+    property ShowAnimateOptions: TAnimateOptions read FShowAnimateOptions write FShowAnimateOptions;
+    property CloseAnimateOptions: TAnimateOptions read FCloseAnimateOptions write FCloseAnimateOptions;
+    property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -122,7 +138,6 @@ type
 implementation
 
 uses
-  system.SysUtils,
   Fmx.Controls,
   FMX.Forms,
   FMX.Types,
@@ -277,10 +292,29 @@ begin
   //--
   FAnimatedImage := nil;
   FAniIndicator := nil;
+  FShowAnimateOptions := [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer];
+  FCloseAnimateOptions := [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer];
+  FOnClosedRefProc := nil;
   //--
   Assign(TALLoadingOverlayManager.Instance.DefaultScrim);
   Name := 'ALLoadingOverlayScrim';
-  HitTest := True;
+end;
+
+{**********************************************************}
+class function TALLoadingOverlay.Current: TALLoadingOverlay;
+begin
+  Result := TALLoadingOverlayManager.Instance.CurrentLoadingOverlay;
+end;
+
+{********************************************************************************************************************************************************************************************}
+class procedure TALLoadingOverlay.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+begin
+  var LCurrentLoadingOverlay := TALLoadingOverlayManager.Instance.CurrentLoadingOverlay;
+  if LCurrentLoadingOverlay <> nil then begin
+    LCurrentLoadingOverlay.OnClosedRefProc := AOnClosedCallback;
+    LCurrentLoadingOverlay.CloseAnimateOptions := AAnimateOptions;
+    TALLoadingOverlayManager.Instance.CloseCurrentLoadingOverlay;
+  end;
 end;
 
 {************************************************************}
@@ -305,6 +339,13 @@ begin
     FAniIndicator.Name := 'ALLoadingOverlayAniIndicator';
   end;
   Result := FAniIndicator;
+end;
+
+{************************************************}
+function TALLoadingOverlay.IsStealthMode: Boolean;
+begin
+  Result := (not FContainer.Visible) and
+            (Fill.Color = TalphaColors.Null);
 end;
 
 {***************************************************}
@@ -393,9 +434,16 @@ procedure TALLoadingOverlayManager.CloseCurrentLoadingOverlay;
 begin
   if FCurrentLoadingOverlay = nil then exit;
 
+  If (FCurrentLoadingOverlay.IsStealthMode) or
+     (not (TALLoadingOverlay.TAnimateOption.AnimateContainer in FCurrentLoadingOverlay.CloseAnimateOptions)) then begin
+    DoCloseCurrentLoadingOverlay;
+    exit;
+  end;
+
   FScrimAnimation.Enabled := False;
-  if (not HasPendingLoadingOverlays) then begin
-    FScrimAnimation.Tag := TAlphaColorRec(FCurrentLoadingOverlay.Fill.Color).A;
+  if (not HasPendingLoadingOverlays) and
+     (TALLoadingOverlay.TAnimateOption.AnimateScrim in FCurrentLoadingOverlay.CloseAnimateOptions) then begin
+    FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentLoadingOverlay.Fill.Color).A / 255;
     FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
     FScrimAnimation.Duration := 0.200;
     FScrimAnimation.StartValue := 1;
@@ -421,10 +469,12 @@ begin
   FCurrentLoadingOverlay := nil;
   FScrimAnimation.Enabled := False;
   FContainerAnimation.Enabled := False;
+  if assigned(LCurrentLoadingOverlay.FOnClosedRefProc) then
+    LCurrentLoadingOverlay.FOnClosedRefProc();
   ProcessPendingLoadingOverlays;
   if not IsShowingLoadingOverlay then
     ALUnfreezeNativeViews(FFrozenNativeControls)
-  else
+  else if not LCurrentLoadingOverlay.IsStealthMode then
     FScrimAnimation.Stop;
   TThread.ForceQueue(nil,
     procedure
@@ -503,23 +553,31 @@ begin
   // Init FCurrentLoadingOverlay
   FCurrentLoadingOverlay := ALoadingOverlay;
 
-  // Start the ScrimAnimation
-  FScrimAnimation.Enabled := False;
-  FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentLoadingOverlay.Fill.Color).A / 255;
-  FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
-  FScrimAnimation.Duration := 0.4;
-  FScrimAnimation.StartValue := 0;
-  FScrimAnimation.StopValue := 1;
-  FScrimAnimation.Start;
+  // No animation in Stealth Mode
+  if (not FCurrentLoadingOverlay.IsStealthMode) and
+     (TALLoadingOverlay.TAnimateOption.AnimateContainer in FCurrentLoadingOverlay.ShowAnimateOptions) then begin
 
-  // Start the ContainerAnimation
-  FContainerAnimation.Enabled := False;
-  FContainerAnimation.TagFloat := 0;
-  FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
-  FContainerAnimation.Duration := 0.5;
-  FContainerAnimation.StartValue := 0;
-  FContainerAnimation.StopValue := 1;
-  FContainerAnimation.Start;
+    // Start the ScrimAnimation
+    if (TALLoadingOverlay.TAnimateOption.AnimateScrim in FCurrentLoadingOverlay.ShowAnimateOptions) then begin
+      FScrimAnimation.Enabled := False;
+      FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentLoadingOverlay.Fill.Color).A / 255;
+      FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
+      FScrimAnimation.Duration := 0.4;
+      FScrimAnimation.StartValue := 0;
+      FScrimAnimation.StopValue := 1;
+      FScrimAnimation.Start;
+    end;
+
+    // Start the ContainerAnimation
+    FContainerAnimation.Enabled := False;
+    FContainerAnimation.TagFloat := 0;
+    FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
+    FContainerAnimation.Duration := 0.5;
+    FContainerAnimation.StartValue := 0;
+    FContainerAnimation.StopValue := 1;
+    FContainerAnimation.Start;
+
+  end;
 
 end;
 

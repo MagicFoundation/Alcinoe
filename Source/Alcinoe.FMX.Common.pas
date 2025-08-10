@@ -137,17 +137,6 @@ type
     function GetScrollEngine: TALScrollEngine;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDownloadContext = Class(TObject)
-  protected
-    FLock: TObject;
-    FFreeByThread: Boolean;
-    FOwner: TObject;
-  public
-    constructor Create(const AOwner: TObject); virtual;
-    destructor Destroy; override;
-  End;
-
 type
 
   {~~~~~~~~~~~~~~~}
@@ -1112,6 +1101,8 @@ function  ALCreateResourceStream(const AResourceName: String): TResourceStream;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
 Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffered: Boolean = True);
+procedure ALDisableControls(const AParent: TControl; var ADisabledControls: TArray<TControl>);
+procedure ALReenableControls(var ADisabledControls: TArray<TControl>);
 function  ALAlignEdgesToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 function  ALAlignDimensionToPixelRound(const Size: TSizeF; const Scale: single; const Epsilon: Single = 0): TSizeF; overload;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
@@ -1457,22 +1448,6 @@ uses
 {**}
 Type
   _TControlProtectedAccess = class(Tcontrol);
-
-{***********************************************************}
-constructor TALDownloadContext.Create(const AOwner: TObject);
-begin
-  inherited Create;
-  FLock := TObject.Create;
-  FFreeByThread := True;
-  FOwner := AOwner;
-end;
-
-{************************************}
-destructor TALDownloadContext.Destroy;
-begin
-  ALFreeAndNil(FLock);
-  inherited
-end;
 
 {***************************}
 constructor TALBounds.Create;
@@ -5947,7 +5922,7 @@ begin
                      TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
   if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
   var LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
-  if TOSVersion.Check(9, 0) then begin
+  if TOSVersion.Check(9, 0) {API level >= 28 (Android P)} then begin
     var LfontWeightInt: Integer;
     case AFontWeight of
       TFontWeight.Thin: LfontWeightInt := 100; //	Thin;
@@ -6128,6 +6103,34 @@ begin
 
   for var LChild in aControl.Controls do
     ALMakeBufDrawables(LChild, AEnsureDoubleBuffered);
+end;
+
+{********************************************************************************************}
+procedure ALDisableControls(const AParent: TControl; var ADisabledControls: TArray<TControl>);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DisableControls(const AControl: TControl);
+  begin
+    for var I := 0 to AControl.ControlsCount - 1 do begin
+      _DisableControls(AControl.Controls[i]);
+      if AControl.Controls[i].Enabled then begin
+        setlength(ADisabledControls, Length(ADisabledControls) + 1);
+        ADisabledControls[High(ADisabledControls)] := AControl.Controls[i];
+        AControl.Controls[i].Enabled := False;
+      end;
+    end;
+  end;
+
+begin
+  _DisableControls(AParent);
+end;
+
+{********************************************************************}
+procedure ALReenableControls(var ADisabledControls: TArray<TControl>);
+begin
+  For var I := low(ADisabledControls) to high(ADisabledControls) do
+    ADisabledControls[I].Enabled := True;
+  setlength(ADisabledControls, 0);
 end;
 
 {*************************************************************************************************************}
@@ -6575,8 +6578,12 @@ procedure ALInitScreenScale;
 begin
   if ALScreenScale = 0 then begin
     var LScreenService: IFMXScreenService;
-    if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenService) then
-      ALScreenScale := LScreenService.GetScreenScale
+    if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenService) then begin
+      ALScreenScale := LScreenService.GetScreenScale;
+      {$IF defined(debug)}
+      ALLog('Screen Size', ALFloatToStrW(LScreenService.GetScreenSize.X) + 'x' + ALFloatToStrW(LScreenService.GetScreenSize.Y));
+      {$ENDIF}
+    end
     else
       ALScreenScale := 1;
     {$IF defined(debug)}

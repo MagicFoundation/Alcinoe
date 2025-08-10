@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 24 24"
+     xmlns="http://www.w3.org/2000/svg" data-name="Layer 1">
+  <!-- Bar with a hole where the circle goes -->
+  <path fill="#787878" fill-rule="evenodd"
+        d="M21,11H17.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2h9.18433a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2Z
+           M15,9.01792a2.98208,2.98208,0,1,1,0,5.96416a2.98208,2.98208,0,1,1,0-5.96416Z"/>
+  <!-- Full inner circle (fills the hole perfectly) -->
+  <circle fill="#cb4c32" cx="15" cy="12" r="2.98208"/>
+</svg>

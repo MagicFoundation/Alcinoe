@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Top bar -->
+  <path d="M22 2v2H2V2h20z" fill="#787878"/>
+
+  <!-- Bottom bar -->
+  <path d="M22 20v2H2v-2h20z" fill="#787878"/>
+
+  <!-- Center shape -->
+  <path d="M16 15v-2H8v2H6v-2H4v-2h2V9h2v2h8V9h2v2h2v2h-2v2h-2z" fill="#cb4c32"/>
+
+  <!-- Small center square (right) -->
+  <path d="M16 15v2h-2v-2h2z" fill="#cb4c32"/>
+
+  <!-- Small center square (top right) -->
+  <path d="M16 9h-2V7h2v2z" fill="#cb4c32"/>
+
+  <!-- Small center square (top left) -->
+  <path d="M8 9V7h2v2H8z" fill="#cb4c32"/>
+
+  <!-- Small center square (bottom left) -->
+  <path d="M8 15h2v2H8v-2z" fill="#cb4c32"/>
+</svg>

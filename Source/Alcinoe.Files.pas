@@ -57,7 +57,8 @@ function  ALGetModulePathA: ansiString;
 function  ALGetModulePathW: String;
 Function  AlGetFileSize(const AFileName: ansistring): int64; overload; deprecated 'Use Tfile.GetSize Instead';
 function  ALGetFileSize(const FileName : string): Int64; overload; deprecated 'Use Tfile.GetSize Instead';
-Function  AlGetFileVersion(const AFileName: ansistring): ansiString;
+Function  AlGetFileVersion(const AFileName: ansistring): ansiString; overload;
+Function  AlGetFileVersion(const AFileName: string): String; overload;
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime; overload; deprecated 'Use Tfile.GetCreationTime/Tfile.GetCreationTimeUtc Instead';
 function  ALGetFileCreationDateTime(const aFileName: String): TDateTime; overload; deprecated 'Use Tfile.GetCreationTime/Tfile.GetCreationTimeUtc Instead';
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime; overload; deprecated 'Use Tfile.GetLastWriteTime/Tfile.GetLastWriteTimeUtc Instead';
@@ -407,6 +408,33 @@ begin
       if GetFileVersionInfoA(PAnsiChar(FileName), Wnd, InfoSize, VerBuf) then
         if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
           Result := ALIntToStrA(HiWord(FI.dwFileVersionMS)) +'.'+ ALIntToStrA(LoWord(FI.dwFileVersionMS)) +'.'+ ALIntToStrA(HiWord(FI.dwFileVersionLS)) +'.'+ ALIntToStrA(LoWord(FI.dwFileVersionLS));
+    finally
+      FreeMem(VerBuf);
+    end;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+Function  AlGetFileVersion(const AFileName: string): String;
+var
+  FileName: String;
+  InfoSize, Wnd: DWORD;
+  VerBuf: Pointer;
+  FI: PVSFixedFileInfo;
+  VerSize: DWORD;
+begin
+  Result := '';
+  FileName := AFileName;
+  UniqueString(FileName);
+  InfoSize := GetFileVersionInfoSizeW(PChar(FileName), Wnd);
+  if InfoSize <> 0 then begin
+    GetMem(VerBuf, InfoSize);
+    try
+      if GetFileVersionInfoW(PChar(FileName), Wnd, InfoSize, VerBuf) then
+        if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
+          Result := ALIntToStrW(HiWord(FI.dwFileVersionMS)) +'.'+ ALIntToStrW(LoWord(FI.dwFileVersionMS)) +'.'+ ALIntToStrW(HiWord(FI.dwFileVersionLS)) +'.'+ ALIntToStrW(LoWord(FI.dwFileVersionLS));
     finally
       FreeMem(VerBuf);
     end;

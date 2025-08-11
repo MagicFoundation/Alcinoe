@@ -1097,6 +1097,7 @@ function  ALGetFontMetrics(
             const AFontSize: single;
             const AFontWeight: TFontWeight;
             const AFontSlant: TFontSlant): TALFontMetrics;
+function  ALGetAppVersion: String;
 function  ALCreateResourceStream(const AResourceName: String): TResourceStream;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
@@ -1419,6 +1420,7 @@ uses
   {$IF defined(IOS)}
   Macapi.CoreFoundation,
   Macapi.Helpers,
+  iOSapi.Helpers,
   Alcinoe.iOSApi.AudioToolbox,
   Alcinoe.iOSapi.CoreText,
   {$ENDIF}
@@ -6013,6 +6015,28 @@ begin
     ALFontMetricsCacheLock.endWrite;
   end;
 
+end;
+
+{********************************}
+function  ALGetAppVersion: String;
+begin
+  {$IF defined(ANDROID)}
+  var LPackageManager := TandroidHelper.Activity.getPackageManager;
+  if LPackageManager <> nil then begin
+    var LPackageInfo := LPackageManager.getPackageInfo(TandroidHelper.Context.getPackageName(), TJPackageManager.JavaClass.GET_ACTIVITIES);
+    if LPackageInfo <> nil then Result := JStringToString(LPackageInfo.versionName) // 1.0.8
+    else Result := 'x.x.x';
+  end
+  else Result := 'x.x.x';
+  {$ELSEIF defined(IOS)}
+  var LVersionObject := TiOSHelper.MainBundle.infoDictionary.objectForKey(StringToID('CFBundleVersion'));
+  if LVersionObject <> nil then Result := NSStrToStr(TNSString.Wrap(LVersionObject)) // 1.0.8
+  else Result := 'x.x.x';
+  {$ELSEIF defined(MSWINDOWS)}
+  Result := AlGetFileVersion(ALGetModuleNameW);
+  {$ELSE}
+  Result := 'x.x.x';
+  {$ENDIF}
 end;
 
 {****************************************************************************}

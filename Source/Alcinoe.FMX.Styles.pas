@@ -13176,7 +13176,9 @@ begin
     DefaultIcon.Align := TALAlignLayout.TopCenter;
 
     // DefaultHeadline
-    var LRatio: Single := 24 / DefaultHeadline.Textsettings.Font.DefaultSize;
+    var LRatio: Single := 14 * ARatio;
+    if CompareValue(LRatio, 14, TEpsilon.FontSize) <= 0 then LRatio := (24 / DefaultHeadline.Textsettings.Font.DefaultSize) * ARatio
+    else LRatio := (24 + ((LRatio - 14) / 2)) / DefaultHeadline.Textsettings.Font.DefaultSize;
     ALResetTextStyle(DefaultHeadline, LRatio);
     if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
     DefaultHeadline.Margins.Top := RoundTo(16 * ARatio, -2);
@@ -13197,7 +13199,7 @@ begin
     // DefaultOptionLayout
     ALResetLayoutStyle(DefaultOptionLayout);
     DefaultOptionLayout.Margins.Rect := TRectF.Create(24*ARatio{Left}, 16*ARatio{Top}, 24*ARatio{Right}, 0{Bottom}).RoundTo(-2);
-    DefaultOptionLayout.TagFloat := 12 * LRatio; // The padding top of the first item (except message) and padding bottom of the last item (except message)
+    DefaultOptionLayout.TagFloat := 12 * ARatio; // The padding top of the first item (except message) and padding bottom of the last item (except message)
     DefaultOptionLayout.AutoSize := TALAutoSizeMode.Both;
     DefaultOptionLayout.Align := TALAlignLayout.TopLeft;
 
@@ -13259,7 +13261,7 @@ begin
 
     // DefaultFooterButton
     LRatio := 14 / DefaultFooterButton.Textsettings.Font.DefaultSize;
-    ALResetButtonStyle(DefaultFooterButton, LRatio);
+    ALResetButtonStyle(DefaultFooterButton, LRatio * ARatio);
     DefaultFooterButton.Margins.Left := RoundTo(8 * ARatio, -2);
     DefaultFooterButton.Align := TALAlignLayout.RightCenter;
 
@@ -13349,7 +13351,7 @@ begin
 
     // DefaultContainer
     ALResetRectangleStyle(DefaultContainer);
-    DefaultContainer.Padding.Rect := TRectF.Create(16*ARatio{Left}, 14*ARatio{Top}, 16*ARatio{Right}, 14*ARatio{Bottom}).RoundTo(-2);
+    DefaultContainer.Padding.Rect := TRectF.Create(16*ARatio{Left}, 12*ARatio{Top}, 16*ARatio{Right}, 12*ARatio{Bottom}).RoundTo(-2);
     DefaultContainer.Margins.Rect := TRectF.Create(24{*ARatio}{Left}, 0{Top}, 24{*ARatio}{Right}, 56{*ARatio}{Bottom}).RoundTo(-2);
     DefaultContainer.AutoSize := TALAutoSizeMode.Both;
     // TALSnackbarManager will convert TALAlignLayout.BottomCenter to TALAlignLayout.Bottom
@@ -13510,7 +13512,7 @@ begin
     // DefaultHorizontalSheetHeaderBar
     ALResetRectangleStyle(DefaultHorizontalSheetHeaderBar, ARatio);
     DefaultHorizontalSheetHeaderBar.Margins.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
-    DefaultHorizontalSheetHeaderBar.AutoSize := TALAutoSizeMode.Height;
+    DefaultHorizontalSheetHeaderBar.AutoSize := TALAutoSizeMode.Both;
     DefaultHorizontalSheetHeaderBar.Align := TALAlignLayout.Top;
     DefaultHorizontalSheetHeaderBar.Fill.Color := TalphaColors.Null;
     DefaultHorizontalSheetHeaderBar.Fill.ColorKey := '';
@@ -13519,44 +13521,44 @@ begin
 
     // DefaultLeftSheetBackButton
     var LRatio := 22 / DefaultLeftSheetBackButton.Textsettings.Font.DefaultSize;
-    ALResetButtonStyle(DefaultLeftSheetBackButton, LRatio);
+    ALResetButtonStyle(DefaultLeftSheetBackButton, LRatio * ARatio);
     DefaultLeftSheetBackButton.Margins.Left := RoundTo(16 * ARatio, -2);
     DefaultLeftSheetBackButton.Align := TALAlignLayout.MostRightCenter;
     DefaultLeftSheetBackButton.Fill.ResourceName := ALLeftSheetBackButtonResourceName;
 
     // DefaultRightSheetBackButton
     LRatio := 22 / DefaultRightSheetBackButton.Textsettings.Font.DefaultSize;
-    ALResetButtonStyle(DefaultRightSheetBackButton, LRatio);
+    ALResetButtonStyle(DefaultRightSheetBackButton, LRatio * ARatio);
     DefaultRightSheetBackButton.Margins.Right := RoundTo(16 * ARatio, -2);
     DefaultRightSheetBackButton.Align := TALAlignLayout.MostLeftCenter;
     DefaultRightSheetBackButton.Fill.ResourceName := ALRightSheetBackButtonResourceName;
 
     // DefaultLeftSheetHeadline
     LRatio := 22 / DefaultLeftSheetHeadline.Textsettings.Font.DefaultSize;
-    ALResetTextStyle(DefaultLeftSheetHeadline, LRatio);
+    ALResetTextStyle(DefaultLeftSheetHeadline, LRatio  * ARatio);
     if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultLeftSheetHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
-    DefaultLeftSheetHeadline.Margins.Rect := TRectF.Create(0{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultLeftSheetHeadline.Margins.Rect := TRectF.Create(32*Aratio{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
     DefaultLeftSheetHeadline.AutoSize := TALAutoSizeMode.Both;
     DefaultLeftSheetHeadline.Align := TALAlignLayout.RightCenter;
 
     // DefaultRightSheetHeadline
     LRatio := 22 / DefaultRightSheetHeadline.Textsettings.Font.DefaultSize;
-    ALResetTextStyle(DefaultRightSheetHeadline, LRatio);
+    ALResetTextStyle(DefaultRightSheetHeadline, LRatio * ARatio);
     if CompareValue(ARatio, 1, TEpsilon.scale) > 0 then DefaultRightSheetHeadline.TextSettings.Font.Weight := TFontWeight.Medium;
-    DefaultRightSheetHeadline.Margins.Rect := TRectF.Create(0{Left}, 0{Top}, 0{Right}, 0{Bottom}).RoundTo(-2);
+    DefaultRightSheetHeadline.Margins.Rect := TRectF.Create(0{Left}, 0{Top}, 32*Aratio{Right}, 0{Bottom}).RoundTo(-2);
     DefaultRightSheetHeadline.AutoSize := TALAutoSizeMode.Both;
     DefaultRightSheetHeadline.Align := TALAlignLayout.LeftCenter;
 
     // DefaultLeftSheetCloseButton
     LRatio := 22 / DefaultLeftSheetCloseButton.Textsettings.Font.DefaultSize;
-    ALResetButtonStyle(DefaultLeftSheetCloseButton, LRatio);
+    ALResetButtonStyle(DefaultLeftSheetCloseButton, LRatio * ARatio);
     DefaultLeftSheetCloseButton.Margins.Right := RoundTo(24 * ARatio, -2);
     DefaultLeftSheetCloseButton.Align := TALAlignLayout.LeftCenter;
     DefaultLeftSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;
 
     // DefaultRightSheetCloseButton
     LRatio := 22 / DefaultRightSheetCloseButton.Textsettings.Font.DefaultSize;
-    ALResetButtonStyle(DefaultRightSheetCloseButton, LRatio);
+    ALResetButtonStyle(DefaultRightSheetCloseButton, LRatio * ARatio);
     DefaultRightSheetCloseButton.Margins.Left := RoundTo(24 * ARatio, -2);
     DefaultRightSheetCloseButton.Align := TALAlignLayout.RightCenter;
     DefaultRightSheetCloseButton.Fill.ResourceName := ALSheetCloseButtonResourceName;

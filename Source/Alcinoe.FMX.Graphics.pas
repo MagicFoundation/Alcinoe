@@ -210,7 +210,8 @@ type
     UNDEFINED);
 
 function ALIsDefaultContextOpenGL: Boolean;
-function ALGetImageDimensions(const aStream: TStream): TSize;
+function ALGetImageDimensions(const aStream: TStream): TSize; overload;
+function ALGetImageDimensions(const AResourceName: String): TSize; overload;
 function AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo; overload;
 function AlGetExifOrientationInfo(const aStream: TStream): TalExifOrientationInfo; overload;
 function AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes; overload;
@@ -1537,15 +1538,9 @@ begin
   try
     AStream.ReadBuffer(LArray.Data^, LLength);
     var LOptions := TJBitmapFactory_Options.Javaclass.Init;
-    if TOSVersion.Check(8, 0) {API level >= 26 (Android O)} then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
-    var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
-    if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
-    try
-      result := TSize.Create(LBitmap.getWidth, LBitmap.getHeight);
-    finally
-      LBitmap.recycle;
-      LBitmap := nil;
-    end;
+    LOptions.inJustDecodeBounds := True;
+    TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    Result := TSize.Create(LOptions.outWidth, LOptions.outHeight);
     LOptions := nil;
   finally
     ALfreeandNil(LArray);
@@ -1572,23 +1567,35 @@ begin
       LLength := LMemoryStream.Size;
       AStream.Position := LSavedPosition;
     end;
-    var LData := TNSData.Wrap(
-                   TNSData.alloc.initWithBytesNoCopy(
-                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    var LDataRef := CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, LBuffer, LLength, kCFAllocatorNull);
+    if LDataRef = nil then raise Exception.Create('Failed to create CFDataRef from given stream');
     try
-      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
-      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      var LImgSourceRef := CGImageSourceCreateWithData(LDataRef{CFDataRef}, nil{options});
+      if LImgSourceRef = nil then raise Exception.Create('Failed to create CGImageSource from CFDataRef');
       try
-        Result := TSize.Create(
-                    ALOSImageGetWidth(LImage),
-                    ALOSImageGetHeight(LImage));
+        var LDictionaryRef := CGImageSourceCopyPropertiesAtIndex(LImgSourceRef{isrc}, 0{index}, nil{options});
+        if LDictionaryRef = nil then raise Exception.Create('Failed to retrieve image properties');
+        try
+
+          var LCFValue := CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyPixelWidth);
+          if (LCFValue = nil) or (CFGetTypeID(LCFValue) <> CFNumberGetTypeID) then raise Exception.Create('kCGImagePropertyPixelWidth missing or not numeric');
+          var LInt32: Int32;
+          if not CFNumberGetValue(LCFValue, kCFNumberSInt32Type, @LInt32) then raise Exception.Create('kCGImagePropertyPixelWidth not convertible to 32-bit integer');
+          Result.Width := LInt32;
+
+          LCFValue := CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyPixelHeight);
+          if (LCFValue = nil) or (CFGetTypeID(LCFValue) <> CFNumberGetTypeID) then raise Exception.Create('kCGImagePropertyPixelHeight missing or not numeric');
+          if not CFNumberGetValue(LCFValue, kCFNumberSInt32Type, @LInt32) then raise Exception.Create('kCGImagePropertyPixelHeight not convertible to 32-bit integer');
+          Result.Height := LInt32;
+
+        finally
+          CFRelease(LDictionaryRef);
+        end;
       finally
-        LImage.release;
+        CFRelease(LImgSourceRef);
       end;
     finally
-      LData.release;
+      CFRelease(LDataRef);
     end;
   finally
     ALFreeAndNil(LMemoryStream);
@@ -1609,6 +1616,20 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
+end;
+
+{****************************************************************}
+function ALGetImageDimensions(const AResourceName: String): TSize;
+begin
+  var LFileName := ALGetResourceFilename(AResourceName);
+  var LStream: TStream;
+  if LFileName <> '' then LStream := TFileStream.Create(LFileName, fmOpenRead)
+  else LStream := ALCreateResourceStream(AResourceName);
+  try
+    Result := ALGetImageDimensions(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
 end;
 
 {*********************************************************************************}
@@ -1649,8 +1670,12 @@ begin
         var LDictionaryRef := CGImageSourceCopyPropertiesAtIndex(LImgSourceRef{isrc}, 0{index}, nil{options});
         if LDictionaryRef = nil then raise Exception.Create('Failed to retrieve image properties');
         try
-          var LOrientation := TNSNumber.Wrap(CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation));
-          if LOrientation <> nil then begin
+          var LCFValue := CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation);
+          if LCFValue <> nil then begin
+
+            if CFGetTypeID(LCFValue) <> CFNumberGetTypeID then raise Exception.Create('kCGImagePropertyOrientation is not numeric');
+            var LOrientation: Int32;
+            if not CFNumberGetValue(LCFValue, kCFNumberSInt32Type, @LOrientation) then raise Exception.Create('kCGImagePropertyOrientation not convertible to 32-bit integer');
 
             //typedef CF_ENUM(uint32_t, CGImagePropertyOrientation) {
             //    kCGImagePropertyOrientationUp = 1,        // 0th row at top,    0th column on left   - default orientation
@@ -1663,7 +1688,7 @@ begin
             //    kCGImagePropertyOrientationLeft           // 0th row on left,   0th column at bottom - 90 deg CCW
             //};
 
-            case LOrientation.integerValue of
+            case LOrientation of
 
               //Top, left (UIImageOrientationUp)
               1: result := TalExifOrientationInfo.NORMAL;
@@ -1692,7 +1717,7 @@ begin
             end;
           end;
         finally
-          CGImageRelease(LDictionaryRef);
+          CFRelease(LDictionaryRef);
         end;
       finally
         CFRelease(LImgSourceRef);
@@ -1811,8 +1836,12 @@ begin
         var LDictionaryRef := CGImageSourceCopyPropertiesAtIndex(LImgSourceRef{isrc}, 0{index}, nil{options});
         if LDictionaryRef = nil then raise Exception.Create('Failed to retrieve image properties');
         try
-          var LOrientation := TNSNumber.Wrap(CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation));
-          if LOrientation <> nil then begin
+          var LCFValue := CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation);
+          if LCFValue <> nil then begin
+
+            if CFGetTypeID(LCFValue) <> CFNumberGetTypeID then raise Exception.Create('kCGImagePropertyOrientation is not numeric');
+            var LOrientation: Int32;
+            if not CFNumberGetValue(LCFValue, kCFNumberSInt32Type, @LOrientation) then raise Exception.Create('kCGImagePropertyOrientation not convertible to 32-bit integer');
 
             //typedef CF_ENUM(uint32_t, CGImagePropertyOrientation) {
             //    kCGImagePropertyOrientationUp = 1,        // 0th row at top,    0th column on left   - default orientation
@@ -1825,7 +1854,7 @@ begin
             //    kCGImagePropertyOrientationLeft           // 0th row on left,   0th column at bottom - 90 deg CCW
             //};
 
-            case LOrientation.integerValue of
+            case LOrientation of
 
               //Top, left (UIImageOrientationUp)
               1: result := TalExifOrientationInfo.NORMAL;
@@ -1854,7 +1883,7 @@ begin
             end;
           end;
         finally
-          CGImageRelease(LDictionaryRef);
+          CFRelease(LDictionaryRef);
         end;
       finally
         CFRelease(LImgSourceRef);

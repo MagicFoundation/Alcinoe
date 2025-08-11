@@ -2306,8 +2306,16 @@ begin
                       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
                     {$ENDIF}
                     var LPlaceholderStyle: sk_placeholderstyle_t;
-                    if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := LOptions.FontSize;
-                    if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := LOptions.FontSize;
+                    if (CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0) and
+                       (CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0) then LCurrImgHeight := LOptions.FontSize;
+                    if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then begin
+                      var LSize := ALGetImageDimensions(LCurrImgSrc);
+                      LCurrImgWidth := (LCurrImgHeight / LSize.Height) * LSize.Width;
+                    end;
+                    if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then begin
+                      var LSize := ALGetImageDimensions(LCurrImgSrc);
+                      LCurrImgHeight := (LCurrImgWidth / LSize.Width) * LSize.Height;
+                    end;
                     LPlaceholderStyle.width := LcurrImgWidth;
                     LPlaceholderStyle.height := LcurrImgHeight;
                     LPlaceholderStyle.alignment := sk_placeholderalignment_t.MIDDLE_SK_PLACEHOLDERALIGNMENT;
@@ -3574,8 +3582,16 @@ begin
           else if LCurrImgSrc <> '' then begin
 
             // Update LCurrImgWidth / LCurrImgHeight
-            if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := LOptions.FontSize;
-            if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := LOptions.FontSize;
+            if (CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0) and
+               (CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0) then LCurrImgHeight := LOptions.FontSize;
+            if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then begin
+              var LSize := ALGetImageDimensions(LCurrImgSrc);
+              LCurrImgWidth := (LCurrImgHeight / LSize.Height) * LSize.Width;
+            end;
+            if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then begin
+              var LSize := ALGetImageDimensions(LCurrImgSrc);
+              LCurrImgHeight := (LCurrImgWidth / LSize.Width) * LSize.Height;
+            end;
 
             // No horizontal space left to add the Image
             If CompareValue(LCurrLineWidth + LCurrImgWidth, ARect.Width - LOptions.Padding.Left - LOptions.Padding.Right, TEpsilon.Position) > 0 then begin

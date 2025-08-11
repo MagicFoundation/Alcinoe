@@ -65,6 +65,7 @@ type
         function AddEdit(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt): TBuilder;
         function AddMemo(const APromptText: String; const ALabelText: String; const ASupportingText: String; const ATag: NativeInt): TBuilder;
         function AddButton(const ACaption: String; const ATag: NativeInt; Const AIsFooterButton: Boolean = True): TBuilder;
+        function SetButtonFontColor(const ATag: NativeInt; const AFontColor: TalphaColor): TBuilder;
         function SetCloseOnScrimClick(const AValue: boolean): TBuilder;
         function SetCustomContainer(const AValue: TALControl): TBuilder;
         function SetCustomDialogProc(const AValue: TCustomDialogRefProc): TBuilder; overload;
@@ -352,6 +353,14 @@ end;
 function TALDialog.TBuilder.AddButton(const ACaption: String; const ATag: NativeInt; Const AIsFooterButton: Boolean = True): TBuilder;
 begin
   FDialog.AddButton(ACaption, ATag, AIsFooterButton);
+  Result := Self;
+end;
+
+{*************************************************************************************************************}
+function TALDialog.TBuilder.SetButtonFontColor(const ATag: NativeInt; const AFontColor: TalphaColor): TBuilder;
+begin
+  var Lbutton := FDialog.GetButton(ATag);
+  if Lbutton <> nil then Lbutton.TextSettings.Font.Color := AFontColor;
   Result := Self;
 end;
 

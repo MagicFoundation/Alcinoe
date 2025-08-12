@@ -9841,8 +9841,14 @@ begin
     if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode
     else begin
       if (not value) and fMandatory then exit;
-      inherited SetChecked(Value);
-      if Value then begin
+      var LOldMandatory := fMandatory;
+      fMandatory := False;
+      try
+        inherited SetChecked(Value);
+      finally
+        fMandatory := LOldMandatory;
+      end;
+      if FChecked then begin
         var M := TRadioButtonGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
@@ -14114,8 +14120,14 @@ begin
     if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode
     else begin
       if (not value) and fMandatory then exit;
-      _doSetChecked;
-      if Value and (GroupName <> '') then begin
+      var LOldMandatory := fMandatory;
+      fMandatory := False;
+      try
+        _doSetChecked;
+      finally
+        fMandatory := LOldMandatory;
+      end;
+      if FChecked and (GroupName <> '') then begin
         var M := TGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;

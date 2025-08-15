@@ -20,6 +20,11 @@ type
     {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
+  // ⚠ Important:
+  // If the definition of FMX.Types.TAlignLayout changes in future Delphi versions,
+  // review this enumeration and all casts like `TALAlignLayout(AlignLayout)`.
+  // Any change in the order or number of values in TAlignLayout could cause
+  // incorrect mappings or runtime errors.
   TALAlignLayout = (
     None,
     Top,
@@ -157,6 +162,12 @@ type
     procedure DoEndUpdate; override;
     procedure DoResized; override;
     procedure DoRealign; override;
+    procedure ParentRealigning; virtual;
+    /// <summary>
+    ///   Return the largest size this control can have while still
+    ///   being fully contained within its container (parent).
+    /// </summary>
+    function GetMaxContainedSize: TSizeF; Virtual;
     procedure AdjustSize; virtual;
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
     function GetAbsoluteDisplayedRect: TRectF; virtual;
@@ -601,89 +612,17 @@ begin
   AdjustSize;
 end;
 
+{************************************}
+procedure TALControl.ParentRealigning;
+begin
+  // Virtual
+end;
+
 {*********************************************************************}
 procedure TALControl.SetFixedSizeBounds(X, Y, AWidth, AHeight: Single);
 begin
   if TNonReentrantHelper.EnterSection(FIsSetBoundsLocked) then begin
     try
-
-      {$IFNDEF ALCompilerVersionSupported123}
-        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
-      {$ENDIF}
-      //TALAlignLayout.TopCenter
-      //TALAlignLayout.TopLeft
-      //TALAlignLayout.TopRight
-      //TALAlignLayout.LeftCenter
-      //TALAlignLayout.LeftTop
-      //TALAlignLayout.LeftBottom
-      //TALAlignLayout.RightCenter
-      //TALAlignLayout.RightTop
-      //TALAlignLayout.RightBottom
-      //TALAlignLayout.BottomCenter
-      //TALAlignLayout.BottomLeft
-      //TALAlignLayout.BottomRight
-      //TALAlignLayout.MostTopCenter
-      //TALAlignLayout.MostTopLeft
-      //TALAlignLayout.MostTopRight
-      //TALAlignLayout.MostLeftCenter
-      //TALAlignLayout.MostLeftTop
-      //TALAlignLayout.MostLeftBottom
-      //TALAlignLayout.MostRightCenter
-      //TALAlignLayout.MostRightTop
-      //TALAlignLayout.MostRightBottom
-      //TALAlignLayout.MostBottomCenter
-      //TALAlignLayout.MostBottomLeft
-      //TALAlignLayout.MostBottomRight
-      If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
-         (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-         (((ParentControl <> nil) and (_TControlProtectedAccess(ParentControl).FDisableAlign)) or            // FDisableAlign = true mean that SetBounds was called by
-          ((ParentControl = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign))) // AlignObjects procedure inside inherited DoRealign
-      then begin
-        case FAlign of
-          TALAlignLayout.TopCenter,
-          TALAlignLayout.BottomCenter,
-          TALAlignLayout.MostTopCenter,
-          TALAlignLayout.MostBottomCenter: begin
-            X := X + ((AWidth - Width) / 2);
-            AWidth := Width;
-          end;
-          TALAlignLayout.TopLeft,
-          TALAlignLayout.BottomLeft,
-          TALAlignLayout.MostTopLeft,
-          TALAlignLayout.MostBottomLeft: begin
-            AWidth := Width;
-          end;
-          TALAlignLayout.TopRight,
-          TALAlignLayout.BottomRight,
-          TALAlignLayout.MostTopRight,
-          TALAlignLayout.MostBottomRight: begin
-            X := X + (AWidth - Width);
-            AWidth := Width;
-          end;
-          TALAlignLayout.LeftCenter,
-          TALAlignLayout.RightCenter,
-          TALAlignLayout.MostLeftCenter,
-          TALAlignLayout.MostRightCenter: begin
-            Y := Y + ((AHeight - Height) / 2);
-            AHeight := Height;
-          end;
-          TALAlignLayout.LeftTop,
-          TALAlignLayout.RightTop,
-          TALAlignLayout.MostLeftTop,
-          TALAlignLayout.MostRightTop: begin
-            AHeight := Height;
-          end;
-          TALAlignLayout.LeftBottom,
-          TALAlignLayout.RightBottom,
-          TALAlignLayout.MostLeftBottom,
-          TALAlignLayout.MostRightBottom: begin
-            Y := Y + (AHeight - Height);
-            AHeight := Height;
-          end;
-          else
-            raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
-        end;
-      end;
 
       {$IF defined(debug)}
       //ALLog(ClassName+'.SetFixedSizeBounds', 'Name: ' + Name + ' | X : '+ALFloatToStrW(X)+'('+ALFloatToStrW(Position.X)+') | Y : '+ALFloatToStrW(Y)+'('+ALFloatToStrW(Position.Y)+') | AWidth : '+ALFloatToStrW(AWidth)+'('+ALFloatToStrW(Width)+') | AHeight : '+ALFloatToStrW(AHeight)+'('+ALFloatToStrW(Height)+')');
@@ -702,6 +641,15 @@ end;
 {************************************************************}
 procedure TALControl.SetBounds(X, Y, AWidth, AHeight: Single);
 begin
+  // ParentControl.FDisableAlign = True means SetBounds was
+  // called by the AlignObjects procedure inside ParentControl.DoRealign.
+  // Fortunately, AlignObjects systematically calls SetBounds on all
+  // its children, even when there’s nothing to update.
+  var LParentRealigning := (((ParentControl <> nil) and (_TControlProtectedAccess(ParentControl).FDisableAlign)) or
+                            ((ParentControl = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign)));
+  If LParentRealigning then
+    ParentRealigning;
+
   {$IFNDEF ALCompilerVersionSupported123}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
@@ -729,11 +677,9 @@ begin
   //TALAlignLayout.MostBottomCenter
   //TALAlignLayout.MostBottomLeft
   //TALAlignLayout.MostBottomRight
-  If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
-     (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
-     (((ParentControl <> nil) and (_TControlProtectedAccess(ParentControl).FDisableAlign)) or             // FDisableAlign = true mean that SetBounds was called by
-      ((ParentControl = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign)))  // AlignObjects procedure inside inherited DoRealign
-  then begin
+  If (LParentRealigning) and
+     (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
+     (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) then begin
     case FAlign of
       TALAlignLayout.TopCenter,
       TALAlignLayout.BottomCenter,
@@ -795,13 +741,265 @@ begin
   inherited;
 end;
 
+{**********************************************}
+function TALControl.GetMaxContainedSize: TSizeF;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function CalculateAvailableClientSize(
+             const AParentWidth: Single;
+             const AParentHeight: Single;
+             const AParentPadding: TRectF;
+             const AChildControls: TArray<TControl>;
+             const AChildControlsCount: Integer): TSizeF;
+  begin
+
+    if Align in [TALAlignLayout.None, TALAlignLayout.Center] then begin
+      Result := TSizeF.Create(65535, 65535);
+      Exit;
+    end
+    else if Align = TALAlignLayout.Contents then begin
+      Result := TSizeF.Create(
+                  AParentWidth - Margins.Left - Margins.Right,
+                  AParentHeight - Margins.top - Margins.Bottom);
+      Exit;
+    end;
+
+    Result := TSizeF.Create(
+                AParentWidth - AParentPadding.Left - AParentPadding.Right,
+                AParentHeight - AParentPadding.Top - AParentPadding.Bottom);
+
+    var IsHorzAligned := Align in [TALAlignLayout.Top,
+                                   TALAlignLayout.TopCenter,
+                                   TALAlignLayout.TopLeft,
+                                   TALAlignLayout.TopRight,
+                                   TALAlignLayout.Bottom,
+                                   TALAlignLayout.BottomCenter,
+                                   TALAlignLayout.BottomLeft,
+                                   TALAlignLayout.BottomRight,
+                                   TALAlignLayout.Client,
+                                   TALAlignLayout.VertCenter,
+                                   TALAlignLayout.Horizontal];
+    //var IsMostHorzAligned := Align in [TALAlignLayout.MostTop,
+    //                                   TALAlignLayout.MostTopCenter,
+    //                                   TALAlignLayout.MostTopLeft,
+    //                                   TALAlignLayout.MostTopRight,
+    //                                   TALAlignLayout.MostBottom,
+    //                                   TALAlignLayout.MostBottomCenter,
+    //                                   TALAlignLayout.MostBottomLeft,
+    //                                   TALAlignLayout.MostBottomRight];
+    var IsVertAligned := Align in [TALAlignLayout.Left,
+                                   TALAlignLayout.LeftCenter,
+                                   TALAlignLayout.LeftTop,
+                                   TALAlignLayout.LeftBottom,
+                                   TALAlignLayout.Right,
+                                   TALAlignLayout.RightCenter,
+                                   TALAlignLayout.RightTop,
+                                   TALAlignLayout.RightBottom,
+                                   TALAlignLayout.Client,
+                                   TALAlignLayout.HorzCenter,
+                                   TALAlignLayout.Vertical];
+    var IsMostVertAligned := Align in [TALAlignLayout.MostLeft,
+                                       TALAlignLayout.MostLeftCenter,
+                                       TALAlignLayout.MostLeftTop,
+                                       TALAlignLayout.MostLeftBottom,
+                                       TALAlignLayout.MostRight,
+                                       TALAlignLayout.MostRightCenter,
+                                       TALAlignLayout.MostRightTop,
+                                       TALAlignLayout.MostRightBottom];
+    // These align values are not classified as horizontal
+    // or vertical alignment:
+    //   TALAlignLayout.None
+    //   TALAlignLayout.Contents
+    //   TALAlignLayout.Center
+
+    for var I := 0 to AChildControlsCount - 1 do begin
+      var LChildControl := AChildControls[I];
+      if not LChildControl.Visible then Continue;
+      if LChildControl = Self then Continue;
+      {$IF defined(ALDPK)}
+      // At design time, the Delphi IDE may add children such as
+      // TGrabHandle.TGrabHandleRectangle
+      if Supports(LChildControl, IDesignerControl) then
+        Continue;
+      {$ENDIF}
+
+      var LChildControlAlign: TALAlignLayout;
+      If (LChildControl is TALControl) then LChildControlAlign := TALControl(LChildControl).Align
+      else begin
+        {$If defined(debug)}
+        if LChildControl.Align in [TAlignLayout.Scale,
+                                   TAlignLayout.Fit,
+                                   TAlignLayout.FitLeft,
+                                   TAlignLayout.FitRight] then
+          Raise Exception.Create('Align values Scale, Fit, FitLeft, and FitRight are not supported');
+        {$ENDIF}
+        LChildControlAlign := TALAlignLayout(LChildControl.Align);
+      end;
+
+      //
+      //  #################            ######## #################            ##################            ##################
+      //  #      TOP      #            #      # #      TOP      #            #    MOST TOP    #            #    MOST TOP    #
+      //  #################            #      # #################            ##################            ##################
+      //                               #      #
+      //  ########                     # MOST #                              ########                      ########
+      //  #      #                     # LEFT #                              #      #                      #      #
+      //  # LEFT #                     #      #                              # LEFT #                      # MOST #
+      //  #      #                     #      #                              #      #                      # LEFT #
+      //  #      #                     #      #                              #      #                      #      #
+      //  ########                     ########                              ########                      ########
+      //
+
+      case LChildControlAlign of
+
+        //--
+        TALAlignLayout.None,
+        TALAlignLayout.Center,
+        TALAlignLayout.Contents,
+        TALAlignLayout.Client,
+        TALAlignLayout.Horizontal,
+        TALAlignLayout.VertCenter,
+        TALAlignLayout.Vertical,
+        TALAlignLayout.HorzCenter:;
+
+        //--
+        TALAlignLayout.Top,
+        TALAlignLayout.TopCenter,
+        TALAlignLayout.TopLeft,
+        TALAlignLayout.TopRight,
+        TALAlignLayout.MostTop,
+        TALAlignLayout.MostTopCenter,
+        TALAlignLayout.MostTopLeft,
+        TALAlignLayout.MostTopRight,
+        TALAlignLayout.Bottom,
+        TALAlignLayout.BottomCenter,
+        TALAlignLayout.BottomLeft,
+        TALAlignLayout.BottomRight,
+        TALAlignLayout.MostBottom,
+        TALAlignLayout.MostBottomCenter,
+        TALAlignLayout.MostBottomLeft,
+        TALAlignLayout.MostBottomRight:
+          Result.Height := Result.Height - LChildControl.Height - LChildControl.Margins.Top - LChildControl.Margins.Bottom;
+
+        //--
+        TALAlignLayout.Left,
+        TALAlignLayout.LeftCenter,
+        TALAlignLayout.LeftTop,
+        TALAlignLayout.LeftBottom,
+        TALAlignLayout.Right,
+        TALAlignLayout.RightCenter,
+        TALAlignLayout.RightTop,
+        TALAlignLayout.RightBottom: begin
+          if IsVertAligned or
+             IsMostVertAligned then
+            Result.Width := Result.Width - LChildControl.Width - LChildControl.Margins.Left - LChildControl.Margins.Right;
+        end;
+
+        //--
+        TALAlignLayout.MostLeft,
+        TALAlignLayout.MostLeftCenter,
+        TALAlignLayout.MostLeftTop,
+        TALAlignLayout.MostLeftBottom,
+        TALAlignLayout.MostRight,
+        TALAlignLayout.MostRightCenter,
+        TALAlignLayout.MostRightTop,
+        TALAlignLayout.MostRightBottom: begin
+          if IsVertAligned or
+             IsMostVertAligned or
+             IsHorzAligned then
+            Result.Width := Result.Width - LChildControl.Width - LChildControl.Margins.Left - LChildControl.Margins.Right;
+        end;
+
+        //--
+        else
+          raise Exception.Create('Error 6DF0FA18-83E4-4B1C-806C-D04A6ED29DB0');
+
+      end;
+    end;
+
+    if not (Align in [TALAlignLayout.None,
+                      TALAlignLayout.Center]) then begin
+      Result.Width := Result.Width - Margins.Left - Margins.Right;
+      Result.Height := Result.Height - Margins.Top - Margins.Bottom;
+    end;
+  end;
+
+begin
+  if ALParentcontrol <> nil then begin
+    var LHasUnconstrainedAutosizeWidth := ALParentcontrol.HasUnconstrainedAutosizeWidth;
+    var LHasUnconstrainedAutosizeHeight := ALParentcontrol.HasUnconstrainedAutosizeHeight;
+    if (LHasUnconstrainedAutosizeWidth) and (LHasUnconstrainedAutosizeHeight) then
+      Exit(TSizeF.Create(65535, 65535));
+
+    Result := CalculateAvailableClientSize(
+                Parentcontrol.Width, // const AWidth: Single;
+                Parentcontrol.Height, // const AHeight: Single;
+                Parentcontrol.Padding.Rect, // const APadding: TRectF;
+                Parentcontrol.Controls.PList^, // const AChildControls: TArray<TControl>
+                Parentcontrol.ControlsCount); // const AChildControlsCount: Integer
+
+    if (LHasUnconstrainedAutosizeWidth) then Result.Width := 65535;
+    if (LHasUnconstrainedAutosizeHeight) then Result.Height := 65535;
+
+    var LParentControl := ParentControl;
+    if LParentControl is TALContent then LParentControl := LParentControl.ParentControl;
+    if LParentControl <> nil then begin
+      var LScrollableControl: IALScrollableControl;
+      if (Supports(LParentControl, IALScrollableControl, LScrollableControl)) then begin
+        if ttVertical in LScrollableControl.GetScrollEngine.TouchTracking then Result.Height := 65535;
+        if tthorizontal in LScrollableControl.GetScrollEngine.TouchTracking then Result.Width := 65535;
+      end;
+    end;
+  end
+  else if Parentcontrol <> nil then begin
+    Result := CalculateAvailableClientSize(
+                Parentcontrol.Width, // const AWidth: Single;
+                Parentcontrol.Height, // const AHeight: Single;
+                Parentcontrol.Padding.Rect, // const APadding: TRectF;
+                Parentcontrol.Controls.PList^, // const AChildControls: TArray<TControl>
+                Parentcontrol.ControlsCount); // const AChildControlsCount: Integer
+
+    var LParentControl := ParentControl;
+    if LParentControl is TALContent then LParentControl := LParentControl.ParentControl;
+    if LParentControl <> nil then begin
+      var LScrollableControl: IALScrollableControl;
+      if (Supports(LParentControl, IALScrollableControl, LScrollableControl)) then begin
+        if ttVertical in LScrollableControl.GetScrollEngine.TouchTracking then Result.Height := 65535;
+        if tthorizontal in LScrollableControl.GetScrollEngine.TouchTracking then Result.Width := 65535;
+      end;
+    end;
+  end
+  else if FForm <> nil then begin
+    var LChildControls: TArray<TControl>;
+    Setlength(LChildControls, FForm.ChildrenCount);
+    var LChildControlsCount := 0;
+    For var I := 0 to FForm.ChildrenCount - 1 do begin
+      var LObject := FForm.Children[i];
+      if LObject is TControl then begin
+        LChildControls[LChildControlsCount] := TControl(LObject);
+        inc(LChildControlsCount);
+      end;
+    end;
+    var LClientSize := _TCustomFormProtectedAccess(FForm).FWinService.GetClientSize(FForm);
+    Result := CalculateAvailableClientSize(
+                LClientSize.X , // const AWidth: Single;
+                LClientSize.Y, // const AHeight: Single;
+                FForm.Padding.Rect, // const APadding: TRectF;
+                LChildControls, // const AChildControls: TArray<TControl>
+                LChildControlsCount); // const AChildControlsCount: Integer
+  end
+  else
+    Result := TSizeF.Create(Width, Height);
+end;
+
 {******************************}
 procedure TALControl.AdjustSize;
 begin
+  var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+  var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
   if (not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
-     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // If AutoSize is false nothing to adjust
+     (LHasUnconstrainedAutosizeWidth or LHasUnconstrainedAutosizeHeight) and // If AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -813,7 +1011,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
+      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(LHasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(LHasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       var LSize := TSizeF.Create(0,0);
@@ -828,17 +1026,17 @@ begin
         {$ENDIF}
 
         var LALChildControl: TALControl;
-        var LALChildControlAlign: TALAlignLayout;
+        var LChildControlAlign: TALAlignLayout;
         If (LChildControl is TALControl) then begin
           LALChildControl := TALControl(LChildControl);
-          LALChildControlAlign := LALChildControl.Align
+          LChildControlAlign := LALChildControl.Align
         end
         else begin
           LALChildControl := nil;
-          LALChildControlAlign := TALAlignLayout(LChildControl.Align);
+          LChildControlAlign := TALAlignLayout(LChildControl.Align);
         end;
 
-        case LALChildControlAlign of
+        case LChildControlAlign of
 
           //--
           TALAlignLayout.None: begin
@@ -1046,11 +1244,13 @@ begin
         end;
       end;
 
-      if (not HasUnconstrainedAutosizeWidth) or (SameValue(LSize.Width, 0, Tepsilon.Position)) then
+      if (not LHasUnconstrainedAutosizeWidth) or (SameValue(LSize.Width, 0, Tepsilon.Position)) then
         LSize.Width := Width;
-      if (not HasUnconstrainedAutosizeHeight) or (SameValue(LSize.Height, 0, Tepsilon.Position)) then
+      if (not LHasUnconstrainedAutosizeHeight) or (SameValue(LSize.Height, 0, Tepsilon.Position)) then
         LSize.Height := Height;
+
       SetFixedSizeBounds(Position.X, Position.Y, LSize.Width, LSize.Height);
+
     finally
       TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
     end;

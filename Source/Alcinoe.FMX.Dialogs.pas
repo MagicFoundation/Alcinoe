@@ -1487,7 +1487,7 @@ begin
 
   end;
 
-  // This will defacto call ADialog.EndUpdate
+  // This will defacto call LForm.Realign and ADialog.EndUpdate
   // in TCustomForm.DoAddObject.SetUpdatingState
   LForm.InsertComponent(ADialog);
   ADialog.Parent := LForm;

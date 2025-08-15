@@ -1042,6 +1042,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALBaseText = class(TALShape)
   public
+    const DefaultMaxWidth = 65535;
+    const DefaultMaxHeight = 65535;
+  public
     type
       TFill = class(TALBrush)
       protected
@@ -1059,6 +1062,7 @@ type
   private
     fDoubleBuffered: boolean;
     FMultiLineTextOptions: TALMultiLineTextOptions;
+    FMaxContainedSize: TSizeF; // 4 bytes
     FOnElementClick: TElementNotifyEvent;
     FOnElementMouseDown: TElementMouseEvent;
     FOnElementMouseMove: TElementMouseMoveEvent;
@@ -1103,6 +1107,7 @@ type
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetAlign(const Value: TALAlignLayout); override;
     procedure SetAutoSize(const Value: TALAutoSizeMode); override;
+    function GetEffectiveMaxSize: TSizeF; Virtual;
     function GetElementAtPos(const APos: TPointF): TALTextElement;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
@@ -1131,6 +1136,7 @@ type
     procedure Paint; override;
     procedure Loaded; override;
     procedure DoResized; override;
+    procedure ParentRealigning; override;
     procedure AdjustSize; override;
     function GetMultiLineTextOptions(
                const AScale: Single;
@@ -1234,11 +1240,19 @@ type
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
     function TextBroken: Boolean;
-    property AutoSize;
+    property AutoSize default TALAutoSizeMode.Both;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
     property HitTest default False;
+    /// <summary>
+    ///   If MaxWidth = 0, there is no explicit maximum; the control grows to the
+    ///   largest width that still fully fits inside its parent container.
+    /// </summary>
     property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored nodefault;
+    /// <summary>
+    ///   If MaxHeight = 0, there is no explicit maximum; the control grows to the
+    ///   largest height that still fully fits inside its parent container.
+    /// </summary>
     property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored nodefault;
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property Text: string read FText write SetText;
@@ -5107,6 +5121,8 @@ begin
   fDoubleBuffered := true;
   FMultiLineTextOptions := TALMultiLineTextOptions.Create;
   //-----
+  FMaxContainedSize := TSizeF.Create(-1,-1);
+  //-----
   FOnElementClick := nil;
   FOnElementMouseDown := nil;
   FOnElementMouseMove := nil;
@@ -5140,12 +5156,14 @@ begin
   HitTest := False;
   //-----
   FAutoTranslate := true;
-  FMaxWidth := 65535;
-  FMaxHeight := 65535;
+  FMaxWidth := DefaultMaxWidth;
+  FMaxHeight := DefaultMaxHeight;
   FText := '';
   //-----
   FTextSettings := CreateTextSettings;
   FTextSettings.OnChanged := TextSettingsChanged;
+  //-----
+  FAutosize := TALAutoSizeMode.Both;
 end;
 
 {*****************************}
@@ -5274,13 +5292,75 @@ begin
     inherited;
 end;
 
+{*************************************}
+procedure TALBaseText.ParentRealigning;
+begin
+  var LAutosize := GetAutoSize;
+  var LMaxWidthIsZero := SameValue(MaxWidth, 0, TEpsilon.Position);
+  var LMaxHeightIsZero := SameValue(MaxHeight, 0, TEpsilon.Position);
+  if (LAutosize = TALAutoSizeMode.None) or
+     ((not LMaxWidthIsZero) and (not LMaxHeightIsZero)) then begin
+    FMaxContainedSize.Width := -1;
+    FMaxContainedSize.Height := -1;
+    exit;
+  end;
+
+  var LMaxContainedSize := GetMaxContainedSize;
+  if ((LAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Height]) and
+      (Align in [TALAlignLayout.Top,
+                 TALAlignLayout.TopCenter,
+                 TALAlignLayout.TopLeft,
+                 TALAlignLayout.TopRight,
+                 TALAlignLayout.Bottom,
+                 TALAlignLayout.BottomCenter,
+                 TALAlignLayout.BottomLeft,
+                 TALAlignLayout.BottomRight,
+                 TALAlignLayout.MostTop,
+                 TALAlignLayout.MostTopCenter,
+                 TALAlignLayout.MostTopLeft,
+                 TALAlignLayout.MostTopRight,
+                 TALAlignLayout.MostBottom,
+                 TALAlignLayout.MostBottomCenter,
+                 TALAlignLayout.MostBottomLeft,
+                 TALAlignLayout.MostBottomRight]) and
+      (not sameValue(LMaxContainedSize.Height, FMaxContainedSize.Height, TEpsilon.Position)) and
+      (LMaxHeightIsZero)) or
+     ((LAutoSize in [TALAutoSizeMode.Both, TALAutoSizeMode.Width]) and
+      (Align in [TALAlignLayout.Left,
+                 TALAlignLayout.LeftCenter,
+                 TALAlignLayout.LeftTop,
+                 TALAlignLayout.LeftBottom,
+                 TALAlignLayout.Right,
+                 TALAlignLayout.RightCenter,
+                 TALAlignLayout.RightTop,
+                 TALAlignLayout.RightBottom,
+                 TALAlignLayout.MostLeft,
+                 TALAlignLayout.MostLeftCenter,
+                 TALAlignLayout.MostLeftTop,
+                 TALAlignLayout.MostLeftBottom,
+                 TALAlignLayout.MostRight,
+                 TALAlignLayout.MostRightCenter,
+                 TALAlignLayout.MostRightTop,
+                 TALAlignLayout.MostRightBottom]) and
+      (not sameValue(LMaxContainedSize.Width, FMaxContainedSize.Width, TEpsilon.Position)) and
+      (LMaxWidthIsZero)) then begin
+    FMaxContainedSize := LMaxContainedSize;
+    ClearBufDrawable;
+    AdjustSize;
+  end
+  else
+    FMaxContainedSize := LMaxContainedSize;
+end;
+
 {*******************************}
 procedure TALBaseText.AdjustSize;
 begin
+  var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+  var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // if AutoSize is false nothing to adjust
      (Text <> '') and // if Text is empty do not do autosize
+     (LHasUnconstrainedAutosizeWidth or LHasUnconstrainedAutosizeHeight) and // if AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
 
@@ -5292,7 +5372,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(LHasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(LHasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       var R: TrectF;
@@ -5324,11 +5404,11 @@ begin
           YRadius); // const AYRadius: Single
       end;
 
-      if not HasUnconstrainedAutosizeWidth then begin
+      if not LHasUnconstrainedAutosizeWidth then begin
         r.Left := 0;
         r.Width := Width;
       end;
-      if not HasUnconstrainedAutosizeHeight then begin
+      if not LHasUnconstrainedAutosizeHeight then begin
         r.Top := 0;
         r.height := height;
       end;
@@ -5729,6 +5809,22 @@ begin
   end;
 end;
 
+{***********************************************}
+function TALBaseText.GetEffectiveMaxSize: TSizeF;
+begin
+  Result := TSizeF.Create(MaxWidth, MaxHeight);
+  var LMaxWidthIsZero := SameValue(Result.Width, 0, TEpsilon.Position);
+  var LMaxHeightIsZero := SameValue(Result.Height, 0, TEpsilon.Position);
+  if LMaxWidthIsZero or LMaxHeightIsZero then begin
+    if (FMaxContainedSize.Width < 0) or
+       (FMaxContainedSize.Height < 0) then FMaxContainedSize := GetMaxContainedSize;
+    if LMaxWidthIsZero then Result.Width := FMaxContainedSize.Width;
+    if LMaxHeightIsZero then Result.Height := FMaxContainedSize.Height;
+  end;
+  Result.Width := Max(Result.Width, 0);
+  Result.Height := Max(Result.Height, 0);
+end;
+
 {*************************************************}
 procedure TALBaseText.SetText(const Value: string);
 begin
@@ -5835,9 +5931,11 @@ begin
   end;
   //--
   Result.AutoSize := TALAutoSizeMode.None;
-  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.Both
-  else if HasUnconstrainedAutosizeWidth then Result.Autosize := TALAutoSizeMode.Width
-  else if HasUnconstrainedAutosizeHeight then Result.Autosize := TALAutoSizeMode.Height;
+  var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+  var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
+  if LHasUnconstrainedAutosizeWidth and LHasUnconstrainedAutosizeHeight then Result.AutoSize := TALAutoSizeMode.Both
+  else if LHasUnconstrainedAutosizeWidth then Result.Autosize := TALAutoSizeMode.Width
+  else if LHasUnconstrainedAutosizeHeight then Result.Autosize := TALAutoSizeMode.Height;
   //--
   Result.MaxLines := TextSettings.MaxLines;
   Result.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
@@ -5993,9 +6091,11 @@ begin
   if (AText <> '') then begin
 
     var LMaxSize: TSizeF;
-    if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-    else if HasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(maxWidth, Height)
-    else if HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, maxHeight)
+    var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+    var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
+    if LHasUnconstrainedAutosizeWidth and LHasUnconstrainedAutosizeHeight then LMaxSize := GetEffectiveMaxSize
+    else if LHasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(GetEffectiveMaxSize.Width, Height)
+    else if LHasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, GetEffectiveMaxSize.Height)
     else LMaxSize := TSizeF.Create(width, height);
 
     ARect.Width := LMaxSize.cX;
@@ -6016,8 +6116,9 @@ begin
   end
   else begin
 
-    ARect.Width := Min(MaxWidth, ARect.Width);
-    ARect.Height := Min(MaxHeight, ARect.Height);
+    var LEffectiveMaxSize := GetEffectiveMaxSize;
+    ARect.Width := Min(LEffectiveMaxSize.Width, ARect.Width);
+    ARect.Height := Min(LEffectiveMaxSize.Height, ARect.Height);
 
     Var LSurfaceSize := ARect.Size;
     DrawMultilineTextAdjustRect(
@@ -6076,9 +6177,11 @@ Procedure TALBaseText.MeasureMultilineText(
             const AYRadius: Single);
 begin
   var LMaxSize: TSizeF;
-  if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-  else if HasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(maxWidth, Height)
-  else if HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, maxHeight)
+  var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+  var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
+  if LHasUnconstrainedAutosizeWidth and LHasUnconstrainedAutosizeHeight then LMaxSize := GetEffectiveMaxSize
+  else if LHasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(GetEffectiveMaxSize.Width, Height)
+  else if LHasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, GetEffectiveMaxSize.Height)
   else LMaxSize := TSizeF.Create(width, height);
 
   ARect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
@@ -6144,9 +6247,11 @@ begin
   if (AText <> '') then begin
 
     var LMaxSize: TSizeF;
-    if HasUnconstrainedAutosizeWidth and HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-    else if HasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(maxWidth, Height)
-    else if HasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, maxHeight)
+    var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+    var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
+    if LHasUnconstrainedAutosizeWidth and LHasUnconstrainedAutosizeHeight then LMaxSize := GetEffectiveMaxSize
+    else if LHasUnconstrainedAutosizeWidth then LMaxSize := TSizeF.Create(GetEffectiveMaxSize.Width, Height)
+    else if LHasUnconstrainedAutosizeHeight then LMaxSize := TSizeF.Create(Width, GetEffectiveMaxSize.Height)
     else LMaxSize := TSizeF.Create(width, height);
 
     ABufDrawableRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
@@ -6180,8 +6285,9 @@ begin
                           nil, // const AFillResourceStream: TStream;
                           AStateLayer, // const AStateLayer: TALStateLayer;
                           AShadow); // const AShadow: TALShadow): TRectF;
-    LSurfaceRect.Width := Min(MaxWidth, LSurfaceRect.Width);
-    LSurfaceRect.Height := Min(MaxHeight, LSurfaceRect.Height);
+    var LEffectiveMaxSize := GetEffectiveMaxSize;
+    LSurfaceRect.Width := Min(LEffectiveMaxSize.Width, LSurfaceRect.Width);
+    LSurfaceRect.Height := Min(LEffectiveMaxSize.Height, LSurfaceRect.Height);
     ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
     Var LSurfaceSize := LSurfaceRect.Size;
@@ -6318,13 +6424,13 @@ end;
 {*********************************************}
 function TALBaseText.IsMaxWidthStored: Boolean;
 begin
-  result := compareValue(fMaxWidth, 65535, Tepsilon.position) <> 0;
+  result := compareValue(fMaxWidth, DefaultMaxWidth, Tepsilon.position) <> 0;
 end;
 
 {**********************************************}
 function TALBaseText.IsMaxHeightStored: Boolean;
 begin
-  result := compareValue(fMaxHeight, 65535, Tepsilon.position) <> 0;
+  result := compareValue(fMaxHeight, DefaultMaxHeight, Tepsilon.position) <> 0;
 end;
 
 {********************************************}

@@ -1632,11 +1632,34 @@ type
         property Focused: TFocusedStateStyle read FFocused write SetFocused;
         property Transition;
       end;
+      // -----------------
+      // TLoadingIndicator
+      TLoadingIndicator = class(TALDynamicAnimatedImage)
+      public
+        type
+          TTransitionPhase = (Idle, ButtonIn, ButtonOut, LoadingIndicatorIn, LoadingIndicatorOut);
+          TTransitionKind = (CollapseWidth, CollapseHeight, CollapseBoth);
+      private
+        FTransitionAnimation: TALFloatAnimation;
+        FTransitionPhase: TTransitionPhase;
+        FTransitionKind: TTransitionKind;
+        procedure TransitionAnimationProcess(Sender: TObject);
+        procedure TransitionAnimationFinish(Sender: TObject);
+      protected
+        property TransitionAnimation: TALFloatAnimation read FTransitionAnimation;
+        property TransitionPhase: TTransitionPhase read FTransitionPhase write FTransitionPhase;
+        property TransitionKind: TTransitionKind read FTransitionKind write FTransitionKind;
+      public
+        constructor Create(const AOwner: TObject); override;
+        destructor Destroy; override;
+        procedure BeforeDestruction; override;
+      end;
   private
     {$IF defined(ALDPK)}
     FPrevStateStyles: TStateStyles;
     {$ENDIF}
     FStateStyles: TStateStyles;
+    FLoadingIndicator: TLoadingIndicator;
     function GetTextSettings: TTextSettings;
     procedure SetStateStyles(const AValue: TStateStyles);
   protected
@@ -1665,6 +1688,12 @@ type
     procedure ApplyColorScheme; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
+    procedure ShowLoadingIndicator(
+                const AResourceName: String = 'alcinoe_loading_indicator';
+                const ATintColor: TAlphaColor = TalphaColors.Null;
+                const ATransitionKind: TLoadingIndicator.TTransitionKind = TLoadingIndicator.TTransitionKind.CollapseWidth); virtual;
+    procedure HideLoadingIndicator; virtual;
+    Property LoadingIndicator: TLoadingIndicator read FLoadingIndicator;
     property CacheEngine;
     property CacheIndex;
   public
@@ -6102,8 +6131,14 @@ begin
     //**if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode
     //**else begin
       if (not value) and fMandatory then exit;
-      inherited SetChecked(Value);
-      if Value then begin
+      var LOldMandatory := fMandatory;
+      fMandatory := False;
+      try
+        inherited SetChecked(Value);
+      finally
+        fMandatory := LOldMandatory;
+      end;
+      if FChecked then begin
         var M := TRadioButtonGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
@@ -8865,6 +8900,92 @@ begin
   Change;
 end;
 
+{***************************************************************************}
+constructor TALDynamicButton.TLoadingIndicator.Create(const AOwner: TObject);
+begin
+  inherited;
+  FTransitionAnimation := TALFloatAnimation.Create;
+  FTransitionAnimation.OnProcess := TransitionAnimationProcess;
+  FTransitionAnimation.OnFinish := TransitionAnimationFinish;
+  FTransitionAnimation.Duration := 0.2;
+  FTransitionPhase := TTransitionPhase.Idle;
+  FTransitionKind := TTransitionKind.CollapseWidth;
+  Align := TALAlignLayout.VertCenter;
+  Visible := False;
+end;
+
+{****************************************************}
+destructor TALDynamicButton.TLoadingIndicator.Destroy;
+begin
+  ALFreeAndNil(FTransitionAnimation);
+  inherited;
+end;
+
+{*************************************************************}
+procedure TALDynamicButton.TLoadingIndicator.BeforeDestruction;
+begin
+  if BeforeDestructionExecuted then exit;
+  // Necessary if the control is destroyed using
+  // AlFreeAndNil with the delayed flag
+  FTransitionAnimation.Enabled := False;
+  inherited;
+end;
+
+{***************************************************************************************}
+procedure TALDynamicButton.TLoadingIndicator.TransitionAnimationProcess(Sender: TObject);
+begin
+  If TransitionPhase in [TLoadingIndicator.TTransitionPhase.LoadingIndicatorIn,
+                         TLoadingIndicator.TTransitionPhase.LoadingIndicatorOut] then begin
+    case FTransitionKind of
+      TTransitionKind.CollapseWidth: Scale := TPointF.create(FTransitionAnimation.CurrentValue, Scale.Y);
+      TTransitionKind.CollapseHeight: Scale := TPointF.create(Scale.X, FTransitionAnimation.CurrentValue);
+      TTransitionKind.CollapseBoth: Scale := TPointF.create(FTransitionAnimation.CurrentValue, FTransitionAnimation.CurrentValue);
+      else Raise Exception.Create('Error 3AFB95DD-9B2A-47B2-8D92-929C1EA545B3')
+    end;
+  end
+  else if Owner <> nil then
+    Owner.Repaint;
+end;
+
+{**************************************************************************************}
+procedure TALDynamicButton.TLoadingIndicator.TransitionAnimationFinish(Sender: TObject);
+begin
+  case FTransitionPhase of
+    // ButtonOut
+    TTransitionPhase.ButtonOut: begin
+      Visible := True;
+      FTransitionPhase := TTransitionPhase.LoadingIndicatorIn;
+      FTransitionAnimation.Enabled := False;
+      FTransitionAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedDecelerate;
+      FTransitionAnimation.StartValue := 0;
+      FTransitionAnimation.StopValue := 1;
+      FTransitionAnimation.Start;
+    end;
+    // ButtonIn
+    TTransitionPhase.ButtonIn: begin
+      Visible := False;
+      FTransitionPhase := TTransitionPhase.Idle;
+    end;
+    // LoadingIndicatorOut
+    TTransitionPhase.LoadingIndicatorOut: begin
+      Visible := False;
+      FTransitionPhase := TTransitionPhase.ButtonIn;
+      FTransitionAnimation.Enabled := False;
+      FTransitionAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedDecelerate;
+      FTransitionAnimation.StartValue := 0;
+      FTransitionAnimation.StopValue := 1;
+      FTransitionAnimation.Start;
+    end;
+    // LoadingIndicatorIn
+    TTransitionPhase.LoadingIndicatorIn: begin
+      FTransitionPhase := TTransitionPhase.Idle;
+    end;
+    // Error
+    else
+      Raise Exception.create('Error 287EE611-AC66-4B57-B916-4BD5CB195128')
+  end;
+end;
+
 {*********************************************************}
 function TALDynamicButton.TPadding.GetDefaultValue: TRectF;
 begin
@@ -8898,6 +9019,8 @@ begin
   //--
   FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
+  //--
+  FLoadingIndicator := nil;
 end;
 
 {*************************************************}
@@ -9105,10 +9228,47 @@ end;
 {*******************************}
 procedure TALDynamicButton.Click;
 begin
+  if (FLoadingIndicator <> nil) and
+     (FLoadingIndicator.TransitionAnimation.Running) then exit;
   if StateStyles.Transition.Running and StateStyles.Transition.DelayClick then
     StateStyles.Transition.ClickDelayed := True
   else
     inherited click;
+end;
+
+{**********************************************}
+procedure TALDynamicButton.ShowLoadingIndicator(
+            const AResourceName: String = 'alcinoe_loading_indicator';
+            const ATintColor: TAlphaColor = TalphaColors.Null;
+            const ATransitionKind: TLoadingIndicator.TTransitionKind = TLoadingIndicator.TTransitionKind.CollapseWidth);
+begin
+  if FLoadingIndicator = nil then begin
+    FLoadingIndicator := TLoadingIndicator.Create(self);
+    FLoadingIndicator.Owner := Self;
+  end;
+  FLoadingIndicator.Width := Height;
+  FLoadingIndicator.ResourceName := AResourceName;
+  FLoadingIndicator.TintColor := ATintColor;
+  FLoadingIndicator.TransitionKind := ATransitionKind;
+
+  FLoadingIndicator.TransitionPhase := TLoadingIndicator.TTransitionPhase.ButtonOut;
+  FLoadingIndicator.TransitionAnimation.Enabled := False;
+  FLoadingIndicator.TransitionAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedAccelerate;
+  FLoadingIndicator.TransitionAnimation.StartValue := 1;
+  FLoadingIndicator.TransitionAnimation.StopValue := 0;
+  FLoadingIndicator.TransitionAnimation.Start;
+end;
+
+{**********************************************}
+procedure TALDynamicButton.HideLoadingIndicator;
+begin
+  if (FLoadingIndicator = nil) or (not FLoadingIndicator.visible) then exit;
+  FLoadingIndicator.TransitionPhase := TLoadingIndicator.TTransitionPhase.LoadingIndicatorOut;
+  FLoadingIndicator.TransitionAnimation.Enabled := False;
+  FLoadingIndicator.TransitionAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedAccelerate;
+  FLoadingIndicator.TransitionAnimation.StartValue := 1;
+  FLoadingIndicator.TransitionAnimation.StopValue := 0;
+  FLoadingIndicator.TransitionAnimation.Start;
 end;
 
 {******************************************}
@@ -9275,191 +9435,217 @@ end;
 procedure TALDynamicButton.Paint;
 begin
 
-  StateStyles.UpdateLastPaintedRawStyle;
-
-  var LDrawable: TALDrawable := ALNullDrawable;
-  var LDrawableRect: TRectF := TRectF.Empty;
-  if not StateStyles.Transition.Running then begin
-    //--
-    var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
-    if LStateStyle <> nil then begin
-      if (CacheIndex <= 0) or
-         (CacheEngine = nil) or
-         (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex+LStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
-        MakeBufDrawable;
-        if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(LStateStyle.FBufDrawable)) then begin
-          if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex+LStateStyle.CacheSubIndex{ASubIndex}, LStateStyle.FBufDrawable{ADrawable}, LStateStyle.FBufDrawableRect{ARect}) then ALFreeAndNilDrawable(LStateStyle.FBufDrawable)
-          else LStateStyle.FBufDrawable := ALNullDrawable;
-          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex+LStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
-            raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
-        end
-        else begin
-          LDrawable := LStateStyle.FBufDrawable;
-          LDrawableRect := LStateStyle.FBufDrawableRect;
-        end;
+  var LSavedMatrix := Canvas.Matrix;
+  if FLoadingIndicator <> nil then begin
+    if FLoadingIndicator.Visible then exit;
+    if FLoadingIndicator.TransitionAnimation.Running then begin
+      var LMatrixPivotPoint: TpointF;
+      LMatrixPivotPoint.X := (Width / 2) + Canvas.Matrix.m31;
+      LMatrixPivotPoint.Y := (Height / 2) + Canvas.Matrix.m32;
+      var LMatrix := Canvas.Matrix;
+      LMatrix := LMatrix * TMatrix.CreateTranslation(-LMatrixPivotPoint.X,-LMatrixPivotPoint.Y);
+      case FLoadingIndicator.TransitionKind of
+        TLoadingIndicator.TTransitionKind.CollapseWidth: LMatrix := LMatrix * TMatrix.CreateScaling(FLoadingIndicator.TransitionAnimation.CurrentValue{AScaleX}, 1{AScaleY});
+        TLoadingIndicator.TTransitionKind.CollapseHeight: LMatrix := LMatrix * TMatrix.CreateScaling(1{AScaleX}, FLoadingIndicator.TransitionAnimation.CurrentValue{AScaleY});
+        TLoadingIndicator.TTransitionKind.CollapseBoth: LMatrix := LMatrix * TMatrix.CreateScaling(FLoadingIndicator.TransitionAnimation.CurrentValue{AScaleX}, FLoadingIndicator.TransitionAnimation.CurrentValue{AScaleY});
+        else Raise Exception.Create('Error 27862E0A-9BD8-461A-BDFB-FC6A43F3A387')
       end;
+      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixPivotPoint.X,LMatrixPivotPoint.Y);
+      Canvas.SetMatrix(LMatrix);
     end;
-    //--
-    If ALIsDrawableNull(LDrawable) then begin
-      if (CacheIndex <= 0) or
-         (CacheEngine = nil) or
-         (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
-        if LStateStyle = nil then MakeBufDrawable;
-        if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
-          if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
-          else fBufDrawable := ALNullDrawable;
-          if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
-            raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
-        end
-        else begin
-          LDrawable := FBufDrawable;
-          LDrawableRect := FBufDrawableRect;
-        end;
-      end;
-    end;
-    //--
   end;
+  try
 
-  if ALIsDrawableNull(LDrawable) then begin
+    StateStyles.UpdateLastPaintedRawStyle;
 
-    var LCurrentAdjustedStateStyle := TBaseStateStyle(StateStyles.GetCurrentAdjustedStyle);
-    if LCurrentAdjustedStateStyle = nil then begin
-      inherited Paint;
+    var LDrawable: TALDrawable := ALNullDrawable;
+    var LDrawableRect: TRectF := TRectF.Empty;
+    if not StateStyles.Transition.Running then begin
+      //--
+      var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
+      if LStateStyle <> nil then begin
+        if (CacheIndex <= 0) or
+           (CacheEngine = nil) or
+           (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex+LStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+          MakeBufDrawable;
+          if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(LStateStyle.FBufDrawable)) then begin
+            if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex+LStateStyle.CacheSubIndex{ASubIndex}, LStateStyle.FBufDrawable{ADrawable}, LStateStyle.FBufDrawableRect{ARect}) then ALFreeAndNilDrawable(LStateStyle.FBufDrawable)
+            else LStateStyle.FBufDrawable := ALNullDrawable;
+            if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex+LStateStyle.CacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+              raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
+          end
+          else begin
+            LDrawable := LStateStyle.FBufDrawable;
+            LDrawableRect := LStateStyle.FBufDrawableRect;
+          end;
+        end;
+      end;
+      //--
+      If ALIsDrawableNull(LDrawable) then begin
+        if (CacheIndex <= 0) or
+           (CacheEngine = nil) or
+           (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect})) then begin
+          if LStateStyle = nil then MakeBufDrawable;
+          if (CacheIndex > 0) and (CacheEngine <> nil) and (not ALIsDrawableNull(fBufDrawable)) then begin
+            if not CacheEngine.TrySetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, fBufDrawable{ADrawable}, fBufDrawableRect{ARect}) then ALFreeAndNilDrawable(fBufDrawable)
+            else fBufDrawable := ALNullDrawable;
+            if not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LDrawable{ADrawable}, LDrawableRect{ARect}) then
+              raise Exception.Create('Error BB5ACD27-7CF2-44D3-AEB1-22C8BB492762');
+          end
+          else begin
+            LDrawable := FBufDrawable;
+            LDrawableRect := FBufDrawableRect;
+          end;
+        end;
+      end;
+      //--
+    end;
+
+    if ALIsDrawableNull(LDrawable) then begin
+
+      var LCurrentAdjustedStateStyle := TBaseStateStyle(StateStyles.GetCurrentAdjustedStyle);
+      if LCurrentAdjustedStateStyle = nil then begin
+        inherited Paint;
+        exit;
+      end;
+
+      {$IF DEFINED(ALSkiaCanvas)}
+
+      // Using a matrix on the canvas results in smoother animations compared to using
+      // Ascale with DrawMultilineText. This is because changes in scale affect the font size,
+      // leading to rounding issues (I spent many hours looking for a way to avoid this).
+      // If there is an animation, it appears jerky because the text position
+      // shifts up or down with scale changes due to pixel alignment.
+      var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
+                                                  Canvas, // Const ACanvas: TCanvas;
+                                                  AbsoluteRect.ReducePrecision, // Const AAbsoluteRect: TRectF;
+                                                  LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
+                                                  true); // Const ASaveState: Boolean);
+      try
+
+        var LRect := LocalRect.ReducePrecision;
+        var LTextBroken: Boolean;
+        var LAllTextDrawn: Boolean;
+        var LElements: TALTextElements;
+        DrawMultilineText(
+          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+          LRect, // var ARect: TRectF;
+          LTextBroken, // out ATextBroken: Boolean;
+          LAllTextDrawn, // out AAllTextDrawn: Boolean;
+          LElements, // out AElements: TALTextElements;
+          1{Ascale},
+          AbsoluteOpacity, // const AOpacity: Single;
+          LCurrentAdjustedStateStyle.Text, // const AText: String;
+          LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+          LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+          LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+          LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
+          LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+          LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
+
+      finally
+        if LCanvasSaveState <> nil then
+          Canvas.RestoreState(LCanvasSaveState);
+      end;
+
+      {$ELSE}
+
+      var LRect := LocalRect.ReducePrecision;
+      InitRenderTargets(LRect);
+      if ALCanvasBeginScene(RenderTargetCanvas) then
+      try
+
+        ALClearCanvas(RenderTargetCanvas, TAlphaColors.Null);
+
+        var LTextBroken: Boolean;
+        var LAllTextDrawn: Boolean;
+        var LElements: TALTextElements;
+        DrawMultilineText(
+          RenderTargetCanvas, // const ACanvas: TALCanvas;
+          LRect, // out ARect: TRectF;
+          LTextBroken, // out ATextBroken: Boolean;
+          LAllTextDrawn, // out AAllTextDrawn: Boolean;
+          LElements, // out AElements: TALTextElements;
+          ALGetScreenScale{Ascale},
+          1, // const AOpacity: Single;
+          LCurrentAdjustedStateStyle.Text, // const AText: String;
+          LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+          LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+          LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
+          LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+          LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+          LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow;
+          LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
+          LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single;
+
+      finally
+        ALCanvasEndScene(RenderTargetCanvas)
+      end;
+
+      ALUpdateDrawableFromSurface(RenderTargetSurface, RenderTargetDrawable);
+
+      // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+      // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+      LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+
+      // LRect must include the LScale
+      LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
+      LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
+      LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
+      LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
+
+      // Since LStateStyle.FBufDrawableRect can have different dimensions than the main BufDrawableRect
+      // (due to autosizing with different font sizes), we must center LStateStyle.FBufDrawableRect
+      // within the main BufDrawableRect to ensure that all changes are visually centered.
+      var LMainDrawableRect: TRectF;
+      if (CacheIndex <= 0) or
+         (CacheEngine = nil) or
+         (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LMainDrawableRect{ARect})) then begin
+        If AlIsDrawableNull(FBufDrawable) then LMainDrawableRect :=LocalRect.ReducePrecision
+        else LMainDrawableRect := FBufDrawableRect;
+      end;
+      LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
+      var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
+      LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
+
+      // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
+      // will be ineffective since the matrix will no longer be a simple translation matrix.
+      // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
+      // if the texture is not perfectly pixel-aligned.
+      var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(RenderTargetDrawable), ALGetDrawableHeight(RenderTargetDrawable));
+      LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+      LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+      LDstRect.SetLocation(
+        LRect.Left,
+        LRect.Top);
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        RenderTargetDrawable, // const ADrawable: TALDrawable;
+        LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+        AbsoluteOpacity); // const AOpacity: Single)
+
+      {$ENDIF}
+
       exit;
     end;
 
-    {$IF DEFINED(ALSkiaCanvas)}
-
-    // Using a matrix on the canvas results in smoother animations compared to using
-    // Ascale with DrawMultilineText. This is because changes in scale affect the font size,
-    // leading to rounding issues (I spent many hours looking for a way to avoid this).
-    // If there is an animation, it appears jerky because the text position
-    // shifts up or down with scale changes due to pixel alignment.
-    var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
-                                                Canvas, // Const ACanvas: TCanvas;
-                                                AbsoluteRect.ReducePrecision, // Const AAbsoluteRect: TRectF;
-                                                LCurrentAdjustedStateStyle.Scale, // Const AScale: Single;
-                                                true); // Const ASaveState: Boolean);
-    try
-
-      var LRect := LocalRect.ReducePrecision;
-      var LTextBroken: Boolean;
-      var LAllTextDrawn: Boolean;
-      var LElements: TALTextElements;
-      DrawMultilineText(
-        TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-        LRect, // var ARect: TRectF;
-        LTextBroken, // out ATextBroken: Boolean;
-        LAllTextDrawn, // out AAllTextDrawn: Boolean;
-        LElements, // out AElements: TALTextElements;
-        1{Ascale},
-        AbsoluteOpacity, // const AOpacity: Single;
-        LCurrentAdjustedStateStyle.Text, // const AText: String;
-        LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
-        LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
-        LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow);
-        LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
-        LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single
-
-    finally
-      if LCanvasSaveState <> nil then
-        Canvas.RestoreState(LCanvasSaveState);
-    end;
-
-    {$ELSE}
-
-    var LRect := LocalRect.ReducePrecision;
-    InitRenderTargets(LRect);
-    if ALCanvasBeginScene(RenderTargetCanvas) then
-    try
-
-      ALClearCanvas(RenderTargetCanvas, TAlphaColors.Null);
-
-      var LTextBroken: Boolean;
-      var LAllTextDrawn: Boolean;
-      var LElements: TALTextElements;
-      DrawMultilineText(
-        RenderTargetCanvas, // const ACanvas: TALCanvas;
-        LRect, // out ARect: TRectF;
-        LTextBroken, // out ATextBroken: Boolean;
-        LAllTextDrawn, // out AAllTextDrawn: Boolean;
-        LElements, // out AElements: TALTextElements;
-        ALGetScreenScale{Ascale},
-        1, // const AOpacity: Single;
-        LCurrentAdjustedStateStyle.Text, // const AText: String;
-        LCurrentAdjustedStateStyle.TextSettings.Font, // const AFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
-        LCurrentAdjustedStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-        LCurrentAdjustedStateStyle.Fill, // const AFill: TALBrush;
-        LCurrentAdjustedStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
-        LCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow, // const AShadow: TALShadow;
-        LCurrentAdjustedStateStyle.XRadius, // const AXRadius: Single;
-        LCurrentAdjustedStateStyle.YRadius); // const AYRadius: Single;
-
-    finally
-      ALCanvasEndScene(RenderTargetCanvas)
-    end;
-
-    ALUpdateDrawableFromSurface(RenderTargetSurface, RenderTargetDrawable);
-
-    // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
-    // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
-    LRect.Offset(-2*LRect.Left, -2*LRect.Top);
-
-    // LRect must include the LScale
-    LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
-    LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
-    LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
-    LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
-
-    // Since LStateStyle.FBufDrawableRect can have different dimensions than the main BufDrawableRect
-    // (due to autosizing with different font sizes), we must center LStateStyle.FBufDrawableRect
-    // within the main BufDrawableRect to ensure that all changes are visually centered.
-    var LMainDrawableRect: TRectF;
-    if (CacheIndex <= 0) or
-       (CacheEngine = nil) or
-       (not CacheEngine.TryGetEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex}, LMainDrawableRect{ARect})) then begin
-      If AlIsDrawableNull(FBufDrawable) then LMainDrawableRect :=LocalRect.ReducePrecision
-      else LMainDrawableRect := FBufDrawableRect;
-    end;
-    LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
-    var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
-    LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
-
-    // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
-    // will be ineffective since the matrix will no longer be a simple translation matrix.
-    // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
-    // if the texture is not perfectly pixel-aligned.
-    var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(RenderTargetDrawable), ALGetDrawableHeight(RenderTargetDrawable));
-    LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-    LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
-    LDstRect.SetLocation(
-      LRect.Left,
-      LRect.Top);
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;
-      RenderTargetDrawable, // const ADrawable: TALDrawable;
-      LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
-      AbsoluteOpacity); // const AOpacity: Single)
+      LDrawable, // const ADrawable: TALDrawable;
+      LDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single);
 
-    {$ENDIF}
-
-    exit;
+  finally
+    if (FLoadingIndicator <> nil) and
+       (FLoadingIndicator.TransitionAnimation.Running) then
+      Canvas.SetMatrix(LSavedMatrix);
   end;
-
-  ALDrawDrawable(
-    Canvas, // const ACanvas: Tcanvas;
-    LDrawable, // const ADrawable: TALDrawable;
-    LDrawableRect.TopLeft, // const ATopLeft: TpointF;
-    AbsoluteOpacity); // const AOpacity: Single);
-
 end;
 
 {********************************************************************************}
@@ -10411,8 +10597,14 @@ begin
     //**if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode
     //**else begin
       if (not value) and fMandatory then exit;
-      _doSetChecked;
-      if Value and (GroupName <> '') then begin
+      var LOldMandatory := fMandatory;
+      fMandatory := False;
+      try
+        _doSetChecked;
+      finally
+        fMandatory := LOldMandatory;
+      end;
+      if FChecked and (GroupName <> '') then begin
         var M := TGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
@@ -10650,10 +10842,12 @@ end;
 {******************************************}
 procedure TALDynamicToggleButton.AdjustSize;
 begin
+  var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+  var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
   if //**(not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not IsDestroying) and // if csDestroying do not do autosize
      (StateStyles <> nil) and // if StateStyles in nil nothing to adjust
-     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // if AutoSize is false nothing to adjust
+     (LHasUnconstrainedAutosizeWidth or LHasUnconstrainedAutosizeHeight) and // if AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
 
@@ -10681,7 +10875,7 @@ begin
         if LDefaultStateStyle.Text = '' then exit;
 
         {$IF defined(debug)}
-        //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
+        //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(LHasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(LHasUnconstrainedAutosizeHeight));
         {$ENDIF}
 
         var R: TrectF;
@@ -10718,11 +10912,11 @@ begin
           {$ENDIF}
         end;
 
-        if not HasUnconstrainedAutosizeWidth then begin
+        if not LHasUnconstrainedAutosizeWidth then begin
           r.Left := 0;
           r.Width := Width;
         end;
-        if not HasUnconstrainedAutosizeHeight then begin
+        if not LHasUnconstrainedAutosizeHeight then begin
           r.Top := 0;
           r.height := height;
         end;

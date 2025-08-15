@@ -63,6 +63,9 @@ end;
 constructor TALFrame.Create(AOwner: TComponent);
 begin
   inherited;
+  // When the frame is later added to a parent control,
+  // the parent's DoAddObject method will call EndUpdate
+  BeginUpdate;
   if not InitInheritedComponent(Self, TALFrame) then
     raise EResNotFound.CreateFmt('Resource %s not found', [ClassName]);
 end;

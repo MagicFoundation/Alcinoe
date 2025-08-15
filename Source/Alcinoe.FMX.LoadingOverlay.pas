@@ -545,7 +545,7 @@ begin
   LForm.Focused := nil;
   ALFreezeNativeViews(FFrozenNativeControls);
   ALoadingOverlay.Align := TALAlignLayout.Contents;
-  // This will defacto call ALoadingOverlay.EndUpdate
+  // This will defacto call LForm.Realign and ALoadingOverlay.EndUpdate
   // in TCustomForm.DoAddObject.SetUpdatingState
   LForm.InsertComponent(ALoadingOverlay);
   ALoadingOverlay.Parent := LForm;

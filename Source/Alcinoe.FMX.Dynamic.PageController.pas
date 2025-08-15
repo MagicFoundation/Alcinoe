@@ -1098,10 +1098,12 @@ end;
 {*******************************************}
 procedure TALDynamicPageIndicator.AdjustSize;
 begin
+  var LHasUnconstrainedAutosizeWidth := HasUnconstrainedAutosizeWidth;
+  var LHasUnconstrainedAutosizeHeight := HasUnconstrainedAutosizeHeight;
   if //**(not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
      (not IsDestroying) and // If csDestroying do not do autosize
      (ControlsCount > 0) and // If there are no controls, do not perform autosizing
-     (HasUnconstrainedAutosizeWidth or HasUnconstrainedAutosizeHeight) and // If AutoSize is false nothing to adjust
+     (LHasUnconstrainedAutosizeWidth or LHasUnconstrainedAutosizeHeight) and // If AutoSize is false nothing to adjust
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
@@ -1113,7 +1115,7 @@ begin
         FAdjustSizeOnEndUpdate := False;
 
       {$IF defined(debug)}
-      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeHeight));
+      //ALLog(ClassName+'.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(LHasUnconstrainedAutosizeWidth)+'/'+ALBoolToStrW(LHasUnconstrainedAutosizeHeight));
       {$ENDIF}
 
       var LWidth := Padding.Left + Padding.Right +
@@ -1121,9 +1123,9 @@ begin
       var LHeight := Padding.Top + Padding.Bottom +
                      FInactiveIndicator.Margins.Top + FInactiveIndicator.Margins.Bottom + FInactiveIndicator.Height;
 
-      if (not HasUnconstrainedAutosizeWidth) or (SameValue(LWidth, 0, Tepsilon.Position)) then
+      if (not LHasUnconstrainedAutosizeWidth) or (SameValue(LWidth, 0, Tepsilon.Position)) then
         LWidth := Width;
-      if (not HasUnconstrainedAutosizeHeight) or (SameValue(LHeight, 0, Tepsilon.Position)) then
+      if (not LHasUnconstrainedAutosizeHeight) or (SameValue(LHeight, 0, Tepsilon.Position)) then
         LHeight := Height;
       SetFixedSizeBounds(Left, Top, LWidth, LHeight);
 

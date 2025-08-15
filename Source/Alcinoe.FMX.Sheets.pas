@@ -1814,7 +1814,7 @@ begin
   LForm.Focused := nil;
   ALFreezeNativeViews(FFrozenNativeControls);
   ASheet.Align := TALAlignLayout.Contents;
-  // This will defacto call ASheet.EndUpdate
+  // This will defacto call LForm.Realign and ASheet.EndUpdate
   // in TCustomForm.DoAddObject.SetUpdatingState
   LForm.InsertComponent(ASheet);
   ASheet.Parent := LForm;

@@ -1150,6 +1150,19 @@ undesired conversions.
 History
 =======
 
+### 15/08/2025 – TALText and TALButton Improvements
+
+- Set `TALText.AutoSize` to default to `TALAutoSizeMode.Both`.  
+- If `TALText.MaxWidth = 0`, no explicit maximum width is enforced; 
+  the control expands to the largest width that still fits fully 
+  inside its parent container.  
+- If `TALText.MaxHeight = 0`, no explicit maximum height is enforced; 
+  the control expands to the largest height that still fits fully 
+  inside its parent container.  
+- Added `ShowLoadingIndicator` and `HideLoadingIndicator` methods 
+  to `TALButton` to morph it into a loading indicator.  
+- Renamed resource `alcinoe_loader` to `alcinoe_loading_indicator`.   
+
 ### 10/08/2025 – Added TALSnackbar Component
 
 - Added **`TALSnackbar`** component for displaying brief, 

@@ -670,6 +670,105 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, ' LocalRect'#13#10, 'LocalRect.ReducePrecision'#13#10);
     aSrc := FindAndReplace(aSrc, 'function FillTextFlags: TFillTextFlags;','//**function FillTextFlags: TFillTextFlags;');
     aSrc := FindAndReplace(aSrc, 'Result := LPageViewClass.Create(Self);','Result := LPageViewClass.Create(nil);');
+    aSrc := FindAndReplace(aSrc, '((Owner <> nil) and (_TALDynamicControlProtectedAccess(Owner).FDisableAlign))','((Owner <> nil) and (Owner.FDisableAlign))');
+    aSrc := FindAndReplace(aSrc, '((Owner = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign))','((Owner = nil) and (Host <> nil) and (Host.FDisableAlign))');
+    aSrc := FindAndReplace(aSrc, 'const AChildControls: TArray<TControl>','const AChildControls: TArray<TALDynamicControl>');
+    aSrc := FindAndReplace(aSrc, 'Owner.Controls.PList^','Owner.FControls');
+    aSrc := FindAndReplace(aSrc, 'Scale.X := FTransitionAnimation.CurrentValue;','Scale := TPointF.create(FTransitionAnimation.CurrentValue, Scale.Y);');
+    aSrc := FindAndReplace(aSrc, 'Scale.Y := FTransitionAnimation.CurrentValue;','Scale := TPointF.create(Scale.X, FTransitionAnimation.CurrentValue);');
+    aSrc := FindAndReplace(aSrc, 'FLoadingIndicator.Parent := Self;','FLoadingIndicator.Owner := Self;');
+    aSrc := FindAndReplace(
+              aSrc,
+              '  else if Owner <> nil then begin'#13#10+
+              '    Result := CalculateAvailableClientSize('#13#10+
+              '                Owner.Width, // const AWidth: Single;'#13#10+
+              '                Owner.Height, // const AHeight: Single;'#13#10+
+              '                Owner.Padding.Rect, // const APadding: TRectF;'#13#10+
+              '                Owner.FControls, // const AChildControls: TArray<TALDynamicControl>'#13#10+
+              '                Owner.ControlsCount); // const AChildControlsCount: Integer'#13#10+
+              ''#13#10+
+              '    var LOwner := Owner;'#13#10+
+              '    if LOwner is TALDynamicContent then LOwner := LOwner.Owner;'#13#10+
+              '    if LOwner <> nil then begin'#13#10+
+              '      var LScrollableControl: IALScrollableControl;'#13#10+
+              '      if (Supports(LOwner, IALScrollableControl, LScrollableControl)) then begin'#13#10+
+              '        if ttVertical in LScrollableControl.GetScrollEngine.TouchTracking then Result.Height := 65535;'#13#10+
+              '        if tthorizontal in LScrollableControl.GetScrollEngine.TouchTracking then Result.Width := 65535;'#13#10+
+              '      end;'#13#10+
+              '    end;'#13#10+
+              '  end'#13#10+
+              '  else if FForm <> nil then begin'#13#10+
+              '    var LChildControls: TArray<TControl>;'#13#10+
+              '    Setlength(LChildControls, FForm.ChildrenCount);'#13#10+
+              '    var LChildControlsCount := 0;'#13#10+
+              '    For var I := 0 to FForm.ChildrenCount - 1 do begin'#13#10+
+              '      var LObject := FForm.Children[i];'#13#10+
+              '      if LObject is TControl then begin'#13#10+
+              '        LChildControls[LChildControlsCount] := TControl(LObject);'#13#10+
+              '        inc(LChildControlsCount);'#13#10+
+              '      end;'#13#10+
+              '    end;'#13#10+
+              '    var LClientSize := _TCustomFormProtectedAccess(FForm).FWinService.GetClientSize(FForm);'#13#10+
+              '    Result := CalculateAvailableClientSize('#13#10+
+              '                LClientSize.X , // const AWidth: Single;'#13#10+
+              '                LClientSize.Y, // const AHeight: Single;'#13#10+
+              '                FForm.Padding.Rect, // const APadding: TRectF;'#13#10+
+              '                LChildControls, // const AChildControls: TArray<TALDynamicControl>'#13#10+
+              '                LChildControlsCount); // const AChildControlsCount: Integer'#13#10+
+              '  end'#13#10,
+              '  //**else if Owner <> nil then begin'#13#10+
+              '  //**  Result := CalculateAvailableClientSize('#13#10+
+              '  //**              Owner.Width, // const AWidth: Single;'#13#10+
+              '  //**              Owner.Height, // const AHeight: Single;'#13#10+
+              '  //**              Owner.Padding.Rect, // const APadding: TRectF;'#13#10+
+              '  //**              Owner.FControls, // const AChildControls: TArray<TALDynamicControl>'#13#10+
+              '  //**              Owner.ControlsCount); // const AChildControlsCount: Integer'#13#10+
+              '  //**'#13#10+
+              '  //**  var LOwner := Owner;'#13#10+
+              '  //**  if LOwner is TALDynamicContent then LOwner := LOwner.Owner;'#13#10+
+              '  //**  if LOwner <> nil then begin'#13#10+
+              '  //**    var LScrollableControl: IALScrollableControl;'#13#10+
+              '  //**    if (Supports(LOwner, IALScrollableControl, LScrollableControl)) then begin'#13#10+
+              '  //**      if ttVertical in LScrollableControl.GetScrollEngine.TouchTracking then Result.Height := 65535;'#13#10+
+              '  //**      if tthorizontal in LScrollableControl.GetScrollEngine.TouchTracking then Result.Width := 65535;'#13#10+
+              '  //**    end;'#13#10+
+              '  //**  end;'#13#10+
+              '  //**end'#13#10+
+              '  //**else if FForm <> nil then begin'#13#10+
+              '  //**  var LChildControls: TArray<TControl>;'#13#10+
+              '  //**  Setlength(LChildControls, FForm.ChildrenCount);'#13#10+
+              '  //**  var LChildControlsCount := 0;'#13#10+
+              '  //**  For var I := 0 to FForm.ChildrenCount - 1 do begin'#13#10+
+              '  //**    var LObject := FForm.Children[i];'#13#10+
+              '  //**    if LObject is TControl then begin'#13#10+
+              '  //**      LChildControls[LChildControlsCount] := TControl(LObject);'#13#10+
+              '  //**      inc(LChildControlsCount);'#13#10+
+              '  //**    end;'#13#10+
+              '  //**  end;'#13#10+
+              '  //**  var LClientSize := _TCustomFormProtectedAccess(FForm).FWinService.GetClientSize(FForm);'#13#10+
+              '  //**  Result := CalculateAvailableClientSize('#13#10+
+              '  //**              LClientSize.X , // const AWidth: Single;'#13#10+
+              '  //**              LClientSize.Y, // const AHeight: Single;'#13#10+
+              '  //**              FForm.Padding.Rect, // const APadding: TRectF;'#13#10+
+              '  //**              LChildControls, // const AChildControls: TArray<TALDynamicControl>'#13#10+
+              '  //**              LChildControlsCount); // const AChildControlsCount: Integer'#13#10+
+              '  //**end'#13#10);
+    aSrc := FindAndReplace(
+              aSrc,
+              '      var LScrollableControl: IALScrollableControl;'#13#10+
+              '      if (Supports(LOwner, IALScrollableControl, LScrollableControl)) then begin'#13#10+
+              '        if ttVertical in LScrollableControl.GetScrollEngine.TouchTracking then Result.Height := 65535;'#13#10+
+              '        if tthorizontal in LScrollableControl.GetScrollEngine.TouchTracking then Result.Width := 65535;'#13#10+
+              '      end;',
+              '      //**var LScrollableControl: IALScrollableControl;'#13#10+
+              '      //**if (Supports(LOwner, IALScrollableControl, LScrollableControl)) then begin'#13#10+
+              '      //**  if ttVertical in LScrollableControl.GetScrollEngine.TouchTracking then Result.Height := 65535;'#13#10+
+              '      //**  if tthorizontal in LScrollableControl.GetScrollEngine.TouchTracking then Result.Width := 65535;'#13#10+
+              '      //**end;'#13#10+
+              '      if LOwner.ScrollEngine <> nil then begin'#13#10+
+              '        if ttVertical in LOwner.ScrollEngine.TouchTracking then Result.Height := 65535;'#13#10+
+              '        if tthorizontal in LOwner.ScrollEngine.TouchTracking then Result.Width := 65535;'#13#10+
+              '      end;');
     aSrc := FindAndReplace(
               aSrc,
               '    if FForm <> nil then'#13#10+
@@ -799,28 +898,55 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    procedure SetScrollEngine(const Value: TALScrollEngine);');
     aSrc := FindAndReplace(
               aSrc,
+              '      var LChildControlAlign: TALAlignLayout;'+#13#10+
+              '      If (LChildControl is TALDynamicControl) then LChildControlAlign := TALDynamicControl(LChildControl).Align'+#13#10+
+              '      else begin'+#13#10+
+              '        {$If defined(debug)}'+#13#10+
+              '        if LChildControl.Align in [TAlignLayout.Scale,'+#13#10+
+              '                                   TAlignLayout.Fit,'+#13#10+
+              '                                   TAlignLayout.FitLeft,'+#13#10+
+              '                                   TAlignLayout.FitRight] then'+#13#10+
+              '          Raise Exception.Create(''Align values Scale, Fit, FitLeft, and FitRight are not supported'');'+#13#10+
+              '        {$ENDIF}'+#13#10+
+              '        LChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
+              '      end;',
+              '      //**var LChildControlAlign: TALAlignLayout;'+#13#10+
+              '      //**If (LChildControl is TALDynamicControl) then LChildControlAlign := TALDynamicControl(LChildControl).Align'+#13#10+
+              '      //**else begin'+#13#10+
+              '      //**  {$If defined(debug)}'+#13#10+
+              '      //**  if LChildControl.Align in [TAlignLayout.Scale,'+#13#10+
+              '      //**                             TAlignLayout.Fit,'+#13#10+
+              '      //**                             TAlignLayout.FitLeft,'+#13#10+
+              '      //**                             TAlignLayout.FitRight] then'+#13#10+
+              '      //**    Raise Exception.Create(''Align values Scale, Fit, FitLeft, and FitRight are not supported'');'+#13#10+
+              '      //**  {$ENDIF}'+#13#10+
+              '      //**  LChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
+              '      //**end;'+#13#10+
+              '      var LChildControlAlign := LChildControl.Align;');
+    aSrc := FindAndReplace(
+              aSrc,
               '        var LALChildControl: TALDynamicControl;'+#13#10+
-              '        var LALChildControlAlign: TALAlignLayout;'+#13#10+
+              '        var LChildControlAlign: TALAlignLayout;'+#13#10+
               '        If (LChildControl is TALDynamicControl) then begin'+#13#10+
               '          LALChildControl := TALDynamicControl(LChildControl);'+#13#10+
-              '          LALChildControlAlign := LALChildControl.Align'+#13#10+
+              '          LChildControlAlign := LALChildControl.Align'+#13#10+
               '        end'+#13#10+
               '        else begin'+#13#10+
               '          LALChildControl := nil;'+#13#10+
-              '          LALChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
+              '          LChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
               '        end;',
               '        //**var LALChildControl: TALDynamicControl;'+#13#10+
-              '        //**var LALChildControlAlign: TALAlignLayout;'+#13#10+
+              '        //**var LChildControlAlign: TALAlignLayout;'+#13#10+
               '        //**If (LChildControl is TALDynamicControl) then begin'+#13#10+
               '        //**  LALChildControl := TALDynamicControl(LChildControl);'+#13#10+
-              '        //**  LALChildControlAlign := LALChildControl.Align'+#13#10+
+              '        //**  LChildControlAlign := LALChildControl.Align'+#13#10+
               '        //**end'+#13#10+
               '        //**else begin'+#13#10+
               '        //**  LALChildControl := nil;'+#13#10+
-              '        //**  LALChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
+              '        //**  LChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
               '        //**end;'+#13#10+
               '        var LALChildControl := LChildControl;'+#13#10+
-              '        var LALChildControlAlign := LALChildControl.Align;');
+              '        var LChildControlAlign := LChildControl.Align;');
     aSrc := FindAndReplace(
               aSrc,
               '  function CheckAllChildrenAreReadyToDisplay(const AControl: TControl): boolean;'+#13#10+
@@ -847,8 +973,14 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode'+#13#10+
               '    else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
-              '      inherited SetChecked(Value);'+#13#10+
-              '      if Value then begin'+#13#10+
+              '      var LOldMandatory := fMandatory;'+#13#10+
+              '      fMandatory := False;'+#13#10+
+              '      try'+#13#10+
+              '        inherited SetChecked(Value);'+#13#10+
+              '      finally'+#13#10+
+              '        fMandatory := LOldMandatory;'+#13#10+
+              '      end;'+#13#10+
+              '      if FChecked then begin'+#13#10+
               '        var M := TRadioButtonGroupMessage.Create(GroupName);'+#13#10+
               '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
               '      end;'+#13#10+
@@ -856,8 +988,14 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    //**if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode'+#13#10+
               '    //**else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
-              '      inherited SetChecked(Value);'+#13#10+
-              '      if Value then begin'+#13#10+
+              '      var LOldMandatory := fMandatory;'+#13#10+
+              '      fMandatory := False;'+#13#10+
+              '      try'+#13#10+
+              '        inherited SetChecked(Value);'+#13#10+
+              '      finally'+#13#10+
+              '        fMandatory := LOldMandatory;'+#13#10+
+              '      end;'+#13#10+
+              '      if FChecked then begin'+#13#10+
               '        var M := TRadioButtonGroupMessage.Create(GroupName);'+#13#10+
               '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
               '      end;'+#13#10+
@@ -867,8 +1005,14 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode'+#13#10+
               '    else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
-              '      _doSetChecked;'+#13#10+
-              '      if Value and (GroupName <> '''') then begin'+#13#10+
+              '      var LOldMandatory := fMandatory;'+#13#10+
+              '      fMandatory := False;'+#13#10+
+              '      try'+#13#10+
+              '        _doSetChecked;'+#13#10+
+              '      finally'+#13#10+
+              '        fMandatory := LOldMandatory;'+#13#10+
+              '      end;'+#13#10+
+              '      if FChecked and (GroupName <> '''') then begin'+#13#10+
               '        var M := TGroupMessage.Create(GroupName);'+#13#10+
               '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
               '      end;'+#13#10+
@@ -876,8 +1020,14 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '    //**if (csDesigning in ComponentState) and FChecked then _doSetChecked // allows check/uncheck in design-mode'+#13#10+
               '    //**else begin'+#13#10+
               '      if (not value) and fMandatory then exit;'+#13#10+
-              '      _doSetChecked;'+#13#10+
-              '      if Value and (GroupName <> '''') then begin'+#13#10+
+              '      var LOldMandatory := fMandatory;'+#13#10+
+              '      fMandatory := False;'+#13#10+
+              '      try'+#13#10+
+              '        _doSetChecked;'+#13#10+
+              '      finally'+#13#10+
+              '        fMandatory := LOldMandatory;'+#13#10+
+              '      end;'+#13#10+
+              '      if FChecked and (GroupName <> '''') then begin'+#13#10+
               '        var M := TGroupMessage.Create(GroupName);'+#13#10+
               '        TMessageManager.DefaultManager.SendMessage(Self, M, True);'+#13#10+
               '      end;'+#13#10+
@@ -1166,8 +1316,8 @@ Procedure BuildAlcinoeFMXDynamicControls;
           end;
         end
         //--
-        else if ALSameTextA(ALTrim(LSrcLine), 'If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and') then begin
-          var P1 := ALPosA('If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and', LSrcLine);
+        else if ALSameTextA(ALTrim(LSrcLine), 'If (LParentRealigning) and') then begin
+          var P1 := ALPosA('If (LParentRealigning) and', LSrcLine);
           var LEndStr: ansiString := '';
           for var J := 1 to P1 - 1 do LEndStr := LEndStr + ' ';
           LEndStr := LEndStr + 'end;';

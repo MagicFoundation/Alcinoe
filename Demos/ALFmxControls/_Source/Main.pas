@@ -416,6 +416,8 @@ type
     ALText75: TALText;
     ALText76: TALText;
     ButtonShowSnackbar: TALButton;
+    ALText79: TALText;
+    ButtonStartLoading: TALButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
@@ -462,6 +464,7 @@ type
     procedure ButtonShowRightSheetClick(Sender: TObject);
     procedure ButtonShowLoadingOverlayClick(Sender: TObject);
     procedure ButtonShowSnackbarClick(Sender: TObject);
+    procedure ButtonStartLoadingClick(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
@@ -1574,6 +1577,22 @@ begin
         begin
           Text1.Text := 'buffer creation: ' + FormatFloat('0.#####',fALRectangle.MakeBufDrawableMs) + ' ms - ' +
                         'Paint: ' + FormatFloat('0.#####',fALRectangle.PaintMs) + ' ms';
+        end);
+    end).Start;
+end;
+
+{***********************************************************}
+procedure TMainForm.ButtonStartLoadingClick(Sender: TObject);
+begin
+  ButtonStartLoading.ShowLoadingIndicator('alcinoe_loading_indicator', TALStyleManager.Instance.GetColor('Material3.Color.Primary'));
+  TThread.CreateAnonymousThread(
+    Procedure
+    begin
+      Sleep(3000);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          ButtonStartLoading.HideLoadingIndicator;
         end);
     end).Start;
 end;

@@ -13701,7 +13701,7 @@ begin
 
     // DefaultAnimatedImage
     DefaultAnimatedImage.Align := TALAlignLayout.Client;
-    DefaultAnimatedImage.ResourceName := 'alcinoe_loader';
+    DefaultAnimatedImage.ResourceName := 'alcinoe_loading_indicator';
     // Switched from Material3.Color.OnPrimaryContainer to Material3.Color.Primary as it looks better in this context.
     DefaultAnimatedImage.TintColorKey := 'Material3.Color.Primary'; // md.sys.color.on-primary-container / md.ref.palette.primary30 / #4F378B
 

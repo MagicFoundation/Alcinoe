@@ -438,6 +438,7 @@ type
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNodeA;
     function NextSibling: TALJSONNodeA;
     function PreviousSibling: TALJSONNodeA;
+    function Clone: TALJSONNodeA;
     procedure SaveToJSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []);
     procedure SaveToJSONFile(const FileName: String; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToJSONFile(const FileName: AnsiString; const Options: TALJSONSaveOptions = []); overload;
@@ -1011,6 +1012,7 @@ type
     function CreateNode(const NodeName: String; NodeType: TALJSONNodeType): TALJSONNodeW;
     function NextSibling: TALJSONNodeW;
     function PreviousSibling: TALJSONNodeW;
+    function Clone: TALJSONNodeW;
     procedure SaveToJSONStream(const Stream: TStream; const Encoding: TEncoding; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToJSONStream(const Stream: TStream; const Options: TALJSONSaveOptions = []); overload;
     procedure SaveToJSONFile(const FileName: String; const Encoding: TEncoding; const Options: TALJSONSaveOptions = []); overload;
@@ -3796,6 +3798,31 @@ function TALJSONNodeA.PreviousSibling: TALJSONNodeA;
 begin
   if Assigned(ParentNode) then Result := ParentNode.ChildNodes.FindSibling(Self, -1)
   else Result := nil;
+end;
+
+{****************************************}
+function TALJSONNodeA.Clone: TALJSONNodeA;
+begin
+  case NodeType of
+    ntObject: Result := TALJSONObjectNodeA.Create(NodeName);
+    ntArray: Result := TALJSONArrayNodeA.Create(NodeName);
+    ntText: begin
+      Result := TALJSONTextNodeA.Create(NodeName);
+      var LDestNode := TALJSONTextNodeA(Result);
+      var LSrcNode := TALJSONTextNodeA(Self);
+      LDestNode.FRawNodeValueInt64 := LSrcNode.FRawNodeValueInt64;
+      LDestNode.fRawNodeValueStr := LSrcNode.fRawNodeValueStr;
+      LDestNode.fRawNodeValueDefined := LSrcNode.fRawNodeValueDefined;
+      LDestNode.fNodeSubType := LSrcNode.fNodeSubType;
+    end;
+    else begin
+      Result := nil;
+      AlJSONDocErrorA(cAlJSONInvalidNodeType);
+    end;
+  end;
+  if HasChildNodes then
+    for var I := 0 to ChildNodes.Count - 1 do
+      Result.ChildNodes.Add(ChildNodes[I].Clone);
 end;
 
 {**************}
@@ -10472,6 +10499,31 @@ function TALJSONNodeW.PreviousSibling: TALJSONNodeW;
 begin
   if Assigned(ParentNode) then Result := ParentNode.ChildNodes.FindSibling(Self, -1)
   else Result := nil;
+end;
+
+{****************************************}
+function TALJSONNodeW.Clone: TALJSONNodeW;
+begin
+  case NodeType of
+    ntObject: Result := TALJSONObjectNodeW.Create(NodeName);
+    ntArray: Result := TALJSONArrayNodeW.Create(NodeName);
+    ntText: begin
+      Result := TALJSONTextNodeW.Create(NodeName);
+      var LDestNode := TALJSONTextNodeW(Result);
+      var LSrcNode := TALJSONTextNodeW(Self);
+      LDestNode.FRawNodeValueInt64 := LSrcNode.FRawNodeValueInt64;
+      LDestNode.fRawNodeValueStr := LSrcNode.fRawNodeValueStr;
+      LDestNode.fRawNodeValueDefined := LSrcNode.fRawNodeValueDefined;
+      LDestNode.fNodeSubType := LSrcNode.fNodeSubType;
+    end;
+    else begin
+      Result := nil;
+      AlJSONDocErrorW(cAlJSONInvalidNodeType);
+    end;
+  end;
+  if HasChildNodes then
+    for var I := 0 to ChildNodes.Count - 1 do
+      Result.ChildNodes.Add(ChildNodes[I].Clone);
 end;
 
 {**************}

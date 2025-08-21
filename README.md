@@ -1150,6 +1150,15 @@ undesired conversions.
 History
 =======
 
+### 21/08/2025 – Enhancements & Cleanup
+
+- Removed `AlInt2BaseN` and `AlBaseN2Int`
+- Added `TALJSONNodeA.Clone` and `TALJSONNodeW.Clone`
+- Introduced `ALDefaultEstimateLineHeightMultiplier`: When the 
+  `LineHeightMultiplier` of a text is `0`, the function assigned to 
+  `ALDefaultEstimateLineHeightMultiplier` (e.g. `ALEstimateLineHeightMultiplier`) 
+  will be used to determine the multiplier
+
 ### 15/08/2025 – TALText and TALButton Improvements
 
 - Set `TALText.AutoSize` to default to `TALAutoSizeMode.Both`.  

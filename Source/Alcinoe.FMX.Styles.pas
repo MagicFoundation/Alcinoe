@@ -481,8 +481,6 @@ Type
     function GetLoadingOverlayStyleNames: TArray<String>;
   end;
 
-function ALEstimateLineHeightMultiplier(Const AFontSize: Single): Single;
-
 implementation
 
 uses
@@ -516,6 +514,7 @@ uses
   Alcinoe.Common,
   Alcinoe.Localization,
   Alcinoe.StringUtils,
+  Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
@@ -535,75 +534,6 @@ begin
   end;
   {$ENDIF}
   Result := LValueF / ADefaultValue;
-end;
-
-const
-  ALLineHeightMultipliers: array[10..60] of Single = (
-    {10} 1.50, // 15/10
-    {11} 1.45, // 16/11 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {12} 1.33, // 16/12 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {13} 1.38, // 18/13
-    {14} 1.43, // 20/14 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {15} 1.47, // 22/15
-    {16} 1.50, // 24/16 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {17} 1.47, // 25/17
-    {18} 1.44, // 26/18
-    {19} 1.42, // 27/19
-    {20} 1.35, // 27/20
-    {21} 1.33, // 28/21
-    {22} 1.27, // 28/22 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {23} 1.30, // 30/23
-    {24} 1.33, // 32/24 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {25} 1.32, // 33/25
-    {26} 1.31, // 34/26
-    {27} 1.30, // 35/27
-    {28} 1.29, // 36/28 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {29} 1.28, // 37/29
-    {30} 1.27, // 38/30
-    {31} 1.26, // 39/31
-    {32} 1.25, // 40/32 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {33} 1.24, // 41/33
-    {34} 1.24, // 42/34
-    {35} 1.23, // 43/35
-    {36} 1.22, // 44/36 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {37} 1.22, // 45/37
-    {38} 1.21, // 46/38
-    {39} 1.21, // 47/39
-    {40} 1.20, // 48/40
-    {41} 1.20, // 49/41
-    {42} 1.19, // 50/42
-    {43} 1.19, // 51/43
-    {44} 1.18, // 52/44
-    {45} 1.16, // 52/45 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {46} 1.15, // 53/46
-    {47} 1.15, // 54/47
-    {48} 1.15, // 55/48
-    {49} 1.14, // 56/49
-    {50} 1.14, // 57/50
-    {51} 1.14, // 58/51
-    {52} 1.13, // 59/52
-    {53} 1.13, // 60/53
-    {54} 1.13, // 61/54
-    {55} 1.13, // 62/55
-    {56} 1.12, // 63/56
-    {57} 1.12, // 64/57 - https://m3.material.io/styles/typography/type-scale-tokens#a734c6ed-634c-4abb-adb2-35daf0aed06a
-    {58} 1.12, // 65/58
-    {59} 1.12, // 66/59
-    {60} 1.12); // 67/60
-
-{***********************************************************************}
-function ALEstimateLineHeightMultiplier(Const AFontSize: Single): Single;
-begin
-  // Excellent reference:
-  // https://pimpmytype.com/line-length-line-height
-  // There is no universal rule for ideal line height — it depends on many factors
-  // such as line length, typeface, font size, device, and context.
-  // This function provides an approximate estimation only.
-  var LRoundFontSize := Round(AFontSize);
-  if (LRoundFontSize >= Low(ALLineHeightMultipliers)) and (LRoundFontSize <= High(ALLineHeightMultipliers)) then
-    Result := ALLineHeightMultipliers[LRoundFontSize]
-  else
-    Result := 0;
 end;
 
 {************************************************************************************************}

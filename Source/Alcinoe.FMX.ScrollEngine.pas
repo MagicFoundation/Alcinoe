@@ -2682,17 +2682,25 @@ end;
 // @param duration Duration of the scroll in milliseconds.
 procedure TALScrollEngine.startScroll(startX: Double; startY: Double; dx: Double; dy: Double; const duration: integer = TALOverScroller.DEFAULT_DURATION);
 begin
-  if not FOverScroller.isFinished then
-    FoverScroller.abortAnimation;
+  if duration = 0 then begin
+    SetViewportPosition(
+      TALPointD.Create(
+        startX + dx,
+        startY + dy));
+  end
+  else begin
+    if not FOverScroller.isFinished then
+      FoverScroller.abortAnimation;
 
-  FOverScroller.startScroll(
-    trunc(startX * ALScreenScale), // startX: integer;
-    trunc(startY * ALScreenScale), // startY: integer;
-    trunc(dx * ALScreenScale), // dx: integer;
-    trunc(dy * ALScreenScale), // dy: integer;
-    duration); // const duration: integer = DEFAULT_DURATION);
+    FOverScroller.startScroll(
+      trunc(startX * ALScreenScale), // startX: integer;
+      trunc(startY * ALScreenScale), // startY: integer;
+      trunc(dx * ALScreenScale), // dx: integer;
+      trunc(dy * ALScreenScale), // dy: integer;
+      duration); // const duration: integer = DEFAULT_DURATION);
 
-  StartTimer;
+    StartTimer;
+  end;
 end;
 
 {***********************************************************************************************************************************}

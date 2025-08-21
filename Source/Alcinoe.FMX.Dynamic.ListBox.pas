@@ -71,6 +71,11 @@ type
           TLoadingContent = class(TContent)
           public
             type
+              // -----------------------
+              // TCheckContentReadyEvent
+              TCheckContentReadyEvent = function(Const Sender: TLoadingContent): Boolean of object;
+              // ----------
+              // TAnimation
               TAnimation = class(TALFloatAnimation)
               public
                 type
@@ -93,13 +98,16 @@ type
               end;
           private
             FAnimation: TAnimation;
+            FOnCheckContentReady: TCheckContentReadyEvent;
           protected
             procedure Paint; override;
+            function IsContentReady: Boolean; virtual;
           public
             constructor Create(const AOwner: TItem); override;
             destructor Destroy; override;
             procedure BeforeDestruction; override;
             property Animation: TAnimation read FAnimation;
+            property OnCheckContentReady: TCheckContentReadyEvent read FOnCheckContentReady write FOnCheckContentReady;
           end;
           // -------------
           // TErrorContent
@@ -107,7 +115,7 @@ type
       public
         type
           TDownloadDataContext = class;
-          TDownloadDataEvent = procedure(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer) of object;
+          TDownloadDataEvent = procedure(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: String) of object;
           TDownloadDataContext = Class(TALWorkerContext)
           private
             FOnDownloadData: TDownloadDataEvent;
@@ -157,7 +165,7 @@ type
         //--
         FData: TALJSONNodeW; // 8 bytes
         FDownloadDataContext: TDownloadDataContext; // 8 bytes
-        FDownloadDataErrorCode: Integer; // 4 byte
+        FDownloadDataErrorCode: String; // 8 bytes
         FOnDownloadData: TDownloadDataEvent; // 16 bytes
         //--
         FContentBuilderContext: TContentBuilderContext; // 8 bytes
@@ -177,10 +185,10 @@ type
         function DownloadData(const AForceReload: Boolean = False): boolean; virtual;
         function CreateDownloadDataContext: TDownloadDataContext; virtual;
         class procedure DownloadDataBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
-        class procedure DownloadDataBackgroundProcFetchData(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: Integer); virtual; // [MultiThread]
-        class procedure DownloadDataBackgroundProcInitData(const AContext: TDownloadDataContext; const AErrorCode: Integer; const AData: TALJSONNodeW); virtual; // [MultiThread]
+        class procedure DownloadDataBackgroundProcFetchData(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: String); virtual; // [MultiThread]
+        class procedure DownloadDataBackgroundProcInitData(const AContext: TDownloadDataContext; const AErrorCode: String; const AData: TALJSONNodeW); virtual; // [MultiThread]
         class function DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; virtual; // [MultiThread]
-        procedure DownloadDataProcessData(const AContext: TDownloadDataContext; const AErrorCode: Integer; var AData: TALJSONNodeW); virtual;
+        procedure DownloadDataProcessData(const AContext: TDownloadDataContext; const AErrorCode: String; var AData: TALJSONNodeW); virtual;
         procedure DownloadDataFinished; virtual;
         function CanDownloadData: Boolean; virtual;
         function IsDownloadDataRunning: Boolean;
@@ -204,6 +212,7 @@ type
         procedure FetchContent(const APreload: boolean); overload; virtual;
         procedure FetchContent; overload; virtual;
         //--
+        function GetDefaultSize: TSizeF; override;
         procedure SetHost(Const Value: TALDynamicControlHost); override;
         function GetParentView: TView; virtual;
         procedure VisibleChanged; override;
@@ -378,7 +387,7 @@ type
           end;
       public
         const
-          DefaultPreloadItemCount = 10;
+          DefaultPreloadItemsCount = 10;
         type
           TItemIdType = (Unknown, Int64, Text);
           TScrollDirection = (FromBeginToEnd, FromEndToBegin);
@@ -387,7 +396,7 @@ type
         type
           TDownloadItemsContext = class;
           TCreateItemEvent = function(const AContext: TDownloadItemsContext; var AData: TALJSONNodeW): TItem of object;
-          TDownloadItemsEvent = procedure(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var APaginationToken: String; var AErrorCode: Integer) of object;
+          TDownloadItemsEvent = procedure(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var APaginationToken: String; var AErrorCode: String) of object;
           TDownloadItemsContext = Class(TALWorkerContext)
           private
             FOnDownloadItems: TDownloadItemsEvent;
@@ -474,6 +483,9 @@ type
         FHandleMouseEvents: Boolean; // 1 byte
         FIsSettingViewportPosition: Boolean; // 1 byte
         FRefreshTransitionKind: TRefreshTransitionKind; // 1 byte
+        FInitialItemHandled: Boolean; // 1 byte
+        FInitialInt64ItemID: Int64; // 8 Bytes
+        FInitialTextItemID: String; // 8 Bytes
         fLastViewportPosition: TALPointD; // 16 bytes
         FMouseDownPos: TpointF; // 8 bytes
         FRefreshTransitionAnimation: TALFloatAnimation; // 8 bytes
@@ -492,15 +504,15 @@ type
         FUniqueInt64ItemIds: TDictionary<Int64, boolean>; // 8 bytes | Used to deduplicate items that contain "Int64" IDs. Must be locked using LockItemIds/UnLockItemIds before used
         FUniqueTextItemIds: TDictionary<String, boolean>; // 8 bytes | Used to deduplicate items that contain "String" IDs. Must be locked using LockItemIds/UnLockItemIds before used
         FMaxItems: integer; // 4 bytes
-        FPreloadItemCount: integer; // 4 bytes
+        FPreloadItemsCount: integer; // 4 bytes
         FScrollEngine: TALScrollEngine; // 8 bytes
         FFirstVisibleItemIndex: integer; // 4 bytes
         FLastVisibleItemIndex: integer; // 4 bytes
         FFirstPreloadedItemIndex: integer; // 4 bytes
         FLastPreloadedItemIndex: integer; // 4 bytes
         FPaginationToken: String; // 8 bytes
-        FTriggerDownloadItemsAtIndex: integer; // 4 byte
-        FDownloadItemsErrorCode: Integer; // 4 byte
+        FTriggerDownloadItemsAtIndex: integer; // 4 bytes
+        FDownloadItemsErrorCode: String; // 8 bytes
         FDownloadItemsContext: TDownloadItemsContext; // 8 bytes
         FOnDownloadItems: TDownloadItemsEvent; // 16 bytes
         FOnCreateItem: TCreateItemEvent; // 16 bytes
@@ -538,10 +550,10 @@ type
         function DownloadItems(const AForceReload: Boolean = False): boolean; virtual;
         function CreateDownloadItemsContext: TDownloadItemsContext; virtual;
         class procedure DownloadItemsBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
-        class procedure DownloadItemsBackgroundProcFetchData(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var AErrorCode: Integer); virtual; // [MultiThread]
-        class procedure DownloadItemsBackgroundProcCreateItems(const AContext: TDownloadItemsContext; const AErrorCode: Integer; const AData: TALJSONNodeW; out AItems: TArray<TItem>); virtual; // [MultiThread]
+        class procedure DownloadItemsBackgroundProcFetchData(const AContext: TDownloadItemsContext; out AData: TALJSONNodeW; var AErrorCode: String); virtual; // [MultiThread]
+        class procedure DownloadItemsBackgroundProcCreateItems(const AContext: TDownloadItemsContext; const AErrorCode: String; const AData: TALJSONNodeW; out AItems: TArray<TItem>); virtual; // [MultiThread]
         class function DownloadItemsBackgroundProcCanProcessItems(const AContext: TDownloadItemsContext): boolean; virtual; // [MultiThread]
-        procedure DownloadItemsProcessItems(const AContext: TDownloadItemsContext; const AErrorCode: Integer; var AItems: TArray<TItem>); virtual;
+        procedure DownloadItemsProcessItems(const AContext: TDownloadItemsContext; const AErrorCode: String; var AItems: TArray<TItem>); virtual;
         procedure DownloadItemsFinished; virtual;
         function CanDownloadItems: Boolean; virtual;
         function IsDownloadItemsRunning: Boolean;
@@ -596,6 +608,8 @@ type
         procedure Refresh; virtual;
         property RefreshTransitionKind: TRefreshTransitionKind read FRefreshTransitionKind write FRefreshTransitionKind;
         property PaginationToken: String read FPaginationToken;
+        property InitialInt64ItemID: Int64 read FInitialInt64ItemID write FInitialInt64ItemID;
+        property InitialTextItemID: String read FInitialTextItemID write FInitialTextItemID;
         property FirstVisibleItemIndex: integer read FFirstVisibleItemIndex;
         property LastVisibleItemIndex: integer read FLastVisibleItemIndex;
         property Items[const Index: Integer]: TItem read GetItemByIndex;
@@ -603,7 +617,7 @@ type
         property ViewportPosition: TALPointD read GetViewportPosition;
         property ItemIdNodeName: String read FItemIdNodeName write FItemIdNodeName;
         property MaxItems: integer read FMaxItems write FMaxItems;
-        property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount;
+        property PreloadItemsCount: Integer read FPreloadItemsCount write FPreloadItemsCount;
         property Orientation: TOrientation read FOrientation write SetOrientation;
         property NoItemsContent: TItem.TContent read FNoItemsContent;
         property BackgroundContent: TBackgroundContent read FBackgroundContent;
@@ -638,7 +652,9 @@ type
     FMainView: TView;
     FRefreshingView: TView;
     FRefreshTransitionKind: TRefreshTransitionKind;
-    FPreloadItemCount: Integer;
+    FPreloadItemsCount: Integer;
+    FInitialInt64ItemID: Int64;
+    FInitialTextItemID: String;
     FActiveScrollEnginesCount: Integer;
     FDisableMouseWheel: Boolean;
     FHasBeenPrepared: Boolean;
@@ -674,7 +690,7 @@ type
     procedure DoResized; override;
     procedure Paint; override;
     property HasActiveScrollEngines: Boolean read GetHasActiveScrollEngines;
-    procedure ShowErrorMessageBanner(const AErrorCode: Integer);
+    procedure ShowErrorMessageBanner(const AErrorCode: String);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -686,6 +702,8 @@ type
     function ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
     function ScrollToItem(const AId: String; Const ADuration: integer): Boolean; overload;
     function ScrollToItem(const AId: Int64; Const ADuration: integer): Boolean; overload;
+    property InitialInt64ItemID: Int64 read FInitialInt64ItemID write FInitialInt64ItemID;
+    property InitialTextItemID: String read FInitialTextItemID write FInitialTextItemID;
     property MainView: TView read FMainView write SetMainView;
     property OnCreateMainView: TCreateMainViewEvent read FOnCreateMainView write FOnCreateMainView;
   published
@@ -716,7 +734,7 @@ type
     property Padding;
     property PopupMenu;
     property Position;
-    property PreloadItemCount: Integer read FPreloadItemCount write FPreloadItemCount default TView.DefaultPreloadItemCount;
+    property PreloadItemsCount: Integer read FPreloadItemsCount write FPreloadItemsCount default TView.DefaultPreloadItemsCount;
     property RefreshTransitionKind: TRefreshTransitionKind read FRefreshTransitionKind write FRefreshTransitionKind default TRefreshTransitionKind.CrossFade;
     property RotationAngle;
     //property RotationCenter;
@@ -1012,7 +1030,7 @@ begin
 
     end;
 
-    if FOwner.Owner.IsReadyToDisplay(False{AStrict}) then begin
+    if FOwner.IsContentReady then begin
       // We cannot call TItem(FOwner.Owner).ActivateContent(TItem.MainContentType)
       // from here because it will destroy the LoadingContent and the Animation as well.
       // Moreover, destroying an animation during its DoProcess event risks an access violation.
@@ -1049,6 +1067,7 @@ constructor TALDynamicListBox.TItem.TLoadingContent.Create(const AOwner: TItem);
 begin
   inherited;
   FAnimation := TAnimation.Create(Self);
+  FOnCheckContentReady := nil;
 end;
 
 {*********************************************************}
@@ -1071,6 +1090,13 @@ procedure TALDynamicListBox.TItem.TLoadingContent.Paint;
 begin
   FAnimation.Start;
   inherited;
+end;
+
+{***********************************************************************}
+function TALDynamicListBox.TItem.TLoadingContent.IsContentReady: Boolean;
+begin
+  if assigned(FOnCheckContentReady) then Result := FOnCheckContentReady(Self)
+  else result := Owner.IsReadyToDisplay(False{AStrict});
 end;
 
 {***********************************************************************************}
@@ -1178,7 +1204,7 @@ begin
   //--
   FData := nil;
   FDownloadDataContext := nil;
-  FDownloadDataErrorCode := 0;
+  FDownloadDataErrorCode := '';
   FOnDownloadData := nil;
   //--
   FContentBuilderContext := nil;
@@ -1323,7 +1349,7 @@ begin
   // Exit if the last download resulted in an error, unless AForceReload is True
   // (e.g., when triggered by a "Reload" button click)
   if (not AForceReload) and
-     (FDownloadDataErrorCode <> 0) then exit(False);
+     (FDownloadDataErrorCode <> '') then exit(False);
 
   // Exit if no data is needed
   if not CanDownloadData then exit(false);
@@ -1335,7 +1361,7 @@ begin
   {$IFDEF DEBUG}
   ALLog(ClassName+'.DownloadData', 'ForceReload: ' + ALBoolToStrW(AForceReload));
   {$ENDIF}
-  FDownloadDataErrorCode := 0;
+  FDownloadDataErrorCode := '';
 
   // Load the data in a separate thread to avoid blocking the calling thread
   FDownloadDataContext := CreateDownloadDataContext;
@@ -1371,7 +1397,7 @@ begin
     var LData: TALJSONNodeW := nil;
     Try
 
-      var LDownloadDataErrorCode: Integer := 0;
+      var LDownloadDataErrorCode: String := '';
       DownloadDataBackgroundProcFetchData(LContext, LData, LDownloadDataErrorCode);
 
       if LContext.FOwner = nil then exit;
@@ -1427,7 +1453,7 @@ end;
 class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProcFetchData(
                   const AContext: TDownloadDataContext;
                   out AData: TALJSONNodeW;
-                  var AErrorCode: Integer);
+                  var AErrorCode: String);
 begin
 
   // We cannot call ALMonitorEnter(AContext.FLock) here because
@@ -1449,11 +1475,11 @@ begin
   //TDownloadDataEvent(LMethod)(
   //  AContext, // const AContext: TDownloadDataContext;
   //  AData, // Const AData: TALJSONNodeW;
-  //  AErrorCode); // var AErrorCode: Integer
+  //  AErrorCode); // var AErrorCode: String
   AContext.FOnDownloadData(
     AContext, // const AContext: TDownloadDataContext;
     AData, // Const AData: TALJSONNodeW;
-    AErrorCode); // var AErrorCode: Integer
+    AErrorCode); // var AErrorCode: String
 
 end;
 
@@ -1461,10 +1487,10 @@ end;
 // [MultiThread]
 class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProcInitData(
                   const AContext: TDownloadDataContext;
-                  const AErrorCode: Integer;
+                  const AErrorCode: String;
                   const AData: TALJSONNodeW);
 begin
-  if (AErrorCode = 0) and (AData <> nil) then begin
+  if (AErrorCode = '') and (AData <> nil) then begin
     AData.ChildNodes.SetSorted(true{Value},true{recurse});
     AData.MultiThreadPrepare(true{aOnlyChildList});
   end;
@@ -1491,11 +1517,11 @@ end;
 {********************************************************}
 procedure TALDynamicListBox.TItem.DownloadDataProcessData(
             const AContext: TDownloadDataContext;
-            const AErrorCode: Integer;
+            const AErrorCode: String;
             var AData: TALJSONNodeW);
 begin
   FDownloadDataErrorCode := AErrorCode;
-  if FDownloadDataErrorCode = 0 then begin
+  if FDownloadDataErrorCode = '' then begin
     ALfreeAndNil(FData);
     Fdata := AData;
     AData := nil;
@@ -1507,7 +1533,7 @@ end;
 {*****************************************************}
 procedure TALDynamicListBox.TItem.DownloadDataFinished;
 begin
-  if FDownloadDataErrorCode <> 0 then begin
+  if FDownloadDataErrorCode <> '' then begin
     if Host <> nil then
       Host.ShowErrorMessageBanner(FDownloadDataErrorCode)
   end
@@ -1533,7 +1559,7 @@ end;
 function TALDynamicListBox.TItem.HasDataBeenDownloaded: Boolean;
 begin
   result := (not CanDownloadData) or
-            (FDownloadDataErrorCode <> 0);
+            (FDownloadDataErrorCode <> '');
 end;
 
 {***************************************************}
@@ -1817,7 +1843,7 @@ begin
   end
 
   // fetch error Content
-  else if FDownloadDataErrorCode <> 0 then begin
+  else if FDownloadDataErrorCode <> '' then begin
     if APreload then TryPreloadContent(ErrorContentType)
     else TryCreateAndActivateContent(ErrorContentType);
   end
@@ -1849,6 +1875,12 @@ end;
 function TALDynamicListBox.TItem._GetHost: TALDynamicListBox;
 begin
   Result := TALDynamicListBox(inherited Host);
+end;
+
+{******************************************************}
+function TALDynamicListBox.TItem.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(200, 200);
 end;
 
 {****************************************************************************}
@@ -2069,11 +2101,21 @@ begin
 
   if (not FIsAdjustingSize) then begin
     Owner.UpdateScrollEngineLimits;
-    var LViewportPosition: TALPointD;
-    if (LFirstVisibleItemIndex >= 0) and (not Owner.ViewportPosition.IsZero) then LViewportPosition := Owner.FItems^[LFirstVisibleItemIndex].Position + LFirstItemOffset
-    else LViewportPosition := Owner.ViewportPosition;
-    if ((Owner.ScrollEngine.TimerActive)) and (not LViewportPosition.EqualsTo(Owner.ViewportPosition,TEpsilon.Position)) then Owner.ScrollEngine.SetViewportPosition(LViewportPosition, False{EnforceLimits})
-    else Owner.SetViewportPosition(LViewportPosition);
+    var LMustSetViewportPosition: Boolean;
+    if not Owner.FInitialItemHandled then begin
+      Owner.FInitialItemHandled := True;
+      if Owner.FInitialInt64ItemID <> 0 then LMustSetViewportPosition := not Owner.ScrollToItem(Owner.FInitialInt64ItemID, 0{ADuration})
+      else if Owner.FInitialTextItemID <> '' then LMustSetViewportPosition := not Owner.ScrollToItem(Owner.FInitialTextItemID, 0{ADuration})
+      else LMustSetViewportPosition := True;
+    end
+    else LMustSetViewportPosition := True;
+    if LMustSetViewportPosition then begin
+      var LViewportPosition: TALPointD;
+      if (LFirstVisibleItemIndex >= 0) and (not Owner.ViewportPosition.IsZero) then LViewportPosition := Owner.FItems^[LFirstVisibleItemIndex].Position + LFirstItemOffset
+      else LViewportPosition := Owner.ViewportPosition;
+      if ((Owner.ScrollEngine.TimerActive)) and (not LViewportPosition.EqualsTo(Owner.ViewportPosition,TEpsilon.Position)) then Owner.ScrollEngine.SetViewportPosition(LViewportPosition, False{EnforceLimits})
+      else Owner.SetViewportPosition(LViewportPosition);
+    end;
   end;
 
 end;
@@ -2107,15 +2149,15 @@ begin
       if LLastActiveItem <> nil then begin
         if Owner.Orientation = TOrientation.Horizontal then begin
           var LWidth: Double := LLastActiveItem.Left + LLastActiveItem.Width + LLastActiveItem.Margins.Right;
-          if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = 0) then LWidth := LWidth + Owner.FLoadMoreIndicator.width + Owner.FLoadMoreIndicator.Margins.Left + Owner.FLoadMoreIndicator.Margins.right
-          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LWidth := LWidth + Owner.FLoadMoreRetryButton.width + Owner.FLoadMoreRetryButton.Margins.Left + Owner.FLoadMoreRetryButton.Margins.right
+          if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = '') then LWidth := LWidth + Owner.FLoadMoreIndicator.width + Owner.FLoadMoreIndicator.Margins.Left + Owner.FLoadMoreIndicator.Margins.right
+          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> '') then LWidth := LWidth + Owner.FLoadMoreRetryButton.width + Owner.FLoadMoreRetryButton.Margins.Left + Owner.FLoadMoreRetryButton.Margins.right
           else LWidth := LWidth + Padding.Right;
           Width := LWidth;
         end
         else begin
           var LHeight: Double := LLastActiveItem.Top + LLastActiveItem.height + LLastActiveItem.Margins.bottom;
-          if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = 0) then LHeight := LHeight + Owner.FLoadMoreIndicator.Height + Owner.FLoadMoreIndicator.Margins.Top + Owner.FLoadMoreIndicator.Margins.Bottom
-          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> 0) then LHeight := LHeight + Owner.FLoadMoreRetryButton.Height + Owner.FLoadMoreRetryButton.Margins.Top + Owner.FLoadMoreRetryButton.Margins.Bottom
+          if (Owner.FLoadMoreIndicator <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode = '') then LHeight := LHeight + Owner.FLoadMoreIndicator.Height + Owner.FLoadMoreIndicator.Margins.Top + Owner.FLoadMoreIndicator.Margins.Bottom
+          else if (Owner.FLoadMoreRetryButton <> nil) and (Owner.FPaginationToken <> '') and (Owner.FDownloadItemsErrorCode <> '') then LHeight := LHeight + Owner.FLoadMoreRetryButton.Height + Owner.FLoadMoreRetryButton.Margins.Top + Owner.FLoadMoreRetryButton.Margins.Bottom
           else LHeight := LHeight + Padding.bottom;
           Height := LHeight;
         end;
@@ -2489,6 +2531,9 @@ begin
   FHandleMouseEvents := False;
   FIsSettingViewportPosition := False;
   FRefreshTransitionKind := TRefreshTransitionKind.CrossFade;
+  FInitialItemHandled := False;
+  FInitialInt64ItemID := 0;
+  FInitialTextItemID := '';
   fLastViewportPosition := TALPointD.Create(0,0);
   FMouseDownPos := TPointF.Zero;
   FRefreshTransitionAnimation := nil;
@@ -2507,7 +2552,7 @@ begin
   FUniqueInt64ItemIds := TDictionary<Int64, boolean>.create;
   FUniqueTextItemIds := TDictionary<String, boolean>.create;
   FMaxItems := MaxInt;
-  FPreloadItemCount := DefaultPreloadItemCount;
+  FPreloadItemsCount := DefaultPreloadItemsCount;
   //--
   FScrollEngine := TALScrollEngine.Create;
   FScrollEngine.TouchTracking := [TTVertical];
@@ -2521,7 +2566,7 @@ begin
   FLastPreloadedItemIndex := -1; // = High(FItems^) when FItems is empty
   FPaginationToken := #0;
   FTriggerDownloadItemsAtIndex := -maxint;
-  FDownloadItemsErrorCode := 0;
+  FDownloadItemsErrorCode := '';
   FDownloadItemsContext := nil;
   FOnDownloadItems := nil;
   FOnCreateItem := nil;
@@ -2976,7 +3021,7 @@ begin
     while (LTMPIdx >= Low(FItems^)) and
           (LTMPIdx <= High(FItems^)) do begin
       if FItems^[LTMPIdx].Visible then begin
-        if compareValue(FItems^[LTMPIdx].right, LPos, TEpsilon.Position) >= 0 then Result := LTMPIdx
+        if compareValue(FItems^[LTMPIdx].right, LPos, TEpsilon.Position) > 0 then Result := LTMPIdx
         else break;
       end;
       dec(LTMPIdx);
@@ -2984,7 +3029,7 @@ begin
     //--
     while (Result < High(FItems^)) and
           ((not FItems^[Result].Visible) or
-           (compareValue(FItems^[Result].right, LPos, TEpsilon.Position) < 0)) do
+           (compareValue(FItems^[Result].right, LPos, TEpsilon.Position) <= 0)) do
       inc(Result);
   end
   else begin
@@ -2993,7 +3038,7 @@ begin
     while (LTMPIdx >= Low(FItems^)) and
           (LTMPIdx <= High(FItems^)) do begin
       if FItems^[LTMPIdx].Visible then begin
-        if compareValue(FItems^[LTMPIdx].bottom, LPos, TEpsilon.Position) >= 0 then Result := LTMPIdx
+        if compareValue(FItems^[LTMPIdx].bottom, LPos, TEpsilon.Position) > 0 then Result := LTMPIdx
         else break;
       end;
       dec(LTMPIdx);
@@ -3001,7 +3046,7 @@ begin
     //--
     while (Result < High(FItems^)) and
           ((not FItems^[Result].Visible) or
-           (compareValue(FItems^[Result].bottom, LPos, TEpsilon.Position) < 0)) do
+           (compareValue(FItems^[Result].bottom, LPos, TEpsilon.Position) <= 0)) do
       inc(Result);
   end;
 
@@ -3051,7 +3096,7 @@ begin
     while (LTMPIdx >= Low(FItems^)) and
           (LTMPIdx <= High(FItems^)) do begin
       if FItems^[LTMPIdx].Visible then begin
-        if compareValue(FItems^[LTMPIdx].left, LPos, TEpsilon.Position) < 0 then Result := LTMPIdx
+        if compareValue(FItems^[LTMPIdx].left, LPos, TEpsilon.Position) <= 0 then Result := LTMPIdx
         else break;
       end;
       inc(LTMPIdx);
@@ -3059,7 +3104,7 @@ begin
     //--
     while (Result > Low(FItems^)) and
           ((not FItems^[Result].Visible) or
-           (compareValue(FItems^[Result].left, LPos, TEpsilon.Position) >= 0)) do
+           (compareValue(FItems^[Result].left, LPos, TEpsilon.Position) > 0)) do
       dec(Result);
   end
   else begin
@@ -3068,7 +3113,7 @@ begin
     while (LTMPIdx >= Low(FItems^)) and
           (LTMPIdx <= High(FItems^)) do begin
       if FItems^[LTMPIdx].Visible then begin
-        if compareValue(FItems^[LTMPIdx].top,  LPos, TEpsilon.Position) < 0 then Result := LTMPIdx
+        if compareValue(FItems^[LTMPIdx].top,  LPos, TEpsilon.Position) <= 0 then Result := LTMPIdx
         else break;
       end;
       inc(LTMPIdx);
@@ -3076,7 +3121,7 @@ begin
     //--
     while (Result > Low(FItems^)) and
           ((not FItems^[Result].Visible) or
-           (compareValue(FItems^[Result].top,  LPos, TEpsilon.Position) >= 0)) do
+           (compareValue(FItems^[Result].top,  LPos, TEpsilon.Position) > 0)) do
       dec(Result);
   end;
 
@@ -3172,6 +3217,13 @@ begin
   {$IF defined(debug)}
   if TThread.Current.ThreadID <> MainThreadID then raise exception.Create('Error 0EF7A7EC-1662-48EE-8C75-41BCDB1D96D7');
   {$ENDIF}
+
+  if (not FIsSettingViewportPosition) and
+     (not AValue.EqualsTo(ScrollEngine.ViewportPosition, TEpsilon.Position)) then begin
+    ScrollEngine.SetViewportPosition(AValue);
+    Exit;
+  end;
+
   if (TNonReentrantHelper.EnterSection(FIsSettingViewportPosition)) then begin
 
     Try
@@ -3207,8 +3259,8 @@ begin
         {$REGION 'calculate FFirstPreloadedItemIndex/FLastPreloadedItemIndex'}
         var LOldFirstPreloadedItemIndex := FFirstPreloadedItemIndex;
         var LOldLastPreloadedItemIndex := FLastPreloadedItemIndex;
-        FFirstPreloadedItemIndex := Max(Low(FItems^){0 if empty}, FFirstVisibleItemIndex - PreloadItemCount);
-        FLastPreloadedItemIndex := Min(High(FItems^){-1 if empty}, FFirstVisibleItemIndex + PreloadItemCount);
+        FFirstPreloadedItemIndex := Max(Low(FItems^){0 if empty}, FFirstVisibleItemIndex - PreloadItemsCount);
+        FLastPreloadedItemIndex := Min(High(FItems^){-1 if empty}, FFirstVisibleItemIndex + PreloadItemsCount);
 
         // Consistency check only in debug
         {$IF defined(DEBUG)}
@@ -3616,7 +3668,7 @@ begin
 
         {$REGION 'Handle FLoadMoreIndicator'}
         if (FLoadMoreIndicator <> nil) then begin
-          If (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0) then begin
+          If (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode = '') then begin
             If Orientation = TOrientation.horizontal then begin
               var LLeft: Double := FMainContent.Width - AValue.X - FLoadMoreIndicator.Width - FLoadMoreIndicator.Margins.Right;
               if LLeft > Width then FLoadMoreIndicator.Visible := False
@@ -3640,7 +3692,7 @@ begin
 
         {$REGION 'Handle FLoadMoreRetryButton'}
         if (FLoadMoreRetryButton <> nil) then begin
-          If (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0) then begin
+          If (FMainContent.Visible) and (FPaginationToken <> '') and (FDownloadItemsErrorCode <> '') then begin
             If Orientation = TOrientation.horizontal then begin
               var LLeft: Double := FMainContent.Width - AValue.X - FLoadMoreRetryButton.Width - FLoadMoreRetryButton.Margins.Right;
               if LLeft > Width then FLoadMoreRetryButton.Visible := False
@@ -3707,7 +3759,7 @@ begin
   // Exit if the last download resulted in an error, unless AForceReload is True
   // (e.g., when triggered by a "Reload" button click)
   if (not AForceReload) and
-     (FDownloadItemsErrorCode <> 0) then exit(False);
+     (FDownloadItemsErrorCode <> '') then exit(False);
 
   // Exit if no data is needed
   if not CanDownloadItems then exit(false);
@@ -3719,7 +3771,7 @@ begin
   {$IFDEF DEBUG}
   ALLog(ClassName+'.DownloadItems', 'ForceReload: ' + ALBoolToStrW(AForceReload));
   {$ENDIF}
-  FDownloadItemsErrorCode := 0;
+  FDownloadItemsErrorCode := '';
 
   // Load the data in a separate thread to avoid blocking the calling thread
   FDownloadItemsContext := CreateDownloadItemsContext;
@@ -3753,58 +3805,79 @@ end;
 
 {***********************************************************************************************************}
 function TALDynamicListBox.TView.ScrollToItemIndex(const AIndex: Integer; Const ADuration: integer): Boolean;
-begin
-  if not FItems^[AIndex].Visible then Exit(False);
 
-  var LStopX: single := FItems^[AIndex].left;
-  var LStopY: single := FItems^[AIndex].Top;
-  If Orientation = TOrientation.horizontal then LStopX := LStopX - FMainContent.Padding.Left
-  else LStopY := LStopY - FMainContent.Padding.Top;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure DoScrollToItemIndex;
+  begin
+    var LStopX: single := FItems^[AIndex].left;
+    var LStopY: single := FItems^[AIndex].Top;
+    If Orientation = TOrientation.horizontal then LStopX := LStopX - FMainContent.Padding.Left
+    else LStopY := LStopY - FMainContent.Padding.Top;
 
-  If FTopBar.Visible then begin
-    if not FTopBar.hidesOnScroll then begin
-      If Orientation = TOrientation.horizontal then LStopX := LStopX - FTopBar.Height
-      else LStopY := LStopY - FTopBar.Height;
-    end
-    else begin
-      If Orientation = TOrientation.horizontal then begin
-        // Scrolling up (from right to left) — hide the top bar
-        if LStopX - scrollengine.ViewportPosition.X > 0 then begin
-          FTopBar.Visible := False;
-          FTopBar.Left := -FTopBar.Width;
-        end
-        // Scrolling down (from left to right) — show the top bar
-        else begin
-          FTopBar.Visible := True;
-          FTopBar.Left := 0;
-          LStopX := LStopX - FTopBar.Width;
-        end;
+    If FTopBar.Visible then begin
+      if not FTopBar.hidesOnScroll then begin
+        If Orientation = TOrientation.horizontal then LStopX := LStopX - FTopBar.Height
+        else LStopY := LStopY - FTopBar.Height;
       end
       else begin
-        // Scrolling up (from bottom to top) — hide the top bar
-        if LStopY - scrollengine.ViewportPosition.Y > 0 then begin
-          FTopBar.Visible := False;
-          FTopBar.Top := -FTopBar.Height;
+        If Orientation = TOrientation.horizontal then begin
+          // Scrolling up (from right to left) — hide the top bar
+          if LStopX - scrollengine.ViewportPosition.X > 0 then begin
+            FTopBar.Visible := False;
+            FTopBar.Left := -FTopBar.Width;
+          end
+          // Scrolling down (from left to right) — show the top bar
+          else begin
+            FTopBar.Visible := True;
+            FTopBar.Left := 0;
+            LStopX := LStopX - FTopBar.Width;
+          end;
         end
-        // Scrolling down (from top to bottom) — show the top bar
         else begin
-          FTopBar.Visible := True;
-          FTopBar.Top := 0;
-          LStopY := LStopY - FTopBar.Height;
+          // Scrolling up (from bottom to top) — hide the top bar
+          if LStopY - scrollengine.ViewportPosition.Y > 0 then begin
+            FTopBar.Visible := False;
+            FTopBar.Top := -FTopBar.Height;
+          end
+          // Scrolling down (from top to bottom) — show the top bar
+          else begin
+            FTopBar.Visible := True;
+            FTopBar.Top := 0;
+            LStopY := LStopY - FTopBar.Height;
+          end;
         end;
       end;
     end;
+
+    scrollengine.startScroll(
+      scrollengine.ViewportPosition.x,// startX: Double;
+      scrollengine.ViewportPosition.y, // startY: Double;
+      min(LStopX, scrollengine.MaxScrollLimit.x) - scrollengine.ViewportPosition.x, // dx: Double;
+      min(LStopY, scrollengine.MaxScrollLimit.Y) - scrollengine.ViewportPosition.y, // dy: Double;
+      ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
   end;
 
-  scrollengine.startScroll(
-    scrollengine.ViewportPosition.x,// startX: Double;
-    scrollengine.ViewportPosition.y, // startY: Double;
-    min(LStopX, scrollengine.MaxScrollLimit.x) - scrollengine.ViewportPosition.x, // dx: Double;
-    min(LStopY, scrollengine.MaxScrollLimit.Y) - scrollengine.ViewportPosition.y, // dy: Double;
-    ADuration); // const duration: integer = TALOverScroller.DEFAULT_DURATION)
-
+begin
+  if not FItems^[AIndex].Visible then Exit(False);
   Result := true;
-
+  DoScrollToItemIndex;
+  if ADuration = 0 then begin
+    if AIndex = FirstVisibleItemIndex then begin
+      var I := FirstVisibleItemIndex;
+      while i <= LastVisibleItemIndex do begin
+        Items[i].FetchContent(False{APreload});
+        inc(i);
+      end;
+    end
+    else begin
+      var I := LastVisibleItemIndex;
+      while i >= FirstVisibleItemIndex do begin
+        Items[i].FetchContent(False{APreload});
+        dec(i);
+      end;
+    end;
+    DoScrollToItemIndex;
+  end;
 end;
 
 {**************************************************************************************************}
@@ -4003,7 +4076,7 @@ begin
     var LItems: TArray<TItem> := nil;
     Try
 
-      var LDownloadItemsErrorCode: Integer := 0;
+      var LDownloadItemsErrorCode: String := '';
       DownloadItemsBackgroundProcFetchData(LContext, LData, LDownloadItemsErrorCode);
 
       if LContext.FOwner = nil then exit;
@@ -4062,7 +4135,7 @@ end;
 class procedure TALDynamicListBox.TView.DownloadItemsBackgroundProcFetchData(
                   const AContext: TDownloadItemsContext;
                   out AData: TALJSONNodeW;
-                  var AErrorCode: Integer);
+                  var AErrorCode: String);
 begin
 
   // We cannot call ALMonitorEnter(AContext.FLock) here because
@@ -4087,12 +4160,12 @@ begin
   //  AContext, // const AContext: TDownloadItemsContext;
   //  AData, // Const AData: TALJSONNodeW;
   //  AContext.PaginationToken, // var APaginationToken: String;
-  //  AErrorCode); // var AErrorCode: Integer
+  //  AErrorCode); // var AErrorCode: String
   AContext.FOnDownloadItems(
     AContext, // const AContext: TDownloadItemsContext;
     AData, // Const AData: TALJSONNodeW;
     AContext.PaginationToken, // var APaginationToken: String;
-    AErrorCode); // var AErrorCode: Integer
+    AErrorCode); // var AErrorCode: String
 
 end;
 
@@ -4100,7 +4173,7 @@ end;
 // [MultiThread]
 class procedure TALDynamicListBox.TView.DownloadItemsBackgroundProcCreateItems(
                   const AContext: TDownloadItemsContext;
-                  const AErrorCode: Integer;
+                  const AErrorCode: String;
                   const AData: TALJSONNodeW;
                   out AItems: TArray<TItem>);
 begin
@@ -4109,7 +4182,7 @@ begin
 
     // Exit
     if (AContext.FOwner = nil) or
-       (AErrorCode <> 0) or
+       (AErrorCode <> '') or
        (AData = nil) or
        (AData.ChildNodes.Count = 0) then begin
       AItems := nil;
@@ -4215,11 +4288,11 @@ end;
 {**********************************************************}
 procedure TALDynamicListBox.TView.DownloadItemsProcessItems(
             const AContext: TDownloadItemsContext;
-            const AErrorCode: Integer;
+            const AErrorCode: String;
             var AItems: TArray<TItem>);
 begin
   FDownloadItemsErrorCode := AErrorCode;
-  if FDownloadItemsErrorCode = 0 then begin
+  if FDownloadItemsErrorCode = '' then begin
 
     {$IFDEF DEBUG}
     var LStopWatch := TstopWatch.startNew;
@@ -4265,7 +4338,7 @@ end;
 {******************************************************}
 procedure TALDynamicListBox.TView.DownloadItemsFinished;
 begin
-  if FDownloadItemsErrorCode <> 0 then begin
+  if FDownloadItemsErrorCode <> '' then begin
     // Adjust size to accommodate the retry button
     // and to show the retry button (SetViewportPosition is
     // called inside AdjustSize);
@@ -4432,8 +4505,8 @@ begin
       if FTopBar <> nil then FTopBar.Visible := FTopBar.ShowWithMainContent;
       if FBottomBar <> nil then FBottomBar.Visible := FBottomBar.ShowWithMainContent;
       if FPullToRefreshIndicator <> nil then FPullToRefreshIndicator.Visible := True;
-      if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode = 0);
-      if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode <> 0);
+      if FLoadMoreIndicator <> nil then FLoadMoreIndicator.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode = '');
+      if FLoadMoreRetryButton <> nil then FLoadMoreRetryButton.Visible := (FPaginationToken <> '') and (FDownloadItemsErrorCode <> '');
       SetViewportPosition(ViewportPosition);
       if assigned(FOnShowMainContent) then FOnShowMainContent(FMainContent);
     end;
@@ -4541,7 +4614,7 @@ begin
 
   // If the items were never successfully downloaded and an
   // error occurred during the last download, fetch the error content
-  else if (FMainContent = nil) and ((FDownloadDataErrorCode <> 0) or (FDownloadItemsErrorCode <> 0)) then begin
+  else if (FMainContent = nil) and ((FDownloadDataErrorCode <> '') or (FDownloadItemsErrorCode <> '')) then begin
     if APreload then TryPreloadContent(ErrorContentType)
     else TryCreateAndActivateContent(ErrorContentType);
   end
@@ -4559,7 +4632,9 @@ constructor TALDynamicListBox.Create(aOwner: TComponent);
 begin
   inherited create(AOwner);
   FRefreshTransitionKind := TRefreshTransitionKind.CrossFade;
-  FPreloadItemCount := TView.DefaultPreloadItemCount;
+  FPreloadItemsCount := TView.DefaultPreloadItemsCount;
+  FInitialInt64ItemID := 0;
+  FInitialTextItemID := '';
   FActiveScrollEnginesCount := 0;
   FDisableMouseWheel := False;
   FHasBeenPrepared := False;
@@ -4604,7 +4679,9 @@ begin
   else begin
     Result := TView.Create(nil);
     Result.RefreshTransitionKind := RefreshTransitionKind;
-    Result.PreloadItemCount := PreloadItemCount;
+    Result.InitialInt64ItemID := InitialInt64ItemID;
+    Result.InitialTextItemID := InitialTextItemID;
+    Result.PreloadItemsCount := PreloadItemsCount;
     //OnDownloadData
     //OnCreateMainContent
     Result.OnCreateLoadingContent := OnCreateLoadingContent;
@@ -4777,8 +4854,8 @@ begin
     DrawDesignBorder;
 end;
 
-{****************************************************************************}
-procedure TALDynamicListBox.ShowErrorMessageBanner(const AErrorCode: Integer);
+{***************************************************************************}
+procedure TALDynamicListBox.ShowErrorMessageBanner(const AErrorCode: String);
 begin
 
 end;

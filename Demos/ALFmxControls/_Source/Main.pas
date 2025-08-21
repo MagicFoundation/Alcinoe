@@ -525,6 +525,7 @@ begin
   ALInitHasTouchScreen;
   ALHasTouchScreen := true;
   {$ENDIF}
+  ALDefaultEstimateLineHeightMultiplier := ALEstimateLineHeightMultiplier;
   TALStyleManager.Instance.ApplyDialogManagerStyle('Material3.DialogManager', TALDialogManager.Instance, 18{AFontSize});
   TALStyleManager.Instance.ApplySnackbarManagerStyle('Material3.SnackbarManager', TALSnackbarManager.Instance, 18{AFontSize});
   TALStyleManager.Instance.ApplySheetManagerStyle('Material3.SheetManager', TALSheetManager.Instance, 22{AFontSize});

@@ -276,7 +276,6 @@ begin
     Lview.OnCreateItemMainContent := StoriesCarouselCreateItemMainContent;
     Lview.OnCreateLoadMoreIndicator := CarouselCreateLoadMoreIndicator;
     Lview.OnCreateLoadMoreRetryButton := CarouselCreateLoadMoreRetryButton;
-    Lview.PreloadItemCount := 10;
     Result := LView;
   end
   else if AData.GetChildNodeValueText('type', '') = 'suggested' then begin
@@ -287,7 +286,6 @@ begin
     Lview.OnCreateItemMainContent := SuggestedCarouselCreateItemMainContent;
     Lview.OnCreateLoadMoreIndicator := CarouselCreateLoadMoreIndicator;
     Lview.OnCreateLoadMoreRetryButton := CarouselCreateLoadMoreRetryButton;
-    Lview.PreloadItemCount := 10;
     LView.Margins.bottom := 23;
     LView.ScrollEngine.Friction := 0.04;
     Result := LView;

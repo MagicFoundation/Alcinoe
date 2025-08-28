@@ -78,6 +78,7 @@ type
     constructor Create(AOwner: TComponent); override;
     class function Current: TALLoadingOverlay;
     class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    function IsTransitioning: Boolean;
     function IsStealthMode: Boolean;
     function HasAnimatedImage: Boolean;
     function HasAniIndicator: Boolean;
@@ -315,6 +316,13 @@ begin
     LCurrentLoadingOverlay.CloseAnimateOptions := AAnimateOptions;
     TALLoadingOverlayManager.Instance.CloseCurrentLoadingOverlay;
   end;
+end;
+
+{*****************************************}
+function TALLoadingOverlay.IsTransitioning: Boolean;
+begin
+  Result := (TALLoadingOverlayManager.Instance.CurrentLoadingOverlay = Self) and
+            (TALLoadingOverlayManager.Instance.FContainerAnimation.Running or TALLoadingOverlayManager.Instance.FScrimAnimation.Running);
 end;
 
 {************************************************************}

@@ -136,6 +136,7 @@ type
     procedure BeforeDestruction; override;
     class function Current: TALSheet;
     class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    function IsTransitioning: Boolean;
     property CloseOnScrimClick: Boolean read GetCloseOnScrimClick write SetCloseOnScrimClick;
     procedure ActionButtonClick(Sender: TObject); virtual;
     property Container: TALRectangle read FContainer;
@@ -934,6 +935,13 @@ begin
     LCurrentSheet.CloseAnimateOptions := AAnimateOptions;
     TALSheetManager.Instance.CloseCurrentSheet;
   end;
+end;
+
+{*****************************************}
+function TALSheet.IsTransitioning: Boolean;
+begin
+  Result := (TALSheetManager.Instance.CurrentSheet = Self) and
+            (TALSheetManager.Instance.FContainerAnimation.Running or TALSheetManager.Instance.FScrimAnimation.Running);
 end;
 
 {**************************************************}

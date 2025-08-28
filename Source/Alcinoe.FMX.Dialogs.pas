@@ -126,6 +126,7 @@ type
     procedure BeforeDestruction; override;
     class function Current: TALDialog;
     class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    function IsTransitioning: Boolean;
     property CloseOnScrimClick: Boolean read GetCloseOnScrimClick write SetCloseOnScrimClick;
     function HasContainer: Boolean;
     function HasIcon: Boolean;
@@ -481,6 +482,13 @@ begin
     LCurrentDialog.CloseAnimateOptions := AAnimateOptions;
     TALDialogManager.Instance.CloseCurrentDialog;
   end;
+end;
+
+{*****************************************}
+function TALDialog.IsTransitioning: Boolean;
+begin
+  Result := (TALDialogManager.Instance.CurrentDialog = Self) and
+            (TALDialogManager.Instance.FContainerAnimation.Running or TALDialogManager.Instance.FScrimAnimation.Running);
 end;
 
 {************************************************************************************************************}

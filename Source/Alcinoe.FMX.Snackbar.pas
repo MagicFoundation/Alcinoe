@@ -99,6 +99,7 @@ type
     procedure BeforeDestruction; override;
     class function Current: TALSnackbar;
     class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateContainer]);
+    function IsTransitioning: Boolean;
     function HasActionButton: Boolean;
     function HasCloseButton: Boolean;
     procedure AddActionButton(const ACaption: String; const ATag: NativeInt);
@@ -330,6 +331,13 @@ begin
     LCurrentSnackbar.CloseAnimateOptions := AAnimateOptions;
     TALSnackbarManager.Instance.CloseCurrentSnackbar;
   end;
+end;
+
+{*****************************************}
+function TALSnackbar.IsTransitioning: Boolean;
+begin
+  Result := (TALSnackbarManager.Instance.CurrentSnackbar = Self) and
+            (TALSnackbarManager.Instance.FContainerAnimation.Running);
 end;
 
 {*************************************************************}

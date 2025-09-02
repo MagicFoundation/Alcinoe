@@ -15,22 +15,22 @@ function  ALExtractHTMLText(
             const HtmlContent: AnsiString;
             Const DecodeHTMLText: Boolean = True): AnsiString; overload;
 function  ALXMLCDataElementEncode(const Src: AnsiString): AnsiString;
-function  ALXMLTextElementEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+function  ALXMLTextElementEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
 procedure ALXMLTextElementDecodeV(var Str: AnsiString);
 function  ALXMLTextElementDecode(const Src: AnsiString): AnsiString;
 function  ALHTMLEncode(
             const Src: AnsiString;
             const EncodeASCIIHtmlEntities: Boolean = True;
-            const useNumericReference: boolean = True): AnsiString;
+            const UseNumericReference: boolean = True): AnsiString;
 function  ALHTMLDecode(const Src: AnsiString): AnsiString;
-function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString; overload;
-function  ALJavascriptEncode(const Src: String; const useNumericReference: boolean = true): String; overload;
+function  ALJavascriptEncode(const Src: AnsiString; const UseNumericReference: boolean = true): AnsiString; overload;
+function  ALJavascriptEncode(const Src: String; const UseNumericReference: boolean = true): String; overload;
 procedure ALJavascriptDecodeV(Var Str: AnsiString); overload;
 procedure ALJavascriptDecodeV(Var Str: String); overload;
 function  ALJavascriptDecode(const Src: AnsiString): AnsiString; overload;
 function  ALJavascriptDecode(const Src: String): String; overload;
 {$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
-function  ALRunJavascript(const aCode: AnsiString): AnsiString;
+function  ALRunJavascript(const ACode: AnsiString): AnsiString;
 {$ENDIF}
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(
             Var HtmlContent: AnsiString;
@@ -331,9 +331,9 @@ Begin
 End;
 
 {*************************************************}
-{we use useNumericReference by default because it's
+{we use UseNumericReference by default because it's
  compatible with XHTML, especially because of the &apos; entity}
-function ALXMLTextElementEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+function ALXMLTextElementEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
 var i, l: integer;
     Buf, P: PAnsiChar;
     ch: Integer;
@@ -348,7 +348,7 @@ begin
       ch := Ord(src[i]);
       case ch of
         34: begin // quot "
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('&#34;', P, 5);
                 Inc(P, 5);
               end
@@ -358,7 +358,7 @@ begin
               end;
             end;
         38: begin // amp  &
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('&#38;', P, 5);
                 Inc(P, 5);
               end
@@ -368,7 +368,7 @@ begin
               end;
             end;
         39: begin // apos  '
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('&#39;', P, 5);
                 Inc(P, 5);
               end
@@ -378,7 +378,7 @@ begin
               end;
             end;
         60: begin // lt   <
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('&#60;', P, 5);
                 Inc(P, 5);
               end
@@ -388,7 +388,7 @@ begin
               end;
             end;
         62: begin // gt   >
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('&#62;', P, 5);
                 Inc(P, 5);
               end
@@ -643,7 +643,7 @@ end;
 function ALHTMLEncode(
            const Src: AnsiString;
            const EncodeASCIIHtmlEntities: Boolean = True;
-           const useNumericReference: boolean = True): AnsiString;
+           const UseNumericReference: boolean = True): AnsiString;
 
 var i, k, l: integer;
     Buf, P: PAnsiChar;
@@ -659,7 +659,7 @@ begin
 
   LstUnicodeEntitiesNumber := TALIntegerList.create;
   Try
-    if not useNumericReference then begin
+    if not UseNumericReference then begin
       LstUnicodeEntitiesNumber.Duplicates := DupIgnore;
       LstUnicodeEntitiesNumber.Sorted := True;
       For i := 0 to _ALHtmlEntities.Count - 1 do
@@ -678,7 +678,7 @@ begin
         Case LEntityInt of
           34: begin // quot "
                 If EncodeASCIIHtmlEntities then begin
-                  if useNumericReference then begin
+                  if UseNumericReference then begin
                     ALStrMove('&#34;', P, 5);
                     Inc(P, 5);
                   end
@@ -694,7 +694,7 @@ begin
               end;
           38: begin // amp  &
                 If EncodeASCIIHtmlEntities then begin
-                  if useNumericReference then begin
+                  if UseNumericReference then begin
                     ALStrMove('&#38;', P, 5);
                     Inc(P, 5);
                   end
@@ -720,7 +720,7 @@ begin
               end;
           60: begin // lt   <
                 If EncodeASCIIHtmlEntities then begin
-                  if useNumericReference then begin
+                  if UseNumericReference then begin
                     ALStrMove('&#60;', P, 5);
                     Inc(P, 5);
                   end
@@ -736,7 +736,7 @@ begin
               end;
           62: begin // gt   >
                 If EncodeASCIIHtmlEntities then begin
-                  if useNumericReference then begin
+                  if UseNumericReference then begin
                     ALStrMove('&#62;', P, 5);
                     Inc(P, 5);
                   end
@@ -752,7 +752,7 @@ begin
               end;
           else begin
             if (LEntityInt > 127) then begin
-              if useNumericReference then LEntityStr := '&#'+ALIntToStrA(LEntityInt)+';'
+              if UseNumericReference then LEntityStr := '&#'+ALIntToStrA(LEntityInt)+';'
               else begin
                 LIndex := LstUnicodeEntitiesNumber.IndexOf(LEntityInt);
                 If LIndex >= 0 Then begin
@@ -893,7 +893,7 @@ end;
 
 {******************************************************************************************}
 // https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
-function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+function  ALJavascriptEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
 var i, l: integer;
     Buf, P: PAnsiChar;
     ch: Integer;
@@ -901,7 +901,7 @@ begin
   Result := '';
   L := Length(src);
   if L = 0 then exit;
-  if useNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
+  if UseNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
   else GetMem(Buf, L * 2); // to be on the *very* safe side
   try
     P := Buf;
@@ -909,7 +909,7 @@ begin
       ch := Ord(src[i]);
       case ch of
         8: begin // Backspace
-             if useNumericReference then begin
+             if UseNumericReference then begin
                ALStrMove('\u0008', P, 6);
                Inc(P, 6);
              end
@@ -919,7 +919,7 @@ begin
              end;
            end;
         9: begin // Tab
-             if useNumericReference then begin
+             if UseNumericReference then begin
                ALStrMove('\u0009', P, 6);
                Inc(P, 6);
              end
@@ -929,7 +929,7 @@ begin
              end;
            end;
         10: begin // New line
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000A', P, 6);
                 Inc(P, 6);
               end
@@ -939,7 +939,7 @@ begin
               end;
             end;
         11: begin // Vertical tab
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000B', P, 6);
                 Inc(P, 6);
               end
@@ -949,7 +949,7 @@ begin
               end;
             end;
         12: begin // Form feed
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000C', P, 6);
                 Inc(P, 6);
               end
@@ -959,7 +959,7 @@ begin
               end;
             end;
         13: begin // Carriage return
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000D', P, 6);
                 Inc(P, 6);
               end
@@ -969,7 +969,7 @@ begin
               end;
             end;
         34: begin // Double quote
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u0022', P, 6);
                 Inc(P, 6);
               end
@@ -983,7 +983,7 @@ begin
               Inc(P, 6);
             end;
         39: begin // Apostrophe or single quote
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u0027', P, 6);
                 Inc(P, 6);
               end
@@ -1002,7 +1002,7 @@ begin
               Inc(P, 6);
             end;
         92: begin // Backslash character (\).
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u005C', P, 6);
                 Inc(P, 6);
               end
@@ -1025,7 +1025,7 @@ end;
 
 {******************************************************************************************}
 // https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
-function  ALJavascriptEncode(const Src: String; const useNumericReference: boolean = true): String;
+function  ALJavascriptEncode(const Src: String; const UseNumericReference: boolean = true): String;
 var i, l: integer;
     Buf, P: PChar;
     ch: Integer;
@@ -1033,7 +1033,7 @@ begin
   Result := '';
   L := Length(src);
   if L = 0 then exit;
-  if useNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
+  if UseNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
   else GetMem(Buf, L * 2); // to be on the *very* safe side
   try
     P := Buf;
@@ -1041,7 +1041,7 @@ begin
       ch := Ord(src[i]);
       case ch of
         8: begin // Backspace
-             if useNumericReference then begin
+             if UseNumericReference then begin
                ALStrMove('\u0008', P, 6);
                Inc(P, 6);
              end
@@ -1051,7 +1051,7 @@ begin
              end;
            end;
         9: begin // Tab
-             if useNumericReference then begin
+             if UseNumericReference then begin
                ALStrMove('\u0009', P, 6);
                Inc(P, 6);
              end
@@ -1061,7 +1061,7 @@ begin
              end;
            end;
         10: begin // New line
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000A', P, 6);
                 Inc(P, 6);
               end
@@ -1071,7 +1071,7 @@ begin
               end;
             end;
         11: begin // Vertical tab
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000B', P, 6);
                 Inc(P, 6);
               end
@@ -1081,7 +1081,7 @@ begin
               end;
             end;
         12: begin // Form feed
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000C', P, 6);
                 Inc(P, 6);
               end
@@ -1091,7 +1091,7 @@ begin
               end;
             end;
         13: begin // Carriage return
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u000D', P, 6);
                 Inc(P, 6);
               end
@@ -1101,7 +1101,7 @@ begin
               end;
             end;
         34: begin // Double quote
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u0022', P, 6);
                 Inc(P, 6);
               end
@@ -1115,7 +1115,7 @@ begin
               Inc(P, 6);
             end;
         39: begin // Apostrophe or single quote
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u0027', P, 6);
                 Inc(P, 6);
               end
@@ -1134,7 +1134,7 @@ begin
               Inc(P, 6);
             end;
         92: begin // Backslash character (\).
-              if useNumericReference then begin
+              if UseNumericReference then begin
                 ALStrMove('\u005C', P, 6);
                 Inc(P, 6);
               end
@@ -1645,10 +1645,10 @@ end;
 {*************************************************}
 {$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
 {This function evaluates the Javascript code given in the
- parameter "aCode" and returns result. The function works
+ parameter "ACode" and returns result. The function works
  similar to browser's console, so you can send even the code
  like this "2+2" => returns "4".}
-function ALRunJavascript(const aCode: AnsiString): AnsiString;
+function ALRunJavascript(const ACode: AnsiString): AnsiString;
 var HandleResult: HResult;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1656,12 +1656,12 @@ var HandleResult: HResult;
   // we create COM-object with CreateOleObject here to make that its creation is handled inside of
   // THIS scope (function MakeExecution) and its destroying is handled inside of this function too
   // on the last "end;" of this function.
-  function _MakeExecution(const aCode: AnsiString): AnsiString;
+  function _MakeExecution(const ACode: AnsiString): AnsiString;
   var LJavaScript: OleVariant;
   begin
     LJavaScript          := CreateOleObject('ScriptControl');
     LJavaScript.Language := 'JavaScript';
-    result               := AnsiString(LJavaScript.Eval(String(aCode)));
+    result               := AnsiString(LJavaScript.Eval(String(ACode)));
   end;
 
 begin
@@ -1673,7 +1673,7 @@ begin
   HandleResult := CoInitializeEx(nil, COINIT_MULTITHREADED);
   if HandleResult <> S_OK then raise EALException.Create('ALRunJavascript: cannot initialize OLE-object');
   try
-    result := _MakeExecution(aCode);
+    result := _MakeExecution(ACode);
   finally
     // Here we deactivate and destroy the COM-server. When it will be destroyed then all the existing
     // OLE-objects will be orphaned, so normally they should be already killed at this time. BUT the

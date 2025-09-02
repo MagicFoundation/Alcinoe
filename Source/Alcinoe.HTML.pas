@@ -16,8 +16,8 @@ function  ALExtractHTMLText(
             Const DecodeHTMLText: Boolean = True): AnsiString; overload;
 function  ALXMLCDataElementEncode(const Src: AnsiString): AnsiString;
 function  ALXMLTextElementEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
-procedure ALXMLTextElementDecodeV(var Str: AnsiString);
 function  ALXMLTextElementDecode(const Src: AnsiString): AnsiString;
+procedure ALXMLTextElementDecodeInPlace(var Str: AnsiString);
 function  ALHTMLEncode(
             const Src: AnsiString;
             const EncodeASCIIHtmlEntities: Boolean = True;
@@ -25,10 +25,10 @@ function  ALHTMLEncode(
 function  ALHTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const UseNumericReference: boolean = true): AnsiString; overload;
 function  ALJavascriptEncode(const Src: String; const UseNumericReference: boolean = true): String; overload;
-procedure ALJavascriptDecodeV(Var Str: AnsiString); overload;
-procedure ALJavascriptDecodeV(Var Str: String); overload;
 function  ALJavascriptDecode(const Src: AnsiString): AnsiString; overload;
 function  ALJavascriptDecode(const Src: String): String; overload;
+procedure ALJavascriptDecodeInPlace(Var Str: AnsiString); overload;
+procedure ALJavascriptDecodeInPlace(Var Str: String); overload;
 {$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
 function  ALRunJavascript(const ACode: AnsiString): AnsiString;
 {$ENDIF}
@@ -330,9 +330,7 @@ Begin
   Result := ALStringReplaceA(Src,']]>',']]]]><![CDATA[>',[rfReplaceAll]);
 End;
 
-{*************************************************}
-{we use UseNumericReference by default because it's
- compatible with XHTML, especially because of the &apos; entity}
+{************************************************************************************************************}
 function ALXMLTextElementEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
 begin
   Result := '';
@@ -371,7 +369,7 @@ begin
                 Inc(P, 5);
               end
               else begin
-                ALStrMove('&apos;', P, 6);  // !! warning this entity not work in HTML nor in XHTML under IE !!
+                ALStrMove('&apos;', P, 6);
                 Inc(P, 6);
               end;
             end;
@@ -408,7 +406,7 @@ begin
 end;
 
 {*****************************************************}
-procedure ALXMLTextElementDecodeV(var Str: AnsiString);
+procedure ALXMLTextElementDecodeInPlace(var Str: AnsiString);
 
 var
   CurrPos: integer;
@@ -625,7 +623,7 @@ end;
 function ALXMLTextElementDecode(const Src: AnsiString): AnsiString;
 begin
   result := Src;
-  ALXMLTextElementDecodeV(result);
+  ALXMLTextElementDecodeInPlace(result);
 end;
 
 {********************}
@@ -1128,7 +1126,7 @@ begin
 end;
 
 {*************************************************}
-procedure ALJavascriptDecodeV(Var Str: AnsiString);
+procedure ALJavascriptDecodeInPlace(Var Str: AnsiString);
 
 var
   CurrPos : Integer;
@@ -1376,7 +1374,7 @@ end;
 
 {**************************}
 {$WARN WIDECHAR_REDUCED OFF}
-procedure ALJavascriptDecodeV(Var Str: String);
+procedure ALJavascriptDecodeInPlace(Var Str: String);
 
 var
   CurrPos : Integer;
@@ -1590,14 +1588,14 @@ end;
 function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
 begin
   result := Src;
-  ALJavascriptDecodeV(result);
+  ALJavascriptDecodeInPlace(result);
 end;
 
 {******************************************************}
 function  ALJavascriptDecode(const Src: String): String;
 begin
   result := Src;
-  ALJavascriptDecodeV(result);
+  ALJavascriptDecodeInPlace(result);
 end;
 
 {*************************************************}

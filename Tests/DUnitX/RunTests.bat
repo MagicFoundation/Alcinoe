@@ -100,13 +100,13 @@ REM -----
 REM Debug
 REM -----
 
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:Platform=Win64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:DCC_UseMSBuildExternally=true /p:Platform=Win64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM ----------
@@ -114,13 +114,13 @@ REM Debug_Skia
 REM ----------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_Skia /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_Skia;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_Skia;DCC_MapFile=3 /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_Skia /p:Platform=Win64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_Skia;DCC_MapFile=3 /p:Platform=Win64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Win64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_Skia;DCC_MapFile=3 /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM ------------------
@@ -128,8 +128,8 @@ REM Debug_ALSkiaEngine
 REM ------------------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_ALSkiaEngine /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_ALSkiaEngine;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_ALSkiaEngine /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_ALSkiaEngine;DCC_MapFile=3 /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM ---------------------
@@ -137,8 +137,8 @@ REM Debug_ALSkiaAvailable
 REM ---------------------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_ALSkiaAvailable /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_ALSkiaAvailable;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug_ALSkiaAvailable /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug_ALSkiaAvailable;DCC_MapFile=3 /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM -------
@@ -146,43 +146,43 @@ REM Release
 REM -------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Android[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Android /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Android[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Android /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Android64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Android64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Android64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Android64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=iOSDevice64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=iOSDevice64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=iOSDevice64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=iOSDevice64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=iOSSimARM64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=iOSSimARM64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=OSX64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=OSX64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=OSX64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=OSX64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=OSXARM64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=OSXARM64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=OSXARM64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=OSXARM64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Win64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Win64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM ------------
@@ -190,43 +190,43 @@ REM Release_Skia
 REM ------------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=Android[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=Android /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Android[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Android /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=Android64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=Android64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Android64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Android64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=iOSDevice64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=iOSDevice64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=iOSDevice64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true_Skia /p:Platform=iOSDevice64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=iOSSimARM64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=iOSSimARM64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=OSX64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=OSX64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=OSX64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=OSX64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=OSXARM64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=OSXARM64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=OSXARM64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=OSXARM64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:Platform=Win64[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:Platform=Win64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Win64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_Skia /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM --------------------
@@ -234,8 +234,8 @@ REM Release_ALSkiaEngine
 REM --------------------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_ALSkiaEngine /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_ALSkiaEngine /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_ALSkiaEngine /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_ALSkiaEngine /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 REM -----------------------
@@ -243,8 +243,8 @@ REM Release_ALSkiaAvailable
 REM -----------------------
 
 echo.
-echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_ALSkiaAvailable /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_ALSkiaAvailable /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release_ALSkiaAvailable /p:DCC_UseMSBuildExternally=true /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release_ALSkiaAvailable /p:DCC_UseMSBuildExternally=true /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.

@@ -91,6 +91,7 @@ Type
     function GetView: UITextView;
     function GetControl: TALMemo;
     procedure TextSettingsChanged(Sender: TObject);
+    procedure DoChange;
   protected
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
@@ -223,6 +224,7 @@ Type
     function GetView: NSScrollView;
     function GetControl: TALMemo;
     procedure TextSettingsChanged(Sender: TObject);
+    procedure DoChange;
   protected
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
@@ -435,8 +437,7 @@ begin
   {$IF defined(DEBUG)}
   //ALLog(Classname + '.textViewDidChange');
   {$ENDIF}
-  FMemoView.FPlaceholderLabel.setHidden((not FMemoView.Text.IsEmpty) or (FMemoView.PromptText.IsEmpty));
-  FMemoView.Control.DoChange;
+  FMemoView.DoChange;
 end;
 
 {******************************************************************************************}
@@ -755,7 +756,10 @@ end;
 {****************************************************}
 procedure TALIosMemoView.SetText(const Value: String);
 begin
-  View.setText(StrToNSStr(Value));
+  if Value <> getText then begin
+    View.setText(StrToNSStr(Value));
+    DoChange;
+  end;
 end;
 
 {********************************************}
@@ -847,6 +851,13 @@ begin
   finally
     CFRelease(LFontRef);
   end;
+end;
+
+{********************************}
+procedure TALIosMemoView.DoChange;
+begin
+  FPlaceholderLabel.setHidden((not Text.IsEmpty) or (PromptText.IsEmpty));
+  Control.DoChange;
 end;
 
 {************************************************}
@@ -965,8 +976,7 @@ begin
   {$IF defined(DEBUG)}
   //ALLog(Classname + '.textDidChange');
   {$ENDIF}
-  FMemoView.FPlaceholderLabel.view.setHidden((not FMemoView.Text.IsEmpty) or (FMemoView.PromptText.IsEmpty));
-  FMemoView.Control.DoChange;
+  FMemoView.DoChange;
 end;
 
 {*****************************************************************************************}
@@ -1227,7 +1237,10 @@ end;
 {****************************************************}
 procedure TALMacMemoView.SetText(const Value: String);
 begin
-  FtextView.View.setString(StrToNSStr(Value));
+  if Value <> getText then begin
+    FtextView.View.setString(StrToNSStr(Value));
+    DoChange;
+  end;
 end;
 
 {********************************************}
@@ -1322,6 +1335,13 @@ begin
   finally
     CFRelease(LFontRef);
   end;
+end;
+
+{********************************}
+procedure TALMacMemoView.DoChange;
+begin
+  FPlaceholderLabel.view.setHidden((not Text.IsEmpty) or (PromptText.IsEmpty));
+  Control.DoChange;
 end;
 
 {************************************************}

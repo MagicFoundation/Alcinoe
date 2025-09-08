@@ -272,6 +272,7 @@ Type
     function GetControl: TALBaseEdit;
     procedure applyPromptTextWithColor(const aStr: String; const aColor: TAlphaColor);
     procedure TextSettingsChanged(Sender: TObject);
+    procedure DoChange;
   protected
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
@@ -408,6 +409,7 @@ Type
     function GetControl: TALBaseEdit;
     procedure applyPromptTextWithColor(const aStr: String; const aColor: TAlphaColor);
     procedure TextSettingsChanged(Sender: TObject);
+    procedure DoChange;
   protected
     function GetKeyboardType: TVirtualKeyboardType; override;
     procedure setKeyboardType(const Value: TVirtualKeyboardType); override;
@@ -2005,7 +2007,7 @@ begin
   {$IF defined(DEBUG)}
   //ALLog(Classname + '.ControlEventEditingChanged', 'control.name: ' + Control.Name);
   {$ENDIF}
-  Control.DoChange;
+  DoChange;
 end;
 
 {****************************************************}
@@ -2242,7 +2244,10 @@ end;
 {****************************************************}
 procedure TALIosEditView.SetText(const Value: String);
 begin
-  View.setText(StrToNSStr(Value));
+  if Value <> getText then begin
+    View.setText(StrToNSStr(Value));
+    DoChange;
+  end;
 end;
 
 {********************************************}
@@ -2292,6 +2297,12 @@ begin
 
   // TextColor
   View.setTextColor(AlphaColorToUIColor(TextSettings.Font.Color));
+end;
+
+{********************************}
+procedure TALIosEditView.DoChange;
+begin
+  Control.DoChange;
 end;
 
 {************************************************}
@@ -2366,7 +2377,7 @@ begin
       exit;
     end;
   end;
-  fEditView.Control.DoChange;
+  fEditView.DoChange;
 end;
 
 {**************************************************************************************************************************************}
@@ -2633,7 +2644,10 @@ end;
 {****************************************************}
 procedure TALMacEditView.SetText(const Value: String);
 begin
-  View.setStringValue(StrToNSStr(Value));
+  if Value <> getText then begin
+    View.setStringValue(StrToNSStr(Value));
+    DoChange;
+  end;
 end;
 
 {***********************************************************}
@@ -2668,6 +2682,12 @@ begin
   // Update the PromptText with the new font settings. This is only necessary in macOS.
   // In iOS, this step is not required.
   applyPromptTextWithColor(PromptText, PromptTextColor);
+end;
+
+{********************************}
+procedure TALMacEditView.DoChange;
+begin
+  Control.DoChange;
 end;
 
 {********************************************}

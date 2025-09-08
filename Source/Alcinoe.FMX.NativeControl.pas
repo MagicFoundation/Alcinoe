@@ -106,6 +106,7 @@ type
     procedure DoResized; override;
     procedure VisibleChanged; override;
     procedure ChangeOrder; override;
+    procedure DoRealign; override;
     procedure DoEndUpdate; override;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -350,6 +351,7 @@ begin
   Result := Padding.PaddingRect(AbsoluteRect);
   for var I := 0 to ControlsCount - 1 do begin
     var LControl := Controls[i];
+    if not LControl.Visible then continue;
     case Lcontrol.Align of
       TAlignLayout.None,
       TAlignLayout.Center,
@@ -618,6 +620,16 @@ procedure TALNativeControl.ParentChanged;
 begin
   inherited;
   if csDestroying in ComponentState then exit;
+  if FNativeView <> nil then
+    FNativeView.UpdateFrame;
+end;
+
+{***********************************}
+procedure TALNativeControl.DoRealign;
+begin
+  inherited;
+  if not FNeedAlign then
+    Exit;
   if FNativeView <> nil then
     FNativeView.UpdateFrame;
 end;

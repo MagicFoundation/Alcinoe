@@ -183,23 +183,23 @@ echo Build Core Tools
 echo ----------------
 echo.
 
-echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build[0m
-MSBuild "%ALBaseDir%\Tools\DProjNormalizer\_Source\DProjNormalizer.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build /verbosity:minimal
+echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
+MSBuild "%ALBaseDir%\Tools\DProjNormalizer\_Source\DProjNormalizer.dproj" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo [36mMSBuild DeployProjNormalizer.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build[0m
-MSBuild "%ALBaseDir%\Tools\DeployProjNormalizer\_Source\DeployProjNormalizer.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build /verbosity:minimal
+echo [36mMSBuild DeployProjNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
+MSBuild "%ALBaseDir%\Tools\DeployProjNormalizer\_Source\DeployProjNormalizer.dproj" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo [36mMSBuild UnitNormalizer.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build[0m
-MSBuild "%ALBaseDir%\Tools\UnitNormalizer\_Source\UnitNormalizer.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build /verbosity:minimal
+echo [36mMSBuild UnitNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
+MSBuild "%ALBaseDir%\Tools\UnitNormalizer\_Source\UnitNormalizer.dproj" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo [36mMSBuild CodeBuilder.dproj /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build[0m
-MSBuild "%ALBaseDir%\Tools\CodeBuilder\_Source\CodeBuilder.dproj" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=Win64 /t:Build /verbosity:minimal
+echo [36mMSBuild CodeBuilder.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
+MSBuild "%ALBaseDir%\Tools\CodeBuilder\_Source\CodeBuilder.dproj" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -519,7 +519,7 @@ REM ------------------------
 
 :CREATE_COMPILED_ARCHIVES
 
-if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO FINISHED
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CLEANUP_TEMP_FILES
 
 echo ------------------------
 echo Create Compiled Archives
@@ -643,6 +643,25 @@ if exist "%FileName%" goto ERROR
 SET FileName=%ALBaseDir%\Compiled\Tools\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
+
+echo.
+
+goto CLEANUP_TEMP_FILES
+
+
+REM ------------------
+REM Cleanup Temp Files
+REM ------------------
+
+:CLEANUP_TEMP_FILES
+
+echo ------------------
+echo Cleanup Temp Files
+echo ------------------
+echo.
+
+echo del "%ALBaseDir%\*.cmds"
+del "%ALBaseDir%\*.cmds" /s >nul
 
 goto FINISHED
 
@@ -850,22 +869,22 @@ if "%~4"=="iOSDevice64" (
 )
 if "%Alcinoe_Mac_Connection_Profile_Name%"=="" Set ALDeploy=N
 if "%ALDeploy%"=="Y" (
-  echo [36mMSBuild %~3 /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=%~4 /t:Build;Deploy[0m
+  echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4 /t:Build;Deploy[0m
   echo Clean PAServer scratch-dir
   ssh %Alcinoe_Mac_Username%@%Alcinoe_Mac_Host% "rm -rf /Users/%Alcinoe_Mac_Username%/PAServer/scratch-dir"
   IF ERRORLEVEL 1 EXIT /B 1
   if "%~4"=="iOSDevice64" ( 
-    MSBuild "%~1\%~2\%~3" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=%~4 /p:Profile=%Alcinoe_Mac_Connection_Profile_Name% /t:Build;Deploy /verbosity:minimal
+    MSBuild "%~1\%~2\%~3" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=%~4 /p:Profile=%Alcinoe_Mac_Connection_Profile_Name% /t:Build;Deploy /verbosity:minimal
   )
   if "%~4" neq "iOSDevice64" ( 
-    MSBuild "%~1\%~2\%~3" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=%~4 /t:Build;Deploy /verbosity:minimal
+    MSBuild "%~1\%~2\%~3" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=%~4 /t:Build;Deploy /verbosity:minimal
   )
   IF ERRORLEVEL 1 EXIT /B 1
   echo.
 )
 if "%ALDeploy%"=="N" (
-  echo [36mMSBuild %~3 /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=%~4 /t:Build[0m
-  MSBuild "%~1\%~2\%~3" /p:config=Release /p:DCC_UseMSBuildExternally=true /p:Platform=%~4 /t:Build /verbosity:minimal
+  echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4 /t:Build[0m
+  MSBuild "%~1\%~2\%~3" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=%~4 /t:Build /verbosity:minimal
   IF ERRORLEVEL 1 EXIT /B 1
   echo.
 )

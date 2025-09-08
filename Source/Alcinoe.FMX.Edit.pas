@@ -5355,7 +5355,7 @@ begin
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(0.5,0.5)
     //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
@@ -5483,7 +5483,7 @@ begin
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(0.5,0.5)
     //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
@@ -5611,7 +5611,7 @@ begin
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(0.5,0.5)
     //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0

@@ -1246,19 +1246,7 @@ Index: Embarcadero/Athens/fmx/FMX.Controls.pas
 diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FMX.Controls.pas
 --- a/Embarcadero/Athens/fmx/FMX.Controls.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Controls.pas	(working copy)
-@@ -520,6 +520,11 @@
-     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
-     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual;
-     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
-+    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-+    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-+    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-+    procedure ChildrenMouseEnter(const AObject: TControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-+    procedure ChildrenMouseLeave(const AObject: TControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-     procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
-     procedure KeyUp(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
-     procedure DialogKey(var Key: Word; Shift: TShiftState); virtual;
-@@ -607,6 +612,7 @@
+@@ -607,6 +607,7 @@
      { optimization }
      function GetFirstVisibleObjectIndex: Integer; virtual;
      function GetLastVisibleObjectIndex: Integer; virtual;
@@ -1266,7 +1254,17 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
      function GetDefaultSize: TSizeF; virtual;
      { bi-di }
      function FillTextFlags: TFillTextFlags; virtual;
-@@ -2421,7 +2427,7 @@
+@@ -2381,7 +2382,8 @@
+         FControls.Remove(AsControl);
+       RepaintJointArea(AObject);
+       AsControl.SetNewScene(nil);
+-      if NeedUpdate and (AsControl.Align <> TAlignLayout.None) then
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4001
++      if NeedUpdate and (AsControl.Visible) and (AsControl.Align <> TAlignLayout.None) then
+         Realign;
+     end;
+     if AObject is TEffect then
+@@ -2421,7 +2423,7 @@
    FRecalcUpdateRect := True;
    if FControls <> nil then
      for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
@@ -1275,7 +1273,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          FControls[I].RecalcUpdateRect;
  end;
  
-@@ -2498,7 +2504,7 @@
+@@ -2498,7 +2500,7 @@
        begin
          for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
          begin
@@ -1284,7 +1282,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
              Continue;
            R := FControls[I].UpdateRect;
            Result := UnionRect(Result, R);
-@@ -2535,7 +2541,7 @@
+@@ -2535,7 +2537,7 @@
      for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
      begin
        Control := FControls[I];
@@ -1293,7 +1291,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          Result := UnionRect(Result, Control.GetChildrenRect);
      end
  end;
-@@ -3058,7 +3064,7 @@
+@@ -3058,7 +3060,7 @@
      for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
      begin
        Control := Controls[I];
@@ -1302,7 +1300,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          Continue;
  
        NewObj := Control.ObjectAtPoint(AScreenPoint);
-@@ -3708,6 +3714,12 @@
+@@ -3708,6 +3710,12 @@
      Result := 0;
  end;
  
@@ -1315,23 +1313,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  function TControl.GetLeft: Single;
  begin
    Result := Position.X;
-@@ -4167,6 +4179,7 @@
-   ApplyTriggerEffect(Self, 'IsMouseOver');
-   if Assigned(FOnMouseEnter) then
-     FOnMouseEnter(Self);
-+  if fparentControl <> nil then fparentControl.ChildrenMouseEnter(Self); // https://quality.embarcadero.com/browse/RSP-24397
- end;
- 
- procedure TControl.DoMouseLeave;
-@@ -4176,6 +4189,7 @@
-   ApplyTriggerEffect(Self, 'IsMouseOver');
-   if Assigned(FOnMouseLeave) then
-     FOnMouseLeave(Self);
-+  if fparentControl <> nil then fparentControl.ChildrenMouseLeave(Self); // https://quality.embarcadero.com/browse/RSP-24397
- end;
- 
- function TControl.GetCanFocus: Boolean;
-@@ -4236,34 +4250,34 @@
+@@ -4236,34 +4244,34 @@
    if not Assigned(AConsumer) or (FScene = nil) or (ControlsCount = 0)then
      Exit;
  
@@ -1392,73 +1374,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
        end;
  
        if AllowPaint then
-@@ -4652,6 +4666,7 @@
- 
-   if Assigned(FOnMouseDown) then
-     FOnMouseDown(Self, Button, Shift, X, Y);
-+  if fparentControl <> nil then fparentControl.ChildrenMouseDown(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
-   if FAutoCapture then
-     Capture;
-   if Button = TMouseButton.mbLeft then
-@@ -4674,6 +4689,7 @@
- begin
-   if Assigned(FOnMouseMove) then
-     FOnMouseMove(Self, Shift, X, Y);
-+  if fparentControl <> nil then fparentControl.ChildrenMouseMove(Self, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
- end;
- 
- procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-@@ -4682,6 +4698,7 @@
- 
-   if Assigned(FOnMouseUp) then
-     FOnMouseUp(Self, Button, Shift, X, Y);
-+  if fparentControl <> nil then fparentControl.ChildrenMouseUp(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
-   if FPressed then
-   begin
-     FPressed := False;
-@@ -4696,6 +4713,41 @@
-     FOnMouseWheel(Self, Shift, WheelDelta, Handled)
- end;
- 
-+// https://quality.embarcadero.com/browse/RSP-24397
-+procedure TControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-+begin
-+  if fParentControl <> nil then
-+    fParentControl.ChildrenMouseDown(AObject, Button, Shift, X, Y);
-+end;
-+
-+// https://quality.embarcadero.com/browse/RSP-24397
-+procedure TControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
-+begin
-+  if fParentControl <> nil then
-+    fParentControl.ChildrenMouseMove(AObject, Shift, X, Y);
-+end;
-+
-+// https://quality.embarcadero.com/browse/RSP-24397
-+procedure TControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-+begin
-+  if fParentControl <> nil then
-+    fParentControl.ChildrenMouseUp(AObject, Button, Shift, X, Y);
-+end;
-+
-+// https://quality.embarcadero.com/browse/RSP-24397
-+procedure TControl.ChildrenMouseEnter(const AObject: TControl);
-+begin
-+  if fParentControl <> nil then
-+    fParentControl.ChildrenMouseEnter(AObject);
-+end;
-+
-+// https://quality.embarcadero.com/browse/RSP-24397
-+procedure TControl.ChildrenMouseLeave(const AObject: TControl);
-+begin
-+  if fParentControl <> nil then
-+    fParentControl.ChildrenMouseLeave(AObject);
-+end;
-+
- procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
- var
-   Operation: TDragOperation;
-@@ -5212,6 +5264,9 @@
+@@ -5212,6 +5220,9 @@
              FParentControl.RecalcUpdateRect;
        UpdateExplicitBounds;
        UpdateAnchorRules;

@@ -3699,7 +3699,7 @@ begin
                       Width * (fframeCount div fRowCount) * ALGetScreenScale,
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
                       TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
-                      TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                      TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                       FTintColor, // const ATintColor: TalphaColor;
                       0, // const ABlurRadius: single;
                       0, // const AXRadius: Single;

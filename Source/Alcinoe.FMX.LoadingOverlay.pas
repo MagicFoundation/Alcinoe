@@ -8,6 +8,7 @@ uses
   System.UITypes,
   System.Generics.Collections,
   System.Types,
+  FMX.Types,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
@@ -37,6 +38,7 @@ type
       public
         constructor Create;
         destructor Destroy; override;
+        function SetOwnerAndParent(const AValue: TALControl): TBuilder;
         function SetStealthMode: TBuilder;
         function SetAnimatedImageResourceName(const AValue: String): TBuilder;
         function SetAnimatedImageTintColor(const AValue: TalphaColor): TBuilder;
@@ -90,8 +92,8 @@ type
     property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALLoadingOverlayManager = class
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALLoadingOverlayManager = class(TInterfacedObject, IFreeNotification)
   private
     class function CreateInstance: TALLoadingOverlayManager;
     class function GetInstance: TALLoadingOverlayManager; static;
@@ -113,6 +115,10 @@ type
     FContainerAnimation: TALFloatAnimation;
     FQueue: TQueue<TALLoadingOverlay>;
     FFrozenNativeControls: TArray<TALNativeControl>;
+    procedure FreezeNativeViews;
+    procedure UnfreezeNativeViews;
+    { IFreeNotification }
+    procedure FreeNotification(AObject: TObject);
   protected
     procedure ScrimAnimationProcess(Sender: TObject);
     procedure ContainerAnimationProcess(Sender: TObject);
@@ -131,7 +137,7 @@ type
     property DefaultContainer: TALRectangle read FDefaultContainer;
     property DefaultAnimatedImage: TALAnimatedImage read FDefaultAnimatedImage;
     property DefaultAniIndicator: TALAniIndicator read FDefaultAniIndicator;
-    property CurrentLoadingOverlay: TALLoadingOverlay read fCurrentLoadingOverlay;
+    property CurrentLoadingOverlay: TALLoadingOverlay read fCurrentLoadingOverlay write fCurrentLoadingOverlay;
     function IsShowingLoadingOverlay: Boolean;
     procedure CloseCurrentLoadingOverlay;
   end;
@@ -141,7 +147,6 @@ implementation
 uses
   Fmx.Controls,
   FMX.Forms,
-  FMX.Types,
   Alcinoe.fmx.Styles,
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
@@ -159,6 +164,17 @@ destructor TALLoadingOverlay.TBuilder.Destroy;
 begin
   ALFreeAndNil(FLoadingOverlay);
   inherited;
+end;
+
+{****************************************************************************************}
+function TALLoadingOverlay.TBuilder.SetOwnerAndParent(const AValue: TALControl): TBuilder;
+begin
+  // This will defacto call AValue.Realign and FLoadingOverlay.EndUpdate
+  // in TControl.DoAddObject.SetUpdatingState
+  AValue.InsertComponent(FLoadingOverlay);
+  FLoadingOverlay.Parent := AValue;
+  FLoadingOverlay.BeginUpdate;
+  Result := Self;
 end;
 
 {***********************************************************}
@@ -304,12 +320,14 @@ end;
 {**********************************************************}
 class function TALLoadingOverlay.Current: TALLoadingOverlay;
 begin
+  if not TALLoadingOverlayManager.HasInstance then exit(nil);
   Result := TALLoadingOverlayManager.Instance.CurrentLoadingOverlay;
 end;
 
 {********************************************************************************************************************************************************************************************}
 class procedure TALLoadingOverlay.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
 begin
+  if not TALLoadingOverlayManager.HasInstance then exit;
   var LCurrentLoadingOverlay := TALLoadingOverlayManager.Instance.CurrentLoadingOverlay;
   if LCurrentLoadingOverlay <> nil then begin
     LCurrentLoadingOverlay.OnClosedRefProc := AOnClosedCallback;
@@ -318,7 +336,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{**************************************************}
 function TALLoadingOverlay.IsTransitioning: Boolean;
 begin
   Result := (TALLoadingOverlayManager.Instance.CurrentLoadingOverlay = Self) and
@@ -431,6 +449,44 @@ begin
   result := FInstance <> nil;
 end;
 
+{***************************************************}
+procedure TALLoadingOverlayManager.FreezeNativeViews;
+begin
+  For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] <> nil then
+      FFrozenNativeControls[I].RemoveFreeNotify(Self);
+
+  ALFreezeNativeViews(FFrozenNativeControls);
+
+  For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] <> nil then
+      FFrozenNativeControls[I].AddFreeNotify(Self);
+end;
+
+{*****************************************************}
+procedure TALLoadingOverlayManager.UnfreezeNativeViews;
+begin
+  For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] <> nil then
+      FFrozenNativeControls[I].RemoveFreeNotify(Self);
+
+  ALUnfreezeNativeViews(FFrozenNativeControls)
+end;
+
+{********************************************************************}
+procedure TALLoadingOverlayManager.FreeNotification(AObject: TObject);
+begin
+  For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] = AObject then
+      FFrozenNativeControls[I] := nil;
+
+  if FCurrentLoadingOverlay = AObject then begin
+    FScrimAnimation.Enabled := False;
+    FContainerAnimation.Enabled := False;
+    FCurrentLoadingOverlay := Nil;
+  end;
+end;
+
 {*****************************************************************}
 function TALLoadingOverlayManager.IsShowingLoadingOverlay: Boolean;
 begin
@@ -481,7 +537,7 @@ begin
     LCurrentLoadingOverlay.FOnClosedRefProc();
   ProcessPendingLoadingOverlays;
   if not IsShowingLoadingOverlay then
-    ALUnfreezeNativeViews(FFrozenNativeControls)
+    UnfreezeNativeViews
   else if not LCurrentLoadingOverlay.IsStealthMode then
     FScrimAnimation.Stop;
   TThread.ForceQueue(nil,
@@ -537,11 +593,6 @@ end;
 procedure TALLoadingOverlayManager.ShowLoadingOverlay(const ALoadingOverlay: TALLoadingOverlay);
 begin
 
-  // Initialize LForm
-  Var LForm := Screen.ActiveForm;
-  if LForm = nil then LForm := Application.MainForm;
-  if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
-
   // by default show AnimatedImage
   if (not ALoadingOverlay.HasAnimatedImage) and
      (not ALoadingOverlay.HasAniIndicator) and
@@ -549,17 +600,29 @@ begin
     ALoadingOverlay.GetAnimatedImage;
   end;
 
-  // Layout the LoadingOverlay
-  LForm.Focused := nil;
-  ALFreezeNativeViews(FFrozenNativeControls);
-  ALoadingOverlay.Align := TALAlignLayout.Contents;
-  // This will defacto call LForm.Realign and ALoadingOverlay.EndUpdate
-  // in TCustomForm.DoAddObject.SetUpdatingState
-  LForm.InsertComponent(ALoadingOverlay);
-  ALoadingOverlay.Parent := LForm;
+  // Attach ALoadingOverlay
+  if ALoadingOverlay.ParentControl = nil then begin
+    Var LForm := Screen.ActiveForm;
+    if LForm = nil then LForm := Application.MainForm;
+    if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+    LForm.Focused := nil;
+    FreezeNativeViews;
+    ALoadingOverlay.Align := TALAlignLayout.Contents;
+    // This will defacto call LForm.Realign and ALoadingOverlay.EndUpdate
+    // in TCustomForm.DoAddObject.SetUpdatingState
+    LForm.InsertComponent(ALoadingOverlay);
+    ALoadingOverlay.Parent := LForm;
+  end
+  else begin
+    ALoadingOverlay.ParentControl.ResetFocus;
+    FreezeNativeViews;
+    ALoadingOverlay.Align := TALAlignLayout.Contents;
+    ALoadingOverlay.EndUpdate;
+  end;
 
   // Init FCurrentLoadingOverlay
   FCurrentLoadingOverlay := ALoadingOverlay;
+  FCurrentLoadingOverlay.AddFreeNotify(Self);
 
   // No animation in Stealth Mode
   if (not FCurrentLoadingOverlay.IsStealthMode) and

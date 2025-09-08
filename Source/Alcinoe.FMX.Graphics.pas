@@ -2681,7 +2681,7 @@ begin
                         AScale, // const AScale: Single;
                         W, H, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                        TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                         TAlphaColors.Null, // const ATintColor: TalphaColor;
                         0, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
@@ -2697,7 +2697,7 @@ begin
                           AScale, // const AScale: Single;
                           W, H, // const W, H: single;
                           AWrapMode, // const AWrapMode: TALImageWrapMode;
-                          TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                          TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                           TAlphaColors.Null, // const ATintColor: TalphaColor;
                           0, // const ABlurRadius: single;
                           AXRadius, // const AXRadius: Single;
@@ -3174,7 +3174,7 @@ begin
                          AScale, // const AScale: Single;
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
-                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                          TAlphaColors.Null, // const ATintColor: TalphaColor;
                          0, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
@@ -3190,7 +3190,7 @@ begin
                            AScale, // const AScale: Single;
                            W, H, // const W, H: single;
                            AWrapMode, // const AWrapMode: TALImageWrapMode;
-                           TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                           TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                            TAlphaColors.Null, // const ATintColor: TalphaColor;
                            0, // const ABlurRadius: single;
                            AXRadius, // const AXRadius: Single;
@@ -3679,7 +3679,7 @@ begin
                         AScale, // const AScale: Single;
                         W, H, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                        TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                         TAlphaColors.Null, // const ATintColor: TalphaColor;
                         0, // const ABlurRadius: single;
                         AXRadius, // const AXRadius: Single;
@@ -3695,7 +3695,7 @@ begin
                           AScale, // const AScale: Single;
                           W, H, // const W, H: single;
                           AWrapMode, // const AWrapMode: TALImageWrapMode;
-                          TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                          TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                           TAlphaColors.Null, // const ATintColor: TalphaColor;
                           0, // const ABlurRadius: single;
                           AXRadius, // const AXRadius: Single;
@@ -4044,7 +4044,7 @@ begin
                          AScale, // const AScale: Single;
                          W, H, // const W, H: single;
                          AWrapMode, // const AWrapMode: TALImageWrapMode;
-                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                          TAlphaColors.Null, // const ATintColor: TalphaColor;
                          0, // const ABlurRadius: single;
                          AXRadius, // const AXRadius: Single;
@@ -4060,7 +4060,7 @@ begin
                            AScale, // const AScale: Single;
                            W, H, // const W, H: single;
                            AWrapMode, // const AWrapMode: TALImageWrapMode;
-                           TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                           TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                            TAlphaColors.Null, // const ATintColor: TalphaColor;
                            0, // const ABlurRadius: single;
                            AXRadius, // const AXRadius: Single;
@@ -4586,7 +4586,7 @@ begin
   FFillImageTintColor := TAlphaColors.Null;
   FFillImageNoRadius := False;
   FFillWrapMode := TALImageWrapMode.Fit;
-  FFillCropCenter := TpointF.Create(-50, -50);
+  FFillCropCenter := TpointF.Create(0.5,0.5);
   FFillBlurRadius := 0;
   FStateLayerOpacity := 0;
   FStateLayerColor := TAlphaColors.Null;

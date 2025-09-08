@@ -121,6 +121,7 @@ type
     FAutoSize: TALAutoSizeMode; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
+    FPropagateMouseEvents: Boolean; // 1 byte — placed here (protected) because the private section has no room left for a 1-byte field
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
@@ -140,10 +141,19 @@ type
     procedure DoMouseEnter; override;
     procedure DoMouseLeave; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoClickSound; virtual;
     procedure Click; override;
+    {$IFNDEF ALCompilerVersionSupported123}
+      {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-24397 have been implemented and adjust the IFDEF'}
+    {$ENDIF}
+    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
+    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); virtual;
+    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
+    procedure ChildrenMouseEnter(const AObject: TControl); virtual;
+    procedure ChildrenMouseLeave(const AObject: TControl); virtual;
     function IsInMotion: Boolean; virtual;
     function GetParentedVisible: Boolean; override;
     procedure DoMatrixChanged(Sender: TObject); override;
@@ -206,6 +216,7 @@ type
     property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     property ALParentControl: TALControl read FALParentControl;
     property ClickSound: TALClickSoundMode read FClickSound write FClickSound default TALClickSoundMode.Default;
+    property PropagateMouseEvents: Boolean read FPropagateMouseEvents write FPropagateMouseEvents default True;
   end;
 
   {*************************************}
@@ -340,6 +351,7 @@ begin
   FAutoSize := TALAutoSizeMode.None;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;
+  FPropagateMouseEvents := True;
 end;
 
 {****************************}
@@ -1596,6 +1608,8 @@ begin
   FIsMouseOver := False;
   {$ENDIF}
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseEnter(Self);
 end;
 
 {********************************}
@@ -1609,6 +1623,8 @@ begin
   if not AutoCapture then
     Pressed := False;
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseLeave(Self);
 end;
 
 {*************************************************************************************}
@@ -1644,6 +1660,17 @@ begin
     inherited;
   //--
   if LPrevPressed <> Pressed then PressedChanged;
+  //--
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseDown(Self, Button, Shift, X, Y);
+end;
+
+{***************************************************************}
+procedure TALControl.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  Inherited;
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseMove(Self, Shift, X, Y);
 end;
 
 {***********************************************************************************}
@@ -1664,6 +1691,8 @@ begin
      (not (csDesigning in ComponentState)) and
      (not FIsFocused) then
     SetFocus;
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseUp(Self, Button, Shift, X, Y);
 end;
 
 {**************************************************************************************}
@@ -1745,6 +1774,41 @@ begin
   // Result := (FForm = nil) or (FForm.visible);
   Result := True;
   {$ENDIF}
+end;
+
+{**********************************************************************************************************************}
+procedure TALControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseDown(AObject, Button, Shift, X, Y);
+end;
+
+{************************************************************************************************}
+procedure TALControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
+begin
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseMove(AObject, Shift, X, Y);
+end;
+
+{********************************************************************************************************************}
+procedure TALControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseUp(AObject, Button, Shift, X, Y);
+end;
+
+{***************************************************************}
+procedure TALControl.ChildrenMouseEnter(const AObject: TControl);
+begin
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseEnter(AObject);
+end;
+
+{***************************************************************}
+procedure TALControl.ChildrenMouseLeave(const AObject: TControl);
+begin
+  if (PropagateMouseEvents) and (ALParentControl <> nil) then
+    ALParentControl.ChildrenMouseLeave(AObject);
 end;
 
 {****************************************************}

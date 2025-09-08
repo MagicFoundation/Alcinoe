@@ -222,6 +222,8 @@ type
   public
     constructor Create(const AOwner: TObject); virtual;
     destructor Destroy; override;
+    property Lock: TObject read FLock;
+    property Owner: TObject read FOwner;
   End;
 
   // Below a sample of how to use a TALWorkerContext:
@@ -1843,20 +1845,26 @@ begin
   Result.Right := Result.Right * Ratio;
 end;
 
-{***********************************************************************************************}
-//Resizes the current rectangle, preserving the current rectangle proportions, to best fit in the
-//bounds rectangle, and returns the scaled rectangle centered in bounds.
-//FitInto implements the following functionality:
-// * If any of the current rectangle dimensions is greater than the corresponding dimension of the bounds
-//   rectangle, then FitInto scales down the current rectangle to fit into bounds. The scaled rectangle is centered in
-//   the bounds rectangle at CenterAt and the obtained scaled and centered rectangle is returned.
-// * If both width and height of the current rectangle dimensions is smaller than the corresponding dimensions of the
-//   bounds rectangle, then FitInto stretches the current rectangle to best fit into bounds. The stretched
-//   rectangle is centered in the bounds rectangle at CenterAt and the obtained stretched and centered rectangle is returned.
-// * If any of the bounds dimensions is zero then FitInto returns the current rectangle and sets Ratio equals to 1.
-//Ratio is the implemented scaling ratio.
-//CenterAt is where we need to center the result in the bounds (ex: center the result on a face instead of the middle of the bounds)
-//if center contain negative value then it's indicate percentage
+{***********}
+/// <summary>
+///   Resizes the current rectangle, preserving its proportions, to best fit into the given bounds,
+///   and returns the scaled rectangle positioned inside the bounds.
+///
+///   Behavior:
+///   - If any dimension of the rectangle is larger than the corresponding dimension of the bounds,
+///     the rectangle is scaled down to fit.
+///   - If both dimensions are smaller, the rectangle is stretched up to best fit.
+///   - If any bound dimension is zero, the original rectangle is returned and Ratio is set to 1.
+///
+///   The scaled or stretched rectangle is centered in the bounds according to <c>CenterAt</c>.
+///   <c>CenterAt</c> is expressed in normalized coordinates [0..1]:
+///     • (0,0) = top-left
+///     • (0.5,0.5) = center
+///     • (1,1) = bottom-right
+///
+///   Example: to center the result on a face located in the upper third of the image, use
+///   <c>CenterAt.Y = 0.33</c>.
+/// </summary>
 function ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF;
 begin
 
@@ -1879,8 +1887,7 @@ begin
     Result := TRectF.Create(0, 0, R.Width / Ratio, R.Height / Ratio);
 
     system.types.OffsetRect(Result, -Result.Left, -Result.Top);
-    if (CenterAt.X < 0) or (CenterAt.y < 0) then system.types.OffsetRect(Result, max(0, (((Bounds.Width) / 100) * -CenterAt.x) - (Result.Width / 2)), max(0, (((Bounds.Height) / 100) * -CenterAt.Y) - (Result.height / 2)))
-    else system.types.OffsetRect(Result, max(0, CenterAt.x - (Result.Width / 2)), max(0, CenterAt.y - (Result.height / 2)));
+    system.types.OffsetRect(Result, max(0, (Bounds.Width * CenterAt.x) - (Result.Width / 2)), max(0, (Bounds.Height * CenterAt.Y) - (Result.height / 2)));
     system.types.OffsetRect(Result, -max(0, Result.Right - Bounds.Width), -max(0, Result.bottom - Bounds.height));
     system.types.OffsetRect(Result, Bounds.Left, Bounds.Top);
 
@@ -1929,19 +1936,27 @@ begin
   Result := ALRectFitInto(R, Bounds, Ratio);
 end;
 
-{**************************************************************************************************************}
-//If any dimension of the current rectangle is greater than the corresponding dimension of the Bounds rectangle,
-//then the current rectangle is scaled down to best fit the Bounds rectangle. The obtained rectangle is aligned in Bounds.
-//PlaceInto implements the following behavior:
-// * If the width or height of the current rectangle is greater than the corresponding dimension of Bounds.
-//   Then PlaceInto scales down the current rectangle (preserving the current rectangle proportions – the ratio between the width
-//   and height) to fit in the Bounds rectangle and centers the scaled rectangle in Bounds at CenterAt.
-// * Otherwise, PlaceInto just center the current rectangle in the Bounds rectangle according to CenterAt
-// * PlaceInto returns the current rectangle if any of the Bounds dimensions is zero.
+{***********}
+/// <summary>
+///   Places the current rectangle inside the given bounds, scaling it down if necessary to ensure it fits,
+///   and returns the resulting rectangle.
+///
+///   Behavior:
+///   - If the rectangle’s width or height is larger than the corresponding dimension of <c>Bounds</c>,
+///     the rectangle is scaled down (preserving aspect ratio) to fit inside <c>Bounds</c>.
+///   - Otherwise, the rectangle is not scaled and is simply placed inside <c>Bounds</c>.
+///   - If any bound dimension is zero, the original rectangle is returned and <c>Ratio</c> is set to 1.
+///
+///   The resulting rectangle is aligned within <c>Bounds</c> according to <c>CenterAt</c>.
+///   <c>CenterAt</c> is expressed in normalized coordinates [0..1]:
+///     • (0,0) = top-left
+///     • (0.5,0.5) = center
+///     • (1,1) = bottom-right
+/// </summary>
 function ALRectPlaceInto(
            const R: TRectf;
            const Bounds: TRectf;
-           const CenterAt: TpointF; // << this is used only when we need to fit the result
+           const CenterAt: TpointF;
            out Ratio: Single): TRectF;
 begin
 
@@ -1950,8 +1965,7 @@ begin
 
     Result := R;
     system.types.OffsetRect(Result, -Result.Left, -Result.Top);
-    if (CenterAt.X < 0) or (CenterAt.y < 0) then system.types.OffsetRect(Result, max(0, (((Bounds.Width) / 100) * -CenterAt.x) - (Result.Width / 2)), max(0, (((Bounds.Height) / 100) * -CenterAt.Y) - (Result.height / 2)))
-    else system.types.OffsetRect(Result, max(0, CenterAt.x - (Result.Width / 2)), max(0, CenterAt.y - (Result.height / 2)));
+    system.types.OffsetRect(Result, max(0, (Bounds.Width * CenterAt.x) - (Result.Width / 2)), max(0, (Bounds.Height * CenterAt.Y) - (Result.height / 2)));
     system.types.OffsetRect(Result, -max(0, Result.Right - Bounds.Width), -max(0, Result.bottom - Bounds.height));
     system.types.OffsetRect(Result, Bounds.Left, Bounds.Top);
 

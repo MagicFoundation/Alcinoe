@@ -3,62 +3,62 @@
     <ProjectGuid>{AF4D00F0-C14D-4232-9454-D8872D1FA1D1}</ProjectGuid>
     <MainSource>CodeProfiler.dpr</MainSource>
     <Base>True</Base>
-    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
+    <Config Condition="'$(Config)'==''">Debug</Config>
     <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Application</AppType>
     <FrameworkType>VCL</FrameworkType>
     <ProjectVersion>20.3</ProjectVersion>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
-    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">CodeProfiler</ProjectName>
+    <Platform Condition="'$(Platform)'==''">Win64</Platform>
+    <ProjectName Condition="'$(ProjectName)'==''">CodeProfiler</ProjectName>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
     <Base_Win32>true</Base_Win32>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
     <Base_Win64>true</Base_Win64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; or &#39;$(Cfg_1)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
     <Cfg_1>true</Cfg_1>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
     <Cfg_1_Win32>true</Cfg_1_Win32>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
     <Cfg_1_Win64>true</Cfg_1_Win64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; or &#39;$(Cfg_2)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
     <Cfg_2>true</Cfg_2>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
     <Cfg_2_Win32>true</Cfg_2_Win32>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
     <Cfg_2_Win64>true</Cfg_2_Win64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base)'!=''">
     <SanitizedProjectName>CodeProfiler</SanitizedProjectName>
     <DCC_DcuOutput>.\Dcu</DCC_DcuOutput>
     <Manifest_File>None</Manifest_File>
@@ -75,7 +75,7 @@
     <DCC_UnitSearchPath>..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <DCC_ExeOutput>..\</DCC_ExeOutput>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
@@ -83,7 +83,7 @@
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
@@ -91,31 +91,31 @@
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1)'!=''">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
     <DCC_DebugInformation>0</DCC_DebugInformation>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2)'!=''">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     <DCC_Optimize>false</DCC_Optimize>
     <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <BT_BuildType>Debug</BT_BuildType>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
@@ -183,6 +183,6 @@
     </BorlandProject>
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
-  <Import Condition="Exists(&#39;$(BDS)\Bin\CodeGear.Delphi.Targets&#39;)" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-  <Import Condition="Exists(&#39;$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj&#39;)" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+  <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+  <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
 </Project>

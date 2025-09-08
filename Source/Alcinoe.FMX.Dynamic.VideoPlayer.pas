@@ -976,7 +976,7 @@ begin
                         AScale, // const AScale: Single;
                         ARect.Width, ARect.Height, // const W, H: single;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                        TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                         TalphaColors.Null, // const ATintColor: TalphaColor;
                         0, // const ABlurRadius: single;
                         0, // const AXRadius: Single;

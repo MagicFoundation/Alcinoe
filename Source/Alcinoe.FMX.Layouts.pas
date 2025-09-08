@@ -1221,10 +1221,22 @@ begin
        (fScrollEngine.TouchEnabled) and
        (((ttHorizontal in fScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
-         (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop)) or
+         (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) and
+         ((ScrollEngine.MinEdgeDragResistanceFactor <> 0) or
+          (not SameValue(ScrollEngine.ViewportPosition.X, ScrollEngine.MinScrollLimit.X, TEpsilon.position)) or
+          (fMouseDownPos.X - X > 0)) and
+         ((ScrollEngine.MaxEdgeDragResistanceFactor <> 0) or
+          (not SameValue(ScrollEngine.ViewportPosition.X, ScrollEngine.MaxScrollLimit.X, TEpsilon.position)) or
+          (fMouseDownPos.X - X < 0))) or
         ((ttVertical in fScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.y - y) > abs(fMouseDownPos.x - x)) and
-         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then begin
+         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop) and
+         ((ScrollEngine.MinEdgeDragResistanceFactor <> 0) or
+          (not SameValue(ScrollEngine.ViewportPosition.Y, ScrollEngine.MinScrollLimit.Y, TEpsilon.position)) or
+          (fMouseDownPos.Y - Y > 0)) and
+         ((ScrollEngine.MaxEdgeDragResistanceFactor <> 0) or
+          (not SameValue(ScrollEngine.ViewportPosition.Y, ScrollEngine.MaxScrollLimit.Y, TEpsilon.position)) or
+          (fMouseDownPos.Y - Y < 0)))) then begin
       {$IFDEF DEBUG}
       //ALLog(
       //  ClassName + '.InternalMouseMove',

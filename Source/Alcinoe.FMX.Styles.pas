@@ -3248,7 +3248,7 @@ begin
       ALResetButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -4121,7 +4121,7 @@ begin
       ALResetButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -4994,7 +4994,7 @@ begin
       ALResetButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -5891,7 +5891,7 @@ begin
       ALResetButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -6764,7 +6764,7 @@ begin
       ALResetButtonStyle(AButton);
       Width := RoundTo(56 * ARatio, -2);
       Height := RoundTo(56 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := RoundTo(16 * ARatio, -2);
       YRadius := RoundTo(16 * ARatio, -2);
@@ -8525,7 +8525,7 @@ begin
       ALResetToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -9455,7 +9455,7 @@ begin
       ALResetToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -10385,7 +10385,7 @@ begin
       ALResetToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -11313,7 +11313,7 @@ begin
       ALResetToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -12279,7 +12279,7 @@ begin
 
       //--Enabled (default)--
       ALResetCheckBoxStyle(ACheckBox, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := RoundTo(2 * ARatio, -2);
       YRadius := RoundTo(2 * ARatio, -2);
@@ -12358,7 +12358,7 @@ begin
 
       //--Enabled (default)--
       ALResetCheckBoxStyle(ACheckBox, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := RoundTo(2 * ARatio, -2);
       YRadius := RoundTo(2 * ARatio, -2);
@@ -12447,7 +12447,7 @@ begin
 
       //--Enabled (default)--
       ALResetRadioButtonStyle(ARadioButton, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
@@ -12521,7 +12521,7 @@ begin
 
       //--Enabled (default)--
       ALResetRadioButtonStyle(ARadioButton, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion.Rect := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
@@ -13439,15 +13439,25 @@ begin
     DefaultBottomSheetDragHandle.XRadius := -50;
     DefaultBottomSheetDragHandle.YRadius := -50;
 
-    // DefaultHorizontalSheetHeaderBar
-    ALResetRectangleStyle(DefaultHorizontalSheetHeaderBar, ARatio);
-    DefaultHorizontalSheetHeaderBar.Margins.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
-    DefaultHorizontalSheetHeaderBar.AutoSize := TALAutoSizeMode.Both;
-    DefaultHorizontalSheetHeaderBar.Align := TALAlignLayout.Top;
-    DefaultHorizontalSheetHeaderBar.Fill.Color := TalphaColors.Null;
-    DefaultHorizontalSheetHeaderBar.Fill.ColorKey := '';
-    DefaultHorizontalSheetHeaderBar.Stroke.Color := TAlphaColors.Null;
-    DefaultHorizontalSheetHeaderBar.Stroke.ColorKey := '';
+    // DefaultLeftSheetHeaderBar
+    ALResetRectangleStyle(DefaultLeftSheetHeaderBar, ARatio);
+    DefaultLeftSheetHeaderBar.Margins.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
+    DefaultLeftSheetHeaderBar.AutoSize := TALAutoSizeMode.Both;
+    DefaultLeftSheetHeaderBar.Align := TALAlignLayout.TopRight;
+    DefaultLeftSheetHeaderBar.Fill.Color := TalphaColors.Null;
+    DefaultLeftSheetHeaderBar.Fill.ColorKey := '';
+    DefaultLeftSheetHeaderBar.Stroke.Color := TAlphaColors.Null;
+    DefaultLeftSheetHeaderBar.Stroke.ColorKey := '';
+
+    // DefaultRightSheetHeaderBar
+    ALResetRectangleStyle(DefaultRightSheetHeaderBar, ARatio);
+    DefaultRightSheetHeaderBar.Margins.Rect := TRectF.Create(24*ARatio{Left}, 24*ARatio{Top}, 24*ARatio{Right}, 24*ARatio{Bottom}).RoundTo(-2);
+    DefaultRightSheetHeaderBar.AutoSize := TALAutoSizeMode.Both;
+    DefaultRightSheetHeaderBar.Align := TALAlignLayout.TopLeft;
+    DefaultRightSheetHeaderBar.Fill.Color := TalphaColors.Null;
+    DefaultRightSheetHeaderBar.Fill.ColorKey := '';
+    DefaultRightSheetHeaderBar.Stroke.Color := TAlphaColors.Null;
+    DefaultRightSheetHeaderBar.Stroke.ColorKey := '';
 
     // DefaultLeftSheetBackButton
     var LRatio := 22 / DefaultLeftSheetBackButton.Textsettings.Font.DefaultSize;
@@ -13539,7 +13549,9 @@ begin
     // DefaultBottomSheetDragHandle
     DefaultBottomSheetDragHandle.Fill.ColorKey := 'Material3.Color.OnSurfaceVariant'; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30 / #49454F
 
-    // DefaultHorizontalSheetHeaderBar
+    // DefaultLeftSheetHeaderBar
+
+    // DefaultRightSheetHeaderBar
 
     // DefaultLeftSheetBackButton
     ALApplyMaterial3ButtonIconStandardStyle(DefaultLeftSheetBackButton, (34 / 40) * ARatio);
@@ -15801,7 +15813,7 @@ begin
       ALResetDynamicButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -16674,7 +16686,7 @@ begin
       ALResetDynamicButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -17547,7 +17559,7 @@ begin
       ALResetDynamicButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -18444,7 +18456,7 @@ begin
       ALResetDynamicButtonStyle(AButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -19317,7 +19329,7 @@ begin
       ALResetDynamicButtonStyle(AButton);
       Width := RoundTo(56 * ARatio, -2);
       Height := RoundTo(56 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := RoundTo(16 * ARatio, -2);
       YRadius := RoundTo(16 * ARatio, -2);
@@ -21078,7 +21090,7 @@ begin
       ALResetDynamicToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -22008,7 +22020,7 @@ begin
       ALResetDynamicToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -22938,7 +22950,7 @@ begin
       ALResetDynamicToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -23866,7 +23878,7 @@ begin
       ALResetDynamicToggleButtonStyle(AToggleButton);
       Width := RoundTo(40 * ARatio, -2);
       Height := RoundTo(40 * ARatio, -2);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := -50;
       YRadius := -50;
@@ -24832,7 +24844,7 @@ begin
 
       //--Enabled (default)--
       ALResetDynamicCheckBoxStyle(ACheckBox, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := RoundTo(2 * ARatio, -2);
       YRadius := RoundTo(2 * ARatio, -2);
@@ -24911,7 +24923,7 @@ begin
 
       //--Enabled (default)--
       ALResetDynamicCheckBoxStyle(ACheckBox, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       XRadius := RoundTo(2 * ARatio, -2);
       YRadius := RoundTo(2 * ARatio, -2);
@@ -25000,7 +25012,7 @@ begin
 
       //--Enabled (default)--
       ALResetDynamicRadioButtonStyle(ARadioButton, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
@@ -25074,7 +25086,7 @@ begin
 
       //--Enabled (default)--
       ALResetDynamicRadioButtonStyle(ARadioButton, ARatio);
-      var LDelta := RoundTo(max(0, (48 - Height) / 2) * ARatio, -2);
+      var LDelta := RoundTo(max(0, (48 - Height) / 2), -2);
       TouchTargetExpansion := TRectf.Create(LDelta,LDelta,LDelta,LDelta);
       Fill.Color := TalphaColors.Null;
       Fill.ColorKey := '';
@@ -28038,7 +28050,8 @@ begin
   if ASheetManager.DefaultBottomSheetContainer.AutoAlignToPixel then ASheetManager.DefaultBottomSheetContainer.AlignToPixel;
   if ASheetManager.DefaultTopSheetDragHandle.AutoAlignToPixel then ASheetManager.DefaultTopSheetDragHandle.AlignToPixel;
   if ASheetManager.DefaultBottomSheetDragHandle.AutoAlignToPixel then ASheetManager.DefaultBottomSheetDragHandle.AlignToPixel;
-  if ASheetManager.DefaultHorizontalSheetHeaderBar.AutoAlignToPixel then ASheetManager.DefaultHorizontalSheetHeaderBar.AlignToPixel;
+  if ASheetManager.DefaultLeftSheetHeaderBar.AutoAlignToPixel then ASheetManager.DefaultLeftSheetHeaderBar.AlignToPixel;
+  if ASheetManager.DefaultRightSheetHeaderBar.AutoAlignToPixel then ASheetManager.DefaultRightSheetHeaderBar.AlignToPixel;
   if ASheetManager.DefaultLeftSheetBackButton.AutoAlignToPixel then ASheetManager.DefaultLeftSheetBackButton.AlignToPixel;
   if ASheetManager.DefaultRightSheetBackButton.AutoAlignToPixel then ASheetManager.DefaultRightSheetBackButton.AlignToPixel;
   if ASheetManager.DefaultLeftSheetHeadline.AutoAlignToPixel then ASheetManager.DefaultLeftSheetHeadline.AlignToPixel;

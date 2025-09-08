@@ -281,8 +281,7 @@ type
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
     // CropCenter is use when wrapmode = FitIntoAndCrop. It's define the center of
     // crop in the source image (ex: center the result on a face instead
-    // of the middle of the bounds). If CropCenter contain negative value then it's
-    // indicate percentage
+    // of the middle of the bounds).
     property CropCenter: TALPosition read GetCropCenter write SetCropCenter;
     property Cursor;
     //property DoubleBuffered;
@@ -1382,7 +1381,7 @@ end;
 {************************************************************}
 function TALDynamicImage.TCropCenter.GetDefaultValue: TPointF;
 begin
-  Result := TpointF.Create(-50,-50);
+  Result := TpointF.Create(0.5,0.5);
 end;
 
 {*****************************************************************************************}
@@ -5483,7 +5482,7 @@ begin
     Result.FillImageNoRadius := AFill.ImageNoRadius;
     Result.FillImageTintColor := AFill.ImageTintColor;
     Result.FillWrapMode := AFill.WrapMode;
-    Result.FillCropCenter := TPointF.create(-50,-50);
+    Result.FillCropCenter := TPointF.create(0.5,0.5);
     Result.FillBlurRadius := 0;
   end
   else begin
@@ -5499,7 +5498,7 @@ begin
     Result.FillImageNoRadius := False;
     Result.FillImageTintColor := TAlphaColors.null;
     Result.FillWrapMode := TALImageWrapMode.Fit;
-    Result.FillCropCenter := TPointF.create(-50,-50);
+    Result.FillCropCenter := TPointF.create(0.5,0.5);
     Result.FillBlurRadius := 0;
   end;
   //--

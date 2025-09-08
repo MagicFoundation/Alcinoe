@@ -101,7 +101,7 @@ type
     FillImageNoRadius: Boolean; // default = False
     FillImageTintColor: TAlphaColor; // default = TAlphaColors.null
     FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    FillCropCenter: TpointF; // default = TPointF.create(0.5,0.5)
     FillBlurRadius: single; // default = 0
     //--
     StateLayerOpacity: Single; // default = 0
@@ -148,7 +148,7 @@ type
     //          width="xxx"
     //          height="xxx"
     //          color="#FFFFFF or {ColorKey} or inherit">
-    //   * Other "<" and ">" must be encoded with "&lt;" and "&gt;"
+    //   * Other "<", ">" and "&" must be encoded with "&lt;", "&gt;" and "&amp;"
     //
     // Note: You can also use the "style" attribute for inline styling
     // Ex: <span style="font-size:14px;font-style:italic">
@@ -336,6 +336,7 @@ uses
   Alcinoe.StringList,
   Alcinoe.Localization,
   Alcinoe.StringUtils,
+  Alcinoe.HTML,
   Alcinoe.Common;
 
 const
@@ -487,7 +488,7 @@ begin
   FillImageNoRadius := False;
   FillImageTintColor := TAlphaColors.null;
   FillWrapMode := TALImageWrapMode.Fit;
-  FillCropCenter := TPointF.create(-50,-50);
+  FillCropCenter := TPointF.create(0.5,0.5);
   FillBlurRadius := 0;
   //--
   StateLayerOpacity := 0;
@@ -1873,7 +1874,6 @@ begin
           LText := ALStringReplaceW(Ltext, ' '#10, #10, [RfReplaceALL]);
         While ALPosW(#10' ', LText) > 0 do
           LText := ALStringReplaceW(Ltext, #10' ', #10, [RfReplaceALL]);
-        LText := ALStringReplaceW(Ltext, '&nbsp;', Chr($A0){0x00A0}, [RfReplaceALL, RfIgnoreCase]);
       end
       else
         LText := ALStringReplaceW(Ltext, #13#10, #10, [RfReplaceALL]);
@@ -2140,8 +2140,7 @@ begin
                                                      //                                 ^P1      ^P2
                   if P2 <= 0 then P2 := Maxint;
                   LCurrText := ALCopyStr(Ltext, P1, P2 - P1);  // blablabla
-                  LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
-                  LCurrText := ALStringReplaceW(LCurrText, '&lt;', '<', [rfReplaceALL]);
+                  ALHtmlDecodeInPlace(LCurrText);
                   P1 := P2; // blablabla <font color="#ffffff">blablabla</font> blablabla
                             //                                          ^P1
                 end;
@@ -2392,7 +2391,7 @@ begin
                   var LTmpLineHeightMultiplier: Single := LLineHeightMultiplier;
                   if sameValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) and Assigned(ALDefaultEstimateLineHeightMultiplier) then
                     LTmpLineHeightMultiplier := ALDefaultEstimateLineHeightMultiplier(LFontSize / LScale);
-                  if not SameValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) then
+                  if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then
                     sk4d_textstyle_set_height_multiplier(LTextStyle, LTmpLineHeightMultiplier);
 
                   // Push the style
@@ -2765,7 +2764,7 @@ begin
                                     1, // const AScale: Single;
                                     LDstRect.Width, LDstRect.Height, // const W, H: single;
                                     TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                                    TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                                     Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
                                     0, // const ABlurRadius: single;
                                     0, // const AXRadius: Single;
@@ -2784,7 +2783,7 @@ begin
                                     1, // const AScale: Single;
                                     LDstRect.Width, LDstRect.Height, // const W, H: single;
                                     TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                                    TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                                     Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
                                     0, // const ABlurRadius: single;
                                     0, // const AXRadius: Single;
@@ -2934,7 +2933,6 @@ begin
           LText := ALStringReplaceW(Ltext, ' '#10, #10, [RfReplaceALL]);
         While ALPosW(#10' ', LText) > 0 do
           LText := ALStringReplaceW(Ltext, #10' ', #10, [RfReplaceALL]);
-        LText := ALStringReplaceW(Ltext, '&nbsp;', Chr($A0){0x00A0}, [RfReplaceALL, RfIgnoreCase]);
       end
       else
         LText := ALStringReplaceW(Ltext, #13#10, #10, [RfReplaceALL]);
@@ -3361,8 +3359,7 @@ begin
             if P3 <= 0 then P3 := Maxint;
             P2 := Min(P2,P3);
             LCurrText := ALCopyStr(Ltext, P1, P2 - P1);  // blablabla
-            LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
-            LCurrText := ALStringReplaceW(LCurrText, '&lt;', '<', [rfReplaceALL]);
+            ALHtmlDecodeInPlace(LCurrText);
             P1 := P2; // blablabla <font color="#ffffff">blablabla</font> blablabla
                       //                                          ^P1
 
@@ -3485,7 +3482,7 @@ begin
             var LTmpLineHeightMultiplier: Single := LLineHeightMultiplier;
             if sameValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) and Assigned(ALDefaultEstimateLineHeightMultiplier) then
               LTmpLineHeightMultiplier := ALDefaultEstimateLineHeightMultiplier(LFontSize / LScale);
-            if not sameValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) then begin
+            if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then begin
               var LOldAscent := LFontMetrics.Ascent;
               var LRatio: Single := (LFontSize / (-LFontMetrics.Ascent + LFontMetrics.Descent));
               LFontMetrics.Ascent := -1 * LRatio * -LFontMetrics.Ascent * LTmpLineHeightMultiplier;
@@ -4109,7 +4106,7 @@ begin
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;
@@ -4174,7 +4171,7 @@ begin
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;
@@ -4257,7 +4254,7 @@ begin
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;

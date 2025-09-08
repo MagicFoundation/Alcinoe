@@ -4602,7 +4602,7 @@ Var Buffer: AnsiString;
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
          ALCopyStr(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
-         if DecodeJSONReferences then ALJavascriptDecodeV(CurrName); // ..."...
+         if DecodeJSONReferences then ALJavascriptDecodeInPlace(CurrName); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
@@ -4843,7 +4843,7 @@ Var Buffer: AnsiString;
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
          ALCopyStr(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
-         if DecodeJSONReferences then ALJavascriptDecodeV(currValue); // ..."...
+         if DecodeJSONReferences then ALJavascriptDecodeInPlace(currValue); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
@@ -11255,7 +11255,7 @@ Var BufferLength: Integer;
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
          ALCopyStr(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
-         if DecodeJSONReferences then ALJavascriptDecodeV(CurrName); // ..."...
+         if DecodeJSONReferences then ALJavascriptDecodeInPlace(CurrName); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
@@ -11493,7 +11493,7 @@ Var BufferLength: Integer;
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
          ALCopyStr(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
-         if DecodeJSONReferences then ALJavascriptDecodeV(currValue); // ..."...
+         if DecodeJSONReferences then ALJavascriptDecodeInPlace(currValue); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."

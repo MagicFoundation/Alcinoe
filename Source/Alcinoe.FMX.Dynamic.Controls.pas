@@ -197,11 +197,11 @@ Type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // [TControl] procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // [TControl] procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual; // [TControl] procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual;
-    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseEnter(const AObject: TALDynamicControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
+    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
+    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
+    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
+    procedure ChildrenMouseEnter(const AObject: TALDynamicControl); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
+    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
     procedure Click; virtual; // [TControl] procedure Click; virtual;
     procedure DblClick; virtual; // [TControl] procedure DblClick; virtual;
     function IsInMotion: Boolean; virtual; abstract;
@@ -359,6 +359,7 @@ type
     FAutoSize: TALAutoSizeMode; // 1 byte
     FIsAdjustingSize: Boolean; // 1 byte
     FAdjustSizeOnEndUpdate: Boolean; // 1 byte
+    FPropagateMouseEvents: Boolean; // 1 byte — placed here (protected) because the private section has no room left for a 1-byte field
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
@@ -378,10 +379,19 @@ type
     procedure MouseEnter; override;
     procedure MouseLeave; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoClickSound; virtual;
     procedure Click; override;
+    {$IFNDEF ALCompilerVersionSupported123}
+      {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-24397 have been implemented and adjust the IFDEF'}
+    {$ENDIF}
+    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseEnter(const AObject: TALDynamicControl); override;
+    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); override;
     function IsInMotion: Boolean; override;
     //**function GetParentedVisible: Boolean; override;
     //**procedure DoMatrixChanged(Sender: TObject); override;
@@ -444,6 +454,7 @@ type
     //**property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     //**property Owner: TALDynamicControl read FOwner;
     property ClickSound: TALClickSoundMode read FClickSound write FClickSound default TALClickSoundMode.Default;
+    property PropagateMouseEvents: Boolean read FPropagateMouseEvents write FPropagateMouseEvents default True;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -598,7 +609,7 @@ begin
     Cursor := FCaptured.Cursor;
     FCaptured.MouseMove(Shift, LCapturedMousePos.X, LCapturedMousePos.Y);
   end
-  else if not ALGetHasTouchScreen then begin
+  else {$IF not defined(DEBUG)}if not ALGetHasTouchScreen then{$ENDIF} begin
     var LControlMousePos: TALPointD;
     var LControl := GetControlAtPos(
                       TALPointD.create(X, Y), // const APos: TPointF; // APos is local to the control
@@ -1277,7 +1288,7 @@ begin
   if Owner <> nil then Result := Owner.AbsoluteToLocal(APoint)
   else if Host <> nil then begin
     Result := APoint;
-    Result.Offset(-Host.AbsoluteToLocal(TPointF.Zero));
+    Result.Offset(Host.AbsoluteToLocal(TPointF.Zero));
   end
   else Result := APoint;
   Result.Offset(-Left, -Top);
@@ -1289,7 +1300,7 @@ begin
   if Owner <> nil then Result := Owner.AbsoluteToLocal(ARect)
   else if Host <> nil then begin
     Result := ARect;
-    Result.Offset(-Host.AbsoluteToLocal(TPointF.Zero));
+    Result.Offset(Host.AbsoluteToLocal(TPointF.Zero));
   end
   else Result := ARect;
   Result.Offset(-Left, -Top);
@@ -2474,46 +2485,6 @@ begin
   //  FOnMouseWheel(Self, Shift, WheelDelta, Handled)
 end;
 
-{*************************************************}
-// https://quality.embarcadero.com/browse/RSP-24397
-procedure TALDynamicControl.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if fOwner <> nil then
-    fOwner.ChildrenMouseDown(AObject, Button, Shift, X, Y);
-end;
-
-{*************************************************}
-// https://quality.embarcadero.com/browse/RSP-24397
-procedure TALDynamicControl.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
-begin
-  if fOwner <> nil then
-    fOwner.ChildrenMouseMove(AObject, Shift, X, Y);
-end;
-
-{*************************************************}
-// https://quality.embarcadero.com/browse/RSP-24397
-procedure TALDynamicControl.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if fOwner <> nil then
-    fOwner.ChildrenMouseUp(AObject, Button, Shift, X, Y);
-end;
-
-{*************************************************}
-// https://quality.embarcadero.com/browse/RSP-24397
-procedure TALDynamicControl.ChildrenMouseEnter(const AObject: TALDynamicControl);
-begin
-  if fOwner <> nil then
-    fOwner.ChildrenMouseEnter(AObject);
-end;
-
-{*************************************************}
-// https://quality.embarcadero.com/browse/RSP-24397
-procedure TALDynamicControl.ChildrenMouseLeave(const AObject: TALDynamicControl);
-begin
-  if fOwner <> nil then
-    fOwner.ChildrenMouseLeave(AObject);
-end;
-
 {********************************}
 procedure TALDynamicControl.Click;
 begin
@@ -2661,6 +2632,7 @@ begin
   FAutoSize := TALAutoSizeMode.None;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;
+  FPropagateMouseEvents := True;
 end;
 
 {*******************************************}
@@ -3925,6 +3897,8 @@ begin
   FIsMouseOver := False;
   {$ENDIF}
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseEnter(Self);
 end;
 
 {*********************************************}
@@ -3938,6 +3912,8 @@ begin
   if not AutoCapture then
     Pressed := False;
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseLeave(Self);
 end;
 
 {****************************************************************************************************}
@@ -3973,6 +3949,17 @@ begin
     inherited;
   //--
   if LPrevPressed <> Pressed then PressedChanged;
+  //--
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseDown(Self, Button, Shift, X, Y);
+end;
+
+{******************************************************************************}
+procedure TALDynamicExtendedControl.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  Inherited;
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseMove(Self, Shift, X, Y);
 end;
 
 {**************************************************************************************************}
@@ -3993,6 +3980,8 @@ begin
   //**   (not (csDesigning in ComponentState)) and
   //**   (not FIsFocused) then
   //**  SetFocus;
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseUp(Self, Button, Shift, X, Y);
 end;
 
 {*****************************************************************************************************}
@@ -4076,6 +4065,41 @@ end;
 //**  Result := True;
 //**  {$ENDIF}
 //**end;
+
+{**********************************************************************************************************************************************}
+procedure TALDynamicExtendedControl.ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseDown(AObject, Button, Shift, X, Y);
+end;
+
+{************************************************************************************************************************}
+procedure TALDynamicExtendedControl.ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);
+begin
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseMove(AObject, Shift, X, Y);
+end;
+
+{********************************************************************************************************************************************}
+procedure TALDynamicExtendedControl.ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseUp(AObject, Button, Shift, X, Y);
+end;
+
+{***************************************************************************************}
+procedure TALDynamicExtendedControl.ChildrenMouseEnter(const AObject: TALDynamicControl);
+begin
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseEnter(AObject);
+end;
+
+{***************************************************************************************}
+procedure TALDynamicExtendedControl.ChildrenMouseLeave(const AObject: TALDynamicControl);
+begin
+  if (PropagateMouseEvents) and (Owner <> nil) then
+    Owner.ChildrenMouseLeave(AObject);
+end;
 
 {***********************************************************************}
 //**procedure TALDynamicExtendedControl.DoMatrixChanged(Sender: TObject);

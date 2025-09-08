@@ -1276,8 +1276,8 @@ Var buffer: AnsiString;
              (not (LContent[1] in ['''','"'])) then ALXmlDocError(CALXmlParseError)
           else begin
             if DecodeXmlReferences then begin
-              if CodePage = CP_UTF8 then LstParams[I] := LstParams.Names[I] + '=' + ALXMLTextElementDecode(alCopyStr(LContent,2,LContentLn-2))
-              else LstParams[I] := LstParams.Names[I] + '=' + ALStringDecode(ALXMLTextElementDecode(ALUTF8Encode(alCopyStr(LContent,2,LContentLn-2), CodePage)), Codepage);
+              if CodePage = CP_UTF8 then LstParams[I] := LstParams.Names[I] + '=' + ALXMLEntityDecode(alCopyStr(LContent,2,LContentLn-2))
+              else LstParams[I] := LstParams.Names[I] + '=' + ALStringDecode(ALXMLEntityDecode(ALUTF8Encode(alCopyStr(LContent,2,LContentLn-2), CodePage)), Codepage);
             end
             else LstParams[I] := LstParams.Names[I] + '=' + alCopyStr(LContent,2,LContentLn-2)
           end;
@@ -1320,8 +1320,8 @@ Var buffer: AnsiString;
     If (PreserveWhiteSpace) or (ALTrim(Str1) <> '') then Begin
 
       if DecodeXmlReferences then begin
-        if CodePage = CP_UTF8 then str1 := ALXMLTextElementDecode(Str1)
-        else str1 := ALStringDecode(ALXMLTextElementDecode(ALUTF8Encode(Str1, CodePage)), Codepage);
+        if CodePage = CP_UTF8 then str1 := ALXMLEntityDecode(Str1)
+        else str1 := ALStringDecode(ALXMLEntityDecode(ALUTF8Encode(Str1, CodePage)), Codepage);
       end;
 
       if (notSaxMode) then begin
@@ -2339,7 +2339,7 @@ Var NodeStack: Tstack;
       if EncodeXmlReferences then begin
         WriteStr2Buffer(NodeName);
         WriteStr2Buffer('="');
-        WriteStr2Buffer(ALXMLTextElementEncode(text));
+        WriteStr2Buffer(ALXMLAttributeEncodeDoubleQuoted(text));
         WriteStr2Buffer('"');
       end
       else begin
@@ -2362,7 +2362,7 @@ Var NodeStack: Tstack;
   Procedure WriteTextNode2Stream(aTextNode:TALXmlNode);
   Begin
     with aTextNode do
-      if EncodeXmlReferences then WriteStr2Buffer(ALXMLTextElementEncode(text))
+      if EncodeXmlReferences then WriteStr2Buffer(ALXMLTextEncode(text))
       else WriteStr2Buffer(text);
   end;
 

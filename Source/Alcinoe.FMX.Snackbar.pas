@@ -7,6 +7,7 @@ uses
   system.Classes,
   System.Generics.Collections,
   System.UITypes,
+  FMX.Types,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Objects,
@@ -44,9 +45,10 @@ type
       public
         constructor Create;
         destructor Destroy; override;
-        function SetMarginLeft(const AValue: Single): TBuilder;
-        function SetMarginRight(const AValue: Single): TBuilder;
-        function SetMarginBottom(const AValue: Single): TBuilder;
+        function SetOwnerAndParent(const AValue: TALControl): TBuilder;
+        function SetContainerMarginLeft(const AValue: Single): TBuilder;
+        function SetContainerMarginRight(const AValue: Single): TBuilder;
+        function SetContainerMarginBottom(const AValue: Single): TBuilder;
         function SetMessageText(const AValue: String): TBuilder;
         function AddActionButton(const ACaption: String; const ATag: NativeInt): TBuilder;
         function AddCloseButton(const ATag: NativeInt): TBuilder;
@@ -78,6 +80,7 @@ type
     /// </summary>
     class function Builder: TBuilder;
   private
+    FMouseDownDT: TDateTime;
     FAutoDismissTimer: TALDisplayTimer;
     FContainer: TALRectangle;
     FMessage: TALText;
@@ -116,8 +119,8 @@ type
     property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALSnackbarManager = class
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALSnackbarManager = class(TInterfacedObject, IFreeNotification)
   private
     class function CreateInstance: TALSnackbarManager;
     class function GetInstance: TALSnackbarManager; static;
@@ -141,6 +144,10 @@ type
     FContainerAnimation: TALFloatAnimation;
     FQueue: TQueue<TALSnackbar>;
     FFrozenNativeControls: TArray<TALNativeControl>;
+    procedure FreezeNativeViews;
+    procedure UnfreezeNativeViews;
+    { IFreeNotification }
+    procedure FreeNotification(AObject: TObject);
   protected
     procedure ContainerAnimationProcess(Sender: TObject);
     procedure ContainerAnimationFinish(Sender: TObject);
@@ -165,7 +172,7 @@ type
     property DefaultMessage: TALText read FDefaultMessage;
     property DefaultActionButton: TALButton read FDefaultActionButton;
     property DefaultCloseButton: TALButton read FDefaultCloseButton;
-    property CurrentSnackbar: TALSnackbar read fCurrentSnackbar;
+    property CurrentSnackbar: TALSnackbar read fCurrentSnackbar write fCurrentSnackbar;
     function IsShowingSnackbar: Boolean;
     procedure CloseCurrentSnackbar;
   end;
@@ -177,6 +184,7 @@ implementation
 
 uses
   System.Types,
+  System.DateUtils,
   FMX.Forms,
   Alcinoe.FMX.Styles,
   Alcinoe.Common;
@@ -196,24 +204,35 @@ begin
   inherited;
 end;
 
-{**************************************************************************}
-function TALSnackbar.TBuilder.SetMarginLeft(const AValue: Single): TBuilder;
+{**********************************************************************************}
+function TALSnackbar.TBuilder.SetOwnerAndParent(const AValue: TALControl): TBuilder;
 begin
-  FSnackbar.Margins.Left := AValue;
+  // This will defacto call AValue.Realign and FSnackbar.EndUpdate
+  // in TControl.DoAddObject.SetUpdatingState
+  AValue.InsertComponent(FSnackbar);
+  FSnackbar.Parent := AValue;
+  FSnackbar.BeginUpdate;
   Result := Self;
 end;
 
-{***************************************************************************}
-function TALSnackbar.TBuilder.SetMarginRight(const AValue: Single): TBuilder;
+{***********************************************************************************}
+function TALSnackbar.TBuilder.SetContainerMarginLeft(const AValue: Single): TBuilder;
 begin
-  FSnackbar.Margins.Right := AValue;
+  FSnackbar.Container.Margins.Left := AValue;
   Result := Self;
 end;
 
-{****************************************************************************}
-function TALSnackbar.TBuilder.SetMarginBottom(const AValue: Single): TBuilder;
+{************************************************************************************}
+function TALSnackbar.TBuilder.SetContainerMarginRight(const AValue: Single): TBuilder;
 begin
-  FSnackbar.Margins.Bottom := AValue;
+  FSnackbar.Container.Margins.Right := AValue;
+  Result := Self;
+end;
+
+{*************************************************************************************}
+function TALSnackbar.TBuilder.SetContainerMarginBottom(const AValue: Single): TBuilder;
+begin
+  FSnackbar.Container.Margins.Bottom := AValue;
   Result := Self;
 end;
 
@@ -277,6 +296,7 @@ end;
 constructor TALSnackbar.Create(AOwner: TComponent);
 begin
   inherited;
+  FMouseDownDT := 0;
   FAutoDismissTimer := TALDisplayTimer.Create;
   FAutoDismissTimer.OnProcess := AutoDismissTimerProcess;
   FContainer := TALRectangle.Create(Self);
@@ -319,12 +339,14 @@ end;
 {**********************************************}
 class function TALSnackbar.Current: TALSnackbar;
 begin
+  if not TALSnackbarManager.HasInstance then exit(nil);
   Result := TALSnackbarManager.Instance.CurrentSnackbar;
 end;
 
 {*********************************************************************************************************************************************************}
 class procedure TALSnackbar.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateContainer]);
 begin
+  if not TALSnackbarManager.HasInstance then exit;
   var LCurrentSnackbar := TALSnackbarManager.Instance.CurrentSnackbar;
   if LCurrentSnackbar <> nil then begin
     LCurrentSnackbar.OnClosedRefProc := AOnClosedCallback;
@@ -333,7 +355,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{********************************************}
 function TALSnackbar.IsTransitioning: Boolean;
 begin
   Result := (TALSnackbarManager.Instance.CurrentSnackbar = Self) and
@@ -349,6 +371,7 @@ end;
 {****************************************************************************************************************}
 procedure TALSnackbar.ContainerMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
+  FMouseDownDT := Now;
   FAutoDismissTimer.Pause;
 end;
 
@@ -356,6 +379,7 @@ end;
 procedure TALSnackbar.ContainerMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   FAutoDismissTimer.Resume;
+  If MilliSecondsBetween(FMouseDownDT, Now) <= 200 then CloseCurrent;
 end;
 
 {**********************************************}
@@ -489,6 +513,43 @@ begin
   result := FInstance <> nil;
 end;
 
+{*********************************************}
+procedure TALSnackbarManager.FreezeNativeViews;
+begin
+  //For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+  //  if FFrozenNativeControls[I] <> nil then
+  //    FFrozenNativeControls[I].RemoveFreeNotify(Self);
+  //
+  //ALFreezeNativeViews(FFrozenNativeControls);
+  //
+  //For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+  //  if FFrozenNativeControls[I] <> nil then
+  //    FFrozenNativeControls[I].AddFreeNotify(Self);
+end;
+
+{***********************************************}
+procedure TALSnackbarManager.UnfreezeNativeViews;
+begin
+  //For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+  //  if FFrozenNativeControls[I] <> nil then
+  //    FFrozenNativeControls[I].RemoveFreeNotify(Self);
+  //
+  //ALUnfreezeNativeViews(FFrozenNativeControls)
+end;
+
+{**************************************************************}
+procedure TALSnackbarManager.FreeNotification(AObject: TObject);
+begin
+  For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] = AObject then
+      FFrozenNativeControls[I] := nil;
+
+  if FCurrentSnackBar = AObject then begin
+    FContainerAnimation.Enabled := False;
+    FCurrentSnackBar := Nil;
+  end;
+end;
+
 {*****************************************************}
 function TALSnackbarManager.IsShowingSnackbar: Boolean;
 begin
@@ -534,7 +595,7 @@ begin
     LCurrentSnackbar.FOnClosedRefProc();
   ProcessPendingSnackbars;
   if not IsShowingSnackbar then
-    ALUnfreezeNativeViews(FFrozenNativeControls);
+    UnfreezeNativeViews;
   TThread.ForceQueue(nil,
     procedure
     begin
@@ -594,14 +655,24 @@ end;
 procedure TALSnackbarManager.ShowSnackbar(const ASnackbar: TALSnackbar);
 begin
 
-  // Initialize LForm
-  Var LForm := Screen.ActiveForm;
-  if LForm = nil then LForm := Application.MainForm;
-  if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+  // Init LForm & LClientWidth
+  Var LForm: TCommonCustomForm;
+  var LClientWidth: Single;
+  if ASnackbar.ParentControl = nil then begin
+    LForm := Screen.ActiveForm;
+    if LForm = nil then LForm := Application.MainForm;
+    if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+    LClientWidth := LForm.ClientWidth;
+  end
+  else begin
+    LForm := nil;
+    LClientWidth := ASnackbar.ParentControl.Width;
+  end;
 
+  // Init ASnackbar.Message.MaxWidth
   var LUsedWidth: Single := ASnackbar.container.Padding.Left + ASnackbar.Container.Padding.Right +
-                        ASnackbar.container.margins.Left + ASnackbar.Container.margins.Right +
-                        ASnackbar.Message.Margins.Left + ASnackbar.Message.Margins.Right;
+                            ASnackbar.container.margins.Left + ASnackbar.Container.margins.Right +
+                            ASnackbar.Message.Margins.Left + ASnackbar.Message.Margins.Right;
   if ASnackbar.HasActionButton then begin
     // BeginUpdate was called when the Snackbar was created.
     // Calling EndUpdate now will adjust the size of the ActionButton.
@@ -616,19 +687,28 @@ begin
     ASnackBar.Container.Align := TalAlignLayout.Bottom;
     LUsedWidth := LUsedWidth + ASnackBar.CloseButton.Width + ASnackBar.CloseButton.Margins.Left + ASnackBar.CloseButton.Margins.Right;
   end;
-  ASnackbar.Message.MaxWidth := LForm.ClientWidth - LUsedWidth;
+  ASnackbar.Message.MaxWidth := LClientWidth - LUsedWidth;
 
-  // Layout the Sheet
-  LForm.Focused := nil;
-  ALFreezeNativeViews(FFrozenNativeControls);
-  ASnackbar.Align := TALAlignLayout.Contents;
-  // This will defacto call LForm.Realign and ASheet.EndUpdate
-  // in TCustomForm.DoAddObject.SetUpdatingState
-  LForm.InsertComponent(ASnackbar);
-  ASnackbar.Parent := LForm;
+  // Attach ASnackbar
+  if ASnackbar.ParentControl = nil then begin
+    LForm.Focused := nil;
+    FreezeNativeViews;
+    ASnackbar.Align := TALAlignLayout.Contents;
+    // This will defacto call LForm.Realign and ASheet.EndUpdate
+    // in TCustomForm.DoAddObject.SetUpdatingState
+    LForm.InsertComponent(ASnackbar);
+    ASnackbar.Parent := LForm;
+  end
+  else begin
+    ASnackbar.ParentControl.ResetFocus;
+    FreezeNativeViews;
+    ASnackbar.Align := TALAlignLayout.Contents;
+    ASnackbar.EndUpdate;
+  end;
 
   // Init FCurrentSnackbar
   FCurrentSnackbar := ASnackbar;
+  FCurrentSnackbar.AddFreeNotify(Self);
 
   // ShowAnimateOptions
   if TALSnackbar.TAnimateOption.AnimateContainer in FCurrentSnackbar.ShowAnimateOptions then begin

@@ -551,7 +551,8 @@ type
     FVelocityTracker: TALVelocityTracker;
     FTouchSlop: Single;
     FOverflingDistance: Single;
-    FDragResistanceFactor: Single;
+    FMinEdgeDragResistanceFactor: Single;
+    FMaxEdgeDragResistanceFactor: Single;
     FMinEdgeSpringbackEnabled: Boolean;
     FMaxEdgeSpringbackEnabled: Boolean;
     FTouchMode: TTouchMode;
@@ -571,7 +572,7 @@ type
     FMoved: Boolean;
     FTag: NativeInt;
     procedure StartTimer;
-    procedure StopTimer(const AAbruptly: Boolean = False);
+    procedure StopTimer(const AAbruptly: Boolean = False; const ATriggerOnStopEventWhenAbrupt: Boolean = False);
     {$IF (not defined(IOS)) and (not defined(ANDROID))}
     procedure TimerProc;
     {$ENDIF}
@@ -579,7 +580,8 @@ type
     procedure SetDown(const Value: Boolean);
     function IsTouchSlopStored: Boolean;
     function IsOverflingDistanceStored: Boolean;
-    function IsDragResistanceFactorStored: Boolean;
+    function IsMinEdgeDragResistanceFactorStored: Boolean;
+    function IsMaxEdgeDragResistanceFactorStored: Boolean;
     function IsFrictionStored: Boolean;
     function GetFriction: Single;
     procedure SetFriction(const Value: Single);
@@ -637,7 +639,7 @@ type
     ///   Halts the ongoing animation, freezing the scroller at its current position
     ///   without completing the remaining motion.
     /// </summary>
-    procedure Stop(const AAbruptly: Boolean = False);
+    procedure Stop(const AAbruptly: Boolean = False; const ATriggerOnStopEventWhenAbrupt: Boolean = False);
     property TouchTracking: TTouchTracking read FTouchTracking write FTouchTracking;
     property TouchEnabled: Boolean read GetTouchEnabled;
     /// <summary>
@@ -676,7 +678,8 @@ type
     ///   of 1 implies normal drag behavior, while values below 1 introduce increased
     ///   resistance, making the drag feel heavier.
     /// </summary>
-    property DragResistanceFactor: Single read FDragResistanceFactor write FDragResistanceFactor stored IsDragResistanceFactorStored nodefault;
+    property MinEdgeDragResistanceFactor: Single read FMinEdgeDragResistanceFactor write FMinEdgeDragResistanceFactor stored IsMinEdgeDragResistanceFactorStored nodefault;
+    property MaxEdgeDragResistanceFactor: Single read FMaxEdgeDragResistanceFactor write FMaxEdgeDragResistanceFactor stored IsMaxEdgeDragResistanceFactorStored nodefault;
     property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write FMinEdgeSpringbackEnabled default true;
     property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write FMaxEdgeSpringbackEnabled default true;
     /// <summary>
@@ -2601,7 +2604,8 @@ begin
   FVelocityTracker := TALVelocityTracker.Create;
   FTouchSlop := DefaultTouchSlop;
   FOverflingDistance := DefaultOverflingDistance;
-  FDragResistanceFactor := DefaultDragResistanceFactor;
+  FMinEdgeDragResistanceFactor := DefaultDragResistanceFactor;
+  FMaxEdgeDragResistanceFactor := DefaultDragResistanceFactor;
   FMinEdgeSpringbackEnabled := True;
   FMaxEdgeSpringbackEnabled := True;
   FTouchMode := TTouchMode.Auto;
@@ -2664,7 +2668,8 @@ begin
     TouchMode := TALScrollEngine(Source).TouchMode;
     TouchSlop := TALScrollEngine(Source).TouchSlop;
     OverflingDistance := TALScrollEngine(Source).OverflingDistance;
-    DragResistanceFactor := TALScrollEngine(Source).DragResistanceFactor;
+    MinEdgeDragResistanceFactor := TALScrollEngine(Source).MinEdgeDragResistanceFactor;
+    MaxEdgeDragResistanceFactor := TALScrollEngine(Source).MaxEdgeDragResistanceFactor;
     MinEdgeSpringbackEnabled := TALScrollEngine(Source).MinEdgeSpringbackEnabled;
     MaxEdgeSpringbackEnabled := TALScrollEngine(Source).MaxEdgeSpringbackEnabled;
     Friction := TALScrollEngine(Source).Friction;
@@ -2825,14 +2830,14 @@ begin
 
 end;
 
-{********************************************************************}
-procedure TALScrollEngine.StopTimer(const AAbruptly: Boolean = False);
+{**************************************************************************************************************************}
+procedure TALScrollEngine.StopTimer(const AAbruptly: Boolean = False; const ATriggerOnStopEventWhenAbrupt: Boolean = False);
 begin
 
   if not FTimerActive then exit;
   FTimerActive := False;
 
-  if not AAbruptly then
+  if (not AAbruptly) or ATriggerOnStopEventWhenAbrupt then
     DoStop;
 
   {$IFDEF IOS}
@@ -2889,14 +2894,14 @@ end;
 {***************************************************************************}
 // Halts the ongoing animation, freezing the scroller at its current position
 // without completing the remaining motion.
-procedure TALScrollEngine.Stop(const AAbruptly: Boolean = False);
+procedure TALScrollEngine.Stop(const AAbruptly: Boolean = False; const ATriggerOnStopEventWhenAbrupt: Boolean = False);
 begin
   if AAbruptly then
     FDown := False;
   //--
   if FOverScroller.isFinished then begin
     if AAbruptly then
-      StopTimer(true{AAbruptly});
+      StopTimer(AAbruptly, ATriggerOnStopEventWhenAbrupt);
     exit;
   end;
   //--
@@ -2906,7 +2911,7 @@ begin
   end
   else begin
     FOverScroller.forceFinished(true{finished});
-    StopTimer(true{AAbruptly});
+    StopTimer(AAbruptly, ATriggerOnStopEventWhenAbrupt);
   end;
 end;
 
@@ -2922,10 +2927,16 @@ begin
   Result := Not sameValue(FOverflingDistance, DefaultOverflingDistance, TEpsilon.Position);
 end;
 
-{*************************************************************}
-function TALScrollEngine.IsDragResistanceFactorStored: Boolean;
+{********************************************************************}
+function TALScrollEngine.IsMinEdgeDragResistanceFactorStored: Boolean;
 begin
-  Result := Not sameValue(FDragResistanceFactor, DefaultDragResistanceFactor, TEpsilon.Scale);
+  Result := Not sameValue(FMinEdgeDragResistanceFactor, DefaultDragResistanceFactor, TEpsilon.Scale);
+end;
+
+{********************************************************************}
+function TALScrollEngine.IsMaxEdgeDragResistanceFactorStored: Boolean;
+begin
+  Result := Not sameValue(FMaxEdgeDragResistanceFactor, DefaultDragResistanceFactor, TEpsilon.Scale);
 end;
 
 {*************************************************}
@@ -3250,16 +3261,19 @@ begin
 
   FMoved := True;
 
-  if (FViewportPosition.x < FMinScrollLimit.x - TEpsilon.Position) or
-     (FViewportPosition.x > FMaxScrollLimit.x + TEpsilon.Position) then xDiff := xDiff * FDragResistanceFactor;
-  if (FViewportPosition.y < FMinScrollLimit.y - TEpsilon.Position) or
-     (FViewportPosition.y > FMaxScrollLimit.y + TEpsilon.Position) then yDiff := yDiff * FDragResistanceFactor;
+       if (FViewportPosition.x < FMinScrollLimit.x - TEpsilon.Position) then xDiff := xDiff * FMinEdgeDragResistanceFactor
+  else if (FViewportPosition.x > FMaxScrollLimit.x + TEpsilon.Position) then xDiff := xDiff * FMaxEdgeDragResistanceFactor;
+       if (FViewportPosition.y < FMinScrollLimit.y - TEpsilon.Position) then yDiff := yDiff * FMinEdgeDragResistanceFactor
+  else if (FViewportPosition.y > FMaxScrollLimit.y + TEpsilon.Position) then yDiff := yDiff * FMaxEdgeDragResistanceFactor;
 
-  if FDragResistanceFactor = 0 then begin
-         if FViewportPosition.x + xDiff < FMinScrollLimit.x - TEpsilon.Position then xDiff := FMinScrollLimit.x - FViewportPosition.x
-    else if FViewportPosition.x + xDiff > FMaxScrollLimit.x + TEpsilon.Position then xDiff := FMaxScrollLimit.x - FViewportPosition.x;
-         if FViewportPosition.y + YDiff < FMinScrollLimit.y - TEpsilon.Position then yDiff := FMinScrollLimit.y - FViewportPosition.y
-    else if FViewportPosition.y + YDiff > FMaxScrollLimit.y + TEpsilon.Position then yDiff := FMaxScrollLimit.y - FViewportPosition.y;
+  if FMinEdgeDragResistanceFactor = 0 then begin
+    if FViewportPosition.x + xDiff < FMinScrollLimit.x - TEpsilon.Position then xDiff := FMinScrollLimit.x - FViewportPosition.x;
+    if FViewportPosition.y + YDiff < FMinScrollLimit.y - TEpsilon.Position then yDiff := FMinScrollLimit.y - FViewportPosition.y;
+  end;
+
+  if FMaxEdgeDragResistanceFactor = 0 then begin
+    if FViewportPosition.x + xDiff > FMaxScrollLimit.x + TEpsilon.Position then xDiff := FMaxScrollLimit.x - FViewportPosition.x;
+    if FViewportPosition.y + YDiff > FMaxScrollLimit.y + TEpsilon.Position then yDiff := FMaxScrollLimit.y - FViewportPosition.y;
   end;
 
   if sameValue(xDiff, 0, Tepsilon.Position) and

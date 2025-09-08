@@ -245,7 +245,7 @@ begin
             LRect, // const ADstRect: TrectF;
             1, // const AOpacity: Single;
             nil, // const AMaskImage: CGImageRef;
-            TpointF.create(-50,-50), // const ACropCenter: TpointF;
+            TpointF.create(0.5,0.5), // const ACropCenter: TpointF;
             TalphaColors.null, // const ATintColor: TalphaColor;
             0, // const ABlurRadius: single;
             0, // const AXRadius: Single;
@@ -289,7 +289,7 @@ begin
           LRect, // const ADstRect: TrectF;
           1, // const AOpacity: Single;
           nil, // const AMaskImage: CGImageRef;
-          TpointF.create(-50,-50), // const ACropCenter: TpointF;
+          TpointF.create(0.5,0.5), // const ACropCenter: TpointF;
           TalphaColors.null, // const ATintColor: TalphaColor;
           0, // const ABlurRadius: single;
           0, // const AXRadius: Single;

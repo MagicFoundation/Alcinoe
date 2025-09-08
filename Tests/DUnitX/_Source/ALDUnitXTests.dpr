@@ -204,9 +204,10 @@ uses
   Grijjy.SymbolTranslator,
   //---------------------
   {$IFDEF MSWINDOWS}
-  ALDUnitXTestStrings in 'ALDUnitXTestStrings.pas',
+  ALDUnitXTestStringUtils in 'ALDUnitXTestStringUtils.pas',
   ALDUnitXTestCipher in 'ALDUnitXTestCipher.pas',
   ALDUnitXTestRtti in 'ALDUnitXTestRtti.pas',
+  ALDUnitXTestHtml in 'ALDUnitXTestHtml.pas',
   {$ENDIF}
   System.SysUtils;
 

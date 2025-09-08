@@ -5,161 +5,161 @@
     <FrameworkType>FMX</FrameworkType>
     <MainSource>Sample.dpr</MainSource>
     <Base>True</Base>
-    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
+    <Config Condition="'$(Config)'==''">Debug</Config>
+    <Platform Condition="'$(Platform)'==''">Android64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Android&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Android)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
     <Base_Android>true</Base_Android>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Android64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Android64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Base)'=='true') or '$(Base_Android64)'!=''">
     <Base_Android64>true</Base_Android64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSDevice64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_iOSDevice64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Base)'=='true') or '$(Base_iOSDevice64)'!=''">
     <Base_iOSDevice64>true</Base_iOSDevice64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_iOSSimARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='iOSSimARM64' and '$(Base)'=='true') or '$(Base_iOSSimARM64)'!=''">
     <Base_iOSSimARM64>true</Base_iOSSimARM64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSX64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_OSX64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Base)'=='true') or '$(Base_OSX64)'!=''">
     <Base_OSX64>true</Base_OSX64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSXARM64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_OSXARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='OSXARM64' and '$(Base)'=='true') or '$(Base_OSXARM64)'!=''">
     <Base_OSXARM64>true</Base_OSXARM64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
     <Base_Win32>true</Base_Win32>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Base)&#39;==&#39;true&#39;) or &#39;$(Base_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
     <Base_Win64>true</Base_Win64>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; or &#39;$(Cfg_1)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
     <Cfg_1>true</Cfg_1>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Android&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Android)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_1)'=='true') or '$(Cfg_1_Android)'!=''">
     <Cfg_1_Android>true</Cfg_1_Android>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Android64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Android64)'!=''">
     <Cfg_1_Android64>true</Cfg_1_Android64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSDevice64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_1)'=='true') or '$(Cfg_1_iOSDevice64)'!=''">
     <Cfg_1_iOSDevice64>true</Cfg_1_iOSDevice64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='iOSSimARM64' and '$(Cfg_1)'=='true') or '$(Cfg_1_iOSSimARM64)'!=''">
     <Cfg_1_iOSSimARM64>true</Cfg_1_iOSSimARM64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSX64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Cfg_1)'=='true') or '$(Cfg_1_OSX64)'!=''">
     <Cfg_1_OSX64>true</Cfg_1_OSX64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSXARM64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_OSXARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='OSXARM64' and '$(Cfg_1)'=='true') or '$(Cfg_1_OSXARM64)'!=''">
     <Cfg_1_OSXARM64>true</Cfg_1_OSXARM64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
     <Cfg_1_Win32>true</Cfg_1_Win32>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
     <Cfg_1_Win64>true</Cfg_1_Win64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; or &#39;$(Cfg_2)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
     <Cfg_2>true</Cfg_2>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Android&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android)'!=''">
     <Cfg_2_Android>true</Cfg_2_Android>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Android64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android64)'!=''">
     <Cfg_2_Android64>true</Cfg_2_Android64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSDevice64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
     <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_iOSSimARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='iOSSimARM64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSSimARM64)'!=''">
     <Cfg_2_iOSSimARM64>true</Cfg_2_iOSSimARM64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSX64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_OSX64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX64)'!=''">
     <Cfg_2_OSX64>true</Cfg_2_OSX64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSXARM64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_OSXARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='OSXARM64' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSXARM64)'!=''">
     <Cfg_2_OSXARM64>true</Cfg_2_OSXARM64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
     <Cfg_2_Win32>true</Cfg_2_Win32>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_2)&#39;==&#39;true&#39;) or &#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
     <Cfg_2_Win64>true</Cfg_2_Win64>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base)'!=''">
     <DCC_CodePage>65001</DCC_CodePage>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
@@ -183,7 +183,7 @@
     <DCC_F>false</DCC_F>
     <DCC_K>false</DCC_K>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_Android)'!=''">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <DisabledSysJars>google-play-billing.dex.jar;google-analytics-v2.dex.jar;cloud-messaging.dex.jar;android-support-v4.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</DisabledSysJars>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
@@ -201,7 +201,7 @@
     <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_Android64)'!=''">
     <VerInfo_Keys>package=com.Sample.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -217,7 +217,7 @@
     <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_iOSDevice64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
     <DCC_LinkerOptions>-force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseCore.framework\FirebaseCore -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseCoreDiagnostics.framework\FirebaseCoreDiagnostics -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseAnalytics.framework\FirebaseAnalytics -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseInstanceID.framework\FirebaseInstanceID -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseMessaging.framework\FirebaseMessaging -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseNanoPB.framework\FirebaseNanoPB -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\nanopb.framework\nanopb -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\Protobuf.framework\Protobuf -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\GoogleToolboxForMac.framework\GoogleToolboxForMac</DCC_LinkerOptions>
     <iPhone_AppIcon180>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png</iPhone_AppIcon180>
     <iPhone_AppIcon120>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png</iPhone_AppIcon120>
@@ -225,7 +225,7 @@
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <iPad_AppIcon152>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png</iPad_AppIcon152>
     <iPad_SpotLight80>$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png</iPad_SpotLight80>
     <iPad_Setting58>$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png</iPad_Setting58>
@@ -248,8 +248,8 @@
     <iPhone_Setting58>$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png</iPhone_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_iOSSimARM64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+  <PropertyGroup Condition="'$(Base_iOSSimARM64)'!=''">
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_LinkerOptions>-force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseCore.framework\FirebaseCore -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseCoreDiagnostics.framework\FirebaseCoreDiagnostics -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseAnalytics.framework\FirebaseAnalytics -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseInstanceID.framework\FirebaseInstanceID -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseMessaging.framework\FirebaseMessaging -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseNanoPB.framework\FirebaseNanoPB -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\nanopb.framework\nanopb -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\Protobuf.framework\Protobuf -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\GoogleToolboxForMac.framework\GoogleToolboxForMac</DCC_LinkerOptions>
@@ -277,27 +277,27 @@
     <iPhone_Setting58>$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png</iPhone_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_OSX64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=1.0.0;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+  <PropertyGroup Condition="'$(Base_OSX64)'!=''">
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=1.0.0;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_OSX32>true</Base_OSX32>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
     <Manifest_File>(None)</Manifest_File>
-    <Debugger_Launcher>/usr/X11/bin/xterm -e &#34;%debuggee%&#34;</Debugger_Launcher>
+    <Debugger_Launcher>/usr/X11/bin/xterm -e "%debuggee%"</Debugger_Launcher>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;FireDACMSSQLDriver;bindcompfmx;DBXOracleDriver;inetdb;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;FireDACASADriver;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;FireDACDSDriver;rtl;DbxClientDriver;DBXSybaseASADriver;CustomIPTransport;bindcomp;DBXInformixDriver;IndyIPClient;dbxcds;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_OSXARM64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=1.0.0;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+  <PropertyGroup Condition="'$(Base_OSXARM64)'!=''">
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=1.0.0;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_OSX32>true</Base_OSX32>
     <Manifest_File>(None)</Manifest_File>
-    <Debugger_Launcher>/usr/X11/bin/xterm -e &#34;%debuggee%&#34;</Debugger_Launcher>
+    <Debugger_Launcher>/usr/X11/bin/xterm -e "%debuggee%"</Debugger_Launcher>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;FireDACMSSQLDriver;bindcompfmx;DBXOracleDriver;inetdb;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;FireDACASADriver;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;FireDACDSDriver;rtl;DbxClientDriver;DBXSybaseASADriver;CustomIPTransport;bindcomp;DBXInformixDriver;IndyIPClient;dbxcds;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_Win32)'!=''">
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <VerInfo_Locale>1033</VerInfo_Locale>
@@ -307,7 +307,7 @@
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Base_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Base_Win64)'!=''">
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <VerInfo_Locale>1033</VerInfo_Locale>
@@ -317,7 +317,7 @@
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1)'!=''">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     <DCC_DebugDCUs>true</DCC_DebugDCUs>
     <DCC_Optimize>false</DCC_Optimize>
@@ -325,41 +325,41 @@
     <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
     <DCC_RemoteDebug>true</DCC_RemoteDebug>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_Android)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_Android)'!=''">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
     <Cfg_1_Android>true</Cfg_1_Android>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_iOSSimARM64)'!=''">
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath);$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_OSX64)'!=''">
     <Cfg_1_OSX32>true</Cfg_1_OSX32>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_OSXARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_OSXARM64)'!=''">
     <Cfg_1>true</Cfg_1>
     <Cfg_1_OSX32>true</Cfg_1_OSX32>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
     <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -367,31 +367,31 @@
     <BT_BuildType>Debug</BT_BuildType>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     <BT_BuildType>Debug</BT_BuildType>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2)'!=''">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
     <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_DebugInformation>0</DCC_DebugInformation>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
     <Cfg_2_Android>true</Cfg_2_Android>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
@@ -401,30 +401,30 @@
     <iPhone_Setting58>$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png</iPhone_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_iOSSimARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_iOSSimARM64)'!=''">
     <Cfg_2>true</Cfg_2>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_OSX64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_OSX64)'!=''">
     <Cfg_2_OSX32>true</Cfg_2_OSX32>
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_OSXARM64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_OSXARM64)'!=''">
     <Cfg_2>true</Cfg_2>
     <Cfg_2_OSX32>true</Cfg_2_OSX32>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     <BT_BuildType>Debug</BT_BuildType>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
   </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
+  <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -1189,7 +1189,7 @@
     </BorlandProject>
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
-  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists(&#39;$(BDS)\Bin\CodeGear.Delphi.Targets&#39;)"/>
-  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists(&#39;$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj&#39;)"/>
-  <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists(&#39;$(MSBuildProjectName).deployproj&#39;)"/>
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+  <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 </Project>

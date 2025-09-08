@@ -84,6 +84,7 @@ forced to apply patches to the original Delphi source files:
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
 * [The width and height of a TContext3D object must be defined as single-precision, not as integers](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723)
+* [TControl.DoRemoveObject should only realign when the removed control is visible](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4001)
 * [Regression in Alexandria: FMX.StrokeBuilder.pas Revamp Leads to TARC Drawing Issues](https://quality.embarcadero.com/browse/RSP-41618)
 * [Multi-Threading for TBitmap, TCanvas, and TContext3D is not working !](https://quality.embarcadero.com/browse/RSP-19673)
 * [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
@@ -1149,6 +1150,16 @@ undesired conversions.
 
 History
 =======
+
+### 21/08/2025 – Framework Updates
+
+- **ALRectFitInto** and **ALRectPlaceInto**  
+  `CenterAt` is now expressed in normalized coordinates `[0..1]`.
+- **ALDrawMultiLineText**  
+  Now decodes all HTML entities, not only `&gt;` and `&lt;`.
+- **Mouse Events**  
+  `ChildrenMouseDown`, `ChildrenMouseMove`, `ChildrenMouseUp`, `ChildrenMouseEnter`, and `ChildrenMouseLeave`  
+  are now part of Alcinoe and no longer require patching the Embarcadero source file.
 
 ### 21/08/2025 – Enhancements & Cleanup
 

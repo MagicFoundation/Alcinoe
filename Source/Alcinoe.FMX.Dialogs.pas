@@ -8,6 +8,7 @@ uses
   System.Generics.Collections,
   System.Messaging,
   System.UITypes,
+  FMX.Types,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Edit,
@@ -53,6 +54,7 @@ type
       public
         constructor Create;
         destructor Destroy; override;
+        function SetOwnerAndParent(const AValue: TALControl): TBuilder;
         function SetIconResourceName(const AValue: String): TBuilder;
         function SetIconTintColor(const AValue: TAlphaColor): TBuilder;
         function SetIconSize(const AWidth, AHeight: Single): TBuilder;
@@ -166,8 +168,8 @@ type
     property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~}
-  TALDialogManager = class
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDialogManager = class(TInterfacedObject, IFreeNotification)
   private
     class function CreateInstance: TALDialogManager;
     class function GetInstance: TALDialogManager; static;
@@ -200,6 +202,10 @@ type
     FContainerAnimation: TALFloatAnimation;
     FQueue: TQueue<TALDialog>;
     FFrozenNativeControls: TArray<TALNativeControl>;
+    procedure FreezeNativeViews;
+    procedure UnfreezeNativeViews;
+    { IFreeNotification }
+    procedure FreeNotification(AObject: TObject);
   protected
     procedure ScrimAnimationProcess(Sender: TObject);
     procedure ContainerAnimationProcess(Sender: TObject);
@@ -239,7 +245,7 @@ type
     property DefaultLabel: TALText read FDefaultLabel;
     property DefaultFooterBar: TALRectangle read FDefaultFooterBar;
     property DefaultFooterButton: TALButton read FDefaultFooterButton;
-    property CurrentDialog: TALDialog read fCurrentDialog;
+    property CurrentDialog: TALDialog read fCurrentDialog write fCurrentDialog;
     function IsShowingDialog: Boolean;
     procedure CloseCurrentDialog;
   end;
@@ -251,7 +257,6 @@ uses
   System.Types,
   Fmx.Controls,
   FMX.Forms,
-  FMX.Types,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
@@ -271,6 +276,17 @@ destructor TALDialog.TBuilder.Destroy;
 begin
   ALFreeAndNil(FDialog);
   inherited;
+end;
+
+{********************************************************************************}
+function TALDialog.TBuilder.SetOwnerAndParent(const AValue: TALControl): TBuilder;
+begin
+  // This will defacto call AValue.Realign and FDialog.EndUpdate
+  // in TControl.DoAddObject.SetUpdatingState
+  AValue.InsertComponent(FDialog);
+  FDialog.Parent := AValue;
+  FDialog.BeginUpdate;
+  Result := Self;
 end;
 
 {******************************************************************************}
@@ -470,12 +486,14 @@ end;
 {******************************************}
 class function TALDialog.Current: TALDialog;
 begin
+  if not TALDialogManager.HasInstance then exit(nil);
   Result := TALDialogManager.Instance.CurrentDialog;
 end;
 
 {************************************************************************************************************************************************************************************}
 class procedure TALDialog.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
 begin
+  if not TALDialogManager.HasInstance then exit;
   var LCurrentDialog := TALDialogManager.Instance.CurrentDialog;
   if LCurrentDialog <> nil then begin
     LCurrentDialog.OnClosedRefProc := AOnClosedCallback;
@@ -484,7 +502,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{******************************************}
 function TALDialog.IsTransitioning: Boolean;
 begin
   Result := (TALDialogManager.Instance.CurrentDialog = Self) and
@@ -1097,6 +1115,44 @@ begin
   result := FInstance <> nil;
 end;
 
+{*******************************************}
+procedure TALDialogManager.FreezeNativeViews;
+begin
+  For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] <> nil then
+      FFrozenNativeControls[I].RemoveFreeNotify(Self);
+
+  ALFreezeNativeViews(FFrozenNativeControls);
+
+  For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] <> nil then
+      FFrozenNativeControls[I].AddFreeNotify(Self);
+end;
+
+{*********************************************}
+procedure TALDialogManager.UnfreezeNativeViews;
+begin
+  For var I := Low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] <> nil then
+      FFrozenNativeControls[I].RemoveFreeNotify(Self);
+
+  ALUnfreezeNativeViews(FFrozenNativeControls)
+end;
+
+{************************************************************}
+procedure TALDialogManager.FreeNotification(AObject: TObject);
+begin
+  For var I := low(FFrozenNativeControls) to high(FFrozenNativeControls) do
+    if FFrozenNativeControls[I] = AObject then
+      FFrozenNativeControls[I] := nil;
+
+  if FCurrentDialog = AObject then begin
+    FScrimAnimation.Enabled := False;
+    FContainerAnimation.Enabled := False;
+    FCurrentDialog := Nil;
+  end;
+end;
+
 {***********************************************************}
 function TALDialogManager.GetMinDialogContainerWidth: Single;
 begin
@@ -1141,6 +1197,10 @@ begin
       exit;
     end;
 
+    If not TALDialogManager.Instance.HasPendingDialogs then begin
+      FCurrentDialog.HitTest := False;
+      FCurrentDialog.FTouchBlocker.Parent := FCurrentDialog.Container;
+    end;
     FCurrentDialog.FTouchBlocker.Visible := True;
     FCurrentDialog.Container.Align := TALAlignlayout.None;
 
@@ -1181,7 +1241,7 @@ begin
     LCurrentDialog.FOnClosedRefProc();
   ProcessPendingDialogs;
   if not IsShowingDialog then
-    ALUnfreezeNativeViews(FFrozenNativeControls)
+    UnfreezeNativeViews
   else begin
     FScrimAnimation.Stop;
     if assigned(FCurrentDialog.CustomDialogRefProc) or
@@ -1261,10 +1321,19 @@ end;
 procedure TALDialogManager.ShowDialog(const ADialog: TALDialog);
 begin
 
-  // Initialize LForm
-  Var LForm := Screen.ActiveForm;
-  if LForm = nil then LForm := Application.MainForm;
-  if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+  // Init LForm & LClientWidth
+  Var LForm: TCommonCustomForm;
+  var LClientHeight: Single;
+  if ADialog.ParentControl = nil then begin
+    LForm := Screen.ActiveForm;
+    if LForm = nil then LForm := Application.MainForm;
+    if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+    LClientHeight := LForm.ClientHeight;
+  end
+  else begin
+    LForm := nil;
+    LClientHeight := ADialog.ParentControl.Height;
+  end;
 
   // Update Width/MaxWith of some elements
   if ADialog.HasHeadline then
@@ -1311,8 +1380,9 @@ begin
 
   // CustomContainer
   else if ADialog.HasCustomContainer then begin
-    LForm.Focused := nil;
-    ALFreezeNativeViews(FFrozenNativeControls);
+    if ADialog.ParentControl = nil then LForm.Focused := nil
+    else ADialog.ParentControl.ResetFocus;
+    FreezeNativeViews;
     if ADialog.HasContainer then
       ADialog.Container.Visible := False;
   end
@@ -1320,8 +1390,9 @@ begin
   // Regular dialog
   else begin
 
-    LForm.Focused := nil;
-    ALFreezeNativeViews(FFrozenNativeControls);
+    if ADialog.ParentControl = nil then LForm.Focused := nil
+    else ADialog.ParentControl.ResetFocus;
+    FreezeNativeViews;
     var LCurrY: Single := 0;
     var LContainerWidth: Single := 0;
     var LContentHeight: Single := 0;
@@ -1483,7 +1554,7 @@ begin
     if ADialog.HasContent then begin
       // Alert dialogs should not exceed 2/3 (66%) of the screen height.
       // This ensures the dialog remains readable and actionable without forcing excessive scrolling.
-      Var LMaxContentHeight := (LForm.ClientHeight * (2/3))
+      Var LMaxContentHeight := (LClientHeight * (2/3))
                                - ADialog.Container.Padding.Top
                                - ADialog.Container.Padding.bottom
                                - LCurrY + LContentHeight;
@@ -1495,12 +1566,19 @@ begin
 
   end;
 
-  // This will defacto call LForm.Realign and ADialog.EndUpdate
-  // in TCustomForm.DoAddObject.SetUpdatingState
-  LForm.InsertComponent(ADialog);
-  ADialog.Parent := LForm;
+  // Attach ADialog
+  if ADialog.ParentControl = nil then begin
+    // This will defacto call LForm.Realign and ADialog.EndUpdate
+    // in TCustomForm.DoAddObject.SetUpdatingState
+    LForm.InsertComponent(ADialog);
+    ADialog.Parent := LForm;
+  end
+  else begin
+    ADialog.EndUpdate;
+  end;
 
   FCurrentDialog := ADialog;
+  FCurrentDialog.AddFreeNotify(Self);
 
   if assigned(FCurrentDialog.CustomDialogRefProc) then FCurrentDialog.CustomDialogRefProc()
   else if assigned(FCurrentDialog.CustomDialogObjProc) then FCurrentDialog.CustomDialogObjProc()
@@ -1561,6 +1639,9 @@ begin
     FCurrentDialog.Container.Position.y := (FContainerAnimation.TagFloat*0.9) + ((FContainerAnimation.TagFloat - (FContainerAnimation.TagFloat*0.9)) * FContainerAnimation.CurrentValue)
   else
     FCurrentDialog.Container.Position.y := (FContainerAnimation.TagFloat*0.8) + ((FContainerAnimation.TagFloat - (FContainerAnimation.TagFloat*0.8)) * FContainerAnimation.CurrentValue);
+  if (FContainerAnimation.StopValue > 0.5) and
+     (FContainerAnimation.NormalizedTime > 0.90) then
+    FCurrentDialog.FTouchBlocker.Visible := False;
 end;
 
 {***************************************************************}

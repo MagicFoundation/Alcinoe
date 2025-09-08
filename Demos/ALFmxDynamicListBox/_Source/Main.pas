@@ -63,15 +63,15 @@ type
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
-                var AErrorCode: Integer);
-    function MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
+                var AErrorCode: String);
+    function MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadingContent;
     function MainListBoxCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
-    function MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
-    function MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
+    function MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
+    function MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
     function MainListBoxCreateItem(const AContext: TALDynamicListBox.TView.TDownloadItemsContext; var AData: TALJSONNodeW): TALDynamicListBox.TItem;
-    function MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
-    function MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
-    function MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
+    function MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+    function MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+    function MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
   private
     {$IF defined(ALUIAutomationEnabled)}
     FSimulateInfiniteScrollCurrentPoint: TPointF;
@@ -85,16 +85,16 @@ type
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
-                var AErrorCode: Integer);
+                var AErrorCode: String);
     function StoriesCarouselCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
     procedure SuggestedCarouselDownloadItems(
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
                 var APaginationToken: string;
-                var AErrorCode: Integer);
+                var AErrorCode: String);
     function SuggestedCarouselCreateItemMainContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TMainContent;
-    function CarouselCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
-    function CarouselCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+    function CarouselCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+    function CarouselCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
     procedure TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
     procedure TextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
     procedure TextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
@@ -297,9 +297,9 @@ begin
 end;
 
 {**********************************************************************************************************************************************************}
-function TMainForm.MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TItem.TLoadingContent;
+function TMainForm.MainListBoxCreateLoadingContent(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadingContent;
 begin
-  Result := TALDynamicListBox.TItem.TLoadingContent.Create(nil);
+  Result := TALDynamicListBox.TView.TLoadingContent.Create(nil);
   Try
 
     Result.BoundsRect := AContext.TargetRect;
@@ -395,7 +395,7 @@ begin
 end;
 
 {****************************************************************************************************************************************************************}
-function TMainForm.MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+function TMainForm.MainListBoxCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreIndicator.Create(nil);
   try
@@ -416,7 +416,7 @@ begin
 end;
 
 {********************************************************************************************************************************************************************}
-function TMainForm.MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+function TMainForm.MainListBoxCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreRetryButton.Create(nil);
   try
@@ -439,7 +439,7 @@ begin
 end;
 
 {******************************************************************************************************************************************************************************}
-function TMainForm.MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
+function TMainForm.MainListBoxCreatePullToRefreshIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TBasePullToRefreshIndicator;
 begin
   Result := TALDynamicListBox.TView.TPullToRefreshIndicator.Create(nil);
   try
@@ -484,7 +484,7 @@ begin
 end;
 
 {******************************************************************************************************************************************}
-function TMainForm.MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
+function TMainForm.MainListBoxCreateTopBar(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TTopBar;
 begin
   Result := TALDynamicListBox.TView.TTopBar.Create(nil);
   try
@@ -526,7 +526,7 @@ begin
 end;
 
 {************************************************************************************************************************************************}
-function TMainForm.MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
+function TMainForm.MainListBoxCreateBottomBar(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TBottomBar;
 begin
   Result := TALDynamicListBox.TView.TBottomBar.Create(nil);
   try
@@ -971,7 +971,7 @@ begin
 end;
 
 {*************************************************************************************************************************************************************}
-function TMainForm.CarouselCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
+function TMainForm.CarouselCreateLoadMoreIndicator(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreIndicator;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreIndicator.Create(nil);
   try
@@ -990,7 +990,7 @@ begin
 end;
 
 {*****************************************************************************************************************************************************************}
-function TMainForm.CarouselCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TItem.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
+function TMainForm.CarouselCreateLoadMoreRetryButton(const AContext: TALDynamicListBox.TView.TContentBuilderContext): TALDynamicListBox.TView.TLoadMoreRetryButton;
 begin
   Result := TALDynamicListBox.TView.TLoadMoreRetryButton.Create(nil);
   try
@@ -1098,14 +1098,15 @@ procedure TMainForm.MainListBoxDownloadItems(
             const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
             out AData: TALJSONNodeW;
             var APaginationToken: string;
-            var AErrorCode: Integer);
+            var AErrorCode: String);
 begin
 
   // Here, we need to download the JSON data that represents each item.
   // Since we are running in a background thread, we can safely download it from
   // the Internet without worrying about freezing the app.
 
-  AErrorCode := 0;
+  AData := nil;
+  AErrorCode := '';
   try
 
     // PaginationToken – A string used to track the position in paginated data,
@@ -1158,7 +1159,7 @@ begin
     On E: Exception do begin
       // In case of an error, assign a custom error code here that
       // can be used later to display an error message to the end user.
-      AErrorCode := 1;
+      AErrorCode := E.Message;
     end;
   end;
 
@@ -1169,14 +1170,15 @@ procedure TMainForm.StoriesCarouselDownloadItems(
             const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
             out AData: TALJSONNodeW;
             var APaginationToken: string;
-            var AErrorCode: Integer);
+            var AErrorCode: String);
 begin
 
   // Here, we need to download the JSON data that represents each item.
   // Since we are running in a background thread, we can safely download it from
   // the Internet without worrying about freezing the app.
 
-  AErrorCode := 0;
+  AData := nil;
+  AErrorCode := '';
   try
 
     // PaginationToken – A string used to track the position in paginated data,
@@ -1218,7 +1220,7 @@ begin
     On E: Exception do begin
       // In case of an error, assign a custom error code here that
       // can be used later to display an error message to the end user.
-      AErrorCode := 1;
+      AErrorCode := E.Message;
     end;
   end;
 
@@ -1229,14 +1231,15 @@ procedure TMainForm.SuggestedCarouselDownloadItems(
             const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
             out AData: TALJSONNodeW;
             var APaginationToken: string;
-            var AErrorCode: Integer);
+            var AErrorCode: String);
 begin
 
   // Here, we need to download the JSON data that represents each item.
   // Since we are running in a background thread, we can safely download it from
   // the Internet without worrying about freezing the app.
 
-  AErrorCode := 0;
+  AData := nil;
+  AErrorCode := '';
   try
 
     // PaginationToken – A string used to track the position in paginated data,
@@ -1278,7 +1281,7 @@ begin
     On E: Exception do begin
       // In case of an error, assign a custom error code here that
       // can be used later to display an error message to the end user.
-      AErrorCode := 1;
+      AErrorCode := E.Message;
     end;
   end;
 

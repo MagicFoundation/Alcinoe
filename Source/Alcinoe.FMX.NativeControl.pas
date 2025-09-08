@@ -203,7 +203,8 @@ end;
 procedure ALUnfreezeNativeViews(var AFrozenNativeControls: TArray<TALNativeControl>);
 begin
   For var I := low(AFrozenNativeControls) to high(AFrozenNativeControls) do
-    AFrozenNativeControls[I].UnFreezeNativeView;
+    if AFrozenNativeControls[I] <> nil then
+      AFrozenNativeControls[I].UnFreezeNativeView;
   setlength(AFrozenNativeControls, 0);
 end;
 

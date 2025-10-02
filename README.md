@@ -1151,6 +1151,54 @@ undesired conversions.
 History
 =======
 
+
+### 02/10/2025 – Framework Updates
+
+- Archived
+  - `Alcinoe.CGI.pas`
+  - `Alcinoe.ExprEval.pas`
+  - `Alcinoe.FTP.Client.WinINet.pas`
+  - `Alcinoe.FTP.Client.pas`
+  - `Alcinoe.GSMComm.pas`
+  - `Alcinoe.HTTP.Client.WinINet.pas`
+  - `Alcinoe.IsapiHTTP.pas`
+  - `Alcinoe.LibPhoneNumber.pas`
+  - `Alcinoe.MySql.Client.pas`
+  - `Alcinoe.MySql.Wrapper.pas`
+  - `Alcinoe.NNTP.Client.pas`
+  - `Alcinoe.PhpRunner.pas`
+  - `Alcinoe.SphinxQL.Client.pas`
+  - `Alcinoe.WebSocket.Client.WinHTTP.pas`
+  - `Alcinoe.WebSocket.Client.pas`
+  - `Alcinoe.ZLibEx.pas`
+  - `Alcinoe.ZLibExGZ.pas`
+  - `ZLibEx.inc`
+  - `ZLibEx.pas`
+  - `ZLibExApi.pas`
+  - `ZLibExGZ.pas`
+  - `Alcinoe.iOSApi.WebRTC.pas`
+  - `Alcinoe.FMX.WebRTC.pas`
+  - `Alcinoe.AndroidApi.WebRTC.pas`
+  - `Alcinoe.QuickSortList.pas`
+- Renamed
+  - `Alcinoe.Mime.pas` → `Alcinoe.Mime.ContentTypes.pas`  
+  - `Alcinoe.MultiPartParser.pas` → `Alcinoe.Mime.Multipart.pas`  
+  - `Alcinoe.WinApi.Common.pas` → `Alcinoe.WinApi.Windows.pas`  
+  - `ALHTTPEncode` → `ALUrlEncode` and `ALPercentEncode`  
+  - `ALHTTPDecode` → `ALUrlDecode` and `ALPercentDecode`  
+  - `Alcinoe.MultiPartParser` → `Alcinoe.Mime.MultiPart`  
+  - `Alcinoe.Mime` → `Alcinoe.Mime.ContentTypes`  
+  - `OnChange` → `OnChanged` in `TALStringsA` and `TALStringsW`
+- Added
+  - `TALStringBuilderA` (same as `TStringBuilder` but for `AnsiString`)  
+  - `IncludeTrailingLineBreakInText` property to `TALStringsA` and `TALStringsW`  
+  - `TALHttpSysServer` (an HTTP server built on top of Windows **http.sys**)  
+- Removed
+  - `ALExtractExpressionA`  
+  - `ALExtractHeaderFieldsWithQuoteEscaped` (use `ALExtractHeaderFields` instead)  
+  - `StripParamQuotes` from `ALExtractTagParamsA`  
+  - `TALNewsArticleHeader`   
+
 ### 21/08/2025 – Framework Updates
 
 - **ALRectFitInto** and **ALRectPlaceInto**  

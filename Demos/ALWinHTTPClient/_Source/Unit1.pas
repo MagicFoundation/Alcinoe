@@ -3,46 +3,13 @@ unit Unit1;
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Variants,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls,
-  shellapi,
-  ExtCtrls,
-  ComCtrls,
-  Menus,
-  cxPCdxBarPopupMenu,
-  cxGraphics,
-  cxControls,
-  cxLookAndFeels,
-  cxLookAndFeelPainters,
-  cxContainer,
-  cxEdit,
-  cxLabel,
-  cxPC,
-  cxRadioGroup,
-  cxCheckBox,
-  cxButtons,
-  cxMemo,
-  cxTextEdit,
-  cxGroupBox,
-  dxSkinsForm,
-  dxSkinsCore,
-  dxSkinFoggy,
-  dxSkinscxPCPainter,
-  cxSplitter,
-  cxClasses,
-  dxBarBuiltInMenu,
-  Alcinoe.StringUtils,
-  Alcinoe.HTTP.Client.WinHTTP,
-  dxCore,
-  dxUIAClasses;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, Menus, cxPCdxBarPopupMenu,
+  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
+  cxEdit, cxLabel, cxPC, cxRadioGroup, cxCheckBox, cxButtons, cxMemo, cxTextEdit,
+  cxGroupBox, dxSkinsForm, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter,
+  cxSplitter, cxClasses, dxBarBuiltInMenu, Alcinoe.http.Client, Alcinoe.StringUtils,
+  Alcinoe.HTTP.Client.WinHTTP, dxCore, dxUIAClasses, cxMaskEdit, cxDropDownEdit;
 
 type
   TForm1 = class(TForm)
@@ -79,23 +46,14 @@ type
     EdProxyServer: TcxTextEdit;
     EdProxyPassword: TcxTextEdit;
     EdProxyBypass: TcxTextEdit;
-    GroupBox5: TcxGroupBox;
-    Label24: TcxLabel;
-    EditBufferUploadSize: TcxTextEdit;
-    CheckBoxInternetOption_BYPASS_PROXY_CACHE: TcxCheckBox;
-    CheckBoxInternetOption_ESCAPE_DISABLE: TcxCheckBox;
-    CheckBoxInternetOption_REFRESH: TcxCheckBox;
-    CheckBoxInternetOption_SECURE: TcxCheckBox;
-    CheckBoxInternetOption_ESCAPE_PERCENT: TcxCheckBox;
-    CheckBoxInternetOption_NULL_CODEPAGE: TcxCheckBox;
-    CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TcxCheckBox;
+    CheckBoxHttpOption_REFRESH: TcxCheckBox;
     GroupBox8: TcxGroupBox;
     MemoRequestRawHeader: TcxMemo;
     Label8: TcxLabel;
     RadioButtonProtocolVersion1_0: TcxRadioButton;
     RadioButtonProtocolVersion1_1: TcxRadioButton;
     GroupBox9: TcxGroupBox;
-    editURL: TcxTextEdit;
+    editURL: TcxComboBox;
     Label4: TcxLabel;
     MemoPostDataStrings: TcxMemo;
     MemoPostDataFiles: TcxMemo;
@@ -104,9 +62,9 @@ type
     Label1: TcxLabel;
     ButtonPost: TcxButton;
     ButtonGet: TcxButton;
-    CheckBoxInternetOption_KEEP_CONNECTION: TcxCheckBox;
-    CheckBoxInternetOption_NO_COOKIES: TcxCheckBox;
-    CheckBoxInternetOption_NO_AUTO_REDIRECT: TcxCheckBox;
+    CheckBoxHttpOption_KEEP_CONNECTION: TcxCheckBox;
+    CheckBoxHttpOption_NO_COOKIES: TcxCheckBox;
+    CheckBoxHttpOption_NO_AUTO_REDIRECT: TcxCheckBox;
     ButtonHead: TcxButton;
     CheckBoxUrlEncodePostData: TcxCheckBox;
     ButtonTrace: TcxButton;
@@ -125,7 +83,9 @@ type
     ButtonPut: TcxButton;
     ButtonDelete: TcxButton;
     cxSplitter3: TcxSplitter;
-    ButtonSaveToFile: TcxButton;
+    RadioButtonProtocolVersion2: TcxRadioButton;
+    RadioButtonProtocolVersion3: TcxRadioButton;
+    CheckBoxHttpOption_DECOMPRESSION: TcxCheckBox;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -137,20 +97,19 @@ type
     procedure ButtonOptionsClick(Sender: TObject);
     procedure ButtonPutClick(Sender: TObject);
     procedure ButtonDeleteClick(Sender: TObject);
-    procedure ButtonSaveToFileClick(Sender: TObject);
+    function GetStatusLine(const AHttpClientResponse: TALHttpclientResponse): String;
   private
     FWinHttpClient: TalWinHttpClient;
     FDownloadSpeedStartTime: TdateTime;
     FDownloadSpeedBytesRead: Integer;
     FDownloadSpeedBytesNotRead: Integer;
     fMustinitWinHTTPClient: Boolean;
-    FHTTPResponseStream: TALStringStreamA;
     procedure initWinHTTPClient;
     function AnsiStrTo8bitUnicodeString(s: AnsiString): String;
   public
     procedure OnHttpClientStatus(sender: Tobject; InternetStatus: DWord; StatusInformation: Pointer; StatusInformationLength: DWord);
-    procedure OnHttpClientDownloadProgress(sender: Tobject; Read: Integer; Total: Integer);
-    procedure OnHttpClientUploadProgress(sender: Tobject; Sent: Integer; Total: Integer);
+    procedure OnHttpClientDownloadProgress(sender: Tobject; Read: Int64; Total: Int64);
+    procedure OnHttpClientUploadProgress(sender: Tobject; Sent: Int64; Total: Int64);
   end;
 
 var
@@ -163,12 +122,12 @@ Uses
   system.AnsiStrings,
   DateUtils,
   HttpApp,
-  Alcinoe.MultiPartParser,
+  Alcinoe.Mime.MultiPart,
   Alcinoe.Files,
   Alcinoe.Common,
-  Alcinoe.Mime,
+  Alcinoe.Mime.ContentTypes,
   Alcinoe.StringList,
-  Alcinoe.HTTP.Client;
+  Alcinoe.HTTP;
 
 {$R *.dfm}
 
@@ -185,10 +144,10 @@ Begin
     if AlIsInteger(AnsiString(EditsendTimeout.Text)) then SendTimeout := StrToInt(EditSendTimeout.Text);
     if AlIsInteger(AnsiString(EditReceiveTimeout.Text)) then ReceiveTimeout := StrToInt(EditReceiveTimeout.Text);
 
-    if RadioButtonProtocolVersion1_0.Checked then ProtocolVersion := TALHTTPProtocolVersion.v1_0
-    else ProtocolVersion := TALHTTPProtocolVersion.v1_1;
-
-    if AlIsInteger(AnsiString(EditBufferUploadSize.Text)) then UploadBufferSize := StrToInt(EditBufferUploadSize.Text);
+    if RadioButtonProtocolVersion1_0.Checked then ProtocolVersion := TALHttpVersion.v1_0
+    else if RadioButtonProtocolVersion2.Checked then ProtocolVersion := TALHttpVersion.v2
+    else if RadioButtonProtocolVersion3.Checked then ProtocolVersion := TALHttpVersion.v3
+    else ProtocolVersion := TALHttpVersion.v1_1;
 
     ProxyParams.ProxyServer := AnsiString(EdProxyServer.Text);
     ProxyParams.ProxyPort := StrToInt(EdProxyPort.Text);
@@ -196,23 +155,18 @@ Begin
     ProxyParams.ProxyPassword := AnsiString(EdProxyPassword.Text);
     ProxyParams.ProxyBypass := AnsiString(EdProxyBypass.Text);
 
-    if RadioButtonAccessType_NO_PROXY.Checked then AccessType := wHttpAt_NO_PROXY
-    else if RadioButtonAccessType_NAMED_PROXY.Checked then AccessType := wHttpAt_NAMED_PROXY
-    else if RadioButtonAccessType_DEFAULT_PROXY.Checked then AccessType := wHttpAt_DEFAULT_PROXY;
+    if RadioButtonAccessType_NO_PROXY.Checked then AccessType := TAccessType.NO_PROXY
+    else if RadioButtonAccessType_NAMED_PROXY.Checked then AccessType := TAccessType.NAMED_PROXY
+    else if RadioButtonAccessType_DEFAULT_PROXY.Checked then AccessType := TAccessType.DEFAULT_PROXY;
 
-    InternetOptions := [];
-    If CheckBoxInternetOption_BYPASS_PROXY_CACHE.checked then InternetOptions := InternetOptions + [wHttpIo_BYPASS_PROXY_CACHE];
-    If CheckBoxInternetOption_ESCAPE_DISABLE.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_DISABLE];
-    If CheckBoxInternetOption_ESCAPE_DISABLE_QUERY.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_DISABLE_QUERY];
-    If CheckBoxInternetOption_ESCAPE_PERCENT.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_PERCENT];
-    If CheckBoxInternetOption_NULL_CODEPAGE.checked then InternetOptions := InternetOptions + [wHttpIo_NULL_CODEPAGE];
-    If CheckBoxInternetOption_REFRESH.checked then InternetOptions := InternetOptions + [wHttpIo_REFRESH];
-    If CheckBoxInternetOption_SECURE.checked then InternetOptions := InternetOptions + [wHttpIo_SECURE];
-    If CheckBoxInternetOption_NO_COOKIES.checked then InternetOptions := InternetOptions + [wHttpIo_NO_COOKIES];
-    If CheckBoxInternetOption_KEEP_CONNECTION.checked then InternetOptions := InternetOptions + [wHttpIo_KEEP_CONNECTION];
-    If CheckBoxInternetOption_NO_AUTO_REDIRECT.checked then InternetOptions := InternetOptions + [wHttpIo_NO_AUTO_REDIRECT];
+    HttpOptions := [];
+    If CheckBoxHttpOption_REFRESH.checked then HttpOptions := HttpOptions + [THttpOption.Refresh];
+    If CheckBoxHttpOption_NO_COOKIES.checked then HttpOptions := HttpOptions + [THttpOption.NO_COOKIES];
+    If CheckBoxHttpOption_KEEP_CONNECTION.checked then HttpOptions := HttpOptions + [THttpOption.KEEP_CONNECTION];
+    If CheckBoxHttpOption_NO_AUTO_REDIRECT.checked then HttpOptions := HttpOptions + [THttpOption.NO_AUTO_REDIRECT];
+    If CheckBoxHttpOption_DECOMPRESSION.checked then HttpOptions := HttpOptions + [THttpOption.DECOMPRESSION];
 
-    RequestHeader.RawHeaderText := AnsiString(MemoRequestRawHeader.Text);
+    RequestHeaders.RawHeaderText := AnsiString(MemoRequestRawHeader.Text);
   end;
 end;
 
@@ -255,26 +209,26 @@ begin
 end;
 
 {***********************************************************************************}
-procedure TForm1.OnHttpClientDownloadProgress(sender: Tobject; Read, Total: Integer);
+procedure TForm1.OnHttpClientDownloadProgress(sender: Tobject; Read: Int64; Total: Int64);
 Var In1, In2: integer;
 begin
- if MainStatusBar.Panels[1].Text = '' then Begin
+  if FDownloadSpeedStartTime = 0 then Begin
    FDownloadSpeedStartTime := now;
    FDownloadSpeedBytesNotRead := Read;
- End;
- FDownloadSpeedBytesRead := Read;
+  End;
+  FDownloadSpeedBytesRead := Read;
 
- MainStatusBar.Panels[1].Text := 'Read '+IntToStr(read) + ' bytes of '+IntToStr(total) + ' bytes';
+  MainStatusBar.Panels[1].Text := 'Read '+IntToStr(read) + ' bytes of '+IntToStr(total) + ' bytes';
 
- in1 := FDownloadSpeedBytesRead - FDownloadSpeedBytesNotRead;
- in2 := MillisecondsBetween(now, FDownloadSpeedStartTime);
- if (in1 > 0) and (in2 > 0) then MainStatusBar.Panels[2].Text := 'Download speed: '+ IntToStr(Round((in1 / 1000) / (in2 / 1000))) +'kbps';
+  in1 := FDownloadSpeedBytesRead - FDownloadSpeedBytesNotRead;
+  in2 := MillisecondsBetween(now, FDownloadSpeedStartTime);
+  if (in1 > 0) and (in2 > 0) then MainStatusBar.Panels[2].Text := 'Download speed: '+ IntToStr(Round((in1 / 1000) / (in2 / 1000))) +'kbps';
 
- application.ProcessMessages;
+  application.ProcessMessages;
 end;
 
 {*********************************************************************************}
-procedure TForm1.OnHttpClientUploadProgress(sender: Tobject; Sent, Total: Integer);
+procedure TForm1.OnHttpClientUploadProgress(sender: Tobject; Sent: Int64; Total: Int64);
 begin
  MainStatusBar.Panels[1].Text := 'Send '+IntToStr(sent) + ' bytes of '+IntToStr(total) + ' bytes';
  application.ProcessMessages;
@@ -291,336 +245,260 @@ end;
 
 {**************************************************}
 procedure TForm1.ButtonDeleteClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  var LHTTPClientResponse := FWinHttpClient.Delete(AnsiString(editURL.Text), nil);
   try
-    fHTTPResponseStream.Size := 0;
-    try
-      FWinHttpClient.Delete(AnsiString(editURL.Text), fHTTPResponseStream, LHTTPResponseHeader);
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
-    end;
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
   finally
-    LHTTPResponseHeader.Free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
 {***********************************************}
 procedure TForm1.ButtonGetClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  var LHTTPClientResponse := FWinHttpClient.Get(AnsiString(editURL.Text));
   try
-    fHTTPResponseStream.Size := 0;
-    try
-      FWinHttpClient.Get(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
-    end;
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
   finally
-    LHTTPResponseHeader.Free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  FWinHttpClient.Free;
-  fHTTPResponseStream.Free;
+  AlfreeAndNil(FWinHttpClient);
 end;
 
 {************************************************}
 procedure TForm1.ButtonHeadClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  var LHTTPClientResponse := FWinHttpClient.Head(AnsiString(editURL.Text));
   try
-    fHTTPResponseStream.Size := 0;
-    try
-      FWinHttpClient.Head(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
-    end;
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
   finally
-    LHTTPResponseHeader.Free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
 {***************************************************}
 procedure TForm1.ButtonOptionsClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  var LHTTPClientResponse := FWinHttpClient.Options(AnsiString(editURL.Text));
   try
-    fHTTPResponseStream.Size := 0;
-    try
-      FWinHttpClient.Options(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
-    end;
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
   finally
-    LHTTPResponseHeader.Free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
 {*************************************************}
 procedure TForm1.ButtonTraceClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  var LHTTPClientResponse := FWinHttpClient.Trace(AnsiString(editURL.Text));
   try
-    fHTTPResponseStream.Size := 0;
-    try
-      FWinHttpClient.Trace(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
-    end;
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
   finally
-    LHTTPResponseHeader.Free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
 {************************************************}
 procedure TForm1.ButtonPostClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
-    LRawPostDatastream: TALStringStreamA;
-    LMultiPartFormDataFile: TALMultiPartFormDataContent;
-    LMultiPartFormDataFiles: TALMultiPartFormDataContents;
-    LTmpPostDataString: TALStringsA;
-    I: Integer;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
-  LMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
-  LTmpPostDataString := TALStringListA.Create;
+  var LHTTPClientResponse: TALHTTPClientResponse := nil;
   try
-    fHTTPResponseStream.Size := 0;
-    Try
 
-      LTmpPostDataString.Assign(MemoPostDataStrings.lines);
-      LTmpPostDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
+    if (MemoPostDataFiles.Lines.Count > 0) and (CheckBoxURLEncodePostData.Checked) then begin
+      var LMultiPartFormDataEncoder := TALMultipartFormDataEncoderA.Create;
+      try
+        For var I := 0 To MemoPostDataFiles.Lines.Count - 1 do
+          if MemoPostDataFiles.Lines[I] <> '' then
+            LMultiPartFormDataEncoder.AddFile(
+              AnsiString(MemoPostDataFiles.Lines.Names[I]), // const AField: AnsiString;
+              MemoPostDataFiles.Lines.ValueFromIndex[I]); // const AFilePath: String;
+        For var I := 0 To MemoPostDataStrings.Lines.Count - 1 do
+          if MemoPostDataStrings.Lines[I] <> '' then
+            LMultiPartFormDataEncoder.AddField(
+              AnsiString(MemoPostDataStrings.Lines.Names[I]), // const AField, AValue: AnsiString;
+              AnsiString(MemoPostDataStrings.Lines.ValueFromIndex[I])); // const AField, AValue: AnsiString;
+        LHTTPClientResponse := FWinHttpClient.PostMultiPartFormData(
+                                 AnsiString(editURL.Text),
+                                 LMultiPartFormDataEncoder);
+      finally
+        ALFreeAndNil(LMultiPartFormDataEncoder);
+      end;
+    end
 
-      For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
-        if MemoPostDataFiles.Lines[I] <> '' then begin
-          LMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
-          TMemoryStream(LMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[I]);
-          LMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[I])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])+'"';
-          LMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
-          LMultiPartFormDataFiles.Add(LMultiPartFormDataFile);
-        end;
+    else if (MemoPostDataFiles.Lines.Count > 0) then begin
+      var LBodyStream := TFileStream.create(MemoPostDataFiles.Lines[0], fmOpenRead or fmShareDenyWrite);
+      try
+        LHTTPClientResponse := FWinHttpClient.post(
+                                 AnsiString(editURL.Text),
+                                 LBodyStream);
+      finally
+        ALFreeAndNil(LBodyStream);
+      end;
+    end
 
-      if (LMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
-        FWinHttpClient.PostMultiPartFormData(
-          AnsiString(editURL.Text),
-          LTmpPostDataString,
-          LMultiPartFormDataFiles,
-          FHTTPResponseStream,
-          LHTTPResponseHeader)
-
-      else if (LMultiPartFormDataFiles.Count > 0) then begin
-
-        FWinHttpClient.post(
-          AnsiString(editURL.Text),
-          LMultiPartFormDataFiles.Items[0].DataStream,
-          FHTTPResponseStream,
-          LHTTPResponseHeader);
-
-      end
-
-      else if LTmpPostDataString.Count > 0 then begin
-        if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PostURLEncoded(
-                                                    AnsiString(editURL.Text),
-                                                    LTmpPostDataString,
-                                                    FHTTPResponseStream,
-                                                    LHTTPResponseHeader,
-                                                    TALNameValueArray.Create(),
-                                                    True)
-        else begin
-
-          LRawPostDatastream := TALStringStreamA.create(LTmpPostDataString.text);
-          try
-
-            FWinHttpClient.post(
-              AnsiString(editURL.Text),
-              LRawPostDatastream,
-              FHTTPResponseStream,
-              LHTTPResponseHeader);
-
-          finally
-            LRawPostDatastream.free;
-          end;
-
+    else begin
+      if CheckBoxUrlEncodePostData.Checked then begin
+        var LFormParams := TALStringListA.Create;
+        try
+          LFormParams.Text := ansiString(MemoPostDataStrings.Text);
+          LHTTPClientResponse := FWinHttpClient.PostFormURLEncoded(
+                                   AnsiString(editURL.Text),
+                                   LFormParams,
+                                   [],
+                                   True)
+        finally
+          ALFreeAndNil(LFormParams);
         end;
       end
-
-      else FWinHttpClient.Post(
-             AnsiString(editURL.Text),
-             FHTTPResponseStream,
-             LHTTPResponseHeader);
-
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    Except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
+      else begin
+        var LBodyStream := TALStringStreamA.create(AnsiString(MemoPostDataStrings.lines.Text));
+        try
+          LHTTPClientResponse := FWinHttpClient.post(
+                                   AnsiString(editURL.Text),
+                                   LBodyStream);
+        finally
+          ALFreeAndNil(LBodyStream);
+        end;
+      end;
     end;
+
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
+
   finally
-    LHTTPResponseHeader.Free;
-    LMultiPartFormDataFiles.Free;
-    LTmpPostDataString.free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
 {***********************************************}
 procedure TForm1.ButtonPutClick(Sender: TObject);
-Var LHTTPResponseHeader: TALHTTPResponseHeader;
-    LRawPutDatastream: TALStringStreamA;
-    LMultiPartFormDataFile: TALMultiPartFormDataContent;
-    LMultiPartFormDataFiles: TALMultiPartFormDataContents;
-    LTmpPutDataString: TALStringsA;
-    I: Integer;
 begin
+  FDownloadSpeedStartTime := 0;
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
-  LMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
-  LTmpPutDataString := TALStringListA.Create;
+  var LHTTPClientResponse: TALHTTPClientResponse := nil;
   try
-    fHTTPResponseStream.Size := 0;
-    Try
 
-      LTmpPutDataString.Assign(MemoPostDataStrings.lines);
-      LTmpPutDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
+    if (MemoPostDataFiles.Lines.Count > 0) and (CheckBoxURLEncodePostData.Checked) then begin
+      var LMultiPartFormDataEncoder := TALMultipartFormDataEncoderA.Create;
+      try
+        For var I := 0 To MemoPostDataFiles.Lines.Count - 1 do
+          if MemoPostDataFiles.Lines[I] <> '' then
+            LMultiPartFormDataEncoder.AddFile(
+              AnsiString(MemoPostDataFiles.Lines.Names[I]), // const AField: AnsiString;
+              MemoPostDataFiles.Lines.ValueFromIndex[I]); // const AFilePath: String;
+        For var I := 0 To MemoPostDataStrings.Lines.Count - 1 do
+          if MemoPostDataStrings.Lines[I] <> '' then
+            LMultiPartFormDataEncoder.AddField(
+              AnsiString(MemoPostDataStrings.Lines.Names[I]), // const AField, AValue: AnsiString;
+              AnsiString(MemoPostDataStrings.Lines.ValueFromIndex[I])); // const AField, AValue: AnsiString;
+        LHTTPClientResponse := FWinHttpClient.PutMultiPartFormData(
+                                 AnsiString(editURL.Text),
+                                 LMultiPartFormDataEncoder);
+      finally
+        ALFreeAndNil(LMultiPartFormDataEncoder);
+      end;
+    end
 
-      For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
-        if MemoPostDataFiles.Lines[I] <> '' then begin
-          LMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
-          TMemoryStream(LMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[I]);
-          LMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[I])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])+'"';
-          LMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
-          LMultiPartFormDataFiles.Add(LMultiPartFormDataFile);
+    else if (MemoPostDataFiles.Lines.Count > 0) then begin
+      var LBodyStream := TFileStream.create(MemoPostDataFiles.Lines[0], fmOpenRead or fmShareDenyWrite);
+      try
+        LHTTPClientResponse := FWinHttpClient.Put(
+                                 AnsiString(editURL.Text),
+                                 LBodyStream);
+      finally
+        ALFreeAndNil(LBodyStream);
+      end;
+    end
+
+    else begin
+      if CheckBoxUrlEncodePostData.Checked then begin
+        var LFormParams := TALStringListA.Create;
+        try
+          LFormParams.Text := ansiString(MemoPostDataStrings.Text);
+          LHTTPClientResponse := FWinHttpClient.PutFormURLEncoded(
+                                   AnsiString(editURL.Text),
+                                   LFormParams,
+                                   [],
+                                   True)
+        finally
+          ALFreeAndNil(LFormParams);
         end;
-
-      //if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
-      //  FWinHttpClient.PutMultiPartFormData(AnsiString(editURL.Text),
-      //                                      aTmpPutDataString,
-      //                                      AMultiPartFormDataFiles,
-      //                                      FHTTPResponseStream,
-      //                                      AHTTPResponseHeader)
-
-      if (LMultiPartFormDataFiles.Count > 0) then begin
-
-        FWinHttpClient.Put(
-          AnsiString(editURL.Text),
-          LMultiPartFormDataFiles.Items[0].DataStream,
-          FHTTPResponseStream,
-          LHTTPResponseHeader);
-
       end
-
-      else if LTmpPutDataString.Count > 0 then begin
-        //if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PutURLEncoded(AnsiString(editURL.Text),
-        //                                                                       aTmpPutDataString,
-        //                                                                       FHTTPResponseStream,
-        //                                                                       AHTTPResponseHeader,
-        //                                                                       TALNameValueArray.Create(),
-        //                                                                       True)
-        //else begin
-
-          LRawPutDatastream := TALStringStreamA.create(LTmpPutDataString.text);
-          try
-
-            FWinHttpClient.Put(
-              AnsiString(editURL.Text),
-              LRawPutDatastream,
-              FHTTPResponseStream,
-              LHTTPResponseHeader);
-
-          finally
-            LRawPutDatastream.free;
-          end;
-
-        //end;
-      end
-
-      else FWinHttpClient.Put(
-             AnsiString(editURL.Text),
-             nil,
-             FHTTPResponseStream,
-             LHTTPResponseHeader);
-
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-    Except
-      MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
-      Raise;
+      else begin
+        var LBodyStream := TALStringStreamA.create(AnsiString(MemoPostDataStrings.lines.Text));
+        try
+          LHTTPClientResponse := FWinHttpClient.Put(
+                                   AnsiString(editURL.Text),
+                                   LBodyStream);
+        finally
+          ALFreeAndNil(LBodyStream);
+        end;
+      end;
     end;
+
+    MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPClientResponse.BodyString);
+    MemoResponseRawHeader.Lines.Text := GetStatusLine(LHTTPClientResponse) + #13#10 + AnsiStrTo8bitUnicodeString(LHTTPClientResponse.Headers.RawHeaderText);
+
   finally
-    LHTTPResponseHeader.Free;
-    LMultiPartFormDataFiles.Free;
-    LTmpPutDataString.free;
+    ALFreeAndNil(LHTTPClientResponse);
   end;
 end;
 
@@ -636,35 +514,32 @@ begin
   fMustinitWinHTTPClient := True;
 end;
 
-{******************************************************}
-procedure TForm1.ButtonSaveToFileClick(Sender: TObject);
-Var LSaveDialog: TsaveDialog;
-begin
-  LSaveDialog := TSaveDialog.Create(self);
-  Try
-    if LSaveDialog.Execute then
-      ALSaveStringToFile(fHTTPResponseStream.DataString, AnsiString(LSaveDialog.FileName));
-  Finally
-    LSaveDialog.Free;
-  End;
-end;
-
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   fMustinitWinHTTPClient := True;
   FWinHttpClient := TaLWinHttpClient.Create;
-  fHTTPResponseStream := TALStringStreamA.Create('');
-  with FWinHttpClient do begin
-    AccessType := wHttpAt_NO_PROXY;
-    InternetOptions := [];
-    OnStatus := OnHttpClientStatus;
-    OnDownloadProgress := OnHttpClientDownloadProgress;
-    OnUploadProgress := OnHttpClientUploadProgress;
-    MemoRequestRawHeader.Text := String(RequestHeader.RawHeaderText);
-  end;
+  FWinHttpClient.OnStatus := OnHttpClientStatus;
+  FWinHttpClient.OnDownloadProgress := OnHttpClientDownloadProgress;
+  FWinHttpClient.OnUploadProgress := OnHttpClientUploadProgress;
+  MemoRequestRawHeader.Text := String(FWinHttpClient.RequestHeaders.RawHeaderText);
   MemoResponseRawHeader.Height := MemoResponseRawHeader.Parent.Height - MemoResponseRawHeader.top - 6;
   MemoContentBody.Height := MemoContentBody.Parent.Height - MemoContentBody.top - 6;
+end;
+
+{************************************}
+function TForm1.GetStatusLine(const AHttpClientResponse: TALHttpclientResponse): String;
+begin
+  case AHttpClientResponse.Version of
+    TALHttpVersion.Unspecified: Result := 'Unspecified ';
+    TALHttpVersion.v0_9: Result := 'HTTP/0.9 ';
+    TALHttpVersion.v1_0: Result := 'HTTP/1.0 ';
+    TALHttpVersion.v1_1: Result := 'HTTP/1.1 ';
+    TALHttpVersion.v2: Result := 'HTTP/2 ';
+    TALHttpVersion.v3: Result := 'HTTP/3 ';
+  end;
+  Result := Result + ALInttoStrW(AHttpClientResponse.StatusCode);
+  Result := Result + ' ' + string(AHttpClientResponse.Reason);
 end;
 
 initialization

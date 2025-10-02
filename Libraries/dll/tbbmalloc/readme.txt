@@ -1,5 +1,7 @@
 Download the framework from 
 https://github.com/oneapi-src/oneTBB/releases
+or
+https://www.intel.com/content/www/us/en/developer/tools/oneapi/onetbb.html
 
 Current version
 Intel(R) Threading Building Blocks 2018 Update 2

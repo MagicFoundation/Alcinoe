@@ -6,21 +6,6 @@
         <Projects Include="ALJsonDoc\_source\ALJsonDocDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ALNNTPClient\_source\ALNNTPClientDemo.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ALPhpRunner\_source\ALPhpRunnerDemo.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="ALSMTPClient\_source\ALSMTPClientDemo.dproj">
             <Dependencies/>
         </Projects>
@@ -36,9 +21,6 @@
         <Projects Include="ALWinHTTPClient\_source\ALWinHTTPClientDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="ALXmlDoc\_source\ALXmlDocDemo.dproj">
             <Dependencies/>
         </Projects>
@@ -49,9 +31,6 @@
             <Dependencies/>
         </Projects>
         <Projects Include="ALRTTI\_source\ALRTTIDemo.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ALPOP3Client\_source\ALPOP3ClientDemo.dproj">
@@ -98,51 +77,6 @@
     <Target Name="ALJsonDocDemo:Make">
         <MSBuild Projects="ALJsonDoc\_source\ALJsonDocDemo.dproj" Targets="Make"/>
     </Target>
-    <Target Name="ALLibPhoneNumberDemo">
-        <MSBuild Projects="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj"/>
-    </Target>
-    <Target Name="ALLibPhoneNumberDemo:Clean">
-        <MSBuild Projects="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALLibPhoneNumberDemo:Make">
-        <MSBuild Projects="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ALLiveVideoChatClient">
-        <MSBuild Projects="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj"/>
-    </Target>
-    <Target Name="ALLiveVideoChatClient:Clean">
-        <MSBuild Projects="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALLiveVideoChatClient:Make">
-        <MSBuild Projects="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ALLiveVideoChatServer">
-        <MSBuild Projects="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj"/>
-    </Target>
-    <Target Name="ALLiveVideoChatServer:Clean">
-        <MSBuild Projects="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALLiveVideoChatServer:Make">
-        <MSBuild Projects="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ALNNTPClientDemo">
-        <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.dproj"/>
-    </Target>
-    <Target Name="ALNNTPClientDemo:Clean">
-        <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALNNTPClientDemo:Make">
-        <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ALPhpRunnerDemo">
-        <MSBuild Projects="ALPhpRunner\_source\ALPhpRunnerDemo.dproj"/>
-    </Target>
-    <Target Name="ALPhpRunnerDemo:Clean">
-        <MSBuild Projects="ALPhpRunner\_source\ALPhpRunnerDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALPhpRunnerDemo:Make">
-        <MSBuild Projects="ALPhpRunner\_source\ALPhpRunnerDemo.dproj" Targets="Make"/>
-    </Target>
     <Target Name="ALSMTPClientDemo">
         <MSBuild Projects="ALSMTPClient\_source\ALSMTPClientDemo.dproj"/>
     </Target>
@@ -188,15 +122,6 @@
     <Target Name="ALWinHTTPClientDemo:Make">
         <MSBuild Projects="ALWinHTTPClient\_source\ALWinHTTPClientDemo.dproj" Targets="Make"/>
     </Target>
-    <Target Name="ALWinInetHTTPClientDemo">
-        <MSBuild Projects="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj"/>
-    </Target>
-    <Target Name="ALWinInetHTTPClientDemo:Clean">
-        <MSBuild Projects="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALWinInetHTTPClientDemo:Make">
-        <MSBuild Projects="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj" Targets="Make"/>
-    </Target>
     <Target Name="ALXmlDocDemo">
         <MSBuild Projects="ALXmlDoc\_source\ALXmlDocDemo.dproj"/>
     </Target>
@@ -232,15 +157,6 @@
     </Target>
     <Target Name="ALRTTIDemo:Make">
         <MSBuild Projects="ALRTTI\_source\ALRTTIDemo.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ALWinHTTPWebSocketClientDemo">
-        <MSBuild Projects="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj"/>
-    </Target>
-    <Target Name="ALWinHTTPWebSocketClientDemo:Clean">
-        <MSBuild Projects="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALWinHTTPWebSocketClientDemo:Make">
-        <MSBuild Projects="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="ALPOP3ClientDemo">
         <MSBuild Projects="ALPOP3Client\_source\ALPOP3ClientDemo.dproj"/>
@@ -324,13 +240,13 @@
         <MSBuild Projects="ALFacebookLogin\_Source\ALFacebookLoginDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="ALJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStringBenchmark;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALWinHTTPWebSocketClientDemo;ALPOP3ClientDemo;ALNotificationServiceDemo;ALDatabaseBenchmark;ALAnimationDemo;ALConfettiDemo;ALFmxGraphicsDemo;ALGeoLocationSensorDemo;ALFmxControlsDemo;ALFacebookLoginDemo"/>
+        <CallTarget Targets="ALJsonDocDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStringBenchmark;ALWinHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALPOP3ClientDemo;ALNotificationServiceDemo;ALDatabaseBenchmark;ALAnimationDemo;ALConfettiDemo;ALFmxGraphicsDemo;ALGeoLocationSensorDemo;ALFmxControlsDemo;ALFacebookLoginDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ALJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStringBenchmark:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALWinHTTPWebSocketClientDemo:Clean;ALPOP3ClientDemo:Clean;ALNotificationServiceDemo:Clean;ALDatabaseBenchmark:Clean;ALAnimationDemo:Clean;ALConfettiDemo:Clean;ALFmxGraphicsDemo:Clean;ALGeoLocationSensorDemo:Clean;ALFmxControlsDemo:Clean;ALFacebookLoginDemo:Clean"/>
+        <CallTarget Targets="ALJsonDocDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStringBenchmark:Clean;ALWinHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALPOP3ClientDemo:Clean;ALNotificationServiceDemo:Clean;ALDatabaseBenchmark:Clean;ALAnimationDemo:Clean;ALConfettiDemo:Clean;ALFmxGraphicsDemo:Clean;ALGeoLocationSensorDemo:Clean;ALFmxControlsDemo:Clean;ALFacebookLoginDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ALJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStringBenchmark:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALWinHTTPWebSocketClientDemo:Make;ALPOP3ClientDemo:Make;ALNotificationServiceDemo:Make;ALDatabaseBenchmark:Make;ALAnimationDemo:Make;ALConfettiDemo:Make;ALFmxGraphicsDemo:Make;ALGeoLocationSensorDemo:Make;ALFmxControlsDemo:Make;ALFacebookLoginDemo:Make"/>
+        <CallTarget Targets="ALJsonDocDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStringBenchmark:Make;ALWinHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALPOP3ClientDemo:Make;ALNotificationServiceDemo:Make;ALDatabaseBenchmark:Make;ALAnimationDemo:Make;ALConfettiDemo:Make;ALFmxGraphicsDemo:Make;ALGeoLocationSensorDemo:Make;ALFmxControlsDemo:Make;ALFacebookLoginDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

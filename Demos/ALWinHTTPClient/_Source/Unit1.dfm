@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 377
   Top = 296
   Caption = 'TALWinHttpClient'
-  ClientHeight = 608
+  ClientHeight = 597
   ClientWidth = 796
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,7 +16,7 @@ object Form1: TForm1
   TextHeight = 13
   object MainStatusBar: TStatusBar
     Left = 0
-    Top = 589
+    Top = 578
     Width = 796
     Height = 19
     Color = 15525605
@@ -35,12 +35,12 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 796
-    Height = 589
+    Height = 578
     Align = alClient
     TabOrder = 1
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 584
+    ClientRectBottom = 573
     ClientRectLeft = 5
     ClientRectRight = 791
     ClientRectTop = 27
@@ -86,11 +86,28 @@ object Form1: TForm1
             TabOrder = 1
             Transparent = True
           end
-          object editURL: TcxTextEdit
+          object editURL: TcxComboBox
             Left = 40
             Top = 7
             Anchors = [akLeft, akTop, akRight]
             ParentFont = False
+            Properties.Items.Strings = (
+              'https://echo.free.beeceptor.com/'
+              'https://postman-echo.com/get?foo1=bar1&foo2=bar2'
+              'https://echo-http-requests.appspot.com/echo'
+              'https://browserleaks.com/http2'
+              'https://http3.is/'
+              'https://ash-speed.hetzner.com/10GB.bin'
+              'http://localhost:23456/hello'
+              'http://localhost:23456/echo'
+              'http://localhost:23456/stats'
+              'http://localhost:23456/1mb'#11
+              'http://localhost:23456/10mb'#11
+              'https://localhost:34567/hello'
+              'https://localhost:34567/echo'
+              'https://localhost:34567/stats'
+              'https://localhost:34567/1mb'#11
+              'https://localhost:34567/10mb')
             Style.Font.Charset = DEFAULT_CHARSET
             Style.Font.Color = clWindowText
             Style.Font.Height = -13
@@ -98,11 +115,11 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 0
-            Text = 'http://www.wikipedia.org'
-            Width = 295
+            Text = 'https://echo.free.beeceptor.com/'
+            Width = 285
           end
           object ButtonPost: TcxButton
-            Left = 397
+            Left = 387
             Top = 6
             Width = 50
             Height = 25
@@ -118,7 +135,7 @@ object Form1: TForm1
             OnClick = ButtonPostClick
           end
           object ButtonGet: TcxButton
-            Left = 342
+            Left = 332
             Top = 6
             Width = 50
             Height = 25
@@ -134,7 +151,7 @@ object Form1: TForm1
             OnClick = ButtonGetClick
           end
           object ButtonHead: TcxButton
-            Left = 452
+            Left = 442
             Top = 6
             Width = 50
             Height = 25
@@ -150,7 +167,7 @@ object Form1: TForm1
             OnClick = ButtonHeadClick
           end
           object ButtonTrace: TcxButton
-            Left = 508
+            Left = 498
             Top = 6
             Width = 50
             Height = 25
@@ -166,7 +183,7 @@ object Form1: TForm1
             OnClick = ButtonTraceClick
           end
           object ButtonOptions: TcxButton
-            Left = 564
+            Left = 554
             Top = 6
             Width = 50
             Height = 25
@@ -182,7 +199,7 @@ object Form1: TForm1
             OnClick = ButtonOptionsClick
           end
           object ButtonPut: TcxButton
-            Left = 620
+            Left = 610
             Top = 6
             Width = 50
             Height = 25
@@ -198,7 +215,7 @@ object Form1: TForm1
             OnClick = ButtonPutClick
           end
           object ButtonDelete: TcxButton
-            Left = 676
+            Left = 666
             Top = 6
             Width = 50
             Height = 25
@@ -279,7 +296,7 @@ object Form1: TForm1
               Margins.Right = 0
               Margins.Bottom = 0
               Align = alTop
-              Caption = 'URL Encode Post Data (Format "name=value" if checked)'
+              Caption = 'URL Encode Data Strings (Format "name=value")'
               ParentFont = False
               State = cbsChecked
               TabOrder = 2
@@ -382,19 +399,19 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 2
-        Height = 346
+        Height = 335
         Width = 786
         object Panel5: TPanel
           Left = 3
           Top = 15
           Width = 267
-          Height = 322
+          Height = 311
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
           DesignSize = (
             267
-            322)
+            311)
           object Label2: TcxLabel
             Left = 5
             Top = 6
@@ -418,7 +435,7 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 172
+            Height = 0
             Width = 260
           end
         end
@@ -426,14 +443,14 @@ object Form1: TForm1
           Left = 277
           Top = 15
           Width = 506
-          Height = 322
+          Height = 311
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
           DesignSize = (
             506
-            322)
+            311)
           object Label3: TcxLabel
             Left = 2
             Top = 6
@@ -457,31 +474,15 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 172
-            Width = 495
-          end
-          object ButtonSaveToFile: TcxButton
-            Left = 415
-            Top = 1
-            Width = 82
-            Height = 21
-            Anchors = [akTop, akRight]
-            Caption = 'Save to file'
-            TabOrder = 2
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = []
-            ParentFont = False
-            OnClick = ButtonSaveToFileClick
+            Height = 0
+            Width = 485
           end
         end
         object cxSplitter1: TcxSplitter
           Left = 270
           Top = 15
           Width = 7
-          Height = 322
+          Height = 311
           Control = Panel5
         end
       end
@@ -498,7 +499,7 @@ object Form1: TForm1
       ImageIndex = 1
       DesignSize = (
         786
-        557)
+        546)
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -511,7 +512,7 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 0
-        Height = 70
+        Height = 78
         Width = 289
         object Label18: TcxLabel
           Left = 16
@@ -530,25 +531,25 @@ object Form1: TForm1
           Transparent = True
         end
         object EditUserName: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 18
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 0
-          Width = 200
+          Width = 192
         end
         object EditPassword: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 42
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 1
-          Width = 200
+          Width = 192
         end
       end
       object GroupBox4: TcxGroupBox
         Left = 7
-        Top = 91
+        Top = 98
         Caption = 'Timeout'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -558,7 +559,7 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 1
-        Height = 94
+        Height = 106
         Width = 289
         object Label14: TcxLabel
           Left = 41
@@ -585,36 +586,36 @@ object Form1: TForm1
           Transparent = True
         end
         object EditSendTimeout: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 42
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Text = '0'
-          Width = 200
+          Width = 192
         end
         object EditReceiveTimeout: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 66
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 1
           Text = '0'
-          Width = 200
+          Width = 192
         end
         object EditConnectTimeout: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 18
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 2
           Text = '0'
-          Width = 200
+          Width = 192
         end
       end
       object GroupBox6: TcxGroupBox
         Left = 7
-        Top = 195
+        Top = 213
         Caption = 'Protocole version'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -624,7 +625,7 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 2
-        Height = 54
+        Height = 78
         Width = 289
         object RadioButtonProtocolVersion1_0: TcxRadioButton
           Left = 32
@@ -664,12 +665,48 @@ object Form1: TForm1
           OnKeyPress = OnCfgEditKeyPress
           Transparent = True
         end
+        object RadioButtonProtocolVersion2: TcxRadioButton
+          Left = 34
+          Top = 47
+          Width = 81
+          Height = 17
+          Caption = 'HTTP/2'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+          OnClick = OnCfgEditChange
+          OnEnter = OnCfgEditChange
+          OnKeyPress = OnCfgEditKeyPress
+          Transparent = True
+        end
+        object RadioButtonProtocolVersion3: TcxRadioButton
+          Left = 128
+          Top = 47
+          Width = 81
+          Height = 17
+          Caption = 'HTTP/3'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 3
+          OnClick = OnCfgEditChange
+          OnEnter = OnCfgEditChange
+          OnKeyPress = OnCfgEditKeyPress
+          Transparent = True
+        end
       end
       object GroupBox7: TcxGroupBox
-        Left = 303
-        Top = 408
+        Left = 304
+        Top = 456
         Anchors = [akLeft, akBottom]
-        Caption = 'Internet options'
+        Caption = 'Options'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
         Style.Font.Color = clWindowText
@@ -678,12 +715,12 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 3
-        Height = 126
+        Height = 84
         Width = 481
-        object CheckBoxInternetOption_BYPASS_PROXY_CACHE: TcxCheckBox
-          Left = 8
+        object CheckBoxHttpOption_REFRESH: TcxCheckBox
+          Left = 195
           Top = 24
-          Caption = 'BYPASS_PROXY_CACHE'
+          Caption = 'REFRESH'
           ParentFont = False
           TabOrder = 0
           Transparent = True
@@ -691,101 +728,50 @@ object Form1: TForm1
           OnEnter = OnCfgEditChange
           OnKeyPress = OnCfgEditKeyPress
         end
-        object CheckBoxInternetOption_ESCAPE_DISABLE: TcxCheckBox
-          Left = 8
-          Top = 48
-          Caption = 'ESCAPE_DISABLE'
+        object CheckBoxHttpOption_KEEP_CONNECTION: TcxCheckBox
+          Left = 9
+          Top = 24
+          Caption = 'KEEP_CONNECTION'
           ParentFont = False
+          State = cbsChecked
           TabOrder = 1
           Transparent = True
           OnClick = OnCfgEditChange
           OnEnter = OnCfgEditChange
           OnKeyPress = OnCfgEditKeyPress
         end
-        object CheckBoxInternetOption_REFRESH: TcxCheckBox
-          Left = 200
-          Top = 48
-          Caption = 'REFRESH'
+        object CheckBoxHttpOption_NO_COOKIES: TcxCheckBox
+          Left = 9
+          Top = 51
+          Caption = 'NO_COOKIES'
           ParentFont = False
+          State = cbsChecked
           TabOrder = 2
           Transparent = True
           OnClick = OnCfgEditChange
           OnEnter = OnCfgEditChange
           OnKeyPress = OnCfgEditKeyPress
         end
-        object CheckBoxInternetOption_SECURE: TcxCheckBox
-          Left = 200
-          Top = 72
-          Caption = 'SECURE'
+        object CheckBoxHttpOption_NO_AUTO_REDIRECT: TcxCheckBox
+          Left = 331
+          Top = 24
+          Caption = 'NO_AUTO_REDIRECT'
           ParentFont = False
+          State = cbsChecked
           TabOrder = 3
           Transparent = True
           OnClick = OnCfgEditChange
           OnEnter = OnCfgEditChange
           OnKeyPress = OnCfgEditKeyPress
         end
-        object CheckBoxInternetOption_ESCAPE_PERCENT: TcxCheckBox
-          Left = 8
-          Top = 96
-          Caption = 'ESCAPE_PERCENT'
-          ParentFont = False
-          TabOrder = 4
-          Transparent = True
-          OnClick = OnCfgEditChange
-          OnEnter = OnCfgEditChange
-          OnKeyPress = OnCfgEditKeyPress
-        end
-        object CheckBoxInternetOption_NULL_CODEPAGE: TcxCheckBox
-          Left = 200
-          Top = 24
-          Caption = 'NULL_CODEPAGE'
-          ParentFont = False
-          TabOrder = 5
-          Transparent = True
-          OnClick = OnCfgEditChange
-          OnEnter = OnCfgEditChange
-          OnKeyPress = OnCfgEditKeyPress
-        end
-        object CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TcxCheckBox
-          Left = 8
-          Top = 72
-          Caption = 'ESCAPE_DISABLE_QUERY'
-          ParentFont = False
-          TabOrder = 6
-          Transparent = True
-          OnClick = OnCfgEditChange
-          OnEnter = OnCfgEditChange
-          OnKeyPress = OnCfgEditKeyPress
-        end
-        object CheckBoxInternetOption_KEEP_CONNECTION: TcxCheckBox
-          Left = 336
-          Top = 24
-          Caption = 'KEEP_CONNECTION'
+        object CheckBoxHttpOption_DECOMPRESSION: TcxCheckBox
+          Left = 195
+          Top = 51
+          Caption = 'DECOMPRESSION'
           ParentFont = False
           State = cbsChecked
-          TabOrder = 7
-          Transparent = True
-          OnClick = OnCfgEditChange
-          OnEnter = OnCfgEditChange
-          OnKeyPress = OnCfgEditKeyPress
-        end
-        object CheckBoxInternetOption_NO_COOKIES: TcxCheckBox
-          Left = 200
-          Top = 96
-          Caption = 'NO_COOKIES'
-          ParentFont = False
-          TabOrder = 8
-          Transparent = True
-          OnClick = OnCfgEditChange
-          OnEnter = OnCfgEditChange
-          OnKeyPress = OnCfgEditKeyPress
-        end
-        object CheckBoxInternetOption_NO_AUTO_REDIRECT: TcxCheckBox
-          Left = 336
-          Top = 48
-          Caption = 'NO_AUTO_REDIRECT'
-          ParentFont = False
-          TabOrder = 9
+          Style.TransparentBorder = False
+          TabOrder = 4
           Transparent = True
           OnClick = OnCfgEditChange
           OnEnter = OnCfgEditChange
@@ -793,8 +779,8 @@ object Form1: TForm1
         end
       end
       object GroupBox2: TcxGroupBox
-        Left = 8
-        Top = 474
+        Left = 7
+        Top = 463
         Caption = 'Access Type'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -804,7 +790,7 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 4
-        Height = 71
+        Height = 77
         Width = 289
         object RadioButtonAccessType_NAMED_PROXY: TcxRadioButton
           Left = 16
@@ -845,7 +831,7 @@ object Form1: TForm1
           Transparent = True
         end
         object RadioButtonAccessType_DEFAULT_PROXY: TcxRadioButton
-          Left = 144
+          Left = 150
           Top = 24
           Width = 121
           Height = 17
@@ -864,8 +850,8 @@ object Form1: TForm1
         end
       end
       object GroupBox1: TcxGroupBox
-        Left = 8
-        Top = 323
+        Left = 7
+        Top = 300
         Caption = 'Proxy'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -875,7 +861,7 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 5
-        Height = 145
+        Height = 154
         Width = 289
         object Label15: TcxLabel
           Left = 47
@@ -918,78 +904,46 @@ object Form1: TForm1
           Transparent = True
         end
         object EdProxyPort: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 42
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Text = '80'
-          Width = 200
+          Width = 192
         end
         object EdProxyUserName: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 66
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 1
-          Width = 200
+          Width = 192
         end
         object EdProxyServer: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 18
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 2
-          Width = 200
+          Width = 192
         end
         object EdProxyPassword: TcxTextEdit
-          Left = 75
+          Left = 80
           Top = 90
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 3
-          Width = 200
+          Width = 192
         end
         object EdProxyBypass: TcxTextEdit
-          Left = 73
+          Left = 80
           Top = 114
           ParentFont = False
           Properties.OnChange = OnCfgEditChange
           TabOrder = 4
           Text = '<local>'
-          Width = 200
-        end
-      end
-      object GroupBox5: TcxGroupBox
-        Left = 8
-        Top = 259
-        Caption = 'Buffer Size'
-        ParentFont = False
-        Style.Font.Charset = DEFAULT_CHARSET
-        Style.Font.Color = clWindowText
-        Style.Font.Height = -11
-        Style.Font.Name = 'Tahoma'
-        Style.Font.Style = [fsBold]
-        Style.IsFontAssigned = True
-        TabOrder = 6
-        Height = 54
-        Width = 289
-        object Label24: TcxLabel
-          Left = 27
-          Top = 21
-          Caption = 'Upload'
-          ParentFont = False
-          TabOrder = 1
-          Transparent = True
-        end
-        object EditBufferUploadSize: TcxTextEdit
-          Left = 73
-          Top = 18
-          ParentFont = False
-          Properties.OnChange = OnCfgEditChange
-          TabOrder = 0
-          Text = '32768'
-          Width = 200
+          Width = 192
         end
       end
       object GroupBox8: TcxGroupBox
@@ -1004,11 +958,11 @@ object Form1: TForm1
         Style.Font.Name = 'Tahoma'
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
-        TabOrder = 7
+        TabOrder = 6
         DesignSize = (
           481
-          385)
-        Height = 391
+          430)
+        Height = 436
         Width = 481
         object Label8: TcxLabel
           Left = 9
@@ -1032,7 +986,7 @@ object Form1: TForm1
           Style.Font.Style = []
           Style.IsFontAssigned = True
           TabOrder = 0
-          Height = 331
+          Height = 357
           Width = 459
         end
       end
@@ -1041,7 +995,7 @@ object Form1: TForm1
   object dxSkinController1: TdxSkinController
     NativeStyle = False
     SkinName = 'Foggy'
-    Left = 696
-    Top = 288
+    Left = 600
+    Top = 296
   end
 end

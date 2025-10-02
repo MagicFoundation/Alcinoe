@@ -12,54 +12,35 @@ program ALDUnitXTests;
 uses
   {$IF defined(SKIA)}
   FMX.Skia,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF MSWINDOWS}
-    {$IFDEF TESTINSIGHT}
-    TestInsight.DUnitX,
-    {$ELSE}
-    DUnitX.Loggers.Console,
-    DUnitX.Loggers.Xml.NUnit,
-    {$ENDIF}
-    DUnitX.TestFramework,
-  {$ENDIF}
-  //---------------------
-  //include all units to be sure
-  //that everything compile well
+  {$IFDEF TESTINSIGHT}
+  TestInsight.DUnitX,
+  {$ELSE}
+  DUnitX.Loggers.Console,
+  DUnitX.Loggers.Xml.NUnit,
+  {$ENDIF }
+  DUnitX.TestFramework,
+  {$ENDIF }
   {$IFDEF MSWINDOWS}
-  Alcinoe.CGI,
   Alcinoe.Execute,
   Alcinoe.FMX.NativeView.Win,
   Alcinoe.FMX.Trayicon,
-  Alcinoe.FTP.Client,
-  Alcinoe.FTP.Client.WinINet,
-  Alcinoe.GSMComm,
   Alcinoe.HTTP.Client.WinHTTP,
-  Alcinoe.HTTP.Client.WinINet,
+  Alcinoe.HTTP.Server.HttpSys,
   Alcinoe.ImageMagick,
   Alcinoe.IniFiles,
-  Alcinoe.IsapiHTTP,
-  Alcinoe.LibPhoneNumber,
   Alcinoe.MemCached.Client,
   Alcinoe.MongoDB.Client,
-  Alcinoe.MySql.Client,
-  Alcinoe.MySql.Wrapper,
-  Alcinoe.NNTP.Client,
   Alcinoe.POP3.Client,
-  Alcinoe.PhpRunner,
   Alcinoe.SMTP.Client,
-  Alcinoe.SphinxQL.Client,
   Alcinoe.Sqlite3.Client,
   Alcinoe.Sqlite3.Wrapper,
   //Alcinoe.TbbMM,
-  Alcinoe.WebSocket.Client.WinHTTP,
-  Alcinoe.WinApi.Common,
+  Alcinoe.WinApi.Windows,
+  Alcinoe.WinApi.HttpApi,
   Alcinoe.WinSock,
-  Alcinoe.ZLibEx,
-  Alcinoe.ZLibExGZ,
-  ZLibEx,
-  ZLibExApi,
-  ZLibExGZ,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF ANDROID}
   Alcinoe.AndroidApi.AndroidX,
   Alcinoe.AndroidApi.AndroidX.Media3,
@@ -78,18 +59,20 @@ uses
   Alcinoe.AndroidApi.Security,
   Alcinoe.AndroidApi.VKontakte,
   Alcinoe.AndroidApi.WebKit,
-  Alcinoe.AndroidApi.WebRTC,
   Alcinoe.AndroidApi.Widget,
   Alcinoe.Androidapi.GraphicsContentViewText,
   Alcinoe.FMX.NativeView.Android,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF iOS}
   Alcinoe.FMX.NativeView.iOS,
+  {$IFNDEF IOSSIMULATOR}
+  {$IFNDEF ALCompilerVersionSupported123}
+  {$MESSAGE}
+  {$ENDIF }
   Alcinoe.iOSApi.AdSupport,
   Alcinoe.iOSApi.AudioToolbox,
   Alcinoe.iOSApi.AuthenticationServices,
   Alcinoe.iOSApi.BackgroundTasks,
-  Alcinoe.iOSapi.CoreFoundation,
   Alcinoe.iOSApi.FacebookCoreKit,
   Alcinoe.iOSApi.FacebookLoginKit,
   Alcinoe.iOSApi.FacebookShareKit,
@@ -97,48 +80,37 @@ uses
   Alcinoe.iOSApi.FirebaseMessaging,
   Alcinoe.iOSApi.MessageUI,
   Alcinoe.iOSApi.Photos,
-  Alcinoe.iOSapi.ImageIO,
-  Alcinoe.iOSapi.Foundation,
+  Alcinoe.iOSApi.VKontakte,
   Alcinoe.iOSapi.AVFoundation,
-  Alcinoe.iOSapi.QuartzCore,
-  Alcinoe.iOSapi.Security,
+  Alcinoe.iOSapi.CoreFoundation,
   Alcinoe.iOSapi.CoreImage,
   Alcinoe.iOSapi.CoreLocation,
   Alcinoe.iOSapi.CoreText,
   Alcinoe.iOSapi.CoreVideo,
+  Alcinoe.iOSapi.Foundation,
+  Alcinoe.iOSapi.ImageIO,
+  Alcinoe.iOSapi.QuartzCore,
+  Alcinoe.iOSapi.Security,
   Alcinoe.iOSapi.UIKit,
+  {$ENDIF }
+  {$ENDIF }
   {$IFNDEF IOSSIMULATOR}
-  //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
-  //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
   {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if a new version of VKontakte/WebRTC are available with a support for IOSSIMULATOR and adjust the IFDEF'}
-  {$ENDIF}
-  Alcinoe.iOSApi.VKontakte,
-  Alcinoe.iOSApi.WebRTC,
-  {$ENDIF}
-  {$ENDIF}
-  {$IFNDEF IOSSIMULATOR}
-  //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
-  //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if a new version of VKontakte/WebRTC are available with a support for IOSSIMULATOR and adjust the IFDEF'}
-  {$ENDIF}
+  {$MESSAGE}
+  {$ENDIF }
   Alcinoe.FMX.VKontakte,
-  Alcinoe.FMX.WebRTC,
-  {$ENDIF}
+  {$ENDIF }
   {$IFDEF ALMacOS}
   Alcinoe.Macapi.AppKit,
   Alcinoe.Macapi.CoreText,
   Alcinoe.Macapi.Foundation,
   Alcinoe.Macapi.QuartzCore,
   Alcinoe.FMX.NativeView.Mac,
-  {$ENDIF}
-  Alcinoe.ExprEval,
+  {$ENDIF }
   Alcinoe.InternetMessages,
-  Alcinoe.Mime,
-  Alcinoe.MultiPartParser,
+  Alcinoe.Mime.ContentTypes,
+  Alcinoe.Mime.Multipart,
   Alcinoe.RTTI,
-  Alcinoe.WebSocket.Client,
   Alcinoe.Cipher,
   //Alcinoe.CodeProfiler,
   Alcinoe.Common,
@@ -181,7 +153,7 @@ uses
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.PageController,
-  Alcinoe.Fmx.Sheets,
+  Alcinoe.FMX.Sheets,
   Alcinoe.FMX.Snackbar,
   Alcinoe.FMX.Styles,
   Alcinoe.FMX.Types3D,
@@ -191,25 +163,30 @@ uses
   Alcinoe.Files,
   Alcinoe.GuardianThread,
   Alcinoe.HTML,
+  Alcinoe.HTTP,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.Net,
   Alcinoe.HTTP.Client.Net.Pool,
+  Alcinoe.HTTP.Server,
   Alcinoe.JSONDoc,
   Alcinoe.Localization,
-  Alcinoe.QuickSortList,
+  Alcinoe.Net,
   Alcinoe.StringList,
   Alcinoe.StringUtils,
+  Alcinoe.Url,
   Alcinoe.XMLDoc,
   Grijjy.ErrorReporting,
   Grijjy.SymbolTranslator,
-  //---------------------
   {$IFDEF MSWINDOWS}
   ALDUnitXTestStringUtils in 'ALDUnitXTestStringUtils.pas',
   ALDUnitXTestCipher in 'ALDUnitXTestCipher.pas',
-  ALDUnitXTestRtti in 'ALDUnitXTestRtti.pas',
   ALDUnitXTestHtml in 'ALDUnitXTestHtml.pas',
-  {$ENDIF}
-  System.SysUtils;
+  {$ENDIF }
+  System.SysUtils,
+  ALDUnitXTestHttp in 'ALDUnitXTestHttp.pas',
+  ALDUnitXTestXmlDoc in 'ALDUnitXTestXmlDoc.pas',
+  ALDUnitXTestNet in 'ALDUnitXTestNet.pas',
+  ALDUnitXTestUrl in 'ALDUnitXTestUrl.pas';
 
 {$IFDEF MSWINDOWS}
   {$IFNDEF TESTINSIGHT}

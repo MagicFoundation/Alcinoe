@@ -871,10 +871,9 @@ Advantages of using http.sys:
 - Widely tested → same engine IIS uses under the hood
 
 Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALHttpServer)
+<br/>
+<br/>
 
-<br/>
-<br/>
-  
 
 Json Parser
 ===========

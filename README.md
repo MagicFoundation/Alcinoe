@@ -1144,8 +1144,6 @@ History
   - `Alcinoe.WinApi.Common.pas` → `Alcinoe.WinApi.Windows.pas`  
   - `ALHTTPEncode` → `ALUrlEncode` and `ALPercentEncode`  
   - `ALHTTPDecode` → `ALUrlDecode` and `ALPercentDecode`  
-  - `Alcinoe.MultiPartParser` → `Alcinoe.Mime.MultiPart`  
-  - `Alcinoe.Mime` → `Alcinoe.Mime.ContentTypes`  
   - `OnChange` → `OnChanged` in `TALStringsA` and `TALStringsW`
 - Added
   - `TALStringBuilderA` (same as `TStringBuilder` but for `AnsiString`)  

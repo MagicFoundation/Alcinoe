@@ -233,13 +233,13 @@ Begin
   FHttpClientRawHeaderText := AnsiString(MemoRequestRawHeader.Text);
 end;
 
-{*******************************************************************************************************************************************}
+{*************************************************************************************}
 procedure TForm1.MainFileOpenDialogFileOkClick(Sender: TObject; var CanClose: Boolean);
 begin
   EditFileToUpload.Text := MainFileOpenDialog.FileName;
 end;
 
-{**************************************************************************************************************************************************************************************}
+{******************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItemsSpeedGetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   var LBytes: Int64;
@@ -250,7 +250,7 @@ begin
   else aText := ALIntToStrW(LBytes) + ' B/s';
 end;
 
-{**************************************************************************************************************************************************************************************}
+{******************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItemsBytesGetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
 begin
   var LBytes: Int64;
@@ -261,7 +261,7 @@ begin
   else aText := ALIntToStrW(LBytes) + ' B';
 end;
 
-{*******************************************************************************************************************************************}
+{***********************************************************************************************************************************}
 procedure TForm1.TableViewThreadBytesGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
 begin
   var LBytes: Int64;
@@ -272,7 +272,7 @@ begin
   else aText := ALIntToStrW(LBytes) + ' B';
 end;
 
-{************************************************}
+{***********************************************************************************************************************************}
 procedure TForm1.TableViewThreadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: String);
 begin
   var LBytes: Int64;
@@ -289,7 +289,7 @@ begin
   if AText <> '' then AText := AText + ' ms';
 end;
 
-{********************************************}
+{****************************************************}
 procedure TForm1.UpdateGuiTimerTimer(Sender: TObject);
 begin
   UpdateGUI;
@@ -356,7 +356,7 @@ begin
 
 end;
 
-{*************************************************}
+{**************************************************************}
 procedure TForm1.ButtonSelectFileToUploadClick(Sender: TObject);
 begin
   MainFileOpenDialog.Execute;
@@ -445,7 +445,7 @@ begin
   FBodyStream := TALStringStreamA.Create('');
 end;
 
-{***********************************}
+{*******************************}
 destructor TWorkerThread.Destroy;
 begin
   ALFreeAndNil(FUrls);
@@ -453,7 +453,7 @@ begin
   inherited;
 end;
 
-{**********************************}
+{******************************}
 procedure TWorkerThread.Execute;
 begin
 
@@ -568,22 +568,22 @@ begin
     end;
 
     TThread.Synchronize(nil,
-    procedure
-    begin
-      Form1.FHttpRequestMetrics[FIndex].&On := False;
-      Form1.FHttpRequestMetrics[FIndex].Url := LUrl;
-      Form1.FHttpRequestMetrics[FIndex].RequestCount := LRequestCount;
-      Form1.FHttpRequestMetrics[FIndex].StatusCode := LStatusCode;
-      Form1.FHttpRequestMetrics[FIndex].TotalBytesSent := LTotalBytesSent;
-      Form1.FHttpRequestMetrics[FIndex].TotalBytesRead := LTotalBytesRead;
-      Form1.FHttpRequestMetrics[FIndex].AverageDNSTimeTaken := LDNSTimeTaken / Max(1, LDNSCount);
-      Form1.FHttpRequestMetrics[FIndex].AverageConnectTimeTaken := LConnectTimeTaken / Max(1, LConnectCount);
-      Form1.FHttpRequestMetrics[FIndex].TotalSendTimeTaken := LSendTimeTaken;
-      Form1.FHttpRequestMetrics[FIndex].AverageSendTimeTaken := LSendTimeTaken / Max(1, LSendCount);
-      Form1.FHttpRequestMetrics[FIndex].AverageWaitTimeTaken := LWaitTimeTaken / Max(1, LWaitCount);
-      Form1.FHttpRequestMetrics[FIndex].totalReceiveTimeTaken := LReceiveTimeTaken;
-      Form1.FHttpRequestMetrics[FIndex].AverageReceiveTimeTaken := LReceiveTimeTaken / Max(1, LReceiveCount);
-    end);
+      procedure
+      begin
+        Form1.FHttpRequestMetrics[FIndex].&On := False;
+        Form1.FHttpRequestMetrics[FIndex].Url := LUrl;
+        Form1.FHttpRequestMetrics[FIndex].RequestCount := LRequestCount;
+        Form1.FHttpRequestMetrics[FIndex].StatusCode := LStatusCode;
+        Form1.FHttpRequestMetrics[FIndex].TotalBytesSent := LTotalBytesSent;
+        Form1.FHttpRequestMetrics[FIndex].TotalBytesRead := LTotalBytesRead;
+        Form1.FHttpRequestMetrics[FIndex].AverageDNSTimeTaken := LDNSTimeTaken / Max(1, LDNSCount);
+        Form1.FHttpRequestMetrics[FIndex].AverageConnectTimeTaken := LConnectTimeTaken / Max(1, LConnectCount);
+        Form1.FHttpRequestMetrics[FIndex].TotalSendTimeTaken := LSendTimeTaken;
+        Form1.FHttpRequestMetrics[FIndex].AverageSendTimeTaken := LSendTimeTaken / Max(1, LSendCount);
+        Form1.FHttpRequestMetrics[FIndex].AverageWaitTimeTaken := LWaitTimeTaken / Max(1, LWaitCount);
+        Form1.FHttpRequestMetrics[FIndex].totalReceiveTimeTaken := LReceiveTimeTaken;
+        Form1.FHttpRequestMetrics[FIndex].AverageReceiveTimeTaken := LReceiveTimeTaken / Max(1, LReceiveCount);
+      end);
 
   finally
     ALFreeAndNil(LHttpClient);
@@ -591,7 +591,7 @@ begin
 
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************}
 procedure TWorkerThread.OnHttpDownloadProgress(sender: Tobject; Read: Int64; Total: Int64);
 begin
   FBytesRead := Read;
@@ -615,7 +615,7 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+{***************************************************************************************}
 procedure TWorkerThread.OnHttpUploadProgress(Sender: Tobject; Sent: Int64; Total: Int64);
 begin
   FBytesSent := Sent;
@@ -639,7 +639,7 @@ begin
   end;
 end;
 
-{***************************************}
+{***********************************}
 procedure TWorkerThread.OnHttpStatus(
             sender: Tobject;
             InternetStatus: DWord;
@@ -664,7 +664,7 @@ begin
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING then FReceiveStopWatch.Stop;
 end;
 
-{*******************************************}
+{************}
 initialization
   {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;

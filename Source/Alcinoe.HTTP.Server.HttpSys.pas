@@ -412,7 +412,7 @@ begin
   end
 end;
 
-{*********************************************************************************}
+{***************************************************************************************}
 constructor TALHttpSysServerRequestHeaders.Create(const AHeaders: PHTTP_REQUEST_HEADERS);
 begin
   inherited Create;
@@ -423,7 +423,7 @@ begin
   FUnknownHeaders := nil;
 end;
 
-{******************************************}
+{************************************************}
 destructor TALHttpSysServerRequestHeaders.Destroy;
 begin
   ALFreeAndNil(FCookies);
@@ -431,7 +431,7 @@ begin
   inherited;
 end;
 
-{*******************************************************************************************************}
+{*************************************************************************************************************}
 function TALHttpSysServerRequestHeaders.PropertyIndexToHeaderID(const APropertyIndex: Integer): HTTP_HEADER_ID;
 begin
   case APropertyIndex of
@@ -480,7 +480,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{**************************************************************}
 function TALHttpSysServerRequestHeaders.GetCookies: TALStringsA;
 begin
   if FCookies = nil then begin
@@ -502,7 +502,7 @@ begin
   Result := FCookies;
 end;
 
-{********************************************************}
+{*********************************************************************}
 function TALHttpSysServerRequestHeaders.GetUnknownHeaders: TALStringsA;
 begin
   if FUnknownHeaders = nil then begin
@@ -527,7 +527,7 @@ begin
   Result := FUnknownHeaders;
 end;
 
-{********************************************************}
+{******************************************************************************************************}
 function TALHttpSysServerRequestHeaders.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
 begin
   var LHttpHeaderID := Ord(PropertyIndexToHeaderID(Index));
@@ -541,13 +541,13 @@ begin
   end;
 end;
 
-{********************************************************}
+{********************************************************************************************************************}
 procedure TALHttpSysServerRequestHeaders.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
 begin
   raise Exception.Create('Cannot modify request headers: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{*******************************************************************}
 Function TALHttpSysServerRequestHeaders.GetRawHeaderText: AnsiString;
 begin
   var SB := TALStringBuilderA.Create(2048);
@@ -580,19 +580,19 @@ begin
   end;
 end;
 
-{********************************************************}
+{******************************************************************************************}
 procedure TALHttpSysServerRequestHeaders.SetRawHeaderText(const ARawHeaderText: AnsiString);
 begin
   raise Exception.Create('Cannot modify request headers: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{*********************************************}
 procedure TALHttpSysServerRequestHeaders.Clear;
 begin
   raise Exception.Create('Cannot modify request headers: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{*******************************************}
+{*************************************************}
 constructor TALHttpSysServerResponseHeaders.Create;
 begin
   inherited Create;
@@ -602,7 +602,7 @@ begin
   FUnknownHeaders := nil;
 end;
 
-{********************************************************}
+{*************************************************}
 destructor TALHttpSysServerResponseHeaders.Destroy;
 begin
   ALFreeAndNil(FCookies);
@@ -610,7 +610,7 @@ begin
   inherited;
 end;
 
-{********************************************************}
+{**************************************************************************************************************}
 function TALHttpSysServerResponseHeaders.PropertyIndexToHeaderID(const APropertyIndex: Integer): HTTP_HEADER_ID;
 begin
   case APropertyIndex of
@@ -648,7 +648,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{******************************************************************************}
 function TALHttpSysServerResponseHeaders.GetCookies: TObjectList<TALHTTPCookie>;
 begin
   if FCookies = nil then
@@ -656,7 +656,7 @@ begin
   Result := FCookies;
 end;
 
-{********************************************************}
+{**********************************************************************}
 function TALHttpSysServerResponseHeaders.GetUnknownHeaders: TALStringsA;
 begin
   if FUnknownHeaders = nil then begin
@@ -667,31 +667,31 @@ begin
   Result := FUnknownHeaders;
 end;
 
-{********************************************************}
+{*******************************************************************************************************}
 function TALHttpSysServerResponseHeaders.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
 begin
   Result := FKnownHeaders[Ord(PropertyIndexToHeaderID(Index))];
 end;
 
-{********************************************************}
+{*********************************************************************************************************************}
 procedure TALHttpSysServerResponseHeaders.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
 begin
   FKnownHeaders[Ord(PropertyIndexToHeaderID(Index))] := Value;
 end;
 
-{********************************************************}
+{*******************************************************************************************}
 procedure TALHttpSysServerResponseHeaders.SetRawHeaderText(const ARawHeaderText: AnsiString);
 begin
   raise ENotImplemented.Create('TALHttpSysServerResponseHeaders.SetRawHeaderText is not yet implemented');
 end;
 
-{********************************************************}
+{********************************************************************}
 Function TALHttpSysServerResponseHeaders.GetRawHeaderText: AnsiString;
 begin
   raise ENotImplemented.Create('TALHttpSysServerResponseHeaders.GetRawHeaderText is not yet implemented');
 end;
 
-{********************************************************}
+{**********************************************}
 procedure TALHttpSysServerResponseHeaders.Clear;
 begin
   if FCookies <> nil then FCookies.Clear;
@@ -700,7 +700,7 @@ begin
     FKnownHeaders[i] := '';
 end;
 
-{********************************************************}
+{****************************************************************************}
 constructor TALHttpSysServerRequest.Create(const AHttpRequest: PHTTP_REQUEST);
 begin
   inherited Create;
@@ -714,7 +714,7 @@ begin
   FLocalAddress := nil;
 end;
 
-{********************************************************}
+{*****************************************}
 destructor TALHttpSysServerRequest.Destroy;
 begin
   ALFreeAndNil(FCookedUrl);
@@ -725,7 +725,7 @@ begin
   inherited;
 end;
 
-{********************************************************}
+{**********************************************************}
 function TALHttpSysServerRequest.GetVersion: TALHttpVersion;
 begin
   case FHttpRequest^.Version.MajorVersion of
@@ -747,13 +747,13 @@ begin
   end;
 end;
 
-{********************************************************}
+{*************************************************************************}
 procedure TALHttpSysServerRequest.SetVersion(const AValue: TALHttpVersion);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{***************************************************}
 function TALHttpSysServerRequest.GetVerb: AnsiString;
 begin
   if FVerb <> '' then Result := FVerb
@@ -768,13 +768,13 @@ begin
   end;
 end;
 
-{********************************************************}
+{******************************************************************}
 procedure TALHttpSysServerRequest.SetVerb(const AValue: AnsiString);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{*****************************************************}
 function TALHttpSysServerRequest.GetRawUrl: AnsiString;
 begin
   if FRawUrl <> '' then Result := FRawUrl
@@ -787,7 +787,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{********************************************************************}
 procedure TALHttpSysServerRequest.SetRawUrl(const AValue: AnsiString);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
@@ -803,49 +803,49 @@ begin
   Result := FCookedUrl;
 end;
 
-{********************************************************}
+{*****************************************************************}
 function TALHttpSysServerRequest.GetHeaders: TALHTTPRequestHeaders;
 begin
   Result := FHeaders;
 end;
 
-{********************************************************}
+{******************************************************}
 function TALHttpSysServerRequest.GetBodyStream: TStream;
 begin
   Result := FBodyStream;
 end;
 
-{********************************************************}
+{*********************************************************************}
 procedure TALHttpSysServerRequest.SetBodyStream(const AValue: TStream);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{*****************************************}
+{**********************************************************}
 function TALHttpSysServerRequest.GetOwnsBodyStream: Boolean;
 begin
   Result := True;
 end;
 
-{*****************************************}
+{*************************************************************************}
 procedure TALHttpSysServerRequest.SetOwnsBodyStream(const AValue: Boolean);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{*********************************************************}
 function TALHttpSysServerRequest.GetBodyString: AnsiString;
 begin
   Result := FBodyStream.DataString;
 end;
 
-{********************************************************}
+{************************************************************************}
 procedure TALHttpSysServerRequest.SetBodyString(const AValue: AnsiString);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{****************************************************************}
 function TALHttpSysServerRequest.GetRemoteAddress: TALNetEndpoint;
 begin
   if FRemoteAddress = nil then
@@ -853,13 +853,13 @@ begin
   Result := FRemoteAddress;
 end;
 
-{********************************************************}
+{*******************************************************************************}
 procedure TALHttpSysServerRequest.SetRemoteAddress(const AValue: TALNetEndpoint);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{***************************************************************}
 function TALHttpSysServerRequest.GetLocalAddress: TALNetEndpoint;
 begin
   if FLocalAddress = nil then
@@ -867,20 +867,20 @@ begin
   Result := FLocalAddress;
 end;
 
-{********************************************************}
+{******************************************************************************}
 procedure TALHttpSysServerRequest.SetLocalAddress(const AValue: TALNetEndpoint);
 begin
   raise Exception.Create('Cannot modify request: http.sys exposes a read-only HTTP_REQUEST');
 end;
 
-{********************************************************}
+{****************************************************}
 function TALHttpSysServerRequest.GetIsSecure: Boolean;
 begin
   // If this request has SSL info, it means the connection is HTTPS
   Result := Assigned(FHttpRequest^.pSslInfo);
 end;
 
-{*****************************************}
+{******************************************}
 constructor TALHttpSysServerResponse.Create;
 begin
   inherited;
@@ -897,7 +897,7 @@ begin
   FCacheSecondsToLive := 0;
 end;
 
-{*****************************************}
+{******************************************}
 destructor TALHttpSysServerResponse.Destroy;
 begin
   if FBodyFileHandle <> INVALID_HANDLE_VALUE then
@@ -907,25 +907,25 @@ begin
   inherited;
 end;
 
-{*****************************************}
+{***********************************************************}
 function TALHttpSysServerResponse.GetVersion: TALHttpVersion;
 begin
   Result := FVersion;
 end;
 
-{*****************************************}
+{**************************************************************************}
 procedure TALHttpSysServerResponse.SetVersion(const AValue: TALHttpVersion);
 begin
   FVersion := AValue;
 end;
 
-{*****************************************}
+{*******************************************************}
 function TALHttpSysServerResponse.GetStatusCode: Integer;
 begin
   Result := FStatusCode;
 end;
 
-{*****************************************}
+{**********************************************************************}
 procedure TALHttpSysServerResponse.SetStatusCode(const AValue: Integer);
 begin
   If AValue <> FStatusCode then begin
@@ -934,19 +934,19 @@ begin
   end;
 end;
 
-{*****************************************}
+{******************************************************}
 function TALHttpSysServerResponse.GetReason: AnsiString;
 begin
   Result := FReason;
 end;
 
-{*****************************************}
+{*********************************************************************}
 procedure TALHttpSysServerResponse.SetReason(const AValue: AnsiString);
 begin
   FReason := AValue;
 end;
 
-{*****************************************}
+{*******************************************************************}
 function TALHttpSysServerResponse.GetHeaders: TALHTTPResponseHeaders;
 begin
   if FHeaders = nil then
@@ -954,7 +954,7 @@ begin
   Result := FHeaders;
 end;
 
-{*****************************************}
+{*******************************************************}
 function TALHttpSysServerResponse.GetBodyStream: TStream;
 begin
   if FBodyStream = nil then
@@ -962,7 +962,7 @@ begin
   Result := FBodyStream;
 end;
 
-{*****************************************}
+{**********************************************************************}
 procedure TALHttpSysServerResponse.SetBodyStream(const AValue: TStream);
 begin
   if AValue <> FBodyStream then begin
@@ -971,19 +971,19 @@ begin
   end;
 end;
 
-{*****************************************}
+{***********************************************************}
 function TALHttpSysServerResponse.GetOwnsBodyStream: Boolean;
 begin
   Result := FOwnsBodyStream;
 end;
 
-{*****************************************}
+{**************************************************************************}
 procedure TALHttpSysServerResponse.SetOwnsBodyStream(const AValue: Boolean);
 begin
   FOwnsBodyStream := AValue;
 end;
 
-{*****************************************}
+{**********************************************************}
 function TALHttpSysServerResponse.GetBodyString: AnsiString;
 begin
   if FBodyStream <> nil then begin
@@ -998,7 +998,7 @@ begin
   else Result := '';
 end;
 
-{*****************************************}
+{*************************************************************************}
 procedure TALHttpSysServerResponse.SetBodyString(const AValue: AnsiString);
 begin
   if FBodyStream <> nil then begin
@@ -1018,13 +1018,13 @@ begin
   FBodyStream := TALStringStreamA.Create(AValue);
 end;
 
-{*****************************************}
+{***********************************************************}
 function TALHttpSysServerResponse.GetBodyFileHandle: THandle;
 begin
   Result := FBodyFileHandle;
 end;
 
-{*****************************************}
+{**************************************************************************}
 procedure TALHttpSysServerResponse.SetBodyFileHandle(const AValue: THandle);
 begin
   if AValue <> FBodyFileHandle then begin
@@ -1034,49 +1034,49 @@ begin
   end;
 end;
 
-{*****************************************}
+{***********************************************************************}
 function TALHttpSysServerResponse.GetBodyByteRangeStartingOffset: UInt64;
 begin
   Result := FBodyByteRangeStartingOffset;
 end;
 
-{*****************************************}
+{**************************************************************************************}
 procedure TALHttpSysServerResponse.SetBodyByteRangeStartingOffset(const AValue: UInt64);
 begin
   FBodyByteRangeStartingOffset := AValue;
 end;
 
-{*****************************************}
+{***************************************************************}
 function TALHttpSysServerResponse.GetBodyByteRangeLength: UInt64;
 begin
   Result := FBodyByteRangeLength;
 end;
 
-{*****************************************}
+{******************************************************************************}
 procedure TALHttpSysServerResponse.SetBodyByteRangeLength(const AValue: UInt64);
 begin
   FBodyByteRangeLength := AValue;
 end;
 
-{*****************************************}
+{*******************************************************************************************}
 function TALHttpSysServerResponse.GetCachePolicyType: TALHttpServerResponse.TCachePolicyType;
 begin
   Result := FCachePolicyType;
 end;
 
-{*****************************************}
+{**********************************************************************************************************}
 procedure TALHttpSysServerResponse.SetCachePolicyType(const AValue: TALHttpServerResponse.TCachePolicyType);
 begin
   FCachePolicyType := AValue;
 end;
 
-{*****************************************}
+{****************************************************************}
 function TALHttpSysServerResponse.GetCacheSecondsToLive: Cardinal;
 begin
   Result := FCacheSecondsToLive;
 end;
 
-{*****************************************}
+{*******************************************************************************}
 procedure TALHttpSysServerResponse.SetCacheSecondsToLive(const AValue: Cardinal);
 begin
   FCacheSecondsToLive := AValue;

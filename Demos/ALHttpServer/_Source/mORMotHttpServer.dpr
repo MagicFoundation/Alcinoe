@@ -70,7 +70,7 @@ uses
   mormot.net.server,
   mormot.net.async;
 
-  
+
 type
   TSimpleHttpAsyncServer = class
   private
@@ -86,7 +86,7 @@ type
 
 { TSimpleHttpAsyncServer }
 
-{********************************************************************************************}
+{******************************************************************************************************}
 function  ALRandomStrA(const aLength: Longint; const aCharset: Array of ansiChar): AnsiString; overload;
 var X: Longint;
     P: Pansichar;
@@ -100,7 +100,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{******************************************************************}
 function ALRandomStrA(const aLength: Longint): AnsiString; overload;
 begin
   Result := ALRandomStrA(aLength,['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']);
@@ -164,13 +164,13 @@ constructor TSimpleHttpAsyncServer.Create;
 begin
   inherited Create;
   fHttpServer := THttpAsyncServer.Create(
-    '8888', nil, nil, '', SystemInfo.dwNumberOfProcessors + 1, 30000,
-    [hsoNoXPoweredHeader,
-     hsoNoStats,
-     hsoHeadersInterning,
-     hsoThreadSmooting
-    //, hsoLogVerbose
-    ]);
+                   '8888', nil, nil, '', SystemInfo.dwNumberOfProcessors + 1, 30000,
+                   [hsoNoXPoweredHeader,
+                    hsoNoStats,
+                    hsoHeadersInterning,
+                    hsoThreadSmooting
+                   //, hsoLogVerbose
+                   ]);
   //writeln('DropPriviledges=', DropPriviledges('abouchez'));
   fHttpServer.HttpQueueLength := 100000; // needed e.g. from wrk/ab benchmarks
   fHttpServer.OnRequest := DoOnRequest;
@@ -222,4 +222,3 @@ begin
   end;
 
 end.
-

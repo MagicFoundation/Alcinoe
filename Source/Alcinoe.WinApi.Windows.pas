@@ -99,7 +99,7 @@ implementation
 uses
   System.SysUtils;
 
-{*********************************************************************************************}
+{********************************************************************************************************************}
 procedure ALCheckWinApiErrorCode(const AExtraInfo: String; const AErrorCode: DWORD; const AModuleHandle: HMODULE = 0);
 begin
   if AErrorCode <> 0 then begin
@@ -111,7 +111,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************}
+{******************************************************************************************************************}
 procedure ALCheckWinApiBoolean(const AExtraInfo: String; const ABoolean: Boolean; const AModuleHandle: HMODULE = 0);
 begin
   If not ABoolean then begin
@@ -125,7 +125,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************}
+{************************************************************************************************************************}
 function ALCheckWinApiHandle(const AExtraInfo: String; const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle;
 begin
   ALCheckWinApiBoolean(
@@ -135,7 +135,7 @@ begin
   Result := AHandle;
 end;
 
-{*********************************************************************************************}
+{**************************************************************************************************************************}
 function ALCheckWinApiPointer(const AExtraInfo: String; const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer;
 begin
   ALCheckWinApiBoolean(
@@ -145,25 +145,25 @@ begin
   Result := APointer;
 end;
 
-{*********************************************************************************************}
+{******************************************************************************************}
 procedure ALCheckWinApiErrorCode(const AErrorCode: DWORD; const AModuleHandle: HMODULE = 0);
 begin
   ALCheckWinApiErrorCode(''{AExtraInfo}, AErrorCode, AModuleHandle);
 end;
 
-{*********************************************************************************************}
+{****************************************************************************************}
 procedure ALCheckWinApiBoolean(const ABoolean: Boolean; const AModuleHandle: HMODULE = 0);
 begin
   ALCheckWinApiBoolean(''{AExtraInfo}, ABoolean, AModuleHandle);
 end;
 
-{*********************************************************************************************}
+{**********************************************************************************************}
 function ALCheckWinApiHandle(const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle;
 begin
   Result := ALCheckWinApiHandle(''{AExtraInfo}, AHandle, AModuleHandle);
 end;
 
-{*********************************************************************************************}
+{************************************************************************************************}
 function ALCheckWinApiPointer(const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer;
 begin
   Result := ALCheckWinApiPointer(''{AExtraInfo}, APointer, AModuleHandle);

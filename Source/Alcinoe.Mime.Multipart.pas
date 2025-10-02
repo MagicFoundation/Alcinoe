@@ -115,13 +115,13 @@ begin
   inherited;
 end;
 
-{**********************************************}
+{***********************************************}
 procedure TALMultipartFormDataEncoderA.BeginPart;
 begin
   FSection := TALStringStreamA.Create('');
 end;
 
-{**********************************************}
+{*********************************************}
 procedure TALMultipartFormDataEncoderA.EndPart;
 begin
   try
@@ -155,7 +155,7 @@ begin
   end;
 end;
 
-{**********************************************}
+{***********************************************}
 procedure TALMultipartFormDataEncoderA.AddStream(
             const AField: AnsiString;
             const AStream: TStream;
@@ -192,7 +192,7 @@ begin
   end;
 end;
 
-{**********************************************}
+{*********************************************}
 procedure TALMultipartFormDataEncoderA.AddFile(
             const AField: AnsiString;
             const AFilePath: String;
@@ -215,7 +215,7 @@ begin
   AddStream(AField, LBytesStream, True, AFileName, AContentType, AHeaders);
 end;
 
-{**********************************************}
+{********************************************************}
 procedure TALMultipartFormDataEncoderA.AdjustLastBoundary;
 begin
   if FLastBoundaryWrited then
@@ -225,13 +225,13 @@ begin
   end;
 end;
 
-{**********************************************}
+{******************************************************************}
 function TALMultipartFormDataEncoderA.GetMimeTypeHeader: AnsiString;
 begin
   Result := 'multipart/form-data; boundary=' + FBoundary; // do not localize
 end;
 
-{**********************************************}
+{*******************************************************}
 function TALMultipartFormDataEncoderA.GetStream: TStream;
 begin
   if not FLastBoundaryWrited then
@@ -247,13 +247,13 @@ begin
   Result := FStream;
 end;
 
-{**********************************************}
+{******************************************************************************}
 procedure TALMultipartFormDataEncoderA.WriteStringLn(const AString: AnsiString);
 begin
   FSection.WriteString(AString + #13#10);
 end;
 
-{**********************************************}
+{*****************************************************************}
 function TALMultipartFormDataEncoderA.GenerateBoundary: AnsiString;
 begin
   Result := '----------------------' + ALIntToHexA(ALRandom64(ALMaxInt64), 16);

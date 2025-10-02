@@ -368,7 +368,7 @@ begin
   inherited;
 end;
 
-{**********************************}
+{**********************************************************************************************}
 procedure TALWinHttpClient.CheckApiErrorCode(const AExtraInfo: String; const AErrorCode: DWORD);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -385,10 +385,10 @@ begin
     _doCheckApiErrorCode;
 end;
 
-{**********************************}
+{********************************************************************************************}
 procedure TALWinHttpClient.CheckApiBoolean(const AExtraInfo: String; const ABoolean: Boolean);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _doCheckApiBoolean;
   Begin
     ALCheckWinApiBoolean(
@@ -402,14 +402,14 @@ begin
     _doCheckApiBoolean
 end;
 
-{**********************************}
+{****************************************************************************************************}
 function TALWinHttpClient.CheckApiPointer(const AExtraInfo: String; const APointer: Pointer): Pointer;
 begin
   CheckApiBoolean(AExtraInfo, APointer <> nil);
   Result := APointer;
 end;
 
-{*********************************************************}
+{**********************************************************}
 procedure TALWinHttpClient.SetURL(const AValue: AnsiString);
 begin
   If AValue <> FRawURL then Begin
@@ -456,14 +456,14 @@ begin
   end;
 end;
 
-{******************************************************************}
+{***************************************************************}
 procedure TALWinHttpClient.SetUsername(const AValue: AnsiString);
 begin
   If UserName <> AValue then Disconnect;
   inherited;
 end;
 
-{**********************************************************************}
+{***************************************************************}
 procedure TALWinHttpClient.SetPassword(const AValue: AnsiString);
 begin
   IF Password <> AValue then Disconnect;
@@ -782,7 +782,7 @@ begin
 
 end;
 
-{**********************************}
+{*********************************}
 procedure TALWinHttpClient.Receive(
             const AContext: HINTERNET;
             const AResponse: TALHTTPClientResponse);
@@ -846,10 +846,10 @@ begin
   CheckApiBoolean(
     'WinHttpQueryOption',
     WinHttpQueryOption(
-     AContext, // hInternet: HINTERNET;
-     WINHTTP_OPTION_HTTP_PROTOCOL_USED, // dwOption: DWORD;
-     LUsed, // out lpBuffer;
-     LLen)); // var lpdwBufferLength: DWORD
+      AContext, // hInternet: HINTERNET;
+      WINHTTP_OPTION_HTTP_PROTOCOL_USED, // dwOption: DWORD;
+      LUsed, // out lpBuffer;
+      LLen)); // var lpdwBufferLength: DWORD
   if (LUsed and WINHTTP_PROTOCOL_FLAG_HTTP3) <> 0 then AResponse.Version := TALHttpVersion.v3
   else if (LUsed and WINHTTP_PROTOCOL_FLAG_HTTP2) <> 0 then AResponse.Version := TALHttpVersion.v2
   else begin
@@ -937,7 +937,7 @@ begin
 
 end;
 
-{*********************************}
+{********************************}
 function TALWinHttpClient.Execute(
            const AUrl: AnsiString;
            const AVerb: AnsiString;
@@ -996,7 +996,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{*****************************************************************}
 procedure TALWinHttpClient.SetAccessType(const Value: TAccessType);
 begin
   If (value <> AccessType) then begin
@@ -1012,7 +1012,7 @@ begin
   FOnStatus := Value;
 end;
 
-{********************************************************************************}
+{**********************************************************************************}
 procedure TALWinHttpClient.SetOnRedirect(const Value: TALHTTPClient.TRedirectEvent);
 begin
   disconnect;

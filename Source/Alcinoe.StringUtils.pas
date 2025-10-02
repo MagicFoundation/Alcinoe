@@ -804,7 +804,7 @@ begin
   Write(PAnsiChar(AString)^, Length(AString));
 end;
 
-{***************************************************}
+{***************************************}
 function TALStringStreamA.GetSize: Int64;
 begin
   Result := length(FDataString);
@@ -1232,7 +1232,7 @@ begin
   result := System.Masks.MatchesMask(Filename, Mask);
 end;
 
-{***************************}
+{***********************************}
 constructor TALStringBuilderA.Create;
 begin
   inherited Create;
@@ -1241,7 +1241,7 @@ begin
   Capacity := DefaultCapacity;
 end;
 
-{***************************}
+{*************************************************************}
 constructor TALStringBuilderA.Create(const ACapacity: Integer);
 begin
   inherited Create;
@@ -1250,14 +1250,14 @@ begin
   Capacity := ACapacity;
 end;
 
-{***************************}
+{*************************************************************}
 constructor TALStringBuilderA.Create(const AValue: AnsiString);
 begin
   Create;
   Append(AValue);
 end;
 
-{***************************}
+{******************************************************************************************}
 constructor TALStringBuilderA.Create(const ACapacity: Integer; const AMaxCapacity: Integer);
 begin
   if AMaxCapacity <= 0 then
@@ -1268,7 +1268,7 @@ begin
   FMaxCapacity := AMaxCapacity;
 end;
 
-{***************************}
+{***************************************************************************************}
 constructor TALStringBuilderA.Create(const AValue: AnsiString; const ACapacity: Integer);
 begin
   inherited Create;
@@ -1278,19 +1278,19 @@ begin
   Append(AValue);
 end;
 
-{***************************}
+{*******************************************************************************************************************************************}
 constructor TALStringBuilderA.Create(const AValue: AnsiString; const AStartIndex: Integer; const ALength: Integer; const ACapacity: Integer);
 begin
   Create(ALCopyStr(AValue, AStartIndex, Alength), ACapacity);
 end;
 
-{***************************}
+{**********************************************}
 function TALStringBuilderA.GetCapacity: Integer;
 begin
   Result := System.Length(FData);
 end;
 
-{***************************}
+{*************************************************************}
 procedure TALStringBuilderA.SetCapacity(const AValue: Integer);
 begin
   if (AValue < Length) or (AValue > FMaxCapacity) then
@@ -1298,13 +1298,13 @@ begin
   System.SetLength(FData, AValue);
 end;
 
-{***************************}
+{********************************************}
 function TALStringBuilderA.GetLength: Integer;
 begin
   Result := FLength;
 end;
 
-{***************************}
+{***********************************************************}
 procedure TALStringBuilderA.SetLength(const AValue: Integer);
 begin
   if AValue < 0 then
@@ -1325,13 +1325,13 @@ begin
   end;
 end;
 
-{***************************}
+{*************************************************}
 function TALStringBuilderA.GetMaxCapacity: Integer;
 begin
   Result := FMaxCapacity;
 end;
 
-{***************************}
+{*****************************************}
 procedure TALStringBuilderA.ExpandCapacity;
 begin
   var LNewCapacity := (Capacity * 3) div 2;
@@ -1344,14 +1344,14 @@ begin
   Capacity := LNewCapacity;
 end;
 
-{***************************}
+{********************************}
 procedure TALStringBuilderA.Clear;
 begin
   Length := 0;
   Capacity := DefaultCapacity;
 end;
 
-{***************************}
+{***************************************************************************}
 function TALStringBuilderA.EnsureCapacity(const ACapacity: Integer): Integer;
 begin
   if ACapacity < 0 then
@@ -1365,7 +1365,7 @@ begin
   Result := Capacity;
 end;
 
-{***************************}
+{*********************}
 {$ZEROBASEDSTRINGS OFF}
 function TALStringBuilderA.Append(const AValue: AnsiChar): TALStringBuilderA;
 begin
@@ -1379,7 +1379,7 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{***************************}
+{*****************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiString): TALStringBuilderA;
 begin
   var LDelta := System.Length(AValue);
@@ -1393,7 +1393,7 @@ begin
   Result := self;
 end;
 
-{***************************}
+{********************************************************************************************************}
 function TALStringBuilderA.Append(const AValue: AnsiChar; const ARepeatCount: Integer): TALStringBuilderA;
 begin
   if ARepeatCount > 0 then begin
@@ -1409,7 +1409,7 @@ begin
   Result := Self;
 end;
 
-{***************************}
+{*********************}
 {$ZEROBASEDSTRINGS OFF}
 function TALStringBuilderA.Append(const AValue: AnsiString; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderA;
 begin
@@ -1427,25 +1427,25 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{***************************}
+{*******************************************************}
 function TALStringBuilderA.AppendLine: TALStringBuilderA;
 begin
   Result := Append(LineBreak);
 end;
 
-{***************************}
+{*********************************************************************************}
 function TALStringBuilderA.AppendLine(const AValue: AnsiString): TALStringBuilderA;
 begin
   Result := Append(AValue).AppendLine;
 end;
 
-{***************************}
+{**********************************************}
 function TALStringBuilderA.ToString: AnsiString;
 begin
   Result := ToString(False);
 end;
 
-{***************************}
+{******************************************************************************}
 function TALStringBuilderA.ToString(const AUpdateCapacity: Boolean): AnsiString;
 begin
   if Length = Capacity then begin
@@ -1460,7 +1460,7 @@ begin
     Result := ALCopyStr(FData, 1, Length);
 end;
 
-{***************************}
+{***********************************}
 constructor TALStringBuilderW.Create;
 begin
   inherited Create;
@@ -1469,7 +1469,7 @@ begin
   Capacity := DefaultCapacity;
 end;
 
-{***************************}
+{*************************************************************}
 constructor TALStringBuilderW.Create(const ACapacity: Integer);
 begin
   inherited Create;
@@ -1478,14 +1478,14 @@ begin
   Capacity := ACapacity;
 end;
 
-{***************************}
+{*********************************************************}
 constructor TALStringBuilderW.Create(const AValue: string);
 begin
   Create;
   Append(AValue);
 end;
 
-{***************************}
+{******************************************************************************************}
 constructor TALStringBuilderW.Create(const ACapacity: Integer; const AMaxCapacity: Integer);
 begin
   if AMaxCapacity <= 0 then
@@ -1496,7 +1496,7 @@ begin
   FMaxCapacity := AMaxCapacity;
 end;
 
-{***************************}
+{***********************************************************************************}
 constructor TALStringBuilderW.Create(const AValue: string; const ACapacity: Integer);
 begin
   inherited Create;
@@ -1506,19 +1506,19 @@ begin
   Append(AValue);
 end;
 
-{***************************}
+{***************************************************************************************************************************************}
 constructor TALStringBuilderW.Create(const AValue: string; const AStartIndex: Integer; const ALength: Integer; const ACapacity: Integer);
 begin
   Create(ALCopyStr(AValue, AStartIndex, Alength), ACapacity);
 end;
 
-{***************************}
+{**********************************************}
 function TALStringBuilderW.GetCapacity: Integer;
 begin
   Result := System.Length(FData);
 end;
 
-{***************************}
+{*************************************************************}
 procedure TALStringBuilderW.SetCapacity(const AValue: Integer);
 begin
   if (AValue < Length) or (AValue > FMaxCapacity) then
@@ -1526,13 +1526,13 @@ begin
   System.SetLength(FData, AValue);
 end;
 
-{***************************}
+{********************************************}
 function TALStringBuilderW.GetLength: Integer;
 begin
   Result := FLength;
 end;
 
-{***************************}
+{***********************************************************}
 procedure TALStringBuilderW.SetLength(const AValue: Integer);
 begin
   if AValue < 0 then
@@ -1553,13 +1553,13 @@ begin
   end;
 end;
 
-{***************************}
+{*************************************************}
 function TALStringBuilderW.GetMaxCapacity: Integer;
 begin
   Result := FMaxCapacity;
 end;
 
-{***************************}
+{*****************************************}
 procedure TALStringBuilderW.ExpandCapacity;
 begin
   var LNewCapacity := (Capacity * 3) div 2;
@@ -1572,14 +1572,14 @@ begin
   Capacity := LNewCapacity;
 end;
 
-{***************************}
+{********************************}
 procedure TALStringBuilderW.Clear;
 begin
   Length := 0;
   Capacity := DefaultCapacity;
 end;
 
-{***************************}
+{***************************************************************************}
 function TALStringBuilderW.EnsureCapacity(const ACapacity: Integer): Integer;
 begin
   if ACapacity < 0 then
@@ -1593,7 +1593,7 @@ begin
   Result := Capacity;
 end;
 
-{***************************}
+{*********************}
 {$ZEROBASEDSTRINGS OFF}
 function TALStringBuilderW.Append(const AValue: Char): TALStringBuilderW;
 begin
@@ -1607,7 +1607,7 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{***************************}
+{*************************************************************************}
 function TALStringBuilderW.Append(const AValue: string): TALStringBuilderW;
 begin
   var LDelta := System.Length(AValue);
@@ -1621,7 +1621,7 @@ begin
   Result := self;
 end;
 
-{***************************}
+{****************************************************************************************************}
 function TALStringBuilderW.Append(const AValue: Char; const ARepeatCount: Integer): TALStringBuilderW;
 begin
   if ARepeatCount > 0 then begin
@@ -1637,7 +1637,7 @@ begin
   Result := Self;
 end;
 
-{***************************}
+{*********************}
 {$ZEROBASEDSTRINGS OFF}
 function TALStringBuilderW.Append(const AValue: string; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderW;
 begin
@@ -1655,25 +1655,25 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{***************************}
+{*******************************************************}
 function TALStringBuilderW.AppendLine: TALStringBuilderW;
 begin
   Result := Append(LineBreak);
 end;
 
-{***************************}
+{*****************************************************************************}
 function TALStringBuilderW.AppendLine(const AValue: string): TALStringBuilderW;
 begin
   Result := Append(AValue).AppendLine;
 end;
 
-{***************************}
+{******************************************}
 function TALStringBuilderW.ToString: string;
 begin
   Result := ToString(False);
 end;
 
-{***************************}
+{**************************************************************************}
 function TALStringBuilderW.ToString(const AUpdateCapacity: Boolean): string;
 begin
   if Length = Capacity then begin
@@ -10174,7 +10174,7 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{***************************************************************}
+{*****************************************************************}
 // Unlike Delphi’s HttpApp.HttpDecode, this function never raises
 // EConvertError if the URL contains stray '%' characters that are
 // not followed by a valid escape sequence.
@@ -10184,7 +10184,7 @@ begin
   ALPercentDecodeInPlace(result, APlusAsSpaces);
 end;
 
-{***************************************************************}
+{*****************************************************************}
 // Unlike Delphi’s HttpApp.HttpDecode, this function never raises
 // EConvertError if the URL contains stray '%' characters that are
 // not followed by a valid escape sequence.
@@ -10361,7 +10361,7 @@ procedure ALExtractHeaderFields(
   LHead: PChar;
   LTail: PChar;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _ExtractToken(var AToken: String; Const AIsNameToken: Boolean);
     begin
 

@@ -258,7 +258,7 @@ uses
   Alcinoe.Url,
   Alcinoe.StringUtils;
 
-{**************************************}
+{*********************************************}
 constructor TALHttpClientRequestHeaders.Create;
 Begin
   inherited;
@@ -268,7 +268,7 @@ Begin
   FUnknownHeaders := nil;
 end;
 
-{**************************************}
+{*********************************************}
 destructor TALHttpClientRequestHeaders.Destroy;
 begin
   AlFreeAndNil(Fcookies);
@@ -276,7 +276,7 @@ begin
   inherited;
 end;
 
-{***********************************}
+{******************************************}
 procedure TALHttpClientRequestHeaders.Clear;
 begin
   for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
@@ -307,7 +307,7 @@ begin
   Result := FUnknownHeaders;
 end;
 
-{********************************************************************************************}
+{***************************************************************************************************}
 function TALHttpClientRequestHeaders.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
 begin
   {$IF defined(DEBUG)}
@@ -317,7 +317,7 @@ begin
   Result := FKnownHeaders[Index];
 end;
 
-{**********************************************************************************************************}
+{*****************************************************************************************************************}
 procedure TALHttpClientRequestHeaders.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
 begin
   {$IF defined(DEBUG)}
@@ -327,7 +327,7 @@ begin
   FKnownHeaders[Index] := Value;
 end;
 
-{*********************************************************}
+{****************************************************************}
 Function TALHttpClientRequestHeaders.GetRawHeaderText: AnsiString;
 begin
   var SB := TALStringBuilderA.Create(2048);
@@ -361,7 +361,7 @@ begin
   end;
 end;
 
-{********************************************************************************}
+{***************************************************************************************}
 procedure TALHttpClientRequestHeaders.SetRawHeaderText(const ARawHeaderText: AnsiString);
 begin
   Clear;
@@ -376,7 +376,7 @@ begin
   end;
 end;
 
-{**************************************}
+{**********************************************}
 constructor TALHttpClientResponseHeaders.Create;
 Begin
   inherited;
@@ -386,7 +386,7 @@ Begin
   FUnknownHeaders := nil;
 end;
 
-{**************************************}
+{**********************************************}
 destructor TALHttpClientResponseHeaders.Destroy;
 begin
   AlFreeAndNil(Fcookies);
@@ -394,7 +394,7 @@ begin
   inherited;
 end;
 
-{***********************************}
+{*******************************************}
 procedure TALHttpClientResponseHeaders.Clear;
 begin
   for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
@@ -411,7 +411,7 @@ begin
   Result := FCookies;
 end;
 
-{******************************************************************}
+{*******************************************************************}
 function TALHttpClientResponseHeaders.GetUnknownHeaders: TALStringsA;
 begin
   if FUnknownHeaders = nil then begin
@@ -422,7 +422,7 @@ begin
   Result := FUnknownHeaders;
 end;
 
-{********************************************************************************************}
+{****************************************************************************************************}
 function TALHttpClientResponseHeaders.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
 begin
   {$IF defined(DEBUG)}
@@ -432,7 +432,7 @@ begin
   Result := FKnownHeaders[Index];
 end;
 
-{**********************************************************************************************************}
+{******************************************************************************************************************}
 procedure TALHttpClientResponseHeaders.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
 begin
   {$IF defined(DEBUG)}
@@ -442,7 +442,7 @@ begin
   FKnownHeaders[Index] := Value;
 end;
 
-{*********************************************************}
+{*****************************************************************}
 Function TALHttpClientResponseHeaders.GetRawHeaderText: AnsiString;
 begin
   var SB := TALStringBuilderA.Create(2048);
@@ -478,7 +478,7 @@ begin
   end;
 end;
 
-{********************************************************************************}
+{****************************************************************************************}
 procedure TALHttpClientResponseHeaders.SetRawHeaderText(const ARawHeaderText: AnsiString);
 begin
   Clear;
@@ -500,7 +500,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{***************************************}
 constructor TALHttpClientResponse.Create;
 begin
   inherited;
@@ -512,7 +512,7 @@ begin
   FOwnsBodyStream := True;
 end;
 
-{*****************************************}
+{***************************************}
 destructor TALHttpClientResponse.Destroy;
 begin
   ALFreeAndNil(FHeaders);
@@ -520,25 +520,25 @@ begin
   inherited;
 end;
 
-{*****************************************}
+{********************************************************}
 function TALHttpClientResponse.GetVersion: TALHttpVersion;
 begin
   Result := FVersion;
 end;
 
-{*****************************************}
+{***********************************************************************}
 procedure TALHttpClientResponse.SetVersion(const AValue: TALHttpVersion);
 begin
   FVersion := AValue;
 end;
 
-{*****************************************}
+{****************************************************}
 function TALHttpClientResponse.GetStatusCode: Integer;
 begin
   Result := FStatusCode;
 end;
 
-{*****************************************}
+{*******************************************************************}
 procedure TALHttpClientResponse.SetStatusCode(const AValue: Integer);
 begin
   If AValue <> FStatusCode then begin
@@ -547,19 +547,19 @@ begin
   end;
 end;
 
-{*****************************************}
+{***************************************************}
 function TALHttpClientResponse.GetReason: AnsiString;
 begin
   Result := FReason;
 end;
 
-{*****************************************}
+{******************************************************************}
 procedure TALHttpClientResponse.SetReason(const AValue: AnsiString);
 begin
   FReason := AValue;
 end;
 
-{*****************************************}
+{****************************************************************}
 function TALHttpClientResponse.GetHeaders: TALHTTPResponseHeaders;
 begin
   if FHeaders = nil then
@@ -567,7 +567,7 @@ begin
   Result := FHeaders;
 end;
 
-{*****************************************}
+{****************************************************}
 function TALHttpClientResponse.GetBodyStream: TStream;
 begin
   if FBodyStream = nil then
@@ -575,7 +575,7 @@ begin
   Result := FBodyStream;
 end;
 
-{*****************************************}
+{*******************************************************************}
 procedure TALHttpClientResponse.SetBodyStream(const AValue: TStream);
 begin
   if AValue <> FBodyStream then begin
@@ -584,19 +584,19 @@ begin
   end;
 end;
 
-{*****************************************}
+{********************************************************}
 function TALHttpClientResponse.GetOwnsBodyStream: Boolean;
 begin
   Result := FOwnsBodyStream;
 end;
 
-{*****************************************}
+{***********************************************************************}
 procedure TALHttpClientResponse.SetOwnsBodyStream(const AValue: Boolean);
 begin
   FOwnsBodyStream := AValue;
 end;
 
-{*****************************************}
+{*******************************************************}
 function TALHttpClientResponse.GetBodyString: AnsiString;
 begin
   if FBodyStream <> nil then begin
@@ -611,7 +611,7 @@ begin
   else Result := '';
 end;
 
-{*****************************************}
+{**********************************************************************}
 procedure TALHttpClientResponse.SetBodyString(const AValue: AnsiString);
 begin
   if FBodyStream <> nil then begin
@@ -734,13 +734,13 @@ begin
   inherited;
 end;
 
-{***************************************************************}
+{************************************************************}
 procedure TALHTTPClient.SetUsername(const AValue: AnsiString);
 begin
   FUserName := AValue;
 end;
 
-{*******************************************************************}
+{************************************************************}
 procedure TALHTTPClient.SetPassword(const AValue: AnsiString);
 begin
   FPassword := AValue;
@@ -752,13 +752,13 @@ begin
   //virtual
 end;
 
-{*****************************************************************************}
+{*****************************************************************}
 procedure TALHTTPClient.SetOnRedirect(const Value: TRedirectEvent);
 begin
   FOnRedirect := Value;
 end;
 
-{**************************************}
+{*******************************************}
 function TALHTTPClient.ExecuteFormUrlEncoded(
            const AUrl: AnsiString;
            const AVerb: AnsiString;
@@ -915,7 +915,7 @@ begin
               AResponseBodyStream); // const AResponseBodyStream: TStream)
 end;
 
-{************************************}
+{****************************************}
 function TALHTTPClient.PostFormUrlEncoded(
            const AUrl: AnsiString;
            const AFormParams: TALStringsA;
@@ -991,7 +991,7 @@ begin
               AResponseBodyStream); // const AResponseBodyStream: TStream)
 end;
 
-{************************************}
+{***************************************}
 function TALHTTPClient.PutFormUrlEncoded(
            const AUrl: AnsiString;
            const AFormParams: TALStringsA;
@@ -1009,7 +1009,7 @@ begin
               AResponseBodyStream); // const AResponseBodyStream: TStream)
 end;
 
-{*******************************************}
+{******************************************}
 function TALHTTPClient.PutMultipartFormData(
            const AUrl: AnsiString;
            const AFormDataEncoder: TALMultipartFormDataEncoderA;
@@ -1024,7 +1024,7 @@ begin
               AResponseBodyStream); // const AResponseBodyStream: TStream)
 end;
 
-{*************************}
+{***************************}
 function TALHTTPClient.Patch(
            const AUrl: AnsiString;
            const ABodyStream: TStream;
@@ -1039,7 +1039,7 @@ begin
               AResponseBodyStream); // const AResponseBodyStream: TStream)
 end;
 
-{************************************}
+{*****************************************}
 function TALHTTPClient.PatchFormUrlEncoded(
            const AUrl: AnsiString;
            const AFormParams: TALStringsA;
@@ -1057,7 +1057,7 @@ begin
               AResponseBodyStream); // const AResponseBodyStream: TStream)
 end;
 
-{*******************************************}
+{********************************************}
 function TALHTTPClient.PatchMultipartFormData(
            const AUrl: AnsiString;
            const AFormDataEncoder: TALMultipartFormDataEncoderA;

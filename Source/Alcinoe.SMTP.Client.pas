@@ -404,7 +404,7 @@ begin
   result := Data(aHeader.RawHeaderText, aBody);
 end;
 
-{****************************************}
+{}
 (*
 Function TAlSmtpClient.DataMultipartMixed(
            aHeader: TALEmailHeader;
@@ -526,7 +526,7 @@ begin
   end;
 end;
 
-{*********************************************}
+{}
 (*
 procedure TAlSmtpClient.SendMailMultipartMixed(
             const aHost: AnsiString;

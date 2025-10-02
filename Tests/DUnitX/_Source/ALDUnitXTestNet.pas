@@ -45,7 +45,7 @@ uses
   Alcinoe.Common,
   Alcinoe.Http;
 
-{*******************************************}
+{************************************************************************************************************************}
 procedure TALDUnitXTestNet.CheckIPv6Binary(const Expected: array of byte; const Actual: TALIPv6Binary; const Msg: string);
 var
   I: Integer;
@@ -55,7 +55,7 @@ begin
     Assert.AreEqual(Expected[I], Actual[I], Msg + Format(' at byte position %d', [I]));
 end;
 
-{*******************************************}
+{*************************************************************************************************}
 procedure TALDUnitXTestNet.FillIPv6Binary(var IPv6Bin: TALIPv6Binary; const Values: array of Word);
 var
   I: Integer;
@@ -68,7 +68,7 @@ begin
   end;
 end;
 
-{*******************************************}
+{***************************************************}
 procedure TALDUnitXTestNet.TestALTryIPV4StrToNumeric;
 var
   IPv4Num: Cardinal;
@@ -93,7 +93,7 @@ begin
   Assert.IsFalse(ALTryIPV4StrToNumeric('192.168.1.1.1', IPv4Num), 'Too many octets with trailing number should return False');
 end;
 
-{*******************************************}
+{*************************************************}
 procedure TALDUnitXTestNet.TestALNumericToIPv4StrA;
 begin
   // Test valid IPv4 numeric values
@@ -104,7 +104,7 @@ begin
   Assert.AreEqual(AnsiString('172.16.254.1'), ALNumericToIPv4StrA($AC10FE01), '0xAC10FE01 should convert to 172.16.254.1');
 end;
 
-{*******************************************}
+{**********************************************}
 procedure TALDUnitXTestNet.TestALIPv4EndOfRange;
 begin
   // Test valid subnet ranges
@@ -120,7 +120,7 @@ begin
   Assert.AreEqual(Cardinal($FFFFFFFF), ALIPv4EndOfRange($C0A80101, 0), '192.168.1.1/0 should end at 255.255.255.255');
 end;
 
-{*******************************************}
+{**************************************************}
 procedure TALDUnitXTestNet.TestALTryIPV6StrToBinary;
 var
   IPv6Bin: TALIPv6Binary;
@@ -283,7 +283,7 @@ begin
   Assert.AreEqual(Expected, Result, 'Maximum value IPv6 address string does not match expected format');
 end;
 
-{************************************************}
+{**********************************************}
 procedure TALDUnitXTestNet.TestALIPv6EndOfRange;
 var
   StartIPv6, ResultIPv6, ExpectedIPv6: TALIPv6Binary;

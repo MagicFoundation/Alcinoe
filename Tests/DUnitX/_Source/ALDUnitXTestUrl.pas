@@ -34,7 +34,7 @@ uses
   Alcinoe.Common,
   Alcinoe.Http;
 
-{*******************************************}
+{******************************************}
 procedure TALDUnitXTestUrl.TestALCookedUrlA;
 var
   CookedUrl: TALCookedUrlA;
@@ -866,9 +866,10 @@ end;
 procedure TALDUnitXTestUrl.TestALCombineUrlA;
 
   // Helper procedure to create and parse result URL
-  procedure CheckUrl(const AResult: AnsiString; const AExpected: AnsiString;
-                    const AScheme, AHost, APath, AQuery, AAnchor: AnsiString;
-                    APort: Integer);
+  procedure CheckUrl(
+              const AResult: AnsiString; const AExpected: AnsiString;
+              const AScheme, AHost, APath, AQuery, AAnchor: AnsiString;
+              APort: Integer);
   begin
     Assert.AreEqual(AExpected, AResult, 'Full URL mismatch');
     var CookedUrl := TALCookedUrlA.Create(AResult, True{Decode}, True{PlusAsSpaces});
@@ -890,103 +891,123 @@ begin
 
   // Test case 1: Absolute relative URL (should return unchanged)
   ResultUrl := AlCombineUrlA('https://example.com/path?key=value#anchor', 'http://base.com');
-  CheckUrl(ResultUrl, 'https://example.com/path?key=value#anchor',
-           'https', 'example.com', '/path', 'key=value', 'anchor', 443);
+  CheckUrl(
+    ResultUrl, 'https://example.com/path?key=value#anchor',
+    'https', 'example.com', '/path', 'key=value', 'anchor', 443);
 
   // Test case 2: Relative path with base URL
   ResultUrl := AlCombineUrlA('sub/path', 'http://base.com/main/page');
-  CheckUrl(ResultUrl, 'http://base.com/main/sub/path',
-           'http', 'base.com', '/main/sub/path', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/main/sub/path',
+    'http', 'base.com', '/main/sub/path', '', '', 80);
 
   // Test case 3: Relative path with base URL ending in slash
   ResultUrl := AlCombineUrlA('sub/path', 'http://base.com/main/');
-  CheckUrl(ResultUrl, 'http://base.com/main/sub/path',
-           'http', 'base.com', '/main/sub/path', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/main/sub/path',
+    'http', 'base.com', '/main/sub/path', '', '', 80);
 
   // Test case 4: Relative path with parent directory (..)
   ResultUrl := AlCombineUrlA('../sub/path', 'http://base.com/main/folder/page');
-  CheckUrl(ResultUrl, 'http://base.com/main/sub/path',
-           'http', 'base.com', '/main/sub/path', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/main/sub/path',
+    'http', 'base.com', '/main/sub/path', '', '', 80);
 
   // Test case 5: Relative path with query and fragment
   ResultUrl := AlCombineUrlA('new?key=value#frag', 'http://base.com/path/');
-  CheckUrl(ResultUrl, 'http://base.com/path/new?key=value#frag',
-           'http', 'base.com', '/path/new', 'key=value', 'frag', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/path/new?key=value#frag',
+    'http', 'base.com', '/path/new', 'key=value', 'frag', 80);
 
   // Test case 6: Empty relative URL (should return base URL without fragment)
   ResultUrl := AlCombineUrlA('', 'http://base.com/path?key=value#anchor');
-  CheckUrl(ResultUrl, 'http://base.com/',
-           'http', 'base.com', '/', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/',
+    'http', 'base.com', '/', '', '', 80);
 
   // Test case 7: Root relative URL (starts with /)
   ResultUrl := AlCombineUrlA('/new/path', 'http://base.com/main/page');
-  CheckUrl(ResultUrl, 'http://base.com/new/path',
-           'http', 'base.com', '/new/path', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/new/path',
+    'http', 'base.com', '/new/path', '', '', 80);
 
   // Test case 8: Base URL with port and userinfo
   ResultUrl := AlCombineUrlA('sub', 'http://user:pass@base.com:8080/main/');
-  CheckUrl(ResultUrl, 'http://user:pass@base.com:8080/main/sub',
-           'http', 'base.com', '/main/sub', '', '', 8080);
+  CheckUrl(
+    ResultUrl, 'http://user:pass@base.com:8080/main/sub',
+    'http', 'base.com', '/main/sub', '', '', 8080);
 
   // Test case 9: Relative URL with encoded characters
   ResultUrl := AlCombineUrlA('sub%20path/file%2Bname', 'http://base.com/main/');
-  CheckUrl(ResultUrl, 'http://base.com/main/sub%20path/file%2Bname',
-           'http', 'base.com', '/main/sub path/file+name', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/main/sub%20path/file%2Bname',
+    'http', 'base.com', '/main/sub path/file+name', '', '', 80);
 
   // Test case 10: Fragment-only relative URL
   ResultUrl := AlCombineUrlA('#newanchor', 'http://base.com/path');
-  CheckUrl(ResultUrl, 'http://base.com/path#newanchor',
-           'http', 'base.com', '/path', '', 'newanchor', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/path#newanchor',
+    'http', 'base.com', '/path', '', 'newanchor', 80);
 
   // Test case 11: Query-only relative URL
   ResultUrl := AlCombineUrlA('?newkey=newvalue', 'http://base.com/path');
-  CheckUrl(ResultUrl, 'http://base.com/path?newkey=newvalue',
-           'http', 'base.com', '/path', 'newkey=newvalue', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/path?newkey=newvalue',
+    'http', 'base.com', '/path', 'newkey=newvalue', '', 80);
 
   // Test case 12: Empty base URL with relative URL
   ResultUrl := AlCombineUrlA('sub/path', '');
-  CheckUrl(ResultUrl, 'sub/path',
-           '', '', 'sub/path', '', '', 0);
+  CheckUrl(
+    ResultUrl, 'sub/path',
+    '', '', 'sub/path', '', '', 0);
 
   // Test case 13: Malformed base URL (missing scheme)
   ResultUrl := AlCombineUrlA('sub', 'base.com/path');
-  CheckUrl(ResultUrl, 'sub',
-           '', '', 'sub', '', '', 0);
+  CheckUrl(
+    ResultUrl, 'sub',
+    '', '', 'sub', '', '', 0);
 
   // Test case 14: IPv6 base URL
   ResultUrl := AlCombineUrlA('sub', 'http://[2001:db8::1]:8080/main');
-  CheckUrl(ResultUrl, 'http://[2001:db8::1]:8080/sub',
-           'http', '[2001:db8::1]', '/sub', '', '', 8080);
+  CheckUrl(
+    ResultUrl, 'http://[2001:db8::1]:8080/sub',
+    'http', '[2001:db8::1]', '/sub', '', '', 8080);
 
   // Test case 15: Both URLs empty
   ResultUrl := AlCombineUrlA('', '');
-  CheckUrl(ResultUrl, '',
-           '', '', '', '', '', 0);
+  CheckUrl(
+    ResultUrl, '',
+    '', '', '', '', '', 0);
 
   // Test case 16: Relative URL with multiple parent directories (../../)
   ResultUrl := AlCombineUrlA('../../sub', 'http://base.com/a/b/c/d');
-  CheckUrl(ResultUrl, 'http://base.com/a/sub',
-           'http', 'base.com', '/a/sub', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/a/sub',
+    'http', 'base.com', '/a/sub', '', '', 80);
 
   // Test case 17: Relative URL with dot (.)
   ResultUrl := AlCombineUrlA('./sub', 'http://base.com/main/');
-  CheckUrl(ResultUrl, 'http://base.com/main/sub',
-           'http', 'base.com', '/main/sub', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/main/sub',
+    'http', 'base.com', '/main/sub', '', '', 80);
 
   // Test case 18: Base URL with fragment (should be ignored)
   ResultUrl := AlCombineUrlA('sub', 'http://base.com/path#oldanchor');
-  CheckUrl(ResultUrl, 'http://base.com/sub',
-           'http', 'base.com', '/sub', '', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/sub',
+    'http', 'base.com', '/sub', '', '', 80);
 
   // Test case 19: Relative URL with encoded query
   ResultUrl := AlCombineUrlA('?key=val%20ue', 'http://base.com/path');
-  CheckUrl(ResultUrl, 'http://base.com/path?key=val%20ue',
-           'http', 'base.com', '/path', 'key=val%20ue', '', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/path?key=val%20ue',
+    'http', 'base.com', '/path', 'key=val%20ue', '', 80);
 
   // Test case 20: Malformed relative URL with scheme-like fragment (e.g., www.yahoo.fr#aze@aze.fr)
   ResultUrl := AlCombineUrlA('#aze@aze.fr', 'http://base.com/path');
-  CheckUrl(ResultUrl, 'http://base.com/path#aze@aze.fr',
-           'http', 'base.com', '/path', '', 'aze@aze.fr', 80);
+  CheckUrl(
+    ResultUrl, 'http://base.com/path#aze@aze.fr',
+    'http', 'base.com', '/path', '', 'aze@aze.fr', 80);
   {$ENDIF}
 end;
 

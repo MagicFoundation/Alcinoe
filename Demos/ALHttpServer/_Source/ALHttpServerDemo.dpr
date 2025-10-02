@@ -23,7 +23,7 @@ uses
 
 var
 
-  {***************************}
+  {*******************************}
   MainHttpServer: TALHttpSysServer;
 
 Type
@@ -34,7 +34,7 @@ Type
     class procedure OnRequest(Const ARequest: TALHttpServerRequest; Const AResponse: TALHttpServerResponse);
   end;
 
-{**********************************************************************************************************}
+{**************************************************************************************************************************}
 class procedure THttpRequestHandler.OnRequest(const ARequest: TALHttpServerRequest; const AResponse: TALHttpServerResponse);
 begin
 

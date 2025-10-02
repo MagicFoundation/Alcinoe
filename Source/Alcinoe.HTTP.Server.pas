@@ -14,7 +14,7 @@ type
   EALHttpServerBodySizeTooBig = Class(Exception);
   EALHttpServerConnectionDropped = class(Exception);
 
-  {-------------------------------------------}
+  {------------------------------------------}
   TALHttpServerRequest = class(TALHTTPRequest)
   protected
     function GetRemoteAddress: TALNetEndpoint; virtual; abstract;

@@ -139,7 +139,7 @@ type
     property Values[const AName: AnsiString]: AnsiString read GetHeaderValueByName write SetHeaderValueByName; default;
   end;
 
-  {------------------------------------}
+  {-------------------------------------}
   TALHTTPResponseHeaders = Class(TObject)
   protected
     function PropertyIndexToName(const AIndex: Integer): AnsiString; virtual;
@@ -506,7 +506,7 @@ begin
   else Result := -1;
 end;
 
-{****************************************************************************************}
+{***************************************************************************************}
 function TALHttpRequestHeaders.GetHeaderValueByName(const AName: AnsiString): AnsiString;
 begin
   Var LIndex := NameToPropertyIndex(AName);
@@ -618,7 +618,7 @@ begin
   else Result := UnknownHeaders.Values[AName];
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************}
 procedure TALHttpResponseHeaders.SetHeaderValueByName(const AName: AnsiString; const AValue: AnsiString);
 begin
   Var LIndex := NameToPropertyIndex(AName);

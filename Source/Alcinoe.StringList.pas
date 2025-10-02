@@ -4217,7 +4217,7 @@ begin
   end;
 end;
 
-{******************************************************************}
+{**********************************************************************}
 function TALHashedStringListA.ItemHasNameValue(Index: Integer): Boolean;
 begin
   if Cardinal(Index) >= Cardinal(Count) then

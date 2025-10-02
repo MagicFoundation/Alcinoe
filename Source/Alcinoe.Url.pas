@@ -66,7 +66,7 @@ uses
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
-{********************************************}
+{****************************************************************************************************************************}
 constructor TALCookedUrlA.Create(const AUrl: AnsiString; Const ADecode: Boolean = False; Const APlusAsSpaces: Boolean = True);
 begin
   inherited create;
@@ -74,7 +74,7 @@ begin
   CrackUrl(AUrl, ADecode, APlusAsSpaces);
 end;
 
-{********************************************}
+{*******************************}
 destructor TALCookedUrlA.Destroy;
 begin
   ALFreeAndNil(FQueryParams);
@@ -95,7 +95,7 @@ begin
   FAnchor := '';
 end;
 
-{********************************************}
+{****************************************************************************************************************************}
 procedure TALCookedUrlA.CrackUrl(const AUrl: AnsiString; Const ADecode: Boolean = False; Const APlusAsSpaces: Boolean = True);
 begin
 
@@ -227,7 +227,7 @@ begin
 
 end;
 
-{********************************************}
+{*****************************************************************************************************************}
 function TALCookedUrlA.GetFullUrl(const AEncode: Boolean = False; Const ASpacesAsPlus: Boolean = True): AnsiString;
 begin
   Var LLength := length(FScheme) + 3{://} +
@@ -364,7 +364,7 @@ begin
   Result := FQueryString;
 end;
 
-{************************************************}
+{***************************************************************}
 procedure TALCookedUrlA.SetQueryString(const AValue: AnsiString);
 begin
   if (AValue <> FQueryString) then begin
@@ -373,7 +373,7 @@ begin
   end;
 end;
 
-{********************************************}
+{*************************************************}
 function TALCookedUrlA.GetQueryParams: TALStringsA;
 begin
   If FQueryParams = nil then begin
@@ -386,7 +386,7 @@ begin
   Result := FQueryParams;
 end;
 
-{********************************************}
+{**********************************************************}
 procedure TALCookedUrlA.QueryParamsChanged(Sender: TObject);
 begin
   FQueryString := '';
@@ -451,11 +451,11 @@ begin
       var LBuffer: AnsiString;
       SetLength(LBuffer, LSize);
       if InternetCombineUrlA(
-            PAnsiChar(ABaseUrl), // lpszBaseUrl: LPCSTR
-            PAnsiChar(ARelativeUrl), // lpszRelativeUrl: LPCSTR;
-            @LBuffer[1], // lpszBuffer: LPSTR
-            Lsize, // var lpdwBufferLength: DWORD;
-            ICU_BROWSER_MODE or ICU_no_encode) then // dwFlags: DWORD
+           PAnsiChar(ABaseUrl), // lpszBaseUrl: LPCSTR
+           PAnsiChar(ARelativeUrl), // lpszRelativeUrl: LPCSTR;
+           @LBuffer[1], // lpszBuffer: LPSTR
+           Lsize, // var lpdwBufferLength: DWORD;
+           ICU_BROWSER_MODE or ICU_no_encode) then // dwFlags: DWORD
         Result := AlCopyStr(LBuffer, 1, LSize)
       else
         result := ARelativeUrl;
@@ -470,14 +470,14 @@ begin
 end;
 {$ENDIF}
 
-{*********************************************************}
+{********************************************************************************************}
 function ALUrlEncode(const AStr: AnsiString; Const ASpacesAsPlus: Boolean = True): AnsiString;
 begin
   // https://datatracker.ietf.org/doc/html/rfc3986#section-2.3
   Result := ALPercentEncode(AStr, ['A'..'Z','a'..'z','0'..'9','-','.','_','~'], ASpacesAsPlus);
 end;
 
-{*************************************************}
+{************************************************************************************}
 function ALUrlEncode(const AStr: String; Const ASpacesAsPlus: Boolean = True): String;
 begin
   // https://datatracker.ietf.org/doc/html/rfc3986#section-2.3

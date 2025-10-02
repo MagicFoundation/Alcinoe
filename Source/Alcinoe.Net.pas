@@ -153,7 +153,7 @@ Begin
     Raise Exception.CreateFmt('Bad IPv4 string: %s', [AIPv4]);
 End;
 
-{*************************************************************}
+{**************************************************************}
 Function ALNumericToIPv4StrA(const AIPv4: Cardinal): AnsiString;
 Var S1, S2, S3, S4: AnsiString;
 Begin
@@ -361,7 +361,7 @@ Begin
     Raise EALException.CreateFmt('Bad IPv6 string: %s', [AIPV6]);
 End;
 
-{*****************************************************************}
+{******************************************************************}
 Function ALBinaryToIPv6StrA(const AIPV6: TALIPv6Binary): AnsiString;
 Begin
   Result := ALIntToHexA(AIPV6[0], 2)  + ALIntToHexA(AIPV6[1], 2)  + ':' +
@@ -449,7 +449,7 @@ begin
   FPort := APort;
 end;
 
-{**************************************************************************}
+{*******************************************************************************}
 constructor TALNetEndpoint.Create(const AIpV6: TALIPv6Binary; const APort: Word);
 begin
   inherited Create;

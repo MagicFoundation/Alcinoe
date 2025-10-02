@@ -208,7 +208,7 @@ begin
  application.ProcessMessages;
 end;
 
-{***********************************************************************************}
+{****************************************************************************************}
 procedure TForm1.OnHttpClientDownloadProgress(sender: Tobject; Read: Int64; Total: Int64);
 Var In1, In2: integer;
 begin
@@ -227,7 +227,7 @@ begin
   application.ProcessMessages;
 end;
 
-{*********************************************************************************}
+{**************************************************************************************}
 procedure TForm1.OnHttpClientUploadProgress(sender: Tobject; Sent: Int64; Total: Int64);
 begin
  MainStatusBar.Panels[1].Text := 'Send '+IntToStr(sent) + ' bytes of '+IntToStr(total) + ' bytes';
@@ -527,7 +527,7 @@ begin
   MemoContentBody.Height := MemoContentBody.Parent.Height - MemoContentBody.top - 6;
 end;
 
-{************************************}
+{**************************************************************************************}
 function TForm1.GetStatusLine(const AHttpClientResponse: TALHttpclientResponse): String;
 begin
   case AHttpClientResponse.Version of

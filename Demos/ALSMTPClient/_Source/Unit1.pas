@@ -88,7 +88,7 @@ Uses
   Alcinoe.StringUtils,
   Alcinoe.StringList,
   Alcinoe.InternetMessages,
-  Alcinoe.MultiPartParser;
+  Alcinoe.Mime.MultiPart;
 
 {$R *.DFM}
 
@@ -163,11 +163,14 @@ end;
 
 {************************************************}
 procedure TForm1.DataButtonClick(Sender: TObject);
+(*
 Var LEmailHeader: TALEmailHeader;
     LMultiPartMixedAttachments : TALMultiPartMixedContents;
     I : integer;
     Str: AnsiString;
+*)
 begin
+(*
   LEmailHeader := TALEmailHeader.Create;
   Try
 
@@ -198,6 +201,7 @@ begin
   finally
     LEmailHeader.Free;
   end;
+*)
 end;
 
 {************************************************}
@@ -208,13 +212,15 @@ end;
 
 {****************************************************}
 procedure TForm1.AllInOneButtonClick(Sender: TObject);
+(*
 Var LEmailHeader: TALEmailHeader;
     LMultiPartMixedAttachments : TALMultiPartMixedContents;
     LLst: TALStringListA;
     Str: AnsiString;
     I : integer;
+*)
 begin
-
+(*
   LLst := TALStringListA.Create;
   LEmailHeader := TALEmailHeader.Create;
   Try
@@ -281,6 +287,7 @@ begin
     LEmailHeader.Free;
     LLst.free;
   end;
+*)
 end;
 
 {*******************************************}

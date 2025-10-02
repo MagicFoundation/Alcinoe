@@ -35,8 +35,7 @@ echo 3) alcinoe-edittext
 echo 4) alcinoe-facebook-share
 echo 5) alcinoe-firebase-messaging
 echo 6) alcinoe-installreferrer
-echo 7) alcinoe-webrtc
-echo 8) alcinoe-webkit
+echo 7) alcinoe-webkit
 
 set /P LibraryToBuild=Select a library (Empty for all): %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
@@ -102,8 +101,7 @@ if "%LibraryToBuild%"=="3" goto alcinoe_edittext
 if "%LibraryToBuild%"=="4" goto alcinoe_facebook_share
 if "%LibraryToBuild%"=="5" goto alcinoe_firebase_messaging
 if "%LibraryToBuild%"=="6" goto alcinoe_installreferrer
-if "%LibraryToBuild%"=="7" goto alcinoe_webrtc
-if "%LibraryToBuild%"=="8" goto alcinoe_webkit
+if "%LibraryToBuild%"=="7" goto alcinoe_webkit
 goto FINISHED
 
 :ALL_LIBRARIES
@@ -145,21 +143,6 @@ type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\edittext\*.java
 Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-edittext" "1.0.0"
-if NOT "%LibraryToBuild%"=="" GOTO FINISHED
-
-
-REM ------------------------
-REM Build alcinoe-webrtc.jar
-REM ------------------------
-
-:alcinoe_webrtc
-echo [36mBuild alcinoe-webrtc[0m
-type nul > %TMPDependenciesFile%
-SET ClassPath="%SDKApiLevelPath%\android.jar"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.3.0"
-Call :UPDATE_ClASSPATH "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
-SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\webrtc\*.java
-Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-webrtc" "1.0.0"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 

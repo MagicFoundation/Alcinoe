@@ -1095,25 +1095,13 @@ begin
                 AArtifactId+'-'+AVersion; // https://dl.google.com/android/maven2/androidx/camera/camera-core/1.1.0/camera-core-1.1.0
     OverWrite(String(LUrl+'.pom'));
     var LPOMSrc: AnsiString;
-    var LResponseContent := TALStringStreamA.Create('');
-    var LResponseHeader := TALHTTPResponseHeader.Create;
+    var LHttpClientResponse := LHttpClient.Get(LUrl+'.pom');
     try
-      Try
-        LHttpClient.Get(
-          LUrl+'.pom', // const aUrl:AnsiString;
-          LResponseContent, // const aResponseContent: TStream;
-          LResponseHeader); // const aResponseHeader: TALHTTPResponseHeader;
-      except
-        on E: Exception do begin
-          if LResponseHeader.StatusCode = '404' then exit
-          else raise;
-        end;
-      End;
-      LPOMSrc := LResponseContent.DataString;
+      if LHttpClientResponse.StatusCode = 404 then exit;
+      LPOMSrc := LHttpClientResponse.BodyString;
     finally
-      ALFreeAndNil(LResponseContent);
-      ALFreeAndNil(LResponseHeader);
-    end;
+      ALFreeandNil(LHttpClientResponse);
+    End;
     ALSaveStringTofile(LPOMSrc, LLocalFilenameWithoutExt+ '.pom');
     var LPomXmlDoc := TalXmlDocument.Create('root');
     try
@@ -1130,8 +1118,14 @@ begin
       if LPackaging = 'pom' then ALocalArchivefilename := ''
       else begin
         OverWrite(String(LUrl+'.'+LPackaging));
-        var LArchiveSrc := LHttpClient.Get(LUrl+'.'+LPackaging);
-        ALSaveStringTofile(LArchiveSrc, LLocalFilenameWithoutExt+'.'+string(LPackaging));
+        LHttpClientResponse := LHttpClient.Get(LUrl+'.'+LPackaging);
+        try
+          if LHttpClientResponse.StatusCode <> 200 then
+            raise Exception.CreateFmt('GET %s.%s failed (HTTP %d)', [LUrl, LPackaging, LHttpClientResponse.StatusCode]);
+          ALSaveStringTofile(LHttpClientResponse.BodyString, LLocalFilenameWithoutExt+'.'+string(LPackaging));
+        finally
+          ALFreeAndNil(LHttpClientResponse);
+        end;
         ALocalArchivefilename := LLocalFilenameWithoutExt+'.'+string(LPackaging);
       end;
       ALocalpomfilename := LLocalFilenameWithoutExt+'.pom';

@@ -7,7 +7,6 @@ interface
 uses
   System.classes,
   System.Net.HttpClient,
-  System.Net.URLClient,
   Alcinoe.Common;
 
 type
@@ -211,11 +210,11 @@ type
 implementation
 
 uses
-  system.SysUtils,
+  System.SysUtils,
+  System.Net.URLClient,
+  Alcinoe.url,
+  Alcinoe.HTTP,
   Alcinoe.HTTP.Client.Net,
-  Alcinoe.HTTP.Client,
-  Alcinoe.Cipher,
-  Alcinoe.Localization,
   Alcinoe.StringUtils;
 
 {*********************************************}
@@ -361,7 +360,7 @@ begin
                   LNetHttpClientPoolRequest.OnErrorRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext);
                 exit;
               end;
-              ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
+              ALDecompressHttpResponseBody(LHTTPResponse.ContentEncoding, LResponseContent);
               if (LNetHttpClientPoolRequest.UseCache) and
                  (assigned(CacheData)) then CacheData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent);
             end;

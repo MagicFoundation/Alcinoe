@@ -83,17 +83,19 @@ contains
   Alcinoe.Files in 'Alcinoe.Files.pas',
   Alcinoe.GuardianThread in 'Alcinoe.GuardianThread.pas',
   Alcinoe.HTML in 'Alcinoe.HTML.pas',
+  Alcinoe.HTTP in 'Alcinoe.HTTP.pas',
   Alcinoe.HTTP.Client in 'Alcinoe.HTTP.Client.pas',
   Alcinoe.HTTP.Client.Net in 'Alcinoe.HTTP.Client.Net.pas',
   Alcinoe.HTTP.Client.Net.Pool in 'Alcinoe.HTTP.Client.Net.Pool.pas',
   Alcinoe.HTTP.Client.WinHTTP in 'Alcinoe.HTTP.Client.WinHTTP.pas',
   Alcinoe.JSONDoc in 'Alcinoe.JSONDoc.pas',
   Alcinoe.Localization in 'Alcinoe.Localization.pas',
-  Alcinoe.Mime in 'Alcinoe.Mime.pas',
-  Alcinoe.MultiPartParser in 'Alcinoe.MultiPartParser.pas',
-  Alcinoe.QuickSortList in 'Alcinoe.QuickSortList.pas',
+  Alcinoe.Mime.ContentTypes in 'Alcinoe.Mime.ContentTypes.pas',
+  Alcinoe.Mime.Multipart in 'Alcinoe.Mime.Multipart.pas',
   Alcinoe.StringList in 'Alcinoe.StringList.pas',
   Alcinoe.StringUtils in 'Alcinoe.StringUtils.pas',
+  Alcinoe.Url in 'Alcinoe.Url.pas',
+  Alcinoe.Winapi.Windows in 'Alcinoe.Winapi.Windows.pas',
   Alcinoe.XMLDoc in 'Alcinoe.XMLDoc.pas';
 
 end.

@@ -557,29 +557,6 @@ to be easily customizable and extendable. On iOS,
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
 <br/>
 <br/>
-
-
-WebRTC Delphi Wrapper
-=====================
-
-WebRTC (Web Real-Time Communications) is a technology that 
-allows web applications and sites to capture and stream 
-audio and/or video media, as well as exchange arbitrary 
-data between browsers and mobile applications without an 
-intermediary. The set of standards behind WebRTC enables 
-peer-to-peer data sharing and teleconferencing without 
-the need for plug-ins or third-party software.
-
-<p align="center">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
-</p>
-
-With the **TALWebRTC** component, you can easily integrate 
-video and audio chat into your applications, providing users 
-with a more interactive and immersive experience! 
-Learn more at [Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
-<br/>
-<br/>
   
   
 Confetti Falling Animation
@@ -862,6 +839,43 @@ Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alci
 <br/>
   
   
+High-Performance HTTP Server (http.sys)
+=======================================
+
+TALHttpSysServer is a high-performance HTTP server component for 
+Delphi that runs directly on top of http.sys, the kernel-mode HTTP 
+stack built into Windows. By leveraging the same foundation that 
+powers IIS, it delivers production-grade performance, scalability, 
+and security without requiring an external web server. With 
+TALHttpSysServer, you can build lightweight yet powerful REST APIs, 
+RPC services, or custom HTTP applications while letting the Windows 
+kernel handle the heavy lifting.
+
+Advantages of using http.sys:
+
+- Kernel-mode HTTP stack → runs directly inside Windows networking core, giving you
+  IIS-level performance, stability, and security without needing a heavyweight web server.
+- Port sharing → multiple apps can listen on the same port with different URL prefixes.
+- I/O Completion Ports → your thread only spends time building the response.
+  Receiving requests and sending responses (even to very slow clients) is
+  handled in the kernel, so your thread never blocks. Concretely, this means
+  a single thread can handle thousands of simultaneous connections.
+- TLS/SSL handled in kernel → you don’t manage OpenSSL/Schannel yourself
+- Modern protocols → supports HTTP/1.1, HTTP/2, and HTTP/3 (QUIC) out of the box.
+- Automatic timeout handling → idle, header, and entity-body timeouts enforced by kernel.
+- Kernel-mode response caching → frequently requested responses can be cached directly
+  in kernel space, bypassing user-mode, which reduces latency and CPU usage.
+- Kernel-managed W3C logging → http.sys writes W3C logs for you and handles
+  file rotation and I/O off the request path, so your app avoids blocking.
+- Quality of Service (QoS) → bandwidth throttling and connection limits built in.
+- Widely tested → same engine IIS uses under the hood
+
+Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALHttpServer)
+
+<br/>
+<br/>
+  
+
 Json Parser
 ===========
 
@@ -991,26 +1005,6 @@ Learn more at [Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFounda
 <br/>
   
 
-WebSocket client
-================
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/websocket.png?raw=true"  width="540" style="width:540px;"/>
-
-The **WebSocket client** for Delphi is built on top of **WinHTTP** and 
-provides a communication protocol for two-way, interactive communication 
-sessions between a user's browser and a server. This enables sending 
-messages to a server and receiving event-driven responses without the 
-need for constant polling. 
-
-With WebSocket, real-time communication is streamlined, making it ideal 
-for applications that require low-latency, continuous data exchange 
-between the client and server. 
-
-Learn more at [Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
-<br/>
-<br/>
-  
-
 Fast TStringList
 ================
 
@@ -1031,24 +1025,6 @@ You can start exploring this feature with the demo located at
 [Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
 <br/>
 <br/>
-
-
-PHP runner
-==========
-
-**ALPHPRunnerEngine** is a simple yet powerful component that allows 
-you to seamlessly use **PHP** (any version) as a scripting language 
-within Delphi applications. With **ALPHPRunnerEngine**, you can 
-execute PHP scripts directly in your Delphi program without the 
-need for a web server. 
-
-This component leverages the **CGI/FastCGI** interface (using **php-cgi.exe**) 
-to communicate with the PHP engine, making it easy to integrate PHP 
-functionality into Delphi-based projects.
-
-Learn more at [Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
-<br/>
-<br/>
   
 
 Memcached Client
@@ -1062,20 +1038,6 @@ caching frequently accessed data in memory, Memcached helps
 improve the performance and scalability of applications.
 
 Learn more at [Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
-<br/>
-<br/>
-  
-
-GSM Component
-=============
-
-The **TAlGSMComm** component enables SMS text messaging 
-using the text-mode interface defined in the **GSM Technical 
-Specification 07.05**. This component allows for easy 
-integration of SMS functionality into your applications, 
-adhering to the standard protocols used in GSM networks.
-
-Learn more at [Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
 <br/>
 <br/>
   
@@ -1098,10 +1060,7 @@ Learn more at [Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFounda
 And Much More
 =============
 
-* CGI Runner 
-* Http Client (WinInet/WinHTTP)
-* MySQL Client 
-* NNTP Client
+* HTTP Client (WinHTTP)
 * POP3 Client
 * SMTP Client
 * Xml Parser 
@@ -1150,6 +1109,54 @@ undesired conversions.
 
 History
 =======
+
+
+### 02/10/2025 – Framework Updates
+
+- Archived
+  - `Alcinoe.CGI.pas`
+  - `Alcinoe.ExprEval.pas`
+  - `Alcinoe.FTP.Client.WinINet.pas`
+  - `Alcinoe.FTP.Client.pas`
+  - `Alcinoe.GSMComm.pas`
+  - `Alcinoe.HTTP.Client.WinINet.pas`
+  - `Alcinoe.IsapiHTTP.pas`
+  - `Alcinoe.LibPhoneNumber.pas`
+  - `Alcinoe.MySql.Client.pas`
+  - `Alcinoe.MySql.Wrapper.pas`
+  - `Alcinoe.NNTP.Client.pas`
+  - `Alcinoe.PhpRunner.pas`
+  - `Alcinoe.SphinxQL.Client.pas`
+  - `Alcinoe.WebSocket.Client.WinHTTP.pas`
+  - `Alcinoe.WebSocket.Client.pas`
+  - `Alcinoe.ZLibEx.pas`
+  - `Alcinoe.ZLibExGZ.pas`
+  - `ZLibEx.inc`
+  - `ZLibEx.pas`
+  - `ZLibExApi.pas`
+  - `ZLibExGZ.pas`
+  - `Alcinoe.iOSApi.WebRTC.pas`
+  - `Alcinoe.FMX.WebRTC.pas`
+  - `Alcinoe.AndroidApi.WebRTC.pas`
+  - `Alcinoe.QuickSortList.pas`
+- Renamed
+  - `Alcinoe.Mime.pas` → `Alcinoe.Mime.ContentTypes.pas`  
+  - `Alcinoe.MultiPartParser.pas` → `Alcinoe.Mime.Multipart.pas`  
+  - `Alcinoe.WinApi.Common.pas` → `Alcinoe.WinApi.Windows.pas`  
+  - `ALHTTPEncode` → `ALUrlEncode` and `ALPercentEncode`  
+  - `ALHTTPDecode` → `ALUrlDecode` and `ALPercentDecode`  
+  - `Alcinoe.MultiPartParser` → `Alcinoe.Mime.MultiPart`  
+  - `Alcinoe.Mime` → `Alcinoe.Mime.ContentTypes`  
+  - `OnChange` → `OnChanged` in `TALStringsA` and `TALStringsW`
+- Added
+  - `TALStringBuilderA` (same as `TStringBuilder` but for `AnsiString`)  
+  - `IncludeTrailingLineBreakInText` property to `TALStringsA` and `TALStringsW`  
+  - `TALHttpSysServer` (an HTTP server built on top of Windows **http.sys**)  
+- Removed
+  - `ALExtractExpressionA`  
+  - `ALExtractHeaderFieldsWithQuoteEscaped` (use `ALExtractHeaderFields` instead)  
+  - `StripParamQuotes` from `ALExtractTagParamsA`  
+  - `TALNewsArticleHeader`   
 
 ### 21/08/2025 – Framework Updates
 

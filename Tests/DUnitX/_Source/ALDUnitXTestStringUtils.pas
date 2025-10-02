@@ -14,7 +14,7 @@ uses
 type
 
   [TestFixture]
-  TALDUnitXTestStrings = class
+  TALDUnitXTestStringUtils = class
   strict private
     fFullAsciiCharsetA: TArray<AnsiChar>;
     fFullAsciiCharsetW: TArray<Char>;
@@ -79,6 +79,22 @@ type
     procedure TestALUTF8CharSize;
     [Test]
     procedure TestALUTF8CharToUtf16;
+    [Test]
+    procedure TestALStringBuilderA;
+    [Test]
+    procedure TestALStringBuilderW;
+    [Test]
+    procedure TestALPercentEncodeA;
+    [Test]
+    procedure TestALPercentEncodeW;
+    [Test]
+    procedure TestALPercentDecodeA;
+    [Test]
+    procedure TestALPercentDecodeW;
+    [Test]
+    procedure ALExtractHeaderFieldsA;
+    [Test]
+    procedure ALExtractHeaderFieldsW;
   end;
 
 implementation
@@ -94,8 +110,8 @@ uses
   Alcinoe.Localization,
   Alcinoe.StringList;
 
-{**************************************}
-constructor TALDUnitXTestStrings.create;
+{******************************************}
+constructor TALDUnitXTestStringUtils.create;
 begin
   Setlength(fFullAsciiCharsetA, 255);
   for var I := Low(fFullAsciiCharsetA) to High(fFullAsciiCharsetA) do
@@ -113,20 +129,20 @@ begin
     end;
 end;
 
-{***********************************}
-procedure TALDUnitXTestStrings.Setup;
+{***************************************}
+procedure TALDUnitXTestStringUtils.Setup;
 begin
   fStopWatchAlcinoe := TStopwatch.Create;
   fStopWatchDELPHI := TStopwatch.Create;
 end;
 
-{****************************************}
-//procedure TALDUnitXTestStrings.TearDown;
+{********************************************}
+//procedure TALDUnitXTestStringUtils.TearDown;
 //begin
 //end;
 
-{****************************************************************************}
-procedure TALDUnitXTestStrings.CheckExecutionTime(const ARatio: single = 1.2);
+{********************************************************************************}
+procedure TALDUnitXTestStringUtils.CheckExecutionTime(const ARatio: single = 1.2);
 begin
   {$IF defined(debug) or defined(Win32)}
   //In debug we have overflow checking and range checking so that mean
@@ -143,8 +159,8 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************************************************}
-function TALDUnitXTestStrings.UnicodeRandomStr(const aLength: Longint): String;
+{*********************************************************************************}
+function TALDUnitXTestStringUtils.UnicodeRandomStr(const aLength: Longint): String;
 begin
   result := '';
   for var i := 0 to aLength - 1 do begin
@@ -157,8 +173,8 @@ begin
   end;
 end;
 
-{*******************************************************}
-procedure TALDUnitXTestStrings.TestALBase64EncodeStringA;
+{***********************************************************}
+procedure TALDUnitXTestStringUtils.TestALBase64EncodeStringA;
 begin
   for var I := 0 to 10000 do begin
     var LStrIn := ALRandomStrA(ALRandom32(16384), fFullAsciiCharsetA);
@@ -178,8 +194,8 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{**************************************************}
-procedure TALDUnitXTestStrings.TestAlposIgnoreCaseA;
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestAlposIgnoreCaseA;
 begin
   //full random substr
   for var I := 0 to 100000 do begin
@@ -207,8 +223,8 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{**************************************************}
-procedure TALDUnitXTestStrings.TestAlposIgnoreCaseW;
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestAlposIgnoreCaseW;
 begin
   //full random substr
   for var I := 0 to 100000 do begin
@@ -236,8 +252,8 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{*************************************************}
-procedure TALDUnitXTestStrings.TestALTryStrToDateA;
+{*****************************************************}
+procedure TALDUnitXTestStringUtils.TestALTryStrToDateA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -279,8 +295,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*************************************************}
-procedure TALDUnitXTestStrings.TestALTryStrToTimeA;
+{*****************************************************}
+procedure TALDUnitXTestStringUtils.TestALTryStrToTimeA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -322,8 +338,8 @@ begin
   CheckExecutionTime(0.8{ARatio});
 end;
 
-{*****************************************************}
-procedure TALDUnitXTestStrings.TestALTryStrToDateTimeA;
+{*********************************************************}
+procedure TALDUnitXTestStringUtils.TestALTryStrToDateTimeA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -365,8 +381,8 @@ begin
   CheckExecutionTime(0.8{ARatio});
 end;
 
-{**********************************************}
-procedure TALDUnitXTestStrings.TestALDateToStrA;
+{**************************************************}
+procedure TALDUnitXTestStringUtils.TestALDateToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -421,8 +437,8 @@ begin
   CheckExecutionTime;
 end;
 
-{**********************************************}
-procedure TALDUnitXTestStrings.TestALTimeToStrA;
+{**************************************************}
+procedure TALDUnitXTestStringUtils.TestALTimeToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -477,8 +493,8 @@ begin
   CheckExecutionTime;
 end;
 
-{**************************************************}
-procedure TALDUnitXTestStrings.TestALDateTimeToStrA;
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALDateTimeToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -534,8 +550,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***************************************************}
-procedure TALDUnitXTestStrings.TestALFormatDateTimeA;
+{*******************************************************}
+procedure TALDUnitXTestStringUtils.TestALFormatDateTimeA;
 begin
 
   Var LSpecifiers := TalStringListW.create;
@@ -633,8 +649,8 @@ begin
 
 end;
 
-{*********************************************}
-procedure TALDUnitXTestStrings.TestALIntToStrA;
+{*************************************************}
+procedure TALDUnitXTestStringUtils.TestALIntToStrA;
 begin
   //int32
   for var I := 0 to 1000000 do begin
@@ -656,8 +672,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*********************************************}
-procedure TALDUnitXTestStrings.TestALStrToIntA;
+{*************************************************}
+procedure TALDUnitXTestStringUtils.TestALStrToIntA;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: Integer := ALRandom32(ALMaxInt);
@@ -676,8 +692,8 @@ begin
   CheckExecutionTime;
 end;
 
-{**********************************************}
-procedure TALDUnitXTestStrings.TestALStrToUIntA;
+{**************************************************}
+procedure TALDUnitXTestStringUtils.TestALStrToUIntA;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: cardinal := ALRandom32(ALMaxUInt);
@@ -695,8 +711,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***********************************************}
-procedure TALDUnitXTestStrings.TestALStrToInt64A;
+{***************************************************}
+procedure TALDUnitXTestStringUtils.TestALStrToInt64A;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: int64 := ALRandom64(ALMaxInt64);
@@ -715,8 +731,8 @@ begin
   CheckExecutionTime;
 end;
 
-{************************************************}
-procedure TALDUnitXTestStrings.TestALStrToUInt64A;
+{****************************************************}
+procedure TALDUnitXTestStringUtils.TestALStrToUInt64A;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: UInt64 := ALRandom64(ALMaxUInt64);
@@ -734,8 +750,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***********************************************}
-procedure TALDUnitXTestStrings.TestALFloatToStrA;
+{***************************************************}
+procedure TALDUnitXTestStringUtils.TestALFloatToStrA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -756,8 +772,8 @@ begin
   CheckExecutionTime;
 end;
 
-{************************************************}
-procedure TALDUnitXTestStrings.TestALFloatToStrFA;
+{****************************************************}
+procedure TALDUnitXTestStringUtils.TestALFloatToStrFA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -790,8 +806,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***********************************************}
-procedure TALDUnitXTestStrings.TestALStrToFloatA;
+{***************************************************}
+procedure TALDUnitXTestStringUtils.TestALStrToFloatA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -818,8 +834,8 @@ begin
   CheckExecutionTime;
 end;
 
-{**********************************************}
-procedure TALDUnitXTestStrings.TestALCurrToStrA;
+{**************************************************}
+procedure TALDUnitXTestStringUtils.TestALCurrToStrA;
 begin
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -840,8 +856,8 @@ begin
   CheckExecutionTime;
 end;
 
-{**********************************************}
-procedure TALDUnitXTestStrings.TestALStrToCurrA;
+{**************************************************}
+procedure TALDUnitXTestStringUtils.TestALStrToCurrA;
 begin
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -868,8 +884,8 @@ begin
   CheckExecutionTime;
 end;
 
-{************************************************}
-procedure TALDUnitXTestStrings.TestALFormatFloatA;
+{****************************************************}
+procedure TALDUnitXTestStringUtils.TestALFormatFloatA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
   //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
@@ -950,8 +966,8 @@ begin
   {$ENDIF}
 end;
 
-{***********************************************}
-procedure TALDUnitXTestStrings.TestALFormatCurrA;
+{***************************************************}
+procedure TALDUnitXTestStringUtils.TestALFormatCurrA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
   //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
@@ -1032,8 +1048,8 @@ begin
   {$ENDIF}
 end;
 
-{*******************************************}
-procedure TALDUnitXTestStrings.TestALFormatA;
+{***********************************************}
+procedure TALDUnitXTestStringUtils.TestALFormatA;
 begin
   for var I := 0 to 10000 do begin
 
@@ -1228,8 +1244,8 @@ begin
   CheckExecutionTime;
 end;
 
-{************************************************}
-procedure TALDUnitXTestStrings.TestALUTF8CharSize;
+{****************************************************}
+procedure TALDUnitXTestStringUtils.TestALUTF8CharSize;
 begin
   for var LUCS4Char := Low(UCS4Char) to High(UCS4Char) do begin
     //In the version 6.0, Unicode has 1,114,112 code points (U+0000—U+10FFFF)
@@ -1253,8 +1269,8 @@ begin
   end;
 end;
 
-{***************************************************}
-procedure TALDUnitXTestStrings.TestALUTF8CharToUtf16;
+{*******************************************************}
+procedure TALDUnitXTestStringUtils.TestALUTF8CharToUtf16;
 begin
   for var LUCS4Char := Low(UCS4Char) to High(UCS4Char) do begin
     //In the version 6.0, Unicode has 1,114,112 code points (U+0000—U+10FFFF)
@@ -1308,7 +1324,1963 @@ begin
   CheckExecutionTime;
 end;
 
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALStringBuilderA;
+begin
+  // Test default constructor
+  var SB := TALStringBuilderA.Create;
+  try
+    Assert.AreEqual(16, SB.Capacity, 'Default capacity should be 16');
+    Assert.AreEqual(0, SB.Length, 'Initial length should be 0');
+    Assert.AreEqual(MaxInt, SB.MaxCapacity, 'Max capacity should be MaxInt');
+    Assert.AreEqual(ansiString(''), SB.ToString, 'Initial string should be empty');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with capacity
+  SB := TALStringBuilderA.Create(100);
+  try
+    Assert.AreEqual(100, SB.Capacity, 'Capacity should be 100');
+    Assert.AreEqual(0, SB.Length, 'Initial length should be 0');
+    Assert.AreEqual(MaxInt, SB.MaxCapacity, 'Max capacity should be MaxInt');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with value
+  SB := TALStringBuilderA.Create('Hello');
+  try
+    Assert.IsTrue(SB.Capacity >= 5, 'Capacity should be at least 5');
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual(ansiString('Hello'), SB.ToString, 'String should be "Hello"');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with capacity and max capacity
+  SB := TALStringBuilderA.Create(50, 100);
+  try
+    Assert.AreEqual(50, SB.Capacity, 'Capacity should be 50');
+    Assert.AreEqual(0, SB.Length, 'Initial length should be 0');
+    Assert.AreEqual(100, SB.MaxCapacity, 'Max capacity should be 100');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with value and capacity
+  SB := TALStringBuilderA.Create('Test', 20);
+  try
+    Assert.AreEqual(20, SB.Capacity, 'Capacity should be 20');
+    Assert.AreEqual(4, SB.Length, 'Length should be 4');
+    Assert.AreEqual(ansiString('Test'), SB.ToString, 'String should be "Test"');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with value, start index, length, and capacity
+  SB := TALStringBuilderA.Create('HelloWorld', 1, 5, 10);
+  try
+    Assert.AreEqual(10, SB.Capacity, 'Capacity should be 10');
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual(ansiString('Hello'), SB.ToString, 'String should be "Hello"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Clear
+  SB := TALStringBuilderA.Create('Test');
+  try
+    SB.Clear;
+    Assert.AreEqual(16, SB.Capacity, 'Capacity should be reset to 16');
+    Assert.AreEqual(0, SB.Length, 'Length should be 0');
+    Assert.AreEqual(ansiString(''), SB.ToString, 'String should be empty');
+  finally
+    SB.Free;
+  end;
+
+  // Test EnsureCapacity
+  SB := TALStringBuilderA.Create;
+  try
+    Assert.AreEqual(16, SB.EnsureCapacity(10), 'EnsureCapacity should return 16');
+    Assert.AreEqual(16, SB.Capacity, 'Capacity should remain 16');
+    Assert.AreEqual(50, SB.EnsureCapacity(50), 'EnsureCapacity should return 50');
+    Assert.AreEqual(50, SB.Capacity, 'Capacity should be 50');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(Char)
+  SB := TALStringBuilderA.Create;
+  try
+    SB.Append('A');
+    Assert.AreEqual(1, SB.Length, 'Length should be 1');
+    Assert.AreEqual(ansiString('A'), SB.ToString, 'String should be "A"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(string)
+  SB := TALStringBuilderA.Create;
+  try
+    SB.Append('Hello');
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual(ansiString('Hello'), SB.ToString, 'String should be "Hello"');
+    SB.Append('World');
+    Assert.AreEqual(10, SB.Length, 'Length should be 10');
+    Assert.AreEqual(ansiString('HelloWorld'), SB.ToString, 'String should be "HelloWorld"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(Char, RepeatCount)
+  SB := TALStringBuilderA.Create;
+  try
+    SB.Append('A', 3);
+    Assert.AreEqual(3, SB.Length, 'Length should be 3');
+    Assert.AreEqual(ansiString('AAA'), SB.ToString, 'String should be "AAA"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(string, StartIndex, Count)
+  SB := TALStringBuilderA.Create;
+  try
+    SB.Append('HelloWorld', 6, 5);
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual(ansiString('World'), SB.ToString, 'String should be "World"');
+  finally
+    SB.Free;
+  end;
+
+  // Test AppendLine
+  SB := TALStringBuilderA.Create;
+  try
+    SB.AppendLine;
+    Assert.AreEqual(Length(sLineBreak), SB.Length, 'Length should match sLineBreak');
+    Assert.AreEqual(sLineBreak, SB.ToString, 'String should be sLineBreak');
+  finally
+    SB.Free;
+  end;
+
+  // Test AppendLine(string)
+  SB := TALStringBuilderA.Create;
+  try
+    SB.AppendLine('Hello');
+    Assert.AreEqual(5 + Length(sLineBreak), SB.Length, 'Length should be 5 + sLineBreak');
+    Assert.AreEqual(ansiString('Hello' + sLineBreak), SB.ToString, 'String should be "Hello" + sLineBreak');
+  finally
+    SB.Free;
+  end;
+
+  // Test ToString
+  SB := TALStringBuilderA.Create('Test');
+  try
+    Assert.AreEqual(ansiString('Test'), SB.ToString, 'ToString should return "Test"');
+    Assert.IsTrue(SB.Capacity >= 4, 'Capacity should remain unchanged');
+  finally
+    SB.Free;
+  end;
+
+  // Test ToString(UpdateCapacity)
+  SB := TALStringBuilderA.Create(20);
+  try
+    SB.Append('Test');
+    Assert.AreEqual(ansiString('Test'), SB.ToString(True), 'ToString should return "Test"');
+    Assert.AreEqual(4, SB.Capacity, 'Capacity should be updated to 4');
+  finally
+    SB.Free;
+  end;
+
+  // Test Capacity
+  SB := TALStringBuilderA.Create;
+  try
+    SB.Capacity := 100;
+    Assert.AreEqual(100, SB.Capacity, 'Capacity should be 100');
+  finally
+    SB.Free;
+  end;
+
+  // Test Length
+  SB := TALStringBuilderA.Create;
+  try
+    SB.Append('Test');
+    SB.Length := 2;
+    Assert.AreEqual(2, SB.Length, 'Length should be 2');
+    Assert.AreEqual(ansiString('Te'), SB.ToString, 'String should be "Te"');
+  finally
+    SB.Free;
+  end;
+
+  // Test MaxCapacity
+  SB := TALStringBuilderA.Create(50, 100);
+  try
+    Assert.AreEqual(100, SB.MaxCapacity, 'MaxCapacity should be 100');
+  finally
+    SB.Free;
+  end;
+
+  // Test ExpandCapacity when Length = Capacity
+  SB := TALStringBuilderA.Create(10);
+  try
+    SB.Append('1234567890'); // Length = 10, Capacity = 10
+    Assert.AreEqual(10, SB.Length, 'Length should be 10');
+    Assert.AreEqual(10, SB.Capacity, 'Capacity should be 10');
+    SB.Append('A'); // Triggers ExpandCapacity
+    Assert.AreEqual(11, SB.Length, 'Length should be 11');
+    Assert.AreEqual(15, SB.Capacity, 'Capacity should be 15 (10 * 3 / 2)');
+    Assert.AreEqual(ansiString('1234567890A'), SB.ToString, 'String should be "1234567890A"');
+  finally
+    SB.Free;
+  end;
+
+  // Test ExpandCapacity when Length > Capacity
+  SB := TALStringBuilderA.Create(5);
+  try
+    SB.Append('123456'); // Length = 6, Capacity = 5, triggers ExpandCapacity
+    Assert.AreEqual(6, SB.Length, 'Length should be 6');
+    Assert.AreEqual(7, SB.Capacity, 'Capacity should be 7 (5 * 3) div 2');
+    Assert.AreEqual(ansiString('123456'), SB.ToString, 'String should be "123456"');
+  finally
+    SB.Free;
+  end;
+
+  // Test ExpandCapacity near MaxCapacity
+  SB := TALStringBuilderA.Create(10, 15);
+  try
+    SB.Append('1234567890'); // Length = 10, Capacity = 10
+    Assert.AreEqual(10, SB.Length, 'Length should be 10');
+    Assert.AreEqual(10, SB.Capacity, 'Capacity should be 10');
+    SB.Append('12345'); // Length = 15, triggers ExpandCapacity
+    Assert.AreEqual(15, SB.Length, 'Length should be 15');
+    Assert.AreEqual(15, SB.Capacity, 'Capacity should be 15 (limited by MaxCapacity)');
+    Assert.AreEqual(ansiString('123456789012345'), SB.ToString, 'String should be "123456789012345"');
+  finally
+    SB.Free;
+  end;
+end;
+
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALStringBuilderW;
+begin
+  // Test default constructor
+  var SB := TALStringBuilderW.Create;
+  try
+    Assert.AreEqual(16, SB.Capacity, 'Default capacity should be 16');
+    Assert.AreEqual(0, SB.Length, 'Initial length should be 0');
+    Assert.AreEqual(MaxInt, SB.MaxCapacity, 'Max capacity should be MaxInt');
+    Assert.AreEqual('', SB.ToString, 'Initial string should be empty');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with capacity
+  SB := TALStringBuilderW.Create(100);
+  try
+    Assert.AreEqual(100, SB.Capacity, 'Capacity should be 100');
+    Assert.AreEqual(0, SB.Length, 'Initial length should be 0');
+    Assert.AreEqual(MaxInt, SB.MaxCapacity, 'Max capacity should be MaxInt');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with value
+  SB := TALStringBuilderW.Create('Hello');
+  try
+    Assert.IsTrue(SB.Capacity >= 5, 'Capacity should be at least 5');
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual('Hello', SB.ToString, 'String should be "Hello"');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with capacity and max capacity
+  SB := TALStringBuilderW.Create(50, 100);
+  try
+    Assert.AreEqual(50, SB.Capacity, 'Capacity should be 50');
+    Assert.AreEqual(0, SB.Length, 'Initial length should be 0');
+    Assert.AreEqual(100, SB.MaxCapacity, 'Max capacity should be 100');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with value and capacity
+  SB := TALStringBuilderW.Create('Test', 20);
+  try
+    Assert.AreEqual(20, SB.Capacity, 'Capacity should be 20');
+    Assert.AreEqual(4, SB.Length, 'Length should be 4');
+    Assert.AreEqual('Test', SB.ToString, 'String should be "Test"');
+  finally
+    SB.Free;
+  end;
+
+  // Test constructor with value, start index, length, and capacity
+  SB := TALStringBuilderW.Create('HelloWorld', 1, 5, 10);
+  try
+    Assert.AreEqual(10, SB.Capacity, 'Capacity should be 10');
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual('Hello', SB.ToString, 'String should be "Hello"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Clear
+  SB := TALStringBuilderW.Create('Test');
+  try
+    SB.Clear;
+    Assert.AreEqual(16, SB.Capacity, 'Capacity should be reset to 16');
+    Assert.AreEqual(0, SB.Length, 'Length should be 0');
+    Assert.AreEqual('', SB.ToString, 'String should be empty');
+  finally
+    SB.Free;
+  end;
+
+  // Test EnsureCapacity
+  SB := TALStringBuilderW.Create;
+  try
+    Assert.AreEqual(16, SB.EnsureCapacity(10), 'EnsureCapacity should return 16');
+    Assert.AreEqual(16, SB.Capacity, 'Capacity should remain 16');
+    Assert.AreEqual(50, SB.EnsureCapacity(50), 'EnsureCapacity should return 50');
+    Assert.AreEqual(50, SB.Capacity, 'Capacity should be 50');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(Char)
+  SB := TALStringBuilderW.Create;
+  try
+    SB.Append('A');
+    Assert.AreEqual(1, SB.Length, 'Length should be 1');
+    Assert.AreEqual('A', SB.ToString, 'String should be "A"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(string)
+  SB := TALStringBuilderW.Create;
+  try
+    SB.Append('Hello');
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual('Hello', SB.ToString, 'String should be "Hello"');
+    SB.Append('World');
+    Assert.AreEqual(10, SB.Length, 'Length should be 10');
+    Assert.AreEqual('HelloWorld', SB.ToString, 'String should be "HelloWorld"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(Char, RepeatCount)
+  SB := TALStringBuilderW.Create;
+  try
+    SB.Append('A', 3);
+    Assert.AreEqual(3, SB.Length, 'Length should be 3');
+    Assert.AreEqual('AAA', SB.ToString, 'String should be "AAA"');
+  finally
+    SB.Free;
+  end;
+
+  // Test Append(string, StartIndex, Count)
+  SB := TALStringBuilderW.Create;
+  try
+    SB.Append('HelloWorld', 6, 5);
+    Assert.AreEqual(5, SB.Length, 'Length should be 5');
+    Assert.AreEqual('World', SB.ToString, 'String should be "World"');
+  finally
+    SB.Free;
+  end;
+
+  // Test AppendLine
+  SB := TALStringBuilderW.Create;
+  try
+    SB.AppendLine;
+    Assert.AreEqual(Length(sLineBreak), SB.Length, 'Length should match sLineBreak');
+    Assert.AreEqual(sLineBreak, SB.ToString, 'String should be sLineBreak');
+  finally
+    SB.Free;
+  end;
+
+  // Test AppendLine(string)
+  SB := TALStringBuilderW.Create;
+  try
+    SB.AppendLine('Hello');
+    Assert.AreEqual(5 + Length(sLineBreak), SB.Length, 'Length should be 5 + sLineBreak');
+    Assert.AreEqual('Hello' + sLineBreak, SB.ToString, 'String should be "Hello" + sLineBreak');
+  finally
+    SB.Free;
+  end;
+
+  // Test ToString
+  SB := TALStringBuilderW.Create('Test');
+  try
+    Assert.AreEqual('Test', SB.ToString, 'ToString should return "Test"');
+    Assert.IsTrue(SB.Capacity >= 4, 'Capacity should remain unchanged');
+  finally
+    SB.Free;
+  end;
+
+  // Test ToString(UpdateCapacity)
+  SB := TALStringBuilderW.Create(20);
+  try
+    SB.Append('Test');
+    Assert.AreEqual('Test', SB.ToString(True), 'ToString should return "Test"');
+    Assert.AreEqual(4, SB.Capacity, 'Capacity should be updated to 4');
+  finally
+    SB.Free;
+  end;
+
+  // Test Capacity
+  SB := TALStringBuilderW.Create;
+  try
+    SB.Capacity := 100;
+    Assert.AreEqual(100, SB.Capacity, 'Capacity should be 100');
+  finally
+    SB.Free;
+  end;
+
+  // Test Length
+  SB := TALStringBuilderW.Create;
+  try
+    SB.Append('Test');
+    SB.Length := 2;
+    Assert.AreEqual(2, SB.Length, 'Length should be 2');
+    Assert.AreEqual('Te', SB.ToString, 'String should be "Te"');
+  finally
+    SB.Free;
+  end;
+
+  // Test MaxCapacity
+  SB := TALStringBuilderW.Create(50, 100);
+  try
+    Assert.AreEqual(100, SB.MaxCapacity, 'MaxCapacity should be 100');
+  finally
+    SB.Free;
+  end;
+
+  // Test ExpandCapacity when Length = Capacity
+  SB := TALStringBuilderW.Create(10);
+  try
+    SB.Append('1234567890'); // Length = 10, Capacity = 10
+    Assert.AreEqual(10, SB.Length, 'Length should be 10');
+    Assert.AreEqual(10, SB.Capacity, 'Capacity should be 10');
+    SB.Append('A'); // Triggers ExpandCapacity
+    Assert.AreEqual(11, SB.Length, 'Length should be 11');
+    Assert.AreEqual(15, SB.Capacity, 'Capacity should be 15 (10 * 3 / 2)');
+    Assert.AreEqual('1234567890A', SB.ToString, 'String should be "1234567890A"');
+  finally
+    SB.Free;
+  end;
+
+  // Test ExpandCapacity when Length > Capacity
+  SB := TALStringBuilderW.Create(5);
+  try
+    SB.Append('123456'); // Length = 6, Capacity = 5, triggers ExpandCapacity
+    Assert.AreEqual(6, SB.Length, 'Length should be 6');
+    Assert.AreEqual(7, SB.Capacity, 'Capacity should be 7 (5 * 3) div 2');
+    Assert.AreEqual('123456', SB.ToString, 'String should be "123456"');
+  finally
+    SB.Free;
+  end;
+
+  // Test ExpandCapacity near MaxCapacity
+  SB := TALStringBuilderW.Create(10, 15);
+  try
+    SB.Append('1234567890'); // Length = 10, Capacity = 10
+    Assert.AreEqual(10, SB.Length, 'Length should be 10');
+    Assert.AreEqual(10, SB.Capacity, 'Capacity should be 10');
+    SB.Append('12345'); // Length = 15, triggers ExpandCapacity
+    Assert.AreEqual(15, SB.Length, 'Length should be 15');
+    Assert.AreEqual(15, SB.Capacity, 'Capacity should be 15 (limited by MaxCapacity)');
+    Assert.AreEqual('123456789012345', SB.ToString, 'String should be "123456789012345"');
+  finally
+    SB.Free;
+  end;
+end;
+
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALPercentEncodeA;
+
+  // Build a TSysCharSet from characters (AnsiString for convenience).
+  function MakeSet(const S: AnsiString): TSysCharSet;
+  var
+    C: AnsiChar;
+  begin
+    Result := [];
+    for C in S do
+      Include(Result, C);
+  end;
+
+  // RFC 3986 unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+  function RFC3986_Unreserved: TSysCharSet;
+  var
+    C: AnsiChar;
+  begin
+    Result := [];
+    for C := 'A' to 'Z' do Include(Result, C);
+    for C := 'a' to 'z' do Include(Result, C);
+    for C := '0' to '9' do Include(Result, C);
+    Include(Result, '-'); Include(Result, '.'); Include(Result, '_'); Include(Result, '~');
+  end;
+
+var
+  Safe: TSysCharSet;
+  S, E: AnsiString;
+begin
+  // 1) Empty string
+  Safe := RFC3986_Unreserved;
+  Assert.AreEqual<AnsiString>(ansiString(''), ALPercentEncode(ansiString(''), Safe, False));
+
+  // 2) All-safe short-circuit (unchanged)
+  S := 'AZaz09-._~';
+  Assert.AreEqual<AnsiString>(S, ALPercentEncode(S, Safe, False));
+
+  // 3) Space handling (ASpacesAsPlus = False -> %20)
+  Assert.AreEqual<AnsiString>(ansiString('hello%20world'), ALPercentEncode(ansiString('hello world'), Safe, False));
+
+  // 4) Space handling (ASpacesAsPlus = True -> '+')
+  Assert.AreEqual<AnsiString>(ansiString('hello+world'), ALPercentEncode(ansiString('hello world'), Safe, True));
+
+  // 5) Literal plus with form-mode: '+' must be encoded to %2B (space still '+')
+  Assert.AreEqual<AnsiString>(ansiString('a%2Bb+c'), ALPercentEncode(ansiString('a+b c'), Safe, True));
+
+  // 6) Reserved characters (none are in the safe set -> all percent-encoded)
+  S := ansiString(':/?#[]@!$&''()*+,;=');
+  E := ansiString('%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D');
+  Assert.AreEqual<AnsiString>(E, ALPercentEncode(S, Safe, False));
+
+  // 7) Percent sign itself (should encode to %25); plus false so space -> %20
+  Assert.AreEqual<AnsiString>(ansiString('100%25%20sure'), ALPercentEncode(ansiString('100% sure'), Safe, False));
+
+  // 8) Non-ASCII byte (AnsiString): 'caf' + #$E9 (é in Latin-1) => caf%E9
+  S := AnsiString('café');
+  Assert.AreEqual<AnsiString>('caf%C3%A9', ALPercentEncode(S, Safe, False));
+
+  // 9) Embedded #0 byte should be encoded to %00 and NOT terminate processing
+  S := AnsiString('A') + AnsiChar(#0) + AnsiString('B');
+  Assert.AreEqual<AnsiString>(ansiString('A%00B'), ALPercentEncode(S, Safe, False));
+
+  // 10) Custom safe set including space and slash (e.g., path-ish tolerance).
+  //     If ' ' is safe, ASpacesAsPlus must not apply; '/' also left as-is.
+  Safe := RFC3986_Unreserved + MakeSet(' /');
+  Assert.AreEqual<AnsiString>(ansiString('a b/c'), ALPercentEncode(ansiString('a b/c'), Safe, True));
+
+  // 11) All-unsafe bytes (control chars) -> all percent-encoded
+  S := AnsiChar(#1) + AnsiChar(#2);
+  Assert.AreEqual<AnsiString>(ansiString('%01%02'), ALPercentEncode(S, RFC3986_Unreserved, False));
+
+  // 12) Mixed sample covering multiple categories at once
+  //     "Az-._~ 123%+/é" with form-mode:
+  //       space -> '+'
+  //       '%' -> %25
+  //       '+' -> %2B
+  //       '/' -> %2F
+  //       'é' (#$E9) -> %E9
+  S := AnsiString('Az-._~ 123%+/') + AnsiChar(#$E9);
+  E := 'Az-._~+123%25%2B%2F%E9';
+  Assert.AreEqual<AnsiString>(E, ALPercentEncode(S, RFC3986_Unreserved, True));
+end;
+
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALPercentEncodeW;
+
+  // Build a TSysCharSet from characters (String for convenience).
+  function MakeSet(const S: String): TSysCharSet;
+  var
+    C: AnsiChar;
+  begin
+    Result := [];
+    for C in AnsiString(S) do
+      Include(Result, C);
+  end;
+
+  // RFC 3986 unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+  function RFC3986_Unreserved: TSysCharSet;
+  var
+    C: AnsiChar;
+  begin
+    Result := [];
+    for C := 'A' to 'Z' do Include(Result, C);
+    for C := 'a' to 'z' do Include(Result, C);
+    for C := '0' to '9' do Include(Result, C);
+    Include(Result, '-'); Include(Result, '.'); Include(Result, '_'); Include(Result, '~');
+  end;
+
+var
+  Safe: TSysCharSet;
+  S, E: String;
+begin
+  // 1) Empty string
+  Safe := RFC3986_Unreserved;
+  Assert.AreEqual<String>(String(''), ALPercentEncode(String(''), Safe, False));
+
+  // 2) All-safe short-circuit (unchanged)
+  S := 'AZaz09-._~';
+  Assert.AreEqual<String>(S, ALPercentEncode(S, Safe, False));
+
+  // 3) Space handling (ASpacesAsPlus = False -> %20)
+  Assert.AreEqual<String>(String('hello%20world'), ALPercentEncode(String('hello world'), Safe, False));
+
+  // 4) Space handling (ASpacesAsPlus = True -> '+')
+  Assert.AreEqual<String>(String('hello+world'), ALPercentEncode(String('hello world'), Safe, True));
+
+  // 5) Literal plus with form-mode: '+' must be encoded to %2B (space still '+')
+  Assert.AreEqual<String>(String('a%2Bb+c'), ALPercentEncode(String('a+b c'), Safe, True));
+
+  // 6) Reserved characters (none are in the safe set -> all percent-encoded)
+  S := String(':/?#[]@!$&''()*+,;=');
+  E := String('%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D');
+  Assert.AreEqual<String>(E, ALPercentEncode(S, Safe, False));
+
+  // 7) Percent sign itself (should encode to %25); plus false so space -> %20
+  Assert.AreEqual<String>(String('100%25%20sure'), ALPercentEncode(String('100% sure'), Safe, False));
+
+  // 8) Non-ASCII byte (String): 'caf' + #$E9 (é in Latin-1) => caf%E9
+  S := String('café');
+  Assert.AreEqual<String>('caf%C3%A9', ALPercentEncode(S, Safe, False));
+
+  // 9) Embedded #0 byte should be encoded to %00 and NOT terminate processing
+  S := String('A') + AnsiChar(#0) + String('B');
+  Assert.AreEqual<String>(String('A%00B'), ALPercentEncode(S, Safe, False));
+
+  // 10) Custom safe set including space and slash (e.g., path-ish tolerance).
+  //     If ' ' is safe, ASpacesAsPlus must not apply; '/' also left as-is.
+  Safe := RFC3986_Unreserved + MakeSet(' /');
+  Assert.AreEqual<String>(String('a b/c'), ALPercentEncode(String('a b/c'), Safe, True));
+
+  // 11) All-unsafe bytes (control chars) -> all percent-encoded
+  S := AnsiChar(#1) + AnsiChar(#2);
+  Assert.AreEqual<String>(String('%01%02'), ALPercentEncode(S, RFC3986_Unreserved, False));
+
+  // 12) Mixed sample covering multiple categories at once
+  //     "Az-._~ 123%+/é" with form-mode:
+  //       space -> '+'
+  //       '%' -> %25
+  //       '+' -> %2B
+  //       '/' -> %2F
+  //       'é' (#$E9) -> %E9
+  S := String('Az-._~ 123%+/é');
+  E := 'Az-._~+123%25%2B%2F%C3%A9';
+  Assert.AreEqual<String>(E, ALPercentEncode(S, RFC3986_Unreserved, True));
+end;
+
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALPercentDecodeA;
+begin
+  // Test case 1: Basic percent-encoded ASCII characters
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello%20World')), AnsiString('Hello World'), 'Basic percent decode (%20 to space) failed');
+  Assert.AreEqual(ALPercentDecode(AnsiString('%7B%7D')), AnsiString('{}'), 'Percent decode of braces (%7B%7D) failed');
+
+  // Test case 2: Non-ASCII percent-encoded characters (UTF-8)
+  Assert.AreEqual(ALPercentDecode(AnsiString('caf%C3%A9')), AnsiString('café'), 'Percent decode of UTF-8 é (%C3%A9) failed');
+  Assert.AreEqual(ALPercentDecode(AnsiString('%E2%82%AC')), AnsiString('€'), 'Percent decode of Euro symbol (%E2%82%AC) failed');
+
+  // Test case 3: Plus sign handling with APlusAsSpaces = True
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello+World'), True), AnsiString('Hello World'), 'Plus to space with APlusAsSpaces=True failed');
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello+World'), False), AnsiString('Hello+World'), 'Plus as literal with APlusAsSpaces=False failed');
+
+  // Test case 4: Mixed encoded and unencoded characters
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello%20World%21%40caf%C3%A9')), AnsiString('Hello World!@café'), 'Mixed encoded/unencoded string failed');
+
+  // Test case 5: Invalid percent encodings
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello%GGWorld')), AnsiString('Hello%GGWorld'), 'Invalid percent encoding (%GG) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello%1')), AnsiString('Hello%1'), 'Incomplete percent encoding (%1) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello%')), AnsiString('Hello%'), 'Lone percent sign (%) should be unchanged');
+
+  // Test case 6: Empty string
+  Assert.AreEqual(ALPercentDecode(AnsiString('')), AnsiString(''), 'Empty string decode failed');
+
+  // Test case 7: String with only percent-encoded characters
+  Assert.AreEqual(ALPercentDecode(AnsiString('%25%26%27')), AnsiString('%&'''), 'Fully percent-encoded string failed');
+
+  // Test case 8: Plus sign with percent-encoded characters
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello+%2B+World'), True), AnsiString('Hello + World'), 'Plus and %2B with APlusAsSpaces=True failed');
+  Assert.AreEqual(ALPercentDecode(AnsiString('Hello+%2B+World'), False), AnsiString('Hello+++World'), 'Plus and %2B with APlusAsSpaces=False failed');
+
+  // Test case 9: Edge case - multiple consecutive percent encodings
+  Assert.AreEqual(ALPercentDecode(AnsiString('%20%20%20')), AnsiString('   '), 'Multiple consecutive spaces (%20%20%20) failed');
+
+  // Test case 10: Edge case - string with no percent encoding
+  Assert.AreEqual(ALPercentDecode(AnsiString('HelloWorld')), AnsiString('HelloWorld'), 'String with no percent encoding failed');
+
+  // Test case 11: Edge case - percent-encoded plus sign
+  Assert.AreEqual(ALPercentDecode(AnsiString('%2B'), True), AnsiString('+'), 'Percent-encoded plus (%2B) with APlusAsSpaces=True failed');
+  Assert.AreEqual(ALPercentDecode(AnsiString('%2B'), False), AnsiString('+'), 'Percent-encoded plus (%2B) with APlusAsSpaces=False failed');
+
+  // Test case 12: Invalid UTF-8 percent-encoded sequences
+  Assert.AreEqual(ALPercentDecode(AnsiString('abc%C3def')), AnsiString('abc')+AnsiString(#$C3)+AnsiString('def'), 'Incomplete UTF-8 sequence (%C3) in "abc%C3def" should be unchanged');
+  Assert.AreEqual(ALPercentDecode(AnsiString('abc%C3%XYdef')), AnsiString('abc')+AnsiString(#$C3)+AnsiString('%XYdef'), 'Invalid UTF-8 continuation byte (%C3%XY) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(AnsiString('%FF')), AnsiString(#$FF), 'Invalid UTF-8 byte (%FF) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(AnsiString('caf%C3%A9%GGdef')), AnsiString('café%GGdef'), 'Mixed valid UTF-8 (%C3%A9) and invalid (%GG) failed');
+end;
+
+{******************************************************}
+procedure TALDUnitXTestStringUtils.TestALPercentDecodeW;
+begin
+  // Test case 1: Basic percent-encoded ASCII characters
+  Assert.AreEqual(ALPercentDecode(String('Hello%20World')), String('Hello World'), 'Basic percent decode (%20 to space) failed');
+  Assert.AreEqual(ALPercentDecode(String('%7B%7D')), String('{}'), 'Percent decode of braces (%7B%7D) failed');
+
+  // Test case 2: Non-ASCII percent-encoded characters (UTF-8)
+  Assert.AreEqual(ALPercentDecode(String('caf%C3%A9')), String('café'), 'Percent decode of UTF-8 é (%C3%A9) failed');
+  Assert.AreEqual(ALPercentDecode(String('%E2%82%AC')), String('€'), 'Percent decode of Euro symbol (%E2%82%AC) failed');
+
+  // Test case 3: Plus sign handling with APlusAsSpaces = True
+  Assert.AreEqual(ALPercentDecode(String('Hello+World'), True), String('Hello World'), 'Plus to space with APlusAsSpaces=True failed');
+  Assert.AreEqual(ALPercentDecode(String('Hello+World'), False), String('Hello+World'), 'Plus as literal with APlusAsSpaces=False failed');
+
+  // Test case 4: Mixed encoded and unencoded characters
+  Assert.AreEqual(ALPercentDecode(String('Hello%20World%21%40caf%C3%A9')), String('Hello World!@café'), 'Mixed encoded/unencoded string failed');
+
+  // Test case 5: Invalid percent encodings
+  Assert.AreEqual(ALPercentDecode(String('Hello%GGWorld')), String('Hello%GGWorld'), 'Invalid percent encoding (%GG) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(String('Hello%1')), String('Hello%1'), 'Incomplete percent encoding (%1) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(String('Hello%')), String('Hello%'), 'Lone percent sign (%) should be unchanged');
+
+  // Test case 6: Empty string
+  Assert.AreEqual(ALPercentDecode(String('')), String(''), 'Empty string decode failed');
+
+  // Test case 7: String with only percent-encoded characters
+  Assert.AreEqual(ALPercentDecode(String('%25%26%27')), String('%&'''), 'Fully percent-encoded string failed');
+
+  // Test case 8: Plus sign with percent-encoded characters
+  Assert.AreEqual(ALPercentDecode(String('Hello+%2B+World'), True), String('Hello + World'), 'Plus and %2B with APlusAsSpaces=True failed');
+  Assert.AreEqual(ALPercentDecode(String('Hello+%2B+World'), False), String('Hello+++World'), 'Plus and %2B with APlusAsSpaces=False failed');
+
+  // Test case 9: Edge case - multiple consecutive percent encodings
+  Assert.AreEqual(ALPercentDecode(String('%20%20%20')), String('   '), 'Multiple consecutive spaces (%20%20%20) failed');
+
+  // Test case 10: Edge case - string with no percent encoding
+  Assert.AreEqual(ALPercentDecode(String('HelloWorld')), String('HelloWorld'), 'String with no percent encoding failed');
+
+  // Test case 11: Edge case - percent-encoded plus sign
+  Assert.AreEqual(ALPercentDecode(String('%2B'), True), String('+'), 'Percent-encoded plus (%2B) with APlusAsSpaces=True failed');
+  Assert.AreEqual(ALPercentDecode(String('%2B'), False), String('+'), 'Percent-encoded plus (%2B) with APlusAsSpaces=False failed');
+
+  // Test case 12: Invalid UTF-8 percent-encoded sequences
+  Assert.AreEqual(ALPercentDecode(String('abc%C3def')), String('abc')+String(#$C3)+String('def'), 'Incomplete UTF-8 sequence (%C3) in "abc%C3def" should be unchanged');
+  Assert.AreEqual(ALPercentDecode(String('abc%C3%XYdef')), String('abc')+String(#$C3)+String('%XYdef'), 'Invalid UTF-8 continuation byte (%C3%XY) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(String('%FF')), String(#$FF), 'Invalid UTF-8 byte (%FF) should be unchanged');
+  Assert.AreEqual(ALPercentDecode(String('caf%C3%A9%GGdef')), String('café%GGdef'), 'Mixed valid UTF-8 (%C3%A9) and invalid (%GG) failed');
+end;
+
+{********************************************************}
+procedure TALDUnitXTestStringUtils.ALExtractHeaderFieldsA;
+var
+  Strings: TALNVStringListA;
+  Content: AnsiString;
+begin
+  Strings := TALNVStringListA.Create;
+  try
+    // Test 1: Basic name=value without quotes, separator ;
+    Content := 'name=value; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 1 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 1 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 1 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 1 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 1 value1');
+    Strings.Clear;
+
+    // Test 2: Empty content
+    Content := '';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 2 count');
+    Strings.Clear;
+
+    // Test 3: Nil content
+    ALExtractHeaderFields([';'], [' ', #9], [], nil, Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 3 count');
+    Strings.Clear;
+
+    // Test 4: Single name without value
+    Content := 'name';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 4 count');
+    Assert.AreEqual(AnsiString('name'), Strings[0], 'Test 4 token');
+    Strings.Clear;
+
+    // Test 5: Multiple names without values
+    Content := 'name1;name2;name3;';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 5 count');
+    Assert.AreEqual(AnsiString('name1'), Strings[0], 'Test 5 tok0');
+    Assert.AreEqual(AnsiString('name2'), Strings[1], 'Test 5 tok1');
+    Assert.AreEqual(AnsiString('name3'), Strings[2], 'Test 5 tok2');
+    Strings.Clear;
+
+    // Test 6: Different field separator (comma)
+    Content := 'name=value, another=val2';
+    ALExtractHeaderFields([','], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 6 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 6 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 6 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 6 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 6 value1');
+    Strings.Clear;
+
+    // Test 7: Multiple separators in set ; and ,
+    Content := 'a=b; c=d, e=f';
+    ALExtractHeaderFields([';', ','], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 7 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 7 name0');
+    Assert.AreEqual(AnsiString('b'), Strings.ValueFromIndex[0], 'Test 7 value0');
+    Assert.AreEqual(AnsiString('c'), Strings.Names[1], 'Test 7 name1');
+    Assert.AreEqual(AnsiString('d'), Strings.ValueFromIndex[1], 'Test 7 value1');
+    Assert.AreEqual(AnsiString('e'), Strings.Names[2], 'Test 7 name2');
+    Assert.AreEqual(AnsiString('f'), Strings.ValueFromIndex[2], 'Test 7 value2');
+    Strings.Clear;
+
+    // Test 8: Whitespace trimming around '='
+    Content := '  name  =  value  ;   another  =  val2  ';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 8 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 8 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 8 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 8 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 8 value1');
+    Strings.Clear;
+
+    // Test 9: Tabs are whitespace
+    Content := 'name'#9'='#9'value;'#9'another'#9'='#9'val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 9 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 9 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 9 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 9 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 9 value1');
+    Strings.Clear;
+
+    // Test 10: Quoted values (strip OFF)
+    Content := 'name="value"; another="val2"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 10 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 10 name0');
+    Assert.AreEqual(AnsiString('"value"'), Strings.ValueFromIndex[0], 'Test 10 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 10 name1');
+    Assert.AreEqual(AnsiString('"val2"'), Strings.ValueFromIndex[1], 'Test 10 value1');
+    Strings.Clear;
+
+    // Test 11: Quoted values (strip ON)
+    Content := 'name="value"; another="val2"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 11 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 11 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 11 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 11 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 11 value1');
+    Strings.Clear;
+
+    // Test 12: Single quotes supported
+    Content := 'name=''value''; another=''val2''';
+    ALExtractHeaderFields([';'], [' ', #9], [#39], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 12 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 12 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 12 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 12 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 12 value1');
+    Strings.Clear;
+
+    // Test 13: Mixed quotes allowed
+    Content := 'name="value"; another=''val2''';
+    ALExtractHeaderFields([';'], [' ', #9], ['"', #39], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 13 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 13 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 13 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 13 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 13 value1');
+    Strings.Clear;
+
+    // Test 14: Quote doubling ("" → ")
+    Content := 'name="val""ue"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 14 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 14 name0');
+    Assert.AreEqual(AnsiString('val"ue'), Strings.ValueFromIndex[0], 'Test 14 value0');
+    Strings.Clear;
+
+    // Test 15: Escape char inside quotes (\)
+    Content := 'name="val\"ue"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 15 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 15 name0');
+    Assert.AreEqual(AnsiString('val"ue'), Strings.ValueFromIndex[0], 'Test 15 value0');
+    Strings.Clear;
+
+    // Test 16: Custom name/value separator ':'
+    Content := 'name:value; another:val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False, False, #0, ':');
+    Assert.AreEqual(2, Strings.Count, 'Test 16 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 16 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 16 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 16 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 16 value1');
+    Strings.Clear;
+
+    // Test 17: Empty value
+    Content := 'name=; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 17 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 17 name0');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[0], 'Test 17 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 17 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 17 value1');
+    Strings.Clear;
+
+    // Test 18: Empty name
+    Content := '=value; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 18 count');
+    Assert.AreEqual(AnsiString(''), Strings.Names[0], 'Test 18 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 18 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 18 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 18 value1');
+    Strings.Clear;
+
+    // Test 19: Quoted empty value (strip ON)
+    Content := 'name=""; another="val2"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 19 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 19 name0');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[0], 'Test 19 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 19 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 19 value1');
+    Strings.Clear;
+
+    // Test 20: Consecutive separators (empties ignored)
+    Content := 'name=value;;;another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 20 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 20 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 20 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 20 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 20 value1');
+    Strings.Clear;
+
+    // Test 21: Only separators
+    Content := ';;;';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 21 count');
+    Strings.Clear;
+
+    // Test 22: Only whitespace
+    Content := '   ';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 22 count');
+    Strings.Clear;
+
+    // Test 23: Embedded separator inside quotes (no split)
+    Content := 'name="value;with;semi"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 23 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 23 name0');
+    Assert.AreEqual(AnsiString('value;with;semi'), Strings.ValueFromIndex[0], 'Test 23 value0');
+    Strings.Clear;
+
+    // Test 24: No separators set -> entire string is one pair
+    Content := 'name=value; another=val2';
+    ALExtractHeaderFields([], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 24 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 24 name0');
+    Assert.AreEqual(AnsiString('value; another=val2'), Strings.ValueFromIndex[0], 'Test 24 value0');
+    Strings.Clear;
+
+    // Test 25: No whitespace set (spaces preserved)
+    Content := 'name  =  value  ;  another  =  val2';
+    ALExtractHeaderFields([';'], [], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 25 count');
+    Assert.AreEqual(AnsiString('name  '), Strings.Names[0], 'Test 25 name0');
+    Assert.AreEqual(AnsiString('  value  '), Strings.ValueFromIndex[0], 'Test 25 value0');
+    Assert.AreEqual(AnsiString('  another  '), Strings.Names[1], 'Test 25 name1');
+    Assert.AreEqual(AnsiString('  val2'), Strings.ValueFromIndex[1], 'Test 25 value1');
+    Strings.Clear;
+
+    // Test 26: Quotes disabled -> quotes literal
+    Content := 'a="b c"; x=y';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 26 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 26 name0');
+    Assert.AreEqual(AnsiString('"b c"'), Strings.ValueFromIndex[0], 'Test 26 value0');
+    Assert.AreEqual(AnsiString('x'), Strings.Names[1], 'Test 26 name1');
+    Assert.AreEqual(AnsiString('y'), Strings.ValueFromIndex[1], 'Test 26 value1');
+    Strings.Clear;
+
+    // Test 27: Embedded '=' inside quoted value
+    Content := 'a="b=c=d"; x=y';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 27 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 27 name0');
+    Assert.AreEqual(AnsiString('b=c=d'), Strings.ValueFromIndex[0], 'Test 27 value0');
+    Assert.AreEqual(AnsiString('x'), Strings.Names[1], 'Test 27 name1');
+    Assert.AreEqual(AnsiString('y'), Strings.ValueFromIndex[1], 'Test 27 value1');
+    Strings.Clear;
+
+    // Test 28: Multiple '=' in unquoted value (split at first)
+    Content := 'name=with=equals=value';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 28 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 28 name0');
+    Assert.AreEqual(AnsiString('with=equals=value'), Strings.ValueFromIndex[0], 'Test 28 value0');
+    Strings.Clear;
+
+    // Test 29: CRLF and tabs as whitespace
+    Content := #13#10'a=b;'#9'c="d e"'#13#10', f=g';
+    ALExtractHeaderFields([';', ','], [' ', #9, #13, #10], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(3, Strings.Count, 'Test 29 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 29 name0');
+    Assert.AreEqual(AnsiString('b'), Strings.ValueFromIndex[0], 'Test 29 value0');
+    Assert.AreEqual(AnsiString('c'), Strings.Names[1], 'Test 29 name1');
+    Assert.AreEqual(AnsiString('d e'), Strings.ValueFromIndex[1], 'Test 29 value1');
+    Assert.AreEqual(AnsiString('f'), Strings.Names[2], 'Test 29 name2');
+    Assert.AreEqual(AnsiString('g'), Strings.ValueFromIndex[2], 'Test 29 value2');
+    Strings.Clear;
+
+    // Test 30: Opposite quotes inside quoted value (no special handling)
+    Content := 'a="he said ''yo''"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"', #39], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 30 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 30 name0');
+    Assert.AreEqual(AnsiString('he said ''yo'''), Strings.ValueFromIndex[0], 'Test 30 value0');
+    Strings.Clear;
+
+    // Test 31: Unbalanced quoted value (kept as-is)
+    Content := 'a="unterminated';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 31 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 31 name0');
+    Assert.AreEqual(AnsiString('"unterminated'), Strings.ValueFromIndex[0], 'Test 31 value0');
+    Strings.Clear;
+
+    // Test 32: Unbalanced bare quoted token (token only)
+    Content := '"token';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 32 count');
+    Assert.AreEqual(AnsiString('"token'), Strings.Names[0], 'Test 32 name0');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[0], 'Test 32 value0');
+    Strings.Clear;
+
+    // Test 33: Trailing separator (ignored)
+    Content := 'a=b;';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 33 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 33 name0');
+    Assert.AreEqual(AnsiString('b'), Strings.ValueFromIndex[0], 'Test 33 value0');
+    Strings.Clear;
+
+    // Test 34: Leading separator (ignored)
+    Content := '; a=b; c=d';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 34 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 34 name0');
+    Assert.AreEqual(AnsiString('b'), Strings.ValueFromIndex[0], 'Test 34 value0');
+    Assert.AreEqual(AnsiString('c'), Strings.Names[1], 'Test 34 name1');
+    Assert.AreEqual(AnsiString('d'), Strings.ValueFromIndex[1], 'Test 34 value1');
+    Strings.Clear;
+
+    // Test 35: Cookie-like flags + params
+    Content := 'theme=light; sessionToken="abc123=="; Secure; HttpOnly; Path=/';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(5, Strings.Count, 'Test 35 count');
+    Assert.AreEqual(AnsiString('theme'), Strings.Names[0], 'Test 35 name0');
+    Assert.AreEqual(AnsiString('light'), Strings.ValueFromIndex[0], 'Test 35 value0');
+    Assert.AreEqual(AnsiString('sessionToken'), Strings.Names[1], 'Test 35 name1');
+    Assert.AreEqual(AnsiString('abc123=='), Strings.ValueFromIndex[1], 'Test 35 value1');
+    Assert.AreEqual(AnsiString('Secure'), Strings.Names[2], 'Test 35 name2');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[2], 'Test 35 value2');
+    Assert.AreEqual(AnsiString('HttpOnly'), Strings.Names[3], 'Test 35 name3');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[3], 'Test 35 value3');
+    Assert.AreEqual(AnsiString('Path'), Strings.Names[4], 'Test 35 name4');
+    Assert.AreEqual(AnsiString('/'), Strings.ValueFromIndex[4], 'Test 35 value4');
+    Strings.Clear;
+
+    // Test 36: Non-standard quote char `
+    Content := '`name`=`value`';
+    ALExtractHeaderFields([';'], [' ', #9], ['`'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 36 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 36 name0');
+    Assert.AreEqual(AnsiString('value'), Strings.ValueFromIndex[0], 'Test 36 value0');
+    Strings.Clear;
+
+    // Test 37: Escaped separator inside quotes
+    Content := 'name="value\;with\;semi"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 37 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 37 name0');
+    Assert.AreEqual(AnsiString('value;with;semi'), Strings.ValueFromIndex[0], 'Test 37 value0');
+    Strings.Clear;
+
+    // Test 38: Escaped quotes and doubled quotes together
+    Content := 'a="x\"y""z\""';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, True, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 38 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 38 name0');
+    Assert.AreEqual(AnsiString('x"y"z"'), Strings.ValueFromIndex[0], 'Test 38 value0');
+    Strings.Clear;
+
+    // Test 39: Escaped backslashes inside quoted value
+    Content := 'a="C:\\Temp\\File"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 39 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 39 name0');
+    Assert.AreEqual(AnsiString('C:\Temp\File'), Strings.ValueFromIndex[0], 'Test 39 value0');
+    Strings.Clear;
+
+    // Test 40: Space as field separator (token list), quotes strip ON
+    Content := '"name1" "name2"';
+    ALExtractHeaderFields([' '], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 40 count');
+    Assert.AreEqual(AnsiString('name1'), Strings[0], 'Test 40 tok0');
+    Assert.AreEqual(AnsiString('name2'), Strings[1], 'Test 40 tok1');
+    Strings.Clear;
+
+    // Test 41: Bare tokens mixed with name/values
+    Content := 'token1; a=b; "token 2"; c="d e"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(4, Strings.Count, 'Test 41 count');
+    Assert.AreEqual(AnsiString('token1'), Strings.Names[0], 'Test 41 name0');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[0], 'Test 41 value0');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[1], 'Test 41 name1');
+    Assert.AreEqual(AnsiString('b'), Strings.ValueFromIndex[1], 'Test 41 value1');
+    Assert.AreEqual(AnsiString('token 2'), Strings.Names[2], 'Test 41 name2');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[2], 'Test 41 value2');
+    Assert.AreEqual(AnsiString('c'), Strings.Names[3], 'Test 41 name3');
+    Assert.AreEqual(AnsiString('d e'), Strings.ValueFromIndex[3], 'Test 41 value3');
+    Strings.Clear;
+
+    // Test 42: Name quoted (strip ON)
+    Content := '"nm"=val';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 42 count');
+    Assert.AreEqual(AnsiString('nm'), Strings.Names[0], 'Test 42 name0');
+    Assert.AreEqual(AnsiString('val'), Strings.ValueFromIndex[0], 'Test 42 value0');
+    Strings.Clear;
+
+    // Test 43: Name quoted (strip OFF)
+    Content := '"nm"=val';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 43 count');
+    Assert.AreEqual(AnsiString('"nm"'), Strings.Names[0], 'Test 43 name0');
+    Assert.AreEqual(AnsiString('val'), Strings.ValueFromIndex[0], 'Test 43 value0');
+    Strings.Clear;
+
+    // Test 44: Name contains separator char inside quotes
+    Content := '"a;b"=x; y=z';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 44 count');
+    Assert.AreEqual(AnsiString('a;b'), Strings.Names[0], 'Test 44 name0');
+    Assert.AreEqual(AnsiString('x'), Strings.ValueFromIndex[0], 'Test 44 value0');
+    Assert.AreEqual(AnsiString('y'), Strings.Names[1], 'Test 44 name1');
+    Assert.AreEqual(AnsiString('z'), Strings.ValueFromIndex[1], 'Test 44 value1');
+    Strings.Clear;
+
+    // Test 45: Real-world header (Content-Type)
+    Content := 'Content-Type= text/html; charset=utf-8; boundary="----=_NextPart_000_0000_01D9876A.ABCD1234"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 45 count');
+    Assert.AreEqual(AnsiString('Content-Type'), Strings.Names[0], 'Test 45 name0');
+    Assert.AreEqual(AnsiString('text/html'), Strings.ValueFromIndex[0], 'Test 45 value0');
+    Assert.AreEqual(AnsiString('charset'), Strings.Names[1], 'Test 45 name1');
+    Assert.AreEqual(AnsiString('utf-8'), Strings.ValueFromIndex[1], 'Test 45 value1');
+    Assert.AreEqual(AnsiString('boundary'), Strings.Names[2], 'Test 45 name2');
+    Assert.AreEqual(AnsiString('"----=_NextPart_000_0000_01D9876A.ABCD1234"'), Strings.ValueFromIndex[2], 'Test 45 value2');
+    Strings.Clear;
+
+    // Test 46: Very long strings
+    Content := AnsiString(StringOfChar('a', 1000) + '=' + StringOfChar('b', 1000));
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 46 count');
+    Assert.AreEqual(AnsiString(StringOfChar('a', 1000)), Strings.Names[0], 'Test 46 name0');
+    Assert.AreEqual(AnsiString(StringOfChar('b', 1000)), Strings.ValueFromIndex[0], 'Test 46 value0');
+    Strings.Clear;
+
+    // Test 47: Unicode in AnsiString (if codepage allows)
+    Content := 'name=valüe; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 47 count');
+    Assert.AreEqual(AnsiString('name'), Strings.Names[0], 'Test 47 name0');
+    Assert.AreEqual(AnsiString('valüe'), Strings.ValueFromIndex[0], 'Test 47 value0');
+    Assert.AreEqual(AnsiString('another'), Strings.Names[1], 'Test 47 name1');
+    Assert.AreEqual(AnsiString('val2'), Strings.ValueFromIndex[1], 'Test 47 value1');
+    Strings.Clear;
+
+    // Test 48: Space-only quoted value preserved when stripped
+    Content := 'a="   "';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 48 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 48 name0');
+    Assert.AreEqual(AnsiString('   '), Strings.ValueFromIndex[0], 'Test 48 value0');
+    Strings.Clear;
+
+    // Test 49: Comma separator with quoted commas
+    Content := 'a="1,2", b="3,4", c=5';
+    ALExtractHeaderFields([','], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(3, Strings.Count, 'Test 49 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 49 name0');
+    Assert.AreEqual(AnsiString('1,2'), Strings.ValueFromIndex[0], 'Test 49 value0');
+    Assert.AreEqual(AnsiString('b'), Strings.Names[1], 'Test 49 name1');
+    Assert.AreEqual(AnsiString('3,4'), Strings.ValueFromIndex[1], 'Test 49 value1');
+    Assert.AreEqual(AnsiString('c'), Strings.Names[2], 'Test 49 name2');
+    Assert.AreEqual(AnsiString('5'), Strings.ValueFromIndex[2], 'Test 49 value2');
+    Strings.Clear;
+
+    // Test 50: Name/value separator ':' with quoted colon inside value
+    Content := 'a:"b:c:d"; e:f';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, #0, ':');
+    Assert.AreEqual(2, Strings.Count, 'Test 50 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 50 name0');
+    Assert.AreEqual(AnsiString('b:c:d'), Strings.ValueFromIndex[0], 'Test 50 value0');
+    Assert.AreEqual(AnsiString('e'), Strings.Names[1], 'Test 50 name1');
+    Assert.AreEqual(AnsiString('f'), Strings.ValueFromIndex[1], 'Test 50 value1');
+    Strings.Clear;
+
+    // Test 51: Separator immediately after closing quote (semicolon)
+    Content := 'a="x";b=y';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 51 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 51 name0');
+    Assert.AreEqual(AnsiString('x'), Strings.ValueFromIndex[0], 'Test 51 value0');
+    Assert.AreEqual(AnsiString('b'), Strings.Names[1], 'Test 51 name1');
+    Assert.AreEqual(AnsiString('y'), Strings.ValueFromIndex[1], 'Test 51 value1');
+    Strings.Clear;
+
+    // Test 52: Separator immediately after closing quote (comma)
+    Content := 'a="x",b=y';
+    ALExtractHeaderFields([','], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 52 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 52 name0');
+    Assert.AreEqual(AnsiString('x'), Strings.ValueFromIndex[0], 'Test 52 value0');
+    Assert.AreEqual(AnsiString('b'), Strings.Names[1], 'Test 52 name1');
+    Assert.AreEqual(AnsiString('y'), Strings.ValueFromIndex[1], 'Test 52 value1');
+    Strings.Clear;
+
+    // Test 53: No field separators at all: one pair
+    Content := 'a=b c d';
+    ALExtractHeaderFields([], [' ', #9], ['"'], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 53 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 53 name0');
+    Assert.AreEqual(AnsiString('b c d'), Strings.ValueFromIndex[0], 'Test 53 value0');
+    Strings.Clear;
+
+    // Test 54: No whitespace set with ':' separator (spaces preserved)
+    Content := 'a  :  b;  c:  d';
+    ALExtractHeaderFields([';'], [], ['"'], PAnsiChar(Content), Strings, False, False, #0, ':');
+    Assert.AreEqual(2, Strings.Count, 'Test 54 count');
+    Assert.AreEqual(AnsiString('a  '), Strings.Names[0], 'Test 54 name0');
+    Assert.AreEqual(AnsiString('  b'), Strings.ValueFromIndex[0], 'Test 54 value0');
+    Assert.AreEqual(AnsiString('  c'), Strings.Names[1], 'Test 54 name1');
+    Assert.AreEqual(AnsiString('  d'), Strings.ValueFromIndex[1], 'Test 54 value1');
+    Strings.Clear;
+
+    // Test 55: Escaped separator with comma list
+    Content := 'a="x\,y", b=2';
+    ALExtractHeaderFields([','], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(2, Strings.Count, 'Test 55 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 55 name0');
+    Assert.AreEqual(AnsiString('x,y'), Strings.ValueFromIndex[0], 'Test 55 value0');
+    Assert.AreEqual(AnsiString('b'), Strings.Names[1], 'Test 55 name1');
+    Assert.AreEqual(AnsiString('2'), Strings.ValueFromIndex[1], 'Test 55 value1');
+    Strings.Clear;
+
+    // Test 56: Trailing escape within quoted value (kept as literal by parser)
+    Content := 'a="xyz\"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 56 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 56 name0');
+    Assert.AreEqual(AnsiString('"xyz\"'), Strings.ValueFromIndex[0], 'Test 56 value0');
+    Strings.Clear;
+
+    // Test 57: Alternate escape char ^
+    Content := 'a="x^"y^"z"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, False, '^');
+    Assert.AreEqual(1, Strings.Count, 'Test 57 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 57 name0');
+    Assert.AreEqual(AnsiString('x"y"z'), Strings.ValueFromIndex[0], 'Test 57 value0');
+    Strings.Clear;
+
+    // Test 58: Doubling ON for single quotes
+    Content := 'a=''It''''s''';
+    ALExtractHeaderFields([';'], [' ', #9], [#39], PAnsiChar(Content), Strings, True, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 58 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 58 name0');
+    Assert.AreEqual(AnsiString('It''s'), Strings.ValueFromIndex[0], 'Test 58 value0');
+    Strings.Clear;
+
+    // Test 59: Name quoted with doubled quotes (strip ON)
+    Content := '"na""me"=x';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 59 count');
+    Assert.AreEqual(AnsiString('na"me'), Strings.Names[0], 'Test 59 name0');
+    Assert.AreEqual(AnsiString('x'), Strings.ValueFromIndex[0], 'Test 59 value0');
+    Strings.Clear;
+
+    // Test 60: Cookie-like Expires date with comma inside quotes
+    Content := 'Expires="Wed, 21 Oct 2015 07:28:00 GMT"; Path=/; Secure; HttpOnly';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(4, Strings.Count, 'Test 60 count');
+    Assert.AreEqual(AnsiString('Expires'), Strings.Names[0], 'Test 60 name0');
+    Assert.AreEqual(AnsiString('Wed, 21 Oct 2015 07:28:00 GMT'), Strings.ValueFromIndex[0], 'Test 60 value0');
+    Assert.AreEqual(AnsiString('Path'), Strings.Names[1], 'Test 60 name1');
+    Assert.AreEqual(AnsiString('/'), Strings.ValueFromIndex[1], 'Test 60 value1');
+    Assert.AreEqual(AnsiString('Secure'), Strings.Names[2], 'Test 60 name2');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[2], 'Test 60 value2');
+    Assert.AreEqual(AnsiString('HttpOnly'), Strings.Names[3], 'Test 60 name3');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[3], 'Test 60 value3');
+    Strings.Clear;
+
+// Test 61: Tab as field separator (IMPORTANT: do NOT include #9 in whitespace)
+    Content := 'a=b'#9'c=d'#9'e=f';
+    ALExtractHeaderFields([#9], [' '], [], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 61 count');
+    Assert.AreEqual(AnsiString('a'), Strings.Names[0], 'Test 61 name0');
+    Assert.AreEqual(AnsiString('b'), Strings.ValueFromIndex[0], 'Test 61 value0');
+    Assert.AreEqual(AnsiString('c'), Strings.Names[1], 'Test 61 name1');
+    Assert.AreEqual(AnsiString('d'), Strings.ValueFromIndex[1], 'Test 61 value1');
+    Assert.AreEqual(AnsiString('e'), Strings.Names[2], 'Test 61 name2');
+    Assert.AreEqual(AnsiString('f'), Strings.ValueFromIndex[2], 'Test 61 value2');
+    Strings.Clear;
+
+    // Test 62: Token-only mixed list, strip OFF (keep quotes on quoted tokens)
+    Content := '"alpha"; beta; "gamma delta"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 62 count');
+    Assert.AreEqual(AnsiString('"alpha"'), Strings.Names[0], 'Test 62 tok0');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[0], 'Test 62 val0');
+    Assert.AreEqual(AnsiString('beta'), Strings.Names[1], 'Test 62 tok1');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[1], 'Test 62 val1');
+    Assert.AreEqual(AnsiString('"gamma delta"'), Strings.Names[2], 'Test 62 tok2');
+    Assert.AreEqual(AnsiString(''), Strings.ValueFromIndex[2], 'Test 62 val2');
+    Strings.Clear;
+
+    // Test 63: Space-as-separator token list, strip OFF (quotes preserved)
+    Content := '"name1" "name2" z';
+    ALExtractHeaderFields([' '], [' ', #9], ['"'], PAnsiChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 63 count');
+    Assert.AreEqual(AnsiString('"name1"'), Strings[0], 'Test 63 tok0');
+    Assert.AreEqual(AnsiString('"name2"'), Strings[1], 'Test 63 tok1');
+    Assert.AreEqual(AnsiString('z'), Strings[2], 'Test 63 tok2');
+    Strings.Clear;
+
+    // Test 64: Tab-as-separator with quoted tokens, strip ON
+    Content := '"a b"'#9'"c d"';
+    ALExtractHeaderFields([#9], [' '], ['"'], PAnsiChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 64 count');
+    Assert.AreEqual(AnsiString('a b'), Strings[0], 'Test 64 tok0');
+    Assert.AreEqual(AnsiString('c d'), Strings[1], 'Test 64 tok1');
+    Strings.Clear;
+
+  finally
+    Strings.Free;
+  end;
+end;
+
+{********************************************************}
+procedure TALDUnitXTestStringUtils.ALExtractHeaderFieldsW;
+var
+  Strings: TALNVStringListW;
+  Content: String;
+begin
+  Strings := TALNVStringListW.Create;
+  try
+    // Test 1: Basic name=value without quotes, separator ;
+    Content := 'name=value; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 1 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 1 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 1 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 1 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 1 value1');
+    Strings.Clear;
+
+    // Test 2: Empty content
+    Content := '';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 2 count');
+    Strings.Clear;
+
+    // Test 3: Nil content
+    ALExtractHeaderFields([';'], [' ', #9], [], nil, Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 3 count');
+    Strings.Clear;
+
+    // Test 4: Single name without value
+    Content := 'name';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 4 count');
+    Assert.AreEqual(String('name'), Strings[0], 'Test 4 token');
+    Strings.Clear;
+
+    // Test 5: Multiple names without values
+    Content := 'name1;name2;name3;';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 5 count');
+    Assert.AreEqual(String('name1'), Strings[0], 'Test 5 tok0');
+    Assert.AreEqual(String('name2'), Strings[1], 'Test 5 tok1');
+    Assert.AreEqual(String('name3'), Strings[2], 'Test 5 tok2');
+    Strings.Clear;
+
+    // Test 6: Different field separator (comma)
+    Content := 'name=value, another=val2';
+    ALExtractHeaderFields([','], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 6 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 6 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 6 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 6 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 6 value1');
+    Strings.Clear;
+
+    // Test 7: Multiple separators in set ; and ,
+    Content := 'a=b; c=d, e=f';
+    ALExtractHeaderFields([';', ','], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 7 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 7 name0');
+    Assert.AreEqual(String('b'), Strings.ValueFromIndex[0], 'Test 7 value0');
+    Assert.AreEqual(String('c'), Strings.Names[1], 'Test 7 name1');
+    Assert.AreEqual(String('d'), Strings.ValueFromIndex[1], 'Test 7 value1');
+    Assert.AreEqual(String('e'), Strings.Names[2], 'Test 7 name2');
+    Assert.AreEqual(String('f'), Strings.ValueFromIndex[2], 'Test 7 value2');
+    Strings.Clear;
+
+    // Test 8: Whitespace trimming around '='
+    Content := '  name  =  value  ;   another  =  val2  ';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 8 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 8 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 8 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 8 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 8 value1');
+    Strings.Clear;
+
+    // Test 9: Tabs are whitespace
+    Content := 'name'#9'='#9'value;'#9'another'#9'='#9'val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 9 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 9 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 9 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 9 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 9 value1');
+    Strings.Clear;
+
+    // Test 10: Quoted values (strip OFF)
+    Content := 'name="value"; another="val2"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 10 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 10 name0');
+    Assert.AreEqual(String('"value"'), Strings.ValueFromIndex[0], 'Test 10 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 10 name1');
+    Assert.AreEqual(String('"val2"'), Strings.ValueFromIndex[1], 'Test 10 value1');
+    Strings.Clear;
+
+    // Test 11: Quoted values (strip ON)
+    Content := 'name="value"; another="val2"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 11 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 11 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 11 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 11 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 11 value1');
+    Strings.Clear;
+
+    // Test 12: Single quotes supported
+    Content := 'name=''value''; another=''val2''';
+    ALExtractHeaderFields([';'], [' ', #9], [#39], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 12 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 12 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 12 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 12 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 12 value1');
+    Strings.Clear;
+
+    // Test 13: Mixed quotes allowed
+    Content := 'name="value"; another=''val2''';
+    ALExtractHeaderFields([';'], [' ', #9], ['"', #39], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 13 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 13 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 13 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 13 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 13 value1');
+    Strings.Clear;
+
+    // Test 14: Quote doubling ("" → ")
+    Content := 'name="val""ue"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 14 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 14 name0');
+    Assert.AreEqual(String('val"ue'), Strings.ValueFromIndex[0], 'Test 14 value0');
+    Strings.Clear;
+
+    // Test 15: Escape char inside quotes (\)
+    Content := 'name="val\"ue"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 15 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 15 name0');
+    Assert.AreEqual(String('val"ue'), Strings.ValueFromIndex[0], 'Test 15 value0');
+    Strings.Clear;
+
+    // Test 16: Custom name/value separator ':'
+    Content := 'name:value; another:val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False, False, #0, ':');
+    Assert.AreEqual(2, Strings.Count, 'Test 16 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 16 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 16 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 16 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 16 value1');
+    Strings.Clear;
+
+    // Test 17: Empty value
+    Content := 'name=; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 17 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 17 name0');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[0], 'Test 17 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 17 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 17 value1');
+    Strings.Clear;
+
+    // Test 18: Empty name
+    Content := '=value; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 18 count');
+    Assert.AreEqual(String(''), Strings.Names[0], 'Test 18 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 18 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 18 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 18 value1');
+    Strings.Clear;
+
+    // Test 19: Quoted empty value (strip ON)
+    Content := 'name=""; another="val2"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 19 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 19 name0');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[0], 'Test 19 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 19 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 19 value1');
+    Strings.Clear;
+
+    // Test 20: Consecutive separators (empties ignored)
+    Content := 'name=value;;;another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 20 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 20 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 20 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 20 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 20 value1');
+    Strings.Clear;
+
+    // Test 21: Only separators
+    Content := ';;;';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 21 count');
+    Strings.Clear;
+
+    // Test 22: Only whitespace
+    Content := '   ';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(0, Strings.Count, 'Test 22 count');
+    Strings.Clear;
+
+    // Test 23: Embedded separator inside quotes (no split)
+    Content := 'name="value;with;semi"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 23 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 23 name0');
+    Assert.AreEqual(String('value;with;semi'), Strings.ValueFromIndex[0], 'Test 23 value0');
+    Strings.Clear;
+
+    // Test 24: No separators set -> entire string is one pair
+    Content := 'name=value; another=val2';
+    ALExtractHeaderFields([], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 24 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 24 name0');
+    Assert.AreEqual(String('value; another=val2'), Strings.ValueFromIndex[0], 'Test 24 value0');
+    Strings.Clear;
+
+    // Test 25: No whitespace set (spaces preserved)
+    Content := 'name  =  value  ;  another  =  val2';
+    ALExtractHeaderFields([';'], [], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 25 count');
+    Assert.AreEqual(String('name  '), Strings.Names[0], 'Test 25 name0');
+    Assert.AreEqual(String('  value  '), Strings.ValueFromIndex[0], 'Test 25 value0');
+    Assert.AreEqual(String('  another  '), Strings.Names[1], 'Test 25 name1');
+    Assert.AreEqual(String('  val2'), Strings.ValueFromIndex[1], 'Test 25 value1');
+    Strings.Clear;
+
+    // Test 26: Quotes disabled -> quotes literal
+    Content := 'a="b c"; x=y';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 26 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 26 name0');
+    Assert.AreEqual(String('"b c"'), Strings.ValueFromIndex[0], 'Test 26 value0');
+    Assert.AreEqual(String('x'), Strings.Names[1], 'Test 26 name1');
+    Assert.AreEqual(String('y'), Strings.ValueFromIndex[1], 'Test 26 value1');
+    Strings.Clear;
+
+    // Test 27: Embedded '=' inside quoted value
+    Content := 'a="b=c=d"; x=y';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 27 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 27 name0');
+    Assert.AreEqual(String('b=c=d'), Strings.ValueFromIndex[0], 'Test 27 value0');
+    Assert.AreEqual(String('x'), Strings.Names[1], 'Test 27 name1');
+    Assert.AreEqual(String('y'), Strings.ValueFromIndex[1], 'Test 27 value1');
+    Strings.Clear;
+
+    // Test 28: Multiple '=' in unquoted value (split at first)
+    Content := 'name=with=equals=value';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 28 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 28 name0');
+    Assert.AreEqual(String('with=equals=value'), Strings.ValueFromIndex[0], 'Test 28 value0');
+    Strings.Clear;
+
+    // Test 29: CRLF and tabs as whitespace
+    Content := #13#10'a=b;'#9'c="d e"'#13#10', f=g';
+    ALExtractHeaderFields([';', ','], [' ', #9, #13, #10], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(3, Strings.Count, 'Test 29 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 29 name0');
+    Assert.AreEqual(String('b'), Strings.ValueFromIndex[0], 'Test 29 value0');
+    Assert.AreEqual(String('c'), Strings.Names[1], 'Test 29 name1');
+    Assert.AreEqual(String('d e'), Strings.ValueFromIndex[1], 'Test 29 value1');
+    Assert.AreEqual(String('f'), Strings.Names[2], 'Test 29 name2');
+    Assert.AreEqual(String('g'), Strings.ValueFromIndex[2], 'Test 29 value2');
+    Strings.Clear;
+
+    // Test 30: Opposite quotes inside quoted value (no special handling)
+    Content := 'a="he said ''yo''"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"', #39], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 30 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 30 name0');
+    Assert.AreEqual(String('he said ''yo'''), Strings.ValueFromIndex[0], 'Test 30 value0');
+    Strings.Clear;
+
+    // Test 31: Unbalanced quoted value (kept as-is)
+    Content := 'a="unterminated';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 31 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 31 name0');
+    Assert.AreEqual(String('"unterminated'), Strings.ValueFromIndex[0], 'Test 31 value0');
+    Strings.Clear;
+
+    // Test 32: Unbalanced bare quoted token (token only)
+    Content := '"token';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 32 count');
+    Assert.AreEqual(String('"token'), Strings.Names[0], 'Test 32 name0');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[0], 'Test 32 value0');
+    Strings.Clear;
+
+    // Test 33: Trailing separator (ignored)
+    Content := 'a=b;';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 33 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 33 name0');
+    Assert.AreEqual(String('b'), Strings.ValueFromIndex[0], 'Test 33 value0');
+    Strings.Clear;
+
+    // Test 34: Leading separator (ignored)
+    Content := '; a=b; c=d';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 34 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 34 name0');
+    Assert.AreEqual(String('b'), Strings.ValueFromIndex[0], 'Test 34 value0');
+    Assert.AreEqual(String('c'), Strings.Names[1], 'Test 34 name1');
+    Assert.AreEqual(String('d'), Strings.ValueFromIndex[1], 'Test 34 value1');
+    Strings.Clear;
+
+    // Test 35: Cookie-like flags + params
+    Content := 'theme=light; sessionToken="abc123=="; Secure; HttpOnly; Path=/';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(5, Strings.Count, 'Test 35 count');
+    Assert.AreEqual(String('theme'), Strings.Names[0], 'Test 35 name0');
+    Assert.AreEqual(String('light'), Strings.ValueFromIndex[0], 'Test 35 value0');
+    Assert.AreEqual(String('sessionToken'), Strings.Names[1], 'Test 35 name1');
+    Assert.AreEqual(String('abc123=='), Strings.ValueFromIndex[1], 'Test 35 value1');
+    Assert.AreEqual(String('Secure'), Strings.Names[2], 'Test 35 name2');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[2], 'Test 35 value2');
+    Assert.AreEqual(String('HttpOnly'), Strings.Names[3], 'Test 35 name3');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[3], 'Test 35 value3');
+    Assert.AreEqual(String('Path'), Strings.Names[4], 'Test 35 name4');
+    Assert.AreEqual(String('/'), Strings.ValueFromIndex[4], 'Test 35 value4');
+    Strings.Clear;
+
+    // Test 36: Non-standard quote char `
+    Content := '`name`=`value`';
+    ALExtractHeaderFields([';'], [' ', #9], ['`'], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 36 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 36 name0');
+    Assert.AreEqual(String('value'), Strings.ValueFromIndex[0], 'Test 36 value0');
+    Strings.Clear;
+
+    // Test 37: Escaped separator inside quotes
+    Content := 'name="value\;with\;semi"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 37 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 37 name0');
+    Assert.AreEqual(String('value;with;semi'), Strings.ValueFromIndex[0], 'Test 37 value0');
+    Strings.Clear;
+
+    // Test 38: Escaped quotes and doubled quotes together
+    Content := 'a="x\"y""z\""';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, True, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 38 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 38 name0');
+    Assert.AreEqual(String('x"y"z"'), Strings.ValueFromIndex[0], 'Test 38 value0');
+    Strings.Clear;
+
+    // Test 39: Escaped backslashes inside quoted value
+    Content := 'a="C:\\Temp\\File"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 39 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 39 name0');
+    Assert.AreEqual(String('C:\Temp\File'), Strings.ValueFromIndex[0], 'Test 39 value0');
+    Strings.Clear;
+
+    // Test 40: Space as field separator (token list), quotes strip ON
+    Content := '"name1" "name2"';
+    ALExtractHeaderFields([' '], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 40 count');
+    Assert.AreEqual(String('name1'), Strings[0], 'Test 40 tok0');
+    Assert.AreEqual(String('name2'), Strings[1], 'Test 40 tok1');
+    Strings.Clear;
+
+    // Test 41: Bare tokens mixed with name/values
+    Content := 'token1; a=b; "token 2"; c="d e"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(4, Strings.Count, 'Test 41 count');
+    Assert.AreEqual(String('token1'), Strings.Names[0], 'Test 41 name0');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[0], 'Test 41 value0');
+    Assert.AreEqual(String('a'), Strings.Names[1], 'Test 41 name1');
+    Assert.AreEqual(String('b'), Strings.ValueFromIndex[1], 'Test 41 value1');
+    Assert.AreEqual(String('token 2'), Strings.Names[2], 'Test 41 name2');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[2], 'Test 41 value2');
+    Assert.AreEqual(String('c'), Strings.Names[3], 'Test 41 name3');
+    Assert.AreEqual(String('d e'), Strings.ValueFromIndex[3], 'Test 41 value3');
+    Strings.Clear;
+
+    // Test 42: Name quoted (strip ON)
+    Content := '"nm"=val';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 42 count');
+    Assert.AreEqual(String('nm'), Strings.Names[0], 'Test 42 name0');
+    Assert.AreEqual(String('val'), Strings.ValueFromIndex[0], 'Test 42 value0');
+    Strings.Clear;
+
+    // Test 43: Name quoted (strip OFF)
+    Content := '"nm"=val';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 43 count');
+    Assert.AreEqual(String('"nm"'), Strings.Names[0], 'Test 43 name0');
+    Assert.AreEqual(String('val'), Strings.ValueFromIndex[0], 'Test 43 value0');
+    Strings.Clear;
+
+    // Test 44: Name contains separator char inside quotes
+    Content := '"a;b"=x; y=z';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 44 count');
+    Assert.AreEqual(String('a;b'), Strings.Names[0], 'Test 44 name0');
+    Assert.AreEqual(String('x'), Strings.ValueFromIndex[0], 'Test 44 value0');
+    Assert.AreEqual(String('y'), Strings.Names[1], 'Test 44 name1');
+    Assert.AreEqual(String('z'), Strings.ValueFromIndex[1], 'Test 44 value1');
+    Strings.Clear;
+
+    // Test 45: Real-world header (Content-Type)
+    Content := 'Content-Type= text/html; charset=utf-8; boundary="----=_NextPart_000_0000_01D9876A.ABCD1234"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 45 count');
+    Assert.AreEqual(String('Content-Type'), Strings.Names[0], 'Test 45 name0');
+    Assert.AreEqual(String('text/html'), Strings.ValueFromIndex[0], 'Test 45 value0');
+    Assert.AreEqual(String('charset'), Strings.Names[1], 'Test 45 name1');
+    Assert.AreEqual(String('utf-8'), Strings.ValueFromIndex[1], 'Test 45 value1');
+    Assert.AreEqual(String('boundary'), Strings.Names[2], 'Test 45 name2');
+    Assert.AreEqual(String('"----=_NextPart_000_0000_01D9876A.ABCD1234"'), Strings.ValueFromIndex[2], 'Test 45 value2');
+    Strings.Clear;
+
+    // Test 46: Very long strings
+    Content := String(StringOfChar('a', 1000) + '=' + StringOfChar('b', 1000));
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 46 count');
+    Assert.AreEqual(String(StringOfChar('a', 1000)), Strings.Names[0], 'Test 46 name0');
+    Assert.AreEqual(String(StringOfChar('b', 1000)), Strings.ValueFromIndex[0], 'Test 46 value0');
+    Strings.Clear;
+
+    // Test 47: Unicode in String (if codepage allows)
+    Content := 'name=valüe; another=val2';
+    ALExtractHeaderFields([';'], [' ', #9], [], PChar(Content), Strings, False);
+    Assert.AreEqual(2, Strings.Count, 'Test 47 count');
+    Assert.AreEqual(String('name'), Strings.Names[0], 'Test 47 name0');
+    Assert.AreEqual(String('valüe'), Strings.ValueFromIndex[0], 'Test 47 value0');
+    Assert.AreEqual(String('another'), Strings.Names[1], 'Test 47 name1');
+    Assert.AreEqual(String('val2'), Strings.ValueFromIndex[1], 'Test 47 value1');
+    Strings.Clear;
+
+    // Test 48: Space-only quoted value preserved when stripped
+    Content := 'a="   "';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 48 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 48 name0');
+    Assert.AreEqual(String('   '), Strings.ValueFromIndex[0], 'Test 48 value0');
+    Strings.Clear;
+
+    // Test 49: Comma separator with quoted commas
+    Content := 'a="1,2", b="3,4", c=5';
+    ALExtractHeaderFields([','], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(3, Strings.Count, 'Test 49 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 49 name0');
+    Assert.AreEqual(String('1,2'), Strings.ValueFromIndex[0], 'Test 49 value0');
+    Assert.AreEqual(String('b'), Strings.Names[1], 'Test 49 name1');
+    Assert.AreEqual(String('3,4'), Strings.ValueFromIndex[1], 'Test 49 value1');
+    Assert.AreEqual(String('c'), Strings.Names[2], 'Test 49 name2');
+    Assert.AreEqual(String('5'), Strings.ValueFromIndex[2], 'Test 49 value2');
+    Strings.Clear;
+
+    // Test 50: Name/value separator ':' with quoted colon inside value
+    Content := 'a:"b:c:d"; e:f';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, False, #0, ':');
+    Assert.AreEqual(2, Strings.Count, 'Test 50 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 50 name0');
+    Assert.AreEqual(String('b:c:d'), Strings.ValueFromIndex[0], 'Test 50 value0');
+    Assert.AreEqual(String('e'), Strings.Names[1], 'Test 50 name1');
+    Assert.AreEqual(String('f'), Strings.ValueFromIndex[1], 'Test 50 value1');
+    Strings.Clear;
+
+    // Test 51: Separator immediately after closing quote (semicolon)
+    Content := 'a="x";b=y';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 51 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 51 name0');
+    Assert.AreEqual(String('x'), Strings.ValueFromIndex[0], 'Test 51 value0');
+    Assert.AreEqual(String('b'), Strings.Names[1], 'Test 51 name1');
+    Assert.AreEqual(String('y'), Strings.ValueFromIndex[1], 'Test 51 value1');
+    Strings.Clear;
+
+    // Test 52: Separator immediately after closing quote (comma)
+    Content := 'a="x",b=y';
+    ALExtractHeaderFields([','], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 52 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 52 name0');
+    Assert.AreEqual(String('x'), Strings.ValueFromIndex[0], 'Test 52 value0');
+    Assert.AreEqual(String('b'), Strings.Names[1], 'Test 52 name1');
+    Assert.AreEqual(String('y'), Strings.ValueFromIndex[1], 'Test 52 value1');
+    Strings.Clear;
+
+    // Test 53: No field separators at all: one pair
+    Content := 'a=b c d';
+    ALExtractHeaderFields([], [' ', #9], ['"'], PChar(Content), Strings, False);
+    Assert.AreEqual(1, Strings.Count, 'Test 53 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 53 name0');
+    Assert.AreEqual(String('b c d'), Strings.ValueFromIndex[0], 'Test 53 value0');
+    Strings.Clear;
+
+    // Test 54: No whitespace set with ':' separator (spaces preserved)
+    Content := 'a  :  b;  c:  d';
+    ALExtractHeaderFields([';'], [], ['"'], PChar(Content), Strings, False, False, #0, ':');
+    Assert.AreEqual(2, Strings.Count, 'Test 54 count');
+    Assert.AreEqual(String('a  '), Strings.Names[0], 'Test 54 name0');
+    Assert.AreEqual(String('  b'), Strings.ValueFromIndex[0], 'Test 54 value0');
+    Assert.AreEqual(String('  c'), Strings.Names[1], 'Test 54 name1');
+    Assert.AreEqual(String('  d'), Strings.ValueFromIndex[1], 'Test 54 value1');
+    Strings.Clear;
+
+    // Test 55: Escaped separator with comma list
+    Content := 'a="x\,y", b=2';
+    ALExtractHeaderFields([','], [' ', #9], ['"'], PChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(2, Strings.Count, 'Test 55 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 55 name0');
+    Assert.AreEqual(String('x,y'), Strings.ValueFromIndex[0], 'Test 55 value0');
+    Assert.AreEqual(String('b'), Strings.Names[1], 'Test 55 name1');
+    Assert.AreEqual(String('2'), Strings.ValueFromIndex[1], 'Test 55 value1');
+    Strings.Clear;
+
+    // Test 56: Trailing escape within quoted value (kept as literal by parser)
+    Content := 'a="xyz\"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, False, '\');
+    Assert.AreEqual(1, Strings.Count, 'Test 56 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 56 name0');
+    Assert.AreEqual(String('"xyz\"'), Strings.ValueFromIndex[0], 'Test 56 value0');
+    Strings.Clear;
+
+    // Test 57: Alternate escape char ^
+    Content := 'a="x^"y^"z"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, False, '^');
+    Assert.AreEqual(1, Strings.Count, 'Test 57 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 57 name0');
+    Assert.AreEqual(String('x"y"z'), Strings.ValueFromIndex[0], 'Test 57 value0');
+    Strings.Clear;
+
+    // Test 58: Doubling ON for single quotes
+    Content := 'a=''It''''s''';
+    ALExtractHeaderFields([';'], [' ', #9], [#39], PChar(Content), Strings, True, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 58 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 58 name0');
+    Assert.AreEqual(String('It''s'), Strings.ValueFromIndex[0], 'Test 58 value0');
+    Strings.Clear;
+
+    // Test 59: Name quoted with doubled quotes (strip ON)
+    Content := '"na""me"=x';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True, True);
+    Assert.AreEqual(1, Strings.Count, 'Test 59 count');
+    Assert.AreEqual(String('na"me'), Strings.Names[0], 'Test 59 name0');
+    Assert.AreEqual(String('x'), Strings.ValueFromIndex[0], 'Test 59 value0');
+    Strings.Clear;
+
+    // Test 60: Cookie-like Expires date with comma inside quotes
+    Content := 'Expires="Wed, 21 Oct 2015 07:28:00 GMT"; Path=/; Secure; HttpOnly';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(4, Strings.Count, 'Test 60 count');
+    Assert.AreEqual(String('Expires'), Strings.Names[0], 'Test 60 name0');
+    Assert.AreEqual(String('Wed, 21 Oct 2015 07:28:00 GMT'), Strings.ValueFromIndex[0], 'Test 60 value0');
+    Assert.AreEqual(String('Path'), Strings.Names[1], 'Test 60 name1');
+    Assert.AreEqual(String('/'), Strings.ValueFromIndex[1], 'Test 60 value1');
+    Assert.AreEqual(String('Secure'), Strings.Names[2], 'Test 60 name2');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[2], 'Test 60 value2');
+    Assert.AreEqual(String('HttpOnly'), Strings.Names[3], 'Test 60 name3');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[3], 'Test 60 value3');
+    Strings.Clear;
+
+// Test 61: Tab as field separator (IMPORTANT: do NOT include #9 in whitespace)
+    Content := 'a=b'#9'c=d'#9'e=f';
+    ALExtractHeaderFields([#9], [' '], [], PChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 61 count');
+    Assert.AreEqual(String('a'), Strings.Names[0], 'Test 61 name0');
+    Assert.AreEqual(String('b'), Strings.ValueFromIndex[0], 'Test 61 value0');
+    Assert.AreEqual(String('c'), Strings.Names[1], 'Test 61 name1');
+    Assert.AreEqual(String('d'), Strings.ValueFromIndex[1], 'Test 61 value1');
+    Assert.AreEqual(String('e'), Strings.Names[2], 'Test 61 name2');
+    Assert.AreEqual(String('f'), Strings.ValueFromIndex[2], 'Test 61 value2');
+    Strings.Clear;
+
+    // Test 62: Token-only mixed list, strip OFF (keep quotes on quoted tokens)
+    Content := '"alpha"; beta; "gamma delta"';
+    ALExtractHeaderFields([';'], [' ', #9], ['"'], PChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 62 count');
+    Assert.AreEqual(String('"alpha"'), Strings.Names[0], 'Test 62 tok0');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[0], 'Test 62 val0');
+    Assert.AreEqual(String('beta'), Strings.Names[1], 'Test 62 tok1');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[1], 'Test 62 val1');
+    Assert.AreEqual(String('"gamma delta"'), Strings.Names[2], 'Test 62 tok2');
+    Assert.AreEqual(String(''), Strings.ValueFromIndex[2], 'Test 62 val2');
+    Strings.Clear;
+
+    // Test 63: Space-as-separator token list, strip OFF (quotes preserved)
+    Content := '"name1" "name2" z';
+    ALExtractHeaderFields([' '], [' ', #9], ['"'], PChar(Content), Strings, False);
+    Assert.AreEqual(3, Strings.Count, 'Test 63 count');
+    Assert.AreEqual(String('"name1"'), Strings[0], 'Test 63 tok0');
+    Assert.AreEqual(String('"name2"'), Strings[1], 'Test 63 tok1');
+    Assert.AreEqual(String('z'), Strings[2], 'Test 63 tok2');
+    Strings.Clear;
+
+    // Test 64: Tab-as-separator with quoted tokens, strip ON
+    Content := '"a b"'#9'"c d"';
+    ALExtractHeaderFields([#9], [' '], ['"'], PChar(Content), Strings, True);
+    Assert.AreEqual(2, Strings.Count, 'Test 64 count');
+    Assert.AreEqual(String('a b'), Strings[0], 'Test 64 tok0');
+    Assert.AreEqual(String('c d'), Strings[1], 'Test 64 tok1');
+    Strings.Clear;
+
+  finally
+    Strings.Free;
+  end;
+end;
+
 initialization
-  TDUnitX.RegisterTestFixture(TALDUnitXTestStrings);
+  TDUnitX.RegisterTestFixture(TALDUnitXTestStringUtils);
 
 end.

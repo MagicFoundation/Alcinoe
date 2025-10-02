@@ -1,4 +1,4 @@
-unit Alcinoe.Mime;
+unit Alcinoe.Mime.ContentTypes;
 
 interface
 
@@ -10,7 +10,7 @@ uses
 
 //From indy
 Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
-Function  ALGetDefaultMIMEContentTypeFromExt(const aExt: AnsiString): AnsiString;
+Function  ALGetDefaultMimeContentTypeFromExt(const aExt: AnsiString): AnsiString;
 
 Var
   AlMimeContentTypeByExtList: TALStringsA; {.htm=text/html}
@@ -40,7 +40,7 @@ Begin
 end;
 
 {******************************************************************************}
-Function ALGetDefaultMIMEContentTypeFromExt(const aExt: AnsiString): AnsiString;
+Function ALGetDefaultMimeContentTypeFromExt(const aExt: AnsiString): AnsiString;
 var Index : Integer;
     LExt: AnsiString;
 begin

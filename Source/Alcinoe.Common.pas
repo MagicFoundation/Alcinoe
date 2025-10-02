@@ -54,6 +54,14 @@ type
     constructor Create(const AKey: K; const AValue: V; const AExtra: E);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALNameValuePairA = record
+    Name: ansistring;
+    Value: ansistring;
+    constructor Create(const AName, AValue: ansistring);
+  end;
+  TALNameValueArrayA = Array of TALNameValuePairA;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALWorkerThreadRefProc = reference to procedure(var AContext: Tobject);
   TALWorkerThreadObjProc = procedure(var AContext: Tobject) of object;
@@ -1097,6 +1105,13 @@ begin
   Key := AKey;
   Value := AValue;
   Extra := AExtra;
+end;
+
+{********************************************************************}
+constructor TALNameValuePairA.Create(const AName, AValue: ansiString);
+begin
+  Name := AName;
+  Value := AValue;
 end;
 
 {****************************************}

@@ -513,6 +513,10 @@ begin
         End;
         {$ENDREGION}
 
+        {$REGION 'Trim the Source'}
+        LSourceStr := ALTrim(LSourceStr);
+        {$ENDREGION}
+
         {$REGION 'Save the file'}
         if LOriginalSourceStr <> LSourceStr then begin
           if LCreateBackup then begin

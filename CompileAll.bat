@@ -403,11 +403,6 @@ Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALNotificationService" "_Source" "ALNoti
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_Source" "ALFmxFilterEffectsDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALGeoLocationSensor" "_Source" "ALGeoLocationSensorDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLibPhoneNumber" "_Source" "ALLibPhoneNumberDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Client" "_Source" "ALLiveVideoChatClient.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Server" "_Source" "ALLiveVideoChatServer.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALNNTPClient" "_Source" "ALNNTPClientDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPhpRunner" "_Source" "ALPhpRunnerDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPOP3Client" "_Source" "ALPOP3ClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_Source" "ALRTTIDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSMTPClient" "_Source" "ALSMTPClientDemo.dproj" || PAUSE
@@ -415,14 +410,10 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSort
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHttpServer" "_Source" "ALHttpServerDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj" || PAUSE
 if "%DXVCL%"=="" goto DEPLOY_TO_APP_STORE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_Source" "ALDatabaseBenchmark.dproj" || PAUSE
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s >nul 2>&1
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s >nul 2>&1
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_Source" "ALWinHTTPClientDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_Source" "ALWinHTTPWebSocketClientDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_Source" "ALWinInetHTTPClientDemo.dproj" || PAUSE
-
 
 REM -----------------------
 REM Deploy to the App Store

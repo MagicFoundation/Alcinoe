@@ -1394,8 +1394,8 @@ uses
   DesignIntf,
   system.ioutils,
   {$ENDIF}
+  Alcinoe.Url,
   Alcinoe.FMX.Styles,
-  Alcinoe.Http.Client,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.Localization,
   Alcinoe.StringUtils;

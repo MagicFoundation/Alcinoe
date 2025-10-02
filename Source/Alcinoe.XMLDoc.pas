@@ -1,20 +1,22 @@
-{*******************************************************************************
-TALXmlDocument is exactly like Delphi TXmlDocument (Same functions and
-procedures) but 10 to 100 times more faster (see demo) and can work even in
-sax mode !
+{******************************************************************
+TALXmlDocument is a drop-in replacement for Delphi’s TXmlDocument,
+offering the same methods and properties but running 10–100× faster
+(see demo). It also supports SAX mode for efficient streaming.
 
-Use TAlXMLDocument to represent an XML document. TAlXMLDocument can read an
-existing XML document from a file, it can be associated with an in-memory
-string that is the contents of an XML document, or it can create a new, empty
-XML document.
+Use TALXmlDocument to work with XML data. It can:
+ * Load an existing XML document from a file.
+ * Attach to an in-memory string containing XML.
+ * Create a new, empty XML document from scratch.
 
-TALXMLDocument uses it's own internal parser to analyze the XML document.
-*******************************************************************************}
+Unlike Delphi’s implementation, TALXmlDocument relies on its own
+optimized internal parser for high-performance XML processing.
+*******************************************************************}
 unit Alcinoe.XMLDoc;
 
 interface
 
 {$I Alcinoe.inc}
+
 {$SCOPEDENUMS OFF}
 
 uses
@@ -715,16 +717,1188 @@ Function  ALFindXmlNodeByNameAndAttribute(
             Const Recurse: Boolean = False): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default: AnsiString = ''): AnsiString;
 
+function  ALXMLCDataSanitize(const Src: AnsiString): AnsiString;
+function  ALXMLAttributeEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString; overload;
+function  ALXMLAttributeEncode(const Src: String; const UseNumericReference: boolean = True): String; overload;
+function  ALXMLAttributeEncodeDoubleQuoted(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString; overload;
+function  ALXMLAttributeEncodeDoubleQuoted(const Src: String; const UseNumericReference: boolean = True): String; overload;
+function  ALXMLAttributeEncodeSingleQuoted(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString; overload;
+function  ALXMLAttributeEncodeSingleQuoted(const Src: String; const UseNumericReference: boolean = True): String; overload;
+function  ALXMLTextEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString; overload;
+function  ALXMLTextEncode(const Src: String; const UseNumericReference: boolean = True): String; overload;
+function  ALXMLEntityDecode(const Src: AnsiString): AnsiString; overload;
+function  ALXMLEntityDecode(const Src: String): String; overload;
+procedure ALXMLEntityDecodeInPlace(var Src: AnsiString); overload;
+procedure ALXMLEntityDecodeInPlace(var Src: String); overload;
+
 implementation
 
 uses
   System.Math,
   System.Contnrs,
   System.AnsiStrings,
-  Alcinoe.HTML,
-  Alcinoe.HTTP.Client,
+  System.Character,
   Alcinoe.Common,
   Alcinoe.StringUtils;
+
+{*************************************************************}
+function ALXMLCDataSanitize(const Src: AnsiString): AnsiString;
+begin
+  // The preferred approach to using CDATA sections for encoding text that contains the triad "]]>" is to use multiple
+  // CDATA sections by splitting each occurrence of the triad just before the ">". For example, to encode "]]>" one would write:
+  // <![CDATA[]]]]><![CDATA[>]]>
+  // This means that to encode "]]>" in the middle of a CDATA section, replace all occurrences of "]]>" with the following:
+  // ]]]]><![CDATA[>
+  Result := ALStringReplaceA(Src,']]>',']]]]><![CDATA[>',[rfReplaceAll]);
+End;
+
+{**********************************************************************************************************}
+function ALXMLAttributeEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
+
+var
+  Sp, Rp: PAnsiChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      if UseNumericReference then SetLength(Result, Length(Src) * 5)
+      else SetLength(Result, Length(Src) * 6);
+      Rp := PAnsiChar(Result);
+      var Start := PAnsiChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PAnsiChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '"': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#34;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&quot;', Rp, 6);
+               Inc(Rp, 6);
+             end;
+           end;
+      '''': begin
+              if not IsUniqueString then _GenerateUniqueString;
+              if UseNumericReference then begin
+                ALStrMove('&#39;', Rp, 5);
+                Inc(Rp, 5);
+              end
+              else begin
+                ALStrMove('&apos;', Rp, 6);
+                Inc(Rp, 6);
+              end;
+            end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PAnsiChar(Result))
+  else
+    Result := Src;
+end;
+
+{**************************************************************************************************}
+function ALXMLAttributeEncode(const Src: String; const UseNumericReference: boolean = True): String;
+
+var
+  Sp, Rp: PChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      if UseNumericReference then SetLength(Result, Length(Src) * 5)
+      else SetLength(Result, Length(Src) * 6);
+      Rp := PChar(Result);
+      var Start := PChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '"': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#34;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&quot;', Rp, 6);
+               Inc(Rp, 6);
+             end;
+           end;
+      '''': begin
+              if not IsUniqueString then _GenerateUniqueString;
+              if UseNumericReference then begin
+                ALStrMove('&#39;', Rp, 5);
+                Inc(Rp, 5);
+              end
+              else begin
+                ALStrMove('&apos;', Rp, 6);
+                Inc(Rp, 6);
+              end;
+            end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PChar(Result))
+  else
+    Result := Src;
+end;
+
+{**********************************************************************************************************************}
+function ALXMLAttributeEncodeDoubleQuoted(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
+
+var
+  Sp, Rp: PAnsiChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      if UseNumericReference then SetLength(Result, Length(Src) * 5)
+      else SetLength(Result, Length(Src) * 6);
+      Rp := PAnsiChar(Result);
+      var Start := PAnsiChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PAnsiChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '"': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#34;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&quot;', Rp, 6);
+               Inc(Rp, 6);
+             end;
+           end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PAnsiChar(Result))
+  else
+    Result := Src;
+end;
+
+{**************************************************************************************************************}
+function ALXMLAttributeEncodeDoubleQuoted(const Src: String; const UseNumericReference: boolean = True): String;
+
+var
+  Sp, Rp: PChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      if UseNumericReference then SetLength(Result, Length(Src) * 5)
+      else SetLength(Result, Length(Src) * 6);
+      Rp := PChar(Result);
+      var Start := PChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '"': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#34;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&quot;', Rp, 6);
+               Inc(Rp, 6);
+             end;
+           end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PChar(Result))
+  else
+    Result := Src;
+end;
+
+{**********************************************************************************************************************}
+function ALXMLAttributeEncodeSingleQuoted(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
+
+var
+  Sp, Rp: PAnsiChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      if UseNumericReference then SetLength(Result, Length(Src) * 5)
+      else SetLength(Result, Length(Src) * 6);
+      Rp := PAnsiChar(Result);
+      var Start := PAnsiChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PAnsiChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '''': begin
+              if not IsUniqueString then _GenerateUniqueString;
+              if UseNumericReference then begin
+                ALStrMove('&#39;', Rp, 5);
+                Inc(Rp, 5);
+              end
+              else begin
+                ALStrMove('&apos;', Rp, 6);
+                Inc(Rp, 6);
+              end;
+            end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PAnsiChar(Result))
+  else
+    Result := Src;
+end;
+
+{**************************************************************************************************************}
+function ALXMLAttributeEncodeSingleQuoted(const Src: String; const UseNumericReference: boolean = True): String;
+
+var
+  Sp, Rp: PChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      if UseNumericReference then SetLength(Result, Length(Src) * 5)
+      else SetLength(Result, Length(Src) * 6);
+      Rp := PChar(Result);
+      var Start := PChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '''': begin
+              if not IsUniqueString then _GenerateUniqueString;
+              if UseNumericReference then begin
+                ALStrMove('&#39;', Rp, 5);
+                Inc(Rp, 5);
+              end
+              else begin
+                ALStrMove('&apos;', Rp, 6);
+                Inc(Rp, 6);
+              end;
+            end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PChar(Result))
+  else
+    Result := Src;
+end;
+
+{*****************************************************************************************************}
+function ALXMLTextEncode(const Src: AnsiString; const UseNumericReference: boolean = True): AnsiString;
+
+var
+  Sp, Rp: PAnsiChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      SetLength(Result, Length(Src) * 5);
+      Rp := PAnsiChar(Result);
+      var Start := PAnsiChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PAnsiChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PAnsiChar(Result))
+  else
+    Result := Src;
+end;
+
+{*********************************************************************************************}
+function ALXMLTextEncode(const Src: String; const UseNumericReference: boolean = True): String;
+
+var
+  Sp, Rp: PChar;
+  IsUniqueString: Boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      SetLength(Result, Length(Src) * 5);
+      Rp := PChar(Result);
+      var Start := PChar(Src);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
+begin
+  IsUniqueString := False;
+  Sp := PChar(Src);
+  for var I := 1 to Length(Src) do begin
+    case Sp^ of
+      '&': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#38;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&amp;', Rp, 5);
+               Inc(Rp, 5);
+             end;
+           end;
+      '<': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#60;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&lt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      '>': begin
+             if not IsUniqueString then _GenerateUniqueString;
+             if UseNumericReference then begin
+               ALStrMove('&#62;', Rp, 5);
+               Inc(Rp, 5);
+             end
+             else begin
+               ALStrMove('&gt;', Rp, 4);
+               Inc(Rp, 4);
+             end;
+           end;
+      else begin
+        if IsUniqueString then begin
+          Rp^ := Sp^;
+          Inc(Rp);
+        end;
+      end;
+    end;
+    Inc(Sp);
+  end;
+  if IsUniqueString then
+    SetLength(Result, Rp - PChar(Result))
+  else
+    Result := Src;
+end;
+
+{************************************************************}
+function ALXMLEntityDecode(const Src: AnsiString): AnsiString;
+begin
+  result := Src;
+  ALXMLEntityDecodeInPlace(result);
+end;
+
+{****************************************************}
+function ALXMLEntityDecode(const Src: String): String;
+begin
+  result := Src;
+  ALXMLEntityDecodeInPlace(result);
+end;
+
+{******************************************************}
+procedure ALXMLEntityDecodeInPlace(var Src: AnsiString);
+
+var
+  CurrPos: Integer;
+  PResHead: PAnsiChar;
+  PResTail: PAnsiChar;
+  Chars: array[1..10] of AnsiChar;
+  IsUniqueString: boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      var Padding := PResTail - PResHead;
+      UniqueString(Src);
+      PResHead := PAnsiChar(Src);
+      PResTail := PResHead + Padding;
+      IsUniqueString := true;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    function _DecimalToInt(I: Cardinal; Ch: AnsiChar): Cardinal;
+    begin
+      Result := I * 10 + Ord(Ch) - Ord('0');
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    function _HexToInt(I: Cardinal; Ch: AnsiChar): Cardinal;
+    begin
+      case Ch of
+        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+        // Should be unreachable because the caller pre-validates hex digits
+        else raise EALException.Create('Wrong HEX-character found');
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyCurrPosCharToResult;
+    begin
+      if IsUniqueString then PResTail^ := Src[CurrPos];
+      Inc(PResTail);
+      Inc(CurrPos);
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyAnsiCharToResult(ACharInt: Byte; ANewCurrPos: Integer);
+    begin
+      if not IsUniqueString then _GenerateUniqueString;
+      PResTail^ := AnsiChar(ACharInt);
+      Inc(PResTail);
+      CurrPos := ANewCurrPos;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyUnicodeCharToResult(ACharInt: Cardinal; ANewCurrPos: Integer);
+    begin
+      if (ACharInt > 1114111{UnicodeLastChar}) or ((ACharInt >= UCS4Char(Char.MinHighSurrogate)) and (ACharInt <= UCS4Char(Char.MaxLowSurrogate))) then _CopyCurrPosCharToResult
+      else begin
+        if not IsUniqueString then _GenerateUniqueString;
+        var LString := AnsiString(Char.ConvertFromUtf32(ACharInt));
+        for var k := low(LString) to High(LString) do begin
+          PResTail^ := LString[k];
+          Inc(PResTail);
+        end;
+        CurrPos := ANewCurrPos;
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyHexadecimalEntityToResult(AEntityLength: Integer);
+    begin
+      var Res: Cardinal := 0;
+      for var i := 3 to AEntityLength - 1 do  // 3 because Chars[1] = # and Chars[2] = x
+        Res := _HexToInt(Res, Chars[i]);
+      _CopyUnicodeCharToResult(Res, CurrPos + AEntityLength + 1); // ...&#x0af8;...
+                                                                  //    ^CurrPos and AEntityLength=7
+                                                                  // =>
+                                                                  // ...&#x0af8;...
+                                                                  //            ^CurrPos
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyDecimalEntityToResult(AEntityLength: Integer);
+    begin
+      var Res: Cardinal := 0;
+      for var i := 2 to AEntityLength - 1 do // 2 because Chars[1] = #
+        Res := _DecimalToInt(Res, Chars[i]);
+      _CopyUnicodeCharToResult(Res, CurrPos + AEntityLength + 1); // ...&#2345;...
+                                                                  //    ^CurrPos and AEntityLength=6
+                                                                  // =>
+                                                                  // ...&#2345;...
+                                                                  //           ^CurrPos
+    end;
+
+begin
+
+  {Init var}
+  CurrPos := low(Src);
+  var Ln := High(Src);
+  IsUniqueString := false;
+  PResHead := PAnsiChar(Src);
+  PResTail := PResHead;
+
+  {Start loop}
+  while CurrPos <= Ln do begin
+
+    {XML-Entity detected}
+    if Src[CurrPos] = '&' then begin
+
+      {Construct chars array of the XML-entity}
+      var j := CurrPos + 1;
+      var i := 1;
+      while (j <= Ln) and (Src[j] <> ';') and (i <= 10) do begin
+        Chars[i] := Src[j];
+        Inc(i);
+        Inc(j);
+      end;
+
+      {If XML-entity is valid}
+      if (j <= Ln) and (Src[j] = ';') then begin
+
+        {Fill the remaining part of array by #0}
+        while i <= 10 do begin
+          Chars[i] := #0;
+          Inc(i);
+        end;
+
+        {Numeric XML-entity}
+        // see: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+        // It states that both character types like &# or &#x (so decimal or hexadecimal) represent
+        // Universal Character Set/Unicode code points.
+        if Chars[1] = '#' then begin
+
+          {Numeric hexadecimal XML-entity}
+          if Chars[2] = 'x' then begin
+
+            var l := j - CurrPos; {Length of entity}
+
+            // Chars[3] of entity should be in this case in 0..9,a..f,A..F and
+            // all the others must be 0..9,a..f,A..F or #0
+            if (Chars[3]  in ['A'..'F', 'a'..'f', '0'..'9']) and
+               ((L <= 4) or (Chars[4]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 5) or (Chars[5]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 6) or (Chars[6]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 7) or (Chars[7]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 8) or (Chars[8]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 9) or (Chars[9]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 10) or (Chars[10] in ['A'..'F', 'a'..'f', '0'..'9'])) then _CopyHexadecimalEntityToResult(l{Length of entity})
+            else _CopyCurrPosCharToResult;
+
+          end
+
+          {Plain numeric decimal XML-entity}
+          else begin
+
+            var l := j - CurrPos; {Length of entity}
+
+            // Chars[2] of entity should be in this case in 0..9 and
+            // all the others must be 0..9 or #0
+            if (Chars[2]  in ['0'..'9']) and
+               ((L <= 3) or (Chars[3]  in ['0'..'9'])) and
+               ((L <= 4) or (Chars[4]  in ['0'..'9'])) and
+               ((L <= 5) or (Chars[5]  in ['0'..'9'])) and
+               ((L <= 6) or (Chars[6]  in ['0'..'9'])) and
+               ((L <= 7) or (Chars[7]  in ['0'..'9'])) and
+               ((L <= 8) or (Chars[8]  in ['0'..'9'])) and
+               ((L <= 9) or (Chars[9]  in ['0'..'9'])) and
+               ((L <= 10) or (Chars[10] in ['0'..'9'])) then _CopyDecimalEntityToResult(l{Length of entity})
+            else _CopyCurrPosCharToResult;
+
+          end;
+
+        end
+
+        {literal XML-entity}
+        else begin
+
+          if      (Chars[1] = 'q') and
+                  (Chars[2] = 'u') and
+                  (Chars[3] = 'o') and
+                  (Chars[4] = 't') and
+                  (Chars[5] = #0) then _CopyAnsiCharToResult(34, j + 1) // "
+
+          else if (Chars[1] = 'a') and
+                  (Chars[2] = 'p') and
+                  (Chars[3] = 'o') and
+                  (Chars[4] = 's') and
+                  (Chars[5] = #0) then _CopyAnsiCharToResult(39, j + 1) // '
+
+          else if (Chars[1] = 'a') and
+                  (Chars[2] = 'm') and
+                  (Chars[3] = 'p') and
+                  (Chars[4] = #0) then _CopyAnsiCharToResult(38, j + 1) // &
+
+          else if (Chars[1] = 'l') and
+                  (Chars[2] = 't') and
+                  (Chars[3] = #0) then _CopyAnsiCharToResult(60, j + 1) // <
+
+          else if (Chars[1] = 'g') and
+                  (Chars[2] = 't') and
+                  (Chars[3] = #0) then _CopyAnsiCharToResult(62, j + 1) // >
+
+          else _CopyCurrPosCharToResult;
+
+        end;
+
+      end
+      else _CopyCurrPosCharToResult;
+
+    end
+    else _CopyCurrPosCharToResult;
+
+  end;
+
+  {Change the length the string only if some modifications was done.
+   Else we don't need to do anything.}
+  if PResTail - PResHead <> length(Src) then
+    SetLength(Src, PResTail - PResHead);
+
+end;
+
+{**************************}
+{$WARN WIDECHAR_REDUCED OFF}
+procedure ALXMLEntityDecodeInPlace(var Src: String);
+
+var
+  CurrPos: Integer;
+  PResHead: PChar;
+  PResTail: PChar;
+  Chars: array[1..10] of Char;
+  IsUniqueString: boolean;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      var Padding := PResTail - PResHead;
+      UniqueString(Src);
+      PResHead := PChar(Src);
+      PResTail := PResHead + Padding;
+      IsUniqueString := true;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    function _DecimalToInt(I: Cardinal; Ch: Char): Cardinal;
+    begin
+      Result := I * 10 + Ord(Ch) - Ord('0');
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    function _HexToInt(I: Cardinal; Ch: Char): Cardinal;
+    begin
+      case Ch of
+        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+        // Should be unreachable because the caller pre-validates hex digits
+        else raise EALException.Create('Wrong HEX-character found');
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyCurrPosCharToResult;
+    begin
+      if IsUniqueString then PResTail^ := Src[CurrPos];
+      Inc(PResTail);
+      Inc(CurrPos);
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyCharToResult(ACharInt: Cardinal; ANewCurrPos: Integer);
+    begin
+      if not IsUniqueString then _GenerateUniqueString;
+      PResTail^ := Char(ACharInt);
+      Inc(PResTail);
+      CurrPos := ANewCurrPos;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyUnicodeCharToResult(ACharInt: Cardinal; ANewCurrPos: Integer);
+    begin
+      if (ACharInt > 1114111{UnicodeLastChar}) or ((ACharInt >= UCS4Char(Char.MinHighSurrogate)) and (ACharInt <= UCS4Char(Char.MaxLowSurrogate))) then _CopyCurrPosCharToResult
+      else begin
+        if not IsUniqueString then _GenerateUniqueString;
+        var LString := Char.ConvertFromUtf32(ACharInt);
+        for var k := low(LString) to High(LString) do begin
+          PResTail^ := LString[k];
+          Inc(PResTail);
+        end;
+        CurrPos := ANewCurrPos;
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyHexadecimalEntityToResult(AEntityLength: Integer);
+    begin
+      var Res: Cardinal := 0;
+      for var i := 3 to AEntityLength - 1 do  // 3 because Chars[1] = # and Chars[2] = x
+        Res := _HexToInt(Res, Chars[i]);
+      _CopyUnicodeCharToResult(Res, CurrPos + AEntityLength + 1); // ...&#x0af8;...
+                                                                  //    ^CurrPos and AEntityLength=7
+                                                                  // =>
+                                                                  // ...&#x0af8;...
+                                                                  //            ^CurrPos
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyDecimalEntityToResult(AEntityLength: Integer);
+    begin
+      var Res: Cardinal := 0;
+      for var i := 2 to AEntityLength - 1 do // 2 because Chars[1] = #
+        Res := _DecimalToInt(Res, Chars[i]);
+      _CopyUnicodeCharToResult(Res, CurrPos + AEntityLength + 1); // ...&#2345;...
+                                                                  //    ^CurrPos and AEntityLength=6
+                                                                  // =>
+                                                                  // ...&#2345;...
+                                                                  //           ^CurrPos
+    end;
+
+begin
+
+  {Init var}
+  CurrPos := low(Src);
+  var Ln := High(Src);
+  IsUniqueString := false;
+  PResHead := PChar(Src);
+  PResTail := PResHead;
+
+  {Start loop}
+  while CurrPos <= Ln do begin
+
+    {XML-Entity detected}
+    if Src[CurrPos] = '&' then begin
+
+      {Construct chars array of the XML-entity}
+      var j := CurrPos + 1;
+      var i := 1;
+      while (j <= Ln) and (Src[j] <> ';') and (i <= 10) do begin
+        Chars[i] := Src[j];
+        Inc(i);
+        Inc(j);
+      end;
+
+      {If XML-entity is valid}
+      if (j <= Ln) and (Src[j] = ';') then begin
+
+        {Fill the remaining part of array by #0}
+        while i <= 10 do begin
+          Chars[i] := #0;
+          Inc(i);
+        end;
+
+        {Numeric XML-entity}
+        // see: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+        // It states that both character types like &# or &#x (so decimal or hexadecimal) represent
+        // Universal Character Set/Unicode code points.
+        if Chars[1] = '#' then begin
+
+          {Numeric hexadecimal XML-entity}
+          if Chars[2] = 'x' then begin
+
+            var l := j - CurrPos; {Length of entity}
+
+            // Chars[3] of entity should be in this case in 0..9,a..f,A..F and
+            // all the others must be 0..9,a..f,A..F or #0
+            if (Chars[3]  in ['A'..'F', 'a'..'f', '0'..'9']) and
+               ((L <= 4) or (Chars[4]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 5) or (Chars[5]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 6) or (Chars[6]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 7) or (Chars[7]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 8) or (Chars[8]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 9) or (Chars[9]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 10) or (Chars[10] in ['A'..'F', 'a'..'f', '0'..'9'])) then _CopyHexadecimalEntityToResult(l{Length of entity})
+            else _CopyCurrPosCharToResult;
+
+          end
+
+          {Plain numeric decimal XML-entity}
+          else begin
+
+            var l := j - CurrPos; {Length of entity}
+
+            // Chars[2] of entity should be in this case in 0..9 and
+            // all the others must be 0..9 or #0
+            if (Chars[2]  in ['0'..'9']) and
+               ((L <= 3) or (Chars[3]  in ['0'..'9'])) and
+               ((L <= 4) or (Chars[4]  in ['0'..'9'])) and
+               ((L <= 5) or (Chars[5]  in ['0'..'9'])) and
+               ((L <= 6) or (Chars[6]  in ['0'..'9'])) and
+               ((L <= 7) or (Chars[7]  in ['0'..'9'])) and
+               ((L <= 8) or (Chars[8]  in ['0'..'9'])) and
+               ((L <= 9) or (Chars[9]  in ['0'..'9'])) and
+               ((L <= 10) or (Chars[10] in ['0'..'9'])) then _CopyDecimalEntityToResult(l{Length of entity})
+            else _CopyCurrPosCharToResult;
+
+          end;
+
+        end
+
+        {literal XML-entity}
+        else begin
+
+          if      (Chars[1] = 'q') and
+                  (Chars[2] = 'u') and
+                  (Chars[3] = 'o') and
+                  (Chars[4] = 't') and
+                  (Chars[5] = #0) then _CopyCharToResult(34, j + 1) // "
+
+          else if (Chars[1] = 'a') and
+                  (Chars[2] = 'p') and
+                  (Chars[3] = 'o') and
+                  (Chars[4] = 's') and
+                  (Chars[5] = #0) then _CopyCharToResult(39, j + 1) // '
+
+          else if (Chars[1] = 'a') and
+                  (Chars[2] = 'm') and
+                  (Chars[3] = 'p') and
+                  (Chars[4] = #0) then _CopyCharToResult(38, j + 1) // &
+
+          else if (Chars[1] = 'l') and
+                  (Chars[2] = 't') and
+                  (Chars[3] = #0) then _CopyCharToResult(60, j + 1) // <
+
+          else if (Chars[1] = 'g') and
+                  (Chars[2] = 't') and
+                  (Chars[3] = #0) then _CopyCharToResult(62, j + 1) // >
+
+          else _CopyCurrPosCharToResult;
+
+        end;
+
+      end
+      else _CopyCurrPosCharToResult;
+
+    end
+    else _CopyCurrPosCharToResult;
+
+  end;
+
+  {Change the length the string only if some modifications was done.
+   Else we don't need to do anything.}
+  if PResTail - PResHead <> length(Src) then
+    SetLength(Src, PResTail - PResHead);
+
+end;
+{$WARN WIDECHAR_REDUCED ON}
 
 {**********************************}
 {Raises an EALXMLDocError exception.
@@ -1241,36 +2415,14 @@ Var buffer: AnsiString;
       LstParams.Clear;
       If (LContent <> '') then begin
         ALExtractHeaderFields(
-          [' ', #9, #13, #10],    //Separators
-          [' ', #9, #13, #10],    //WhiteSpace
-          ['"', ''''],            //Quotes
-          PAnsiChar(LContent),    //Content
-          lstParams,              //Strings
-          False,                  //Decode
-          False);                 //StripQuotes
-        I := 0;
-        While I <= LstParams.Count - 1 do begin
+          [' ', #9, #13, #10],    // const ASeparators: TSysCharSet;
+          [' ', #9, #13, #10],    // const AWhiteSpace: TSysCharSet;
+          ['"', ''''],            // const AQuoteChars: TSysCharSet;
+          PAnsiChar(LContent),    // const AContent: PAnsiChar;
+          lstParams);             // const AStrings: TALStringsA;
+        for I := 0 to LstParams.Count - 1 do begin
           LContent := LstParams.ValueFromIndex[I];
           LContentLn := length(LContent);
-          //handle case like name= "value" / name ="value" / name = "value"
-          //ALExtractHeaderFields will make 2 lines:
-          //  name=
-          //  "value"
-          //instead of one line
-          //  name="value"
-          if (LContentLn = 0) and (i < LstParams.Count - 1) then begin // name= "value"
-            LContent := LstParams[I+1];
-            if LContent = '=' then begin // name = "value"
-              LstParams.Delete(i+1);
-              if i >= LstParams.Count - 1 then ALXmlDocError(CALXmlParseError);
-              LContent := LstParams[I+1];
-            end
-            else if (LContent <> '') and (LContent[low(LContent)] = '=') then // name ="value"
-              delete(LContent,1,1);
-            LContentLn := length(LContent);
-            LstParams[I] := LstParams.Names[I] + '=' + LContent;
-            LstParams.Delete(i+1);
-          end;
           if (LContentLn < 2) or
              (LContent[1] <> LContent[LContentLn]) or
              (not (LContent[1] in ['''','"'])) then ALXmlDocError(CALXmlParseError)
@@ -1281,7 +2433,6 @@ Var buffer: AnsiString;
             end
             else LstParams[I] := LstParams.Names[I] + '=' + alCopyStr(LContent,2,LContentLn-2)
           end;
-          inc(i);
         end;
 
         if NotSaxMode then

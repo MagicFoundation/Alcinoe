@@ -363,7 +363,7 @@ Uses
   Alcinoe.Common,
   Alcinoe.Cipher,
   Alcinoe.StringUtils,
-  Alcinoe.WinApi.Common;
+  Alcinoe.WinApi.Windows;
 
 {***********************************************************************************}
 constructor EALSqlite3Error.Create(const aErrorMsg: AnsiString; aErrorCode: Integer);

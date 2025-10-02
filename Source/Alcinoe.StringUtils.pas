@@ -81,7 +81,9 @@ type
     FPosition: Integer;
     procedure SetDataString(const AValue: AnsiString);
   protected
+    function GetSize: Int64; override;
     procedure SetSize(NewSize: Longint); override;
+    procedure SetSize(const NewSize: Int64); override;
   public
     constructor Create(const AString: AnsiString);
     procedure LoadFromStream(Stream: TStream);
@@ -132,6 +134,82 @@ type
 
 function  ALMatchesMaskA(const Filename, Mask: AnsiString): Boolean;
 function  ALMatchesMaskW(const Filename, Mask: String): Boolean; inline;
+
+type
+
+  TALStringBuilderA = class
+  private const
+    DefaultCapacity = $10;
+    LineBreak: AnsiString = sLineBreak;
+  private
+    function GetCapacity: Integer; inline;
+    procedure SetCapacity(const AValue: Integer);
+    function GetLength: Integer; inline;
+    procedure SetLength(const AValue: Integer);
+    function GetMaxCapacity: Integer; inline;
+    procedure ExpandCapacity;
+  protected
+    FMaxCapacity: Integer;
+    FLength: Integer;
+    FData: AnsiString;
+  public
+    constructor Create; overload;
+    constructor Create(const ACapacity: Integer); overload;
+    constructor Create(const AValue: AnsiString); overload;
+    constructor Create(const ACapacity: Integer; const AMaxCapacity: Integer); overload;
+    constructor Create(const AValue: AnsiString; const ACapacity: Integer); overload;
+    constructor Create(const AValue: AnsiString; const AStartIndex: Integer; const ALength: Integer; const ACapacity: Integer); overload;
+    procedure Clear;
+    function EnsureCapacity(const ACapacity: Integer): Integer;
+    function Append(const AValue: AnsiChar): TALStringBuilderA; overload;
+    function Append(const AValue: AnsiString): TALStringBuilderA; overload;
+    function Append(const AValue: AnsiChar; const ARepeatCount: Integer): TALStringBuilderA; overload;
+    function Append(const AValue: AnsiString; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderA; overload;
+    function AppendLine: TALStringBuilderA; overload; inline;
+    function AppendLine(const AValue: AnsiString): TALStringBuilderA; overload;
+    function ToString: AnsiString; reintroduce; overload;
+    function ToString(const AUpdateCapacity: Boolean): AnsiString; reintroduce; overload;
+    property Capacity: Integer read GetCapacity write SetCapacity;
+    property Length: Integer read GetLength write SetLength;
+    property MaxCapacity: Integer read GetMaxCapacity;
+  end;
+
+  TALStringBuilderW = class
+  private const
+    DefaultCapacity = $10;
+    LineBreak: string = sLineBreak;
+  private
+    function GetCapacity: Integer; inline;
+    procedure SetCapacity(const AValue: Integer);
+    function GetLength: Integer; inline;
+    procedure SetLength(const AValue: Integer);
+    function GetMaxCapacity: Integer; inline;
+    procedure ExpandCapacity;
+  protected
+    FMaxCapacity: Integer;
+    FLength: Integer;
+    FData: string;
+  public
+    constructor Create; overload;
+    constructor Create(const ACapacity: Integer); overload;
+    constructor Create(const AValue: string); overload;
+    constructor Create(const ACapacity: Integer; const AMaxCapacity: Integer); overload;
+    constructor Create(const AValue: string; const ACapacity: Integer); overload;
+    constructor Create(const AValue: string; const AStartIndex: Integer; const ALength: Integer; const ACapacity: Integer); overload;
+    procedure Clear;
+    function EnsureCapacity(const ACapacity: Integer): Integer;
+    function Append(const AValue: Char): TALStringBuilderW; overload;
+    function Append(const AValue: string): TALStringBuilderW; overload;
+    function Append(const AValue: Char; const ARepeatCount: Integer): TALStringBuilderW; overload;
+    function Append(const AValue: string; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderW; overload;
+    function AppendLine: TALStringBuilderW; overload; inline;
+    function AppendLine(const AValue: string): TALStringBuilderW; overload;
+    function ToString: string; overload; override;
+    function ToString(const AUpdateCapacity: Boolean): string; reintroduce; overload;
+    property Capacity: Integer read GetCapacity write SetCapacity;
+    property Length: Integer read GetLength write SetLength;
+    property MaxCapacity: Integer read GetMaxCapacity;
+  end;
 
 Function  ALNewGUIDBytes: TBytes;
 function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
@@ -507,41 +585,32 @@ Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 {$IF defined(MSWINDOWS)}
 Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
 {$ENDIF}
-function  ALExtractExpressionA(
-            const S: AnsiString;
-            const OpenChar, CloseChar: AnsiChar; // ex: '(' and ')'
-            Const QuoteChars: Array of ansiChar; // ex: ['''', '"']
-            Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
-            var StartPos: integer;
-            var EndPos: integer): boolean;
-function  ALHTTPEncode(const AStr: AnsiString): AnsiString; overload;
-function  ALHTTPEncode(const AStr: String): String; overload;
-function  ALHTTPDecode(const AStr: AnsiString): AnsiString; overload;
-function  ALHTTPDecode(const AStr: String): String; overload;
+function  ALPercentEncode(const AStr: AnsiString; const ASafeChars: TSysCharSet; Const ASpacesAsPlus: Boolean = False): AnsiString; overload;
+function  ALPercentEncode(const AStr: String; const ASafeChars: TSysCharSet; Const ASpacesAsPlus: Boolean = False): String; overload;
+function  ALPercentDecode(const AStr: AnsiString; const APlusAsSpaces: Boolean = False): AnsiString; overload;
+function  ALPercentDecode(const AStr: String; const APlusAsSpaces: Boolean = False): String; overload;
+procedure ALPercentDecodeInPlace(var AStr: AnsiString; const APlusAsSpaces: Boolean = False); overload;
+procedure ALPercentDecodeInPlace(var AStr: String; const APlusAsSpaces: Boolean = False); overload;
 procedure ALExtractHeaderFields(
-            Separators,
-            WhiteSpace,
-            Quotes: TSysCharSet;
-            Content: PAnsiChar;
-            Strings: TALStringsA;
-            HttpDecode: Boolean;
-            StripQuotes: Boolean = False);
-procedure ALExtractHeaderFieldsWithQuoteEscaped(
-            Separators,
-            WhiteSpace,
-            Quotes: TSysCharSet;
-            Content: PAnsiChar;
-            Strings: TALStringsA;
-            HttpDecode: Boolean;
-            StripQuotes: Boolean = False); overload;
-procedure ALExtractHeaderFieldsWithQuoteEscaped(
-            Separators,
-            WhiteSpace,
-            Quotes: TSysCharSet;
-            Content: PChar;
-            Strings: TALStringsW;
-            HttpDecode: Boolean;
-            StripQuotes: Boolean = False); overload;
+            const ASeparators: TSysCharSet;
+            const AWhiteSpace: TSysCharSet;
+            const AQuoteChars: TSysCharSet;
+            const AContent: PAnsiChar;
+            const AStrings: TALStringsA;
+            const AStripQuotes: Boolean = False;
+            const AQuoteDoublingEscape: Boolean = False;
+            const AEscapeChar: AnsiChar = #0;
+            const ANameValueSeparator: AnsiChar = '='); overload;
+procedure ALExtractHeaderFields(
+            const ASeparators: TSysCharSet;
+            const AWhiteSpace: TSysCharSet;
+            const AQuoteChars: TSysCharSet;
+            const AContent: PChar;
+            const AStrings: TALStringsW;
+            const AStripQuotes: Boolean = False;
+            const AQuoteDoublingEscape: Boolean = False;
+            const AEscapeChar: Char = #0;
+            const ANameValueSeparator: Char = '='); overload;
 
 type
 
@@ -591,7 +660,6 @@ type
 function ALFastTagReplacePrecompileA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            PrecompileProc: TALHandleTagPrecompileFunctA;
-           StripParamQuotes: Boolean;
            Context: Pointer;
            TagsContainer: TObjectList;
            Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
@@ -599,7 +667,6 @@ function ALFastTagReplaceA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            ReplaceProc: TALHandleTagFunctA;
            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-           StripParamQuotes: Boolean;
            Flags: TReplaceFlags;
            Context: Pointer;
            TagParamsClass: TALTagParamsClassA;
@@ -607,14 +674,12 @@ function ALFastTagReplaceA(
 function  ALFastTagReplaceA(
             const SourceString, TagStart, TagEnd: AnsiString;
             ReplaceProc: TALHandleTagFunctA;
-            StripParamQuotes: Boolean;
             Context: Pointer;
             Const flags: TReplaceFlags=[rfreplaceall];
             const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 function  ALFastTagReplaceA(
             const SourceString, TagStart, TagEnd: AnsiString;
             ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-            StripParamQuotes: Boolean;
             Context: Pointer;
             Const flags: TReplaceFlags=[rfreplaceall];
             const TagReplaceProcResult: Boolean = False): AnsiString; overload;
@@ -624,7 +689,6 @@ function  ALFastTagReplaceA(
             const Flags: TReplaceFlags=[rfreplaceall]): AnsiString; overload;
 function  ALExtractTagParamsA(
             Const SourceString, TagStart, TagEnd: AnsiString;
-            StripParamQuotes: Boolean;
             TagParams: TALStringsA;
             IgnoreCase: Boolean): Boolean;
 Procedure ALSplitTextAndTagA(
@@ -741,7 +805,19 @@ begin
 end;
 
 {***************************************************}
+function TALStringStreamA.GetSize: Int64;
+begin
+  Result := length(FDataString);
+end;
+
+{***************************************************}
 procedure TALStringStreamA.SetSize(NewSize: Longint);
+begin
+  SetSize(Int64(NewSize));
+end;
+
+{*******************************************************}
+procedure TALStringStreamA.SetSize(const NewSize: Int64);
 begin
   SetLength(FDataString, NewSize);
   if FPosition > NewSize then FPosition := NewSize;
@@ -1154,6 +1230,462 @@ end;
 function ALMatchesMaskW(const Filename, Mask: String): Boolean;
 begin
   result := System.Masks.MatchesMask(Filename, Mask);
+end;
+
+{***************************}
+constructor TALStringBuilderA.Create;
+begin
+  inherited Create;
+  FMaxCapacity := MaxInt;
+  FLength := 0;
+  Capacity := DefaultCapacity;
+end;
+
+{***************************}
+constructor TALStringBuilderA.Create(const ACapacity: Integer);
+begin
+  inherited Create;
+  FMaxCapacity := MaxInt;
+  FLength := 0;
+  Capacity := ACapacity;
+end;
+
+{***************************}
+constructor TALStringBuilderA.Create(const AValue: AnsiString);
+begin
+  Create;
+  Append(AValue);
+end;
+
+{***************************}
+constructor TALStringBuilderA.Create(const ACapacity: Integer; const AMaxCapacity: Integer);
+begin
+  if AMaxCapacity <= 0 then
+    raise ERangeError.CreateRes(@SRangeError);
+  if ACapacity > AMaxCapacity then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [ACapacity]);
+  Create(ACapacity);
+  FMaxCapacity := AMaxCapacity;
+end;
+
+{***************************}
+constructor TALStringBuilderA.Create(const AValue: AnsiString; const ACapacity: Integer);
+begin
+  inherited Create;
+  FMaxCapacity := MaxInt;
+  FLength := 0;
+  Capacity := ACapacity;
+  Append(AValue);
+end;
+
+{***************************}
+constructor TALStringBuilderA.Create(const AValue: AnsiString; const AStartIndex: Integer; const ALength: Integer; const ACapacity: Integer);
+begin
+  Create(ALCopyStr(AValue, AStartIndex, Alength), ACapacity);
+end;
+
+{***************************}
+function TALStringBuilderA.GetCapacity: Integer;
+begin
+  Result := System.Length(FData);
+end;
+
+{***************************}
+procedure TALStringBuilderA.SetCapacity(const AValue: Integer);
+begin
+  if (AValue < Length) or (AValue > FMaxCapacity) then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [AValue]);
+  System.SetLength(FData, AValue);
+end;
+
+{***************************}
+function TALStringBuilderA.GetLength: Integer;
+begin
+  Result := FLength;
+end;
+
+{***************************}
+procedure TALStringBuilderA.SetLength(const AValue: Integer);
+begin
+  if AValue < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['AValue']); // DO NOT LOCALIZE
+  if AValue > MaxCapacity then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [AValue]);
+
+  var LOldLength := FLength;
+  try
+    FLength := AValue;
+    if FLength > Capacity then
+      ExpandCapacity;
+  except
+    on E: EOutOfMemory do begin
+      FLength := LOldLength;
+      raise;
+    end;
+  end;
+end;
+
+{***************************}
+function TALStringBuilderA.GetMaxCapacity: Integer;
+begin
+  Result := FMaxCapacity;
+end;
+
+{***************************}
+procedure TALStringBuilderA.ExpandCapacity;
+begin
+  var LNewCapacity := (Capacity * 3) div 2;
+  if Length > LNewCapacity then
+    LNewCapacity := Length * 2; // this line may overflow NewCapacity to a negative value
+  if LNewCapacity > MaxCapacity then
+    LNewCapacity := MaxCapacity;
+  if LNewCapacity < 0 then // if NewCapacity has been overflowed
+    LNewCapacity := Length;
+  Capacity := LNewCapacity;
+end;
+
+{***************************}
+procedure TALStringBuilderA.Clear;
+begin
+  Length := 0;
+  Capacity := DefaultCapacity;
+end;
+
+{***************************}
+function TALStringBuilderA.EnsureCapacity(const ACapacity: Integer): Integer;
+begin
+  if ACapacity < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['ACapacity']); // DO NOT LOCALIZE
+  if ACapacity > MaxCapacity then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [ACapacity]);
+
+  if Capacity < ACapacity then
+    Capacity := ACapacity;
+
+  Result := Capacity;
+end;
+
+{***************************}
+{$ZEROBASEDSTRINGS OFF}
+function TALStringBuilderA.Append(const AValue: AnsiChar): TALStringBuilderA;
+begin
+  FLength := Length + 1;
+  if Length > Capacity then
+    ExpandCapacity;
+  FData[Length] := AValue;
+  Result := Self;
+end;
+{$IF defined(ALZEROBASEDSTRINGSON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{***************************}
+function TALStringBuilderA.Append(const AValue: AnsiString): TALStringBuilderA;
+begin
+  var LDelta := System.Length(AValue);
+  if LDelta <> 0 then begin
+    var LOldLength := Length;
+    FLength := Length + LDelta;
+    if Length > Capacity then
+      ExpandCapacity;
+    ALMove(Pointer(AValue)^, (PAnsiChar(Pointer(FData)) + LOldLength)^, LDelta * SizeOf(AnsiChar));
+  end;
+  Result := self;
+end;
+
+{***************************}
+function TALStringBuilderA.Append(const AValue: AnsiChar; const ARepeatCount: Integer): TALStringBuilderA;
+begin
+  if ARepeatCount > 0 then begin
+    FLength := Length + ARepeatCount;
+    if Length > Capacity then
+      ExpandCapacity;
+    var P: PAnsiChar := PAnsiChar(Pointer(FData)) + Length - ARepeatCount;
+    for var I := 1 to ARepeatCount do begin
+      P^ := AValue;
+      Inc(P);
+    end;
+  end;
+  Result := Self;
+end;
+
+{***************************}
+{$ZEROBASEDSTRINGS OFF}
+function TALStringBuilderA.Append(const AValue: AnsiString; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderA;
+begin
+  if (AStartIndex < low(AValue)) or (AStartIndex > high(AValue)) then
+    raise ERangeError.CreateFmt(SByteIndexOutOfBounds, [AStartIndex]); // DO NOT LOCALIZE
+  var LCount := Min(ACount, System.Length(AValue) - AStartIndex + 1);
+  if LCount > 0 then begin
+    var LOldLength := Length;
+    Length := Length + LCount;
+    ALMove(AValue[AStartIndex], FData[LOldLength + 1], LCount * SizeOf(AnsiChar));
+  end;
+  Result := Self;
+end;
+{$IF defined(ALZEROBASEDSTRINGSON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{***************************}
+function TALStringBuilderA.AppendLine: TALStringBuilderA;
+begin
+  Result := Append(LineBreak);
+end;
+
+{***************************}
+function TALStringBuilderA.AppendLine(const AValue: AnsiString): TALStringBuilderA;
+begin
+  Result := Append(AValue).AppendLine;
+end;
+
+{***************************}
+function TALStringBuilderA.ToString: AnsiString;
+begin
+  Result := ToString(False);
+end;
+
+{***************************}
+function TALStringBuilderA.ToString(const AUpdateCapacity: Boolean): AnsiString;
+begin
+  if Length = Capacity then begin
+    Result := FData;
+    UniqueString(Result);
+  end
+  else if AUpdateCapacity then begin
+    System.SetLength(FData, Length);
+    Result := FData;
+  end
+  else
+    Result := ALCopyStr(FData, 1, Length);
+end;
+
+{***************************}
+constructor TALStringBuilderW.Create;
+begin
+  inherited Create;
+  FMaxCapacity := MaxInt;
+  FLength := 0;
+  Capacity := DefaultCapacity;
+end;
+
+{***************************}
+constructor TALStringBuilderW.Create(const ACapacity: Integer);
+begin
+  inherited Create;
+  FMaxCapacity := MaxInt;
+  FLength := 0;
+  Capacity := ACapacity;
+end;
+
+{***************************}
+constructor TALStringBuilderW.Create(const AValue: string);
+begin
+  Create;
+  Append(AValue);
+end;
+
+{***************************}
+constructor TALStringBuilderW.Create(const ACapacity: Integer; const AMaxCapacity: Integer);
+begin
+  if AMaxCapacity <= 0 then
+    raise ERangeError.CreateRes(@SRangeError);
+  if ACapacity > AMaxCapacity then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [ACapacity]);
+  Create(ACapacity);
+  FMaxCapacity := AMaxCapacity;
+end;
+
+{***************************}
+constructor TALStringBuilderW.Create(const AValue: string; const ACapacity: Integer);
+begin
+  inherited Create;
+  FMaxCapacity := MaxInt;
+  FLength := 0;
+  Capacity := ACapacity;
+  Append(AValue);
+end;
+
+{***************************}
+constructor TALStringBuilderW.Create(const AValue: string; const AStartIndex: Integer; const ALength: Integer; const ACapacity: Integer);
+begin
+  Create(ALCopyStr(AValue, AStartIndex, Alength), ACapacity);
+end;
+
+{***************************}
+function TALStringBuilderW.GetCapacity: Integer;
+begin
+  Result := System.Length(FData);
+end;
+
+{***************************}
+procedure TALStringBuilderW.SetCapacity(const AValue: Integer);
+begin
+  if (AValue < Length) or (AValue > FMaxCapacity) then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [AValue]);
+  System.SetLength(FData, AValue);
+end;
+
+{***************************}
+function TALStringBuilderW.GetLength: Integer;
+begin
+  Result := FLength;
+end;
+
+{***************************}
+procedure TALStringBuilderW.SetLength(const AValue: Integer);
+begin
+  if AValue < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['AValue']); // DO NOT LOCALIZE
+  if AValue > MaxCapacity then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [AValue]);
+
+  var LOldLength := FLength;
+  try
+    FLength := AValue;
+    if FLength > Capacity then
+      ExpandCapacity;
+  except
+    on E: EOutOfMemory do begin
+      FLength := LOldLength;
+      raise;
+    end;
+  end;
+end;
+
+{***************************}
+function TALStringBuilderW.GetMaxCapacity: Integer;
+begin
+  Result := FMaxCapacity;
+end;
+
+{***************************}
+procedure TALStringBuilderW.ExpandCapacity;
+begin
+  var LNewCapacity := (Capacity * 3) div 2;
+  if Length > LNewCapacity then
+    LNewCapacity := Length * 2; // this line may overflow NewCapacity to a negative value
+  if LNewCapacity > MaxCapacity then
+    LNewCapacity := MaxCapacity;
+  if LNewCapacity < 0 then // if NewCapacity has been overflowed
+    LNewCapacity := Length;
+  Capacity := LNewCapacity;
+end;
+
+{***************************}
+procedure TALStringBuilderW.Clear;
+begin
+  Length := 0;
+  Capacity := DefaultCapacity;
+end;
+
+{***************************}
+function TALStringBuilderW.EnsureCapacity(const ACapacity: Integer): Integer;
+begin
+  if ACapacity < 0 then
+    raise ERangeError.CreateResFmt(@SParamIsNegative, ['ACapacity']); // DO NOT LOCALIZE
+  if ACapacity > MaxCapacity then
+    raise ERangeError.CreateResFmt(@SListCapacityError, [ACapacity]);
+
+  if Capacity < ACapacity then
+    Capacity := ACapacity;
+
+  Result := Capacity;
+end;
+
+{***************************}
+{$ZEROBASEDSTRINGS OFF}
+function TALStringBuilderW.Append(const AValue: Char): TALStringBuilderW;
+begin
+  FLength := Length + 1;
+  if Length > Capacity then
+    ExpandCapacity;
+  FData[Length] := AValue;
+  Result := Self;
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{***************************}
+function TALStringBuilderW.Append(const AValue: string): TALStringBuilderW;
+begin
+  var LDelta := System.Length(AValue);
+  if LDelta <> 0 then begin
+    var LOldLength := Length;
+    FLength := Length + LDelta;
+    if Length > Capacity then
+      ExpandCapacity;
+    ALMove(Pointer(AValue)^, (PChar(Pointer(FData)) + LOldLength)^, LDelta * SizeOf(Char));
+  end;
+  Result := self;
+end;
+
+{***************************}
+function TALStringBuilderW.Append(const AValue: Char; const ARepeatCount: Integer): TALStringBuilderW;
+begin
+  if ARepeatCount > 0 then begin
+    FLength := Length + ARepeatCount;
+    if Length > Capacity then
+      ExpandCapacity;
+    var P: PChar := PChar(Pointer(FData)) + Length - ARepeatCount;
+    for var I := 1 to ARepeatCount do begin
+      P^ := AValue;
+      Inc(P);
+    end;
+  end;
+  Result := Self;
+end;
+
+{***************************}
+{$ZEROBASEDSTRINGS OFF}
+function TALStringBuilderW.Append(const AValue: string; const AStartIndex: Integer; const ACount: Integer): TALStringBuilderW;
+begin
+  if (AStartIndex < low(AValue)) or (AStartIndex > high(AValue)) then
+    raise ERangeError.CreateFmt(SByteIndexOutOfBounds, [AStartIndex]); // DO NOT LOCALIZE
+  var LCount := Min(ACount, System.Length(AValue) - AStartIndex + 1);
+  if LCount > 0 then begin
+    var LOldLength := Length;
+    Length := Length + LCount;
+    ALMove(AValue[AStartIndex], FData[LOldLength + 1], LCount * SizeOf(Char));
+  end;
+  Result := Self;
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{***************************}
+function TALStringBuilderW.AppendLine: TALStringBuilderW;
+begin
+  Result := Append(LineBreak);
+end;
+
+{***************************}
+function TALStringBuilderW.AppendLine(const AValue: string): TALStringBuilderW;
+begin
+  Result := Append(AValue).AppendLine;
+end;
+
+{***************************}
+function TALStringBuilderW.ToString: string;
+begin
+  Result := ToString(False);
+end;
+
+{***************************}
+function TALStringBuilderW.ToString(const AUpdateCapacity: Boolean): string;
+begin
+  if Length = Capacity then begin
+    Result := FData;
+    UniqueString(Result);
+  end
+  else if AUpdateCapacity then begin
+    System.SetLength(FData, Length);
+    Result := FData;
+  end
+  else
+    Result := ALCopyStr(FData, 1, Length);
 end;
 
 {*************************************}
@@ -7812,7 +8344,7 @@ begin
     Exit;
   end;
 
-  if aLength > LSourceStringLn - (aStart - 1) then aLength := LSourceStringLn - (aStart-1);
+  aLength := Min(aLength, LSourceStringLn - (aStart - 1));
 
   SetLength(Result,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
   ALMove(Pbyte(aSourceString)[aStart-1], pointer(Result)^, aLength); // pointer(Result)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
@@ -7832,7 +8364,7 @@ begin
     Exit;
   end;
 
-  if aLength > LSourceStringLn - (aStart - 1) then aLength := LSourceStringLn - (aStart-1);
+  aLength := Min(aLength, LSourceStringLn - (aStart - 1));
 
   SetLength(Result,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
   ALMove(PChar(aSourceString)[aStart-1], pointer(Result)^, aLength*SizeOf(Char)); // pointer(Result)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
@@ -7852,7 +8384,7 @@ begin
     Exit;
   end;
 
-  if aLength > LSourceStringLn - (aStart - 1) then aLength := LSourceStringLn - (aStart-1);
+  aLength := Min(aLength, LSourceStringLn - (aStart - 1));
 
   SetLength(aDestString,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
   ALMove(Pbyte(aSourceString)[aStart-1], pointer(aDestString)^, aLength);  // pointer(aDestString)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
@@ -7872,7 +8404,7 @@ begin
     Exit;
   end;
 
-  if aLength > LSourceStringLn - (aStart - 1) then aLength := LSourceStringLn - (aStart-1);
+  aLength := Min(aLength, LSourceStringLn - (aStart - 1));
 
   SetLength(aDestString,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
   ALMove(PChar(aSourceString)[aStart-1], pointer(aDestString)^, aLength*SizeOf(Char));  // pointer(aDestString)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
@@ -9408,542 +9940,540 @@ begin
 end;
 {$ENDIF}
 
-{****************************}
-function ALExtractExpressionA(
-           const S: AnsiString;
-           const OpenChar, CloseChar: AnsiChar; // ex: '(' and ')'
-           Const QuoteChars: Array of ansiChar; // ex: ['''', '"']
-           Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
-           var StartPos: integer;
-           var EndPos: integer): boolean;
+{********************************************************************************************************************************}
+function ALPercentEncode(const AStr: AnsiString; const ASafeChars: TSysCharSet; Const ASpacesAsPlus: Boolean = False): AnsiString;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _IsQuote(aChar: ansiChar): Boolean;
-  var i: integer;
-  begin
-    result := False;
-    for I := Low(QuoteChars) to High(QuoteChars) do
-      if aChar = QuoteChars[i] then begin
-        result := true;
-        break;
-      end;
-    if (result) and
-       (EscapeQuoteChar <> #0) and
-       (S[EndPos - 1] = EscapeQuoteChar) then result := False;
-  end;
-
-var
-  LCurInQuote: boolean;
-  LCurQuoteChar: AnsiChar;
-  LOpenCount: integer;
-
-begin
-  result := false;
-  if StartPos <= 0 then StartPos := 1;
-  while (StartPos <= length(S)) and
-        (s[StartPos] <> OpenChar) do inc(StartPos);
-  if StartPos > length(S) then exit;
-  LOpenCount := 1;
-  LCurInQuote := False;
-  LCurQuoteChar := #0;
-  EndPos := StartPos + 1;
-  while (EndPos <= length(S)) and
-        (LOpenCount > 0) do begin
-    if _IsQuote(s[EndPos]) then begin
-      if LCurInQuote then begin
-        if (s[EndPos] = LCurQuoteChar) then LCurInQuote := False
-      end
-      else begin
-        LCurInQuote := True;
-        LCurQuoteChar := s[EndPos];
-      end;
-    end
-    else if not LCurInQuote then begin
-      if s[EndPos] = OpenChar then inc(LOpenCount)
-      else if s[EndPos] = CloseChar then dec(LOpenCount);
-    end;
-    if LOpenCount <> 0 then inc(EndPos);
-  end;
-  result := EndPos <= length(S);
-end;
-
-{*********************************************************}
-function  ALHTTPEncode(const AStr: AnsiString): AnsiString;
-// The NoConversion set contains characters as specificed in RFC 1738 and
-// should not be modified unless the standard changes.
-const
-  NoConversion = ['A'..'Z','a'..'z','*','@','.','_','-',
-                  '0'..'9','$','!','''','(',')'];
 var
   Sp, Rp: PAnsiChar;
-begin
-  SetLength(Result, Length(AStr) * 3);
-  Sp := PAnsiChar(AStr);
-  Rp := PAnsiChar(Result);
-  while Sp^ <> #0 do
-  begin
-    if Sp^ in NoConversion then
-      Rp^ := Sp^
-    else
-      if Sp^ = ' ' then
-        Rp^ := '+'
-      else
-      begin
-        System.AnsiStrings.FormatBuf(Rp^, 3, AnsiString('%%%.2x'), 6, [Ord(Sp^)]);
-        Inc(Rp,2);
-      end;
-    Inc(Rp);
-    Inc(Sp);
-  end;
-  SetLength(Result, Rp - PAnsiChar(Result));
-end;
+  IsUniqueString: Boolean;
 
-{*************************************************}
-function  ALHTTPEncode(const AStr: String): String;
-// The NoConversion set contains characters as specificed in RFC 1738 and
-// should not be modified unless the standard changes.
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      SetLength(Result, Length(AStr) * 3);
+      Rp := PAnsiChar(Result);
+      var Start := PAnsiChar(AStr);
+      var Prefix := Sp - Start;
+      if Prefix > 0 then begin
+        ALStrMove(Start, Rp, Prefix);
+        Inc(Rp, Prefix);
+      end;
+      IsUniqueString := true;
+    end;
+
 const
-  NoConversion = [Ord('A')..Ord('Z'),Ord('a')..Ord('z'),Ord('*'),Ord('@'),Ord('.'),Ord('_'),Ord('-'),
-                  Ord('0')..Ord('9'),Ord('$'),Ord('!'),Ord(''''),Ord('('),Ord(')')];
-var
-  Sb: Tbytes;
-  Rp: PChar;
-  ln: integer;
-  i: integer;
-begin
-  Sb := Tencoding.UTF8.GetBytes(aStr);
-  ln := length(Sb);
-  SetLength(Result, ln * 3);
-  Rp := PChar(Result);
-  i := 0;
-  while i <= ln - 1 do
-  begin
-    if Sb[i] in NoConversion then
-      Rp^ := Char(Sb[i])
-    else
-      if Sb[i] = Ord(' ') then
-        Rp^ := '+'
-      else
-      begin
-        FormatBuf(Rp, 3, String('%%%.2x'), 6, [Sb[i]]);
-        Inc(Rp,2);
-      end;
-    Inc(Rp);
-    Inc(i);
-  end;
-  SetLength(Result, Rp - PChar(Result));
-end;
+  Hex: array[0..15] of AnsiChar = ('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
 
-{************************************************************}
-//the difference between this function and the delphi function
-//HttpApp.HttpDecode is that this function will not raise any
-//error (EConvertError) when the url will contain % that
-//are not encoded
-function ALHTTPDecode(const AStr: AnsiString): AnsiString;
-var Sp, Rp, Cp, Tp: PAnsiChar;
-    int: integer;
-    S: AnsiString;
 begin
-  SetLength(Result, Length(AStr));
+  IsUniqueString := False;
   Sp := PAnsiChar(AStr);
-  Rp := PAnsiChar(Result);
-  while Sp^ <> #0 do begin
-    case Sp^ of
-      '+': Rp^ := ' ';
-      '%': begin
-             Tp := Sp;
-             Inc(Sp);
-
-             //escaped % (%%)
-             if Sp^ = '%' then Rp^ := '%'
-
-             // %<hex> encoded character
-             else begin
-               Cp := Sp;
-               Inc(Sp);
-               if (Cp^ <> #0) and (Sp^ <> #0) then begin
-                 S := AnsiChar('$') + AnsiChar(Cp^) + AnsiChar(Sp^);
-                 if ALTryStrToInt(s,int) then Rp^ := ansiChar(int)
-                 else begin
-                   Rp^ := '%';
-                   Sp := Tp;
-                 end;
-               end
-               else begin
-                 Rp^ := '%';
-                 Sp := Tp;
-               end;
-             end;
-           end;
-      else Rp^ := Sp^;
+  for var I := 1 to Length(AStr) do begin
+    if Sp^ in ASafeChars then begin
+      if IsUniqueString then begin
+        Rp^ := Sp^;
+        Inc(Rp);
+      end;
+    end
+    else begin
+      if not IsUniqueString then _GenerateUniqueString;
+      if (Sp^=' ') and ASpacesAsPlus then begin
+        Rp^ := '+';
+        Inc(Rp);
+      end
+      else begin
+        Rp^ := '%'; Inc(Rp);
+        Rp^ := Hex[Byte(Sp^) shr 4]; Inc(Rp);
+        Rp^ := Hex[Byte(Sp^) and $0F]; Inc(Rp);
+      end;
     end;
-    Inc(Rp);
     Inc(Sp);
   end;
-  SetLength(Result, Rp - PAnsiChar(Result));
+  if IsUniqueString then
+    SetLength(Result, Rp - PAnsiChar(Result))
+  else
+    Result := AStr;
 end;
 
-{************************************************************}
-//the difference between this function and the delphi function
-//HttpApp.HttpDecode is that this function will not raise any
-//error (EConvertError) when the url will contain % that
-//are not encoded
-function ALHTTPDecode(const AStr: String): String;
-var Rb: Tbytes;
-    Sp, Cp, Tp: PChar;
-    int: integer;
-    S: String;
-    i: integer;
+{**************************}
+{$WARN WIDECHAR_REDUCED OFF}
+function ALPercentEncode(const AStr: String; const ASafeChars: TSysCharSet; Const ASpacesAsPlus: Boolean = False): String;
+const
+  Hex: array[0..15] of Char = ('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
 begin
-  SetLength(Rb, Length(AStr));
-  Sp := PChar(AStr);
-  i := 0;
-  while Sp^ <> #0 do begin
-    case Sp^ of
-      '+': Rb[i] := ord(' ');
-      '%': begin
-             Tp := Sp;
-             Inc(Sp);
-
-             //escaped % (%%)
-             if Sp^ = '%' then Rb[i] := ord('%')
-
-             // %<hex> encoded character
-             else begin
-               Cp := Sp;
-               Inc(Sp);
-               if (Cp^ <> #0) and (Sp^ <> #0) then begin
-                 S := Char('$') + Char(Cp^) + Char(Sp^);
-                 if ALTryStrToInt(s,int) then Rb[i] := int
-                 else begin
-                   Rb[i] := ord('%');
-                   Sp := Tp;
-                 end;
-               end
-               else begin
-                 Rb[i] := ord('%');
-                 Sp := Tp;
-               end;
-             end;
-           end;
-      else Rb[i] := ord(Sp^);
-    end;
-    Inc(i);
+  var Start := PChar(AStr);
+  var Sp := Start;
+  for var I := 1 to Length(AStr) do begin
+    if not (Sp^ in ASafeChars) then break;
     Inc(Sp);
   end;
-  result := Tencoding.Utf8.GetString(Rb, 0{ByteIndex}, i{ByteCount});
-end;
 
-{********************************************************}
-{Parses a multi-valued string into its constituent fields.
- ExtractHeaderFields is a general utility to parse multi-valued HTTP header strings into separate substrings.
- * Separators is a set of characters that are used to separate individual values within the multi-valued string.
- * WhiteSpace is a set of characters that are to be ignored when parsing the string.
- * Content is the multi-valued string to be parsed.
- * Strings is the TStrings object that receives the individual values that are parsed from Content.
- * StripQuotes determines whether the surrounding quotes are removed from the resulting items. When StripQuotes is true, surrounding quotes are removed
-   before substrings are added to Strings.
- Note:	Characters contained in Separators or WhiteSpace are treated as part of a value substring if the substring is surrounded by single or double quote
- marks. HTTP escape characters are converted using the ALHTTPDecode function.}
-procedure ALExtractHeaderFields(
-            Separators,
-            WhiteSpace,
-            Quotes: TSysCharSet;
-            Content: PAnsiChar;
-            Strings: TALStringsA;
-            HttpDecode: Boolean;
-            StripQuotes: Boolean = False);
+  If Sp - Start = Length(AStr) then
+    Exit(AStr);
 
-var Head, Tail: PAnsiChar;
-    EOS, InQuote: Boolean;
-    QuoteChar: AnsiChar;
-    ExtractedField: AnsiString;
-    SeparatorsWithQuotesAndNulChar: TSysCharSet;
-    QuotesWithNulChar: TSysCharSet;
-
-  {-------------------------------------------------------}
-  //as i don't want to add the parameter namevalueseparator
-  //to the function, we will stripquote only if the string end
-  //with the quote or start with the quote
-  //ex: "name"="value"  =>  name=value
-  //ex: "name"=value    =>  name=value
-  //ex: name="value"    =>  name=value
-  function DoStripQuotes(const S: AnsiString): AnsiString;
-  var I: Integer;
-      StripQuoteChar: AnsiChar;
-      canStripQuotesOnLeftSide: boolean;
-  begin
-    Result := S;
-    if StripQuotes then begin
-
-      canStripQuotesOnLeftSide := True;
-      if (length(result) > 0) and (result[length(result)] in quotes) then begin
-        StripQuoteChar := result[length(result)];
-        Delete(Result, length(result), 1);
-        i := Length(Result);
-        while i > 0 do begin
-          if (Result[I] = StripQuoteChar) then begin
-            Delete(Result, I, 1);
-            canStripQuotesOnLeftSide := i > 1;
-            break;
-          end;
-          dec(i);
-        end;
-      end;
-
-      if (canStripQuotesOnLeftSide) and (length(result) > 0) and (result[1] in quotes) then begin
-        StripQuoteChar := result[1];
-        Delete(Result, 1, 1);
-        i := 1;
-        while i <= Length(Result) do begin
-          if (Result[I] = StripQuoteChar) then begin
-            Delete(Result, I, 1);
-            break;
-          end;
-          inc(i);
-        end;
-      end;
-
-    end;
+  var Sb := Tencoding.UTF8.GetBytes(aStr);
+  SetLength(Result, length(Sb) * 3);
+  var Rp := PChar(Result);
+  var Prefix := Sp - Start;
+  if Prefix > 0 then begin
+    ALStrMove(Start, Rp, Prefix);
+    Inc(Rp, Prefix);
   end;
 
-Begin
-  if (Content = nil) or (Content^ = #0) then Exit;
-  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
-  QuotesWithNulChar := Quotes + [#0];
-  Tail := Content;
-  QuoteChar := #0;
-  repeat
-    while Tail^ in WhiteSpace do Inc(Tail);
-    Head := Tail;
-    InQuote := False;
-    while True do begin
-      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
-      if Tail^ in Quotes then begin
-        if (QuoteChar <> #0) and (QuoteChar = Tail^) then QuoteChar := #0
-        else If QuoteChar = #0 then QuoteChar := Tail^;
-        InQuote := QuoteChar <> #0;
-        Inc(Tail);
+  for var I := Prefix to Length(Sb) - 1 do begin
+    if AnsiChar(Sb[i]) in ASafeChars then begin
+      Rp^ := Char(Sb[i]);
+      Inc(Rp);
+    end
+    else begin
+      if (Sb[i]=Ord(' ')) and ASpacesAsPlus then begin
+        Rp^ := '+';
+        Inc(Rp);
       end
-      else Break;
-    end;
-    EOS := Tail^ = #0;
-    if Head^ <> #0 then begin
-      SetString(ExtractedField, Head, Tail-Head);
-      if HttpDecode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
-      else Strings.Add(DoStripQuotes(ExtractedField));
-    end;
-    Inc(Tail);
-  until EOS;
-end;
-
-{**************************************************************************************}
-{same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
-procedure ALExtractHeaderFieldsWithQuoteEscaped(
-            Separators,
-            WhiteSpace,
-            Quotes: TSysCharSet;
-            Content: PAnsiChar;
-            Strings: TALStringsA;
-            HttpDecode: Boolean;
-            StripQuotes: Boolean = False);
-
-var Head, Tail, NextTail: PAnsiChar;
-    EOS, InQuote: Boolean;
-    QuoteChar: AnsiChar;
-    ExtractedField: AnsiString;
-    SeparatorsWithQuotesAndNulChar: TSysCharSet;
-    QuotesWithNulChar: TSysCharSet;
-
-  {-------------------------------------------------------}
-  //as i don't want to add the parameter namevalueseparator
-  //to the function, we will stripquote only if the string end
-  //with the quote or start with the quote
-  //ex: "name"="value"  =>  name=value
-  //ex: "name"=value    =>  name=value
-  //ex: name="value"    =>  name=value
-  function DoStripQuotes(const S: AnsiString): AnsiString;
-  var I: Integer;
-      StripQuoteChar: AnsiChar;
-      canStripQuotesOnLeftSide: boolean;
-  begin
-    Result := S;
-    if StripQuotes then begin
-
-      canStripQuotesOnLeftSide := True;
-      if (length(result) > 0) and (result[length(result)] in quotes) then begin
-        StripQuoteChar := result[length(result)];
-        Delete(Result, length(result), 1);
-        i := Length(Result);
-        while i > 0 do begin
-          if (Result[I] = StripQuoteChar) then begin
-            Delete(Result, I, 1);
-            if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
-            else begin
-              canStripQuotesOnLeftSide := i > 1;
-              break;
-            end;
-          end;
-          dec(i);
-        end;
+      else begin
+        Rp^ := '%'; Inc(Rp);
+        Rp^ := Hex[Sb[i] shr 4]; Inc(Rp);
+        Rp^ := Hex[Sb[i] and $0F]; Inc(Rp);
       end;
-
-      if (canStripQuotesOnLeftSide) and (length(result) > 0) and (result[1] in quotes) then begin
-        StripQuoteChar := result[1];
-        Delete(Result, 1, 1);
-        i := 1;
-        while i <= Length(Result) do begin
-          if (Result[I] = StripQuoteChar) then begin
-            Delete(Result, I, 1);
-            if (i < Length(Result)) and (Result[I+1] = StripQuoteChar) then inc(i)
-            else break;
-          end;
-          inc(i);
-        end;
-      end;
-
     end;
   end;
-
-Begin
-  if (Content = nil) or (Content^ = #0) then Exit;
-  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
-  QuotesWithNulChar := Quotes + [#0];
-  Tail := Content;
-  QuoteChar := #0;
-  repeat
-    while Tail^ in WhiteSpace do Inc(Tail);
-    Head := Tail;
-    InQuote := False;
-    while True do begin
-      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
-      if Tail^ in Quotes then begin
-        if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
-          NextTail := Tail + 1;
-          if NextTail^ = Tail^ then inc(tail)
-          else QuoteChar := #0;
-        end
-        else If QuoteChar = #0 then QuoteChar := Tail^;
-        InQuote := QuoteChar <> #0;
-        Inc(Tail);
-      end
-      else Break;
-    end;
-    EOS := Tail^ = #0;
-    if Head^ <> #0 then begin
-      SetString(ExtractedField, Head, Tail-Head);
-      if HttpDecode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
-      else Strings.Add(DoStripQuotes(ExtractedField));
-    end;
-    Inc(Tail);
-  until EOS;
+  SetLength(Result, Rp - PChar(Result))
 end;
+{$WARN WIDECHAR_REDUCED ON}
 
-{**************************************************************************************}
-{same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
+{*********************}
 {$ZEROBASEDSTRINGS OFF}
-procedure ALExtractHeaderFieldsWithQuoteEscaped(
-            Separators,
-            WhiteSpace,
-            Quotes: TSysCharSet;
-            Content: PChar;
-            Strings: TALStringsW;
-            HttpDecode: Boolean;
-            StripQuotes: Boolean = False);
+procedure ALPercentDecodeInPlace(var AStr: AnsiString; const APlusAsSpaces: Boolean = False);
 
-var Head, Tail, NextTail: PChar;
-    EOS, InQuote: Boolean;
-    QuoteChar: Char;
-    ExtractedField: String;
-    SeparatorsWithQuotesAndNulChar: TSysCharSet;
-    QuotesWithNulChar: TSysCharSet;
+var
+  CurrPos: Integer;
+  PResHead: PAnsiChar;
+  PResTail: PAnsiChar;
+  IsUniqueString: boolean;
 
-  {-------------------------------------------------------}
-  //as i don't want to add the parameter namevalueseparator
-  //to the function, we will stripquote only if the string end
-  //with the quote or start with the quote
-  //ex: "name"="value"  =>  name=value
-  //ex: "name"=value    =>  name=value
-  //ex: name="value"    =>  name=value
-  function DoStripQuotes(const S: String): String;
-  var I: Integer;
-      StripQuoteChar: Char;
-      canStripQuotesOnLeftSide: boolean;
-  begin
-    Result := S;
-    if StripQuotes then begin
-
-      canStripQuotesOnLeftSide := True;
-      if (length(result) > 0) and charInSet(result[length(result)], quotes) then begin
-        StripQuoteChar := result[length(result)];
-        Delete(Result, length(result), 1);
-        i := Length(Result);
-        while i > 0 do begin
-          if (Result[I] = StripQuoteChar) then begin
-            Delete(Result, I, 1);
-            if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
-            else begin
-              canStripQuotesOnLeftSide := i > 1;
-              break;
-            end;
-          end;
-          dec(i);
-        end;
-      end;
-
-      if (canStripQuotesOnLeftSide) and (length(result) > 0) and charInSet(result[1], quotes) then begin
-        StripQuoteChar := result[1];
-        Delete(Result, 1, 1);
-        i := 1;
-        while i <= Length(Result) do begin
-          if (Result[I] = StripQuoteChar) then begin
-            Delete(Result, I, 1);
-            if (i < Length(Result)) and (Result[I+1] = StripQuoteChar) then inc(i)
-            else break;
-          end;
-          inc(i);
-        end;
-      end;
-
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _GenerateUniqueString;
+    begin
+      var Padding := PResTail - PResHead;
+      UniqueString(AStr);
+      PResHead := PAnsiChar(AStr);
+      PResTail := PResHead + Padding;
+      IsUniqueString := true;
     end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    function _HexToInt(I: Cardinal; Ch: AnsiChar): Cardinal;
+    begin
+      case Ch of
+        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+        // Should be unreachable because the caller pre-validates hex digits
+        else raise EALException.Create('Wrong HEX-character found');
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyCurrPosCharToResult;
+    begin
+      if IsUniqueString then PResTail^ := AStr[CurrPos];
+      Inc(PResTail);
+      Inc(CurrPos);
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyAnsiCharToResult(ACharInt: Byte; ANewCurrPos: Integer);
+    begin
+      if not IsUniqueString then _GenerateUniqueString;
+      PResTail^ := AnsiChar(ACharInt);
+      Inc(PResTail);
+      CurrPos := ANewCurrPos;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _CopyHexadecimalEntityToResult;
+    begin
+      var Res: Cardinal := 0;
+      for var i := CurrPos+1 to CurrPos + 2 do  // CurrPos+1 because AStr[CurrPos] = %
+        Res := _HexToInt(Res, AStr[i]);
+      _CopyAnsiCharToResult(Res, CurrPos + 3); // ...%C9...
+                                               //    ^CurrPos
+                                               // =>
+                                               // ...%C9...
+                                               //       ^CurrPos
+    end;
+
+begin
+
+  {Init var}
+  CurrPos := low(AStr);
+  var Ln := High(AStr);
+  IsUniqueString := false;
+  PResHead := PAnsiChar(AStr);
+  PResTail := PResHead;
+
+  {Start loop}
+  while CurrPos <= Ln do begin
+
+    {plus char detected}
+    if AStr[CurrPos] = '+' then begin
+      If APlusAsSpaces then
+        _CopyAnsiCharToResult(32, CurrPos + 1)
+      else
+        _CopyCurrPosCharToResult;
+    end
+
+    {Percent char detected}
+    else if AStr[CurrPos] = '%' then begin
+
+      // AStr[CurrPos+1] and AStr[CurrPos+2] of entity should be in this case in 0..9,a..f,A..F
+      if (CurrPos <= ln - 2) and
+         (AStr[CurrPos+1]  in ['A'..'F', 'a'..'f', '0'..'9']) and
+         (AStr[CurrPos+2]  in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyHexadecimalEntityToResult
+      else _CopyCurrPosCharToResult;
+
+    end
+    else _CopyCurrPosCharToResult;
+
   end;
 
-Begin
-  if (Content = nil) or (Content^ = #0) then Exit;
-  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
-  QuotesWithNulChar := Quotes + [#0];
-  Tail := Content;
-  QuoteChar := #0;
-  repeat
-    while charInSet(Tail^, WhiteSpace) do Inc(Tail);
-    Head := Tail;
-    InQuote := False;
-    while True do begin
-      while (InQuote and not charInSet(Tail^, QuotesWithNulChar)) or not charInSet(Tail^, SeparatorsWithQuotesAndNulChar) do Inc(Tail);
-      if charInSet(Tail^, Quotes) then begin
-        if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
-          NextTail := Tail + 1;
-          if NextTail^ = Tail^ then inc(tail)
-          else QuoteChar := #0;
-        end
-        else If QuoteChar = #0 then QuoteChar := Tail^;
-        InQuote := QuoteChar <> #0;
-        Inc(Tail);
-      end
-      else Break;
-    end;
-    EOS := Tail^ = #0;
-    if Head^ <> #0 then begin
-      SetString(ExtractedField, Head, Tail-Head);
-      if HttpDecode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
-      else Strings.Add(DoStripQuotes(ExtractedField));
-    end;
-    Inc(Tail);
-  until EOS;
+  {Change the length the string only if some modifications was done.
+   Else we don't need to do anything.}
+  if PResTail - PResHead <> length(AStr) then
+    SetLength(AStr, PResTail - PResHead);
+
 end;
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
+
+{*********************}
+{$ZEROBASEDSTRINGS OFF}
+procedure ALPercentDecodeInPlace(var AStr: String; const APlusAsSpaces: Boolean = False);
+begin
+
+  var Start := PChar(AStr);
+  var Sp := Start;
+  for var I := 1 to Length(AStr) do begin
+    if (Sp^ = '+') then begin
+      if APlusAsSpaces then
+        Break;
+    end
+    else if (Sp^ = '%') then break;
+    Inc(Sp);
+  end;
+
+  If Sp - Start = Length(AStr) then
+    Exit;
+
+  var LAnsiString := AnsiString(AStr);
+  ALPercentDecodeInPlace(LAnsiString, APlusAsSpaces);
+  AStr := String(LAnsiString);
+
+end;
+{$IF defined(ALZeroBasedStringsON)}
+  {$ZEROBASEDSTRINGS ON}
+{$ENDIF}
+
+{***************************************************************}
+// Unlike Delphi’s HttpApp.HttpDecode, this function never raises
+// EConvertError if the URL contains stray '%' characters that are
+// not followed by a valid escape sequence.
+function ALPercentDecode(const AStr: AnsiString; const APlusAsSpaces: Boolean = False): AnsiString;
+begin
+  result := AStr;
+  ALPercentDecodeInPlace(result, APlusAsSpaces);
+end;
+
+{***************************************************************}
+// Unlike Delphi’s HttpApp.HttpDecode, this function never raises
+// EConvertError if the URL contains stray '%' characters that are
+// not followed by a valid escape sequence.
+function ALPercentDecode(const AStr: String; const APlusAsSpaces: Boolean = False): String;
+begin
+  result := AStr;
+  ALPercentDecodeInPlace(result, APlusAsSpaces);
+end;
+
+{***********}
+/// <summary>
+///   Parse an HTTP-style header parameter list into a name/value collection.
+///   Typical inputs look like:
+///     - 'k=v; x="y z"; flag; q=1'
+///     - 'charset=UTF-8; boundary="---123"'
+///     - 'a:b; c:d'
+///   The function tokenizes on ASeparators, splits each token on the first
+///   ANameValueSeparator (if any), trims whitespace you define in AWhiteSpace
+///   around separators and the name/value separator, and (optionally) removes
+///   paired quotes and unescapes content inside quoted tokens.
+/// </summary>
+procedure ALExtractHeaderFields(
+            const ASeparators: TSysCharSet;
+            const AWhiteSpace: TSysCharSet;
+            const AQuoteChars: TSysCharSet;
+            const AContent: PAnsiChar;
+            const AStrings: TALStringsA;
+            const AStripQuotes: Boolean = False;
+            const AQuoteDoublingEscape: Boolean = False;
+            const AEscapeChar: AnsiChar = #0;
+            const ANameValueSeparator: AnsiChar = '=');
+
+var
+  LHead: PAnsiChar;
+  LTail: PAnsiChar;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _ExtractToken(var AToken: AnsiString; Const AIsNameToken: Boolean);
+    begin
+
+      // Init LQuoteChar
+      var LQuoteChar: AnsiChar := #0;
+
+      // Remove left white spaces
+      while LTail^ in AWhiteSpace do Inc(LTail);
+      LHead := LTail;
+
+      // We are on a quote char
+      if LTail^ in AQuoteChars then begin
+        LQuoteChar := LTail^;
+        inc(LTail);
+        While true do begin
+          if (LTail^ = LQuoteChar) or (LTail^ = #0) then begin
+            if AQuoteDoublingEscape and (LTail^ = LQuoteChar) and ((LTail+1)^ = LQuoteChar) then begin
+              inc(LTail, 2);
+              continue;
+            end;
+            if LTail^ = LQuoteChar then inc(LTail)
+            else LQuoteChar := #0;
+            break;
+          end
+          //--
+          else if (LTail^ = AEscapeChar) then begin
+            inc(LTail);
+            if LTail^ <> #0 then inc(LTail);
+            continue;
+          end
+          //--
+          else
+            Inc(LTail);
+        end;
+      end;
+
+      // Loop still the end of token
+      while true do begin
+
+        // We are at the end of token
+        if (AIsNameToken and (LTail^ = ANameValueSeparator)) or (LTail^ in ASeparators) or (LTail^ = #0) then begin
+          var LTailNoWhiteSpaces := LTail;
+          While (LTailNoWhiteSpaces > LHead) and
+                ((LTailNoWhiteSpaces-1)^ in AWhiteSpace) do dec(LTailNoWhiteSpaces);
+          if (not AStripQuotes) or (LQuoteChar = #0) then SetString(AToken, LHead, LTailNoWhiteSpaces-LHead)
+          else begin
+            var LLength := LTailNoWhiteSpaces - LHead - 2; // Exclude quotes
+            if LLength <= 0 then SetLength(AToken, 0)
+            else begin
+              Setlength(AToken, LLength);
+              var LTokenPtr := PAnsiChar(AToken);
+              var LContentPtr := LHead + 1;
+              while LContentPtr < LTailNoWhiteSpaces - 1 do begin
+                if (AQuoteDoublingEscape and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = LQuoteChar) and ((LContentPtr+1)^ = LQuoteChar)) or
+                   ((AEscapeChar <> #0) and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = AEscapeChar)) then
+                  inc(LContentPtr);
+                LTokenPtr^ := LContentPtr^;
+                inc(LTokenPtr);
+                inc(LContentPtr);
+              end;
+              SetLength(AToken, LTokenPtr-PAnsiChar(AToken));
+            end;
+          end;
+          // Remove right White spaces
+          while LTail^ in AWhiteSpace do Inc(LTail);
+          // Remove right Separators
+          while LTail^ in ASeparators do Inc(LTail);
+          LHead := LTail;
+          break;
+        end
+
+        // We are inside token
+        else begin
+          If (LQuoteChar <> #0) and (not (LTail^ in AWhiteSpace)) then
+            LQuoteChar := #0;
+          inc(LTail);
+        end;
+
+      end;
+    end;
+
+
+Begin
+  {$IF defined(DEBUG)}
+  Assert((AEscapeChar = #0) or (not (AEscapeChar in AQuoteChars)), 'AEscapeChar must not be in AQuoteChars');
+  Assert(not (ansiChar(#0) in ASeparators), '#0 must not be in ASeparators');
+  Assert(not (ansiChar(#0) in AWhiteSpace), '#0 must not be in AWhiteSpace');
+  Assert(not (ansiChar(#0) in AQuoteChars), '#0 must not be in AQuoteChars');
+  {$ENDIF}
+
+  AStrings.Clear;
+
+  if (AContent = nil) or (AContent^ = #0) then Exit;
+
+  LHead := AContent;
+  LTail := LHead;
+  var LName: AnsiString;
+  var LValue: AnsiString;
+
+  while LTail^ <> #0 do begin
+    _ExtractToken(LName, true{AIsNameToken});
+    if (ANameValueSeparator <> #0) and (LTail^ = ANameValueSeparator) then begin
+      inc(LTail);
+      LHead := LTail;
+      _ExtractToken(LValue, False{AIsNameToken});
+      AStrings.AddNameValue(LName, LValue);
+    end
+    else if LName <> '' then
+      AStrings.Add(LName);
+  end;
+end;
+
+{**************************}
+{$WARN WIDECHAR_REDUCED OFF}
+/// <summary>
+///   Parse an HTTP-style header parameter list into a name/value collection.
+///   Typical inputs look like:
+///     - 'k=v; x="y z"; flag; q=1'
+///     - 'charset=UTF-8; boundary="---123"'
+///     - 'a:b; c:d'
+///   The function tokenizes on ASeparators, splits each token on the first
+///   ANameValueSeparator (if any), trims whitespace you define in AWhiteSpace
+///   around separators and the name/value separator, and (optionally) removes
+///   paired quotes and unescapes content inside quoted tokens.
+/// </summary>
+procedure ALExtractHeaderFields(
+            const ASeparators: TSysCharSet;
+            const AWhiteSpace: TSysCharSet;
+            const AQuoteChars: TSysCharSet;
+            const AContent: PChar;
+            const AStrings: TALStringsW;
+            const AStripQuotes: Boolean = False;
+            const AQuoteDoublingEscape: Boolean = False;
+            const AEscapeChar: Char = #0;
+            const ANameValueSeparator: Char = '='); overload;
+ var
+  LHead: PChar;
+  LTail: PChar;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _ExtractToken(var AToken: String; Const AIsNameToken: Boolean);
+    begin
+
+      // Init LQuoteChar
+      var LQuoteChar: Char := #0;
+
+      // Remove left white spaces
+      while LTail^ in AWhiteSpace do Inc(LTail);
+      LHead := LTail;
+
+      // We are on a quote char
+      if LTail^ in AQuoteChars then begin
+        LQuoteChar := LTail^;
+        inc(LTail);
+        While true do begin
+          if (LTail^ = LQuoteChar) or (LTail^ = #0) then begin
+            if AQuoteDoublingEscape and (LTail^ = LQuoteChar) and ((LTail+1)^ = LQuoteChar) then begin
+              inc(LTail, 2);
+              continue;
+            end;
+            if LTail^ = LQuoteChar then inc(LTail)
+            else LQuoteChar := #0;
+            break;
+          end
+          //--
+          else if (LTail^ = AEscapeChar) then begin
+            inc(LTail);
+            if LTail^ <> #0 then inc(LTail);
+            continue;
+          end
+          //--
+          else
+            Inc(LTail);
+        end;
+      end;
+
+      // Loop still the end of token
+      while true do begin
+
+        // We are at the end of token
+        if (AIsNameToken and (LTail^ = ANameValueSeparator)) or (LTail^ in ASeparators) or (LTail^ = #0) then begin
+          var LTailNoWhiteSpaces := LTail;
+          While (LTailNoWhiteSpaces > LHead) and
+                ((LTailNoWhiteSpaces-1)^ in AWhiteSpace) do dec(LTailNoWhiteSpaces);
+          if (not AStripQuotes) or (LQuoteChar = #0) then SetString(AToken, LHead, LTailNoWhiteSpaces-LHead)
+          else begin
+            var LLength := LTailNoWhiteSpaces - LHead - 2; // Exclude quotes
+            if LLength <= 0 then SetLength(AToken, 0)
+            else begin
+              Setlength(AToken, LLength);
+              var LTokenPtr := PChar(AToken);
+              var LContentPtr := LHead + 1;
+              while LContentPtr < LTailNoWhiteSpaces - 1 do begin
+                if (AQuoteDoublingEscape and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = LQuoteChar) and ((LContentPtr+1)^ = LQuoteChar)) or
+                   ((AEscapeChar <> #0) and (LContentPtr < LTailNoWhiteSpaces - 2) and (LContentPtr^ = AEscapeChar)) then
+                  inc(LContentPtr);
+                LTokenPtr^ := LContentPtr^;
+                inc(LTokenPtr);
+                inc(LContentPtr);
+              end;
+              SetLength(AToken, LTokenPtr-PChar(AToken));
+            end;
+          end;
+          // Remove right White spaces
+          while LTail^ in AWhiteSpace do Inc(LTail);
+          // Remove right Separators
+          while LTail^ in ASeparators do Inc(LTail);
+          LHead := LTail;
+          break;
+        end
+
+        // We are inside token
+        else begin
+          If (LQuoteChar <> #0) and (not (LTail^ in AWhiteSpace)) then
+            LQuoteChar := #0;
+          inc(LTail);
+        end;
+
+      end;
+    end;
+
+
+Begin
+  {$IF defined(DEBUG)}
+  Assert((AEscapeChar = #0) or (not (AEscapeChar in AQuoteChars)), 'AEscapeChar must not be in AQuoteChars');
+  Assert(not (Char(#0) in ASeparators), '#0 must not be in ASeparators');
+  Assert(not (Char(#0) in AWhiteSpace), '#0 must not be in AWhiteSpace');
+  Assert(not (Char(#0) in AQuoteChars), '#0 must not be in AQuoteChars');
+  {$ENDIF}
+
+  AStrings.Clear;
+
+  if (AContent = nil) or (AContent^ = #0) then Exit;
+
+  LHead := AContent;
+  LTail := LHead;
+  var LName: String;
+  var LValue: String;
+
+  while LTail^ <> #0 do begin
+    _ExtractToken(LName, true{AIsNameToken});
+    if (ANameValueSeparator <> #0) and (LTail^ = ANameValueSeparator) then begin
+      inc(LTail);
+      LHead := LTail;
+      _ExtractToken(LValue, False{AIsNameToken});
+      AStrings.AddNameValue(LName, LValue);
+    end
+    else if LName <> '' then
+      AStrings.Add(LName);
+  end;
+end;
+{$WARN WIDECHAR_REDUCED ON}
 
 {************************************}
 constructor TALPrecompiledTagA.Create;
@@ -9970,7 +10500,6 @@ end;
 function ALFastTagReplacePrecompileA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            PrecompileProc: TALHandleTagPrecompileFunctA;
-           StripParamQuotes: Boolean; // useless if PrecompileProc is provided
            Context: Pointer;
            TagsContainer: TObjectList; // just a container where all the PrecompiledTag will be store. must free all the PrecompiledTag at the end of the application
            Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
@@ -9978,7 +10507,7 @@ function ALFastTagReplacePrecompileA(
 var ReplaceString: AnsiString;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
-    ParamList: TALStringListA;
+    ParamList: TALNVStringListA;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
@@ -10023,7 +10552,7 @@ Const ResultBuffSize: integer = 16384;
          (aLength < 1) or
          (aStart > LSourceStringLn) then Exit;
 
-      if aLength > LSourceStringLn - (aStart - 1) then aLength := LSourceStringLn - (aStart-1);
+      aLength := Min(aLength, LSourceStringLn - (aStart - 1));
 
       If aLength + ResultCurrentPos - 1 > ResultCurrentLength then begin
         ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
@@ -10091,17 +10620,17 @@ begin
     If assigned(PrecompileProc) then begin
       TokenStr := _ExtractTokenStr;
       ParamStr := _ExtractParamsStr(TokenStr);
-      ParamList := TALStringListA.Create;
+      ParamList := TALNVStringListA.Create;
       try
         ParamList.Duplicates := dupIgnore;
-        ALExtractHeaderFieldsWithQuoteEscaped(
-          [' ', #9, #13, #10],
-          [' ', #9, #13, #10],
-          ['"', ''''],
-          PAnsiChar(ParamStr),
-          ParamList,
-          False,
-          StripParamQuotes);
+        ALExtractHeaderFields(
+          [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+          [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+          ['"', ''''], // const AQuoteChars: TSysCharSet;
+          PAnsiChar(ParamStr), // const AContent: PAnsiChar;
+          ParamList, // const AStrings: TALStringsA;
+          True, // const AStripQuotes: Boolean = False;
+          True); // const AQuoteDoublingEscape: Boolean = False;
 
         T2 := T2 - T1;
         PrecompiledTag := PrecompileProc(TokenStr, ParamList, Context, SourceString, T1, T2);
@@ -10120,14 +10649,14 @@ begin
       try
         PrecompiledTag.TagString := _ExtractTokenStr;
         ParamStr := _ExtractParamsStr(PrecompiledTag.TagString);
-        ALExtractHeaderFieldsWithQuoteEscaped(
-          [' ', #9, #13, #10],
-          [' ', #9, #13, #10],
-          ['"', ''''],
-          PAnsiChar(ParamStr),
-          PrecompiledTag.TagParams,
-          False,
-          StripParamQuotes);
+        ALExtractHeaderFields(
+          [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+          [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+          ['"', ''''], // const AQuoteChars: TSysCharSet;
+          PAnsiChar(ParamStr), // const AContent: PAnsiChar;
+          PrecompiledTag.TagParams, // const AStrings: TALStringsA;
+          True, // const AStripQuotes: Boolean = False;
+          True); // const AQuoteDoublingEscape: Boolean = False;
         TagsContainer.Add(PrecompiledTag);
         ReplaceString := TagStart + #2{start of text} + _ObjAddressToStr(PrecompiledTag) + #3{end of text} + TagEnd;
       except
@@ -10140,7 +10669,6 @@ begin
                                          TagStart,
                                          TagEnd,
                                          PrecompileProc,
-                                         StripParamQuotes,
                                          Context,
                                          TagsContainer,
                                          flags);
@@ -10149,7 +10677,6 @@ begin
                                     TagStart,
                                     TagEnd,
                                     PrecompileProc,
-                                    StripParamQuotes,
                                     Context,
                                     TagsContainer,
                                     flags);
@@ -10187,7 +10714,6 @@ function ALFastTagReplaceA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            ReplaceProc: TALHandleTagFunctA;
            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-           StripParamQuotes: Boolean;
            Flags: TReplaceFlags;
            Context: Pointer;
            TagParamsClass: TALTagParamsClassA;
@@ -10243,7 +10769,7 @@ Const ResultBuffSize: integer = 16384;
          (aLength < 1) or
          (aStart > LSourceStringLn) then Exit;
 
-      if aLength > LSourceStringLn - (aStart - 1) then aLength := LSourceStringLn - (aStart-1);
+      aLength := Min(aLength, LSourceStringLn - (aStart - 1));
 
       If aLength + ResultCurrentPos - 1 > ResultCurrentLength then begin
         ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
@@ -10351,14 +10877,14 @@ begin
       ParamStr := _ExtractParamsStr;
       ParamList := TagParamsClass.Create;
       try
-        ALExtractHeaderFieldsWithQuoteEscaped(
-          [' ', #9, #13, #10],
-          [' ', #9, #13, #10],
-          ['"', ''''],
-          PAnsiChar(ParamStr),
-          ParamList,
-          False,
-          StripParamQuotes);
+        ALExtractHeaderFields(
+          [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+          [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+          ['"', ''''], // const AQuoteChars: TSysCharSet;
+          PAnsiChar(ParamStr), // const AContent: PAnsiChar;
+          ParamList, // const AStrings: TALStringsA;
+          True, // const AStripQuotes: Boolean = False;
+          True); // const AQuoteDoublingEscape: Boolean = False;
         if assigned(ReplaceExtendedProc) then begin
           T2 := T2 - T1;
           ReplaceString := ReplaceExtendedProc(TokenStr, ParamList, Context, TagHandled, SourceString, T1, T2);
@@ -10378,7 +10904,6 @@ begin
                                                        TagEnd,
                                                        ReplaceProc,
                                                        ReplaceExtendedProc,
-                                                       StripParamQuotes,
                                                        Flags,
                                                        Context,
                                                        TagParamsClass,
@@ -10437,7 +10962,6 @@ end;
 function ALFastTagReplaceA(
            const SourceString, TagStart, TagEnd: AnsiString;
            ReplaceProc: TALHandleTagFunctA;
-           StripParamQuotes: Boolean;
            Context: Pointer;
            Const flags: TReplaceFlags=[rfreplaceall];
            const TagReplaceProcResult: Boolean = False): AnsiString;
@@ -10448,7 +10972,6 @@ Begin
               TagEnd,
               ReplaceProc,
               nil,
-              StripParamQuotes,
               flags,
               Context,
               TALStringListA,
@@ -10459,7 +10982,6 @@ end;
 function ALFastTagReplaceA(
            const SourceString, TagStart, TagEnd: AnsiString;
            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
-           StripParamQuotes: Boolean;
            Context: Pointer;
            Const flags: TReplaceFlags=[rfreplaceall];
            const TagReplaceProcResult: Boolean = False): AnsiString;
@@ -10470,7 +10992,6 @@ Begin
               TagEnd,
               nil,
               ReplaceExtendedProc,
-              StripParamQuotes,
               flags,
               Context,
               TALStringListA,
@@ -10500,7 +11021,6 @@ Begin
               TagEnd,
               ALFastTagReplaceWithFunc,
               nil,
-              True,
               flags,
               PAnsiChar(ReplaceWith),
               TALStringListA,
@@ -10515,7 +11035,6 @@ end;
 //because it's will extract the params of the <#mytagwww
 function ALExtractTagParamsA(
            Const SourceString, TagStart, TagEnd: AnsiString;
-           StripParamQuotes: Boolean;
            TagParams: TALStringsA;
            IgnoreCase: Boolean): Boolean;
 
@@ -10583,14 +11102,14 @@ begin
     ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
     TokenStr := _ExtractTokenStr;
     ParamStr := _ExtractParamsStr;
-    ALExtractHeaderFieldsWithQuoteEscaped(
-      [' ', #9, #13, #10],
-      [' ', #9, #13, #10],
-      ['"', ''''],
-      PAnsiChar(ParamStr),
-      TagParams,
-      False,
-      StripParamQuotes);
+    ALExtractHeaderFields(
+      [' ', #9, #13, #10], // const ASeparators: TSysCharSet;
+      [' ', #9, #13, #10], // const AWhiteSpace: TSysCharSet;
+      ['"', ''''], // const AQuoteChars: TSysCharSet;
+      PAnsiChar(ParamStr), // const AContent: PAnsiChar;
+      TagParams, // const AStrings: TALStringsA;
+      True, // const AStripQuotes: Boolean = False;
+      True); // const AQuoteDoublingEscape: Boolean = False;
     Result := True
   end;
 end;

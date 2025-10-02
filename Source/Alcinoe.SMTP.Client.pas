@@ -1,17 +1,3 @@
-{*******************************************************************************
-TALsmtpClient class implements the SMTP protocol (RFC-821)
-Support file attachement using MIME format (RFC-1521, RFC-2045)
-Support authentification (RFC-2104)
-
-Link :
-http://linuxgazette.net/issue45/stumpel.html
-http://www.overbyte.be
-http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winsock/winsock/socket_options.asp
-http://www.fehcom.de/qmail/smtpauth.html
-http://www.freesoft.org/CIE/RFC/821/
-http://www.expita.com/header1.html
-http://cr.yp.to/immhf.html
-*******************************************************************************}
 unit Alcinoe.SMTP.Client;
 
 interface
@@ -23,7 +9,7 @@ Uses
   Winapi.WinSock2,
   Alcinoe.StringList,
   Alcinoe.InternetMessages,
-  Alcinoe.MultiPartParser;
+  Alcinoe.Mime.MultiPart;
 
 type
 
@@ -71,10 +57,12 @@ type
       Function Data(const aMailData: AnsiString): AnsiString; overload; virtual;
       Function Data(const aHeader, aBody: AnsiString): AnsiString; overload; virtual;
       Function Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString; overload; virtual;
+      (*
       Function DataMultipartMixed(
                  aHeader: TALEmailHeader;
                  const aInlineText, aInlineTextContentType: AnsiString;
                  aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
+      *)
       Function Quit: AnsiString; virtual;
       Function Rset: AnsiString; virtual;
       procedure SendMail(
@@ -93,6 +81,7 @@ type
                   const AUserName, APassword: AnsiString;
                   aAuthType: TalSmtpClientAuthType;
                   const aHeader, aBody: AnsiString); overload; virtual;
+      (*
       procedure SendMailMultipartMixed(
                   const aHost: AnsiString;
                   APort: integer;
@@ -103,6 +92,7 @@ type
                   aHeader: TALEmailHeader;
                   const aInlineText, aInlineTextContentType: AnsiString;
                   aAttachments: TALMultiPartMixedContents); virtual;
+      *)
       Procedure Disconnect; virtual;
       Function GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet; virtual;
       property Connected: Boolean read FConnected;
@@ -415,6 +405,7 @@ begin
 end;
 
 {****************************************}
+(*
 Function TAlSmtpClient.DataMultipartMixed(
            aHeader: TALEmailHeader;
            const aInlineText, aInlineTextContentType: AnsiString;
@@ -439,6 +430,7 @@ begin
     LMultipartMixedEncoder.free;
   end;
 end;
+*)
 
 {**************************************************************}
 {This command specifies that the receiver must send an OK reply,
@@ -535,6 +527,7 @@ begin
 end;
 
 {*********************************************}
+(*
 procedure TAlSmtpClient.SendMailMultipartMixed(
             const aHost: AnsiString;
             APort: integer;
@@ -566,6 +559,7 @@ begin
     Disconnect;
   end;
 end;
+*)
 
 {******************************************************************************}
 {commands consist of a command code followed by an argument field. Command codes

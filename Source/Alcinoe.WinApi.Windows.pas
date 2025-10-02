@@ -1,7 +1,4 @@
-{************************************************
-Windows API function not (yet) in the windows.pas
-************************************************}
-unit Alcinoe.WinApi.Common;
+unit Alcinoe.WinApi.Windows;
 
 interface
 
@@ -12,25 +9,14 @@ interface
 uses
   Winapi.Windows;
 
-type
-  _MEMORYSTATUSEX = record
-    dwLength: DWORD;
-    dwMemoryLoad: DWORD;
-    ullTotalPhys: Int64;
-    ullAvailPhys: Int64;
-    ullTotalPageFile: Int64;
-    ullAvailPageFile: Int64;
-    ullTotalVirtual: Int64;
-    ullAvailVirtual: Int64;
-    ullAvailExtendedVirtual: Int64;
-  end;
-  MEMORYSTATUSEX = _MEMORYSTATUSEX;
-  LPMEMORYSTATUSEX = ^MEMORYSTATUSEX;
+function RtlNtStatusToDosError(Status: NTSTATUS): ULONG; stdcall; external 'ntdll.dll';
 
-{$IF CompilerVersion < 32} // tokyo
-function GetTickCount64: UInt64; stdcall; external kernel32; // Windows Vista / Windows Server 2008
-{$ENDIF}
-function GlobalMemoryStatusEx(var lpBuffer : TMEMORYSTATUSEX): BOOL; stdcall; external kernel32; // Windows XP / Windows Server 2003
+const
+  FILE_SKIP_COMPLETION_PORT_ON_SUCCESS = $1;
+  FILE_SKIP_SET_EVENT_ON_HANDLE        = $2;
+
+function SetFileCompletionNotificationModes(FileHandle: THandle; Flags: UCHAR): BOOL; stdcall; external kernel32;
+
 function CreateProcessWithLogonW(
            lpUsername: LPCWSTR;  // LPCWSTR
            lpDomain: LPCWSTR;  // LPCWSTR
@@ -43,8 +29,6 @@ function CreateProcessWithLogonW(
            lpCurrentDirectory: LPCWSTR;  // LPCWSTR
            const lpStartupInfo: TStartupInfoW;  // LPSTARTUPINFOW
            var lpProcessInfo: TProcessInformation): BOOL; stdcall; external advapi32; // LPPROCESS_INFORMATION
-function AttachConsole(dwProcessId: DWORD): BOOL; stdcall; external kernel32;
-function ALUserExists(const aUserName: AnsiString): boolean;
 
 type
   _FILE_FS_SECTOR_SIZE_INFORMATION = record
@@ -60,9 +44,6 @@ type
   PFILE_FS_SECTOR_SIZE_INFORMATION = ^FILE_FS_SECTOR_SIZE_INFORMATION;
 
 Type
-  NTSTATUS = LONG;
-
-Type
   _IO_STATUS_BLOCK = record
     //union {
     Status: NTSTATUS;
@@ -74,17 +55,18 @@ Type
   PIO_STATUS_BLOCK = ^IO_STATUS_BLOCK;
 
 Type
-  _FSINFOCLASS = (FileFsVolumeInformation = 1,
-                  FileFsLabelInformation = 2,
-                  FileFsSizeInformation = 3,
-                  FileFsDeviceInformation = 4,
-                  FileFsAttributeInformation = 5,
-                  FileFsControlInformation = 6,
-                  FileFsFullSizeInformation = 7,
-                  FileFsObjectIdInformation = 8,
-                  FileFsDriverPathInformation = 9,
-                  FileFsVolumeFlagsInformation = 10,
-                  FileFsSectorSizeInformation = 11);
+  _FSINFOCLASS = (
+    FileFsVolumeInformation = 1,
+    FileFsLabelInformation = 2,
+    FileFsSizeInformation = 3,
+    FileFsDeviceInformation = 4,
+    FileFsAttributeInformation = 5,
+    FileFsControlInformation = 6,
+    FileFsFullSizeInformation = 7,
+    FileFsObjectIdInformation = 8,
+    FileFsDriverPathInformation = 9,
+    FileFsVolumeFlagsInformation = 10,
+    FileFsSectorSizeInformation = 11);
   FS_INFORMATION_CLASS = _FSINFOCLASS;
   PFS_INFORMATION_CLASS = ^FS_INFORMATION_CLASS;
 
@@ -93,71 +75,98 @@ function NtQueryVolumeInformationFile(
            IoStatusBlock: PIO_STATUS_BLOCK;
            FsInformation: PVOID;
            Length: ULONG;
-           FsInformationClass: FS_INFORMATION_CLASS): NTSTATUS; stdcall; external 'ntdll.dll'; // Available starting with Windows XP.
+           FsInformationClass: FS_INFORMATION_CLASS): NTSTATUS; stdcall; external 'ntdll.dll';
 
 const
   STATUS_SUCCESS = $00000000;
 
 const
   INVALID_SET_FILE_POINTER = DWORD(-1);
-  QUOTA_LIMITS_HARDWS_MIN_DISABLE = $2;
-  QUOTA_LIMITS_HARDWS_MIN_ENABLE  = $1;
-  QUOTA_LIMITS_HARDWS_MAX_DISABLE = $8;
-  QUOTA_LIMITS_HARDWS_MAX_ENABLE  = $4;
   LOGON_WITH_PROFILE        = $1;
   LOGON_NETCREDENTIALS_ONLY = $2;
-  ATTACH_PARENT_PROCESS = DWORD(-1);
+
+procedure ALCheckWinApiErrorCode(const AExtraInfo: String; const AErrorCode: DWORD; const AModuleHandle: HMODULE = 0); overload; inline;
+procedure ALCheckWinApiBoolean(const AExtraInfo: String; const ABoolean: Boolean; const AModuleHandle: HMODULE = 0); overload; inline;
+function  ALCheckWinApiHandle(const AExtraInfo: String; const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle; overload; inline;
+function  ALCheckWinApiPointer(const AExtraInfo: String; const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer; overload; inline;
+procedure ALCheckWinApiErrorCode(const AErrorCode: DWORD; const AModuleHandle: HMODULE = 0); overload; inline;
+procedure ALCheckWinApiBoolean(const ABoolean: Boolean; const AModuleHandle: HMODULE = 0); overload; inline;
+function  ALCheckWinApiHandle(const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle; overload; inline;
+function  ALCheckWinApiPointer(const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer; overload; inline;
 
 implementation
 
 uses
-  System.Ansistrings,
   System.SysUtils;
 
-{**********************************************************}
-function ALUserExists(const aUserName: AnsiString): boolean;
-var SID: PSID;
-    szDomain: PansiChar;
-    cbDomain, cbSID: DWORD;
-    NameUse: SID_NAME_USE;
+{*********************************************************************************************}
+procedure ALCheckWinApiErrorCode(const AExtraInfo: String; const AErrorCode: DWORD; const AModuleHandle: HMODULE = 0);
 begin
-
-  // initial values, reset them
-  SID      := nil;
-  cbSID    := 0;
-  szDomain := '';
-  cbDomain := 0;
-
-  // first attempt to get the buffer sizes
-  LookupAccountNameA(
-    nil,  // lpSystemName
-    PAnsiChar(aUserName), // lpAccountName: PAnsiChar;
-    SID, //  Sid: PSID;
-    cbSID,  // var cbSid: DWORD;
-    szDomain, // ReferencedDomainName: PAnsiChar;
-    cbDomain, // var cbReferencedDomainName: DWORD;
-    NameUse); // var peUse: SID_NAME_USE
-
-  // init buffers according to retrieved data
-  szDomain := System.Ansistrings.AnsiStrAlloc(cbDomain);
-  SID      := AllocMem(cbSID);
-  try
-
-    // check if user exists
-    result := LookupAccountNameA(
-                nil,
-                PAnsiChar(aUserName),
-                SID,
-                cbSID,
-                szDomain,
-                cbDomain,
-                NameUse);
-
-  finally
-    System.Ansistrings.StrDispose(szDomain);
-    FreeMem(SID);
+  if AErrorCode <> 0 then begin
+    var LErrorMessage := SysErrorMessage(AErrorCode, AModuleHandle);
+    if (LErrorMessage = '') and (AModuleHandle <> 0) then LErrorMessage := SysErrorMessage(AErrorCode);
+    if LErrorMessage = '' then LErrorMessage := 'A call to an OS function failed';
+    if (AExtraInfo <> '') then raise Exception.CreateFmt('%s (code=%d, hex=0x%X) - %s', [LErrorMessage, AErrorCode, AErrorCode, AExtraInfo])
+    else raise Exception.CreateFmt('%s (code=%d, hex=0x%X)', [LErrorMessage, AErrorCode, AErrorCode]);
   end;
+end;
 
+{*********************************************************************************************}
+procedure ALCheckWinApiBoolean(const AExtraInfo: String; const ABoolean: Boolean; const AModuleHandle: HMODULE = 0);
+begin
+  If not ABoolean then begin
+    var LLastError := GetLastError;
+    If LLastError = 0 then begin
+      if AExtraInfo <> '' then raise Exception.CreateFmt('A call to an OS function failed - %s', [AExtraInfo])
+      else raise Exception.Create('A call to an OS function failed');
+    end
+    else
+      ALCheckWinApiErrorCode(AExtraInfo, LLastError, AModuleHandle);
+  end;
+end;
+
+{*********************************************************************************************}
+function ALCheckWinApiHandle(const AExtraInfo: String; const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle;
+begin
+  ALCheckWinApiBoolean(
+    AExtraInfo, // const AExtraInfo: String;
+    (AHandle <> 0) and (AHandle <> INVALID_HANDLE_VALUE), // const ABoolean: Boolean;
+    AModuleHandle); // const AModuleHandle: HMODULE = 0)
+  Result := AHandle;
+end;
+
+{*********************************************************************************************}
+function ALCheckWinApiPointer(const AExtraInfo: String; const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer;
+begin
+  ALCheckWinApiBoolean(
+    AExtraInfo, // const AExtraInfo: String;
+    APointer <> nil, // const ABoolean: Boolean;
+    AModuleHandle); // const AModuleHandle: HMODULE = 0)
+  Result := APointer;
+end;
+
+{*********************************************************************************************}
+procedure ALCheckWinApiErrorCode(const AErrorCode: DWORD; const AModuleHandle: HMODULE = 0);
+begin
+  ALCheckWinApiErrorCode(''{AExtraInfo}, AErrorCode, AModuleHandle);
+end;
+
+{*********************************************************************************************}
+procedure ALCheckWinApiBoolean(const ABoolean: Boolean; const AModuleHandle: HMODULE = 0);
+begin
+  ALCheckWinApiBoolean(''{AExtraInfo}, ABoolean, AModuleHandle);
+end;
+
+{*********************************************************************************************}
+function ALCheckWinApiHandle(const AHandle: THandle; const AModuleHandle: HMODULE = 0): THandle;
+begin
+  Result := ALCheckWinApiHandle(''{AExtraInfo}, AHandle, AModuleHandle);
+end;
+
+{*********************************************************************************************}
+function ALCheckWinApiPointer(const APointer: Pointer; const AModuleHandle: HMODULE = 0): Pointer;
+begin
+  Result := ALCheckWinApiPointer(''{AExtraInfo}, APointer, AModuleHandle);
 end;
 
 end.

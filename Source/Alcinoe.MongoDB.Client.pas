@@ -999,7 +999,7 @@ uses
   System.math,
   Alcinoe.Cipher,
   Alcinoe.WinSock,
-  Alcinoe.WinApi.Common,
+  Alcinoe.WinApi.Windows,
   Alcinoe.StringUtils;
 
 {***************************************************************************************************************************************}

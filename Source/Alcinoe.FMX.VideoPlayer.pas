@@ -831,10 +831,10 @@ uses
   Fmx.types,
   fmx.controls,
   fmx.Types3d,
+  Alcinoe.url,
   Alcinoe.FMX.Styles,
   Alcinoe.Localization,
   Alcinoe.StringUtils,
-  Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.Net.Pool;
 
 {$IF defined(ANDROID) or defined(IOS)}

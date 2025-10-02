@@ -37,7 +37,6 @@ uses
   FMX.forms,
   Fmx.types3D,
   Fmx.types,
-  FMX.TextLayout,
   FMX.graphics,
   FMX.Filter,
   FMX.Effects,
@@ -1389,7 +1388,7 @@ function ALGetFillTextFlags: TFillTextFlags; Inline;
 implementation
 
 uses
-  system.SysUtils,
+  System.SysUtils,
   System.Math,
   System.SyncObjs,
   System.IOutils,
@@ -1436,13 +1435,11 @@ uses
   {$IF not defined(ALDPK)}
   Alcinoe.Cipher,
   {$ENDIF}
-  Alcinoe.FMX.Types3D,
+  Alcinoe.Url,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Objects,
-  Alcinoe.FMX.StdCtrls,
   Alcinoe.files,
   Alcinoe.FMX.Styles,
-  Alcinoe.HTTP.Client,
   Alcinoe.stringList,
   Alcinoe.Localization,
   ALcinoe.StringUtils;

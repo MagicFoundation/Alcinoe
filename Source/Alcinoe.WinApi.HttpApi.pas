@@ -2,6 +2,8 @@ unit Alcinoe.Winapi.HttpApi;
 
 interface
 
+{$I Alcinoe.inc}
+
 {$MINENUMSIZE 4}
 {$A+}
 
@@ -2683,7 +2685,7 @@ function HttpWaitForDemandStart(
            RequestQueueHandle: HANDLE;
            Overlapped: LPOVERLAPPED): ULONG; stdcall; external HTTPAPI_DLL; // OPTIONAL
 function HttpIsFeatureSupported(
-           FeatureId: HTTP_FEATURE_ID): ULONG; stdcall; external HTTPAPI_DLL;
+           FeatureId: HTTP_FEATURE_ID): BOOL; stdcall; external HTTPAPI_DLL;
 
 function HttpDelegateRequestEx(
            RequestQueueHandle: HANDLE;

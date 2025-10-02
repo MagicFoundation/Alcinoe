@@ -364,7 +364,7 @@ uses
   System.SysUtils,
   Alcinoe.StringList,
   Alcinoe.WinSock,
-  Alcinoe.WinApi.Common;
+  Alcinoe.WinApi.Windows;
 
 {**************************************************************************************************************}
 constructor EAlMemCachedClientException.Create(const aMsg: AnsiString; const aCloseConnection: Boolean = False);

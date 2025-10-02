@@ -679,7 +679,7 @@ uses
   {$ENDIF}
   FMX.Effects,
   System.UIConsts,
-  Alcinoe.http.client,
+  Alcinoe.Url,
   Alcinoe.FMX.Types3D;
 
 {*}

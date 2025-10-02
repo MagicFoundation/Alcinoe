@@ -97,7 +97,7 @@ uses
   winapi.messages,
   winapi.winsvc,
   System.Diagnostics,
-  Alcinoe.WinApi.Common,
+  Alcinoe.WinApi.Windows,
   Alcinoe.Common;
 
 {*******************************************}

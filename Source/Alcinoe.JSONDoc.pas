@@ -1360,7 +1360,6 @@ uses
   system.IOUtils,
   System.DateUtils,
   System.AnsiStrings,
-  Alcinoe.QuickSortList,
   Alcinoe.HTML,
   Alcinoe.Common;
 
@@ -3867,7 +3866,7 @@ Var Buffer: AnsiString;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNodeA;
     NamePaths: TALNVStringListA;
-    ObjectPaths: TALIntegerList;
+    ObjectPaths: TList<TPair<Integer, TALJsonNodeA>>;
     DecodeJSONReferences: boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -4424,7 +4423,7 @@ Var Buffer: AnsiString;
       if NotSaxMode then begin
 
         //init anode to one level up
-        if assigned(ObjectPaths) then LNode := TALJSONNodeA(ObjectPaths.Objects[ObjectPaths.Count - 1])
+        if assigned(ObjectPaths) then LNode := ObjectPaths[ObjectPaths.Count - 1].Value
         else LNode := TALJSONNodeA(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
@@ -4448,7 +4447,7 @@ Var Buffer: AnsiString;
 
           //update CurrIndex if WorkingNode.NodeType = ntArray
           if assigned(ObjectPaths) then begin
-            if WorkingNode.NodeType = ntArray then CurrIndex := ObjectPaths[Objectpaths.Count - 1] + 1;
+            if WorkingNode.NodeType = ntArray then CurrIndex := ObjectPaths[Objectpaths.Count - 1].Key + 1;
           end
           else begin
             if WorkingNode.NodeType = ntArray then CurrIndex := _extractLastIndexFromNamePath + 1;
@@ -4530,7 +4529,7 @@ Var Buffer: AnsiString;
         WorkingNode := LNode;
 
         //update the path
-        if assigned(ObjectPaths) then ObjectPaths.AddObject(CurrIndex, WorkingNode)
+        if assigned(ObjectPaths) then ObjectPaths.Add(TPair<Integer, TALJsonNodeA>.create(CurrIndex, WorkingNode))
         else _AddItemToNamePath(CurrIndex, '', WorkingNode);
 
       end
@@ -4783,7 +4782,7 @@ Var Buffer: AnsiString;
         WorkingNode := LNode;
 
         //update the path
-        if assigned(ObjectPaths) then ObjectPaths.AddObject(-1, WorkingNode)
+        if assigned(ObjectPaths) then ObjectPaths.Add(TPair<Integer, TALJsonNodeA>.create(-1, WorkingNode))
         else _AddItemToNamePath(-1, CurrName, WorkingNode);
 
       end
@@ -4981,7 +4980,7 @@ Begin
      (not assigned(OnParseEndObject)) and
      (not assigned(OnParseStartArray)) and
      (not assigned(OnParseEndArray)) then begin
-    ObjectPaths := TALIntegerList.Create(false{OwnsObjects});
+    ObjectPaths := TList<TPair<Integer, TALJsonNodeA>>.Create;
     NamePaths := nil;
   end
   else begin
@@ -5004,7 +5003,7 @@ Begin
     end;
 
     //add first node in ObjectPaths/NamePaths
-    if assigned(ObjectPaths) then ObjectPaths.AddObject(-1, WorkingNode)
+    if assigned(ObjectPaths) then ObjectPaths.Add(TPair<Integer, TALJsonNodeA>.create(-1, WorkingNode))
     else begin
       if NotSaxMode then _AddNameItemToNamePath('', WorkingNode)
       else _AddNameItemToNamePath('', pointer(NodeType));
@@ -6359,8 +6358,8 @@ procedure TALJSONNodeA.SaveToBson(
 Const BufferSize: integer = 8192;
 
 Var NodeStack: Tstack<TALJSONNodeA>;
-    NodeIndexStack: TALintegerList;
-    NodeStartPosStack: TALInt64List;
+    NodeIndexStack: TList<Integer>;
+    NodeStartPosStack: TList<System.Int64>;
     CurrentNode: TALJSONNodeA;
     CurrentParentNode: TALJSONNodeA;
     CurrentNodeIndex: integer;
@@ -6627,12 +6626,12 @@ Var NodeStack: Tstack<TALJSONNodeA>;
           If count > 0 then begin
             LEmptyNode := False;
             NodeStack.Push(aObjectNode);
-            NodeIndexStack.Push(aNodeIndex);
-            NodeStartPosStack.Push(LPos);
+            NodeIndexStack.Add(aNodeIndex);
+            NodeStartPosStack.Add(LPos);
             For I := Count - 1 downto 0 do begin
               NodeStack.Push(Nodes[I]);
-              NodeIndexStack.Push(I);
-              NodeStartPosStack.Push(-1);
+              NodeIndexStack.Add(I);
+              NodeStartPosStack.Add(-1);
             end;
           end
       end;
@@ -6682,12 +6681,12 @@ Var NodeStack: Tstack<TALJSONNodeA>;
           If count > 0 then begin
             LEmptyNode := False;
             NodeStack.Push(aArrayNode);
-            NodeIndexStack.Push(aNodeIndex);
-            NodeStartPosStack.Push(LPos);
+            NodeIndexStack.Add(aNodeIndex);
+            NodeStartPosStack.Add(LPos);
             For I := Count - 1 downto 0 do begin
               NodeStack.Push(Nodes[I]);
-              NodeIndexStack.Push(I);
-              NodeStartPosStack.Push(-1);
+              NodeIndexStack.Add(I);
+              NodeStartPosStack.Add(-1);
             end;
           end
       end;
@@ -6712,8 +6711,8 @@ begin
 
   CurrentParentNode := nil;
   NodeStack := Tstack<TALJSONNodeA>.Create;
-  NodeIndexStack := TALintegerList.Create;
-  NodeStartPosStack := TALInt64List.Create;
+  NodeIndexStack := TList<Integer>.Create;
+  NodeStartPosStack := TList<System.Int64>.Create;
   Try
 
     {init buffer string}
@@ -6724,15 +6723,15 @@ begin
 
     {SaveOnlyChildNode}
     NodeStack.Push(self);
-    NodeIndexStack.Push(0);
-    NodeStartPosStack.Push(StreamPos);
+    NodeIndexStack.Add(0);
+    NodeStartPosStack.Add(StreamPos);
 
 
     {loop on all nodes}
     While NodeStack.Count > 0 Do begin
       CurrentNode := NodeStack.Pop;
-      CurrentNodeIndex := integer(NodeIndexStack.Pop);
-      CurrentNodeStartPos := integer(NodeStartPosStack.Pop);
+      CurrentNodeIndex := NodeIndexStack.ExtractAt(NodeIndexStack.Count-1);
+      CurrentNodeStartPos := NodeStartPosStack.ExtractAt(NodeStartPosStack.Count - 1);
 
       with CurrentNode do
         case NodeType of
@@ -10566,7 +10565,7 @@ Var BufferLength: Integer;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNodeW;
     NamePaths: TALNVStringListW;
-    ObjectPaths: TALIntegerList;
+    ObjectPaths: TList<TPair<Integer, TALJsonNodeW>>;
     DecodeJSONReferences: boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11078,7 +11077,7 @@ Var BufferLength: Integer;
       if NotSaxMode then begin
 
         //init anode to one level up
-        if assigned(ObjectPaths) then LNode := TALJSONNodeW(ObjectPaths.Objects[ObjectPaths.Count - 1])
+        if assigned(ObjectPaths) then LNode := ObjectPaths[ObjectPaths.Count - 1].Value
         else LNode := TALJSONNodeW(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
@@ -11102,7 +11101,7 @@ Var BufferLength: Integer;
 
           //update CurrIndex if WorkingNode.NodeType = ntArray
           if assigned(ObjectPaths) then begin
-            if WorkingNode.NodeType = ntArray then CurrIndex := ObjectPaths[Objectpaths.Count - 1] + 1;
+            if WorkingNode.NodeType = ntArray then CurrIndex := ObjectPaths[Objectpaths.Count - 1].Key + 1;
           end
           else begin
             if WorkingNode.NodeType = ntArray then CurrIndex := _extractLastIndexFromNamePath + 1;
@@ -11184,7 +11183,7 @@ Var BufferLength: Integer;
         WorkingNode := LNode;
 
         //update the path
-        if assigned(ObjectPaths) then ObjectPaths.AddObject(CurrIndex, WorkingNode)
+        if assigned(ObjectPaths) then ObjectPaths.Add(TPair<Integer, TALJsonNodeW>.create(CurrIndex, WorkingNode))
         else _AddItemToNamePath(CurrIndex, '', WorkingNode);
 
       end
@@ -11434,7 +11433,7 @@ Var BufferLength: Integer;
         WorkingNode := LNode;
 
         //update the path
-        if assigned(ObjectPaths) then ObjectPaths.AddObject(-1, WorkingNode)
+        if assigned(ObjectPaths) then ObjectPaths.Add(TPair<Integer, TALJsonNodeW>.create(-1, WorkingNode))
         else _AddItemToNamePath(-1, CurrName, WorkingNode);
 
       end
@@ -11628,7 +11627,7 @@ Begin
      (not assigned(OnParseEndObject)) and
      (not assigned(OnParseStartArray)) and
      (not assigned(OnParseEndArray)) then begin
-    ObjectPaths := TALIntegerList.Create(false{OwnsObjects});
+    ObjectPaths := TList<TPair<Integer, TALJsonNodeW>>.Create;
     NamePaths := nil;
   end
   else begin
@@ -11642,7 +11641,7 @@ Begin
     BufferPos := 1;
 
     //add first node in ObjectPaths/NamePaths
-    if assigned(ObjectPaths) then ObjectPaths.AddObject(-1, WorkingNode)
+    if assigned(ObjectPaths) then ObjectPaths.Add(TPair<Integer, TALJsonNodeW>.create(-1, WorkingNode))
     else begin
       if NotSaxMode then _AddNameItemToNamePath('', WorkingNode)
       else _AddNameItemToNamePath('', pointer(NodeType));
@@ -12911,8 +12910,8 @@ procedure TALJSONNodeW.SaveToBson(
 Const BufferSize: integer = 8192;
 
 Var NodeStack: Tstack<TALJSONNodeW>;
-    NodeIndexStack: TALintegerList;
-    NodeStartPosStack: TALInt64List;
+    NodeIndexStack: TList<Integer>;
+    NodeStartPosStack: TList<System.Int64>;
     CurrentNode: TALJSONNodeW;
     CurrentParentNode: TALJSONNodeW;
     CurrentNodeIndex: integer;
@@ -13194,12 +13193,12 @@ Var NodeStack: Tstack<TALJSONNodeW>;
           If count > 0 then begin
             LEmptyNode := False;
             NodeStack.Push(aObjectNode);
-            NodeIndexStack.Push(aNodeIndex);
-            NodeStartPosStack.Push(LPos);
+            NodeIndexStack.Add(aNodeIndex);
+            NodeStartPosStack.Add(LPos);
             For I := Count - 1 downto 0 do begin
               NodeStack.Push(Nodes[I]);
-              NodeIndexStack.Push(I);
-              NodeStartPosStack.Push(-1);
+              NodeIndexStack.Add(I);
+              NodeStartPosStack.Add(-1);
             end;
           end
       end;
@@ -13249,12 +13248,12 @@ Var NodeStack: Tstack<TALJSONNodeW>;
           If count > 0 then begin
             LEmptyNode := False;
             NodeStack.Push(aArrayNode);
-            NodeIndexStack.Push(aNodeIndex);
-            NodeStartPosStack.Push(LPos);
+            NodeIndexStack.Add(aNodeIndex);
+            NodeStartPosStack.Add(LPos);
             For I := Count - 1 downto 0 do begin
               NodeStack.Push(Nodes[I]);
-              NodeIndexStack.Push(I);
-              NodeStartPosStack.Push(-1);
+              NodeIndexStack.Add(I);
+              NodeStartPosStack.Add(-1);
             end;
           end
       end;
@@ -13279,8 +13278,8 @@ begin
 
   CurrentParentNode := nil;
   NodeStack := Tstack<TALJSONNodeW>.Create;
-  NodeIndexStack := TALintegerList.Create;
-  NodeStartPosStack := TALInt64List.Create;
+  NodeIndexStack := TList<Integer>.Create;
+  NodeStartPosStack := TList<System.Int64>.Create;
   Try
 
     {init buffer string}
@@ -13291,15 +13290,15 @@ begin
 
     {SaveOnlyChildNode}
     NodeStack.Push(self);
-    NodeIndexStack.Push(0);
-    NodeStartPosStack.Push(StreamPos);
+    NodeIndexStack.Add(0);
+    NodeStartPosStack.Add(StreamPos);
 
 
     {loop on all nodes}
     While NodeStack.Count > 0 Do begin
       CurrentNode := NodeStack.Pop;
-      CurrentNodeIndex := integer(NodeIndexStack.Pop);
-      CurrentNodeStartPos := integer(NodeStartPosStack.Pop);
+      CurrentNodeIndex := NodeIndexStack.ExtractAt(NodeIndexStack.Count-1);
+      CurrentNodeStartPos := NodeStartPosStack.ExtractAt(NodeStartPosStack.Count - 1);
 
       with CurrentNode do
         case NodeType of

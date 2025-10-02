@@ -1,7 +1,3 @@
-{*******************************************
-Misc function that use winsock (for exemple
-ALHostToIP, ALIPAddrToName or ALgetLocalIPs)
-*******************************************}
 unit Alcinoe.WinSock;
 
 interface

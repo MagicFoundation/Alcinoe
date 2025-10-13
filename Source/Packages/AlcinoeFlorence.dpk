@@ -1,0 +1,101 @@
+package AlcinoeFlorence;
+
+{$R *.res}
+{$R AlcinoeComponentIcons.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$DEFINE ALDPK}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Alcinoe'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  Rtl,
+  Fmx,
+  DesignIDE,
+  dclFmxStd,
+  Skia.Package.RTL,
+  Skia.Package.FMX,
+  inet;
+
+contains
+  Alcinoe.Cipher in 'Alcinoe.Cipher.pas',
+  Alcinoe.Common in 'Alcinoe.Common.pas',
+  Alcinoe.FMX.Ani in 'Alcinoe.FMX.Ani.pas',
+  Alcinoe.FMX.BreakText in 'Alcinoe.FMX.BreakText.pas',
+  Alcinoe.FMX.CacheEngines in 'Alcinoe.FMX.CacheEngines.pas',
+  Alcinoe.FMX.Common in 'Alcinoe.FMX.Common.pas',
+  Alcinoe.FMX.Confetti in 'Alcinoe.FMX.Confetti.pas',
+  Alcinoe.FMX.Controls in 'Alcinoe.FMX.Controls.pas',
+  Alcinoe.FMX.CustomStyles in 'Alcinoe.FMX.CustomStyles.pas',
+  Alcinoe.FMX.DesignEditors in 'Alcinoe.FMX.DesignEditors.pas',
+  Alcinoe.FMX.Dialogs in 'Alcinoe.FMX.Dialogs.pas',
+  Alcinoe.FMX.Dynamic.Common in 'Alcinoe.FMX.Dynamic.Common.pas',
+  Alcinoe.FMX.Dynamic.Controls in 'Alcinoe.FMX.Dynamic.Controls.pas',
+  Alcinoe.FMX.Dynamic.Layouts in 'Alcinoe.FMX.Dynamic.Layouts.pas',
+  Alcinoe.FMX.Dynamic.ListBox in 'Alcinoe.FMX.Dynamic.ListBox.pas',
+  Alcinoe.FMX.Dynamic.Objects in 'Alcinoe.FMX.Dynamic.Objects.pas',
+  Alcinoe.FMX.Dynamic.PageController in 'Alcinoe.FMX.Dynamic.PageController.pas',
+  Alcinoe.FMX.Dynamic.StdCtrls in 'Alcinoe.FMX.Dynamic.StdCtrls.pas',
+  Alcinoe.FMX.Dynamic.VideoPlayer in 'Alcinoe.FMX.Dynamic.VideoPlayer.pas',
+  Alcinoe.FMX.Edit in 'Alcinoe.FMX.Edit.pas',
+  Alcinoe.FMX.FilterEffects in 'Alcinoe.FMX.FilterEffects.pas',
+  Alcinoe.FMX.Graphics in 'Alcinoe.FMX.Graphics.pas',
+  Alcinoe.FMX.Layouts in 'Alcinoe.FMX.Layouts.pas',
+  Alcinoe.FMX.LoadingOverlay in 'Alcinoe.FMX.LoadingOverlay.pas',
+  Alcinoe.FMX.Materials.Canvas in 'Alcinoe.FMX.Materials.Canvas.pas',
+  Alcinoe.FMX.Memo in 'Alcinoe.FMX.Memo.pas',
+  Alcinoe.FMX.NativeControl in 'Alcinoe.FMX.NativeControl.pas',
+  Alcinoe.FMX.NativeView.Win in 'Alcinoe.FMX.NativeView.Win.pas',
+  Alcinoe.FMX.Objects in 'Alcinoe.FMX.Objects.pas',
+  Alcinoe.FMX.PageController in 'Alcinoe.FMX.PageController.pas',
+  Alcinoe.FMX.ScrollEngine in 'Alcinoe.FMX.ScrollEngine.pas',
+  Alcinoe.FMX.Sheets in 'Alcinoe.FMX.Sheets.pas',
+  Alcinoe.FMX.Snackbar in 'Alcinoe.FMX.Snackbar.pas',
+  Alcinoe.FMX.StdCtrls in 'Alcinoe.FMX.StdCtrls.pas',
+  Alcinoe.FMX.Styles in 'Alcinoe.FMX.Styles.pas',
+  Alcinoe.FMX.Types3D in 'Alcinoe.FMX.Types3D.pas',
+  Alcinoe.FMX.UserPreferences in 'Alcinoe.FMX.UserPreferences.pas',
+  Alcinoe.FMX.VideoPlayer in 'Alcinoe.FMX.VideoPlayer.pas',
+  Alcinoe.FMX.WebBrowser in 'Alcinoe.FMX.WebBrowser.pas',
+  Alcinoe.Files in 'Alcinoe.Files.pas',
+  Alcinoe.GuardianThread in 'Alcinoe.GuardianThread.pas',
+  Alcinoe.HTML in 'Alcinoe.HTML.pas',
+  Alcinoe.HTTP in 'Alcinoe.HTTP.pas',
+  Alcinoe.HTTP.Client in 'Alcinoe.HTTP.Client.pas',
+  Alcinoe.HTTP.Client.Net in 'Alcinoe.HTTP.Client.Net.pas',
+  Alcinoe.HTTP.Client.Net.Pool in 'Alcinoe.HTTP.Client.Net.Pool.pas',
+  Alcinoe.HTTP.Client.WinHTTP in 'Alcinoe.HTTP.Client.WinHTTP.pas',
+  Alcinoe.JSONDoc in 'Alcinoe.JSONDoc.pas',
+  Alcinoe.Localization in 'Alcinoe.Localization.pas',
+  Alcinoe.Mime.ContentTypes in 'Alcinoe.Mime.ContentTypes.pas',
+  Alcinoe.Mime.Multipart in 'Alcinoe.Mime.Multipart.pas',
+  Alcinoe.StringList in 'Alcinoe.StringList.pas',
+  Alcinoe.StringUtils in 'Alcinoe.StringUtils.pas',
+  Alcinoe.Url in 'Alcinoe.Url.pas',
+  Alcinoe.Winapi.Windows in 'Alcinoe.Winapi.Windows.pas',
+  Alcinoe.XMLDoc in 'Alcinoe.XMLDoc.pas';
+
+end.

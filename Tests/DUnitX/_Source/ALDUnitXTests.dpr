@@ -12,16 +12,16 @@ program ALDUnitXTests;
 uses
   {$IF defined(SKIA)}
   FMX.Skia,
-  {$ENDIF }
+  {$ENDIF}
   {$IFDEF MSWINDOWS}
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
-  {$ENDIF }
+  {$ENDIF}
   DUnitX.TestFramework,
-  {$ENDIF }
+  {$ENDIF}
   {$IFDEF MSWINDOWS}
   Alcinoe.Execute,
   Alcinoe.FMX.NativeView.Win,
@@ -40,7 +40,7 @@ uses
   Alcinoe.WinApi.Windows,
   Alcinoe.WinApi.HttpApi,
   Alcinoe.WinSock,
-  {$ENDIF }
+  {$ENDIF}
   {$IFDEF ANDROID}
   Alcinoe.AndroidApi.AndroidX,
   Alcinoe.AndroidApi.AndroidX.Media3,
@@ -62,13 +62,9 @@ uses
   Alcinoe.AndroidApi.Widget,
   Alcinoe.Androidapi.GraphicsContentViewText,
   Alcinoe.FMX.NativeView.Android,
-  {$ENDIF }
+  {$ENDIF}
   {$IFDEF iOS}
   Alcinoe.FMX.NativeView.iOS,
-  {$IFNDEF IOSSIMULATOR}
-  {$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE}
-  {$ENDIF }
   Alcinoe.iOSApi.AdSupport,
   Alcinoe.iOSApi.AudioToolbox,
   Alcinoe.iOSApi.AuthenticationServices,
@@ -80,33 +76,20 @@ uses
   Alcinoe.iOSApi.FirebaseMessaging,
   Alcinoe.iOSApi.MessageUI,
   Alcinoe.iOSApi.Photos,
-  Alcinoe.iOSApi.VKontakte,
-  Alcinoe.iOSapi.AVFoundation,
-  Alcinoe.iOSapi.CoreFoundation,
-  Alcinoe.iOSapi.CoreImage,
-  Alcinoe.iOSapi.CoreLocation,
-  Alcinoe.iOSapi.CoreText,
-  Alcinoe.iOSapi.CoreVideo,
-  Alcinoe.iOSapi.Foundation,
-  Alcinoe.iOSapi.ImageIO,
-  Alcinoe.iOSapi.QuartzCore,
-  Alcinoe.iOSapi.Security,
-  Alcinoe.iOSapi.UIKit,
-  {$ENDIF }
-  {$ENDIF }
   {$IFNDEF IOSSIMULATOR}
-  {$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE}
-  {$ENDIF }
+  Alcinoe.iOSApi.VKontakte,
+  {$ENDIF}
+  Alcinoe.iOSapi.CoreFoundation,
+  Alcinoe.iOSapi.CoreVideo,
+  {$ENDIF}
+  {$IFNDEF IOSSIMULATOR}
   Alcinoe.FMX.VKontakte,
-  {$ENDIF }
+  {$ENDIF}
   {$IFDEF ALMacOS}
   Alcinoe.Macapi.AppKit,
-  Alcinoe.Macapi.CoreText,
-  Alcinoe.Macapi.Foundation,
   Alcinoe.Macapi.QuartzCore,
   Alcinoe.FMX.NativeView.Mac,
-  {$ENDIF }
+  {$ENDIF}
   Alcinoe.InternetMessages,
   Alcinoe.Mime.ContentTypes,
   Alcinoe.Mime.Multipart,
@@ -181,7 +164,7 @@ uses
   ALDUnitXTestStringUtils in 'ALDUnitXTestStringUtils.pas',
   ALDUnitXTestCipher in 'ALDUnitXTestCipher.pas',
   ALDUnitXTestHtml in 'ALDUnitXTestHtml.pas',
-  {$ENDIF }
+  {$ENDIF}
   System.SysUtils,
   ALDUnitXTestHttp in 'ALDUnitXTestHttp.pas',
   ALDUnitXTestXmlDoc in 'ALDUnitXTestXmlDoc.pas',

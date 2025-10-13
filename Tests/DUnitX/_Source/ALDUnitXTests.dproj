@@ -5,7 +5,7 @@
     <FrameworkType>None</FrameworkType>
     <Base>True</Base>
     <Config Condition="'$(Config)'==''">Debug</Config>
-    <Platform Condition="'$(Platform)'==''">Android64</Platform>
+    <Platform Condition="'$(Platform)'==''">iOSDevice64</Platform>
     <TargetedPlatforms>693395</TargetedPlatforms>
     <AppType>Console</AppType>
     <MainSource>ALDUnitXTests.dpr</MainSource>
@@ -296,6 +296,12 @@
     <Cfg_2>true</Cfg_2>
     <Base>true</Base>
   </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+    <Cfg_2_Win32>true</Cfg_2_Win32>
+    <CfgParent>Cfg_2</CfgParent>
+    <Cfg_2>true</Cfg_2>
+    <Base>true</Base>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Config)'=='Release_Skia' or '$(Cfg_4)'!=''">
     <Cfg_4>true</Cfg_4>
     <CfgParent>Cfg_2</CfgParent>
@@ -452,7 +458,7 @@
     <UsingDelphiRTL>true</UsingDelphiRTL>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-    <DCC_UnitSearchPath>$(DUnitX);..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>$(DUnitX);..\..\..\Source;..\..\..\Embarcadero\Florence\fmx;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <SanitizedProjectName>ALDUnitXTests</SanitizedProjectName>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -565,7 +571,7 @@
     <iPad_SpotLight80>$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png</iPad_SpotLight80>
     <iPad_Setting58>$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png</iPad_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
-    <DCC_FrameworkPath>..\..\..\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\vkontakte\;$(DCC_FrameworkPath)</DCC_FrameworkPath>
+    <DCC_FrameworkPath>..\..\..\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64_x86_64-simulator;$(DCC_FrameworkPath)</DCC_FrameworkPath>
     <DCC_iOSMinimumVersion>14.0</DCC_iOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_Linux64)'!=''">
@@ -581,6 +587,7 @@
     <Debugger_Launcher>/usr/X11/bin/xterm -e "%debuggee%"</Debugger_Launcher>
     <Manifest_File>(None)</Manifest_File>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+    <DCC_macOSMinimumVersion>10.15</DCC_macOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_OSXARM64)'!=''">
     <DCC_UsePackage>DataSnapServer;fmx;DbxCommonDriver;bindengine;IndyIPCommon;FireDACCommonODBC;emsclient;IndyProtocols;dbxcds;FmxTeeUI;DBXFirebirdDriver;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;fmxdae;CustomIPTransport;FireDACMSSQLDriver;IndySystem;ibxbindings;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;bindcompdbx;rtl;FireDACMySQLDriver;DBXSqliteDriver;DataSnapFireDAC;inetdbxpress;FireDAC;xmlrtl;ibxpress;dsnap;DBXOracleDriver;DBXInformixDriver;fmxobj;DataSnapNativeClient;FireDACCommonDriver;IndyIPClient;bindcompfmx;inetdb;ibmonitor;FireDACASADriver;fmxFireDAC;DBXMySQLDriver;DataSnapCommon;fmxase;dbrtl;FireDACOracleDriver;DataSnapIndy10ServerTransport;DBXInterBaseDriver;FireDACMongoDBDriver;FireDACTDataDriver;bindcomp;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;tethering;CloudService;DBXSybaseASADriver;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -650,7 +657,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
-    <Debugger_RunParams>--run:ALDUnitXTestUrl.TALDUnitXTestUrl.TestALCookedUrlA</Debugger_RunParams>
+    <Debugger_RunParams>--run:ALDUnitXTestStringUtils.TALDUnitXTestStringUtils.TestALTryStrToDateTimeA</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
     <Debugger_RunParams>--run:ALDUnitXTestStringUtils.TALDUnitXTestStringUtils.TestALStringBuilderW</Debugger_RunParams>
@@ -793,6 +800,9 @@
   <PropertyGroup Condition="'$(Cfg_2_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+    <Debugger_RunParams>--run:ALDUnitXTestStringUtils.TALDUnitXTestStringUtils.TestALTryStrToDateTimeA</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4)'!=''">
     <DCC_Define>SKIA;$(DCC_Define)</DCC_Define>
@@ -945,8 +955,8 @@
           <Source Name="MainSource">ALDUnitXTests.dpr</Source>
         </Source>
         <Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k370.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dclofficexp370.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
       <Deployment Version="5"/>

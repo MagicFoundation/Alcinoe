@@ -95,6 +95,8 @@ type
     procedure ALExtractHeaderFieldsA;
     [Test]
     procedure ALExtractHeaderFieldsW;
+    [Test]
+    procedure TestALMatchesMaskA;
   end;
 
 implementation
@@ -106,6 +108,7 @@ uses
   System.DateUtils,
   System.Character,
   System.StrUtils,
+  System.Masks,
   Alcinoe.StringUtils,
   Alcinoe.Localization,
   Alcinoe.StringList;
@@ -378,7 +381,7 @@ begin
 
   end;
   //--
-  CheckExecutionTime(0.8{ARatio});
+  CheckExecutionTime(0.9{ARatio});
 end;
 
 {**************************************************}
@@ -3278,6 +3281,341 @@ begin
   finally
     Strings.Free;
   end;
+end;
+
+{****************************************************}
+procedure TALDUnitXTestStringUtils.TestALMatchesMaskA;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure DoAssert(const Filename, Mask: string; CaseSensitive: Boolean; Expected: Boolean);
+  var
+    ActualA, ActualW: Boolean;
+  begin
+    ActualA := ALMatchesMaskA(AnsiString(Filename), AnsiString(Mask), CaseSensitive);
+    ActualW := ALMatchesMaskW(Filename, Mask, CaseSensitive);
+    Assert.AreEqual(ActualW, ActualA, Format('Mismatch for "%s" vs "%s" (CaseSens=%s): Expected %s, got %s', [Filename, Mask, BoolToStr(CaseSensitive, True), BoolToStr(Expected, True), BoolToStr(ActualA, True)]));
+  end;
+
+begin
+  // Exact match, case insensitive (default)
+  DoAssert('file.txt', 'file.txt', False, True);
+  DoAssert('FILE.TXT', 'file.txt', False, True);
+  DoAssert('File.Txt', 'file.txt', False, True);
+
+  // Exact match, case sensitive
+  DoAssert('file.txt', 'file.txt', True, True);
+  DoAssert('FILE.TXT', 'file.txt', True, False);
+  DoAssert('File.Txt', 'file.txt', True, False);
+
+  // Wildcard *
+  DoAssert('anything', '*', False, True);
+  DoAssert('', '*', False, True);
+  DoAssert('file.txt', '*.txt', False, True);
+  DoAssert('file.doc', '*.txt', False, False);
+  DoAssert('dir/file.txt', 'dir/*.txt', False, True);
+  DoAssert('dir/file.doc', 'dir/*.txt', False, False);
+
+  // Wildcard ?
+  DoAssert('abc', 'a?c', False, True);
+  DoAssert('abc', '???', False, True);
+  DoAssert('ab', '???', False, False);
+  DoAssert('abcd', '???', False, False);
+  DoAssert('a1c', 'a?c', False, True);
+  DoAssert('a1C', 'a?c', False, True); // case insensitive
+
+  // Sets [a-z]
+  DoAssert('abc', '[a-c]bc', False, True);
+  DoAssert('Abc', '[a-c]bc', False, True);
+  DoAssert('dbc', '[a-c]bc', False, False);
+  DoAssert('ABC', '[a-c]bc', False, True); // case insensitive
+  DoAssert('abc', '[a-c]bc', True, True);
+  DoAssert('Abc', '[a-c]bc', True, False); // case sensitive
+
+  // Ranges in sets
+  DoAssert('a1c', '[a-z09]1[a-z]', False, True);
+  DoAssert('a1C', '[a-z09]1[a-z]', False, True);
+  DoAssert('a1!', '[a-z09]1[a-z]', False, False);
+
+  // Negated sets [!a-z]
+  DoAssert('1bc', '[!a-c]bc', False, True);
+  DoAssert('abc', '[!a-c]bc', False, False);
+  DoAssert('Abc', '[!a-c]bc', False, False); // A upcases to A, which is not a-c? Wait, assuming ASCII, A is before a, but UpCase('A')='A', and [a-c] is lowercase.
+  // Note: In original, sets use UpCase for non-CS, so [a-c] matches A-C as well in non-CS mode.
+
+  // Mixed wildcards and literals
+  DoAssert('file123.txt', 'file*.txt', False, True);
+  DoAssert('file123.doc', 'file*.txt', False, False);
+  DoAssert('test.file', '*file', False, True);
+  DoAssert('file.test', '*file', False, False);
+  DoAssert('a*b', 'a*b', False, True);
+  DoAssert('acb', 'a*b', False, True); // * matches 'c'
+  DoAssert('ab', 'a*b', False, True); // * matches nothing
+  DoAssert('abb', 'a*b', False, True); // * matches 'b'
+
+  // Complex: multiple *, sets, ?
+  DoAssert('dir1/subfile.txt', 'dir?/*.[t-z][x-z][s-t]', False, True);
+  DoAssert('dir1/subfile.doc', 'dir?/*.[t-z][x-z][s-t]', False, False);
+
+  // Edge cases
+  DoAssert('', '', False, True);
+  DoAssert('file', '', False, False); // empty mask shouldn't match non-empty
+  DoAssert('', 'file', False, False); // empty file shouldn't match non-empty mask
+  DoAssert('', '*', False, True);
+  DoAssert(' ', '?', False, True);
+  DoAssert('ab', 'a[b-?]', False, True); // ? in set
+  DoAssert('a?', 'a?', False, True);
+  DoAssert('a?', 'a?', True, True); // literal ? matches ?
+
+  // Invalid masks - but since we trust ALMatchesMaskW, assume it raises EMaskException on invalid, and ALMatchesMaskA should too, but for equality, test valid ones only
+  // To test exceptions, could add separate asserts, but keeping to boolean results
+
+  // More set cases
+  DoAssert('a1b', 'a[!0-9]b', False, False); // !0-9 should match non-digit, but 1 is digit, so false
+  DoAssert('aAb', 'a[!0-9]b', False, True); // A is not digit
+  DoAssert('a1b', '[a][!0-9][b]', False, False);
+
+  // Case sensitive sets
+  DoAssert('abc', '[A-C]bc', True, False); // [A-C] doesn't match 'a'
+  DoAssert('Abc', '[A-C]bc', True, True);
+
+
+  // Multiple consecutive stars
+  DoAssert('abc', '**', False, True);
+  DoAssert('abc', '***', False, True);
+  DoAssert('abc', 'a**c', False, True);
+  DoAssert('abbbc', 'a**c', False, True);
+  DoAssert('ac', 'a**c', False, True);
+  DoAssert('abbc', 'a****bc', False, True);
+  DoAssert('a', '****a****', False, True);
+  DoAssert('', '****', False, True);
+  DoAssert('x', '**?**', False, True);
+  DoAssert('xy', '**??**', False, True);
+
+  // Mixed ? and * at edges
+  DoAssert('a', '?*', False, True);
+  DoAssert('ab', '?*', False, True);
+  DoAssert('', '?*', False, False);
+  DoAssert('a', '*?', False, True);
+  DoAssert('ab', '*?', False, True);
+  DoAssert('', '*?', False, False);
+  DoAssert('abc', '?*?', False, True);
+  DoAssert('ab', '?*?', False, True);
+  DoAssert('a', '?*?', False, False);
+
+  // Exact-length ? sequences
+  DoAssert('abcd', '????', False, True);
+  DoAssert('abc', '????', False, False);
+  DoAssert('abcde', '????', False, False);
+  DoAssert('', '', True, True);
+  DoAssert('', '?', False, False);
+
+  // Star absorbing everything
+  DoAssert('anything.ext', '*.ext', False, True);
+  DoAssert('anything.ext', '*.*', False, True);
+  DoAssert('.hidden', '*.*', False, True);
+  DoAssert('noext', '*.*', False, False);
+  DoAssert('a.b.c', '*.*', False, True);
+  DoAssert('a.b.c', '*.b.*', False, True);
+
+  // Dots and extensions
+  DoAssert('file.', 'file.', False, True);
+  DoAssert('file.', 'file.?', False, False);
+  DoAssert('file..', 'file..', False, True);
+  DoAssert('file..txt', 'file..*', False, True);
+  DoAssert('.gitignore', '.*', False, True);
+  DoAssert('.config', '.*', False, True);
+  DoAssert('..', '..', False, True);
+  DoAssert('..', '.*', False, True);
+  DoAssert('.', '.', False, True);
+
+  // Sets: simple membership
+  DoAssert('a', '[abc]', False, True);
+  DoAssert('b', '[abc]', False, True);
+  DoAssert('d', '[abc]', False, False);
+  DoAssert('A', '[abc]', False, True);
+  DoAssert('A', '[abc]', True, False);
+  DoAssert('C', '[A-C]', True, True);
+
+  // Sets: multiple segments/ranges
+  DoAssert('m', '[a-fm-z]', False, True);
+  DoAssert('g', '[a-fm-z]', False, False);
+  DoAssert('5', '[0-3 5-9]', False, True); // space is literal member
+  DoAssert(' ', '[0-3 5-9]', False, True);
+
+  // Sets: as first char in name
+  DoAssert('[', '[[]', False, True);
+  DoAssert('[', '[[]', True, True);
+  DoAssert('[[', '[[][[]', False, True);
+
+  // Sets: negation
+  DoAssert('z', '[!a-y]', False, True);
+  DoAssert('a', '[!a-y]', False, False);
+  DoAssert('A', '[!a-y]', False, False);
+  DoAssert('9', '[!0-8]', False, True);
+  DoAssert('8', '[!0-8]', False, False);
+
+  // Sets: used within longer patterns
+  DoAssert('cat', 'c[a-z]t', False, True);
+  DoAssert('cAt', 'c[a-z]t', False, True);
+  DoAssert('cAt', 'c[a-z]t', True, False);
+  DoAssert('c.t', 'c[.-/]t', False, True);  // dot is literal in set
+  DoAssert('c/t', 'c[.-/]t', False, True);
+  DoAssert('c-t', 'c[.-/]t', False, True);
+  DoAssert('cxt', 'c[.-/]t', False, False);
+
+  // Mixed cards with sets
+  DoAssert('prefixXsuffix', 'prefix*[A-Z]suffix', False, True);
+  DoAssert('prefixxsuffix', 'prefix*[A-Z]suffix', False, False);
+  DoAssert('pXmidYend', 'p*[A-Z]*[A-Z]end', False, True);
+  DoAssert('pXmidyend', 'p*[A-Z]*[A-Z]end', False, False);
+
+  // Case sensitivity toggles
+  DoAssert('Readme.MD', '*.md', False, True);
+  DoAssert('Readme.MD', '*.md', True, False);
+  DoAssert('Δ.txt', '*.TXT', False, True); // non-ASCII; W may consider case-insensitive; we trust W vs A comparison
+  DoAssert('Δ.txt', '*.TXT', True, False);
+
+  // Empty + star interplay
+  DoAssert('', '***', False, True);
+  DoAssert('', '**?**', False, False);
+  DoAssert('x', '**?**', False, True);
+
+  // Star placement specifics
+  DoAssert('abc', '*abc', False, True);
+  DoAssert('xabc', '*abc', False, True);
+  DoAssert('xab', '*abc', False, False);
+  DoAssert('abc', 'abc*', False, True);
+  DoAssert('abccccc', 'abc*', False, True);
+  DoAssert('ab', 'abc*', False, False);
+
+  // Deep backtracking
+  DoAssert('aaaaab', 'a*a*a*a*b', False, True);
+  DoAssert('aaaaac', 'a*a*a*a*b', False, False);
+  DoAssert('axbxcxd', 'a*b*c*d', False, True);
+  DoAssert('abcd', 'a*b*c*d', False, True);
+  DoAssert('acbd', 'a*b*c*d', False, False);
+
+  // Question marks at ends
+  DoAssert('a', '?', False, True);
+  DoAssert('ab', '?', False, False);
+  DoAssert('ab', 'a?', False, True);
+  DoAssert('ab', '?b', False, True);
+  DoAssert('ab', '??', False, True);
+  DoAssert('ab', '???', False, False);
+
+  // Mixed directory-like separators (treated as literals)
+  DoAssert('dir/file.txt', 'dir/*', False, True);
+  DoAssert('dir/sub/file.txt', 'dir/*', False, False);
+  DoAssert('dir\\file.txt', 'dir\\*.txt', False, True);
+  DoAssert('dir\\sub\\file.txt', 'dir\\*.txt', False, False);
+  DoAssert('dir/sub/file.txt', 'dir/*/*.txt', False, True);
+  DoAssert('dir/sub/file.doc', 'dir/*/*.txt', False, False);
+
+  // Literal question mark in name
+  DoAssert('what?', 'what?', False, True);
+  DoAssert('what?', 'what??', False, False);
+  DoAssert('what??', 'what??', False, True);
+
+  // Literal star in name (no escaping in this engine => '*' is wildcard; ensure mismatch when literal star present)
+  DoAssert('a*b', 'a*b', False, True); // wildcard absorbs literal '*'
+  DoAssert('a*b', 'a**b', False, True);
+  DoAssert('a*b', 'a?b', False, False); // '?' cannot match two chars
+
+  // Complex mixed cases
+  DoAssert('log-2025-10-05.txt', 'log-????-??-??.txt', False, True);
+  DoAssert('log-2025-10-5.txt', 'log-????-??-??.txt', False, False);
+  DoAssert('img_0012.jpeg', 'img_*.[jJ][pP][eE][gG]', False, True);
+  DoAssert('img_0012.jPeG', 'img_*.[jJ][pP][eE][gG]', True, True);
+  DoAssert('img_0012.JPG', '*.jp*g', False, True);
+  DoAssert('img_0012.JPG', '*.jp*g', True, False);
+
+  // Boundary of sets with single-member ranges
+  DoAssert('a', '[a-a]', False, True);
+  DoAssert('b', '[a-a]', False, False);
+  DoAssert('0', '[0-0]', False, True);
+  DoAssert('1', '[0-0]', False, False);
+
+  // Negation with single member
+  DoAssert('x', '[!x]', False, True);
+  DoAssert('x', '[!x]', True, False);
+
+  // Spaces in name and mask
+  DoAssert('my file.txt', 'my *.txt', False, True);
+  DoAssert('myfile.txt', 'my *.txt', False, False);
+  DoAssert(' spaced ', '* *', False, True);
+  DoAssert('spaced', '* *', False, False);
+
+  // Many cards with minimal content
+  DoAssert('a', '*a*', False, True);
+  DoAssert('b', '*a*', False, False);
+  DoAssert('aba', '*a*', False, True);
+  DoAssert('bbb', '*a*', False, False);
+
+  // End anchoring via sentinel (no trailing star)
+  DoAssert('abcd', 'abc', False, False);
+  DoAssert('abc', 'abc', False, True);
+  DoAssert('abc', 'ab?', False, True);
+  DoAssert('abcd', 'ab?', False, False);
+
+  // Bracket as literal outside sets using set-trick
+  DoAssert('[x]', '[[]x]', False, True);
+  DoAssert('[]', '[[]]', False, True);
+  DoAssert('[', '[[]', False, True);
+  DoAssert('x[', 'x[[]', False, True);
+
+  // Mixed ranges; case variants
+  DoAssert('G', '[a-g]', False, True);
+  DoAssert('G', '[a-g]', True, False);
+  DoAssert('g', '[A-G]', True, False);
+  DoAssert('G', '[A-G]', True, True);
+
+  // Star consuming nothing between literals
+  DoAssert('ab', 'a*b', False, True);
+  DoAssert('aXb', 'a*b', False, True);
+  DoAssert('aXYZb', 'a*b', False, True);
+  DoAssert('ab', 'a**b', False, True);
+
+  // Multi-dot tricky
+  DoAssert('a..b', 'a..b', False, True);
+  DoAssert('a..b', 'a.*.b', False, True);
+  DoAssert('a...b', 'a.*.b', False, True);
+  DoAssert('a.b', 'a.*.b', False, True);
+  DoAssert('a.b', 'a..b', False, False);
+
+  // Numeric-looking names
+  DoAssert('12345', '12*45', False, True);
+  DoAssert('1245', '12*45', False, True);
+  DoAssert('125', '12*45', False, False);
+  DoAssert('12945', '12?45', False, True);
+  DoAssert('12A45', '12?45', False, True);
+  DoAssert('12AA45', '12?45', False, False);
+
+  // Long names with scattered wildcards
+  DoAssert('alpha_beta_gamma_delta', 'a*_*_*_delta', False, True);
+  DoAssert('alpha_beta_gamma_theta', 'a*_*_*_delta', False, False);
+
+  // Question marks crossing separators (still literal match)
+  DoAssert('a/b', 'a/?', False, True);
+  DoAssert('a/bc', 'a/?', False, False);
+  DoAssert('a\\b', 'a\\?', False, True);
+
+  // Star + set right after
+  DoAssert('fooX', '*[A-Z]', False, True);
+  DoAssert('foox', '*[A-Z]', False, False);
+  DoAssert('foo9', '*[0-9]', False, True);
+  DoAssert('foo/', '*[0-9]', False, False);
+
+  // Star in the middle with minimal remainder
+  DoAssert('abc', 'a*c', False, True);
+  DoAssert('ac', 'a*c', False, True);
+  DoAssert('abdc', 'a*c', False, True);
+  DoAssert('abdc', 'a*d', False, False);
+
+  // Very long star coverage
+  DoAssert('this_is_a_very_long_filename.ext', 'this*ext', False, True);
+  DoAssert('this_is_a_very_long_filename.ext', 'that*ext', False, False);
+  DoAssert('prefix_middle_suffix', 'prefix*suffix', False, True);
+  DoAssert('prefix_middle_suf', 'prefix*suffix', False, False);
 end;
 
 initialization

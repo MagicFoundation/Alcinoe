@@ -921,7 +921,6 @@ uses
   Macapi.ObjectiveC,
   iOSApi.Foundation,
   iOSapi.Helpers,
-  Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   {$IFDEF ALDPK}
   DesignIntf,
@@ -5391,7 +5390,7 @@ initialization
   //https://developer.android.com/media/optimize/performance/frame-rate
   TALDynamicListBox.TView.DisplayDefaultRefreshRate := TAndroidHelper.Display.getRefreshRate;
   {$ELSEIf defined(IOS)}
-  TALDynamicListBox.TView.DisplayDefaultRefreshRate := TALUIScreen.Wrap(NSObjectToID(TiOSHelper.MainScreen)).maximumFramesPerSecond;
+  TALDynamicListBox.TView.DisplayDefaultRefreshRate := TiOSHelper.MainScreen.maximumFramesPerSecond;
   {$ELSE}
   TALDynamicListBox.TView.DisplayDefaultRefreshRate := 60
   {$ENDIF}

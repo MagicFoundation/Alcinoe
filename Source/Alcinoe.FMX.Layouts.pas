@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -119,9 +119,7 @@ type
         FScrollBox: TALCustomScrollBox;
       protected
         procedure DoContentChanged; override;
-        {$IFNDEF ALDPK}
-        function IsVisibleObject(const AObject: TControl): Boolean; override;
-        {$ENDIF}
+        function IsVisibleChild(const AChild: TControl): Boolean; override;
       public
         constructor Create(AOwner: TComponent); override;
         property ScrollBox: TALCustomScrollBox read FScrollBox;
@@ -294,12 +292,10 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
-    {$IFNDEF ALDPK}
     procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseLeave(const AObject: TControl); override;
-    {$ENDIF}
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     property HScrollBar: TScrollBar read fHScrollBar;
     property VScrollBar: TScrollBar read fVScrollBar;
@@ -620,35 +616,33 @@ begin
   FScrollBox := TALCustomScrollBox(AOwner);
 end;
 
-{*************}
-{$IFNDEF ALDPK}
-function TALCustomScrollBox.TContent.IsVisibleObject(const AObject: TControl): Boolean;
+{***********************************************************************************}
+function TALCustomScrollBox.TContent.IsVisibleChild(const AChild: TControl): Boolean;
 begin
-  if AObject.Visible then begin
+  if AChild.Visible then begin
 
     If Height > ScrollBox.Height then
-      Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
-                (AObject.Position.Y + (AObject.Height * _TControlProtectedAccess(AObject).scale.y) > -Position.Y)
+      Result := (AChild.Position.Y < -Position.Y + FscrollBox.Height) and
+                (AChild.Position.Y + (AChild.Height * _TControlProtectedAccess(AChild).scale.y) > -Position.Y)
     else
       // Handle the maxContentHeight
-      Result := (AObject.Position.Y < Height) and
-                (AObject.Position.Y + (AObject.Height * _TControlProtectedAccess(AObject).scale.y) > 0);
+      Result := (AChild.Position.Y < Height) and
+                (AChild.Position.Y + (AChild.Height * _TControlProtectedAccess(AChild).scale.y) > 0);
 
     If Width > ScrollBox.Width then
       Result := Result and
-                (AObject.Position.X < -Position.X + FscrollBox.Width) and
-                (AObject.Position.X + (AObject.Width * _TControlProtectedAccess(AObject).scale.x) > -Position.X)
+                (AChild.Position.X < -Position.X + FscrollBox.Width) and
+                (AChild.Position.X + (AChild.Width * _TControlProtectedAccess(AChild).scale.x) > -Position.X)
     else
       // Handle the maxContentWidth
       Result := Result and
-                (AObject.Position.X < Width) and
-                (AObject.Position.X + (AObject.Width * _TControlProtectedAccess(AObject).scale.x) > 0);
+                (AChild.Position.X < Width) and
+                (AChild.Position.X + (AChild.Width * _TControlProtectedAccess(AChild).scale.x) > 0);
 
   end
   else
     result := False;
 end;
-{$ENDIF}
 
 {*****************************************************}
 procedure TALCustomScrollBox.TContent.DoContentChanged;
@@ -1317,8 +1311,7 @@ begin
   InternalMouseLeave;
 end;
 
-{*************}
-{$IFNDEF ALDPK}
+{******************************************************************************************************************************}
 procedure TALCustomScrollBox.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then begin
@@ -1333,20 +1326,16 @@ begin
   InternalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{********************************************************************************************************}
 procedure TALCustomScrollBox.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
 begin
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   InternalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{****************************************************************************************************************************}
 procedure TALCustomScrollBox.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then begin
@@ -1361,16 +1350,13 @@ begin
   InternalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{***********************************************************************}
 procedure TALCustomScrollBox.ChildrenMouseLeave(const AObject: TControl);
 begin
   InternalMouseLeave;
   inherited;
 end;
-{$ENDIF}
 
 {*****************************************************************************************************}
 procedure TALCustomScrollBox.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);

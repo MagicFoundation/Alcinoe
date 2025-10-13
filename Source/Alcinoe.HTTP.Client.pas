@@ -291,7 +291,7 @@ begin
   if FCookies = nil then begin
     FCookies := TALNVStringListA.Create;
     FCookies.LineBreak := '; ';
-    FCookies.IncludeTrailingLineBreakInText := False;
+    FCookies.TrailingLineBreak := False;
   end;
   Result := FCookies;
 end;
@@ -302,7 +302,7 @@ begin
   if FUnknownHeaders = nil then begin
     FUnknownHeaders := TALNVStringListA.Create;
     FUnknownHeaders.NameValueSeparator := ':';
-    FUnknownHeaders.IncludeTrailingLineBreakInText := False;
+    FUnknownHeaders.TrailingLineBreak := False;
   end;
   Result := FUnknownHeaders;
 end;
@@ -417,7 +417,7 @@ begin
   if FUnknownHeaders = nil then begin
     FUnknownHeaders := TALNVStringListA.Create;
     FUnknownHeaders.NameValueSeparator := ':';
-    FUnknownHeaders.IncludeTrailingLineBreakInText := False;
+    FUnknownHeaders.TrailingLineBreak := False;
   end;
   Result := FUnknownHeaders;
 end;
@@ -802,16 +802,16 @@ Begin
       else begin
         var LPrevNameValueSeparator := AFormParams.NameValueSeparator;
         var LPrevLineBreak := AFormParams.LineBreak;
-        var LPrevIncludeTrailingLineBreakInText := AFormParams.IncludeTrailingLineBreakInText;
+        var LPrevTrailingLineBreak := AFormParams.TrailingLineBreak;
         AFormParams.NameValueSeparator := '=';
         AFormParams.LineBreak := '&';
-        AFormParams.IncludeTrailingLineBreakInText := False;
+        AFormParams.TrailingLineBreak := False;
         try
           SB.Append(AFormParams.Text);
         finally
           AFormParams.NameValueSeparator := LPrevNameValueSeparator;
           AFormParams.LineBreak := LPrevLineBreak;
-          AFormParams.IncludeTrailingLineBreakInText := LPrevIncludeTrailingLineBreakInText;
+          AFormParams.TrailingLineBreak := LPrevTrailingLineBreak;
         end;
       end;
     end;

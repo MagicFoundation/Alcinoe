@@ -4,6 +4,10 @@ interface
 
 {$I Alcinoe.inc}
 
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4349 was corrected, if yes remove the MACOS conditional define around TNSNumber, else adjust the IFDEF'}
+{$ENDIF}
+
 uses
   System.classes,
   System.UITypes,
@@ -145,7 +149,7 @@ type
   TALShadow = class;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Types.TBounds was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALBounds = class(TPersistent)
@@ -192,7 +196,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Types.TPosition was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALPosition = class(TPersistent)
@@ -1134,11 +1138,7 @@ function ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeigh
 function ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALTextHorzAlignToUITextAlignment(const ATextHorzAlign: TALTextHorzAlign): UITextAlignment;
-{$ENDIF}
-
-{$IF defined(ALMacOS)}
+{$IF defined(ALAppleOS)}
 function ALTextHorzAlignToNSTextAlignment(const ATextHorzAlign: TALTextHorzAlign): NSTextAlignment;
 {$ENDIF}
 
@@ -1158,7 +1158,7 @@ function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 
 Type
 
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALControlAccessPrivate = class(TFmxObject)
@@ -1190,7 +1190,9 @@ Type
     FRotationAngle: Single;
     FPosition: TPosition;
     FScale: TPosition;
+    {$IF CompilerVersion < 37}  // Florence
     FSkew: TPosition;
+    {$ENDIF}
     FRotationCenter: TPosition;
     FCanFocus: Boolean;
     FOnCanFocus: TCanFocusEvent;
@@ -1327,7 +1329,7 @@ Type
 
 {$IF defined(IOS)}
 type
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Platform.iOS.TFMXViewBase still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALFMXViewBaseAccessPrivate = class(TOCLocal)
@@ -1336,6 +1338,9 @@ type
   public
     FGestureControl: TComponent;
     FMultiTouchManager: TMultiTouchManagerIOS;
+    {$IF CompilerVersion >= 37}  // Florence
+    FNeedRender: Boolean;
+    {$ENDIF}
     FNoOfTouches: NativeUInt;
     [Weak] FTextService: TObject; // TTextServiceCocoa;
   public
@@ -1356,6 +1361,9 @@ type
     FInputDelegate: UITextInputDelegate;
     FShouldIgnoreNextClick: Boolean;
     FAdditionalShift: TShiftState;
+    {$IF CompilerVersion >= 37}  // Florence
+    FAdditionalKeyShift: TShiftState;
+    {$ENDIF}
     FSavedFocusedControl: TObject; // TDelegatedFreeNotify<IControl>;
   end;
 {$ENDIF}
@@ -1414,14 +1422,12 @@ uses
   Macapi.CoreFoundation,
   Macapi.Helpers,
   Macapi.AppKit,
-  Alcinoe.Macapi.CoreText,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.CoreFoundation,
   Macapi.Helpers,
   iOSapi.Helpers,
   Alcinoe.iOSApi.AudioToolbox,
-  Alcinoe.iOSapi.CoreText,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
   Winapi.Windows,
@@ -5694,7 +5700,7 @@ begin
       if LFontRef = nil then raise Exception.Create('Failed to create CGFontRef from data provider');
       try
         var LErrorRef: PCFErrorRef;
-        if CTFontManagerRegisterGraphicsFont(LFontRef, @LErrorRef) = 0 then begin
+        if not CTFontManagerRegisterGraphicsFont(LFontRef, @LErrorRef) then begin
           var LNSError: NSError := TNSError.Wrap(LErrorRef);
           Raise Exception.createFmt('Cannot register font: code="%d", description="%s"', [LNSError.code, NSStrToStr(LNSError.localizedDescription)]);
         end;
@@ -5759,7 +5765,7 @@ Function ALGetSkFontStyle(
            const AFontSlant: TFontSlant;
            const AFontStretch: TFontStretch): sk_fontstyle_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_fontstyle_t didn''t changed'}
   {$ENDIF}
   //--
@@ -6217,7 +6223,7 @@ end;
 // This is what is returned by canvas.matrix by default.
 function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.SetMatrix was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelHorizontally was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelVertically was not updated and adjust the IFDEF'}
@@ -6240,7 +6246,7 @@ end;
 // This is what is returned by canvas.matrix by default.
 function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.SetMatrix was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelHorizontally was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelVertically was not updated and adjust the IFDEF'}
@@ -6289,7 +6295,7 @@ procedure ALVibrateDevice(const ADurationMs: Integer = 500);
 begin
   {$IF defined(ANDROID)}
   var aVibratorServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.VIBRATOR_SERVICE);
-  var aVibrator := TJVibrator.Wrap((aVibratorServiceNative as ILocalObject).GetObjectID);
+  var aVibrator := TJVibrator.Wrap(TAndroidHelper.JObjectToID(aVibratorServiceNative));
   aVibrator.Vibrate(500);
   {$ELSEIF defined(IOS)}
   AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
@@ -6380,13 +6386,13 @@ function  ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; 
             TFontWeight.UltraBlack: LCTFontWeight := 1.00; // 1000
             else raise Exception.Create('Error 9F8E0D0B-78A0-4EBE-A4C6-B4098DEE7EFF');
           end;
-          LFontTraits.setValue(TNSNumber.OCClass.numberWithFloat(LCTFontWeight), TNSString.Wrap(kCTFontWeightTrait));
+          LFontTraits.setObject({$IF not defined(ALMacOS)}NSObjectToID({$ENDIF}TNSNumber.OCClass.numberWithFloat(LCTFontWeight){$IF not defined(ALMacOS)}){$ENDIF}, kCTFontWeightTrait);
         end;
 
         if (AFontSlant = TFontSlant.Italic) then
-          LFontTraits.setValue(TNSNumber.OCClass.numberWithUnsignedInt(kCTFontItalicTrait), TNSString.Wrap(kCTFontSymbolicTrait));
+          LFontTraits.setObject({$IF not defined(ALMacOS)}NSObjectToID({$ENDIF}TNSNumber.OCClass.numberWithUnsignedInt(kCTFontItalicTrait){$IF not defined(ALMacOS)}){$ENDIF}, kCTFontSymbolicTrait);
 
-        AAttributes.setValue(NSObjectToID(LFontTraits), TNSString.Wrap(kCTFontTraitsAttribute));
+        AAttributes.setObject(NSObjectToID(LFontTraits), kCTFontTraitsAttribute);
 
       finally
         LFontTraits.release;
@@ -6410,7 +6416,7 @@ begin
         if LFontFamily = '' then Continue;
         //--
         If not LMainFontFamilySet then begin
-          LAttributes.setValue(StringToID(LFontFamily), TNSString.Wrap(kCTFontFamilyNameAttribute));
+          LAttributes.setObject(StringToID(LFontFamily), kCTFontFamilyNameAttribute);
           _UpdateFontTraitsAttribute(LAttributes);
           LMainFontFamilySet := True;
         end
@@ -6418,9 +6424,9 @@ begin
         else begin
           var LFallbackAttributes := TNSMutableDictionary.Create;
           try
-            LFallbackAttributes.setValue(StringToID(LFontFamily), TNSString.Wrap(kCTFontFamilyNameAttribute));
+            LFallbackAttributes.setObject(StringToID(LFontFamily), kCTFontFamilyNameAttribute);
             _UpdateFontTraitsAttribute(LFallbackAttributes);
-            LFallbackAttributes.setValue(TNSNumber.OCClass.numberWithFloat(AFontSize), TNSString.Wrap(kCTFontSizeAttribute));
+            LFallbackAttributes.setObject({$IF not defined(ALMacOS)}NSObjectToID({$ENDIF}TNSNumber.OCClass.numberWithFloat(AFontSize){$IF not defined(ALMacOS)}){$ENDIF}, kCTFontSizeAttribute);
             var LFallbackFontDescriptorRef := CTFontDescriptorCreateWithAttributes(CFDictionaryRef(NSObjectToID(LFallbackAttributes)));
             if LFallbackFontDescriptorRef = nil then raise Exception.Create('Error creating fallback font descriptor');
             setlength(LFallbackFontDescriptorRefs, length(LFallbackFontDescriptorRefs) + 1);
@@ -6433,7 +6439,7 @@ begin
 
       if length(LFallbackFontDescriptorRefs) > 0 then begin
         var LCascadeListArray := TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LFallbackFontDescriptorRefs[0], Length(LFallbackFontDescriptorRefs)));
-        LAttributes.setValue(NSObjectToID(LCascadeListArray), TNSString.Wrap(kCTFontCascadeListAttribute));
+        LAttributes.setObject(NSObjectToID(LCascadeListArray), kCTFontCascadeListAttribute);
       end;
 
       var LFontDescriptorRef := CTFontDescriptorCreateWithAttributes(CFDictionaryRef(NSObjectToID(LAttributes)));
@@ -6455,24 +6461,20 @@ begin
 end;
 {$ENDIF}
 
-{****************}
-{$IF defined(IOS)}
-function ALTextHorzAlignToUITextAlignment(const ATextHorzAlign: TALTextHorzAlign): UITextAlignment;
-begin
-  case ATextHorzAlign of
-    TALTextHorzAlign.Center:   Result := UITextAlignmentCenter;
-    TALTextHorzAlign.Leading:  Result := UITextAlignmentLeft;
-    TALTextHorzAlign.Trailing: Result := UITextAlignmentRight;
-    TALTextHorzAlign.Justify:  Result := UITextAlignmentLeft;
-    else Raise Exception.Create('Error 1F3C2FAF-354E-4584-A269-DEFD7E626A4A');
-  end;
-end;
-{$ENDIF}
-
-{********************}
-{$IF defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 function ALTextHorzAlignToNSTextAlignment(const ATextHorzAlign: TALTextHorzAlign): NSTextAlignment;
 begin
+  {$IF defined(IOS)}
+  case ATextHorzAlign of
+    TALTextHorzAlign.Center:   Result := NSTextAlignmentCenter;
+    TALTextHorzAlign.Leading:  Result := NSTextAlignmentLeft;
+    TALTextHorzAlign.Trailing: Result := NSTextAlignmentRight;
+    TALTextHorzAlign.Justify:  Result := NSTextAlignmentLeft;
+    else Raise Exception.Create('Error 1F3C2FAF-354E-4584-A269-DEFD7E626A4A');
+  end;
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
   case ATextHorzAlign of
     TALTextHorzAlign.Center:   Result := NSCenterTextAlignment;
     TALTextHorzAlign.Leading:  Result := NSLeftTextAlignment;
@@ -6480,6 +6482,7 @@ begin
     TALTextHorzAlign.Justify:  Result := NSJustifiedTextAlignment;
     else Raise Exception.Create('Error 8E1D2DC2-33BA-4A53-9CE4-977748C1CAE0');
   end;
+  {$ENDIF}
 end;
 {$ENDIF}
 
@@ -6521,7 +6524,7 @@ begin
     Index := 0;
     Iterator := ASet.iterator;
     while Iterator.hasNext do begin
-      S := TJString.Wrap((Iterator.next as ILocalObject).GetObjectID);
+      S := TJString.Wrap(TAndroidHelper.JObjectToID(Iterator.next));
       if S <> nil then begin
         Result[Index] := JStringToString(S);
         Inc(Index);

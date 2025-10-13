@@ -13,7 +13,7 @@ uses
 
 type
 
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings is still the same and adjust the IFDEF'}
   {$ENDIF}
 
@@ -1309,7 +1309,7 @@ begin
   end;
 end;
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings.GetEraYearOffset is still the same and adjust the IFDEF'}
 {$ENDIF}
 function TALFormatSettingsA.GetEraYearOffset(const Name: ansistring): Integer;

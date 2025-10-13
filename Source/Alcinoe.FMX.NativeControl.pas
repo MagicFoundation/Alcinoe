@@ -352,6 +352,9 @@ begin
   for var I := 0 to ControlsCount - 1 do begin
     var LControl := Controls[i];
     if not LControl.Visible then continue;
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
+    {$ENDIF}
     case Lcontrol.Align of
       TAlignLayout.None,
       TAlignLayout.Center,
@@ -367,15 +370,27 @@ begin
       TAlignLayout.FitRight:;
       //--
       TAlignLayout.Top,
+      TAlignLayout.TopLeft,
+      TAlignLayout.TopCenter,
+      TAlignLayout.TopRight,
       TAlignLayout.MostTop: Result.Top := Result.top + LControl.Height + LControl.Margins.top + LControl.Margins.bottom;
       //--
       TAlignLayout.Left,
+      TAlignLayout.LeftTop,
+      TAlignLayout.LeftCenter,
+      TAlignLayout.LeftBottom,
       TAlignLayout.MostLeft: Result.Left := Result.Left + LControl.width + LControl.Margins.left + LControl.Margins.right;
       //--
       TAlignLayout.Right,
+      TAlignLayout.RightTop,
+      TAlignLayout.RightCenter,
+      TAlignLayout.RightBottom,
       TAlignLayout.MostRight: Result.Right := Result.Right - LControl.width - LControl.Margins.left - LControl.Margins.right;
       //--
       TAlignLayout.Bottom,
+      TAlignLayout.BottomLeft,
+      TAlignLayout.BottomCenter,
+      TAlignLayout.BottomRight,
       TAlignLayout.MostBottom: Result.Bottom := Result.Bottom - LControl.Height - LControl.Margins.top - LControl.Margins.bottom;
       //--
       else

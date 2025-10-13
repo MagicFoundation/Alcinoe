@@ -196,7 +196,7 @@ begin
   {$IF defined(IOS)}
 
   // https://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
-  // In general, if you create such a class with Create, alloc, copy, mutableCopy, new... then retain
+  // In general, if you create such a class with create, alloc, copy, mutableCopy, new... then retain
   // is called for you. Then you need to call release or autorelease.
   FLoginManager := TFBSDKLoginManager.Create;
 
@@ -245,7 +245,7 @@ begin
   {$IF defined(android)}
 
   var LArrayList := ALStringsToJArrayList(APermissions);
-  var LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
+  var LCollection := TJCollection.Wrap(TAndroidHelper.JObjectToID(LArrayList));
   TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, LCollection);
 
   {$ENDIF}
@@ -469,7 +469,7 @@ var LLoginResult: JLoginResult;
     LDeniedPermissions: TArray<String>;
 begin
 
-  LLoginResult := TJLoginResult.Wrap((result as ILocalObject).GetObjectID);
+  LLoginResult := TJLoginResult.Wrap(TAndroidHelper.JObjectToID(result));
   LToken := LLoginResult.getAccessToken;
   if LToken <> nil then begin
     LUserIDStr := JStringToString(LToken.getUserId);

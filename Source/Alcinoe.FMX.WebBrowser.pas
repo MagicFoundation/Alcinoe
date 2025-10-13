@@ -4,11 +4,8 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.WebBrowser.Delegate.iOS.pas was not updated and adjust the IFDEF'}
-{$ENDIF}
-{$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE WARN 'Check if FMX.WebBrowser.Cocoa.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 uses
@@ -132,24 +129,25 @@ Type
         FWebBrowserView: TALIosWebBrowserView;
       public
         constructor Create(const AWebBrowserView: TALIosWebBrowserView);
-        [MethodName('webView:decidePolicyForNavigationAction:decisionHandler:')]
-        procedure webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction; decisionHandler: Pointer); overload; cdecl; // TWKNavigationDelegateBlockMethod1
-        [MethodName('webView:decidePolicyForNavigationResponse:decisionHandler:')]
-        procedure webViewDecidePolicyForNavigationResponse(webView: WKWebView; navigationResponse: WKNavigationResponse; decisionHandler: Pointer); cdecl; // TWKNavigationDelegateBlockMethod3
+        procedure webView(webView: WKWebView; didFailProvisionalNavigation: WKNavigation; withError: NSError); overload; cdecl;
+        procedure webView(webView: WKWebView; navigationResponse: WKNavigationResponse; didBecomeDownload: WKDownload); overload; cdecl;
+        procedure webView(webView: WKWebView; didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge; completionHandler: Pointer); overload; cdecl;
+        procedure webView(webView: WKWebView; navigationAction: WKNavigationAction; didBecomeDownload: WKDownload); overload; cdecl;
+        procedure webView(webView: WKWebView; shouldGoToBackForwardListItem: WKBackForwardListItem; willUseInstantBack: Boolean; completionHandler: Pointer); overload; cdecl;
+        procedure webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer); overload; cdecl;
+        procedure webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; preferences: WKWebpagePreferences; decisionHandler: Pointer); overload; cdecl;
+        procedure webView(webView: WKWebView; decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer); overload; cdecl;
+        procedure webView(webView: WKWebView; didStartProvisionalNavigation: WKNavigation); overload; cdecl;
+        [MethodName('webView:authenticationChallenge:shouldAllowDeprecatedTLS:')]
+        procedure webViewAuthenticationChallenge(webView: WKWebView; authenticationChallenge: NSURLAuthenticationChallenge; shouldAllowDeprecatedTLS: Pointer); cdecl;
         [MethodName('webView:didCommitNavigation:')]
-        procedure webViewDidCommitNavigation(webView: WKWebView; navigation: WKNavigation); cdecl;
+        procedure webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation); cdecl;
         [MethodName('webView:didFailNavigation:withError:')]
-        procedure webViewDidFailNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError); cdecl;
-        [MethodName('webView:didFailProvisionalNavigation:withError:')]
-        procedure webViewDidFailProvisionalNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError); cdecl;
+        procedure webViewDidFailNavigation(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError); cdecl;
         [MethodName('webView:didFinishNavigation:')]
-        procedure webViewDidFinishNavigation(webView: WKWebView; navigation: WKNavigation); cdecl;
-        [MethodName('webView:didReceiveAuthenticationChallenge:completionHandler:')]
-        procedure webViewDidReceiveAuthenticationChallenge(webView: WKWebView; challenge: NSURLAuthenticationChallenge; completionHandler: Pointer); cdecl; // TWKNavigationDelegateBlockMethod4
+        procedure webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation); cdecl;
         [MethodName('webView:didReceiveServerRedirectForProvisionalNavigation:')]
-        procedure webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; navigation: WKNavigation); cdecl;
-        [MethodName('webView:didStartProvisionalNavigation:')]
-        procedure webViewDidStartProvisionalNavigation(webView: WKWebView; navigation: WKNavigation); cdecl;
+        procedure webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; didReceiveServerRedirectForProvisionalNavigation: WKNavigation); cdecl;
         procedure webViewWebContentProcessDidTerminate(webView: WKWebView); cdecl;
       end;
   private
@@ -644,7 +642,7 @@ begin
   FNavigationDelegate := TNavigationDelegate.Create(Self);
   View.setNavigationDelegate(FNavigationDelegate.GetObjectID);
   View.setOpaque(False);
-  View.setbackgroundColor(TUIColor.Wrap(TUIColor.OCClass.clearColor));
+  View.setbackgroundColor(TUIColor.OCClass.clearColor);
 end;
 
 {**************************************}
@@ -694,73 +692,32 @@ begin
   FWebBrowserView := AWebBrowserView;
 end;
 
-{*****************************************************************************************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction; decisionHandler: Pointer); // TWKNavigationDelegateBlockMethod1
-var
-  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
+{*********************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; didFailProvisionalNavigation: WKNavigation; withError: NSError);
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDecidePolicyForNavigationAction');
-  {$ENDIF}
-  var LShouldStartLoadUrl := FWebBrowserView.Control.ShouldStartLoadUrl(NSStrToStr(navigationAction.request.URL.absoluteString));
-  @LBlockImp := imp_implementationWithBlock(decisionHandler);
-  if LShouldStartLoadUrl then LBlockImp(WKNavigationActionPolicyAllow)
-  else LBlockImp(WKNavigationActionPolicyCancel);
-  imp_removeBlock(@LBlockImp);
-end;
-
-{***********************************************************************************************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView: WKWebView; navigationResponse: WKNavigationResponse; decisionHandler: Pointer); // TWKNavigationDelegateBlockMethod3
-var
-  LDecisionHandlerBlock: procedure(policy: WKNavigationResponsePolicy); cdecl;
-begin
-  {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDecidePolicyForNavigationResponse');
-  {$ENDIF}
-  @LDecisionHandlerBlock := imp_implementationWithBlock(decisionHandler);
-  LDecisionHandlerBlock(WKNavigationResponsePolicyAllow);
-  imp_removeBlock(@LDecisionHandlerBlock);
-end;
-
-{**************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; navigation: WKNavigation);
-begin
-  {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidCommitNavigation');
+  //ALLog('TNavigationDelegate.webView:didFailProvisionalNavigation:withError');
   {$ENDIF}
 end;
 
-{****************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFailNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
+{******************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; navigationResponse: WKNavigationResponse; didBecomeDownload: WKDownload);
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidFailNavigation');
+  //ALLog('TNavigationDelegate.webView:navigationResponse:didBecomeDownload');
   {$ENDIF}
 end;
 
-{***************************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFailProvisionalNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
-begin
-  {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidFailProvisionalNavigation');
-  {$ENDIF}
-end;
-
-{**************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; navigation: WKNavigation);
-begin
-  {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidFinishNavigation');
-  {$ENDIF}
-end;
-
-{************************************************************************************************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidReceiveAuthenticationChallenge(webView: WKWebView; challenge: NSURLAuthenticationChallenge; completionHandler: Pointer); // TWKNavigationDelegateBlockMethod4
+{**************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge; completionHandler: Pointer);
 
 type
   TAuthenticationResponseProc = reference to procedure(const ACredential: NSURLCredential);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if FMX.WebBrowser.Delegate.Cocoa.TBaseWebViewDelegate.AuthenticateForHost was not updated and adjust the IFDEF'}
+  {$ENDIF}
   procedure AuthenticateForHost(const AHost: NSString; const AResponseProc: TAuthenticationResponseProc);
   var
     LTitle: string;
@@ -786,7 +743,7 @@ type
         if AResult = mrOK then begin
           LUserName := StrToNSStr(AValues[0]);
           LPassword := StrToNSStr(AValues[1]);
-          LCredential := TNSURLCredential.Wrap(TNSURLCredential.OCClass.credentialWithUser(LUserName, LPassword, NSURLCredentialPersistenceNone));
+          LCredential := TNSURLCredential.OCClass.credentialWithUser(LUserName, LPassword, NSURLCredentialPersistenceNone);
           AResponseProc(LCredential)
         end
         else
@@ -799,10 +756,10 @@ var
   LAuthMethod: NSString;
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidReceiveAuthenticationChallenge');
+  //ALLog('TNavigationDelegate.webView:didReceiveAuthenticationChallenge:completionHandler');
   {$ENDIF}
   @LCompletionHandlerBlock := imp_implementationWithBlock(completionHandler);
-  LAuthMethod := challenge.protectionSpace.authenticationMethod;
+  LAuthMethod := didReceiveAuthenticationChallenge.protectionSpace.authenticationMethod;
   if LAuthMethod.isEqualToString(NSURLAuthenticationMethodDefault) or LAuthMethod.isEqualToString(NSURLAuthenticationMethodHTTPBasic) or
     LAuthMethod.isEqualToString(NSURLAuthenticationMethodHTTPDigest) then begin
     AuthenticateForHost(
@@ -823,19 +780,103 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; navigation: WKNavigation);
+{**************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; navigationAction: WKNavigationAction; didBecomeDownload: WKDownload);
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation');
+  //ALLog('TNavigationDelegate.webView:navigationAction:didBecomeDownload');
   {$ENDIF}
 end;
 
-{************************************************************************************************************************************}
-procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidStartProvisionalNavigation(webView: WKWebView; navigation: WKNavigation);
+{********************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; shouldGoToBackForwardListItem: WKBackForwardListItem; willUseInstantBack: Boolean; completionHandler: Pointer);
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webViewDidStartProvisionalNavigation');
+  //ALLog('TNavigationDelegate.webView:shouldGoToBackForwardListItem:willUseInstantBack:completionHandler');
+  {$ENDIF}
+end;
+
+{************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webView:decidePolicyForNavigationAction:decisionHandler');
+  {$ENDIF}
+  var LShouldStartLoadUrl := FWebBrowserView.Control.ShouldStartLoadUrl(NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString));
+  @LBlockImp := imp_implementationWithBlock(decisionHandler);
+  if LShouldStartLoadUrl then LBlockImp(WKNavigationActionPolicyAllow)
+  else LBlockImp(WKNavigationActionPolicyCancel);
+  imp_removeBlock(@LBlockImp);
+end;
+
+{***********************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; preferences: WKWebpagePreferences; decisionHandler: Pointer);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webView:decidePolicyForNavigationAction:preferences');
+  {$ENDIF}
+end;
+
+{****************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer);
+var
+  LDecisionHandlerBlock: procedure(policy: WKNavigationResponsePolicy); cdecl;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webView:decidePolicyForNavigationResponse:decisionHandler');
+  {$ENDIF}
+  @LDecisionHandlerBlock := imp_implementationWithBlock(decisionHandler);
+  LDecisionHandlerBlock(WKNavigationResponsePolicyAllow);
+  imp_removeBlock(@LDecisionHandlerBlock);
+end;
+
+{**************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; didStartProvisionalNavigation: WKNavigation);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webView:didStartProvisionalNavigation');
+  {$ENDIF}
+end;
+
+{**********************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewAuthenticationChallenge(webView: WKWebView; authenticationChallenge: NSURLAuthenticationChallenge; shouldAllowDeprecatedTLS: Pointer);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webViewAuthenticationChallenge');
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webViewDidCommitNavigation');
+  {$ENDIF}
+end;
+
+{***************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFailNavigation(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webViewDidFailNavigation');
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webViewDidFinishNavigation');
+  {$ENDIF}
+end;
+
+{*********************************************************************************************************************************************************************************************}
+procedure TALIosWebBrowserView.TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView; didReceiveServerRedirectForProvisionalNavigation: WKNavigation);
+begin
+  {$IF defined(DEBUG)}
+  //ALLog('TNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation');
   {$ENDIF}
 end;
 
@@ -847,7 +888,10 @@ begin
   {$ENDIF}
 end;
 
-{*********************************************************}
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if FMX.WebBrowser.Cocoa.TCommonWebBrowserService.DoNavigate.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
 procedure TALIosWebBrowserView.LoadUrl(const AURL: string);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -859,16 +903,16 @@ procedure TALIosWebBrowserView.LoadUrl(const AURL: string);
     // 1. In application bundle resources
     // 2. In root of disk.
     // For this case we start looking for this file in application bundle resources and after in global file system.
-    var LBundle: Pointer := TNSBundle.OCClass.mainBundle;
-    var LPath := TNSBundle.Wrap(LBundle).pathForResource(StrToNSStr(LFileName), nil);
+    var LBundle := TNSBundle.OCClass.mainBundle;
+    var LPath := LBundle.pathForResource(StrToNSStr(LFileName), nil);
     if LPath = nil then begin
-      LBundle := TNSBundle.OCClass.bundleWithPath(StrToNSStr(LDir));
-      LPath := TNSBundle.Wrap(LBundle).pathForResource(StrToNSStr(LFileName), nil);
+      LBundle := TNSBundle.Wrap(TNSBundle.OCClass.bundleWithPath(StrToNSStr(LDir)));
+      LPath := LBundle.pathForResource(StrToNSStr(LFileName), nil);
     end;
     if LPath <> nil then
-      AUrl := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(LPath))
+      AUrl := TNSURL.OCClass.fileURLWithPath(LPath)
     else if FileExists(AURI.Path) then
-      AUrl := TNSUrl.Wrap(TNSUrl.OCClass.fileURLWithPath(StrToNSStr(AURI.Path)))
+      AUrl := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(AURI.Path))
     else
       AUrl := nil;
     Result := AUrl <> nil;
@@ -1054,7 +1098,10 @@ procedure TALMacWebBrowserView.TNavigationDelegate.webViewDidReceiveAuthenticati
 type
   TAuthenticationResponseProc = reference to procedure(const ACredential: NSURLCredential);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if FMX.WebBrowser.Delegate.Cocoa.TBaseWebViewDelegate.AuthenticateForHost was not updated and adjust the IFDEF'}
+  {$ENDIF}
   procedure AuthenticateForHost(const AHost: NSString; const AResponseProc: TAuthenticationResponseProc);
   var
     LTitle: string;
@@ -1117,7 +1164,10 @@ begin
   end;
 end;
 
-{*********************************************************}
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if FMX.WebBrowser.Cocoa.TCommonWebBrowserService.DoNavigate.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
 procedure TALMacWebBrowserView.LoadUrl(const AURL: string);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1135,6 +1185,9 @@ procedure TALMacWebBrowserView.LoadUrl(const AURL: string);
       LBundle := TNSBundle.OCClass.bundleWithPath(StrToNSStr(LDir));
       LPath := TNSBundle.Wrap(LBundle).pathForResource(StrToNSStr(LFileName), nil);
     end;
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4402 is corrected, if yes remove the TNSURL.Wrap(), and adjust the IFDEF'}
+    {$ENDIF}
     if LPath <> nil then
       AUrl := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(LPath))
     else if FileExists(AURI.Path) then

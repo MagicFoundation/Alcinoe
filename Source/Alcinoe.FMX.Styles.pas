@@ -506,7 +506,6 @@ uses
   iOSapi.Foundation,
   iOSapi.Helpers,
   iOSapi.UIKit,
-  Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   {$IF defined(ALDPK)}
   Vcl.Dialogs,
@@ -25875,7 +25874,7 @@ begin
     else raise Exception.Create('Error 888B969C-A83E-4717-838E-6A830DB0B7D6');
   end;
   if LSystemIsDarkMode <> FIsDarkMode then begin
-    var LWindow := TALUIView.Wrap(NSObjectToID(TiOSHelper.SharedApplication.keyWindow));
+    var LWindow := TiOSHelper.SharedApplication.keyWindow;
     if Assigned(LWindow) then begin
       if not FIsDarkMode then LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleLight)
       else LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleDark);
@@ -27033,7 +27032,7 @@ begin
     else Raise Exception.Create('Error C03E31E0-61CA-4C67-8A50-6765BED18013')
   end;
   {$ELSEIF defined(IOS)}
-  var LWindow := TALUIView.Wrap(NSObjectToID(TiOSHelper.SharedApplication.keyWindow));
+  var LWindow := TiOSHelper.SharedApplication.keyWindow;
   case AValue of
     TDarkModeBehavior.FollowSystem: begin
       if Assigned(LWindow) then LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleUnspecified);

@@ -580,7 +580,7 @@ begin
     else
       LNotificationChannel.setSound(nil, nil);
     var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-    var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
+    var LNotificationManager := TJNotificationManager.Wrap(TAndroidHelper.JObjectToID(LNotificationServiceNative));
     LNotificationManager.createNotificationChannel(LNotificationChannel);
   end;
   {$ENDIF}
@@ -733,7 +733,7 @@ begin
 
     //-----
     var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-    var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
+    var LNotificationManager := TJNotificationManager.Wrap(TAndroidHelper.JObjectToID(LNotificationServiceNative));
     if ANotification.FTag <> '' then
       LNotificationManager.notify(
         StringToJstring(ANotification.FTag), // tag	String: A string identifier for this notification. May be null.
@@ -773,7 +773,7 @@ begin
     end;
     if ANotification.FTitle <> '' then LNotificationContent.setTitle(StrToNSStr(ANotification.FTitle));
     if ANotification.Ftext <> '' then LNotificationContent.setbody(StrToNSStr(ANotification.Ftext));
-    if ANotification.FNumber >= 0 then LNotificationContent.setBadge(TNSNumber.Wrap(TNSNumber.OCClass.numberWithInt(ANotification.FNumber)));
+    if ANotification.FNumber >= 0 then LNotificationContent.setBadge(TNSNumber.OCClass.numberWithInt(ANotification.FNumber));
     if ANotification.Fsound then LNotificationContent.setSound(TUNNotificationSound.OCClass.defaultSound);
     if ANotification.FLargeIconStream <> nil then begin
       var LFileExt := AlDetectImageExtension(ANotification.FLargeIconStream);
@@ -784,36 +784,39 @@ begin
                          'alcinoe_notification_'+ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}).tolower + ALIfThenW(LFileExt <> '', '.') + LFileExt);
       ANotification.FLargeIconStream.SaveToFile(LFileName);
       var LErrorPtr: PNSError := nil;
+      {$IFNDEF ALCompilerVersionSupported130}
+        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4411 was corrected and adjust the IFDEF'}
+      {$ENDIF}
       var LNotificationAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(
                                        nil, // identifier: NSString;
                                        StrToNSUrl(LFileName), // URL: NSURL;
                                        nil, // options: NSDictionary;
-                                       @LErrorPtr); // error: PNSError
+                                       @LErrorPtr); // error: PPointer
       if LErrorPtr <> nil then
         ALLog(
-          'TALNotification.Show',
+          'TALNotificationService.ShowNotification',
           NSStrToStr(TNSError.Wrap(LErrorPtr).localizedDescription),
           TalLogType.Error)
       else if LNotificationAttachment <> nil then
         LNotificationContent.SetAttachments(
           TNSArray.Wrap(
             TNSArray.OCClass.arrayWithObject(
-              NSObjectToID(
-                LNotificationAttachment))));
+              LNotificationAttachment)));
     end;
     //-----
-    var LNotificationRequest := TUNNotificationRequest.OCClass.requestWithIdentifier(
-                                  StrToNsStr(ANotification.FTag), // identifier: NSString; ;
-                                  LNotificationContent, // content: UNNotificationContent
-                                  nil); // trigger: UNNotificationTrigger
-    try
-      TUNUserNotificationCenter.OCClass.currentNotificationCenter.addNotificationRequest(
-        LNotificationRequest, // request: UNNotificationRequest;
-        nil); //withCompletionHandler: TUserNotificationsWithCompletionHandler
-    finally
-      //exception if we release it here
-      //LNotificationRequest.release;
-    end;
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4412 was corrected and adjust the IFDEF'}
+    {$ENDIF}
+    var LNotificationRequest := TUNNotificationRequest.Wrap(
+                                  TUNNotificationRequest.OCClass.requestWithIdentifier(
+                                    StrToNsStr(ANotification.FTag), // identifier: NSString; ;
+                                    LNotificationContent, // content: UNNotificationContent
+                                    nil)); // trigger: UNNotificationTrigger
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+    // No release required for LNotificationRequest because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+    TUNUserNotificationCenter.OCClass.currentNotificationCenter.addNotificationRequest(
+      LNotificationRequest, // request: UNNotificationRequest;
+      nil); //withCompletionHandler: TUserNotificationsWithCompletionHandler
   finally
     LNotificationContent.release;
   end;
@@ -842,7 +845,7 @@ begin
   {$IF defined(ANDROID)}
 
   var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-  var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
+  var LNotificationManager := TJNotificationManager.Wrap(TAndroidHelper.JObjectToID(LNotificationServiceNative));
   LNotificationManager.cancelAll;
 
   {$ENDIF}

@@ -486,7 +486,7 @@ begin
   if FCookies = nil then begin
     FCookies := TALNVStringListA.Create;
     FCookies.LineBreak := '; ';
-    FCookies.IncludeTrailingLineBreakInText := False;
+    FCookies.TrailingLineBreak := False;
     var LRawCookiesStr: AnsiString;
     SetString(
       LRawCookiesStr,
@@ -508,7 +508,7 @@ begin
   if FUnknownHeaders = nil then begin
     FUnknownHeaders := TALNVStringListA.Create;
     FUnknownHeaders.NameValueSeparator := ':';
-    FUnknownHeaders.IncludeTrailingLineBreakInText := False;
+    FUnknownHeaders.TrailingLineBreak := False;
     for var I := 0 to FHeaders^.UnknownHeaderCount - 1 do begin
       var LUnknownHeader := PHTTP_UNKNOWN_HEADER(NativeUInt(FHeaders^.pUnknownHeaders) + (NativeUInt(I) * SizeOf(HTTP_UNKNOWN_HEADER)));
       var LName: AnsiString;
@@ -662,7 +662,7 @@ begin
   if FUnknownHeaders = nil then begin
     FUnknownHeaders := TALNVStringListA.Create;
     FUnknownHeaders.NameValueSeparator := ':';
-    FUnknownHeaders.IncludeTrailingLineBreakInText := False;
+    FUnknownHeaders.TrailingLineBreak := False;
   end;
   Result := FUnknownHeaders;
 end;

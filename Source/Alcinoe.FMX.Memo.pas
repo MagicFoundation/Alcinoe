@@ -15,7 +15,6 @@ uses
   iOSapi.Foundation,
   iOSapi.UIKit,
   Macapi.ObjectiveC,
-  Alcinoe.iOSapi.UIKit,
   Alcinoe.FMX.NativeView.iOS,
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
@@ -68,18 +67,37 @@ Type
         FMemoView: TALIosMemoView;
       public
         constructor Create(const AMemoView: TALIosMemoView);
+        function textView(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange; interaction: UITextItemInteraction): Boolean; overload; cdecl;
+        function textView(textView: UITextView; writingToolsIgnoredRangesInEnclosingRange: NSRange): NSArray; overload; cdecl;
+        procedure textView(textView: UITextView; textItemMenuWillDisplayForTextItem: UITextItem; animator: Pointer); overload; cdecl;
+        function textView(textView: UITextView; menuConfigurationForTextItem: UITextItem; defaultMenu: UIMenu): UITextItemMenuConfiguration; overload; cdecl;
+        function textView(textView: UITextView; primaryActionForTextItem: UITextItem; defaultAction: UIAction): UIAction; overload; cdecl;
+        procedure textView(textView: UITextView; insertInputSuggestion: UIInputSuggestion); overload; cdecl;
+        procedure textView(textView: UITextView; willBeginFormattingWithViewController: UITextFormattingViewController); overload; cdecl;
+        function textView(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean; overload; cdecl;
+        function textView(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange): Boolean; overload; cdecl;
+        function textView(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange; interaction: UITextItemInteraction): Boolean; overload; cdecl;
+        function textView(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean; overload; cdecl;
+        function textView(textView: UITextView; editMenuForTextInRange: NSRange; suggestedActions: NSArray): UIMenu; overload; cdecl;
+        procedure textView(textView: UITextView; willPresentEditMenuWithAnimator: Pointer); overload; cdecl;
         procedure textViewDidBeginEditing(textView: UITextView); cdecl;
+        [MethodName('textView:didBeginFormattingWithViewController:')]
+        procedure textViewDidBeginFormattingWithViewController(textView: UITextView; didBeginFormattingWithViewController: UITextFormattingViewController); cdecl;
         procedure textViewDidChange(textView: UITextView); cdecl;
         procedure textViewDidChangeSelection(textView: UITextView); cdecl;
         procedure textViewDidEndEditing(textView: UITextView); cdecl;
+        [MethodName('textView:didEndFormattingWithViewController:')]
+        procedure textViewDidEndFormattingWithViewController(textView: UITextView; didEndFormattingWithViewController: UITextFormattingViewController); cdecl;
         function textViewShouldBeginEditing(textView: UITextView): Boolean; cdecl;
         function textViewShouldEndEditing(textView: UITextView): Boolean; cdecl;
-        [MethodName('textView:shouldChangeTextInRange:replacementText:')]
-        function textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean; cdecl;
-        [MethodName('textView:shouldInteractWithURL:inRange:')]
-        function textViewShouldInteractWithURLInRange(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange): Boolean; cdecl;
-        [MethodName('textView:shouldInteractWithTextAttachment:inRange:')]
-        function textViewShouldInteractWithTextAttachmentInRange(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean; cdecl;
+        [MethodName('textView:textItemMenuWillEndForTextItem:animator:')]
+        procedure textViewTextItemMenuWillEndForTextItem(textView: UITextView; textItemMenuWillEndForTextItem: UITextItem; animator: Pointer); cdecl;
+        [MethodName('textView:willDismissEditMenuWithAnimator:')]
+        procedure textViewWillDismissEditMenuWithAnimator(textView: UITextView; willDismissEditMenuWithAnimator: Pointer); cdecl;
+        [MethodName('textView:willEndFormattingWithViewController:')]
+        procedure textViewWillEndFormattingWithViewController(textView: UITextView; willEndFormattingWithViewController: UITextFormattingViewController); cdecl;
+        procedure textViewWritingToolsDidEnd(textView: UITextView); cdecl;
+        procedure textViewWritingToolsWillBegin(textView: UITextView); cdecl;
       end;
   private
     FTextViewDelegate: TTextViewDelegate;
@@ -175,7 +193,7 @@ Type
       end;
       // -----------------
       // TTextViewDelegate
-      TTextViewDelegate = class(TOCLocal, Alcinoe.Macapi.AppKit.NSTextViewDelegate)
+      TTextViewDelegate = class(TOCLocal, NSTextViewDelegate)
       private
         FMemoView: TALMacMemoView;
       public
@@ -426,8 +444,96 @@ begin
   FMemoView := AMemoView;
 end;
 
+{********************************************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange; interaction: UITextItemInteraction): Boolean;
+begin
+  Result := True;
+end;
+
+{************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; writingToolsIgnoredRangesInEnclosingRange: NSRange): NSArray;
+begin
+  Result := TNSArray.Wrap(TNSArray.OCClass.&array);
+end;
+
+{*******************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; textItemMenuWillDisplayForTextItem: UITextItem; animator: Pointer);
+begin
+end;
+
+{*******************************************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; menuConfigurationForTextItem: UITextItem; defaultMenu: UIMenu): UITextItemMenuConfiguration;
+begin
+  result := nil;
+end;
+
+{************************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; primaryActionForTextItem: UITextItem; defaultAction: UIAction): UIAction;
+begin
+  result := nil;
+end;
+
+{******************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; insertInputSuggestion: UIInputSuggestion);
+begin
+end;
+
+{***********************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; willBeginFormattingWithViewController: UITextFormattingViewController);
+begin
+end;
+
+{******************************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean;
+begin
+  Result := True;
+end;
+
+{********************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange): Boolean;
+begin
+  Result := True;
+end;
+
+{******************************************************************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange; interaction: UITextItemInteraction): Boolean;
+begin
+  Result := True;
+end;
+
+{*********************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
+begin
+  {$IF defined(DEBUG)}
+  //ALLog(Classname + '.textView:shouldChangeTextInRange:replacementText');
+  {$ENDIF}
+  if FMemoView.maxLength > 0 then begin
+    var LText: NSString := textView.text;
+    if shouldChangeTextInRange.length + shouldChangeTextInRange.location > LText.length then exit(false);
+    result := LText.length + replacementText.length - shouldChangeTextInRange.length <= NSUInteger(FMemoView.maxLength);
+  end
+  else Result := True;
+end;
+
+{*******************************************************************************************************************************************}
+function TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; editMenuForTextInRange: NSRange; suggestedActions: NSArray): UIMenu;
+begin
+  // Return nil to present the default system menu.
+  Result := nil;
+end;
+
+{******************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textView(textView: UITextView; willPresentEditMenuWithAnimator: Pointer);
+begin
+end;
+
 {***************************************************************************************}
-procedure TALIosMemoView.TTextViewDelegate.TextViewDidBeginEditing(TextView: UITextView);
+procedure TALIosMemoView.TTextViewDelegate.textViewDidBeginEditing(textView: UITextView);
+begin
+end;
+
+{**********************************************************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewDidBeginFormattingWithViewController(textView: UITextView; didBeginFormattingWithViewController: UITextFormattingViewController);
 begin
 end;
 
@@ -451,24 +557,15 @@ begin
   FMemoView.Control.ResetFocus;
 end;
 
+{******************************************************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewDidEndFormattingWithViewController(textView: UITextView; didEndFormattingWithViewController: UITextFormattingViewController);
+begin
+end;
+
 {**************************************************************************************************}
 function TALIosMemoView.TTextViewDelegate.textViewShouldBeginEditing(textView: UITextView): Boolean;
 begin
   Result := True;
-end;
-
-{***********************************************************************************************************************************************************************************}
-function TALIosMemoView.TTextViewDelegate.textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
-begin
-  {$IF defined(DEBUG)}
-  //ALLog(Classname + '.textViewShouldChangeTextInRangeReplacementText');
-  {$ENDIF}
-  if FMemoView.maxLength > 0 then begin
-    var LText: NSString := textView.text;
-    if shouldChangeTextInRange.length + shouldChangeTextInRange.location > LText.length then exit(false);
-    result := LText.length + replacementText.length - shouldChangeTextInRange.length <= NSUInteger(FMemoView.maxLength);
-  end
-  else Result := True;
 end;
 
 {************************************************************************************************}
@@ -477,30 +574,43 @@ begin
   Result := True;
 end;
 
-{*********************************************************************************************************************************************************************************************}
-function TALIosMemoView.TTextViewDelegate.textViewShouldInteractWithTextAttachmentInRange(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean;
+{*********************************************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewTextItemMenuWillEndForTextItem(textView: UITextView; textItemMenuWillEndForTextItem: UITextItem; animator: Pointer);
 begin
-  Result := True;
 end;
 
-{************************************************************************************************************************************************************}
-function TALIosMemoView.TTextViewDelegate.textViewShouldInteractWithURLInRange(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange): Boolean;
+{*************************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewWillDismissEditMenuWithAnimator(textView: UITextView; willDismissEditMenuWithAnimator: Pointer);
 begin
-  Result := True;
+end;
+
+{********************************************************************************************************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewWillEndFormattingWithViewController(textView: UITextView; willEndFormattingWithViewController: UITextFormattingViewController);
+begin
+end;
+
+{******************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewWritingToolsDidEnd(textView: UITextView);
+begin
+end;
+
+{*********************************************************************************************}
+procedure TALIosMemoView.TTextViewDelegate.textViewWritingToolsWillBegin(textView: UITextView);
+begin
 end;
 
 {********************************}
 constructor TALIosMemoView.Create;
 begin
   inherited; // This will call InitView
-  View.setbackgroundColor(TUIColor.Wrap(TUIColor.OCClass.clearColor));
+  View.setbackgroundColor(TUIColor.OCClass.clearColor);
   var LUIEdgeInsets: UIEdgeInsets;
   LUIEdgeInsets.top := 0;
   LUIEdgeInsets.left := 0;
   LUIEdgeInsets.bottom := 0;
   LUIEdgeInsets.right := 0;
   View.setTextContainerInset(LUIEdgeInsets);
-  TALUITextView.Wrap(NSObjectToID(View)).textContainer.setLineFragmentPadding(0);
+  View.textContainer.setLineFragmentPadding(0);
   FPlaceholderLabel := TUILabel.Wrap(TUILabel.Alloc.initWithFrame(RectToNSRect(TRect.Create(0,0,0,0))));
   FPlaceholderLabel.setHidden(True);
   View.addSubview(FPlaceholderLabel);
@@ -534,7 +644,7 @@ procedure TALIosMemoView.SetEnabled(const value: Boolean);
 begin
   inherited;
   View.setEditable(value);
-  TALUITextView.Wrap(NSObjectToID(View)).setSelectable(value);
+  View.setSelectable(value);
 end;
 
 {************************************************************************}
@@ -811,9 +921,9 @@ begin
           // LForKeys.addObject(NSObjectToID(NSFontAttributeName));
 
           var LDictionary := TNSDictionary.Wrap(TNSDictionary.OCClass.dictionaryWithObjects(LObjects, LForKeys));
-          TALUITextView.Wrap(NSObjectToID(View)).setTypingAttributes(LDictionary);
-          // I can't call LDictionary.release or I have an error
-          // LDictionary.release;
+          // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+          // No release required for LDictionary because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+          View.setTypingAttributes(LDictionary);
         finally
           LObjects.release;
           LForKeys.release;
@@ -823,13 +933,13 @@ begin
       end;
     end
     else
-       TALUITextView.Wrap(NSObjectToID(View)).setTypingAttributes(nil);
+      View.setTypingAttributes(nil);
 
     // Font
     View.setFont(TUIFont.Wrap(LFontRef));
 
     // TextAlignment
-    View.setTextAlignment(ALTextHorzAlignToUITextAlignment(TextSettings.HorzAlign));
+    View.setTextAlignment(ALTextHorzAlignToNSTextAlignment(TextSettings.HorzAlign));
 
     // TextColor
     View.setTextColor(AlphaColorToUIColor(TextSettings.Font.Color));
@@ -876,7 +986,7 @@ end;
 function TALIosMemoView.getLineCount: integer;
 begin
   Result := 0;
-  var LlayoutManager := TALUITextView.Wrap(NSObjectToID(view)).layoutManager;
+  var LlayoutManager := view.layoutManager;
   var LnumberOfGlyphs := LlayoutManager.numberOfGlyphs;
   var LlineRange: NSRange;
   var LIndex: Integer := 0;
@@ -995,10 +1105,10 @@ end;
 function TALMacMemoView.TTextViewDelegate.textViewShouldChangeTextInRangeReplacementString(textView: NSTextView; shouldChangeTextInRange: NSRange; replacementString: NSString): boolean;
 begin
   {$IF defined(DEBUG)}
-  //ALLog(Classname + '.textViewShouldChangeTextInRangeReplacementText');
+  //ALLog(Classname + '.textViewShouldChangeTextInRangeReplacementString');
   {$ENDIF}
   if FMemoView.maxLength > 0 then begin
-    var LText: NSString := TALNSText.wrap(NSObjectToID(textView)).&String;
+    var LText: NSString := textView.&String;
     if shouldChangeTextInRange.length + shouldChangeTextInRange.location > LText.length then exit(false);
     result := LText.length + replacementString.length - shouldChangeTextInRange.length <= NSUInteger(FMemoView.maxLength);
   end
@@ -1061,7 +1171,7 @@ begin
   FTextView.View.textContainer.setLineFragmentPadding(0);
   //--
   FTextViewDelegate := TTextViewDelegate.Create(Self);
-  TALNSTextView.Wrap(NSObjectToID(FTextView.View)).setDelegate(FTextViewDelegate.GetObjectID);
+  FTextView.View.setDelegate(FTextViewDelegate.GetObjectID);
   //--
   FPlaceholderLabel := TPlaceHolder.Create(Self);
   FPlaceholderLabel.view.initWithFrame(RectToNSRect(TRect.Create(0,0,0,0)));
@@ -1231,7 +1341,7 @@ end;
 {**************************************}
 function TALMacMemoView.getText: String;
 begin
-  result := NSStrToStr(TALNSText.wrap(NSObjectToID(FtextView.View)).&String);
+  result := NSStrToStr(FtextView.View.&String);
 end;
 
 {****************************************************}
@@ -1292,9 +1402,9 @@ begin
           // LForKeys.addObject(NSObjectToID(NSFontAttributeName));
 
           var LDictionary := TNSDictionary.Wrap(TNSDictionary.OCClass.dictionaryWithObjects(LObjects, LForKeys));
+          // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+          // No release required for LDictionary because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
           FTextView.View.setTypingAttributes(LDictionary);
-          // I can't call LDictionary.release or I have an error
-          // LDictionary.release;
         finally
           LObjects.release;
           LForKeys.release;

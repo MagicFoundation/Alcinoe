@@ -87,7 +87,6 @@ uses
   Macapi.Helpers,
   Macapi.ObjectiveC,
   iOSapi.Security,
-  Alcinoe.iOSApi.Security,
   {$ENDIF}
   {$IF defined(ALMacOS)}
   Macapi.CoreFoundation,
@@ -107,7 +106,11 @@ begin
   FAESKey := nil;
   {$ENDIF}
   {$IF defined(ALAppleOS)}
-  FUserDefaults := TNSUserDefaults.Wrap(TNSUserDefaults.OCClass.standardUserDefaults);
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4389 was corrected and adjust the IFDEF'}
+  {$ENDIF}
+  FUserDefaults := {$IF defined(ALMacOS)}TNSUserDefaults.Wrap({$ENDIF}TNSUserDefaults.OCClass.standardUserDefaults{$IF defined(ALMacOS)}){$ENDIF};
+  FUserDefaults.retain;
   {$ENDIF}
   {$IF defined(MSWindows) and (not defined(ALDPK))}
   FSection := 'Settings';
@@ -127,11 +130,7 @@ begin
   FAESKey := nil;
   {$ENDIF}
   {$IF defined(ALAppleOS)}
-  // You do not need to call release on FUserDefaults when using:
-  // FUserDefaults := TNSUserDefaults.Wrap(TNSUserDefaults.OCClass.standardUserDefaults);
-  // Because standardUserDefaults returns a singleton object managed by the Cocoa
-  // runtime. You are not the owner, so you must not release it.
-  //FUserDefaults.release;
+  FUserDefaults.release;
   FUserDefaults := nil;
   {$ENDIF}
   {$IF defined(MSWindows) and (not defined(ALDPK))}
@@ -285,11 +284,22 @@ begin
   Result := True;
   var LQuery := TNSMutableDictionary.Create;
   try
-    LQuery.setValue(NSObjectToID(kSecClassGenericPassword), kSecClass);
-    LQuery.setValue(NSObjectToID(StrToNSStr('alcinoe.userpreferences')), kSecAttrService);
-    LQuery.setValue(NSObjectToID(StrToNSStr(AKey)), kSecAttrAccount);
-    LQuery.setValue(kCFBooleanTrue, kSecReturnData);
-    LQuery.setValue(NSObjectToID(kSecMatchLimitOne), kSecMatchLimit);
+    {$IF defined(ALMacOS)}
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
+    {$ENDIF}
+    LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
+    LQuery.setObject(StringToID('alcinoe.userpreferences'), NSStringToID(kSecAttrService));
+    LQuery.setObject(StringToID(AKey), NSStringToID(kSecAttrAccount));
+    LQuery.setObject(kCFBooleanTrue, NSStringToID(kSecReturnData));
+    LQuery.setObject(NSStringToID(kSecMatchLimitOne), NSStringToID(kSecMatchLimit));
+    {$ELSE}
+    LQuery.setObject(kSecClassGenericPassword, kSecClass);
+    LQuery.setObject(StringToID('alcinoe.userpreferences'), kSecAttrService);
+    LQuery.setObject(StringToID(AKey), kSecAttrAccount);
+    LQuery.setObject(kCFBooleanTrue, kSecReturnData);
+    LQuery.setObject(kSecMatchLimitOne, kSecMatchLimit);
+    {$ENDIF}
     var CFRef: CFTypeRef := nil;
     var Status := SecItemCopyMatching(NSObjectToID(LQuery), @CFRef);
     if (Status = errSecSuccess) and
@@ -314,16 +324,35 @@ begin
   var LDataObj: NSData;
   if Length(ABytes) = 0 then LDataObj := TNSData.Wrap(TNSData.OCClass.data) // empty NSData
   else LDataObj := TNSData.Wrap(TNSData.OCClass.dataWithBytes(@ABytes[0], Length(ABytes)));
+  // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+  // No release required for LDataObj because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
   var LQuery := TNSMutableDictionary.Create;
   Try
-    LQuery.setValue(NSObjectToID(kSecClassGenericPassword), kSecClass);
-    LQuery.setValue(NSObjectToID(StrToNSStr('alcinoe.userpreferences')), kSecAttrService);
-    LQuery.setValue(NSObjectToID(StrToNSStr(AKey)), kSecAttrAccount);
+    {$IF defined(ALMacOS)}
+    {$IFNDEF ALCompilerVersionSupported130}
+      {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
+    {$ENDIF}
+    LQuery.setObject(NSStringToID(kSecClassGenericPassword), NSStringToID(kSecClass));
+    LQuery.setObject(StringToID('alcinoe.userpreferences'), NSStringToID(kSecAttrService));
+    LQuery.setObject(StringToID(AKey), NSStringToID(kSecAttrAccount));
+    {$ELSE}
+    LQuery.setObject(kSecClassGenericPassword, kSecClass);
+    LQuery.setObject(StringToID('alcinoe.userpreferences'), kSecAttrService);
+    LQuery.setObject(StringToID(AKey), kSecAttrAccount);
+    {$ENDIF}
 
     var LAttrs := TNSMutableDictionary.Create;
     Try
-      LAttrs.setValue(NSObjectToID(LDataObj), kSecValueData);
-      LAttrs.setValue(NSObjectToID(kSecAttrAccessibleAfterFirstUnlock), kSecAttrAccessible);
+      {$IF defined(ALMacOS)}
+      {$IFNDEF ALCompilerVersionSupported130}
+        {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4404 was corrected and adjust the IFDEF'}
+      {$ENDIF}
+      LAttrs.setObject(NSObjectToID(LDataObj), NSStringToID(kSecValueData));
+      LAttrs.setObject(NSStringToID(kSecAttrAccessibleAfterFirstUnlock), NSStringToID(kSecAttrAccessible));
+      {$ELSE}
+      LAttrs.setObject(NSObjectToID(LDataObj), kSecValueData);
+      LAttrs.setObject(kSecAttrAccessibleAfterFirstUnlock, kSecAttrAccessible);
+      {$ENDIF}
 
       var LStatus := SecItemUpdate(NSObjectToID(LQuery), NSObjectToID(LAttrs));
       if LStatus = errSecItemNotFound then begin
@@ -339,8 +368,6 @@ begin
   finally
     LQuery.release;
   end;
-  // EAccessViolation when doing this
-  // LDataObj.release;
 end;
 {$ENDIF}
 
@@ -366,7 +393,7 @@ begin
     else Result := ADefValue;
   end
   else begin
-    if (ADefValue = False) or (FUserDefaults.dictionaryRepresentation.objectForKey(StrToNSStr(AKey)) <> nil) then
+    if (ADefValue = False) or (FUserDefaults.dictionaryRepresentation.objectForKey(StringToID(AKey)) <> nil) then
       Result := FUserDefaults.boolForKey(StrToNSStr(AKey))
     else
       Result := ADefValue;
@@ -439,7 +466,7 @@ begin
     else Result := ADefValue;
   end
   else begin
-    if (ADefValue = 0) or (FUserDefaults.dictionaryRepresentation.objectForKey(StrToNSStr(AKey)) <> nil) then
+    if (ADefValue = 0) or (FUserDefaults.dictionaryRepresentation.objectForKey(StringToID(AKey)) <> nil) then
       Result := FUserDefaults.integerForKey(StrToNSStr(AKey))
     else
       Result := ADefValue;
@@ -512,7 +539,7 @@ begin
     else Result := ADefValue;
   end
   else begin
-    if (ADefValue = 0) or (FUserDefaults.dictionaryRepresentation.objectForKey(StrToNSStr(AKey)) <> nil) then
+    if (ADefValue = 0) or (FUserDefaults.dictionaryRepresentation.objectForKey(StringToID(AKey)) <> nil) then
       Result := FUserDefaults.integerForKey(StrToNSStr(AKey))
     else
       Result := ADefValue;
@@ -581,7 +608,7 @@ begin
     else Result := ADefValue;
   end
   else begin
-    if (ADefValue = '') or (FUserDefaults.dictionaryRepresentation.objectForKey(StrToNSStr(AKey)) <> nil) then
+    if (ADefValue = '') or (FUserDefaults.dictionaryRepresentation.objectForKey(StringToID(AKey)) <> nil) then
       Result := NSStrToStr(FUserDefaults.stringForKey(StrToNSStr(AKey)))
     else
       Result := ADefValue;

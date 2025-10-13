@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.Presentation.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -220,64 +220,21 @@ function TALIosNativeView.CaptureScreenshot: TALDrawable;
 begin
   UIGraphicsBeginImageContextWithOptions(View.bounds.size, False{opaque}, 0{scale});
   try
-    View.drawViewHierarchyInRectAfterScreenUpdates(View.bounds, False{afterUpdates});
+    View.drawViewHierarchyInRect(View.bounds, False{afterUpdates});
     var LUIImage := TUIImage.Wrap(UIGraphicsGetImageFromCurrentImageContext);
     if LUIImage = nil then exit(ALNullDrawable);
-    //try
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+    // No release required for LUIImage because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
 
-      {$IF defined(ALSkiaCanvas)}
-      var LCGImage := ALOSImageGetCgImage(LUIImage);
-      var LWidth: Integer := CGImageGetWidth(LCGImage);
-      var LHeight: Integer := CGImageGetHeight(LCGImage);
-      var LRect := TrectF.Create(0, 0, LWidth, LHeight);
-      var LBufferSize := LWidth * LHeight * 4;
-      var LPixelData := AllocMem(LBufferSize);
-      try
-        var LCGContextRef := ALCreateCGContextRef(Round(LRect.Width), Round(LRect.Height), LPixelData);
-        try
-
-          ALDrawCGImageRef(
-            LCGContextRef, // const ACanvas: CGContextRef;
-            LCGImage, // const AImage: CGImageRef;
-            1, // const AScale: Single;
-            false, // const AAlignToPixel: Boolean;
-            LRect, // const ASrcRect: TrectF;
-            LRect, // const ADstRect: TrectF;
-            1, // const AOpacity: Single;
-            nil, // const AMaskImage: CGImageRef;
-            TpointF.create(0.5,0.5), // const ACropCenter: TpointF;
-            TalphaColors.null, // const ATintColor: TalphaColor;
-            0, // const ABlurRadius: single;
-            0, // const AXRadius: Single;
-            0); // const AYRadius: Single)
-
-          var LImageInfo := ALGetSkImageinfo(LWidth, LHeight);
-          var LPixmap: sk_pixmap_t := ALSkCheckHandle(
-                                        sk4d_pixmap_create(
-                                          @LImageInfo,
-                                          LPixelData,
-                                          LWidth * 4));
-          try
-            Result := ALSkCheckHandle(
-                        sk4d_image_make_from_raster(
-                          LPixmap, // const pixmap: sk_pixmap_t;
-                          @ALReleaseMemPixelBufferProc, // proc: sk_image_raster_release_proc;
-                          LPixelData)); // proc_context: Pointer
-          finally
-            sk4d_refcnt_unref(LPixmap);
-          end;
-
-        finally
-          CGContextRelease(LCGContextRef);
-        end;
-      except
-        FreeMem(LPixelData);
-        raise;
-      end;
-      {$ELSE}
-      var LCGImage := ALOSImageGetCgImage(LUIImage);
-      var LRect := TrectF.Create(0, 0, CGImageGetWidth(LCGImage), CGImageGetHeight(LCGImage));
-      var LCGContextRef := ALCreateCGContextRef(Round(LRect.Width), Round(LRect.Height));
+    {$IF defined(ALSkiaCanvas)}
+    var LCGImage := ALOSImageGetCgImage(LUIImage);
+    var LWidth: Integer := CGImageGetWidth(LCGImage);
+    var LHeight: Integer := CGImageGetHeight(LCGImage);
+    var LRect := TrectF.Create(0, 0, LWidth, LHeight);
+    var LBufferSize := LWidth * LHeight * 4;
+    var LPixelData := AllocMem(LBufferSize);
+    try
+      var LCGContextRef := ALCreateCGContextRef(Round(LRect.Width), Round(LRect.Height), LPixelData);
       try
 
         ALDrawCGImageRef(
@@ -295,16 +252,57 @@ begin
           0, // const AXRadius: Single;
           0); // const AYRadius: Single)
 
-        result := ALCreateTextureFromCGContextRef(LCGContextRef);
+        var LImageInfo := ALGetSkImageinfo(LWidth, LHeight);
+        var LPixmap: sk_pixmap_t := ALSkCheckHandle(
+                                      sk4d_pixmap_create(
+                                        @LImageInfo,
+                                        LPixelData,
+                                        LWidth * 4));
+        try
+          Result := ALSkCheckHandle(
+                      sk4d_image_make_from_raster(
+                        LPixmap, // const pixmap: sk_pixmap_t;
+                        @ALReleaseMemPixelBufferProc, // proc: sk_image_raster_release_proc;
+                        LPixelData)); // proc_context: Pointer
+        finally
+          sk4d_refcnt_unref(LPixmap);
+        end;
 
       finally
         CGContextRelease(LCGContextRef);
       end;
-      {$ENDIF}
+    except
+      FreeMem(LPixelData);
+      raise;
+    end;
+    {$ELSE}
+    var LCGImage := ALOSImageGetCgImage(LUIImage);
+    var LRect := TrectF.Create(0, 0, CGImageGetWidth(LCGImage), CGImageGetHeight(LCGImage));
+    var LCGContextRef := ALCreateCGContextRef(Round(LRect.Width), Round(LRect.Height));
+    try
 
-    //finally
-    //  LUIImage.release;
-    //end;
+      ALDrawCGImageRef(
+        LCGContextRef, // const ACanvas: CGContextRef;
+        LCGImage, // const AImage: CGImageRef;
+        1, // const AScale: Single;
+        false, // const AAlignToPixel: Boolean;
+        LRect, // const ASrcRect: TrectF;
+        LRect, // const ADstRect: TrectF;
+        1, // const AOpacity: Single;
+        nil, // const AMaskImage: CGImageRef;
+        TpointF.create(0.5,0.5), // const ACropCenter: TpointF;
+        TalphaColors.null, // const ATintColor: TalphaColor;
+        0, // const ABlurRadius: single;
+        0, // const AXRadius: Single;
+        0); // const AYRadius: Single)
+
+      result := ALCreateTextureFromCGContextRef(LCGContextRef);
+
+    finally
+      CGContextRelease(LCGContextRef);
+    end;
+    {$ENDIF}
+
   finally
     UIGraphicsEndImageContext;
   end;

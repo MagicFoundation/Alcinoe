@@ -100,13 +100,10 @@ begin
   try
     LFBSDKShareLinkContent.setContentURL(StrToNSUrl(aLinkUrl));
     var LFBSDKShareDialog := TFBSDKShareDialog.OCClass.dialogWithViewController(nil{SharedApplication.keyWindow.rootViewController},LFBSDKShareLinkContent,nil);
-    try
-      if LFBSDKShareDialog.canshow then
-        LFBSDKShareDialog.show;
-    finally
-      //exception when we close the dialog if we release it here
-      //LFBSDKShareDialog.release;
-    end;
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+    // No release required for LFBSDKShareDialog because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+    if LFBSDKShareDialog.canshow then
+      LFBSDKShareDialog.show;
   finally
     LFBSDKShareLinkContent.release;
   end;

@@ -229,12 +229,6 @@ function ALAcquireKeepAliveWinHttpClient(const AURI: TUri): TALWinHttpClient;
 procedure ALReleaseKeepAliveWinHttpClient(const AURI: TUri; var AHTTPClient: TALWinHttpClient);
 procedure ALReleaseAllKeepAliveWinHttpClients;
 
-const
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if WINHTTP_PROTOCOL_FLAG_HTTP3 was not added in Winapi.WinHTTP.pas and adjust the IFDEF'}
-  {$ENDIF}
-  WINHTTP_PROTOCOL_FLAG_HTTP3 = $2;
-
 implementation
 
 uses

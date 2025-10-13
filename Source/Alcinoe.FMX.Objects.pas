@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.Objects.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -1011,7 +1011,7 @@ type
     property Stroke;
     //property TabOrder;
     //property TabStop;
-    //property TouchTargetExpansion;
+    property TouchTargetExpansion;
     property Visible;
     property Width;
     //property OnCanFocus;

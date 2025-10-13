@@ -660,11 +660,10 @@ uses
   iOSapi.Foundation,
   iOSapi.CoreImage,
   iOSapi.Helpers,
+  iOSapi.ImageIO,
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
-  Alcinoe.iOSapi.ImageIO,
-  Alcinoe.iOSapi.CoreImage,
   Alcinoe.iOSapi.CoreFoundation,
   {$ENDIF}
   {$IF defined(ALMacOS)}
@@ -681,6 +680,13 @@ uses
   System.UIConsts,
   Alcinoe.Url,
   Alcinoe.FMX.Types3D;
+
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4392 was corrected, if yes delete the function below, and adjust the IFDEF'}
+{$ENDIF}
+{$IF defined(ALAppleOS)}
+procedure CGContextSetBlendMode(c: CGContextRef; mode: Int32); cdecl; external libCoreGraphics name _PU + 'CGContextSetBlendMode';
+{$ENDIF}
 
 {*}
 var
@@ -2925,7 +2931,7 @@ begin
                                            LScaledBlurRadius,
                                            TJShader_TileMode.JavaClass.MIRROR);
                 LRenderNode.setRenderEffect(LBlurRenderEffect);
-                var LrenderCanvas := TJALRecordingCanvas.wrap(LrenderNode.beginRecording);
+                var LRenderCanvas := LrenderNode.beginRecording;
                 LRenderCanvas.drawBitmap(LTmpBitmap, 0{left}, 0{top}, nil{paint});
                 LRenderNode.endRecording;
                 LHardwareRenderer.createRenderRequest.setWaitForPresent(true).syncAndDraw;
@@ -3416,37 +3422,39 @@ begin
                                ASrcRect.height,
                                CGImageGetHeight(AImage)));
       try
-        var LCIImage := TCIImage.Wrap(TCIImage.OCClass.imageWithCGImage(LCroppedImage));
-        Try
-          // Gaussian blur CIFilter naturally creates artifacts at the borders of the
-          // output image. It is happening because the gaussian blur filter samples
-          // pixels outside the edges of the image. But because there are no pixels,
-          // you get this weird artefact. You can use "CIAffineClamp" filter to
-          // "extend" your image infinitely in all directions.
-          var LClampFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
-          Try
-            LClampFilter.setDefaults;
-            LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
-            var LBlurFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
-            try
-              LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
-              LBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(LScaledBlurRadius), kCIInputRadiusKey);
-              var LCIContext := TCIContext.Wrap({$IF defined(ALMacOS)}TALCIContext{$ELSE}TCIContext{$ENDIF}.OCClass.contextWithOptions(nil));
-              try
-                LBlurredImage := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
-                if LBlurredImage = nil then raise Exception.Create('Failed to create CGImageRef from CIContext');
-              finally
-                LCIContext.release;
-              end;
-            finally
-              LBlurFilter.release;
-            end
-          finally
-            LClampFilter.release;
-          end;
-        finally
-          LCIImage.release;
-        end;
+        {$IFNDEF ALCompilerVersionSupported130}
+          {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4347 was corrected and adjust the IFDEF'}
+          {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4348 was corrected and adjust the IFDEF'}
+          {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4349 was corrected and adjust the IFDEF'}
+          {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4350 was corrected and adjust the IFDEF'}
+        {$ENDIF}
+        var LCIImage := {$IF defined(ALMacOS)}TCIImage.Wrap({$ENDIF}TCIImage.OCClass.imageWithCGImage(LCroppedImage){$IF defined(ALMacOS)}){$ENDIF};
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+        // No release required for LCIImage because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+
+        // Gaussian blur CIFilter naturally creates artifacts at the borders of the
+        // output image. It is happening because the gaussian blur filter samples
+        // pixels outside the edges of the image. But because there are no pixels,
+        // you get this weird artefact. You can use "CIAffineClamp" filter to
+        // "extend" your image infinitely in all directions.
+        var LClampFilter := {$IF defined(ALMacOS)}TALCIFilter.Wrap({$ENDIF}TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')){$IF defined(ALMacOS)}){$ENDIF};
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+        // No release required for LClampFilter because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+
+        LClampFilter.setDefaults;
+        LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
+        var LBlurFilter := {$IF defined(ALMacOS)}TALCIFilter.Wrap({$ENDIF}TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')){$IF defined(ALMacOS)}){$ENDIF};
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+        // No release required for LBlurFilter because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+
+        LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
+        LBlurFilter.setValueforKey({$IF not defined(ALMacOS)}NSObjectToID({$ENDIF}TNSNumber.OCClass.numberWithFloat(LScaledBlurRadius){$IF not defined(ALMacOS)}){$ENDIF}, kCIInputRadiusKey);
+        var LCIContext := {$IF defined(ALMacOS)}TCIContext.Wrap({$ENDIF}TCIContext.OCClass.contextWithOptions(nil){$IF defined(ALMacOS)}){$ENDIF};
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+        // No release required for LCIContext because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+
+        LBlurredImage := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
+        if LBlurredImage = nil then raise Exception.Create('Failed to create CGImageRef from CIContext');
       finally
         CGImageRelease(LCroppedImage);
       end;
@@ -6744,8 +6752,8 @@ begin
       //      var LPixelBuffer: Pointer;
       //      var LBitmapInfo: AndroidBitmapInfo;
       //      FillChar(LBitmapInfo, SizeOf(LBitmapInfo), 0);
-      //      if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LBitmapInfo) = 0) and
-      //         (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LPixelBuffer) = 0) then
+      //      if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, TAndroidHelper.JObjectToID(LTmpBitmap), @LBitmapInfo) = 0) and
+      //         (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, TAndroidHelper.JObjectToID(LTmpBitmap), @LPixelBuffer) = 0) then
       //      try
       //        var LBitmapData: TBitmapData;
       //        if FFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
@@ -6755,7 +6763,7 @@ begin
       //          FFill.Bitmap.Bitmap.Unmap(LBitmapData);
       //        end;
       //      finally
-      //        AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID);
+      //        AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, TAndroidHelper.JObjectToID(LTmpBitmap));
       //      end;
       //      //--
       //      ...
@@ -8111,7 +8119,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_imageinfo_t didn''t changed'}
   {$ENDIF}
   Result.width := W;
@@ -8425,7 +8433,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -8443,7 +8451,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -8459,7 +8467,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -8701,7 +8709,10 @@ end;
 {$IF defined(ALAppleOS)}
 function ALCreateCGContextRef(const W, H: integer; const AData: Pointer = nil; const ABytesPerRow: Integer = -1): CGContextRef;
 begin
-  var LbitmapInfo: CGBitmapInfo;
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4391 is corrected and if yes replace UInt32 by CGBitmapInfo'}
+  {$ENDIF}
+  var LbitmapInfo: UInt32{CGBitmapInfo};
   if GlobalUseMetal then LbitmapInfo := kCGImageAlphaPremultipliedFirst or kCGBitmapByteOrder32Little{Little-endian} // BGRA (The pixelformat of Metal)
   else LbitmapInfo := kCGImageAlphaPremultipliedLast or kCGBitmapByteOrder32Big{Big-endian}; // RGBA (The pixelformat of OpenGL)
 
@@ -8940,7 +8951,7 @@ begin
   // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
   // and with Skia, we use platform API functions to draw images. However,
   // on other platforms, we resort to using TCanvas. :(
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,
@@ -8974,7 +8985,7 @@ begin
   // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
   // and with Skia, we use platform API functions to draw images. However,
   // on other platforms, we resort to using TCanvas. :(
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,

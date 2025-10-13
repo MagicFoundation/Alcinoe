@@ -339,6 +339,16 @@ uses
   Alcinoe.HTML,
   Alcinoe.Common;
 
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4392 was corrected, if yes delete the type below, and adjust the IFDEF'}
+{$ENDIF}
+type
+  CTParagraphStyleSetting = record
+    spec: UInt32{CTParagraphStyleSpecifier};
+    valueSize: NativeUInt;
+    value: Pointer;
+  end;
+
 const
   ALLineHeightMultipliers: array[10..60] of Single = (
     {10} 1.50, // 15/10
@@ -2318,7 +2328,7 @@ begin
                   // Set decoration kinds
                   // https://api.flutter.dev/flutter/painting/TextStyle/decoration.html
                   // The decorations to paint near the text (e.g., an underline).
-                  {$IFNDEF ALCompilerVersionSupported123}
+                  {$IFNDEF ALCompilerVersionSupported130}
                     {$MESSAGE WARN 'Check if declaration of System.Skia.TSkTextDecoration didn''t changed'}
                   {$ENDIF}
                   sk4d_textstyle_set_decorations(LTextStyle, Byte(LDecorationKind));
@@ -2402,7 +2412,7 @@ begin
 
                   // Add the text or PlaceHolder
                   if LCurrImgSrc <> '' then begin
-                    {$IFNDEF ALCompilerVersionSupported123}
+                    {$IFNDEF ALCompilerVersionSupported130}
                       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
                     {$ENDIF}
                     var LPlaceholderStyle: sk_placeholderstyle_t;

@@ -89,7 +89,7 @@ type
   {********************************************************}
   // Calculates the velocity of pointer movements over time.
   // Based on Android's VelocityTracker
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if android VelocityTracker was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\VelocityTracker.h with https://android.googlesource.com/platform/frameworks/native/+/refs/heads/main/include/input/VelocityTracker.h
     //Compare <Alcinoe>\References\Android\VelocityTracker.cpp with https://android.googlesource.com/platform/frameworks/native/+/refs/heads/main/libs/input/VelocityTracker.cpp
@@ -440,7 +440,7 @@ type
   // ability to overshoot the bounds of a scrolling operation.
   // Based on the Android OverScroller class
   // https://www.sobyte.net/post/2022-02/android-over-scroller/
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if android OverScroller was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\OverScroller.java with <SDKs>\android\sources\android-XX\android\widget\OverScroller.java
   {$ENDIF}
@@ -705,8 +705,6 @@ uses
   Macapi.Helpers,
   Macapi.ObjCRuntime,
   FMX.Platform.iOS,
-  Alcinoe.iOSapi.UIKit,
-  Alcinoe.iOSapi.QuartzCore,
   {$ENDIF}
   FMX.Platform,
   Alcinoe.FMX.Common,
@@ -2797,7 +2795,7 @@ begin
   if fDisplayLinkListener = nil then
     fDisplayLinkListener := TDisplayLinkListener.Create(self);
   if fDisplayLink = nil then begin
-    fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
+    fDisplayLink := TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated'));
     fDisplayLink.retain;
     if GlobalUseMetal then begin
       // In OpenGL, the animation appears more jerky when using
@@ -2807,12 +2805,13 @@ begin
         LFrameRateRange.minimum := ALMinimumFramesPerSecond;
         LFrameRateRange.maximum := ALMaximumFramesPerSecond;
         LFrameRateRange.preferred := ALPreferredFramesPerSecond;
-        TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFrameRateRange(LFrameRateRange);
+        fDisplayLink.setPreferredFrameRateRange(LFrameRateRange);
       end
       else
-        TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
+        fDisplayLink.setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
     end;
-    fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.mainRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+    // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+    fDisplayLink.addToRunLoop(TNSRunLoop.OCClass.mainRunLoop, NSRunLoopCommonModes);
   end;
   fDisplayLink.setPaused(False);
   {$ELSEIF defined(ANDROID)}
@@ -3168,14 +3167,13 @@ begin
   if (AHandle = nil) or (not TouchEnabled) then exit;
 
   {$IF defined(ANDROID)}
-  var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
-  if LTmpCurrentMotionEvent = nil then begin
+  var LCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
+  if LCurrentMotionEvent = nil then begin
     {$IF defined(DEBUG)}
     ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseDown', 'CurrentMotionEvent is nil', TALLogType.ERROR);
     {$ENDIF}
     exit;
   end;
-  var LCurrentMotionEvent := TJALMotionEvent.wrap(LTmpCurrentMotionEvent);
   if (LCurrentMotionEvent.getPointerCount = 0) or
      (LCurrentMotionEvent.getActionMasked <> AMOTION_EVENT_ACTION_DOWN) then exit;
   //--
@@ -3192,14 +3190,13 @@ begin
   {$ENDIF}
 
   {$IF defined(IOS)}
-  var LTmpCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
-  if LTmpCurrentTouchEvent = nil then begin
+  var LCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
+  if LCurrentTouchEvent = nil then begin
     {$IF defined(DEBUG)}
     ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseDown', 'CurrentTouchEvent is nil', TALLogType.ERROR);
     {$ENDIF}
     exit;
   end;
-  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(LTmpCurrentTouchEvent));
   if (LCurrentTouchEvent.AllTouches = nil) or
      (LCurrentTouchEvent.AllTouches.count = 0) then exit;
   var LTouch := TUITouch.Wrap(LCurrentTouchEvent.alltouches.anyObject);
@@ -3315,14 +3312,13 @@ begin
   if (AHandle = nil) or (not fDown) then exit;
 
   {$IF defined(ANDROID)}
-  var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
-  if LTmpCurrentMotionEvent = nil then begin
+  var LCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
+  if LCurrentMotionEvent = nil then begin
     {$IF defined(DEBUG)}
     ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseMove', 'CurrentMotionEvent is nil', TALLogType.ERROR);
     {$ENDIF}
     exit;
   end;
-  var LCurrentMotionEvent := TJALMotionEvent.wrap(LTmpCurrentMotionEvent);
   if (LCurrentMotionEvent.getPointerCount = 0) or
      (LCurrentMotionEvent.getActionMasked <> AMOTION_EVENT_ACTION_MOVE) then exit;
   //--
@@ -3352,14 +3348,13 @@ begin
   {$ENDIF}
 
   {$IF defined(IOS)}
-  var LTmpCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
-  if LTmpCurrentTouchEvent = nil then begin
+  var LCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
+  if LCurrentTouchEvent = nil then begin
     {$IF defined(DEBUG)}
     ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseMove', 'CurrentTouchEvent is nil', TALLogType.ERROR);
     {$ENDIF}
     exit;
   end;
-  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(LTmpCurrentTouchEvent));
   if (LCurrentTouchEvent.AllTouches = nil) or
      (LCurrentTouchEvent.AllTouches.count = 0) then exit;
   var LTouch := TUITouch.Wrap(LCurrentTouchEvent.alltouches.anyObject);
@@ -3493,14 +3488,13 @@ begin
   if (AHandle = nil) or (not Fdown) then exit;
 
   {$IF defined(ANDROID)}
-  var LTmpCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
-  if LTmpCurrentMotionEvent = nil then begin
+  var LCurrentMotionEvent := WindowHandleToPlatform(AHandle).CurrentMotionEvent;
+  if LCurrentMotionEvent = nil then begin
     {$IF defined(DEBUG)}
     ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseUp', 'CurrentMotionEvent is nil', TALLogType.ERROR);
     {$ENDIF}
     exit;
   end;
-  var LCurrentMotionEvent := TJALMotionEvent.wrap(LTmpCurrentMotionEvent);
   if (LCurrentMotionEvent.getPointerCount = 0) or
      (LCurrentMotionEvent.getActionMasked <> AMOTION_EVENT_ACTION_UP) then exit;
   //--
@@ -3516,14 +3510,13 @@ begin
   FMovements.Add(LMovement);
   {$ENDIF}
   {$IF defined(IOS)}
-  var LTmpCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
-  if LTmpCurrentTouchEvent = nil then begin
+  var LCurrentTouchEvent := WindowHandleToPlatform(AHandle).CurrentTouchEvent;
+  if LCurrentTouchEvent = nil then begin
     {$IF defined(DEBUG)}
     ALLog('Alcinoe.FMX.ScrollEngine.TALScrollEngine.MouseUp', 'CurrentTouchEvent is nil', TALLogType.ERROR);
     {$ENDIF}
     exit;
   end;
-  var LCurrentTouchEvent := TALUIEvent.Wrap(NSObjectToID(LTmpCurrentTouchEvent));
   if (LCurrentTouchEvent.AllTouches = nil) or
      (LCurrentTouchEvent.AllTouches.count = 0) then exit;
   var LTouch := TUITouch.Wrap(LCurrentTouchEvent.alltouches.anyObject);

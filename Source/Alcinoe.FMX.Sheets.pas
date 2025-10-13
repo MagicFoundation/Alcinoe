@@ -113,24 +113,20 @@ type
     procedure SetCloseOnScrimClick(const AValue: Boolean);
     procedure SetContent(const AValue: TALControl);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
-    {$IFNDEF ALDPK}
     procedure internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure internalMouseMove(Shift: TShiftState; X, Y: Single);
     procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure internalMouseLeave;
-    {$ENDIF}
     { IALScrollableControl }
     function GetScrollEngine: TALScrollEngine;
     procedure SetScrollEngine(const Value: TALScrollEngine);
   protected
     function CreateScrollEngine: TScrollEngine; virtual;
     procedure DoRealign; override;
-    {$IFNDEF ALDPK}
     procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseLeave(const AObject: TControl); override;
-    {$ENDIF}
     procedure AfterPaint; override;
     property DockEdge: TDockEdge read FDockEdge;
   public
@@ -1155,8 +1151,7 @@ begin
   end;
 end;
 
-{*************}
-{$IFNDEF ALDPK}
+{*******************************************************************************************}
 procedure TALSheet.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
@@ -1175,10 +1170,8 @@ begin
     {$ENDIF}
   end;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{*********************************************************************}
 procedure TALSheet.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   //{$IFDEF DEBUG}
@@ -1223,10 +1216,8 @@ begin
     {$ENDIF}
   end;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{*****************************************************************************************}
 procedure TALSheet.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   {$IFDEF DEBUG}
@@ -1245,10 +1236,8 @@ begin
     FHandleMouseEvents := False;
   end;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{************************************}
 procedure TALSheet.internalMouseLeave;
 begin
   {$IFDEF DEBUG}
@@ -1260,14 +1249,12 @@ begin
     FHandleMouseEvents := False;
   end;
 end;
-{$ENDIF}
 
 {**}
 Type
   _TControlProtectedAccess = class(Tcontrol);
 
-{*************}
-{$IFNDEF ALDPK}
+{********************************************************************************************************************}
 procedure TALSheet.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if (FTouchBlocker.Visible) and (not FTouchBlocker.HitTest) then begin
@@ -1288,10 +1275,8 @@ begin
   end;
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{**********************************************************************************************}
 procedure TALSheet.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
 begin
   if not FTouchBlocker.Visible then begin
@@ -1300,10 +1285,8 @@ begin
   end;
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{******************************************************************************************************************}
 procedure TALSheet.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not FTouchBlocker.Visible then begin
@@ -1320,17 +1303,14 @@ begin
   end;
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{*************************************************************}
 procedure TALSheet.ChildrenMouseLeave(const AObject: TControl);
 begin
   if not FTouchBlocker.Visible then
     internalMouseLeave;
   inherited;
 end;
-{$ENDIF}
 
 {****************************}
 procedure TALSheet.AfterPaint;

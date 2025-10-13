@@ -139,7 +139,6 @@ uses
   FMX.Helpers.iOS,
   FMX.Platform.iOS,
   Alcinoe.FMX.Common,
-  Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.Url,
@@ -249,7 +248,7 @@ begin
     var LScope := TJVKScope.JavaClass.valueOf(StringToJString(AlUpperCase(LString)));
     LArrayList.add(LScope);
   end;
-  var LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
+  var LCollection := TJCollection.Wrap(TAndroidHelper.JObjectToID(LArrayList));
   TJVK.JavaClass.login(TAndroidHelper.Activity, LCollection);
 
   {$ENDIF}
@@ -619,7 +618,7 @@ begin
                                                              //             an additional request to download the missing information from the published page. If
                                                              //             false , the request will always be sent.
     if SharedApplication.canOpenURL(LURL) then
-      TALUIApplication.Wrap(NSObjectToID(SharedApplication)).openURLOptionsCompletionHandler(LURL, nil{options}, nil{completionHandler})
+      SharedApplication.openURL(LURL, nil{options}, nil{completionHandler})
     else
       result := false;
 

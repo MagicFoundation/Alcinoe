@@ -97,7 +97,6 @@ uses
   Macapi.ObjectiveC,
   iOSapi.CoreLocation,
   iOSapi.Foundation,
-  Alcinoe.iOSapi.CoreLocation,
   {$ENDIF}
   FMX.Platform;
 
@@ -152,37 +151,29 @@ type
           FGeoLocationSensor: TALGeoLocationSensor;
         public
           constructor Create(AGeoLocationSensor: TALGeoLocationSensor);
+          procedure locationManager(manager: CLLocationManager; didEnterRegion: CLRegion); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint); overload; cdecl;
           procedure locationManager(manager: CLLocationManager; didFailWithError: NSError); overload; cdecl;
-          procedure locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading); overload; cdecl;
-          procedure locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation); overload; cdecl;
-          procedure locationManager(manager: CLLocationManager; monitoringDidFailForRegion: CLRegion; withError: NSError); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didVisit: CLVisit); overload; cdecl;
           procedure locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; monitoringDidFailForRegion: CLRegion; withError: NSError); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didUpdateLocations: NSArray); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didDetermineState: CLRegionState; forRegion: CLRegion); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; didRangeBeacons: NSArray; inRegion: CLBeaconRegion); overload; cdecl;
+          procedure locationManager(manager: CLLocationManager; rangingBeaconsDidFailForRegion: CLBeaconRegion; withError: NSError); overload; cdecl;
           procedure locationManagerDidChangeAuthorization(manager: CLLocationManager); cdecl;
-          [MethodName('locationManager:didUpdateLocations:')]
-          procedure locationManagerDidUpdateLocations(manager: CLLocationManager; locations: NSArray); cdecl;
-          function locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean; cdecl;
-          [MethodName('locationManager:didDetermineState:forRegion:')]
-          procedure locationManagerDidDetermineStateForRegion(manager: CLLocationManager; state: CLRegionState; region: CLRegion); cdecl;
-          [MethodName('locationManager:didRangeBeacons:satisfyingConstraint:')]
-          procedure locationManagerDidRangeBeaconsSatisfyingConstraint(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint); cdecl;
-          [MethodName('locationManager:didFailRangingBeaconsForConstraint:error:')]
-          procedure locationManagerDidFailRangingBeaconsForConstraintError(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError); cdecl;
-          [MethodName('locationManager:didRangeBeacons:inRegion:')]
-          procedure locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager; beacons: NSArray; region: CLBeaconRegion); cdecl;
-          [MethodName('locationManager:rangingBeaconsDidFailForRegion:withError:')]
-          procedure locationManagerRangingBeaconsDidFailForRegionWithError(manager: CLLocationManager; region: CLBeaconRegion; error: NSError); cdecl;
-          [MethodName('locationManager:didEnterRegion:')]
-          procedure locationManagerDidEnterRegion(manager: CLLocationManager; region: CLRegion); cdecl;
           [MethodName('locationManager:didExitRegion:')]
-          procedure locationManagerDidExitRegion(manager: CLLocationManager; region: CLRegion); cdecl;
-          [MethodName('locationManager:didStartMonitoringForRegion:')]
-          procedure locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; region: CLRegion); cdecl;
+          procedure locationManagerDidExitRegion(manager: CLLocationManager; didExitRegion: CLRegion); cdecl;
+          [MethodName('locationManager:didFinishDeferredUpdatesWithError:')]
+          procedure locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; didFinishDeferredUpdatesWithError: NSError); cdecl;
           procedure locationManagerDidPauseLocationUpdates(manager: CLLocationManager); cdecl;
           procedure locationManagerDidResumeLocationUpdates(manager: CLLocationManager); cdecl;
-          [MethodName('locationManager:didFinishDeferredUpdatesWithError:')]
-          procedure locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError); cdecl;
-          [MethodName('locationManager:didVisit:')]
-          procedure locationManagerDidVisit(manager: CLLocationManager; visit: CLVisit); cdecl;
+          [MethodName('locationManager:didStartMonitoringForRegion:')]
+          procedure locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; didStartMonitoringForRegion: CLRegion); cdecl;
+          function locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean; cdecl;
         end;
     private
       fLocationManager: CLLocationManager;
@@ -304,7 +295,6 @@ uses
   Macapi.Helpers,
   iOSapi.UIKit,
   FMX.Helpers.iOS,
-  Alcinoe.iOSapi.UIKit,
   {$ENDIF}
   Alcinoe.Cipher,
   Alcinoe.Localization,
@@ -910,7 +900,7 @@ begin
         {$REGION ' IOS'}
         {$IF defined(IOS)}
         FApplicationEventHandlerEnabled:=true;
-        TALUIApplication.Wrap(NSObjectToID(SharedApplication)).openURLOptionsCompletionHandler(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString((UIApplicationOpenSettingsURLString))), nil{options}, nil{completionHandler});
+        SharedApplication.openURL(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(UIApplicationOpenSettingsURLString)), nil{options}, nil{completionHandler});
         {$ENDIF}
         {$ENDREGION}
 
@@ -972,7 +962,7 @@ begin
             {$REGION ' IOS'}
             {$IF defined(IOS)}
             FApplicationEventHandlerEnabled:=true;
-            TALUIApplication.Wrap(NSObjectToID(SharedApplication)).openURLOptionsCompletionHandler(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString((UIApplicationOpenSettingsURLString))), nil{options}, nil{completionHandler});
+            SharedApplication.openURL(TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(UIApplicationOpenSettingsURLString)), nil{options}, nil{completionHandler});
             {$ENDIF}
             {$ENDREGION}
 
@@ -1425,6 +1415,56 @@ begin
   FGeoLocationSensor := AGeoLocationSensor;
 end;
 
+{****************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didEnterRegion: CLRegion);
+begin
+
+  //Tells the delegate that location updates were paused.
+  //
+  //Because regions are a shared application resource, every active location
+  //manager object delivers this message to its associated delegate. It
+  //doesn’t matter which location manager actually registered the specified
+  //region. If multiple location managers share a delegate object, that
+  //delegate receives the message multiple times.
+  //
+  //The region object provided may not be the same one that was registered.
+  //As a result, you should never perform pointer-level comparisons to
+  //determine equality. Instead, use the region’s identifier string to
+  //determine if your delegate should respond.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didEnterRegion');
+  {$ENDIF}
+
+end;
+
+
+{**********************************************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError);
+begin
+
+  //Tells the delegate that the location manager couldn’t detect any beacons
+  //that satisfy the provided constraint.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didFailRangingBeaconsForConstraint:error');
+  {$ENDIF}
+
+end;
+
+{******************************************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint);
+begin
+
+  //Tells the delegate that the location manager detected at least one beacon
+  //that satisfies the provided constraint.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didRangeBeacons:satisfyingConstraint');
+  {$ENDIF}
+
+end;
+
 {*****************************************************************************************************************************}
 procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didFailWithError: NSError);
 begin
@@ -1462,37 +1502,31 @@ begin
 
 end;
 
-{*******************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading);
+{*********************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didVisit: CLVisit);
 begin
 
-  //Tells the delegate that the location manager received updated
-  //heading information.
+  //Tells the delegate that a new visit-related event was received.
   //
-  //Implementation of this method is optional but expected if you start heading
-  //updates using the startUpdatingHeading method.
-  //
-  //The location manager object calls this method after you initially start the
-  //heading service. Subsequent events are delivered when the previously
-  //reported value changes by more than the value specified in the
-  //headingFilter property of the location manager object.
+  //The location manager calls this method whenever it has new visit event
+  //to report to your app.
 
   {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didUpdateHeading');
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didVisit');
   {$ENDIF}
+
 end;
 
-{*************************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation);
+{*******************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus);
 begin
 
-  //Tells the delegate that a new location value is available.
+  //Tells the delegate its authorization status when the app creates the
+  //location manager and when the authorization status changes.
   //
-  //iOS 2.0–6.0 Deprecated
+  //iOS 4.2–14.0 Deprecated
 
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didUpdateToLocation:fromLocation');
-  {$ENDIF}
+  locationManagerDidChangeAuthorization(FGeoLocationSensor.fLocationManager);
 
 end;
 
@@ -1523,16 +1557,135 @@ begin
 
 end;
 
-{*******************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus);
+{*******************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading);
 begin
 
-  //Tells the delegate its authorization status when the app creates the
-  //location manager and when the authorization status changes.
+  //Tells the delegate that the location manager received updated
+  //heading information.
   //
-  //iOS 4.2–14.0 Deprecated
+  //Implementation of this method is optional but expected if you start heading
+  //updates using the startUpdatingHeading method.
+  //
+  //The location manager object calls this method after you initially start the
+  //heading service. Subsequent events are delivered when the previously
+  //reported value changes by more than the value specified in the
+  //headingFilter property of the location manager object.
 
-  locationManagerDidChangeAuthorization(FGeoLocationSensor.fLocationManager);
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didUpdateHeading');
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateLocations: NSArray);
+begin
+
+  //Tells the delegate that new location data is available.
+
+  for var I := 0 to didUpdateLocations.count - 1 do begin
+    var LLocation := TCLLocation.Wrap(didUpdateLocations.objectAtIndex(I));
+    {$IFDEF DEBUG}
+    ALLog(
+      'TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didUpdateLocations',
+      'Date: ' + ALDateTimeToStrW(ALNSDateToUTCDateTime(LLocation.timestamp)) + ' | ' +
+      'Latitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.latitude) + ' | ' +
+      'Longitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.longitude) + ' | ' +
+      'Accuracy: ' + ALFormatFloatW('#.##', LLocation.horizontalAccuracy) + 'm');
+    {$ENDIF}
+    //The location’s latitude and longitude identify the center of the
+    //circle, and this value indicates the radius of that circle.
+    //A negative value indicates that the location’s latitude and longitude
+    //are invalid. i don't think this will ever happen but cost nothing to
+    //add a trap here
+    if (compareValue(LLocation.horizontalAccuracy, 0, Tepsilon.Vector) >= 0) and
+       (assigned(FGeoLocationSensor.OnGeoLocationUpdate)) then begin
+      FGeoLocationSensor.OnGeoLocationUpdate(
+        Self, // const Sender: TObject;
+        Llocation.coordinate.latitude, // const ALatitude: Double;
+        Llocation.coordinate.longitude, // const ALongitude: Double;
+        Llocation.Altitude, // const AAltitude: Double;
+        Llocation.horizontalAccuracy, // const AAccuracy: Double;
+        ALNSDateToUTCDateTime(LLocation.timestamp)); // Const ADateTime: TdateTime
+    end;
+  end;
+
+end;
+
+{*************************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation);
+begin
+
+  //Tells the delegate that a new location value is available.
+  //
+  //iOS 2.0–6.0 Deprecated
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didUpdateToLocation:fromLocation');
+  {$ENDIF}
+
+end;
+
+{*********************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didDetermineState: CLRegionState; forRegion: CLRegion);
+begin
+
+  //Tells the delegate about the state of the specified region.
+  //
+  //The location manager calls this method whenever there is a boundary
+  //transition for a region. It calls this method in addition to calling the
+  //locationManager:didEnterRegion: and locationManager:didExitRegion: methods.
+  //The location manager also calls this method in response to a call to its
+  //requestStateForRegion: method, which runs asynchronously.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didDetermineState:forRegion');
+  {$ENDIF}
+
+end;
+
+{******************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didRangeBeacons: NSArray; inRegion: CLBeaconRegion);
+begin
+
+  //iOS 7.0–13.0 Deprecated
+  //
+  //Tells the delegate that one or more beacons are in range.
+  //
+  //The location manager calls this method when a new set of beacons
+  //becomes available in the specified region or when a beacon goes out
+  //of range. The location manager also calls this method when the range
+  //of a beacon changes; for example, when a beacon gets closer.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:didRangeBeacons:inRegion');
+  {$ENDIF}
+
+end;
+
+{**********************************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; rangingBeaconsDidFailForRegion: CLBeaconRegion; withError: NSError);
+begin
+
+  //iOS 7.0–13.0 Deprecated
+  //
+  //Tells the delegate that an error occurred while gathering ranging
+  //information for a set of beacons.
+  //
+  //Errors occur most often when registering a beacon region failed. If
+  //the region object itself is invalid or if it contains invalid data, the
+  //location manager calls this method to report the problem.
+
+  {$IFDEF DEBUG}
+  if (withError <> nil) then
+    allog(
+      'TALGeoLocationSensor.TLocationManagerDelegate.locationManager:rangingBeaconsDidFailForRegion:withError',
+      NSStrToStr(withError.localizedDescription) + ' | ' +
+      'ErrorCode: ' + ALIntToStrW(withError.code),
+      TalLogType.error)
+  else
+    allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManager:rangingBeaconsDidFailForRegion:withError');
+  {$ENDIF}
 
 end;
 
@@ -1649,37 +1802,118 @@ begin
 end;
 
 {****************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations(manager: CLLocationManager; locations: NSArray);
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidExitRegion(manager: CLLocationManager; didExitRegion: CLRegion);
 begin
 
-  //Tells the delegate that new location data is available.
+  //Tells the delegate that the user left the specified region.
+  //
+  //Because regions are a shared application resource, every active
+  //location manager object delivers this message to its associated delegate.
+  //It doesn't matter which location manager actually registered the
+  //specified region. If multiple location managers share a delegate object,
+  //that delegate receives the message multiple times.
+  //
+  //The region object provided may not be the same one that was registered.
+  //As a result, you should never perform pointer-level comparisons to
+  //determine equality. Instead, use the region’s identifier string to
+  //determine if your delegate should respond.
 
-  for var I := 0 to locations.count - 1 do begin
-    var LLocation := TCLLocation.Wrap(locations.objectAtIndex(I));
-    {$IFDEF DEBUG}
-    ALLog(
-      'TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations',
-      'Date: ' + ALDateTimeToStrW(ALNSDateToUTCDateTime(LLocation.timestamp)) + ' | ' +
-      'Latitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.latitude) + ' | ' +
-      'Longitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.longitude) + ' | ' +
-      'Accuracy: ' + ALFormatFloatW('#.##', LLocation.horizontalAccuracy) + 'm');
-    {$ENDIF}
-    //The location’s latitude and longitude identify the center of the
-    //circle, and this value indicates the radius of that circle.
-    //A negative value indicates that the location’s latitude and longitude
-    //are invalid. i don't think this will ever happen but cost nothing to
-    //add a trap here
-    if (compareValue(LLocation.horizontalAccuracy, 0, Tepsilon.Vector) >= 0) and
-       (assigned(FGeoLocationSensor.OnGeoLocationUpdate)) then begin
-      FGeoLocationSensor.OnGeoLocationUpdate(
-        Self, // const Sender: TObject;
-        Llocation.coordinate.latitude, // const ALatitude: Double;
-        Llocation.coordinate.longitude, // const ALongitude: Double;
-        Llocation.Altitude, // const AAltitude: Double;
-        Llocation.horizontalAccuracy, // const AAccuracy: Double;
-        ALNSDateToUTCDateTime(LLocation.timestamp)); // Const ADateTime: TdateTime
-    end;
-  end;
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidExitRegion');
+  {$ENDIF}
+
+end;
+
+{*******************************************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; didFinishDeferredUpdatesWithError: NSError);
+begin
+
+  //Tells the delegate that updates will no longer be deferred.
+  //
+  //The location manager object calls this method to let you know that it has
+  //stopped deferring the delivery of location events. The manager may call
+  //this method for any number of reasons. For example, it calls it when you
+  //stop location updates altogether, when you ask the location manager to
+  //disallow deferred updates, or when a condition for deferring updates (such
+  //as exceeding a timeout or distance parameter) is met.
+
+  {$IFDEF DEBUG}
+  if (didFinishDeferredUpdatesWithError <> nil) then
+    allog(
+      'TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError',
+      NSStrToStr(didFinishDeferredUpdatesWithError.localizedDescription) + ' | ' +
+      'ErrorCode: ' + ALIntToStrW(didFinishDeferredUpdatesWithError.code),
+      TalLogType.error)
+  else
+    allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError');
+  {$ENDIF}
+
+end;
+
+{*************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates(manager: CLLocationManager);
+begin
+
+  //Tells the delegate that location updates were paused.
+  //
+  //When the location manager detects that the device’s location is not
+  //changing, it can pause the delivery of updates in order to shut down the
+  //appropriate hardware and save power. When it does this, it calls this
+  //method to let your app know that this has happened.
+  //
+  //After a pause occurs, it is your responsibility to restart location
+  //services again at an appropriate time. You might use your implementation
+  //of this method to start region monitoring at the user's current
+  //location or enable the visits location service to determine when the
+  //user starts moving again. Another alternative is to restart location
+  //services immediately with a reduced accuracy (which can save power)
+  //and then return to a greater accuracy only after the user starts
+  //moving again.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates')
+  {$ENDIF}
+
+end;
+
+
+{**************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates(manager: CLLocationManager);
+begin
+
+  //Tells the delegate that the delivery of location updates has resumed.
+  //
+  //When you restart location services after an automatic pause, Core
+  //Location calls this method to notify your app that services have resumed.
+  //You are responsible for restarting location services in your app.
+  //Core Location does not resume updates automatically after it pauses them.
+  //For tips on how to restart location services when a pause occurs, see
+  //the discussion of the locationManagerDidPauseLocationUpdates: method.
+  //
+  //NOTE: this is false :
+  //You are responsible for restarting location services in your app. Core
+  //Location does not resume updates automatically after it pauses them.
+  //i see that when the app is in background, then
+  //locationManagerDidPauseLocationUpdates is called and then if later you
+  //move the app to the foreground then locationManagerDidResumeLocationUpdates
+  //will be called automatiquelly !
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates')
+  {$ENDIF}
+
+end;
+
+{********************************************************************************************************************************************************************}
+procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; didStartMonitoringForRegion: CLRegion);
+begin
+
+  //Tells the delegate that a new region is being monitored.
+
+  {$IFDEF DEBUG}
+  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion');
+  {$ENDIF}
 
 end;
 
@@ -1728,248 +1962,6 @@ begin
   {$ENDIF}
 
   Result := False;
-
-end;
-
-{********************************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion(manager: CLLocationManager; state: CLRegionState; region: CLRegion);
-begin
-
-  //Tells the delegate about the state of the specified region.
-  //
-  //The location manager calls this method whenever there is a boundary
-  //transition for a region. It calls this method in addition to calling the
-  //locationManager:didEnterRegion: and locationManager:didExitRegion: methods.
-  //The location manager also calls this method in response to a call to its
-  //requestStateForRegion: method, which runs asynchronously.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion');
-  {$ENDIF}
-
-end;
-
-{*****************************************************************************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint);
-begin
-
-  //Tells the delegate that the location manager detected at least one beacon
-  //that satisfies the provided constraint.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint');
-  {$ENDIF}
-
-end;
-
-{*************************************************************************************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError);
-begin
-
-  //Tells the delegate that the location manager couldn’t detect any beacons
-  //that satisfy the provided constraint.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError');
-  {$ENDIF}
-
-end;
-
-{*******************************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager; beacons: NSArray; region: CLBeaconRegion);
-begin
-
-  //iOS 7.0–13.0 Deprecated
-  //
-  //Tells the delegate that one or more beacons are in range.
-  //
-  //The location manager calls this method when a new set of beacons
-  //becomes available in the specified region or when a beacon goes out
-  //of range. The location manager also calls this method when the range
-  //of a beacon changes; for example, when a beacon gets closer.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion');
-  {$ENDIF}
-
-end;
-
-{*********************************************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError(manager: CLLocationManager; region: CLBeaconRegion; error: NSError);
-begin
-
-  //iOS 7.0–13.0 Deprecated
-  //
-  //Tells the delegate that an error occurred while gathering ranging
-  //information for a set of beacons.
-  //
-  //Errors occur most often when registering a beacon region failed. If
-  //the region object itself is invalid or if it contains invalid data, the
-  //location manager calls this method to report the problem.
-
-  {$IFDEF DEBUG}
-  if (error <> nil) then
-    allog(
-      'TALGeoLocationSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError',
-      NSStrToStr(error.localizedDescription) + ' | ' +
-      'ErrorCode: ' + ALIntToStrW(error.code),
-      TalLogType.error)
-  else
-    allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError');
-  {$ENDIF}
-
-end;
-
-{**********************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidEnterRegion(manager: CLLocationManager; region: CLRegion);
-begin
-
-  //Tells the delegate that location updates were paused.
-  //
-  //Because regions are a shared application resource, every active location
-  //manager object delivers this message to its associated delegate. It
-  //doesn’t matter which location manager actually registered the specified
-  //region. If multiple location managers share a delegate object, that
-  //delegate receives the message multiple times.
-  //
-  //The region object provided may not be the same one that was registered.
-  //As a result, you should never perform pointer-level comparisons to
-  //determine equality. Instead, use the region’s identifier string to
-  //determine if your delegate should respond.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidEnterRegion');
-  {$ENDIF}
-
-end;
-
-{*********************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidExitRegion(manager: CLLocationManager; region: CLRegion);
-begin
-
-  //Tells the delegate that the user left the specified region.
-  //
-  //Because regions are a shared application resource, every active
-  //location manager object delivers this message to its associated delegate.
-  //It doesn't matter which location manager actually registered the
-  //specified region. If multiple location managers share a delegate object,
-  //that delegate receives the message multiple times.
-  //
-  //The region object provided may not be the same one that was registered.
-  //As a result, you should never perform pointer-level comparisons to
-  //determine equality. Instead, use the region’s identifier string to
-  //determine if your delegate should respond.
-
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidExitRegion');
-  {$ENDIF}
-
-end;
-
-{***********************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; region: CLRegion);
-begin
-
-  //Tells the delegate that a new region is being monitored.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion');
-  {$ENDIF}
-
-end;
-
-{*************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates(manager: CLLocationManager);
-begin
-
-  //Tells the delegate that location updates were paused.
-  //
-  //When the location manager detects that the device’s location is not
-  //changing, it can pause the delivery of updates in order to shut down the
-  //appropriate hardware and save power. When it does this, it calls this
-  //method to let your app know that this has happened.
-  //
-  //After a pause occurs, it is your responsibility to restart location
-  //services again at an appropriate time. You might use your implementation
-  //of this method to start region monitoring at the user's current
-  //location or enable the visits location service to determine when the
-  //user starts moving again. Another alternative is to restart location
-  //services immediately with a reduced accuracy (which can save power)
-  //and then return to a greater accuracy only after the user starts
-  //moving again.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates')
-  {$ENDIF}
-
-end;
-
-{**************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates(manager: CLLocationManager);
-begin
-
-  //Tells the delegate that the delivery of location updates has resumed.
-  //
-  //When you restart location services after an automatic pause, Core
-  //Location calls this method to notify your app that services have resumed.
-  //You are responsible for restarting location services in your app.
-  //Core Location does not resume updates automatically after it pauses them.
-  //For tips on how to restart location services when a pause occurs, see
-  //the discussion of the locationManagerDidPauseLocationUpdates: method.
-  //
-  //NOTE: this is false :
-  //You are responsible for restarting location services in your app. Core
-  //Location does not resume updates automatically after it pauses them.
-  //i see that when the app is in background, then
-  //locationManagerDidPauseLocationUpdates is called and then if later you
-  //move the app to the foreground then locationManagerDidResumeLocationUpdates
-  //will be called automatiquelly !
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates')
-  {$ENDIF}
-
-end;
-
-{***************************************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError);
-begin
-
-  //Tells the delegate that updates will no longer be deferred.
-  //
-  //The location manager object calls this method to let you know that it has
-  //stopped deferring the delivery of location events. The manager may call
-  //this method for any number of reasons. For example, it calls it when you
-  //stop location updates altogether, when you ask the location manager to
-  //disallow deferred updates, or when a condition for deferring updates (such
-  //as exceeding a timeout or distance parameter) is met.
-
-  {$IFDEF DEBUG}
-  if (error <> nil) then
-    allog(
-      'TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError',
-      NSStrToStr(error.localizedDescription) + ' | ' +
-      'ErrorCode: ' + ALIntToStrW(error.code),
-      TalLogType.error)
-  else
-    allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError');
-  {$ENDIF}
-
-end;
-
-{**************************************************************************************************************************}
-procedure TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidVisit(manager: CLLocationManager; visit: CLVisit);
-begin
-
-  //Tells the delegate that a new visit-related event was received.
-  //
-  //The location manager calls this method whenever it has new visit event
-  //to report to your app.
-
-  {$IFDEF DEBUG}
-  allog('TALGeoLocationSensor.TLocationManagerDelegate.locationManagerDidVisit');
-  {$ENDIF}
 
 end;
 

@@ -410,9 +410,7 @@ type
         procedure DoRemoveObject(const AObject: TFmxObject); override;
         procedure DoDeleteChildren; override;
         procedure DoContentChanged; override;
-        {$IFNDEF ALDPK}
-        function IsVisibleObject(const AObject: TControl): Boolean; override;
-        {$ENDIF}
+        function IsVisibleChild(const AChild: TControl): Boolean; override;
       public
         constructor Create(AOwner: TComponent); override;
         property PageControl: TALPageController read FPageController;
@@ -493,12 +491,10 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
-    {$IFNDEF ALDPK}
     procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseLeave(const AObject: TControl); override;
-    {$ENDIF}
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1604,20 +1600,19 @@ begin
   FPageController := TALPageController(AOwner);
 end;
 
-{*************}
-{$IFNDEF ALDPK}
-function TALPageController.TContent.IsVisibleObject(const AObject: TControl): Boolean;
+{**********************************************************************************}
+function TALPageController.TContent.IsVisibleChild(const AChild: TControl): Boolean;
 begin
 
-  if AObject.Visible then begin
+  if AChild.Visible then begin
 
     if FPageController.Orientation = TOrientation.Horizontal then begin
-      Result := (AObject.Position.X < -Position.X + FPageController.Width) and
-                (AObject.Position.X + AObject.Width > -Position.X);
+      Result := (AChild.Position.X < -Position.X + FPageController.Width) and
+                (AChild.Position.X + AChild.Width > -Position.X);
     end
     else begin
-      Result := (AObject.Position.Y < -Position.Y + FPageController.Height) and
-                (AObject.Position.Y + AObject.Height > -Position.Y);
+      Result := (AChild.Position.Y < -Position.Y + FPageController.Height) and
+                (AChild.Position.Y + AChild.Height > -Position.Y);
     end;
 
   end
@@ -1625,7 +1620,6 @@ begin
     result := False;
 
 end;
-{$ENDIF}
 
 {**************************************************************************}
 procedure TALPageController.TContent.DoAddObject(const AObject: TFmxObject);
@@ -2717,8 +2711,7 @@ end;
 Type
   _TControlProtectedAccess = class(Tcontrol);
 
-{*************}
-{$IFNDEF ALDPK}
+{*****************************************************************************************************************************}
 procedure TALPageController.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then begin
@@ -2733,20 +2726,16 @@ begin
   InternalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{*******************************************************************************************************}
 procedure TALPageController.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
 begin
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{***************************************************************************************************************************}
 procedure TALPageController.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not aObject.AutoCapture then begin
@@ -2761,16 +2750,13 @@ begin
   InternalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
 
-{*************}
-{$IFNDEF ALDPK}
+{**********************************************************************}
 procedure TALPageController.ChildrenMouseLeave(const AObject: TControl);
 begin
   internalMouseLeave;
   inherited;
 end;
-{$ENDIF}
 
 {*************************************************************************}
 function TALPageController.NextPage(ATransition: TPageTransition): Boolean;

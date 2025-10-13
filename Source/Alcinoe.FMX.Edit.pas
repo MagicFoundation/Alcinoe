@@ -21,7 +21,6 @@ uses
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
-  Alcinoe.iOSapi.UIKit,
   Alcinoe.FMX.NativeView.iOS,
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
@@ -253,14 +252,20 @@ Type
         FEditView: TALIosEditView;
       public
         constructor Create(const AEditView: TALIosEditView);
-        // Better name would be textFieldShouldChangeCharactersInRange
-        function textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean; cdecl;
+        function textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean; overload; cdecl;
+        function textField(textField: UITextField; editMenuForCharactersInRange: NSRange; suggestedActions: NSArray): UIMenu; overload; cdecl;
+        procedure textField(textField: UITextField; willPresentEditMenuWithAnimator: Pointer); overload; cdecl;
+        procedure textField(textField: UITextField; insertInputSuggestion: UIInputSuggestion); overload; cdecl;
         procedure textFieldDidBeginEditing(textField: UITextField); cdecl;
-        procedure textFieldDidEndEditing(textField: UITextField); cdecl;
+        procedure textFieldDidChangeSelection(textField: UITextField); cdecl;
+        procedure textFieldDidEndEditing(textField: UITextField); overload; cdecl;
+        procedure textFieldDidEndEditing(textField: UITextField; reason: UITextFieldDidEndEditingReason); overload; cdecl;
         function textFieldShouldBeginEditing(textField: UITextField): Boolean; cdecl;
         function textFieldShouldClear(textField: UITextField): Boolean; cdecl;
         function textFieldShouldEndEditing(textField: UITextField): Boolean; cdecl;
         function textFieldShouldReturn(textField: UITextField): Boolean; cdecl;
+        [MethodName('textField:willDismissEditMenuWithAnimator:')]
+        procedure textFieldWillDismissEditMenuWithAnimator(textField: UITextField; willDismissEditMenuWithAnimator: Pointer); cdecl;
       end;
   private
     FTextFieldDelegate: TTextFieldDelegate;
@@ -376,9 +381,9 @@ Type
   TALMacEditView = class(TALMacBaseEditView)
   private
     type
-      // --------------------
-      // TTextEditingDelegate
-      TTextEditingDelegate = class(TOCLocal, Alcinoe.Macapi.AppKit.NSControlTextEditingDelegate)
+      // ------------------
+      // TTextFieldDelegate
+      TTextFieldDelegate = class(TOCLocal, NSTextFieldDelegate)
       private
         FEditView: TALMacEditView;
       public
@@ -394,7 +399,7 @@ Type
         function controlTextViewDoCommandBySelector(control: NSControl; textView: NSTextView; doCommandBySelector: SEL): Boolean; cdecl;
       end;
   private
-    FTextFieldDelegate: TTextEditingDelegate;
+    FTextFieldDelegate: TTextFieldDelegate;
     FTextSettings: TALBaseTextSettings;
     FFillColor: TAlphaColor;
     fMaxLength: integer;
@@ -1209,13 +1214,11 @@ uses
   Macapi.Helpers,
   iOSapi.CoreText,
   FMX.Helpers.iOS,
-  Alcinoe.iOSapi.Foundation,
   {$ELSEIF defined(ALMacOS)}
   Macapi.ObjCRuntime,
   Macapi.CoreFoundation,
   Macapi.Helpers,
   FMX.Helpers.Mac,
-  Alcinoe.Macapi.Foundation,
   Alcinoe.StringUtils,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.CommCtrl,
@@ -1281,7 +1284,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.TAndroidNativeView.ProcessTouch was not updated and adjust the IFDEF'}
 {$ENDIF}
 function TALAndroidEditView.TTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
@@ -1909,16 +1912,33 @@ function TALIosEditView.TTextFieldDelegate.textField(textField: UITextField; sho
 begin
   {$IF defined(DEBUG)}
   //ALLog(
-  //  Classname + '.textField',
+  //  Classname + '.textField:shouldChangeCharactersInRange:replacementString',
   //  'control.name: ' + FTextField.Control.Name + ' | ' +
   //  'replacementString: ' + NSStrToStr(replacementString));
   {$ENDIF}
   if FEditView.maxLength > 0 then begin
-    var LText: NSString := TNSString.Wrap(textField.text);
+    var LText := textField.text;
     if shouldChangeCharactersInRange.length + shouldChangeCharactersInRange.location > LText.length then exit(false);
     result := LText.length + replacementString.length - shouldChangeCharactersInRange.length <= NSUInteger(FEditView.maxLength);
   end
   else Result := True;
+end;
+
+{*****************************************************************************************************************************************************}
+function TALIosEditView.TTextFieldDelegate.textField(textField: UITextField; editMenuForCharactersInRange: NSRange; suggestedActions: NSArray): UIMenu;
+begin
+  // Return nil to present the default system menu.
+  Result := nil;
+end;
+
+{**********************************************************************************************************************}
+procedure TALIosEditView.TTextFieldDelegate.textField(textField: UITextField; willPresentEditMenuWithAnimator: Pointer);
+begin
+end;
+
+{**********************************************************************************************************************}
+procedure TALIosEditView.TTextFieldDelegate.textField(textField: UITextField; insertInputSuggestion: UIInputSuggestion);
+begin
 end;
 
 {*******************************************************************************************}
@@ -1926,8 +1946,19 @@ procedure TALIosEditView.TTextFieldDelegate.textFieldDidBeginEditing(textField: 
 begin
 end;
 
+{**********************************************************************************************}
+procedure TALIosEditView.TTextFieldDelegate.textFieldDidChangeSelection(textField: UITextField);
+begin
+end;
+
 {*****************************************************************************************}
 procedure TALIosEditView.TTextFieldDelegate.textFieldDidEndEditing(textField: UITextField);
+begin
+  FEditView.Control.ResetFocus;
+end;
+
+{*********************************************************************************************************************************}
+procedure TALIosEditView.TTextFieldDelegate.textFieldDidEndEditing(textField: UITextField; reason: UITextFieldDidEndEditingReason);
 begin
   FEditView.Control.ResetFocus;
 end;
@@ -1961,6 +1992,11 @@ begin
     result := false;
   end
   else Result := true; // return YES if the text field should implement its default behavior for the return button; otherwise, NO.
+end;
+
+{*****************************************************************************************************************************************************}
+procedure TALIosEditView.TTextFieldDelegate.textFieldWillDismissEditMenuWithAnimator(textField: UITextField; willDismissEditMenuWithAnimator: Pointer);
+begin
 end;
 
 {********************************}
@@ -2154,7 +2190,7 @@ end;
 {********************************************}
 function TALIosEditView.GetPromptText: String;
 begin
-  var LAttributedString := TALNSAttributedString.wrap(NSObjectToID(TUITextField.Wrap(NSObjectToID(View)).AttributedPlaceholder));
+  var LAttributedString := View.AttributedPlaceholder;
   if LAttributedString = nil then Result := NSStrToStr(View.placeholder)
   else result := NSStrToStr(LAttributedString.&String);
 end;
@@ -2203,8 +2239,9 @@ begin
                              ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                                PremultipliedAlpha.
                                ToAlphaColor);
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+        // No release required for LUIColor because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
         LPromptTextAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LUIColor), LTextRange);
-        //NOTE: If I try to release the LUIColor I have an exception
       finally
         LPromptTextAttr.endEditing;
       end;
@@ -2238,7 +2275,7 @@ end;
 {**************************************}
 function TALIosEditView.getText: String;
 begin
-  result := NSStrToStr(TNSString.Wrap(View.text));
+  result := NSStrToStr(View.text);
 end;
 
 {****************************************************}
@@ -2283,17 +2320,19 @@ begin
     var LDictionary := TNSDictionary.Wrap(
                          TNSDictionary.OCClass.dictionaryWithObject(
                            LFontRef,
-                           NSObjectToID(TNSString.Wrap(kCTFontAttributeName))));
+                           kCTFontAttributeName));
+    // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+    // No release required for LDictionary because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+
     // Setting this property applies the specified attributes to the entire
     // text of the text field. Unset attributes maintain their default values.
-    // Note: I can't later call LDictionary.release or I have an error
     View.setdefaultTextAttributes(LDictionary);
   finally
     CFRelease(LFontRef);
   end;
 
   // TextAlignment
-  View.setTextAlignment(ALTextHorzAlignToUITextAlignment(TextSettings.HorzAlign));
+  View.setTextAlignment(ALTextHorzAlignToNSTextAlignment(TextSettings.HorzAlign));
 
   // TextColor
   View.setTextColor(AlphaColorToUIColor(TextSettings.Font.Color));
@@ -2349,26 +2388,26 @@ end;
 {$REGION ' MacOS'}
 {$IF defined(ALMacOS)}
 
-{**************************************************************************************}
-constructor TALMacEditView.TTextEditingDelegate.Create(const AEditView: TALMacEditView);
+{************************************************************************************}
+constructor TALMacEditView.TTextFieldDelegate.Create(const AEditView: TALMacEditView);
 begin
   inherited Create;
   FEditView := AEditView;
 end;
 
-{********************************************************************************************}
-procedure TALMacEditView.TTextEditingDelegate.controlTextDidBeginEditing(obj: NSNotification);
+{******************************************************************************************}
+procedure TALMacEditView.TTextFieldDelegate.controlTextDidBeginEditing(obj: NSNotification);
 begin
 end;
 
-{******************************************************************************************}
-procedure TALMacEditView.TTextEditingDelegate.controlTextDidEndEditing(obj: NSNotification);
+{****************************************************************************************}
+procedure TALMacEditView.TTextFieldDelegate.controlTextDidEndEditing(obj: NSNotification);
 begin
   FEditView.Control.ResetFocus;
 end;
 
-{**************************************************************************************}
-procedure TALMacEditView.TTextEditingDelegate.controlTextDidChange(obj: NSNotification);
+{************************************************************************************}
+procedure TALMacEditView.TTextFieldDelegate.controlTextDidChange(obj: NSNotification);
 begin
   if FEditView.maxLength > 0 then begin
     var LText := NSStrToStr(FEditView.View.stringValue);
@@ -2380,20 +2419,20 @@ begin
   fEditView.DoChange;
 end;
 
-{**************************************************************************************************************************************}
-function TALMacEditView.TTextEditingDelegate.controlTextShouldBeginEditing(control: NSControl; textShouldBeginEditing: NSText): Boolean;
+{************************************************************************************************************************************}
+function TALMacEditView.TTextFieldDelegate.controlTextShouldBeginEditing(control: NSControl; textShouldBeginEditing: NSText): Boolean;
 begin
   Result := True;
 end;
 
-{**********************************************************************************************************************************}
-function TALMacEditView.TTextEditingDelegate.controlTextShouldEndEditing(control: NSControl; textShouldEndEditing: NSText): Boolean;
+{********************************************************************************************************************************}
+function TALMacEditView.TTextFieldDelegate.controlTextShouldEndEditing(control: NSControl; textShouldEndEditing: NSText): Boolean;
 begin
   Result := True;
 end;
 
-{***********************************************************************************************************************************************************}
-function TALMacEditView.TTextEditingDelegate.controlTextViewDoCommandBySelector(control: NSControl; textView: NSTextView; doCommandBySelector: SEL): Boolean;
+{*********************************************************************************************************************************************************}
+function TALMacEditView.TTextFieldDelegate.controlTextViewDoCommandBySelector(control: NSControl; textView: NSTextView; doCommandBySelector: SEL): Boolean;
 begin
   if assigned(fEditView.Control.OnReturnKey) and (sel_getName(doCommandBySelector) = 'insertNewline:') then begin
     fEditView.Control.DoReturnKey;
@@ -2409,11 +2448,14 @@ begin
   inherited; // This will call InitView
   View.SetBezeled(False);
   View.setBordered(false);
-  TALNSControl.Wrap(NSObjectToID(View)).setLineBreakMode(NSLineBreakByClipping);
+  View.setLineBreakMode(NSLineBreakByClipping);
   View.setDrawsBackground(false);
   View.setFocusRingType(NSFocusRingTypeNone);
-  FTextFieldDelegate := TTextEditingDelegate.Create(Self);
-  TALNSTextField.wrap(NSObjectToID(View)).setDelegate(FTextFieldDelegate.GetObjectID);
+  FTextFieldDelegate := TTextFieldDelegate.Create(Self);
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4352 has been resolved. If resolved, remove the class definition below.'}
+  {$ENDIF}
+  View.setDelegate(FTextFieldDelegate);
   FTextSettings := TALBaseEdit.TTextSettings.Create;
   FTextSettings.OnChanged := TextSettingsChanged;
   FFillColor := $ffffffff;
@@ -2532,7 +2574,7 @@ function TALMacEditView.GetPromptText: String;
 begin
   var LAttributedString := TALNSTextField.Wrap(NSObjectToID(View)).placeholderAttributedString;
   if LAttributedString = nil then Result := NSStrToStr(TALNSTextField.Wrap(NSObjectToID(View)).PlaceholderString)
-  else result := NSStrToStr(TALNSAttributedString.wrap(NSObjectToID(LAttributedString)).&String);
+  else result := NSStrToStr(LAttributedString.&String);
 end;
 
 {**********************************************************}
@@ -2579,8 +2621,9 @@ begin
                              ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                                PremultipliedAlpha.
                                ToAlphaColor);
+        // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+        // No release required for LUIColor because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
         LPromptTextAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LNSColor), LTextRange);
-        //NOTE: If I try to release the LNSColor I have an exception
 
         // No need to do this in iOS, only in MacOS
         var LParagraphStyle := TNSMutableParagraphStyle.Alloc;

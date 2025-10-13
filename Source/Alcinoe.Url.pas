@@ -379,7 +379,7 @@ begin
   If FQueryParams = nil then begin
     FQueryParams := TALNVStringListA.Create;
     FQueryParams.LineBreak := '&';
-    FQueryParams.IncludeTrailingLineBreakInText := False;
+    FQueryParams.TrailingLineBreak := False;
     FQueryParams.Text := FQueryString;
     FQueryParams.OnChanged := QueryParamsChanged;
   end;

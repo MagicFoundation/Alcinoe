@@ -40,7 +40,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.Ani.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -702,7 +702,7 @@ type
   // (i.e. under-damped), the mass tends to overshoot, and return, and overshoot again. Without any
   // damping (i.e. damping ratio := 0), the mass will oscillate forever.
   // Taken from Android SpringForce
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if android SpringForce.java was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\SpringForce.java with https://android.googlesource.com/platform/frameworks/support/dynamicanimation/dynamicanimation/src/main/java/androidx/dynamicanimation/animation/SpringForce.java
   {$ENDIF}
@@ -939,7 +939,6 @@ uses
   {$IFDEF IOS}
   Macapi.Helpers,
   Macapi.ObjCRuntime,
-  Alcinoe.iOSapi.QuartzCore,
   {$ENDIF}
   FMX.Ani,
   FMX.Forms,
@@ -1315,7 +1314,7 @@ end;
 
 {************************************************************}
 // Taken from android.widget.Scroller.ViscousFluidInterpolator
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if android.widget.Scroller.ViscousFluidInterpolator was not updated and adjust the IFDEF'}
   //Compare <Alcinoe>\References\Android\Scroller.java with <SDKs>c:\SDKs\android\sources\android-33\android\widget\Scroller.java
 {$ENDIF}
@@ -1443,7 +1442,7 @@ constructor TALDisplayLinkThread.Create(AOwner: TComponent);
 begin
   inherited create;
   fDisplayLinkListener := TDisplayLinkListener.Create(self);
-  fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
+  fDisplayLink := TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated'));
   fDisplayLink.retain;
   if GlobalUseMetal then begin
     // In OpenGL, the animation appears more jerky when using
@@ -1453,12 +1452,13 @@ begin
       LFrameRateRange.minimum := ALMinimumFramesPerSecond;
       LFrameRateRange.maximum := ALMaximumFramesPerSecond;
       LFrameRateRange.preferred := ALPreferredFramesPerSecond;
-      TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFrameRateRange(LFrameRateRange);
+      fDisplayLink.setPreferredFrameRateRange(LFrameRateRange);
     end
     else
-      TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
+      fDisplayLink.setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
   end;
-  fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.mainRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+  // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+  fDisplayLink.addToRunLoop(TNSRunLoop.OCClass.mainRunLoop, NSRunLoopCommonModes);
   fDisplayLink.setPaused(true);
   FTimerEvent := nil;
   Interval := 1;

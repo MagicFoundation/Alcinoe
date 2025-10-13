@@ -31,7 +31,7 @@ type
   ////////////////////////////////////////////////}
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if System.Net.Mime.TMultipartFormData.pas is still the same and adjust the IFDEF'}
   {$ENDIF}
   TALMultipartFormDataEncoderA = class (TObject)

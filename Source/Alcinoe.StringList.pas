@@ -33,15 +33,15 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
-  {$  MESSAGE WARN 'Check if System.classes.TStringsEnumerator didn''t change and adjust the IFDEF'}
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if System.classes.TStringsEnumerator didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
 {$ENDIF}
 
@@ -83,11 +83,11 @@ Type
     //[deleted from Tstrings] procedure WriteData(Writer: TWriter);
     FDelimiter: AnsiChar;
     FLineBreak: AnsiString;
-    FIncludeTrailingLineBreakInText: Boolean;
     FQuoteChar: AnsiChar;
     FNameValueSeparator: AnsiChar;
     FStrictDelimiter: Boolean;
     FUpdateCount: Integer;
+    FTrailingLineBreak: Boolean;
     FProtectedSave: Boolean;
     function GetCommaText: AnsiString;
     function GetDelimitedText: AnsiString;
@@ -179,7 +179,6 @@ Type
     property Delimiter: AnsiChar read fDelimiter write fDelimiter;
     property DelimitedText: AnsiString read GetDelimitedText write SetDelimitedText;
     property LineBreak: AnsiString read fLineBreak write fLineBreak;
-    property IncludeTrailingLineBreakInText: Boolean read FIncludeTrailingLineBreakInText write FIncludeTrailingLineBreakInText;
     property Names[Index: Integer]: AnsiString read GetName;
     property StrictNames[Index: Integer]: AnsiString read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
@@ -192,6 +191,13 @@ Type
     property StrictDelimiter: Boolean read fStrictDelimiter write fStrictDelimiter;
     property Strings[Index: Integer]: AnsiString read Get write Put; default;
     property Text: AnsiString read GetTextStr write SetTextStr;
+    /// <summary>
+    ///    When TrailingLineBreak property is True (default value) then Text property
+    ///    will contain line break after last line. When it is False, then Text value
+    ///    will not contain line break after last line. This also may be controlled
+    ///    by soTrailingLineBreak option.
+    /// </summary>
+    property TrailingLineBreak: Boolean read FTrailingLineBreak write FTrailingLineBreak;
     property ProtectedSave: Boolean read fProtectedSave write fProtectedSave;
   end;
 
@@ -486,12 +492,12 @@ Type
     FDefaultEncoding: TEncoding;
     FDelimiter: Char;
     FLineBreak: String;
-    FIncludeTrailingLineBreakInText: Boolean;
     FQuoteChar: Char;
     FNameValueSeparator: Char;
     FStrictDelimiter: Boolean;
     FUpdateCount: Integer;
     FWriteBOM: Boolean;
+    FTrailingLineBreak: Boolean;
     FProtectedSave: Boolean;
     function GetCommaText: String;
     function GetDelimitedText: String;
@@ -581,7 +587,6 @@ Type
     property DelimitedText: String read GetDelimitedText write SetDelimitedText;
     property Encoding: TEncoding read FEncoding;
     property LineBreak: String read fLineBreak write fLineBreak;
-    property IncludeTrailingLineBreakInText: Boolean read FIncludeTrailingLineBreakInText write FIncludeTrailingLineBreakInText;
     property Names[Index: Integer]: String read GetName;
     property StrictNames[Index: Integer]: String read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
@@ -595,6 +600,13 @@ Type
     property Strings[Index: Integer]: String read Get write Put; default;
     property Text: String read GetTextStr write SetTextStr;
     property WriteBOM: Boolean read FWriteBOM write FWriteBOM;
+    /// <summary>
+    ///    When TrailingLineBreak property is True (default value) then Text property
+    ///    will contain line break after last line. When it is False, then Text value
+    ///    will not contain line break after last line. This also may be controlled
+    ///    by soTrailingLineBreak option.
+    /// </summary>
+    property TrailingLineBreak: Boolean read FTrailingLineBreak write FTrailingLineBreak;
     property ProtectedSave: Boolean read fProtectedSave write fProtectedSave;
   end;
 
@@ -807,11 +819,11 @@ begin
   inherited Create;
   FDelimiter := ',';
   FLineBreak := sLineBreak;
-  FIncludeTrailingLineBreakInText := True;
   FQuoteChar := '"';
   FNameValueSeparator := '=';
   FStrictDelimiter:= False;
   FUpdateCount:= 0;
+  FTrailingLineBreak := True;
   fProtectedSave := False;
 end;
 
@@ -910,8 +922,8 @@ begin
       QuoteChar := TALStringsA(Source).QuoteChar;
       Delimiter := TALStringsA(Source).Delimiter;
       LineBreak := TALStringsA(Source).LineBreak;
-      IncludeTrailingLineBreakInText := TALStringsA(Source).IncludeTrailingLineBreakInText;
       StrictDelimiter := TALStringsA(Source).StrictDelimiter;
+      TrailingLineBreak := TALStringsA(Source).TrailingLineBreak;
       AddStrings(TALStringsA(Source));
     finally
       EndUpdate;
@@ -927,8 +939,8 @@ begin
       QuoteChar := AnsiChar(TStrings(Source).QuoteChar);
       Delimiter := AnsiChar(TStrings(Source).Delimiter);
       LineBreak := AnsiString(TStrings(Source).LineBreak);
-      IncludeTrailingLineBreakInText := True;
       StrictDelimiter := TStrings(Source).StrictDelimiter;
+      TrailingLineBreak := True;
       for I := 0 to Tstrings(Source).Count - 1 do
         AddObject(Ansistring(Tstrings(Source)[I]), Tstrings(Source).Objects[I]);
     finally
@@ -1204,7 +1216,7 @@ begin
   Size := 0;
   LB := LineBreak;
   for I := 0 to Count - 1 do Inc(Size, Length(Get(I)) + Length(LB));
-  if (Size > 0) and (not IncludeTrailingLineBreakInText) then dec(Size, Length(LB));
+  if (Size > 0) and (not TrailingLineBreak) then dec(Size, Length(LB));
   SetString(Result, nil, Size);
   P := Pointer(Result);
   for I := 0 to Count - 1 do
@@ -1216,7 +1228,7 @@ begin
       ALMove(Pointer(S)^, P^, L);
       Inc(P, L);
     end;
-    if (I < Count - 1) or IncludeTrailingLineBreakInText then
+    if TrailingLineBreak or (I < Count - 1) then
     begin
       L := Length(LB);
       if L <> 0 then
@@ -2045,19 +2057,8 @@ end;
 
 {****************************}
 procedure TALStringListA.Grow;
-{$IF CompilerVersion <= 32}{tokyo}
-var
-  Delta: Integer;
-{$endif}
 begin
-  {$IF CompilerVersion <= 32}{tokyo}
-  if FCapacity > 64 then Delta := FCapacity div 4 else
-    if FCapacity > 8 then Delta := 16 else
-      Delta := 4;
-  SetCapacity(FCapacity + Delta);
-  {$else}
   SetCapacity(GrowCollection(FCapacity, FCount + 1));
-  {$endif}
 end;
 
 {************************************************************}
@@ -2912,19 +2913,8 @@ end;
 
 {******************************}
 procedure TALNVStringListA.Grow;
-{$IF CompilerVersion <= 32}{tokyo}
-var
-  Delta: Integer;
-{$endif}
 begin
-  {$IF CompilerVersion <= 32}{tokyo}
-  if FCapacity > 64 then Delta := FCapacity div 4 else
-    if FCapacity > 8 then Delta := 16 else
-      Delta := 4;
-  SetCapacity(FCapacity + Delta);
-  {$else}
   SetCapacity(GrowCollection(FCapacity, FCount + 1));
-  {$endif}
 end;
 
 {***********************************************}
@@ -2942,7 +2932,7 @@ begin
     if FList[i].fNvs then Inc(Size, Length(FList[i].fName) + 1{length(NameValueSeparator)} +  Length(FList[i].fValue) + Length(LB))
     else Inc(Size, Length(FList[i].fName) + Length(LB))
   end;
-  if (Size > 0) and (not IncludeTrailingLineBreakInText) then dec(Size, Length(LB));
+  if (Size > 0) and (not TrailingLineBreak) then dec(Size, Length(LB));
   SetString(Result, nil, Size);
   P := Pointer(Result);
   for I := 0 to FCount - 1 do
@@ -2965,7 +2955,7 @@ begin
         Inc(P, L);
       end;
     end;
-    if (I < Count - 1) or IncludeTrailingLineBreakInText then
+    if TrailingLineBreak or (I < Count - 1) then
     begin
       L := Length(LB);
       if L <> 0 then
@@ -3775,7 +3765,7 @@ begin
     if fNodeList[i].Nvs then Inc(Size, Length(fNodeList[i].ID) + 1{length(NameValueSeparator)} +  Length(fNodeList[i].Val) + Length(LB))
     else Inc(Size, Length(fNodeList[i].ID) + Length(LB))
   end;
-  if (Size > 0) and (not IncludeTrailingLineBreakInText) then dec(Size, Length(LB));
+  if (Size > 0) and (not TrailingLineBreak) then dec(Size, Length(LB));
   SetString(Result, nil, Size);
   P := Pointer(Result);
   for I := 0 to Count - 1 do
@@ -3798,7 +3788,7 @@ begin
         Inc(P, L);
       end;
     end;
-    if (I < Count - 1) or IncludeTrailingLineBreakInText then
+    if TrailingLineBreak or (I < Count - 1) then
     begin
       L := Length(LB);
       if L <> 0 then
@@ -3898,12 +3888,7 @@ begin
   LNode.Val := Value;
   LNode.Nvs := True;
   LNode.Obj := AObject;
-  {$IF CompilerVersion <= 32} // tokyo
-  if not Fdictionary.ContainsKey(Name) then Fdictionary.Add(Name,aNode)
-  else begin
-  {$ELSE}
   if not Fdictionary.TryAdd(Name,LNode) then begin
-  {$ENDIF}
     ALFreeAndNil(LNode);
     case Duplicates of
       dupIgnore: Exit;
@@ -3933,12 +3918,7 @@ begin
   LNode.Val := LValue;
   LNode.Nvs := LNvs;
   LNode.Obj := AObject;
-  {$IF CompilerVersion <= 32} // tokyo
-  if not Fdictionary.ContainsKey(aName) then Fdictionary.Add(aName,aNode)
-  else begin
-  {$ELSE}
   if not Fdictionary.TryAdd(LName,LNode) then begin
-  {$ENDIF}
     ALFreeAndNil(LNode);
     case Duplicates of
       dupIgnore: Exit;
@@ -3972,12 +3952,7 @@ begin
     LNewNode.Val := LNewValue;
     LNewNode.NVS := LNewNvs;
     LNewNode.Obj := LOldNode.Obj;
-    {$IF CompilerVersion <= 32} // tokyo
-    if not Fdictionary.ContainsKey(aNewName) then Fdictionary.Add(aNewName, aNewNode)
-    else begin
-    {$ELSE}
     if not Fdictionary.TryAdd(LNewName, LNewNode) then begin
-    {$ENDIF}
       ALFreeAndNil(LNewNode);
       case Duplicates of
         dupIgnore: Exit;
@@ -4164,7 +4139,7 @@ end;
 type
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<K,V> was not updated and adjust the IFDEF'}
   {$ENDIF}
   _TObjectDictionaryAccessPrivate<K,V> = class(TObjectDictionary<K,V>)
@@ -4371,11 +4346,11 @@ begin
   FWriteBOM := True;
   FDelimiter := ',';
   FLineBreak := sLineBreak;
-  FIncludeTrailingLineBreakInText := True;
   FQuoteChar := '"';
   FNameValueSeparator := '=';
   FStrictDelimiter:= False;
   FUpdateCount:= 0;
+  FTrailingLineBreak := True;
   fProtectedSave := False;
 end;
 
@@ -4488,9 +4463,9 @@ begin
       QuoteChar := TALStringsW(Source).QuoteChar;
       Delimiter := TALStringsW(Source).Delimiter;
       LineBreak := TALStringsW(Source).LineBreak;
-      IncludeTrailingLineBreakInText := TALStringsW(Source).IncludeTrailingLineBreakInText;
       StrictDelimiter := TALStringsW(Source).StrictDelimiter;
       WriteBOM := TALStringsW(Source).WriteBOM;
+      TrailingLineBreak := TALStringsW(Source).TrailingLineBreak;
       AddStrings(TALStringsW(Source));
     finally
       EndUpdate;
@@ -4510,9 +4485,9 @@ begin
       QuoteChar := TStrings(Source).QuoteChar;
       Delimiter := TStrings(Source).Delimiter;
       LineBreak := TStrings(Source).LineBreak;
-      IncludeTrailingLineBreakInText := True;
       StrictDelimiter := TStrings(Source).StrictDelimiter;
       WriteBOM := TStrings(Source).WriteBOM;
+      TrailingLineBreak := True;
       for I := 0 to Tstrings(Source).Count - 1 do
         AddObject(Tstrings(Source)[I], Tstrings(Source).Objects[I]);
     finally
@@ -4790,7 +4765,7 @@ begin
   Size := 0;
   LB := LineBreak;
   for I := 0 to Count - 1 do Inc(Size, Length(Get(I)) + Length(LB));
-  if (Size > 0) and (not IncludeTrailingLineBreakInText) then dec(Size, Length(LB));
+  if (Size > 0) and (not TrailingLineBreak) then dec(Size, Length(LB));
   SetString(Result, nil, Size);
   P := Pointer(Result);
   for I := 0 to Count - 1 do
@@ -4802,7 +4777,7 @@ begin
       ALMove(Pointer(S)^, P^, L*SizeOf(Char));
       Inc(P, L);
     end;
-    if (I < Count - 1) or IncludeTrailingLineBreakInText then
+    if TrailingLineBreak or (I < Count - 1) then
     begin
       L := Length(LB);
       if L <> 0 then
@@ -4975,21 +4950,36 @@ end;
 {*************************************************************************}
 procedure TALStringsW.LoadFromStream(Stream: TStream; Encoding: TEncoding);
 var
-  Size: Integer;
+  Size: Int64;
   Buffer: TBytes;
+  Reader: TStreamReader;
 begin
   BeginUpdate;
   try
     Size := Stream.Size - Stream.Position;
-    SetLength(Buffer, Size);
-    {$IF CompilerVersion >= 30}{Delphi seattle}
-    Stream.ReadBuffer(Buffer, 0, Size);
-    {$else}
-    Stream.Read(Buffer, 0, Size);
-    {$ENDIF}
-    Size := TEncoding.GetBufferEncoding(Buffer, Encoding, FDefaultEncoding);
-    SetEncoding(Encoding); // Keep Encoding in case the stream is saved
-    SetTextStr(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));
+    if (Size >= $15000000) and ALSameTextW(LineBreak, sLineBreak) then
+    begin
+      if Encoding = nil then
+        Encoding := DefaultEncoding;
+      Reader := TStreamReader.Create(Stream, Encoding, True, $FFFF);
+      try
+        Clear;
+        Reader.EndOfStream; // fill buffer and set CurrentEncoding
+        SetEncoding(Reader.CurrentEncoding); // Keep Encoding in case the stream is saved
+        while not Reader.EndOfStream do
+          Add(Reader.ReadLine);
+      finally
+        ALFreeAndNil(Reader);
+      end;
+    end
+    else
+    begin
+      SetLength(Buffer, Size);
+      Stream.Read(Buffer, 0, Size);
+      Size := TEncoding.GetBufferEncoding(Buffer, Encoding, FDefaultEncoding);
+      SetEncoding(Encoding); // Keep Encoding in case the stream is saved
+      SetTextStr(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));
+    end;
   finally
     EndUpdate;
   end;
@@ -5678,19 +5668,8 @@ end;
 
 {****************************}
 procedure TALStringListW.Grow;
-{$IF CompilerVersion <= 32}{tokyo}
-var
-  Delta: Integer;
-{$endif}
 begin
-  {$IF CompilerVersion <= 32}{tokyo}
-  if FCapacity > 64 then Delta := FCapacity div 4 else
-    if FCapacity > 8 then Delta := 16 else
-      Delta := 4;
-  SetCapacity(FCapacity + Delta);
-  {$else}
   SetCapacity(GrowCollection(FCapacity, FCount + 1));
-  {$endif}
 end;
 
 {********************************************************}
@@ -6538,19 +6517,8 @@ end;
 
 {******************************}
 procedure TALNVStringListW.Grow;
-{$IF CompilerVersion <= 32}{tokyo}
-var
-  Delta: Integer;
-{$endif}
 begin
-  {$IF CompilerVersion <= 32}{tokyo}
-  if FCapacity > 64 then Delta := FCapacity div 4 else
-    if FCapacity > 8 then Delta := 16 else
-      Delta := 4;
-  SetCapacity(FCapacity + Delta);
-  {$else}
   SetCapacity(GrowCollection(FCapacity, FCount + 1));
-  {$endif}
 end;
 
 {*******************************************}
@@ -6568,7 +6536,7 @@ begin
     if FList[i].fNvs then Inc(Size, Length(FList[i].fName) + 1{length(NameValueSeparator)} +  Length(FList[i].fValue) + Length(LB))
     else Inc(Size, Length(FList[i].fName) + Length(LB))
   end;
-  if (Size > 0) and (not IncludeTrailingLineBreakInText) then dec(Size, Length(LB));
+  if (Size > 0) and (not TrailingLineBreak) then dec(Size, Length(LB));
   SetString(Result, nil, Size);
   P := Pointer(Result);
   for I := 0 to FCount - 1 do
@@ -6591,7 +6559,7 @@ begin
         Inc(P, L);
       end;
     end;
-    if (I < Count - 1) or IncludeTrailingLineBreakInText then
+    if TrailingLineBreak or (I < Count - 1) then
     begin
       L := Length(LB);
       if L <> 0 then

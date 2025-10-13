@@ -854,7 +854,7 @@ type
     property Stroke;
     //property TabOrder;
     //property TabStop;
-    //property TouchTargetExpansion;
+    property TouchTargetExpansion;
     property Visible;
     property Width;
     //property OnCanFocus;

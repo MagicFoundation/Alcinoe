@@ -256,7 +256,7 @@ begin
   FUIDatePicker.setDatePickerMode(UIDatePickerModeDate);
 
   { Subscribing to change orientation events }
-  DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('DeviceOrientationChanged'), StringToID(FMXViewControllerFrameChanged), nil);
+  DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('DeviceOrientationChanged'), StrToNSStr(FMXViewControllerFrameChanged), nil);
 
   { Creating Root view container for picker }
   FUIOverlayView := TUIView.Create;
@@ -281,7 +281,7 @@ begin
 
   { Creating Root view container for picker }
   FUIContainerView := TUIView.Create;
-  FUIContainerView.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.systemBackgroundColor));
+  FUIContainerView.setBackgroundColor(TUIColor.OCClass.systemBackgroundColor);
   FUIContainerView.setAutoresizingMask(
     UIViewAutoresizingFlexibleWidth or
     UIViewAutoresizingFlexibleLeftMargin or
@@ -380,8 +380,8 @@ begin
   if aTitle <> '' then begin
 
     FUITitle := TUILabel.Wrap(TUILabel.Alloc.initWithFrame(RectToNSRect(TRect.Create(0, 0, floor(getWidth) - _TitlePaddingleft - _TitlePaddingRight, 10000))));
-    FUITitle.setTextAlignment(UITextAlignmentCenter);
-    FUITitle.setLineBreakMode(UILineBreakModeWordWrap);
+    FUITitle.setTextAlignment(NSTextAlignmentCenter);
+    FUITitle.setLineBreakMode(NSLineBreakByWordWrapping);
     FUITitle.setFont(FUITitle.font.fontWithSize(TUIFont.OCClass.labelFontSize + 5));
     FUITitle.setNumberOfLines(0);
     FUITitle.setText(StrToNsStr(aTitle));

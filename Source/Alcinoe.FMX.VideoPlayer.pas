@@ -37,7 +37,7 @@ uses
   iOSapi.Foundation,
   iOSapi.AVFoundation,
   iOSapi.CoreVideo,
-  Alcinoe.iOSapi.AVFoundation,
+  iOSapi.AVFAudio,
   Alcinoe.iOSapi.CoreVideo,
   Alcinoe.FMX.Ani,
   {$endIF}
@@ -314,7 +314,7 @@ type
     class var AppAudioSessionActivated: Boolean;
   private
     FPlayer: AVPlayer;
-    FPlayerItem: ALAVPlayerItem;
+    FPlayerItem: AVPlayerItem;
     FPlayerItemVideoOutput: AVPlayerItemVideoOutput;
     fDisplayLink: CADisplayLink;
     fDisplayLinkListener: TDisplayLinkListener;
@@ -817,8 +817,6 @@ uses
   Macapi.ObjCRuntime,
   FMX.Context.GLES.iOS,
   FMX.Context.Metal,
-  Alcinoe.iOSApi.Foundation,
-  Alcinoe.iOSapi.QuartzCore,
   {$ENDIF}
   {$IF defined(ALSkiaCanvas)}
   FMX.Skia.Canvas,
@@ -1070,7 +1068,7 @@ begin
     {$ELSE}
     if (fVideoPlayerEngine.fDrawable.Width <> fVideoPlayerEngine.fVideoWidth) or
        (fVideoPlayerEngine.fDrawable.Height <> fVideoPlayerEngine.fVideoHeight) then begin
-      {$IFNDEF ALCompilerVersionSupported123}
+      {$IFNDEF ALCompilerVersionSupported130}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       // we can't use setsize because it's will finalise the texture
@@ -1856,7 +1854,7 @@ begin
 
     var LkeyPath := NSStrToStr(keyPath);
     if LkeyPath = 'presentationSize' then begin
-      var LNewSizeValue := iOSapi.UIKit.TNSValue.Wrap(change.objectForKey((NSKeyValueChangeNewKey as ILocalObject).GetObjectID)).CGSizeValue;
+      var LNewSizeValue := iOSapi.UIKit.TNSValue.Wrap(change.objectForKey(NSStringToID(NSKeyValueChangeNewKey))).CGSizeValue;
       {$IF defined(DEBUG)}
       //ALLog(
       //  'TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath',
@@ -2028,7 +2026,7 @@ begin
     Try
       if not AppAudioSessionActivated then begin
         AppAudioSessionActivated := True;
-        var LAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
+        var LAudioSession := TAVAudioSession.OCClass.sharedInstance;
         LAudioSession.setCategory(AVAudioSessionCategoryPlayback, nil);
         LAudioSession.setActive(True, nil);
       end;
@@ -2048,8 +2046,8 @@ begin
   FDrawableReady := False;
   //--
   If GlobalUseMetal then begin
-    fOpenGlVideoTextureCacheRef := 0;
-    fMetalTextureRef := 0;
+    fOpenGlVideoTextureCacheRef := nil;
+    fMetalTextureRef := nil;
     if CVMetalTextureCacheCreate(
          kCFAllocatorDefault, // allocator: The memory allocator for the texture.
          nil, // cacheAttributes: A dictionary specifying options for the cache’s behavior, or NULL to use default options. For applicable keys and values, see Cache Attributes.
@@ -2059,7 +2057,7 @@ begin
   end
   else begin
     fMetalvideoTextureCacheRef := nil;
-    fOpenGLTextureRef := 0;
+    fOpenGLTextureRef := nil;
     if CVOpenGLESTextureCacheCreate(
          kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
          nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
@@ -2069,7 +2067,7 @@ begin
   end;
   //--
   fDisplayLinkListener := TDisplayLinkListener.Create(self);
-  fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
+  fDisplayLink := TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated'));
   fDisplayLink.retain;
   if GlobalUseMetal then begin
     // In OpenGL, the animation appears more jerky when using
@@ -2079,12 +2077,13 @@ begin
       LFrameRateRange.minimum := ALMinimumFramesPerSecond;
       LFrameRateRange.maximum := ALMaximumFramesPerSecond;
       LFrameRateRange.preferred := ALPreferredFramesPerSecond;
-      TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFrameRateRange(LFrameRateRange);
+      fDisplayLink.setPreferredFrameRateRange(LFrameRateRange);
     end
     else
-      TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
+      fDisplayLink.setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
   end;
-  fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.mainRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+  // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+  fDisplayLink.addToRunLoop(TNSRunLoop.OCClass.mainRunLoop, NSRunLoopCommonModes);
   fDisplayLink.setPaused(true);
   //--
   FPlayer := nil;
@@ -2117,7 +2116,7 @@ begin
   AlFreeAndNil(fDisplayLinkListener);
   //--
   if fNotificationsDelegate <> nil then begin
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).removeObserver(FNotificationsDelegate.GetObjectID);
+    TNSNotificationCenter.OCClass.defaultCenter.removeObserver(FNotificationsDelegate.GetObjectID);
     AlFreeAndNil(FNotificationsDelegate);
   end;
   //--
@@ -2147,20 +2146,20 @@ begin
   alfreeAndNil(fDrawable);
   {$ENDIF}
   //--
-  if fOpenGLTextureRef <> 0 then CFRelease(pointer(fOpenGLTextureRef));
+  if fOpenGLTextureRef <> nil then CFRelease(fOpenGLTextureRef);
   // The texture cache automatically flushes currently unused resources when you call the
   // CVOpenGLESTextureCacheCreateTextureFromImage function, but can you can also flush the
   // cache explicitly by calling this function. The EAGLContext associated with the cache
   // may be used to delete or unbind textures.
-  if fOpenGLvideoTextureCacheRef <> 0 then begin
+  if fOpenGLvideoTextureCacheRef <> nil then begin
     CVOpenGLESTextureCacheFlush(fOpenGLvideoTextureCacheRef, 0);
-    CFrelease(pointer(fOpenGLVideoTextureCacheRef));
+    CFrelease(fOpenGLVideoTextureCacheRef);
   end;
   //--
-  if fMetalTextureRef <> 0 then CFRelease(pointer(fMetalTextureRef));
+  if fMetalTextureRef <> nil then CFRelease(fMetalTextureRef);
   If fMetalvideoTextureCacheRef <> nil then begin
     CVMetalTextureCacheFlush(fMetalvideoTextureCacheRef, 0);
-    CFrelease(pointer(fMetalVideoTextureCacheRef));
+    CFrelease(fMetalVideoTextureCacheRef);
   end;
   //--
   if FPlayerItemVideoOutput <> nil then begin
@@ -2202,7 +2201,7 @@ begin
     // NODE: A pixel buffer containing the image data to display or nil if nothing should be displayed at the specified time.
     //       The caller is responsible for calling CVBufferRelease on the returned data when it is no longer needed.
     var LPixelBuffer := FPlayerItemVideoOutput.copyPixelBufferForItemTime(T, nil);
-    if LPixelBuffer = 0 then begin // could be nil if nothing should be displayed
+    if LPixelBuffer = nil then begin // could be nil if nothing should be displayed
       {$IFDEF DEBUG}
       ALLog('TALIOSVideoPlayer.DoOnFrameRefresh', 'copyPixelBufferForItemTime:nil', TalLogType.warn);
       {$ENDIF}
@@ -2356,7 +2355,7 @@ begin
         end;
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        {$IFNDEF ALCompilerVersionSupported123}
+        {$IFNDEF ALCompilerVersionSupported130}
           {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
         {$ENDIF}
         // we can't use setsize because it's will finalise the texture
@@ -2378,10 +2377,10 @@ begin
 
       {$ENDIF}
 
-      if LPrevMetalTextureRef <> 0 then
-        CfRElease(pointer(LPrevMetalTextureRef));
-      if LPrevOpenGLTextureRef <> 0 then
-        CfRElease(pointer(LPrevOpenGLTextureRef));
+      if LPrevMetalTextureRef <> nil then
+        CfRElease(LPrevMetalTextureRef);
+      if LPrevOpenGLTextureRef <> nil then
+        CfRElease(LPrevOpenGLTextureRef);
 
       if assigned(FonFrameAvailableEvent) then
         FonFrameAvailableEvent(self);
@@ -2469,7 +2468,7 @@ begin
     if FPlayerItemVideoOutput = nil then begin
       var LPixelBufferAttributes: NSMutableDictionary := TNSMutableDictionary.Create;
       try
-        LPixelBufferAttributes.setObject(TNSNumber.OCClass.numberWithInt(kCVPixelFormatType_32BGRA), Pointer(kCVPixelBufferPixelFormatTypeKey));
+        LPixelBufferAttributes.setObject(NSObjectToID(TNSNumber.OCClass.numberWithInt(kCVPixelFormatType_32BGRA)), kCVPixelBufferPixelFormatTypeKey);
         // Initializes and returns a video output object using the specified
         // pixel buffer attributes.
         // The pixel buffer attributes required for video output. For a list
@@ -2480,7 +2479,6 @@ begin
         LPixelBufferAttributes.release;
         LPixelBufferAttributes := nil;
       end;
-      FPlayerItemVideoOutput.retain;
       FPlayerItem.addOutput(FPlayerItemVideoOutput);
     end;
 
@@ -2665,6 +2663,9 @@ begin
   {$ENDIF}
   if not SetState(vpsPreparing, vpsIdle) then raise Exception.Create('Prepare can be call only in the idle state');
   //--
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4401 is corrected, if yes replace P: Pointer by LURL: NSUrl, and adjust the IFDEF'}
+  {$ENDIF}
   var P: Pointer;
   if AlIsHttpOrHttpsUrl(ADataSource) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(ADataSource)) // Creates and returns an NSURL object initialized with a provided URL string
   else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(ADataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
@@ -2673,6 +2674,9 @@ begin
     exit;
   end;
   var LURL := TNSUrl.Wrap(P);
+  // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+  // No release required for LURL because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
+  //
   // return A new player item, Prepared to use URL.
   // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
   // Associating the player item with an AVPlayer immediately begins enqueuing its media
@@ -2681,21 +2685,19 @@ begin
   // URL contains no valid data or otherwise can't be used by the player item, its status
   // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
   // by querying the player item’s error property.
-  FPlayerItem := TALAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
+  FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
   FPlayerItem.retain;
-  //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
-  //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
   //--
   FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
   FPlayer.retain;
   //--
   fNotificationsDelegate := TNotificationsDelegate.Create(Self);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), NSObjectToID(FPlayerItem));
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(FPlayerItem));
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(FPlayerItem));
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.OCClass.defaultCenter.addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StrToNSStr('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.OCClass.defaultCenter.addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StrToNSStr('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.OCClass.defaultCenter.addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StrToNSStr('AVPlayerItemTimeJumpedNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.OCClass.defaultCenter.addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StrToNSStr('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.OCClass.defaultCenter.addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StrToNSStr('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(FPlayerItem));
+  TNSNotificationCenter.OCClass.defaultCenter.addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StrToNSStr('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(FPlayerItem));
   //--
   FKVODelegate := TKVODelegate.Create(Self);
   FPlayer.addObserver(

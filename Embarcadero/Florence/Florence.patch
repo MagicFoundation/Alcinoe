@@ -1,0 +1,2118 @@
+Index: Embarcadero/Florence/fmx/FMX.Canvas.GPU.Helpers.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Florence/fmx/FMX.Canvas.GPU.Helpers.pas
+--- a/Embarcadero/Florence/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
+@@ -313,8 +313,11 @@
+ 
+   if Material <> nil then
+     M := Material
+-  else if Texture <> nil then
+-    M := FTexMat
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
++  else if Texture <> nil then begin
++    if Texture.material <> nil then M := Texture.material
++    else M := FTexMat
++  end
+   else
+     M := FSolidMat;
+ 
+@@ -432,7 +435,9 @@
+ var
+   SolidDecl: TVertexDeclaration;
+ begin
+-  if FCurrentMaterial = FTexMat then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
++  if (FCurrentMaterial = FTexMat) or
++     ((FCurrentMaterial <> nil) and (FCurrentTexture <> nil) and (FCurrentMaterial = FCurrentTexture.Material)) then
+   begin
+     SetLength(SolidDecl, 3);
+     SolidDecl[0].Format := TVertexFormat.Vertex;
+@@ -441,7 +446,7 @@
+     SolidDecl[1].Offset := 12;
+     SolidDecl[2].Format := TVertexFormat.Color0;
+     SolidDecl[2].Offset := 20;
+-    FTexMat.Texture := FCurrentTexture;
++    TCanvasTextureMaterial(FCurrentMaterial).Texture := FCurrentTexture; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     FContext.DrawPrimitives(TPrimitivesKind.Triangles, @FBatchVertexBuffer[0], @FBatchIndexBuffer[0], SolidDecl,
+       SizeOf(TVertexBufferItem), FBatchedVertices, SizeOf(TIndexBufferItem), FBatchedIndices, FCurrentMaterial, 1);
+   end
+Index: Embarcadero/Florence/fmx/FMX.Controls.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Controls.pas b/Embarcadero/Florence/fmx/FMX.Controls.pas
+--- a/Embarcadero/Florence/fmx/FMX.Controls.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Controls.pas	(working copy)
+@@ -2407,7 +2407,8 @@
+         FControls.Remove(AsControl);
+       RepaintJointArea(AObject);
+       AsControl.SetNewScene(nil);
+-      if NeedUpdate and (AsControl.Align <> TAlignLayout.None) then
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4001
++      if NeedUpdate and (AsControl.Visible) and (AsControl.Align <> TAlignLayout.None) then
+         Realign;
+     end;
+     if AObject is TEffect then
+@@ -5264,7 +5265,7 @@
+             FParentControl.RecalcUpdateRect;
+       UpdateExplicitBounds;
+       UpdateAnchorRules;
+-      if (not Moved or (RotationAngle = 0)) and Visible then
++      if (not Moved) and (RotationAngle = 0) and Visible then // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3264
+         ParentContentChanged;
+       RequestAlign;
+     end;
+Index: Embarcadero/Florence/fmx/FMX.Filter.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Filter.pas b/Embarcadero/Florence/fmx/FMX.Filter.pas
+--- a/Embarcadero/Florence/fmx/FMX.Filter.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Filter.pas	(working copy)
+@@ -1612,9 +1612,10 @@
+ 
+ function TFilterContext3D.InputTexture: TTexture;
+ begin
+-  if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
+-    Result := TContextManager.DefaultContextClass.BitmapToTexture(FInputBitmap)
+-  else
++  //https://quality.embarcadero.com/browse/RSP-20825
++  //if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
++  //  Result := TContextManager.DefaultContextClass.BitmapToTexture(FInputBitmap)
++  //else
+     Result := FInput;
+ end;
+ 
+@@ -1944,9 +1945,10 @@
+ 
+ function TFilterContext3D.TargetTexture: TTexture;
+ begin
+-  if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
+-    Result := TContextManager.DefaultContextClass.BitmapToTexture(FTargetBitmap)
+-  else
++  //https://quality.embarcadero.com/browse/RSP-20825
++  //if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
++  //  Result := TContextManager.DefaultContextClass.BitmapToTexture(FTargetBitmap)
++  //else
+     Result := FTarget;
+ end;
+ 
+Index: Embarcadero/Florence/fmx/FMX.Forms.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Forms.pas b/Embarcadero/Florence/fmx/FMX.Forms.pas
+--- a/Embarcadero/Florence/fmx/FMX.Forms.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Forms.pas	(working copy)
+@@ -6695,6 +6695,7 @@
+   if AObject is TControl then
+   begin
+     Child := TControl(AObject);
++    ResetUpdatingState(Child); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4302
+     if FControls <> nil  then
+       FControls.Remove(Child);
+ 
+Index: Embarcadero/Florence/fmx/FMX.Platform.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas
+--- a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas	(working copy)
+@@ -1,4 +1,4 @@
+-{*******************************************************}
++﻿{*******************************************************}
+ {                                                       }
+ {              Delphi FireMonkey Platform               }
+ {                                                       }
+@@ -25,6 +25,7 @@
+   private
+     FHandle: TOCLocal;
+     FZOrderManager: TiOSZOrderManager;
++    FCurrentTouchEvent: UIEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     function GetZOrderManager: TiOSZOrderManager;
+   protected
+     function GetView: UIView; virtual;
+@@ -44,6 +45,9 @@
+     property Handle: TOCLocal read FHandle;
+     /// <summary>Link to Z-Order manager that used as shared manager for platform controls
+     property ZOrderManager: TiOSZOrderManager read GetZOrderManager;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    /// <summary>Gets or sets the current touch event associated with the form.</summary>
++    property CurrentTouchEvent: UIEvent read FCurrentTouchEvent write FCurrentTouchEvent;
+   end;
+ 
+   TiOSOpenApplicationContext = class
+@@ -3879,11 +3883,22 @@
+   TextInput: ITextInput;
+   Obj: IControl;
+   Touch: UITouch;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ begin
+   try
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
+ 
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
++
+     // find the control from under the gesture
+     Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
+     SendTouches(withEvent.allTouches, TTouchAction.Down, Obj);
+@@ -3913,6 +3928,11 @@
+       FClickedAnotherControl := (Obj <> nil) and (FContextMenu.Control <> Obj.GetObject);
+       View.touchesBegan(touches, withEvent);
+     end;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
+   except
+     Application.HandleException(Form);
+   end;
+@@ -3934,6 +3954,7 @@
+   X, Y : single;
+   Obj: IControl;
+   LPoint: TPointF;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ const
+   LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
+ begin
+@@ -3940,6 +3961,17 @@
+   try
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
++
+     LPoint := TPointF.Create(X, Y);
+     FShouldIgnoreNextClick := False;
+     FAdditionalShift := [];
+@@ -3952,6 +3984,11 @@
+     finally
+       View.touchesCancelled(touches, withEvent);
+     end;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
+   except
+     Application.HandleException(Form);
+   end;
+@@ -3974,6 +4011,7 @@
+   X, Y : single;
+   Touch: UITouch;
+   Obj: IControl;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ const
+   LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
+ begin
+@@ -3981,6 +4019,16 @@
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
+ 
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
++
+     // find the control from under the gesture
+     Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
+     SendTouches(withEvent.allTouches, TTouchAction.Up, Obj);
+@@ -3997,6 +4045,11 @@
+       if Form <> nil then
+         View.touchesEnded(touches, withEvent);
+     end;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
+   except
+     Application.HandleException(Form);
+   end;
+@@ -4007,11 +4060,22 @@
+   X, Y : single;
+   Obj: IControl;
+   LPoint: TPointF;
++  Handle: TiOSWindowHandle; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ begin
+   try
+     if not GetTouchCoord(touches, View, X, Y) then
+       Exit;
+ 
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Form.IsHandleAllocated then
++      Handle := WindowHandleToPlatform(Form.Handle)
++    else
++      Handle := nil;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := withEvent;
++
+     LPoint := TPointF.Create(X, Y);
+     Obj := Form.ObjectAtPoint(Form.ClientToScreen(LPoint));
+     SendTouches(withEvent.allTouches, TTouchAction.Move, Obj);
+@@ -4021,6 +4085,11 @@
+     finally
+       View.touchesMoved(touches, withEvent);
+     end;
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    if Handle <> nil then
++      Handle.CurrentTouchEvent := nil;
++
+   except
+     Application.HandleException(Form);
+   end;
+Index: Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas
+--- a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas	(working copy)
+@@ -26,10 +26,61 @@
+   TAndroidMotionManager = class;
+   TTextServiceAndroid = class;
+ 
+-  TRender<T: class> = class(TJavaLocal, JRunnable)
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  // We cannot use JChoreographer_FrameCallback everywhere in the code because
++  // there is no practical way to define the callback order. We need the
++  // animation callback to be called first and the render callback to be called last.
++  // Another issue we face is that if we manage to ensure the animation callback
++  // is executed first (before the render callback), then when a new frame starts,
++  // calling "repaint" inside the animation callback will have no effect. This happens
++  // because the render process does not yet understand that we want to redraw
++  // on the next frame rather than the current one. Since the render callback has not
++  // been invoked yet, TRender will simply ignore the repaint instruction.
++  TChoreographer = class
+   private
++    type
++      TChoreographerFrameCallback = class(TJavaLocal, JChoreographer_FrameCallback)
++      private
++        fChoreographer: TChoreographer;
++      public
++        constructor Create(const AChoreographer: TChoreographer);
++        procedure doFrame(frameTimeNanos: Int64); cdecl;
++      end;
++  private
++    FChoreographerFrameCallback: TChoreographerFrameCallback;
++    procedure ExecuteFrameCallbacks(frameTimeNanos: Int64);
++  private
++    class var FInstance: TChoreographer;
++    class function GetInstance: TChoreographer; static;
++  public
++    type
++      TFrameCallback = procedure(frameTimeNanos: Int64) of Object;
++  private
++    FIsFrameCallbackScheduled: Boolean;
++    FAniFrameCallbackCurrList: TList<TFrameCallback>;
++    FRenderFrameCallbackCurrList: TList<TFrameCallback>;
++    FAniFrameCallbackEmptyList: TList<TFrameCallback>;
++    FRenderFrameCallbackEmptyList: TList<TFrameCallback>;
++    FPrevframeTimeNanos: Int64;
++    FCurrframeTimeNanos: Int64;
++  public
++    constructor Create;
++    destructor Destroy; override;
++    class procedure DestroyInstance;
++    procedure PostAniFrameCallback(const callback: TFrameCallback);
++    procedure RemoveAniFrameCallback(const callback: TFrameCallback);
++    procedure PostRenderFrameCallback(const callback: TFrameCallback);
++    procedure RemoveRenderFrameCallback(const callback: TFrameCallback);
++    property PrevframeTimeNanos: Int64 read FPrevframeTimeNanos;
++    property CurrframeTimeNanos: Int64 read FCurrframeTimeNanos;
++    class property Instance: TChoreographer read GetInstance;
++  end;
++
++  TRender<T: class> = class // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  private
+     [Weak] FContext: T;
+-    FIsNeededUpdate: Boolean;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++    //FIsNeededUpdate: Boolean;
+     { System message handler }
+     procedure ApplicationEventHandler(const Sender: TObject; const AMessage: TMessage);
+   public
+@@ -41,14 +92,14 @@
+     /// <summary>Posts event to event bus for future rendering.</summary>
+     procedure PostRender;
+ 
+-    { JRunnable }
+-    procedure run; cdecl;
++    { JChoreographer_FrameCallback } // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++    procedure doFrame(frameTimeNanos: Int64); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
+   public
+     property Context: T read FContext;
+   end;
+ 
+   /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
+-  TFormRender = class(TRender<TAndroidWindowHandle>, JRunnable)
++  TFormRender = class(TRender<TAndroidWindowHandle>) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
+   public
+     /// <summary>Renders form Immediately.</summary>
+     procedure Render; override;
+@@ -126,6 +177,7 @@
+     FZOrderManager: TAndroidZOrderManager;
+     FMultiTouchManager: TMultiTouchManagerAndroid;
+     FMotionManager: TAndroidMotionManager;
++    FCurrentMotionEvent: JMotionEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+     FRender: TFormRender;
+     FFormBounds: TRectF;
+     FSafeAreaInsets: TRectF;
+@@ -171,6 +223,9 @@
+     property MultiTouchManager: TMultiTouchManagerAndroid read GetMultiTouchManager;
+     /// <summary>MotionManager of form.</summary>
+     property MotionManager: TAndroidMotionManager read GetMotionManager;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++    /// <summary>Gets or sets the current Android motion event associated with the form.</summary>
++    property CurrentMotionEvent: JMotionEvent read FCurrentMotionEvent write FCurrentMotionEvent;
+     property Render: TFormRender read FRender;
+     property SafeAreaInsets: TRectF read FSafeAreaInsets;
+   end;
+@@ -2198,6 +2253,8 @@
+ 
+ begin
+   { Pre initialization }
++  if IsHandleAlive then
++    FHandle.CurrentMotionEvent := AEvent; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+   ReadMotionEvent(AEvent, FMotionEvents);
+   UpdateMousePosition;
+ 
+@@ -2216,6 +2273,8 @@
+   end;
+ 
+   Result := True;
++  if IsHandleAlive then
++    FHandle.CurrentMotionEvent := nil; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ end;
+ 
+ procedure TAndroidMotionManager.HandleMultiTouch;
+@@ -2308,6 +2367,13 @@
+         FAdditionalShift := [];
+       end;
+ 
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3762
++      AMOTION_EVENT_ACTION_CANCEL:
++      begin
++        PlatformAndroid.WindowService.MouseUp(FHandle.Form, TMouseButton.mbLeft, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position, False);
++        FAdditionalShift := [];
++      end;
++
+       AMOTION_EVENT_ACTION_MOVE:
+         PlatformAndroid.WindowService.MouseMove(FHandle.Form, MotionEvent.Shift + FAdditionalShift, MotionEvent.Position);
+     else
+@@ -2976,7 +3042,8 @@
+ begin
+   inherited Create;
+   FContext := AContext;
+-  FIsNeededUpdate := False;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //FIsNeededUpdate := False;
+   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+ end;
+ 
+@@ -2983,19 +3050,23 @@
+ destructor TRender<T>.Destroy;
+ begin
+   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+-  AtomicIncrement(FRefCount);
+-  TAndroidHelper.MainHandler.removeCallbacks(Self);
+-  AtomicDecrement(FRefCount);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //AtomicIncrement(FRefCount);
++  //TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //AtomicDecrement(FRefCount);
++  TChoreographer.Instance.RemoveRenderFrameCallback(doFrame);
+   inherited;
+ end;
+ 
+ procedure TRender<T>.PostRender;
+ begin
+-  if not FIsNeededUpdate then
+-  begin
+-    FIsNeededUpdate := True;
+-    TAndroidHelper.MainHandler.post(Self);
+-  end;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //if not FIsNeededUpdate then
++  //begin
++  //  FIsNeededUpdate := True;
++  //  TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //end;
++  TChoreographer.Instance.PostRenderFrameCallback(doFrame);
+ end;
+ 
+ procedure TRender<T>.Render;
+@@ -3002,10 +3073,134 @@
+ begin
+ end;
+ 
+-procedure TRender<T>.run;
++procedure TRender<T>.doFrame(frameTimeNanos: Int64); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
+ begin
+   Render;
+-  FIsNeededUpdate := False;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++  //FIsNeededUpdate := False;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++constructor TChoreographer.TChoreographerFrameCallback.Create(const AChoreographer: TChoreographer);
++begin
++  inherited Create;
++  FChoreographer := AChoreographer;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.TChoreographerFrameCallback.doFrame(frameTimeNanos: Int64); cdecl;
++begin
++  FChoreographer.ExecuteFrameCallbacks(frameTimeNanos);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++constructor TChoreographer.Create;
++begin
++  inherited Create;
++  FIsFrameCallbackScheduled := False;
++  FAniFrameCallbackCurrList := TList<TFrameCallback>.Create;
++  FRenderFrameCallbackCurrList := TList<TFrameCallback>.Create;
++  FAniFrameCallbackEmptyList := TList<TFrameCallback>.Create;
++  FRenderFrameCallbackEmptyList := TList<TFrameCallback>.Create;
++  FPrevframeTimeNanos := 0;
++  FCurrframeTimeNanos := 0;
++  fChoreographerFrameCallback := TChoreographerFrameCallback.create(self);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++destructor TChoreographer.Destroy;
++begin
++  TJChoreographer.JavaClass.getInstance.removeFrameCallback(fChoreographerFrameCallback);
++  fChoreographerFrameCallback.Free;
++  FAniFrameCallbackCurrList.free;
++  FRenderFrameCallbackCurrList.free;
++  FAniFrameCallbackEmptyList.free;
++  FRenderFrameCallbackEmptyList.free;
++  inherited Destroy;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++class procedure TChoreographer.DestroyInstance;
++begin
++  FreeAndNil(FInstance);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++class function TChoreographer.GetInstance: TChoreographer;
++begin
++  if FInstance = nil then
++    FInstance := TChoreographer.Create;
++  Result := FInstance;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.ExecuteFrameCallbacks(frameTimeNanos: Int64);
++begin
++  FIsFrameCallbackScheduled := False;
++
++  FPrevframeTimeNanos := FCurrframeTimeNanos;
++  FCurrframeTimeNanos := frameTimeNanos;
++
++  var LAniFrameCallbackWorkList := FAniFrameCallbackCurrList;
++  var LRenderFrameCallbackWorkList := FRenderFrameCallbackCurrList;
++  //--
++  FAniFrameCallbackCurrList := FAniFrameCallbackEmptyList;
++  FRenderFrameCallbackCurrList := FRenderFrameCallbackEmptyList;
++  //--
++  FAniFrameCallbackEmptyList := LAniFrameCallbackWorkList;
++  FRenderFrameCallbackEmptyList := LRenderFrameCallbackWorkList;
++
++  for var I := 0 to LAniFrameCallbackWorkList.Count - 1 do
++    LAniFrameCallbackWorkList[i](frameTimeNanos);
++  for var I := 0 to LRenderFrameCallbackWorkList.Count - 1 do
++    LRenderFrameCallbackWorkList[i](frameTimeNanos);
++
++  LAniFrameCallbackWorkList.Count := 0;
++  LRenderFrameCallbackWorkList.Count := 0;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.PostAniFrameCallback(const callback: TFrameCallback);
++begin
++  if not FAniFrameCallbackCurrList.Contains(callback) then
++  begin
++    FAniFrameCallbackCurrList.Add(callback);
++    if not FIsFrameCallbackScheduled then
++    begin
++      FIsFrameCallbackScheduled := true;
++      TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback);
++    end;
++  end;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.RemoveAniFrameCallback(const callback: TFrameCallback);
++begin
++  FAniFrameCallbackCurrList.Remove(callback);
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.PostRenderFrameCallback(const callback: TFrameCallback);
++begin
++  if not FRenderFrameCallbackCurrList.Contains(callback) then
++  begin
++    FRenderFrameCallbackCurrList.Add(callback);
++    if not FIsFrameCallbackScheduled then
++    begin
++      FIsFrameCallbackScheduled := true;
++      TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback);
++    end;
++  end;
++end;
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
++procedure TChoreographer.RemoveRenderFrameCallback(const callback: TFrameCallback);
++begin
++  FRenderFrameCallbackCurrList.Remove(callback);
++end;
++
++initialization
++finalization
++  TChoreographer.DestroyInstance;
++
+ end.
+Index: Embarcadero/Florence/fmx/FMX.Presentation.Android.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Presentation.Android.pas b/Embarcadero/Florence/fmx/FMX.Presentation.Android.pas
+--- a/Embarcadero/Florence/fmx/FMX.Presentation.Android.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Presentation.Android.pas	(working copy)
+@@ -243,7 +243,8 @@
+ 
+ uses
+   System.SysUtils, System.UITypes, System.Math, Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.App,
+-  FMX.Platform, FMX.Platform.Android, FMX.Helpers.Android, FMX.Presentation.Factory, FMX.Consts;
++  FMX.Platform, FMX.Platform.Android, FMX.Helpers.Android, FMX.Presentation.Factory, FMX.Consts,
++  FMX.Platform.UI.Android; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
+ 
+ { TAndroidPresentationProxy<T> }
+ 
+@@ -706,6 +707,17 @@
+   if not PointInside(TouchPoint, event) then
+     Exit(False);
+ 
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TAndroidWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentMotionEvent := event;
++
+   // Transfer touch point into gestures recognizers
+   FGestureDetector.onTouchEvent(event);
+   FScaleGestureDetector.onTouchEvent(event);
+@@ -746,6 +758,10 @@
+   end
+   else
+     Result := False;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentMotionEvent := nil;
+ end;
+ 
+ procedure TAndroidNativeView.RefreshNativeParent;
+Index: Embarcadero/Florence/fmx/FMX.Presentation.Android.Style.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Florence/fmx/FMX.Presentation.Android.Style.pas
+--- a/Embarcadero/Florence/fmx/FMX.Presentation.Android.Style.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Presentation.Android.Style.pas	(working copy)
+@@ -71,7 +71,7 @@
+   end;
+ 
+   /// <summary>Render of native view.</summary>
+-  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JRunnable)
++  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>) // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865
+   public
+     procedure Render; override;
+   end;
+Index: Embarcadero/Florence/fmx/FMX.Presentation.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Presentation.iOS.pas b/Embarcadero/Florence/fmx/FMX.Presentation.iOS.pas
+--- a/Embarcadero/Florence/fmx/FMX.Presentation.iOS.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Presentation.iOS.pas	(working copy)
+@@ -648,6 +648,17 @@
+ var
+   TouchPoint: TPointF;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+   begin
+@@ -655,6 +666,10 @@
+     Form.MouseMove([], TouchPoint.X, TouchPoint.Y); // Require for correct IsMouseOver handle
+     Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
+   end;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
+@@ -661,6 +676,17 @@
+ var
+   TouchPoint: TPointF;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
+@@ -667,6 +693,10 @@
+   // Don't combine these if statements because in MouseUp the form can unload presentation!
+   if Form <> nil then
+     Form.MouseLeave;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.touchesEnded(touches: NSSet; withEvent: UIEvent);
+@@ -674,6 +704,17 @@
+   TouchPoint: TPointF;
+   Touch: UITouch;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+     Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
+@@ -684,6 +725,10 @@
+   Touch := TUITouch.Wrap(touches.anyObject);
+   if Touch.tapCount = 2 then
+     SendDblTapToGestureControl(TouchPoint);
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.touchesMoved(touches: NSSet; withEvent: UIEvent);
+@@ -690,9 +735,24 @@
+ var
+   TouchPoint: TPointF;
+ begin
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  var LHandle: TiOSWindowHandle;
++  if (Form <> nil) and Form.IsHandleAllocated then
++    LHandle := WindowHandleToPlatform(Form.Handle)
++  else
++    LHandle := nil;
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := withEvent;
++
+   TouchPoint := ExtractFirstTouchPoint(touches);
+   if Form <> nil then
+     Form.MouseMove([ssLeft, ssTouch], TouchPoint.x, TouchPoint.y);
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002
++  if LHandle <> nil then
++    LHandle.CurrentTouchEvent := nil;
+ end;
+ 
+ procedure TiOSNativeView.PMAncestorPresentationLoaded(var AMessage: TDispatchMessageWithValue<Boolean>);
+Index: Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas
+--- a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas	(working copy)
+@@ -1,3 +1,4 @@
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541
+ {************************************************************************}
+ {                                                                        }
+ {                              Skia4Delphi                               }
+@@ -15,7 +16,7 @@
+ {$SCOPEDENUMS ON}
+ {$HPPEMIT NOUSINGNAMESPACE}
+ 
+-{$IF DEFINED(MSWINDOWS) or DEFINED(ANDROID) or DEFINED(IOS)}
++{$IF DEFINED(ANDROID) or DEFINED(IOS)}
+   {$DEFINE SKIA_GL}
+ {$ENDIF}
+ 
+@@ -28,16 +29,8 @@
+ type
+   { TGlSharedContextCustom }
+ 
+-  TGlSharedContextCustom = class abstract(TGrSharedContext)
+-  protected
+-    FStencilBits: Integer;
+-  public
+-    property StencilBits: Integer read FStencilBits;
+-  end;
++  TGlSharedContextCustom = class abstract(TGrSharedContext);
+ 
+-var
+-  GlobalUseSkiaGLSwapInterval: Integer;
+-
+ implementation
+ 
+ uses
+@@ -45,31 +38,19 @@
+   FMX.Graphics,
+   FMX.Types,
+   {$IF DEFINED(ANDROID)}
+-  FMX.Platform.UI.Android,
+-  FMX.Presentation.Android.Style,
+-  Androidapi.Egl,
++  FMX.Context.GLES.Android,
+   Androidapi.Gles2,
+   Androidapi.Gles2ext,
+-  Androidapi.JNI.GraphicsContentViewText,
+-  Androidapi.JNIBridge,
+-  Androidapi.NativeWindow,
+-  Androidapi.NativeWindowJni,
+   {$ELSEIF DEFINED(IOS)}
+   FMX.Platform.iOS,
++  FMX.Context.GLES.iOS,
+   iOSapi.GLKit,
+   iOSapi.OpenGLES,
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FMX.Platform.Win,
+-  Winapi.OpenGL,
+-  Winapi.OpenGLext,
+-  Winapi.Windows,
+-  System.AnsiStrings,
+-  System.Generics.Collections,
+-  System.Generics.Defaults,
+   {$ENDIF}
+   System.Math,
+   System.SysUtils,
+   System.Types,
++  FMX.Types3D,
+ 
+   { Skia }
+   System.Skia,
+@@ -83,130 +64,29 @@
+   TGlCanvas = class(TGrCanvas)
+   private
+     FBackBufferSurface: ISkSurface;
+-    {$IF DEFINED(ANDROID)}
+-    FANativeWindow: PANativeWindow;
+-    FContext: EGLContext;
+-    FOldContext: EGLContext;
+-    FOldDisplay: EGLDisplay;
+-    FOldDraw: EGLSurface;
+-    FOldRead: EGLSurface;
+-    FSurface: EGLSurface;
+-    {$ELSEIF DEFINED(IOS)}
+-    FContext: EAGLContext;
+-    FOldContext: EAGLContext;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    FDC: HDC;
+-    FGLRC: HGLRC;
+-    FOldDC: HDC;
+-    FOldGLRC: HGLRC;
+-    {$ENDIF}
+-    function CreateContext: Boolean;
+-    procedure DestroyContext;
+-    procedure MakeCurrent;
+-    procedure RestoreCurrent;
+-    procedure SaveCurrent;
++    FContext: TContext3D;
+     function TryMakeCurrent: Boolean;
++  strict protected
++    function BeginCanvas(const AContextHandle: THandle): ISkCanvas; override;
++    procedure EndCanvas(const AContextHandle: THandle); override;
+   protected
+-    procedure BeforeRestore; override;
+     function CreateSharedContext: IGrSharedContext; override;
+-    procedure DoDrawBitmap(const ABitmap: FMX.Graphics.TBitmap; const ASrcRect, ADestRect: TRectF; const AOpacity: Single; const AHighSpeed: Boolean); override;
+     function GetSurfaceFromWindow(const AContextHandle: THandle): TSkSurface; override;
+     procedure Resized; override;
+-    procedure SwapBuffers(const AContextHandle: THandle); override;
+   public
+     destructor Destroy; override;
+     class function IsSupported: Boolean;
+   end;
+ 
+-{$IF DEFINED(MSWINDOWS)}
+-
+-const
+-  WGL_DRAW_TO_WINDOW_ARB           = $2001;
+-  WGL_ACCELERATION_ARB             = $2003;
+-  WGL_SUPPORT_OPENGL_ARB           = $2010;
+-  WGL_DOUBLE_BUFFER_ARB            = $2011;
+-  WGL_COLOR_BITS_ARB               = $2014;
+-  WGL_ALPHA_BITS_ARB               = $201B;
+-  WGL_STENCIL_BITS_ARB             = $2023;
+-  WGL_FULL_ACCELERATION_ARB        = $2027;
+-  WGL_SAMPLE_BUFFERS_ARB           = $2041;
+-  WGL_SAMPLES_ARB                  = $2042;
+-  WGL_CONTEXT_CORE_PROFILE_BIT_ARB = $00000001;
+-  WGL_CONTEXT_MAJOR_VERSION_ARB    = $2091;
+-  WGL_CONTEXT_MINOR_VERSION_ARB    = $2092;
+-  WGL_CONTEXT_PROFILE_MASK_ARB     = $9126;
+-
+ type
+-  PFNWGLCHOOSEPIXELFORMATARBPROC      = function (hdc: HDC; const piAttribIList: PInteger; const pfAttribFList: PSingle; nMaxFormats: UINT; piFormats: PInteger; nNumFormats: PUINT): BOOL; stdcall;
+-  PFNWGLCREATECONTEXTATTRIBSARBPROC   = function (hDC: HDC; hShareContext: HGLRC; const attribList: PInteger): HGLRC; stdcall;
+-  PFNWGLGETEXTENSIONSSTRINGARBPROC    = function (hdc: HDC): MarshaledAString; stdcall;
+-  PFNWGLGETPIXELFORMATATTRIBIVARBPROC = function (hdc: HDC; iPixelFormat, iLayerPlane: Integer; nAttributes: UINT; const piAttributes: PInteger; piValues: PInteger): BOOL; stdcall;
+-  PFNWGLSWAPINTERVALEXTPROC           = function (interval: Integer): BOOL; stdcall;
+-
+-  { TGlInterface }
+-
+-  TGlInterface = record
+-  private
+-    FChoosePixelFormatARB: PFNWGLCHOOSEPIXELFORMATARBPROC;
+-    FCreateContextAttribsARB: PFNWGLCREATECONTEXTATTRIBSARBPROC;
+-    FGetExtensionsStringARB: PFNWGLGETEXTENSIONSSTRINGARBPROC;
+-    FGetPixelFormatAttribivARB: PFNWGLGETPIXELFORMATATTRIBIVARBPROC;
+-    FSwapIntervalEXT: PFNWGLSWAPINTERVALEXTPROC;
+-  private
+-    procedure GetGlProc(const AName: MarshaledAString; out AProc); inline;
+-  public
+-    procedure Initialize;
+-    function HasExtension(const AHDC: HDC; const AName: MarshaledAString): Boolean;
+-    property ChoosePixelFormatARB: PFNWGLCHOOSEPIXELFORMATARBPROC read FChoosePixelFormatARB;
+-    property CreateContextAttribsARB: PFNWGLCREATECONTEXTATTRIBSARBPROC read FCreateContextAttribsARB;
+-    property GetExtensionsStringARB: PFNWGLGETEXTENSIONSSTRINGARBPROC read FGetExtensionsStringARB;
+-    property GetPixelFormatAttribivARB: PFNWGLGETPIXELFORMATATTRIBIVARBPROC read FGetPixelFormatAttribivARB;
+-    property SwapIntervalEXT: PFNWGLSWAPINTERVALEXTPROC read FSwapIntervalEXT;
+-  end;
+-{$ENDIF}
+-
+-type
+   { TGlSharedContext }
+ 
+   TGlSharedContext = class(TGlSharedContextCustom)
+   private
+     procedure MakeCurrent;
+-  private
+-    [Volatile] FBeginContextCount: Integer;
+-    FGrGlInterface: IGrGlInterface;
+-    {$IF DEFINED(ANDROID)}
+-    FConfig: EGLConfig;
+-    FContext: EGLContext;
+-    FDisplay: EGLDisplay;
+-    FOldContext: EGLContext;
+-    FOldDisplay: EGLDisplay;
+-    FOldDraw: EGLSurface;
+-    FOldRead: EGLSurface;
+-    FSurface: EGLSurface;
+-    {$ELSEIF DEFINED(IOS)}
+-    FContext: EAGLContext;
+-    FLibraryHandle: HMODULE;
+-    FOldContext: EAGLContext;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    FContextAttributes: TArray<Integer>;
+-    FDC: HDC;
+-    FGlInterface: TGlInterface;
+-    FGLRC: HGLRC;
+-    FOldDC: HDC;
+-    FOldGLRC: HGLRC;
+-    FPixelFormat: Integer;
+-    FPixelFormatDescriptor: TPixelFormatDescriptor;
+-    FWindow: HWND;
+-    {$ENDIF}
+-    procedure CreateBackendContext(const AQuality: TCanvasQuality);
+-    procedure DestroyBackendContext;
+-    procedure RestoreCurrent;
+-    procedure SaveAndMakeCurrent; inline;
+-    procedure SaveCurrent;
+   protected
+     procedure BeginContext; override;
+     procedure DestroyContext; override;
+-    procedure EndContext; override;
+     function GetTextureColorType: TSkColorType; override;
+     function GetTextureOrigin: TGrSurfaceOrigin; override;
+     procedure RefreshContext; override;
+@@ -214,460 +94,121 @@
+     constructor Create(const AQuality: TCanvasQuality);
+     procedure FinalizeTextureCache(const ABitmap: TGrBitmapHandle); override;
+     procedure InitializeTextureCache(const ABitmap: TGrBitmapHandle); override;
+-    property GrGlInterface: IGrGlInterface read FGrGlInterface;
+-    {$IF DEFINED(ANDROID)}
+-    property Config: EGLConfig read FConfig;
+-    property Context: EGLContext read FContext;
+-    property Display: EGLDisplay read FDisplay;
+-    const ContextAttributes: array[0..2] of EGLint = (EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE);
+-    {$ELSEIF DEFINED(IOS)}
+-    property Context: EAGLContext read FContext;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    property ContextAttributes: TArray<Integer> read FContextAttributes;
+-    property GlInterface: TGlInterface read FGlInterface;
+-    property GLRC: HGLRC read FGLRC;
+-    property PixelFormat: Integer read FPixelFormat;
+-    property PixelFormatDescriptor: TPixelFormatDescriptor read FPixelFormatDescriptor;
+-    {$ENDIF}
+   end;
+ 
+ { TGlCanvas }
+ 
+-procedure TGlCanvas.BeforeRestore;
++function TGlCanvas.BeginCanvas(const AContextHandle: THandle): ISkCanvas;
+ begin
+-  inherited;
+-  if Parent <> nil then
+-    MakeCurrent
+-  else if Supports(FWrapper, IGrCanvasWrapper) then
+-    TGlSharedContext(SharedContext).MakeCurrent;
+-end;
+-
+-function TGlCanvas.CreateContext: Boolean;
+-{$IFDEF ANDROID}
+-var
+-  LFormat: GLint;
+-  LJSurface: JSurface;
+-  LSurface: Pointer;
+-{$ENDIF}
+-begin
+-  Result := False;
+-  {$IF DEFINED(ANDROID)}
+-  if FANativeWindow = nil then
++  if (Fcontext = nil) and (Parent <> nil) then
+   begin
+-    if Parent is TAndroidWindowHandle then
+-    begin
+-      if TAndroidWindowHandle(Parent).Holder = nil then
+-        Exit;
+-      LSurface := (TAndroidWindowHandle(Parent).Holder.getSurface as ILocalObject).GetObjectID;
+-    end
+-    else if Parent is TAndroidHandle then
+-    begin
+-      if TAndroidHandle(Parent).Surface = nil then
+-        Exit;
+-      LJSurface := TJSurface.JavaClass.init(TAndroidHandle(Parent).Surface);
+-      LSurface  := TJNIResolver.JavaInstanceToID(LJSurface);
+-    end
++    var LMultisample: TMultisample;
++    case Quality of
++      TCanvasQuality.HighPerformance: LMultisample := TMultisample.None;
++      TCanvasQuality.HighQuality: LMultisample := TMultisample.FourSamples;
+     else
+-      Exit;
+-    FANativeWindow := ANativeWindow_fromSurface(TJNIResolver.GetJNIEnv, LSurface);
+-    if FANativeWindow = nil then
+-      Exit;
+-    eglGetConfigAttrib(TGlSharedContext(SharedContext).Display, TGlSharedContext(SharedContext).Config, EGL_NATIVE_VISUAL_ID, @LFormat);
+-    ANativeWindow_setBuffersGeometry(FANativeWindow, 0, 0, LFormat);
+-    FSurface := eglCreateWindowSurface(TGlSharedContext(SharedContext).Display, TGlSharedContext(SharedContext).Config, FANativeWindow, nil);
+-    if FSurface = EGL_NO_SURFACE then
+-    begin
+-      ANativeWindow_release(FANativeWindow);
+-      FANativeWindow := nil;
+-      Exit;
++      LMultisample := TMultisample.None;
+     end;
++    FContext := TContextManager.CreateFromWindow(Parent, Width, Height, LMultisample, true);
+   end;
+-  FContext := eglCreateContext(TGlSharedContext(SharedContext).Display, TGlSharedContext(SharedContext).Config, TGlSharedContext(SharedContext).Context, @TGlSharedContext.ContextAttributes);
+-  if FContext = EGL_NO_CONTEXT then
+-    Exit;
+-  {$ELSEIF DEFINED(IOS)}
+-  FContext := TEAGLContext.Wrap(TEAGLContext.Alloc.initWithAPI(kEAGLRenderingAPIOpenGLES2, TGlSharedContext(SharedContext).Context.sharegroup));
+-  if FContext = nil then
+-    Exit;
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  if FDC = 0 then
++
++  if FContext <> nil then
+   begin
+-    FDC := GetDC(WindowHandleToPlatform(Parent).Wnd);
+-    if FDC = 0 then
+-      Exit;
+-    SetPixelFormat(FDC, TGlSharedContext(SharedContext).PixelFormat, @TGlSharedContext(SharedContext).PixelFormatDescriptor);
+-  end;
+-  if TGlSharedContext(SharedContext).ContextAttributes <> nil then
+-  begin
+-    FGLRC := TGlSharedContext(SharedContext).GlInterface.CreateContextAttribsARB(FDC, TGlSharedContext(SharedContext).GLRC, Pointer(TGlSharedContext(SharedContext).ContextAttributes));
+-    if FGLRC = 0 then
+-      Exit;
++    if FContext.BeginScene then
++      result := inherited
++    else
++      Result := nil;
+   end
+-  else
+-  begin
+-    FGLRC := wglCreateContext(FDC);
+-    if FGLRC = 0 then
+-      Exit;
+-    if not wglShareLists(TGlSharedContext(SharedContext).GLRC, FGLRC) then
+-    begin
+-      wglDeleteContext(FGLRC);
+-      Exit;
+-    end;
++  else begin
++    if TryMakeCurrent then
++      result := inherited
++    else
++      Result := nil;
+   end;
+-  {$ENDIF}
+-  try
+-    if not TryMakeCurrent then
+-      Exit;
+-    {$IF DEFINED(ANDROID)}
+-    eglSwapInterval(TGlSharedContext(SharedContext).Display, GlobalUseSkiaGLSwapInterval);
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    if TGlSharedContext(SharedContext).GlInterface.HasExtension(FDC, 'WGL_EXT_swap_control') then
+-      TGlSharedContext(SharedContext).GlInterface.SwapIntervalEXT(GlobalUseSkiaGLSwapInterval);
+-    {$ENDIF}
+-    FGrDirectContext := TGrDirectContext.MakeGl(TGlSharedContext(SharedContext).GrGlInterface);
+-    Result           := FGrDirectContext <> nil;
+-  finally
+-    if not Result then
+-      {$IF DEFINED(ANDROID)}
+-      eglDestroyContext(TGlSharedContext(SharedContext).Display, FContext);
+-      {$ELSEIF DEFINED(IOS)}
+-      FContext.release;
+-      {$ELSEIF DEFINED(MSWINDOWS)}
+-      wglDeleteContext(FGLRC);
+-      {$ENDIF}
+-  end;
+-  {$IFDEF IOS}
+-  if Result then
+-  begin
+-    GLKView(WindowHandleToPlatform(Parent).View).setContext(FContext);
+-    GLKView(WindowHandleToPlatform(Parent).View).bindDrawable;
+-  end;
+-  {$ENDIF}
+ end;
+ 
+-function TGlCanvas.CreateSharedContext: IGrSharedContext;
++procedure TGlCanvas.EndCanvas(const AContextHandle: THandle);
+ begin
+-  Result := TGlSharedContext.Create(Quality);
+-end;
+-
+-destructor TGlCanvas.Destroy;
+-begin
+-  if Parent <> nil then
+-  begin
+-    DestroyContext;
+-    {$IF DEFINED(ANDROID)}
+-    if FANativeWindow <> nil then
+-    begin
+-      eglDestroySurface(TGlSharedContext(SharedContext).Display, FSurface);
+-      ANativeWindow_release(FANativeWindow);
+-    end;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    if FDC <> 0 then
+-      ReleaseDC(WindowHandleToPlatform(Parent).Wnd, FDC);
+-    {$ENDIF}
+-  end;
+   inherited;
++  if FContext <> nil then
++    FContext.EndScene;
+ end;
+ 
+-procedure TGlCanvas.DestroyContext;
++function TGlCanvas.CreateSharedContext: IGrSharedContext;
+ begin
+-  if FGrDirectContext <> nil then
+-  begin
+-    SaveCurrent;
+-    try
+-      TryMakeCurrent;
+-      FBackBufferSurface := nil;
+-      FGrDirectContext.AbandonContext;
+-      FGrDirectContext := nil;
+-      {$IF DEFINED(ANDROID)}
+-      eglDestroyContext(TGlSharedContext(SharedContext).Display, FContext);
+-      {$ELSEIF DEFINED(IOS)}
+-      FContext.release;
+-      {$ELSEIF DEFINED(MSWINDOWS)}
+-      wglDeleteContext(FGLRC);
+-      {$ENDIF}
+-    finally
+-      RestoreCurrent;
+-    end;
+-  end;
++  Result := TGlSharedContext.Create(Quality);
+ end;
+ 
+-procedure TGlCanvas.DoDrawBitmap(const ABitmap: FMX.Graphics.TBitmap;
+-  const ASrcRect, ADestRect: TRectF; const AOpacity: Single;
+-  const AHighSpeed: Boolean);
++destructor TGlCanvas.Destroy;
+ begin
+-  if Parent <> nil then
+-    MakeCurrent
+-  else if Supports(FWrapper, IGrCanvasWrapper) then
+-    TGlSharedContext(SharedContext).MakeCurrent;
++  FBackBufferSurface := nil;
++  FGrDirectContext := nil;
++  if Fcontext <> nil then
++    FreeAndNil(FContext);
+   inherited;
+ end;
+ 
+ function TGlCanvas.GetSurfaceFromWindow(
+   const AContextHandle: THandle): TSkSurface;
+-var
+-  LGrBackendRenderTarget: IGrBackendRenderTarget;
+-  LGrGlFramebufferInfo: TGrGlFramebufferInfo;
+ begin
+   Result := nil;
+-  SaveCurrent;
+-  try
+-    if FBackBufferSurface <> nil then
+-    begin
+-      if not TryMakeCurrent then
+-        Exit;
+-    end
+-    else
+-    begin
+-      if FGrDirectContext = nil then
+-      begin
+-        if not CreateContext then
+-          Exit;
+-      end
+-      else if not TryMakeCurrent then
+-        Exit;
+-      glGetIntegerv(GL_FRAMEBUFFER_BINDING, @GLuint(LGrGlFramebufferInfo.FBOID));
+-      LGrGlFramebufferInfo.Format := {$IF DEFINED(IOS) or DEFINED(ANDROID)}GL_RGBA8_OES{$ELSE}GL_RGBA8{$ENDIF};
+-      LGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Round(Width * Scale), Round(Height * Scale), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), TGlSharedContext(SharedContext).StencilBits, LGrGlFramebufferInfo);
+-      FBackBufferSurface     := TSkSurface.MakeFromRenderTarget(FGrDirectContext, LGrBackendRenderTarget, TGrSurfaceOrigin.BottomLeft, TSkColorType.RGBA8888);
+-    end;
+-    Result := TSkSurface(FBackBufferSurface);
+-  finally
+-    if Result = nil then
+-      RestoreCurrent;
+-  end;
+-end;
+ 
+-class function TGlCanvas.IsSupported: Boolean;
+-{$IFDEF MSWINDOWS}
+-const
+-  WGLARBPixelFormatExtName = 'WGL_ARB_pixel_format';
+-var
+-  LClass: TWndClass;
+-  LDC: HDC;
+-  LEnd: MarshaledAString;
+-  LExtensions: MarshaledAString;
+-  LGetExtensionsStringARB: PFNWGLGETEXTENSIONSSTRINGARBPROC;
+-  LGLRC: HGLRC;
+-  LPixelFormat: Integer;
+-  LPixelFormatDescriptor: TPixelFormatDescriptor;
+-  LWindow: HWND;
+-{$ENDIF}
+-begin
+-{$IF DEFINED(MSWINDOWS)}
+-  FillChar(LClass, SizeOf(TWndClass), 0);
+-  LClass.lpfnWndProc   := @DefWindowProc;
+-  LClass.hInstance     := HInstance;
+-  LClass.lpszClassName := '_temp';
+-  if Winapi.Windows.RegisterClass(LClass) = 0 then
+-    Exit(False);
+-  try
+-    LWindow := CreateWindowEx(WS_EX_TOOLWINDOW, '_temp', nil, WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
+-    if LWindow = 0 then
+-      Exit(False);
+-    try
+-      LDC := GetDC(LWindow);
+-      if LDC = 0 then
+-        Exit(False);
+-      try
+-        FillChar(LPixelFormatDescriptor, SizeOf(TPixelFormatDescriptor), 0);
+-        LPixelFormatDescriptor.nSize        := SizeOf(TPixelFormatDescriptor);
+-        LPixelFormatDescriptor.nVersion     := 1;
+-        LPixelFormatDescriptor.dwFlags      := PFD_DRAW_TO_WINDOW or PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER;
+-        LPixelFormatDescriptor.iPixelType   := PFD_TYPE_RGBA;
+-        LPixelFormatDescriptor.cColorBits   := 24;
+-        LPixelFormatDescriptor.cAlphaBits   := 8;
+-        LPixelFormatDescriptor.cStencilBits := 8;
+-        LPixelFormatDescriptor.iLayerType   := PFD_MAIN_PLANE;
+-        try
+-          // Some GPU drivers (e.g. in virtual machines) may throw privileged instruction
+-          // exceptions inside ChoosePixelFormat/SetPixelFormat, so we guard with try/except.
+-          LPixelFormat := ChoosePixelFormat(LDC, @LPixelFormatDescriptor);
+-          if (LPixelFormat = 0) or (not SetPixelFormat(LDC, LPixelFormat, @LPixelFormatDescriptor)) then
+-            Exit(False);
+-        except
+-          Exit(False);
+-        end;
+-        LGLRC := wglCreateContext(LDC);
+-        if LGLRC = 0 then
+-          Exit(False);
+-        try
+-          if not wglMakeCurrent(LDC, LGLRC) then
+-            Exit(False);
+-          try
+-            LGetExtensionsStringARB := GetProcAddress(GetModuleHandle(opengl32), 'wglGetExtensionsStringARB');
+-            if not Assigned(LGetExtensionsStringARB) then
+-            begin
+-              LGetExtensionsStringARB := wglGetProcAddress('wglGetExtensionsStringARB');
+-              if not Assigned(LGetExtensionsStringARB) then
+-                Exit(False);
+-            end;
+-            LExtensions := LGetExtensionsStringARB(LDC);
+-            while LExtensions^ <> #0 do
+-            begin
+-              LEnd := LExtensions;
+-              while (LEnd^ <> ' ') and (LEnd^ <> #0) do
+-                Inc(LEnd);
+-              if (LEnd - LExtensions = Length(WGLARBPixelFormatExtName)) and (System.AnsiStrings.StrLIComp(LExtensions, WGLARBPixelFormatExtName, LEnd - LExtensions) = 0) then
+-                Exit(True);
+-              if LEnd^ = #0 then
+-                Break;
+-              LExtensions := LEnd + 1;
+-            end;
+-            Result := False;
+-          finally
+-            wglMakeCurrent(0, 0);
+-          end;
+-        finally
+-          wglDeleteContext(LGLRC);
+-        end;
+-      finally
+-        ReleaseDC(LWindow, LDC);
+-      end;
+-    finally
+-      DestroyWindow(LWindow);
+-    end;
+-  finally
+-    Winapi.Windows.UnregisterClass('_temp', HInstance);
+-  end;
+-{$ELSE}
+-  Result := True;
+-{$ENDIF}
+-end;
+-
+-procedure TGlCanvas.MakeCurrent;
+-begin
+   if not TryMakeCurrent then
+-    raise EGlError.Create('Could not make context as current.');
+-end;
++    Exit;
+ 
+-procedure TGlCanvas.Resized;
+-begin
+-  inherited;
+-  if FBackBufferSurface <> nil then
++  if FGrDirectContext = nil then
+   begin
+-    SaveCurrent;
+-    try
+-      MakeCurrent;
+-      FBackBufferSurface := nil;
+-    finally
+-      RestoreCurrent;
+-    end;
++    // GPU-wrapped objects cannot be shared between different GrDirectContexts.
++    // For instance, an SkImage created on one GrDirectContext cannot be used on another.
++    // Therefore, we use the same instance of GrDirectContext between TGlCanvas and TGlSharedContext.
++    // As a result, TGlCanvas is effectively not multithreaded.
++    FGrDirectContext := TGlSharedContext(SharedContext).GrDirectContext;
++    if FGrDirectContext = nil then
++      Exit;
+   end;
+-end;
+ 
+-procedure TGlCanvas.RestoreCurrent;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  eglMakeCurrent(FOldDisplay, FOldDraw, FOldRead, FOldContext);
+-  {$ELSEIF DEFINED(IOS)}
+-  TEAGLContext.OCClass.setCurrentContext(FOldContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  wglMakeCurrent(FOldDC, FOldGLRC);
+-  {$ENDIF}
++  if FBackBufferSurface = nil then
++  begin
++    var LGrGlFramebufferInfo: TGrGlFramebufferInfo;
++    glGetIntegerv(GL_FRAMEBUFFER_BINDING, @GLuint(LGrGlFramebufferInfo.FBOID));
++    LGrGlFramebufferInfo.Format := {$IF DEFINED(IOS) or DEFINED(ANDROID)}GL_RGBA8_OES{$ELSE}GL_RGBA8{$ENDIF};
++    var LStencilBits: GLint;
++    glGetIntegerv(GL_STENCIL_BITS, @LStencilBits);
++    var LGrBackendRenderTarget: IGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Round(Width * Scale), Round(Height * Scale), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), LStencilBits, LGrGlFramebufferInfo);
++    FBackBufferSurface     := TSkSurface.MakeFromRenderTarget(FGrDirectContext, LGrBackendRenderTarget, TGrSurfaceOrigin.BottomLeft, TSkColorType.RGBA8888);
++  end;
++
++  Result := TSkSurface(FBackBufferSurface);
+ end;
+ 
+-procedure TGlCanvas.SaveCurrent;
++class function TGlCanvas.IsSupported: Boolean;
+ begin
+-  {$IF DEFINED(ANDROID)}
+-  FOldDisplay := eglGetCurrentDisplay;
+-  if FOldDisplay = EGL_NO_DISPLAY then
+-  begin
+-    FOldDisplay := TGlSharedContext(SharedContext).Display;
+-    FOldDraw    := EGL_NO_SURFACE;
+-    FOldRead    := EGL_NO_SURFACE;
+-    FOldContext := EGL_NO_CONTEXT;
+-  end
+-  else
+-  begin
+-    FOldDraw    := eglGetCurrentSurface(EGL_DRAW);
+-    FOldRead    := eglGetCurrentSurface(EGL_READ);
+-    FOldContext := eglGetCurrentContext;
+-  end;
+-  {$ELSEIF DEFINED(IOS)}
+-  FOldContext := TEAGLContext.Wrap(TEAGLContext.OCClass.currentContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FOldDC   := wglGetCurrentDC;
+-  FOldGLRC := wglGetCurrentContext;
+-  {$ENDIF}
++{$IF DEFINED(ANDROID) or DEFINED(IOS)}
++  Result := True;
++{$ELSE}
++  Result := False;
++{$ENDIF}
+ end;
+ 
+-procedure TGlCanvas.SwapBuffers(const AContextHandle: THandle);
++procedure TGlCanvas.Resized;
+ begin
+   inherited;
+-  {$IF DEFINED(ANDROID)}
+-  if eglSwapBuffers(TGlSharedContext(SharedContext).Display, FSurface) = EGL_FALSE then
+-    raise EGrCanvas.Create('Could not swap buffers.');
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  if not Winapi.Windows.SwapBuffers(FDC) then
+-    raise EGrCanvas.Create('Could not swap buffers.');
+-  {$ENDIF}
+-  RestoreCurrent;
++  FBackBufferSurface := nil;
++  if Fcontext <> nil then
++    Fcontext.Resize;
+ end;
+ 
+ function TGlCanvas.TryMakeCurrent: Boolean;
+ begin
+   {$IF DEFINED(ANDROID)}
+-  Result := eglMakeCurrent(TGlSharedContext(SharedContext).Display, FSurface, FSurface, FContext) <> EGL_FALSE;
++  Result := TCustomAndroidContext.Valid;
+   {$ELSEIF DEFINED(IOS)}
+-  Result := TEAGLContext.OCClass.setCurrentContext(FContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  Result := wglMakeCurrent(FDC, FGLRC);
++  Result := TCustomContextIOS.Valid;
+   {$ELSE}
+   Result := False;
+   {$ENDIF}
+ end;
+ 
+-{$IFDEF MSWINDOWS}
+-
+-{ TGlInterface }
+-
+-procedure TGlInterface.GetGlProc(const AName: MarshaledAString; out AProc);
+-begin
+-  PPointer(@AProc)^ := GetProcAddress(GetModuleHandle(opengl32), AName);
+-  if PPointer(@AProc)^ = nil then
+-    PPointer(@AProc)^ := wglGetProcAddress(AName);
+-end;
+-
+-function TGlInterface.HasExtension(const AHDC: HDC;
+-  const AName: MarshaledAString): Boolean;
+-var
+-  LEnd: MarshaledAString;
+-  LExtensions: MarshaledAString;
+-begin
+-  if not Assigned(FGetExtensionsStringARB) then
+-    Exit(False);
+-  if System.AnsiStrings.StrComp(AName, 'WGL_ARB_extensions_string') = 0 then
+-    Exit(True);
+-  LExtensions := FGetExtensionsStringARB(AHDC);
+-  if LExtensions <> nil then
+-  begin
+-    while LExtensions^ <> #0 do
+-    begin
+-      LEnd := LExtensions;
+-      while (LEnd^ <> ' ') and (LEnd^ <> #0) do
+-        Inc(LEnd);
+-      if (LEnd - LExtensions = Length(AName)) and (System.AnsiStrings.StrLIComp(LExtensions, AName, LEnd - LExtensions) = 0) then
+-        Exit(True);
+-      if LEnd^ = #0 then
+-        Break;
+-      LExtensions := LEnd + 1;
+-    end;
+-  end;
+-  Result := False;
+-end;
+-
+-procedure TGlInterface.Initialize;
+-begin
+-  GetGlProc('wglChoosePixelFormatARB', FChoosePixelFormatARB);
+-  GetGlProc('wglCreateContextAttribsARB', FCreateContextAttribsARB);
+-  GetGlProc('wglGetExtensionsStringARB', FGetExtensionsStringARB);
+-  GetGlProc('wglGetPixelFormatAttribivARB', FGetPixelFormatAttribivARB);
+-  GetGlProc('wglSwapIntervalEXT', FSwapIntervalEXT);
+-end;
+-
+-{$ENDIF}
+-
+ { TGlSharedContext }
+ 
+ procedure TGlSharedContext.BeginContext;
+@@ -674,9 +215,6 @@
+ begin
+   inherited;
+   try
+-    Inc(FBeginContextCount);
+-    if FBeginContextCount = 1 then
+-      SaveCurrent;
+     MakeCurrent;
+   except
+     inherited EndContext;
+@@ -687,372 +225,22 @@
+ constructor TGlSharedContext.Create(const AQuality: TCanvasQuality);
+ begin
+   inherited Create;
+-  CreateBackendContext(AQuality);
+-  try
+-    FGrGlInterface   := TGrGlInterface.MakeNative;
+-    FGrDirectContext := TGrDirectContext.MakeGl(FGrGlInterface);
+-    if FGrDirectContext = nil then
+-    begin
+-      FGrGlInterface := nil;
+-      DestroyBackendContext;
+-      raise EGrCanvas.Create('Could not create shared direct context.');
+-    end;
+-  finally
+-    RestoreCurrent;
+-  end;
++  MakeCurrent;
++  // Ideally, we should have a separate FGrDirectContext for each thread
++  // (FMX.Context.GLES.Android already manages distinct OpenGL contexts per thread).
++  // However, the design of TGrSharedContext does not allow for this, as GrDirectContext
++  // is a member variable without a virtual getter. For now, I prefer not to modify FMX.Skia.Canvas.
++  // As a result, TGlSharedContext is effectively not multithreaded.
++  FGrDirectContext := TGrDirectContext.MakeGl;
++  if FGrDirectContext = nil then
++    raise EGrCanvas.Create('Could not create shared direct context.');
+ end;
+ 
+-procedure TGlSharedContext.CreateBackendContext(const AQuality: TCanvasQuality);
+-{$IF DEFINED(ANDROID)}
+-
+-  function SelectConfig(const AAttributes: TArray<Integer>;
+-    const AMinSampleCount: Integer = 1): EGLConfig;
+-  var
+-    LAttributes: TArray<GLint>;
+-    LCount: GLint;
+-  begin
+-    LAttributes := AAttributes;
+-    if AMinSampleCount > 1 then
+-    begin
+-      LAttributes := LAttributes + [
+-        EGL_SAMPLES        , AMinSampleCount,
+-        EGL_SAMPLE_BUFFERS , 1];
+-    end;
+-    LAttributes := LAttributes + [EGL_NONE];
+-    if (eglChooseConfig(FDisplay, Pointer(LAttributes), @Result, 1, @LCount) = EGL_FALSE) or (LCount <= 0) then
+-      Exit(nil);
+-  end;
+-
+-const
+-  SurfaceAttributes: array[0..4] of EGLint = (EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE);
+-var
+-  LConfigAttributes: TArray<GLint>;
+-{$ELSEIF DEFINED(MSWINDOWS)}
+-  // There are some known issues with implementations of certain drivers,
+-  // especially older ones, related to the "WGL_ARB_pixel_format" extension:
+-  //
+-  //  - The order in which pixel formats are returned by the function
+-  //    wglChoosePixelFormatARB may not follow the order of the smallest number
+-  //    of samples, meaning that the first chosen may have a higher number than
+-  //    necessary;
+-  //
+-  // - The parameter nNumFormats of the wglChoosePixelFormatARB function may
+-  //   return all formats available numbers instead of just the number that will
+-  //   actually be returned;
+-  //
+-  // - The "pfAttribFList" parameter cannot be "nil", and attributes must end
+-  //   with two null values instead of one.
+-  function SelectPixelFormat(const AAttributes: TArray<Integer>;
+-    const AMinSampleCount: Integer = 1): Integer;
+-  type
+-    TRankPixelFormat = record
+-      Index: Integer;
+-      PixelFormat: Integer;
+-      SampleCount: Integer;
+-    end;
+-
+-  const
+-    AttributesF: array[0..1] of Single = (0, 0);
+-
+-    QueryAttribute: Integer = WGL_SAMPLES_ARB;
+-  var
+-    I: Integer;
+-    LAttributes: TArray<Integer>;
+-    LCount: Cardinal;
+-    LPixelFormats: array[0..63] of Integer;
+-    LRankPixelFormat: TRankPixelFormat;
+-    LRankPixelFormats: TList<TRankPixelFormat>;
+-  begin
+-    if AMinSampleCount = 1 then
+-    begin
+-      LAttributes := AAttributes + [0, 0];
+-      if (not FGlInterface.ChoosePixelFormatARB(FDC, Pointer(LAttributes), @AttributesF, 1, @Result, @LCount)) or (LCount = 0) then
+-        Exit(0);
+-    end
+-    else
+-    begin
+-      LAttributes := AAttributes + [
+-        WGL_SAMPLE_BUFFERS_ARB , 1               ,
+-        WGL_SAMPLES_ARB        , AMinSampleCount ,
+-        0                      , 0];
+-      if (not FGlInterface.ChoosePixelFormatARB(FDC, Pointer(LAttributes), @AttributesF, 64, @LPixelFormats, @LCount)) or (LCount = 0) then
+-        Exit(0);
+-      LCount            := Min(LCount, 64);
+-      LRankPixelFormats := TList<TRankPixelFormat>.Create;
+-      try
+-        for I := 0 to LCount - 1 do
+-        begin
+-          LRankPixelFormat.Index := I;
+-          LRankPixelFormat.PixelFormat := LPixelFormats[I];
+-          FGlInterface.GetPixelFormatAttribivARB(FDC, LPixelFormats[I], 0, 1, @QueryAttribute, @LRankPixelFormat.SampleCount);
+-          LRankPixelFormats.Add(LRankPixelFormat);
+-        end;
+-        LRankPixelFormats.Sort(TComparer<TRankPixelFormat>.Construct(
+-          function(const ALeft, ARight: TRankPixelFormat): Integer
+-          begin
+-            Result := ALeft.SampleCount - ARight.SampleCount;
+-            if Result = 0 then
+-              Result := ALeft.Index - ARight.Index;
+-          end));
+-        Result := LRankPixelFormats.First.PixelFormat;
+-      finally
+-        LRankPixelFormats.Free;
+-      end;
+-    end;
+-  end;
+-
+-const
+-  CoreVersions: array[0..11] of GLInt = (
+-    4, 3,
+-    4, 2,
+-    4, 1,
+-    4, 0,
+-    3, 3,
+-    3, 2);
+-
+-  PixelFormatDescriptor: TPixelFormatDescriptor = (
+-    nSize           : SizeOf(TPixelFormatDescriptor);
+-    nVersion        : 1;
+-    dwFlags         : PFD_DRAW_TO_WINDOW or PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER;
+-    iPixelType      : PFD_TYPE_RGBA;
+-    cColorBits      : 24;
+-    cRedBits        : 0;
+-    cRedShift       : 0;
+-    cGreenBits      : 0;
+-    cGreenShift     : 0;
+-    cBlueBits       : 0;
+-    cBlueShift      : 0;
+-    cAlphaBits      : 8;
+-    cAlphaShift     : 0;
+-    cAccumBits      : 0;
+-    cAccumRedBits   : 0;
+-    cAccumGreenBits : 0;
+-    cAccumBlueBits  : 0;
+-    cAccumAlphaBits : 0;
+-    cDepthBits      : 0;
+-    cStencilBits    : 8;
+-    cAuxBuffers     : 0;
+-    iLayerType      : PFD_MAIN_PLANE;
+-    bReserved       : 0;
+-    dwLayerMask     : 0;
+-    dwVisibleMask   : 0;
+-    dwDamageMask    : 0);
+-var
+-  I: Integer;
+-  LClass: TWndClass;
+-  LDC: HDC;
+-  LGLRC: HGLRC;
+-  LPixelFormat: Integer;
+-  LPixelFormatAttributes: TArray<Integer>;
+-  LWindow: HWND;
+-{$ENDIF}
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  FDisplay := eglGetDisplay(EGL_DEFAULT_DISPLAY);
+-  if (FDisplay = EGL_NO_DISPLAY) or (eglInitialize(FDisplay, nil, nil) = EGL_FALSE) then
+-    raise EGlError.Create('Could not initialize the default display.');
+-  try
+-    LConfigAttributes := [
+-      EGL_RENDERABLE_TYPE , EGL_OPENGL_ES2_BIT ,
+-      EGL_SURFACE_TYPE    , EGL_PBUFFER_BIT    ,
+-      EGL_RED_SIZE        , 8                  ,
+-      EGL_GREEN_SIZE      , 8                  ,
+-      EGL_BLUE_SIZE       , 8                  ,
+-      EGL_ALPHA_SIZE      , 8                  ,
+-      EGL_STENCIL_SIZE    , 8];
+-    if AQuality <> TCanvasQuality.HighPerformance then
+-    begin
+-      if AQuality = TCanvasQuality.HighQuality then
+-        FConfig := SelectConfig(LConfigAttributes, 4);
+-      if FConfig = nil then
+-        FConfig := SelectConfig(LConfigAttributes, 2);
+-    end;
+-    if FConfig = nil then
+-    begin
+-      FConfig := SelectConfig(LConfigAttributes);
+-      if FConfig = nil then
+-        raise EGlError.Create('Could not choose configuration.');
+-    end;
+-    eglGetConfigAttrib(FDisplay, FConfig, EGL_STENCIL_SIZE, @FStencilBits);
+-    FSurface := eglCreatePbufferSurface(FDisplay, FConfig, @SurfaceAttributes);
+-    if FSurface = EGL_NO_SURFACE then
+-      raise EGlError.Create('Could not create shared surface.');
+-    try
+-      FContext := eglCreateContext(FDisplay, FConfig, EGL_NO_CONTEXT, @ContextAttributes);
+-      if FContext = EGL_NO_CONTEXT then
+-        raise EGlError.Create('Could not create shared context.');
+-      SaveAndMakeCurrent;
+-    except
+-      eglDestroySurface(FDisplay, FSurface);
+-      raise;
+-    end;
+-  except
+-    eglTerminate(FDisplay);
+-    raise;
+-  end;
+-  {$ELSEIF DEFINED(IOS)}
+-  FLibraryHandle := SafeLoadLibrary(libGLKit);
+-  if FLibraryHandle = 0 then
+-    raise EGrCanvas.Create('Could not load "GLKit" framework.');
+-  try
+-    FContext := TEAGLContext.Wrap(TEAGLContext.Alloc.initWithAPI(kEAGLRenderingAPIOpenGLES2));
+-    if FContext = nil then
+-      raise EGlError.Create('Could not create shared context.');
+-    SaveAndMakeCurrent;
+-    glGetIntegerv(GL_STENCIL_BITS, @FStencilBits);
+-  except
+-    FreeLibrary(FLibraryHandle);
+-    raise;
+-  end;
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FillChar(LClass, SizeOf(TWndClass), 0);
+-  LClass.lpfnWndProc   := @DefWindowProc;
+-  LClass.hInstance     := HInstance;
+-  LClass.lpszClassName := '_SkDummy';
+-  if Winapi.Windows.RegisterClass(LClass) = 0 then
+-    raise EGrCanvas.Create('Could not register class.');
+-  try
+-    LWindow := CreateWindowEx(WS_EX_TOOLWINDOW, '_SkDummy', nil, WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
+-    if LWindow = 0 then
+-      raise EGrCanvas.Create('Could not create temporary window.');
+-    try
+-      SaveCurrent;
+-      try
+-        LDC := GetDC(LWindow);
+-        if LDC = 0 then
+-          raise EGrCanvas.Create('Could not get temporary device context.');
+-        try
+-          LPixelFormat := ChoosePixelFormat(LDC, @PixelFormatDescriptor);
+-          if (LPixelFormat = 0) or (not SetPixelFormat(LDC, LPixelFormat, @PixelFormatDescriptor)) then
+-            raise EGrCanvas.Create('Could not choose/set pixel format for temporary device context.');
+-          LGLRC := wglCreateContext(LDC);
+-          if LGLRC = 0 then
+-            raise EGlError.Create('Could not create temporary context.');
+-          try
+-            if not wglMakeCurrent(LDC, LGLRC) then
+-              raise EGlError.Create('Could not make temporary context as current.');
+-            try
+-              FGlInterface.Initialize;
+-            finally
+-              wglMakeCurrent(0, 0);
+-            end;
+-          finally
+-            wglDeleteContext(LGLRC);
+-          end;
+-        finally
+-          ReleaseDC(LWindow, LDC);
+-        end;
+-      finally
+-        DestroyWindow(LWindow);
+-      end;
+-      FWindow := CreateWindowEx(WS_EX_TOOLWINDOW, '_SkDummy', nil, WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
+-      if FWindow = 0 then
+-        raise EGrCanvas.Create('Could not create shared window.');
+-      try
+-        FDC := GetDC(FWindow);
+-        if FDC = 0 then
+-          raise EGrCanvas.Create('Could not get shared device context.');
+-        try
+-          LPixelFormatAttributes := [
+-            WGL_DRAW_TO_WINDOW_ARB , 1                         ,
+-            WGL_ACCELERATION_ARB   , WGL_FULL_ACCELERATION_ARB ,
+-            WGL_SUPPORT_OPENGL_ARB , 1                         ,
+-            WGL_DOUBLE_BUFFER_ARB  , 1                         ,
+-            WGL_COLOR_BITS_ARB     , 24                        ,
+-            WGL_ALPHA_BITS_ARB     , 8                         ,
+-            WGL_STENCIL_BITS_ARB   , 8];
+-          if (AQuality <> TCanvasQuality.HighPerformance) and (FGlInterface.HasExtension(FDC, 'WGL_ARB_multisample')) then
+-          begin
+-            if AQuality = TCanvasQuality.HighQuality then
+-              FPixelFormat := SelectPixelFormat(LPixelFormatAttributes, 4);
+-            if FPixelFormat = 0 then
+-              FPixelFormat := SelectPixelFormat(LPixelFormatAttributes, 2);
+-          end;
+-          if FPixelFormat = 0 then
+-          begin
+-            FPixelFormat := SelectPixelFormat(LPixelFormatAttributes);
+-            if FPixelFormat = 0 then
+-              raise EGlError.Create('Could not choose pixel format.');
+-          end;
+-          if (not DescribePixelFormat(FDC, FPixelFormat, SizeOf(TPixelFormatDescriptor), FPixelFormatDescriptor)) or (not SetPixelFormat(FDC, FPixelFormat, @PixelFormatDescriptor)) then
+-            raise EGrCanvas.Create('Could not set pixel format for shared device context.');
+-          FStencilBits := FPixelFormatDescriptor.cStencilBits;
+-          if FGlInterface.HasExtension(FDC, 'WGL_ARB_create_context') then
+-          begin
+-            FContextAttributes := [
+-              WGL_CONTEXT_MAJOR_VERSION_ARB , -1                               ,
+-              WGL_CONTEXT_MINOR_VERSION_ARB , -1                               ,
+-              WGL_CONTEXT_PROFILE_MASK_ARB  , WGL_CONTEXT_CORE_PROFILE_BIT_ARB ,
+-              0];
+-            for I := 0 to Length(CoreVersions) div 2 - 1 do
+-            begin
+-              FContextAttributes[1] := CoreVersions[I * 2];
+-              FContextAttributes[3] := CoreVersions[I * 2 + 1];
+-              FGLRC := FGlInterface.CreateContextAttribsARB(FDC, 0, Pointer(FContextAttributes));
+-              if FGLRC <> 0 then
+-                Break;
+-            end;
+-          end;
+-          if FGLRC = 0 then
+-          begin
+-            FContextAttributes := nil;
+-            FGLRC := wglCreateContext(FDC);
+-            if FGLRC = 0 then
+-              raise EGlError.Create('Could not create shared context.');
+-          end;
+-          MakeCurrent;
+-        except
+-          ReleaseDC(FWindow, FDC);
+-          raise;
+-        end;
+-      except
+-        RestoreCurrent;
+-        raise;
+-      end;
+-    except
+-      DestroyWindow(FWindow);
+-      raise;
+-    end;
+-  except
+-    Winapi.Windows.UnregisterClass('_SkDummy', HInstance);
+-    raise;
+-  end;
+-  {$ENDIF}
+-end;
+-
+-procedure TGlSharedContext.DestroyBackendContext;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  eglDestroyContext(FDisplay, FContext);
+-  eglDestroySurface(FDisplay, FSurface);
+-  eglTerminate(FDisplay);
+-  {$ELSEIF DEFINED(IOS)}
+-  FContext.release;
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  wglDeleteContext(FGLRC);
+-  ReleaseDC(FWindow, FDC);
+-  DestroyWindow(FWindow);
+-  Winapi.Windows.UnregisterClass('_SkDummy', HInstance);
+-  {$ENDIF}
+-end;
+-
+ procedure TGlSharedContext.DestroyContext;
+ begin
+-  SaveAndMakeCurrent;
+-  try
+-    FGrGlInterface := nil;
+-    inherited;
+-  finally
+-    RestoreCurrent;
+-  end;
+-  DestroyBackendContext;
+-end;
+-
+-procedure TGlSharedContext.EndContext;
+-begin
+-  Dec(FBeginContextCount);
+-  if FBeginContextCount = 0 then
+-    RestoreCurrent;
++  // This is done in TGrSharedContext.DestroyContext
++  // FGrDirectContext.AbandonContext;
++  // FGrDirectContext := nil;
+   inherited;
+ end;
+ 
+@@ -1091,11 +279,9 @@
+ procedure TGlSharedContext.MakeCurrent;
+ begin
+   {$IF DEFINED(ANDROID)}
+-  if eglMakeCurrent(FDisplay, FSurface, FSurface, FContext) = EGL_FALSE then
++  if not TCustomAndroidContext.Valid then
+   {$ELSEIF DEFINED(IOS)}
+-  if not TEAGLContext.OCClass.setCurrentContext(FContext) then
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  if not wglMakeCurrent(FDC, FGLRC) then
++  if not TCustomContextIOS.Valid then
+   {$ENDIF}
+     raise EGlError.Create('Could not make shared context as current.');
+ end;
+@@ -1105,55 +291,11 @@
+   MakeCurrent;
+ end;
+ 
+-procedure TGlSharedContext.RestoreCurrent;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  eglMakeCurrent(FOldDisplay, FOldDraw, FOldRead, FOldContext);
+-  {$ELSEIF DEFINED(IOS)}
+-  TEAGLContext.OCClass.setCurrentContext(FOldContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  wglMakeCurrent(FOldDC, FOldGLRC);
+-  {$ENDIF}
+-end;
+-
+-procedure TGlSharedContext.SaveAndMakeCurrent;
+-begin
+-  SaveCurrent;
+-  MakeCurrent;
+-end;
+-
+-procedure TGlSharedContext.SaveCurrent;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  FOldDisplay := eglGetCurrentDisplay;
+-  if FOldDisplay = EGL_NO_DISPLAY then
+-  begin
+-    FOldDisplay := FDisplay;
+-    FOldDraw    := EGL_NO_SURFACE;
+-    FOldRead    := EGL_NO_SURFACE;
+-    FOldContext := EGL_NO_CONTEXT;
+-  end
+-  else
+-  begin
+-    FOldDraw    := eglGetCurrentSurface(EGL_DRAW);
+-    FOldRead    := eglGetCurrentSurface(EGL_READ);
+-    FOldContext := eglGetCurrentContext;
+-  end;
+-  {$ELSEIF DEFINED(IOS)}
+-  FOldContext := TEAGLContext.Wrap(TEAGLContext.OCClass.currentContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FOldDC   := wglGetCurrentDC;
+-  FOldGLRC := wglGetCurrentContext;
+-  {$ENDIF}
+-end;
+-
+ {$HPPEMIT END '#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_FMX_SKIA_CANVAS_GL)'}
+ {$HPPEMIT END '    using ::Fmx::Skia::Canvas::Gl::TGlSharedContextCustom;'}
+-{$HPPEMIT END '    using ::Fmx::Skia::Canvas::Gl::GlobalUseSkiaGLSwapInterval;'}
+ {$HPPEMIT END '#endif'}
+ 
+ initialization
+-  GlobalUseSkiaGLSwapInterval := {$IFDEF ANDROID}1{$ELSE}0{$ENDIF};
+   RegisterSkiaRenderCanvas(TGlCanvas, False,
+     function: Boolean
+     begin
+Index: Embarcadero/Florence/fmx/FMX.Types3D.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Types3D.pas b/Embarcadero/Florence/fmx/FMX.Types3D.pas
+--- a/Embarcadero/Florence/fmx/FMX.Types3D.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Types3D.pas	(working copy)
+@@ -458,9 +458,11 @@
+     FBits: Pointer;
+     FContextLostId: TMessageSubscriptionId;
+     FContextResetId: TMessageSubscriptionId;
++    FMaterial: TMaterial; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     procedure ContextLostHandler(const Sender : TObject; const Msg : TMessage);
+     procedure ContextResetHandler(const Sender : TObject; const Msg : TMessage);
+     procedure SetPixelFormat(const Value: TPixelFormat);
++    procedure SetMaterial(const Value: TMaterial); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     procedure SetStyle(const Value: TTextureStyles);
+     function GetBytesPerPixel: Integer;
+     procedure SetMagFilter(const Value: TTextureFilter);
+@@ -490,6 +492,7 @@
+     property PixelFormat: TPixelFormat read FPixelFormat write SetPixelFormat;
+     property TextureScale: Single read FTextureScale; // hi resolution mode
+     property Style: TTextureStyles read FStyle write SetStyle;
++    property Material: TMaterial read FMaterial write SetMaterial; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     property Width: Integer read FWidth write SetWidth;
+     property Height: Integer read FHeight write SetHeight;
+     property Handle: TTextureHandle read FHandle;
+@@ -959,7 +962,8 @@
+ implementation
+ 
+ uses
+-  System.Math, System.TypInfo, System.RTLConsts, FMX.Platform, FMX.Materials, FMX.Surfaces, FMX.Consts, FMX.Utils;
++  System.Math, System.TypInfo, System.RTLConsts, FMX.Platform, FMX.Materials, FMX.Surfaces, FMX.Consts, FMX.Utils,
++  FMX.Materials.Canvas; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+ 
+ type
+   TOpenObject = class(TFmxObject);
+@@ -3199,6 +3203,17 @@
+   FPixelFormat := Value;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
++procedure TTexture.SetMaterial(const Value: TMaterial);
++begin
++  // We cannot use TCanvasTextureMaterial in the interface
++  // because it would create a circular reference.
++  if not (Value is TCanvasTextureMaterial) then
++    raise Exception.Create('Material must be a descendant of TCanvasTextureMaterial');
++  // The material is not owned by TTexture
++  FMaterial := Value;
++end;
++
+ procedure TTexture.SetSize(const AWidth, AHeight: Integer);
+ begin
+   TMonitor.Enter(Self);
+Index: Embarcadero/Florence/fmx/FMX.VirtualKeyboard.Android.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Florence/fmx/FMX.VirtualKeyboard.Android.pas
+--- a/Embarcadero/Florence/fmx/FMX.VirtualKeyboard.Android.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
+@@ -22,7 +22,8 @@
+   TKeyboardStateChangedListener = class(TJavaLocal, JOnKeyboardStateChangedListener)
+   private
+     [Weak] FKeyboardService: TAndroidVirtualKeyboard;
+-    FNeedNotifyAboutFrameChanges: Boolean;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++    //FNeedNotifyAboutFrameChanges: Boolean;
+     FPreviousVKRect: TRect;
+   public
+     constructor Create(const AService: TAndroidVirtualKeyboard);
+@@ -201,14 +202,16 @@
+ begin
+   inherited Create;
+   FKeyboardService := AService;
+-  FNeedNotifyAboutFrameChanges := False;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++  //FNeedNotifyAboutFrameChanges := False;
+   FPreviousVKRect := TRect.Empty;
+ end;
+ 
+ procedure TKeyboardStateChangedListener.onVirtualKeyboardWillShown;
+ begin
+-  FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
+-                                  not (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++  //FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
++  //                                not (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
+ end;
+ 
+ procedure TKeyboardStateChangedListener.onVirtualKeyboardFrameChanged(newFrame: JRect);
+@@ -215,28 +218,47 @@
+ var
+   VKRect: TRect;
+ 
+-  function IsFirstInitialization: Boolean;
+-  begin
+-    Result := (FPreviousVKRect = TRectF.Empty) and (VKRect.Height = 0);
+-  end;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++  //function IsFirstInitialization: Boolean;
++  //begin
++  //  Result := (FPreviousVKRect = TRectF.Empty) and (VKRect.Height = 0);
++  //end;
+ 
+ begin
+   VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
+   VKRect.BottomRight := ConvertPixelToPoint(TPointF.Create(newFrame.Right, newFrame.Bottom)).Round;
+ 
+-  if (FPreviousVKRect <> VKRect) and not IsFirstInitialization then
+-    try
+-      FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
+-      FPreviousVKRect := VKRect;
+-    finally
+-      FNeedNotifyAboutFrameChanges := False;
+-    end;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++  // The events onVirtualKeyboardWillHidden and onVirtualKeyboardWillShown
++  // are not reliable. For example, onVirtualKeyboardWillHidden is often not
++  // triggered when the user dismisses the keyboard by pressing the "return"
++  // key in the bottom-left corner. In rarer cases (though I have observed it),
++  // onVirtualKeyboardWillShown is also not triggered.  
++  // What does appear consistent is that onVirtualKeyboardFrameChanged is always
++  // called, and it provides valid VKRect values. Therefore, we base all our
++  // keyboard visibility handling exclusively on this event.
++
++  if FPreviousVKRect <> VKRect then begin
++    FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
++    FPreviousVKRect := VKRect;
++  end;
+ end;
+ 
+ procedure TKeyboardStateChangedListener.onVirtualKeyboardWillHidden;
+ begin
+-  FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
+-                                  (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++  //FNeedNotifyAboutFrameChanges := FNeedNotifyAboutFrameChanges or
++  //                                (TVirtualKeyboardState.Visible in FKeyboardService.VirtualKeyboardState);
++  
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311
++  // To synchronize our UI animation with the keyboard hide animation, we need
++  // to know precisely when the keyboard is about to be hidden so that we can
++  // start our animation at the same time.
++  var VKRect := TRect.Empty;
++  if FPreviousVKRect <> VKRect then begin
++    FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
++    FPreviousVKRect := VKRect;
++  end;
+ end;
+ 
+ end.

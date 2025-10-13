@@ -1,15 +1,18 @@
 program ALFmxGraphicsDemo;
 
-
-
 {$R 'Resources.res' 'Resources\Resources.rc'}
+
+{$I Alcinoe.inc}
 
 uses
   System.StartUpCopy,
-  FMX.Forms,
   {$IF defined(SKIA)}
   FMX.Skia,
   {$ENDIF}
+  {$IF defined(ALAppleOS) and defined(ALUseMetal)}
+  FMX.Context.Metal,
+  {$ENDIF}
+  FMX.Forms,
   FMX.Types,
   Main in 'Main.pas' {MainForm};
 
@@ -24,7 +27,7 @@ begin
   GlobalUseVulkan := False;
   {$ENDIF}
   {$ENDIF}
-  {$IF defined(ALUseMetal)}
+  {$IF defined(ALAppleOS) and defined(ALUseMetal)}
   if TCustomContextMetal.IsMetalSupported then
     GlobalUseMetal := True
   else

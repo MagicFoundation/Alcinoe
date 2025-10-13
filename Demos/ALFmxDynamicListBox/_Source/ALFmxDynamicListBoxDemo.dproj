@@ -5,11 +5,10 @@
     <FrameworkType>FMX</FrameworkType>
     <MainSource>ALFmxDynamicListBoxDemo.dpr</MainSource>
     <Base>True</Base>
-    <Config Condition="'$(Config)'==''">Debug</Config>
-    <Platform Condition="'$(Platform)'==''">Android64</Platform>
+    <Config Condition="'$(Config)'==''">Release</Config>
+    <Platform Condition="'$(Platform)'==''">OSXARM64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
-    <PlatformSDK Condition="'$(PlatformSDK)'=='' And '$(Platform)'=='Android64'">AndroidSDK26.1.1_64bit.sdk</PlatformSDK>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
     <Base>true</Base>
@@ -679,7 +678,7 @@
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base)'!=''">
-    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Florence\fmx;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
     <AUP_INTERNET>true</AUP_INTERNET>
@@ -703,17 +702,17 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;label=$(MSBuildProjectName);versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=True;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;label=$(MSBuildProjectName);versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=True;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <DCC_Define>ALSkiaAvailable;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_Android64)'!=''">
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;label=$(MSBuildProjectName);versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=True;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;label=$(MSBuildProjectName);versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=True;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_Android>true</Base_Android>
@@ -723,7 +722,7 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
@@ -742,7 +741,7 @@
     <iPad_SpotLight80>.\iOS\Icons\ipad_spotlight_search_icon_80x80.png</iPad_SpotLight80>
     <iPhone_Spotlight80>.\iOS\Icons\iphone_spotlight_search_icon_80x80.png</iPhone_Spotlight80>
     <BT_BuildType>Debug</BT_BuildType>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo</VerInfo_BundleId>
     <iPhone_Spotlight120>.\iOS\Icons\iphone_spotlight_search_icon_120x120.png</iPhone_Spotlight120>
     <iPad_AppIcon83_5>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png</iPad_AppIcon83_5>
@@ -760,13 +759,14 @@
     <iPhone_Setting58>.\iOS\Icons\iphone_setting_icon_58x58.png</iPhone_Setting58>
     <iPad_Notification40>.\iOS\Icons\ipad_notification_icon_40x40.png</iPad_Notification40>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
     <DCC_Define>ALSkiaAvailable;$(DCC_Define)</DCC_Define>
+    <DCC_iOSMinimumVersion>12.0</DCC_iOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_iOSSimARM64)'!=''">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
@@ -792,13 +792,13 @@
     <iPhone_Setting58>.\iOS\Icons\iphone_setting_icon_58x58.png</iPhone_Setting58>
     <iPad_Notification40>.\iOS\Icons\ipad_notification_icon_40x40.png</iPad_Notification40>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
     <DCC_Define>ALSkiaAvailable;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_OSX64)'!=''">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_OSX32>true</Base_OSX32>
@@ -810,12 +810,13 @@
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <DCC_Define>ALSkiaAvailable;$(DCC_Define)</DCC_Define>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
+    <DCC_macOSMinimumVersion>10.15</DCC_macOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_OSXARM64)'!=''">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_OSX32>true</Base_OSX32>
@@ -825,7 +826,7 @@
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <DCC_Define>ALSkiaAvailable;$(DCC_Define)</DCC_Define>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -834,15 +835,15 @@
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileVersion=2.0.89.89;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=2.0.89.89;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=2.0.93.93;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=2.0.93.93;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <UWP_DelphiLogo44>Windows\Icons\uwp_logo_44x44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>Windows\Icons\uwp_logo_150x150.png</UWP_DelphiLogo150>
     <DCC_Define>SKIA;$(DCC_Define)</DCC_Define>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -851,15 +852,15 @@
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileVersion=2.0.89.89;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=2.0.89.89;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=2.0.93.93;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=2.0.93.93;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <UWP_DelphiLogo44>Windows\Icons\uwp_logo_44x44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>Windows\Icons\uwp_logo_150x150.png</UWP_DelphiLogo150>
     <DCC_Define>SKIA;$(DCC_Define)</DCC_Define>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -875,10 +876,10 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_DebugInformation>1</DCC_DebugInformation>
     <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName);versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName);versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
     <Cfg_1_Android>true</Cfg_1_Android>
@@ -886,30 +887,30 @@
     <Cfg_1>true</Cfg_1>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_DebugInformation>1</DCC_DebugInformation>
-    <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath);C:\Dev\MagicFoundation\Alcinoe\Source\;C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Athens\fmx\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
-    <VerInfo_Build>89</VerInfo_Build>
+    <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath);C:\Dev\MagicFoundation\Alcinoe\Source\;C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Florence\fmx\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
+    <VerInfo_Build>93</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName);versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName);versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Athens\fmx\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
+    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Florence\fmx\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_iOSSimARM64)'!=''">
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
   </PropertyGroup>
@@ -920,8 +921,8 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -930,8 +931,8 @@
     <Cfg_1_OSX32>true</Cfg_1_OSX32>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -942,8 +943,8 @@
     <BT_BuildType>Debug</BT_BuildType>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -953,8 +954,8 @@
     <BT_BuildType>Debug</BT_BuildType>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -962,59 +963,59 @@
     <DCC_Define>DEBUG;SKIA</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1022,8 +1023,8 @@
   <PropertyGroup Condition="'$(Cfg_3_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1032,59 +1033,59 @@
     <DCC_Define>ALUseVulkan;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Vulkan;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Vulkan;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Vulkan;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Vulkan;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1092,8 +1093,8 @@
   <PropertyGroup Condition="'$(Cfg_4_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1102,59 +1103,59 @@
     <DCC_Define>ALUseMetal;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Metal;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Metal;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Metal;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Skia_Metal;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1162,8 +1163,8 @@
   <PropertyGroup Condition="'$(Cfg_5_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1172,59 +1173,59 @@
     <DCC_Define>DEBUG;ALSkiaEngine</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1232,8 +1233,8 @@
   <PropertyGroup Condition="'$(Cfg_6_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1242,59 +1243,59 @@
     <DCC_Define>ALUseVulkan;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1302,8 +1303,8 @@
   <PropertyGroup Condition="'$(Cfg_7_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1312,59 +1313,59 @@
     <DCC_Define>ALUseMetal;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1372,8 +1373,8 @@
   <PropertyGroup Condition="'$(Cfg_8_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1382,59 +1383,59 @@
     <DCC_Define>DEBUG;ALUseMetal;ALSkiaAvailable</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Metal;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Metal;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Metal;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_Metal;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_Win32)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1442,8 +1443,8 @@
   <PropertyGroup Condition="'$(Cfg_9_Win64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
@@ -1452,15 +1453,15 @@
     <DCC_Define>DEBUG;ALUseOpenGL;ALSkiaAvailable</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_10_Android)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_OpenGL;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_OpenGL;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_10_Android64)'!=''">
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_OpenGL;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;label=D$(MSBuildProjectName)_Debug_OpenGL;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
@@ -1468,8 +1469,8 @@
   <PropertyGroup Condition="'$(Cfg_10_iOSDevice64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
@@ -1478,8 +1479,8 @@
   <PropertyGroup Condition="'$(Cfg_10_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.89;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.93;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
@@ -1487,16 +1488,16 @@
   <PropertyGroup Condition="'$(Cfg_10_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_10_OSXARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.89;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.89;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Build>93</VerInfo_Build>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleVersion=2.0.93;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.93;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -1508,7 +1509,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -1517,21 +1518,21 @@
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
-    <VerInfo_Build>90</VerInfo_Build>
+    <VerInfo_Build>94</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <PF_AliasKey>alfmxdynamiclistboxdemo</PF_AliasKey>
     <DCC_GenerateAndroidAppBundleFile>true</DCC_GenerateAndroidAppBundleFile>
     <BT_BuildType>AppStore</BT_BuildType>
     <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;label=ALFmxDynamicListBoxDemo;versionCode=89;versionName=2.0.89;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;label=ALFmxDynamicListBoxDemo;versionCode=93;versionName=2.0.93;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=35</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo</VerInfo_BundleId>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
     <BT_BuildType>AppStore</BT_BuildType>
@@ -1541,7 +1542,7 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
   </PropertyGroup>
@@ -1551,7 +1552,7 @@
     <Cfg_2>true</Cfg_2>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -1560,7 +1561,7 @@
     <Cfg_2_OSX32>true</Cfg_2_OSX32>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>MacOS\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>MacOS\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -1570,8 +1571,8 @@
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -1581,8 +1582,8 @@
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
-    <VerInfo_Release>89</VerInfo_Release>
-    <VerInfo_Build>89</VerInfo_Build>
+    <VerInfo_Release>93</VerInfo_Release>
+    <VerInfo_Build>93</VerInfo_Build>
     <Icon_MainIcon>Windows\Icons\app.ico</Icon_MainIcon>
     <Icns_MainIcns>Windows\Icons\icon.icns</Icns_MainIcns>
   </PropertyGroup>
@@ -1766,8 +1767,8 @@
           <Source Name="MainSource">ALFmxDynamicListBoxDemo.dpr</Source>
         </Source>
         <Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k370.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dclofficexp370.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
       <Deployment Version="5">
@@ -22545,7 +22546,7 @@
     </BorlandProject>
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
-  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" />
-  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" />
-  <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')" />
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+  <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 </Project>

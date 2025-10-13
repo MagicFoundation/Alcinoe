@@ -22520,24 +22520,6 @@
       <RemoteDir>ALNotificationServiceDemo.app\.\</RemoteDir>
       <RemoteName>GoogleService-Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="IOS\PlugIns\NotificationService.appex\Info.plist">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="IOS\PlugIns\NotificationService.appex\NotificationService">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>NotificationService</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
@@ -22763,24 +22745,6 @@
       <RemoteCommand/>
       <RemoteDir>ALNotificationServiceDemo.app\.\</RemoteDir>
       <RemoteName>GoogleService-Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="IOS\PlugIns\NotificationService.appex\Info.plist">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="IOS\PlugIns\NotificationService.appex\NotificationService">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>NotificationService</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="'$(Platform)'=='iOSSimARM64'">
@@ -23019,24 +22983,6 @@
       <RemoteDir>ALNotificationServiceDemo.app\.\</RemoteDir>
       <RemoteName>GoogleService-Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="IOS\PlugIns\NotificationService.appex\Info.plist">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Debug'" Include="IOS\PlugIns\NotificationService.appex\NotificationService">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>NotificationService</RemoteName>
-    </DeployFile>
     <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
@@ -23262,24 +23208,6 @@
       <RemoteCommand/>
       <RemoteDir>ALNotificationServiceDemo.app\.\</RemoteDir>
       <RemoteName>GoogleService-Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="IOS\PlugIns\NotificationService.appex\Info.plist">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="'$(Config)'=='Release'" Include="IOS\PlugIns\NotificationService.appex\NotificationService">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo.app\PlugIns\NotificationService.appex\</RemoteDir>
-      <RemoteName>NotificationService</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ProjectExtensions>

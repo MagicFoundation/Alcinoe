@@ -10,7 +10,7 @@ uses
   {$IF defined(SKIA)}
   FMX.Skia,
   {$ENDIF }
-  {$IF defined(ALAppleOS)}
+  {$IF defined(ALAppleOS) and defined(ALUseMetal)}
   FMX.Context.Metal,
   {$ENDIF }
   FMX.Forms,
@@ -29,7 +29,7 @@ begin
   GlobalUseVulkan := False;
   {$ENDIF}
   {$ENDIF}
-  {$IF defined(ALUseMetal)}
+  {$IF defined(ALAppleOS) and defined(ALUseMetal)}
   if TCustomContextMetal.IsMetalSupported then
     GlobalUseMetal := True
   else

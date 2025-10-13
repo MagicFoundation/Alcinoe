@@ -481,7 +481,6 @@ type
     procedure PageViewAnimationProcess(Sender: TObject);
     {$IF defined(android)}
     procedure UpdateSystemBarsAppearance;
-    function ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
     {$ENDIF}
   public
     procedure InitializeNewForm; override;
@@ -537,15 +536,7 @@ begin
   TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular', 'Ma Shan Zheng');
 
   {$IF defined(android)}
-
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
-  {$ENDIF}
-  var LApplicationEventService: IFMXApplicationEventService;
-  if TPlatformServices.Current.SupportsPlatformService(IFMXApplicationEventService, IInterface(LApplicationEventService)) then
-    LApplicationEventService.SetApplicationEventHandler(ApplicationEventHandler);
   UpdateSystemBarsAppearance;
-
   {$ENDIF}
 
   inherited;
@@ -772,63 +763,46 @@ begin
   ALFreeAndNil(FCurrentTextElements);
 end;
 
-{*************************************}
-{$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
-{$ENDIF}
+{********************}
 {$IF defined(android)}
 procedure TMainForm.UpdateSystemBarsAppearance;
 begin
+  // https://stackoverflow.com/questions/64481841/android-api-level-30-setsystembarsappearance-doesnt-overwrite-theme-data
+  var LWindow := TAndroidHelper.Activity.getWindow;
+  var LDecorView := LWindow.getDecorView;
+  LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
+  LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
+  if TALStyleManager.Instance.IsDarkMode then begin
+    LDecorView.setSystemUiVisibility(
+      LDecorView.getSystemUiVisibility and
+      (not TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) and
+      (not TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));
+  end
+  else begin
+    LDecorView.setSystemUiVisibility(
+      LDecorView.getSystemUiVisibility or
+      TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+      TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+  end;
+
   if TOSVersion.Check(11{API level 30}) then begin
-    var LWindow := TAndroidHelper.Activity.getWindow;
-    LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
-    LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
     var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
     if LInsetsController <> nil then begin
       if TALStyleManager.Instance.IsDarkMode then begin
         LInsetsController.setSystemBarsAppearance(
-          0,
+          0, // appearance: Integer
           TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);  // mask: Integer
       end
       else begin
         LInsetsController.setSystemBarsAppearance(
           TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS,
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS, // appearance: Integer
           TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);
+          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS); // mask: Integer
       end;
     end;
-  end
-  else begin
-    TThread.ForceQueue(nil,
-      procedure
-      begin
-        var LWindow := TAndroidHelper.Activity.getWindow;
-        LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
-        LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
-        if TALStyleManager.Instance.IsDarkMode then begin
-          LWindow.getDecorView.setSystemUiVisibility(0);
-        end
-        else begin
-          LWindow.getDecorView.setSystemUiVisibility(
-            TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-            TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-        end;
-      end, 500);
   end;
-end;
-{$ENDIF}
-
-{*************************************}
-{$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3207 has been resolved. If resolved, remove the code below.'}
-{$ENDIF}
-{$IF defined(android)}
-function TMainForm.ApplicationEventHandler(AAppEvent: TApplicationEvent; AContext: TObject): Boolean;
-begin
-  if AAppEvent = TApplicationEvent.BecameActive then UpdateSystemBarsAppearance;
-  Result := True;
 end;
 {$ENDIF}
 

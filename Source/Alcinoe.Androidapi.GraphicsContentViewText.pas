@@ -17,8 +17,6 @@ type
   JALBroadcastReceiver = interface;
   JSoundEffectConstants = interface;
   JALBitmap = interface;
-  JALRecordingCanvas = interface;
-  JALMotionEvent = interface;
 
   {*******************************************************}
   JALBroadcastReceiverListenerClass = interface(IJavaClass)
@@ -72,7 +70,7 @@ type
   TJSoundEffectConstants = class(TJavaGenericImport<JSoundEffectConstantsClass, JSoundEffectConstants>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-44100 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALBitmapClass = interface(JBitmapClass)
@@ -86,38 +84,6 @@ type
   end;
   TJALBitmap = class(TJavaGenericImport<JALBitmapClass, JALBitmap>) end; //https://quality.embarcadero.com/browse/RSP-44100
 
-  {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-44102 has been resolved. If resolved, remove the class definition below.'}
-  {$ENDIF}
-  JALRecordingCanvasClass = interface(JRecordingCanvasClass)
-    ['{BA2A5ADF-60C8-4E8F-A73B-766400D4AAB5}']
-  end;
-  [JavaSignature('android/graphics/RecordingCanvas')]
-  JALRecordingCanvas = interface(JRecordingCanvas)
-    ['{F8DABC57-5411-4383-8AA8-22EF9654DC67}']
-    procedure drawBitmap(bitmap: JBitmap; matrix: JMatrix; paint: JPaint); cdecl; overload; //https://quality.embarcadero.com/browse/RSP-44102
-    procedure drawBitmap(bitmap: JBitmap; src: JRect; dst: JRect; paint: JPaint); cdecl; overload; //https://quality.embarcadero.com/browse/RSP-44102
-    procedure drawBitmap(bitmap: JBitmap; left: Single; top: Single; paint: JPaint); cdecl; overload; //https://quality.embarcadero.com/browse/RSP-44102
-    procedure drawBitmap(bitmap: JBitmap; src: JRect; dst: JRectF; paint: JPaint); cdecl; overload; //https://quality.embarcadero.com/browse/RSP-44102
-  end;
-  TJALRecordingCanvas = class(TJavaGenericImport<JALRecordingCanvasClass, JALRecordingCanvas>) end;
-
-  {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2992 has been resolved. If resolved, remove the class definition below.'}
-  {$ENDIF}
-  JALMotionEventClass = interface(JMotionEventClass)
-    ['{6002774D-239C-4679-8B78-647D04075ADB}']
-  end;
-  [JavaSignature('android/view/MotionEvent')]
-  JALMotionEvent = interface(JMotionEvent)
-    ['{B29E8CD6-C05B-4A72-B377-8D51A70813CF}']
-    function getEventTimeNanos: Int64; cdecl;
-    function getHistoricalEventTimeNanos(pos: Integer): Int64; cdecl;
-  end;
-  TJALMotionEvent = class(TJavaGenericImport<JALMotionEventClass, JALMotionEvent>) end;
-
 implementation
 
 uses
@@ -130,8 +96,6 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.GraphicsContentViewText.JALBroadcastReceiver', TypeInfo(Alcinoe.AndroidApi.GraphicsContentViewText.JALBroadcastReceiver));
   TRegTypes.RegisterType('Alcinoe.Androidapi.GraphicsContentViewText.JSoundEffectConstants', TypeInfo(Alcinoe.Androidapi.GraphicsContentViewText.JSoundEffectConstants));
   TRegTypes.RegisterType('Alcinoe.Androidapi.GraphicsContentViewText.JALBitmap', TypeInfo(Alcinoe.Androidapi.GraphicsContentViewText.JALBitmap));
-  TRegTypes.RegisterType('Alcinoe.Androidapi.GraphicsContentViewText.JALRecordingCanvas', TypeInfo(Alcinoe.Androidapi.GraphicsContentViewText.JALRecordingCanvas));
-  TRegTypes.RegisterType('Alcinoe.Androidapi.GraphicsContentViewText.JALMotionEvent', TypeInfo(Alcinoe.Androidapi.GraphicsContentViewText.JALMotionEvent));
 end;
 
 initialization

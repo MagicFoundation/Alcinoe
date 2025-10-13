@@ -39,13 +39,13 @@ type
   TJUiModeManager = class(TJavaGenericImport<JUiModeManagerClass, JUiModeManager>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationClass = interface(JNotificationClass)
     ['{D0C93C68-19D5-4CB6-997B-19EC96149450}']
-    {class} function _GetAUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes; cdecl; // https://quality.embarcadero.com/browse/RSP-39511
-    {class} property AUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes read _GetAUDIO_ATTRIBUTES_DEFAULT; // https://quality.embarcadero.com/browse/RSP-39511
+    {class} function _GetAUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes; cdecl; // https://quality.embarcadero.com/browse/RSP-21296
+    {class} property AUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes read _GetAUDIO_ATTRIBUTES_DEFAULT; // https://quality.embarcadero.com/browse/RSP-21296
   end;
   [JavaSignature('android/app/Notification')]
   JALNotification = interface(JNotification)
@@ -54,7 +54,7 @@ type
   TJALNotification = class(TJavaGenericImport<JALNotificationClass, JALNotification>) end;
 
   {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-21296 has been resolved. If resolved, remove the class definition below.'}
   {$ENDIF}
   JALNotificationChannelClass = interface(JNotificationChannelClass)
@@ -63,7 +63,7 @@ type
   [JavaSignature('android/app/NotificationChannel')]
   JALNotificationChannel = interface(JNotificationChannel)
     ['{5338DB86-8DE1-41ED-9455-1234D9274A5C}']
-    procedure setSound(sound: Jnet_Uri; audioAttributes: JAudioAttributes); cdecl; // https://quality.embarcadero.com/browse/RSP-39511
+    procedure setSound(sound: Jnet_Uri; audioAttributes: JAudioAttributes); cdecl; // https://quality.embarcadero.com/browse/RSP-21296
   end;
   TJALNotificationChannel = class(TJavaGenericImport<JALNotificationChannelClass, JALNotificationChannel>) end;
 

@@ -457,7 +457,7 @@ type
   TALPointDType = array [0..1] of Double;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALPointD = ^TALPointD;
@@ -533,7 +533,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALSizeD = ^TALSizeD;
@@ -549,6 +549,9 @@ type
     class operator NotEqual(const Lhs, Rhs: TALSizeD): Boolean;
     class operator Add(const Lhs, Rhs: TALSizeD): TALSizeD;
     class operator Subtract(const Lhs, Rhs: TALSizeD): TALSizeD;
+
+    /// <summary> Zero size having values of (0, 0). </summary>
+    class function Zero: TALSizeD; inline; static;
 
     class operator Implicit(const Size: TALSizeD): TALPointD;
     class operator Implicit(const Point: TALPointD): TALSizeD;
@@ -573,7 +576,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported123}
+  {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$ENDIF}
   PALRectD = ^TALRectD;
@@ -723,7 +726,7 @@ type
   end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
 {$ENDIF}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
@@ -857,7 +860,7 @@ function ALIsValidLatlng(const ALatitude, ALongitude: Double): Boolean;
 function ALGetDistanceBetween2Points(const ALatitude1, ALongitude1, ALatitude2, ALongitude2: Double): Double{meters};
 
 {$IFDEF MSWINDOWS}
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
 {$ENDIF}
 {$WARNINGS OFF}
@@ -2381,7 +2384,7 @@ end;
 {*************************************************************}
 function TALPointD.Reflect(const APoint: TALPointD): TALPointD;
 begin
-  Result := Self + APoint * (-2 * Self.DotProduct(APoint));
+  Result := -Self + APoint * (2 * Self.DotProduct(APoint) / APoint.DotProduct(APoint));
 end;
 
 {**************************************************************}
@@ -3013,6 +3016,13 @@ function TALSizeD.Truncate: TSize;
 begin
   Result.cx := Trunc(cx);
   Result.cy := Trunc(cy);
+end;
+
+{*************************************}
+class function TALSizeD.Zero: TALSizeD;
+begin
+  Result.cx := 0;
+  Result.cy := 0;
 end;
 
 {************************************************************}
@@ -3698,10 +3708,8 @@ begin
                 LSystemTime.wMinute,
                 LSystemTime.wSecond,
                 LSystemTime.wMilliseconds)
-  else begin
-    result := 0; // to hide a warning
+  else
     RaiseLastOsError;
-  end;
 end;
 {$ENDIF}
 
@@ -3774,10 +3782,8 @@ begin
                 LLocalTime.wMinute,
                 LLocalTime.wSecond,
                 LLocalTime.wMilliseconds)
-  else begin
-    result := 0; // to hide a warning
+  else
     RaiseLastOsError;
-  end;
 end;
 {$ENDIF}
 

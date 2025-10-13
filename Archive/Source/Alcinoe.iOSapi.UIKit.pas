@@ -88,20 +88,6 @@ type
   end;
   TALUIView = class(TOCGenericImport<ALUIViewClass, ALUIView>)  end;
 
-  {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3535 has been resolved. If resolved, remove the class definition below.'}
-  {$ENDIF}
-  ALUIApplicationClass = interface(UIApplicationClass)
-    ['{D18E722E-2B09-4524-954C-7A7DFC2203DA}']
-  end;
-  ALUIApplication = interface(UIApplication)
-    ['{7BD10B79-422D-47BE-AC59-733E89C51680}']
-    [MethodName('openURL:options:completionHandler:')]
-    procedure openURLOptionsCompletionHandler(url: NSURL; options: NSDictionary; completionHandler: TUIKitCompletion); cdecl;
-  end;
-  TALUIApplication = class(TOCGenericImport<ALUIApplicationClass, ALUIApplication>)  end;
-
 implementation
 
 end.

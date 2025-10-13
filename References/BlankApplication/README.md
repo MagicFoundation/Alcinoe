@@ -8,6 +8,11 @@ Check DProjNormalizer/DeployProjNormalizer
     Project1.deployproj.normalize.bat
 * Make a new multi platform blank application (Name it Project1)
 * Enable SKIA on Project1
+* Building > Delphi compiler > Compiling
+    Android 64 bit > Release
+      Generate Android 32-bit and 64 bit binaries (armeabi-v7a + arm64-v8a): TRUE
+    MacOS ARM > release
+      Generate macos universal binary file (x86_64 + arm64): TRUE
 * Save Project1  
 * Build each plateform in debug (ctrl+f9)
 * Build each plateform in release (ctrl+f9)
@@ -36,14 +41,28 @@ Check DProjNormalizer/DeployProjNormalizer
   NOTE: If you see some missing nodes, try to deploy again 
   in configuration of the missing nodes and compare again.
   You can ignore the node:
-    <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Linux64&#39;"/>
-    <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64x&#39;"/>
-    <PropertyGroup>
-      <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">2B011FDH200DHE</DeviceId>
-      <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">2B011FDH200DHE</DeviceId>
-      <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;"/>
-      <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">BFD2217C-51A5-4855-BA03-B430731C177E</DeviceId>
-    </PropertyGroup>
+    * This node appear when deploying for the Application store only
+      <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\libProject1.so">
+        <DeployClass>ProjectOutput_Android32</DeployClass>
+        <LocalCommand/>
+        <Operation>1</Operation>
+        <Overwrite>True</Overwrite>
+        <RemoteCommand/>
+        <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
+        <RemoteName>libProject1.so</RemoteName>
+      </DeployFile>    
+    * <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Linux64&#39;"/>
+    * <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64x&#39;"/>
+    * <PropertyGroup>
+        <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">2B011FDH200DHE</DeviceId>
+        <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">2B011FDH200DHE</DeviceId>
+        <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;"/>
+        <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">BFD2217C-51A5-4855-BA03-B430731C177E</DeviceId>
+      </PropertyGroup>
+    * This node appear when deploying for the Application store only
+      <PropertyGroup>
+        <OSX64_OutputDir Condition="'$(Platform)'=='OSXARM64'">OSX64\Release\</OSX64_OutputDir>
+      </PropertyGroup>
 * rename Project1.deployproj.bak in Project1.deployproj.bak.tmp
 * Run Project1.dproj.normalize.bat
 * Study the diffs between Project1.dproj and the previous commited version

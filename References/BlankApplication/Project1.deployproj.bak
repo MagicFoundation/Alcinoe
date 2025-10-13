@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+  <Import Condition="Exists('$(BDS)\bin\CodeGear.Deployment.targets')" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
+  <ItemGroup Condition="'$(Platform)'=='Android'">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -10,7 +10,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_background.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
       <DeployClass>Android_AdaptiveIconForeground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -19,7 +19,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_foreground.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
       <DeployClass>Android_AdaptiveIconMonochrome</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -28,7 +28,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_monochrome.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -37,7 +37,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
       <DeployClass>Android_LauncherIcon192</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -46,7 +46,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
       <DeployClass>Android_LauncherIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -55,7 +55,7 @@
       <RemoteDir>Project1\res\drawable-ldpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
       <DeployClass>Android_LauncherIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -64,7 +64,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
       <DeployClass>Android_LauncherIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -73,7 +73,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
       <DeployClass>Android_LauncherIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -82,7 +82,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
       <DeployClass>Android_NotificationIcon24</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -91,7 +91,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
       <DeployClass>Android_NotificationIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -100,7 +100,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
       <DeployClass>Android_NotificationIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -109,7 +109,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
       <DeployClass>Android_NotificationIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -118,7 +118,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
       <DeployClass>Android_NotificationIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -127,7 +127,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
       <DeployClass>Android_SplashImage426</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -136,7 +136,7 @@
       <RemoteDir>Project1\res\drawable-small\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
       <DeployClass>Android_SplashImage470</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -145,7 +145,7 @@
       <RemoteDir>Project1\res\drawable-normal\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
       <DeployClass>Android_SplashImage640</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -154,7 +154,7 @@
       <RemoteDir>Project1\res\drawable-large\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
       <DeployClass>Android_SplashImage960</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -163,7 +163,7 @@
       <RemoteDir>Project1\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
       <DeployClass>Android_VectorizedNotificationIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -172,7 +172,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v24\</RemoteDir>
       <RemoteName>ic_notification.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
       <DeployClass>Android_VectorizedSplash</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -181,7 +181,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
       <DeployClass>Android_VectorizedSplashDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -190,7 +190,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v21\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
       <DeployClass>Android_VectorizedSplashV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -199,7 +199,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
       <DeployClass>Android_VectorizedSplashV31Dark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -208,7 +208,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
       <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -217,7 +217,7 @@
       <RemoteDir>Project1\library\lib\armeabi\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
       <DeployClass>AndroidLibnativeMipsFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -226,7 +226,7 @@
       <RemoteDir>Project1\library\lib\mips\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\AndroidManifest.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -235,7 +235,7 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\colors-night-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -244,7 +244,7 @@
       <RemoteDir>Project1\res\values-night-v21\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\colors.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\colors.xml">
       <DeployClass>Android_Colors</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -253,7 +253,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\ic_launcher-v33.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\ic_launcher-v33.xml">
       <DeployClass>Android_AdaptiveIconV33</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -262,7 +262,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v33\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\ic_launcher.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\ic_launcher.xml">
       <DeployClass>Android_AdaptiveIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -271,7 +271,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v26\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\libProject1.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\libProject1.so">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -281,7 +281,7 @@
       <RemoteName>libProject1.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\splash_image_def-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\splash_image_def-v21.xml">
       <DeployClass>AndroidSplashImageDefV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -290,7 +290,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v21\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\splash_image_def.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\splash_image_def.xml">
       <DeployClass>AndroidSplashImageDef</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -299,7 +299,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\strings.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\strings.xml">
       <DeployClass>Android_Strings</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -308,7 +308,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>strings.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\styles-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\styles-v21.xml">
       <DeployClass>AndroidSplashStylesV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -317,7 +317,7 @@
       <RemoteDir>Project1\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\styles-v31.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\styles-v31.xml">
       <DeployClass>AndroidSplashStylesV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -326,7 +326,7 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\styles-v35.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\styles-v35.xml">
       <DeployClass>AndroidSplashStylesV35</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -335,7 +335,7 @@
       <RemoteDir>Project1\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\styles.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android\Debug\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -344,7 +344,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -353,7 +353,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_background.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
       <DeployClass>Android_AdaptiveIconForeground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -362,7 +362,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_foreground.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
       <DeployClass>Android_AdaptiveIconMonochrome</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -371,7 +371,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_monochrome.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -380,7 +380,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
       <DeployClass>Android_LauncherIcon192</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -389,7 +389,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
       <DeployClass>Android_LauncherIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -398,7 +398,7 @@
       <RemoteDir>Project1\res\drawable-ldpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
       <DeployClass>Android_LauncherIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -407,7 +407,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
       <DeployClass>Android_LauncherIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -416,7 +416,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
       <DeployClass>Android_LauncherIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -425,7 +425,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
       <DeployClass>Android_NotificationIcon24</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -434,7 +434,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
       <DeployClass>Android_NotificationIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -443,7 +443,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
       <DeployClass>Android_NotificationIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -452,7 +452,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
       <DeployClass>Android_NotificationIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -461,7 +461,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
       <DeployClass>Android_NotificationIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -470,7 +470,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
       <DeployClass>Android_SplashImage426</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -479,7 +479,7 @@
       <RemoteDir>Project1\res\drawable-small\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
       <DeployClass>Android_SplashImage470</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -488,7 +488,7 @@
       <RemoteDir>Project1\res\drawable-normal\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
       <DeployClass>Android_SplashImage640</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -497,7 +497,7 @@
       <RemoteDir>Project1\res\drawable-large\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
       <DeployClass>Android_SplashImage960</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -506,7 +506,7 @@
       <RemoteDir>Project1\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
       <DeployClass>Android_VectorizedNotificationIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -515,7 +515,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v24\</RemoteDir>
       <RemoteName>ic_notification.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
       <DeployClass>Android_VectorizedSplash</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -524,7 +524,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
       <DeployClass>Android_VectorizedSplashDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -533,7 +533,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v21\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
       <DeployClass>Android_VectorizedSplashV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -542,7 +542,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
       <DeployClass>Android_VectorizedSplashV31Dark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -551,7 +551,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
       <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -560,7 +560,7 @@
       <RemoteDir>Project1\library\lib\armeabi\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
       <DeployClass>AndroidLibnativeMipsFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -569,7 +569,7 @@
       <RemoteDir>Project1\library\lib\mips\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\AndroidManifest.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -578,7 +578,7 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\colors-night-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -587,7 +587,7 @@
       <RemoteDir>Project1\res\values-night-v21\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\colors.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\colors.xml">
       <DeployClass>Android_Colors</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -596,7 +596,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\ic_launcher-v33.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\ic_launcher-v33.xml">
       <DeployClass>Android_AdaptiveIconV33</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -605,7 +605,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v33\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\ic_launcher.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\ic_launcher.xml">
       <DeployClass>Android_AdaptiveIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -614,7 +614,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v26\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\libProject1.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\libProject1.so">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -624,7 +624,7 @@
       <RemoteName>libProject1.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\splash_image_def-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\splash_image_def-v21.xml">
       <DeployClass>AndroidSplashImageDefV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -633,7 +633,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v21\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\splash_image_def.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\splash_image_def.xml">
       <DeployClass>AndroidSplashImageDef</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -642,7 +642,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\strings.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\strings.xml">
       <DeployClass>Android_Strings</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -651,7 +651,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>strings.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\styles-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\styles-v21.xml">
       <DeployClass>AndroidSplashStylesV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -660,7 +660,7 @@
       <RemoteDir>Project1\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\styles-v31.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\styles-v31.xml">
       <DeployClass>AndroidSplashStylesV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -669,7 +669,7 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\styles-v35.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\styles-v35.xml">
       <DeployClass>AndroidSplashStylesV35</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -678,7 +678,7 @@
       <RemoteDir>Project1\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\styles.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android\Release\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -688,8 +688,8 @@
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+  <ItemGroup Condition="'$(Platform)'=='Android64'">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -698,7 +698,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_background.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
       <DeployClass>Android_AdaptiveIconForeground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -707,7 +707,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_foreground.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
       <DeployClass>Android_AdaptiveIconMonochrome</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -716,7 +716,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_monochrome.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -725,7 +725,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
       <DeployClass>Android_LauncherIcon192</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -734,7 +734,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
       <DeployClass>Android_LauncherIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -743,7 +743,7 @@
       <RemoteDir>Project1\res\drawable-ldpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
       <DeployClass>Android_LauncherIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -752,7 +752,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
       <DeployClass>Android_LauncherIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -761,7 +761,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
       <DeployClass>Android_LauncherIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -770,7 +770,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
       <DeployClass>Android_NotificationIcon24</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -779,7 +779,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
       <DeployClass>Android_NotificationIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -788,7 +788,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
       <DeployClass>Android_NotificationIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -797,7 +797,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
       <DeployClass>Android_NotificationIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -806,7 +806,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
       <DeployClass>Android_NotificationIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -815,7 +815,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
       <DeployClass>Android_SplashImage426</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -824,7 +824,7 @@
       <RemoteDir>Project1\res\drawable-small\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
       <DeployClass>Android_SplashImage470</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -833,7 +833,7 @@
       <RemoteDir>Project1\res\drawable-normal\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
       <DeployClass>Android_SplashImage640</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -842,7 +842,7 @@
       <RemoteDir>Project1\res\drawable-large\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
       <DeployClass>Android_SplashImage960</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -851,7 +851,7 @@
       <RemoteDir>Project1\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
       <DeployClass>Android_VectorizedNotificationIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -860,7 +860,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v24\</RemoteDir>
       <RemoteName>ic_notification.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
       <DeployClass>Android_VectorizedSplash</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -869,7 +869,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
       <DeployClass>Android_VectorizedSplashDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -878,7 +878,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v21\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
       <DeployClass>Android_VectorizedSplashV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -887,7 +887,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
       <DeployClass>Android_VectorizedSplashV31Dark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -896,7 +896,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
       <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -905,7 +905,7 @@
       <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
       <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -914,7 +914,7 @@
       <RemoteDir>Project1\library\lib\armeabi\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
       <DeployClass>AndroidLibnativeMipsFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -923,7 +923,7 @@
       <RemoteDir>Project1\library\lib\mips\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\AndroidManifest.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -932,7 +932,7 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\colors-night-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -941,7 +941,7 @@
       <RemoteDir>Project1\res\values-night-v21\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\colors.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\colors.xml">
       <DeployClass>Android_Colors</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -950,7 +950,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\ic_launcher-v33.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\ic_launcher-v33.xml">
       <DeployClass>Android_AdaptiveIconV33</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -959,7 +959,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v33\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\ic_launcher.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\ic_launcher.xml">
       <DeployClass>Android_AdaptiveIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -968,7 +968,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v26\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\libProject1.so">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\libProject1.so">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -978,7 +978,7 @@
       <RemoteName>libProject1.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\splash_image_def-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\splash_image_def-v21.xml">
       <DeployClass>AndroidSplashImageDefV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -987,7 +987,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v21\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\splash_image_def.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\splash_image_def.xml">
       <DeployClass>AndroidSplashImageDef</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -996,7 +996,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\strings.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\strings.xml">
       <DeployClass>Android_Strings</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1005,7 +1005,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>strings.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\styles-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\styles-v21.xml">
       <DeployClass>AndroidSplashStylesV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1014,7 +1014,7 @@
       <RemoteDir>Project1\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\styles-v31.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\styles-v31.xml">
       <DeployClass>AndroidSplashStylesV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1023,7 +1023,7 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\styles-v35.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\styles-v35.xml">
       <DeployClass>AndroidSplashStylesV35</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1032,7 +1032,7 @@
       <RemoteDir>Project1\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\styles.xml">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Android64\Debug\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1041,7 +1041,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1050,7 +1050,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_background.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
       <DeployClass>Android_AdaptiveIconForeground</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1059,7 +1059,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_foreground.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
       <DeployClass>Android_AdaptiveIconMonochrome</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1068,7 +1068,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>ic_launcher_monochrome.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1077,7 +1077,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
       <DeployClass>Android_LauncherIcon192</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1086,7 +1086,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
       <DeployClass>Android_LauncherIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1095,7 +1095,7 @@
       <RemoteDir>Project1\res\drawable-ldpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
       <DeployClass>Android_LauncherIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1104,7 +1104,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
       <DeployClass>Android_LauncherIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1113,7 +1113,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
       <DeployClass>Android_LauncherIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1122,7 +1122,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
       <DeployClass>Android_NotificationIcon24</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1131,7 +1131,7 @@
       <RemoteDir>Project1\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
       <DeployClass>Android_NotificationIcon36</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1140,7 +1140,7 @@
       <RemoteDir>Project1\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
       <DeployClass>Android_NotificationIcon48</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1149,7 +1149,7 @@
       <RemoteDir>Project1\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
       <DeployClass>Android_NotificationIcon72</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1158,7 +1158,7 @@
       <RemoteDir>Project1\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
       <DeployClass>Android_NotificationIcon96</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1167,7 +1167,7 @@
       <RemoteDir>Project1\res\drawable-xxxhdpi\</RemoteDir>
       <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
       <DeployClass>Android_SplashImage426</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1176,7 +1176,7 @@
       <RemoteDir>Project1\res\drawable-small\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
       <DeployClass>Android_SplashImage470</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1185,7 +1185,7 @@
       <RemoteDir>Project1\res\drawable-normal\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
       <DeployClass>Android_SplashImage640</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1194,7 +1194,7 @@
       <RemoteDir>Project1\res\drawable-large\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
       <DeployClass>Android_SplashImage960</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1203,7 +1203,7 @@
       <RemoteDir>Project1\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
       <DeployClass>Android_VectorizedNotificationIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1212,7 +1212,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v24\</RemoteDir>
       <RemoteName>ic_notification.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
       <DeployClass>Android_VectorizedSplash</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1221,7 +1221,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
       <DeployClass>Android_VectorizedSplashDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1230,7 +1230,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v21\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
       <DeployClass>Android_VectorizedSplashV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1239,7 +1239,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
       <DeployClass>Android_VectorizedSplashV31Dark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1248,7 +1248,7 @@
       <RemoteDir>Project1\res\drawable-night-anydpi-v31\</RemoteDir>
       <RemoteName>splash_vector.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
       <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1257,7 +1257,7 @@
       <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
       <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1266,7 +1266,7 @@
       <RemoteDir>Project1\library\lib\armeabi\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
       <DeployClass>AndroidLibnativeMipsFile</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1275,7 +1275,7 @@
       <RemoteDir>Project1\library\lib\mips\</RemoteDir>
       <RemoteName>libProject1.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\AndroidManifest.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1284,7 +1284,7 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\colors-night-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1293,7 +1293,7 @@
       <RemoteDir>Project1\res\values-night-v21\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\colors.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\colors.xml">
       <DeployClass>Android_Colors</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1302,7 +1302,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>colors.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\ic_launcher-v33.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\ic_launcher-v33.xml">
       <DeployClass>Android_AdaptiveIconV33</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1311,7 +1311,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v33\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\ic_launcher.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\ic_launcher.xml">
       <DeployClass>Android_AdaptiveIcon</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1320,7 +1320,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v26\</RemoteDir>
       <RemoteName>ic_launcher.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\libProject1.so">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\libProject1.so">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1330,7 +1330,7 @@
       <RemoteName>libProject1.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\splash_image_def-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\splash_image_def-v21.xml">
       <DeployClass>AndroidSplashImageDefV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1339,7 +1339,7 @@
       <RemoteDir>Project1\res\drawable-anydpi-v21\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\splash_image_def.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\splash_image_def.xml">
       <DeployClass>AndroidSplashImageDef</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1348,7 +1348,7 @@
       <RemoteDir>Project1\res\drawable\</RemoteDir>
       <RemoteName>splash_image_def.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\strings.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\strings.xml">
       <DeployClass>Android_Strings</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1357,7 +1357,7 @@
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>strings.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\styles-v21.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\styles-v21.xml">
       <DeployClass>AndroidSplashStylesV21</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1366,7 +1366,7 @@
       <RemoteDir>Project1\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\styles-v31.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\styles-v31.xml">
       <DeployClass>AndroidSplashStylesV31</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1375,7 +1375,7 @@
       <RemoteDir>Project1\res\values-v31\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\styles-v35.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\styles-v35.xml">
       <DeployClass>AndroidSplashStylesV35</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1384,7 +1384,7 @@
       <RemoteDir>Project1\res\values-v35\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\styles.xml">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="Android64\Release\styles.xml">
       <DeployClass>AndroidSplashStyles</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1394,9 +1394,9 @@
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Linux64&#39;"/>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+  <ItemGroup Condition="'$(Platform)'=='Linux64'"/>
+  <ItemGroup Condition="'$(Platform)'=='OSX64'">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1405,7 +1405,7 @@
       <RemoteDir>Project1.app\Contents\Resources\</RemoteDir>
       <RemoteName>Project1.icns</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSX64\Debug\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1415,7 +1415,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.dSYM">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSX64\Debug\Project1.dSYM">
       <DeployClass>ProjectOSXDebug</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1424,7 +1424,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
       <RemoteName>Project1</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSX64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1433,7 +1433,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSX64\Debug\Project1.info.plist">
       <DeployClass>ProjectOSXInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1442,7 +1442,7 @@
       <RemoteDir>Project1.app\Contents\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1451,7 +1451,7 @@
       <RemoteDir>Project1.app\Contents\Resources\</RemoteDir>
       <RemoteName>Project1.icns</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="OSX64\Release\Project1">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="OSX64\Release\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1461,7 +1461,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="OSX64\Release\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="OSX64\Release\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1470,7 +1470,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="OSX64\Release\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="OSX64\Release\Project1.info.plist">
       <DeployClass>ProjectOSXInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1480,8 +1480,8 @@
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+  <ItemGroup Condition="'$(Platform)'=='OSXARM64'">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1490,7 +1490,7 @@
       <RemoteDir>Project1.app\Contents\Resources\</RemoteDir>
       <RemoteName>Project1.icns</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSXARM64\Debug\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1500,7 +1500,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.dSYM">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSXARM64\Debug\Project1.dSYM">
       <DeployClass>ProjectOSXDebug</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1509,7 +1509,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
       <RemoteName>Project1</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSXARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1518,7 +1518,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="OSXARM64\Debug\Project1.info.plist">
       <DeployClass>ProjectOSXInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1527,7 +1527,7 @@
       <RemoteDir>Project1.app\Contents\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1536,7 +1536,7 @@
       <RemoteDir>Project1.app\Contents\Resources\</RemoteDir>
       <RemoteName>Project1.icns</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="OSXARM64\Release\Project1">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="OSXARM64\Release\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1546,7 +1546,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="OSXARM64\Release\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="OSXARM64\Release\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1555,7 +1555,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="OSXARM64\Release\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="OSXARM64\Release\Project1.info.plist">
       <DeployClass>ProjectOSXInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1565,8 +1565,8 @@
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
+  <ItemGroup Condition="'$(Platform)'=='Win32'">
+    <DeployFile Condition="'$(Config)'=='Debug' And '$(SKIADIR)'!=''" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
       <DeployClass>Skia</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
@@ -1576,7 +1576,7 @@
       <RemoteName>sk4d.dll</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin\sk4d.dll">
+    <DeployFile Condition="'$(Config)'=='Debug' And '$(SKIADIR)'==''" Include="$(BDS)\bin\sk4d.dll">
       <DeployClass>Skia</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
@@ -1586,7 +1586,7 @@
       <RemoteName>sk4d.dll</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Win32\Debug\Project1.exe">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="Win32\Debug\Project1.exe">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
@@ -1596,7 +1596,7 @@
       <RemoteName>Project1.exe</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
+    <DeployFile Condition="'$(Config)'=='Release' And '$(SKIADIR)'!=''" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
       <DeployClass>Skia</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
@@ -1606,49 +1606,7 @@
       <RemoteName>sk4d.dll</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-  </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin64\sk4d.dll">
+    <DeployFile Condition="'$(Config)'=='Release' And '$(SKIADIR)'==''" Include="$(BDS)\bin\sk4d.dll">
       <DeployClass>Skia</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
@@ -1659,9 +1617,51 @@
       <Required>True</Required>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64x&#39;"/>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+  <ItemGroup Condition="'$(Platform)'=='Win64'">
+    <DeployFile Condition="'$(Config)'=='Debug' And '$(SKIADIR)'!=''" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="'$(Config)'=='Debug' And '$(SKIADIR)'==''" Include="$(BDS)\bin64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="'$(Config)'=='Release' And '$(SKIADIR)'!=''" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="'$(Config)'=='Release' And '$(SKIADIR)'==''" Include="$(BDS)\bin64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>Project1\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)'=='Win64x'"/>
+  <ItemGroup Condition="'$(Platform)'=='iOSDevice64'">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1670,7 +1670,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
       <DeployClass>iPad_AppIcon167</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1679,7 +1679,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1688,7 +1688,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
       <DeployClass>iPad_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1697,7 +1697,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
       <DeployClass>iPad_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1706,7 +1706,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
       <DeployClass>iPad_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1715,7 +1715,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPad_SpotLight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1724,7 +1724,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
       <DeployClass>iOS_AppStore1024</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1733,7 +1733,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1742,7 +1742,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
       <DeployClass>iPhone_AppIcon180</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1751,7 +1751,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
       <DeployClass>iPhone_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1760,7 +1760,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1769,7 +1769,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
       <DeployClass>iPhone_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1778,7 +1778,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1787,7 +1787,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
       <DeployClass>iPhone_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1796,7 +1796,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
       <DeployClass>iPhone_Notification60</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1805,7 +1805,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
       <DeployClass>iPhone_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1814,7 +1814,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
       <DeployClass>iPhone_Setting87</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1823,7 +1823,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
       <DeployClass>iPhone_Spotlight120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1832,7 +1832,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPhone_Spotlight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1841,7 +1841,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSDevice64\Debug\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1851,7 +1851,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.dSYM">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSDevice64\Debug\Project1.dSYM">
       <DeployClass>ProjectiOSDeviceDebug</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1860,7 +1860,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
       <RemoteName>Project1</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSDevice64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1869,7 +1869,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSDevice64\Debug\Project1.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1878,7 +1878,7 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.launchscreen">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSDevice64\Debug\Project1.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -1887,7 +1887,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
       <RemoteName>Project1.launchscreen</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1896,7 +1896,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
       <DeployClass>iPad_AppIcon167</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1905,7 +1905,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1914,7 +1914,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
       <DeployClass>iPad_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1923,7 +1923,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
       <DeployClass>iPad_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1932,7 +1932,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
       <DeployClass>iPad_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1941,7 +1941,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPad_SpotLight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1950,7 +1950,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
       <DeployClass>iOS_AppStore1024</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1959,7 +1959,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1968,7 +1968,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
       <DeployClass>iPhone_AppIcon180</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1977,7 +1977,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
       <DeployClass>iPhone_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1986,7 +1986,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1995,7 +1995,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
       <DeployClass>iPhone_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2004,7 +2004,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2013,7 +2013,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
       <DeployClass>iPhone_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2022,7 +2022,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
       <DeployClass>iPhone_Notification60</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2031,7 +2031,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
       <DeployClass>iPhone_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2040,7 +2040,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
       <DeployClass>iPhone_Setting87</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2049,7 +2049,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
       <DeployClass>iPhone_Spotlight120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2058,7 +2058,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPhone_Spotlight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2067,7 +2067,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSDevice64\Release\Project1">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSDevice64\Release\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2077,7 +2077,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSDevice64\Release\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSDevice64\Release\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2086,7 +2086,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSDevice64\Release\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSDevice64\Release\Project1.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2095,7 +2095,7 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSDevice64\Release\Project1.launchscreen">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSDevice64\Release\Project1.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -2105,8 +2105,8 @@
       <RemoteName>Project1.launchscreen</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+  <ItemGroup Condition="'$(Platform)'=='iOSSimARM64'">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2115,7 +2115,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
       <DeployClass>iPad_AppIcon167</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2124,7 +2124,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2133,7 +2133,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
       <DeployClass>iPad_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2142,7 +2142,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
       <DeployClass>iPad_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2151,7 +2151,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
       <DeployClass>iPad_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2160,7 +2160,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPad_SpotLight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2169,7 +2169,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
       <DeployClass>iOS_AppStore1024</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2178,7 +2178,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2187,7 +2187,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
       <DeployClass>iPhone_AppIcon180</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2196,7 +2196,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
       <DeployClass>iPhone_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2205,7 +2205,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2214,7 +2214,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
       <DeployClass>iPhone_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2223,7 +2223,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2232,7 +2232,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
       <DeployClass>iPhone_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2241,7 +2241,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
       <DeployClass>iPhone_Notification60</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2250,7 +2250,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
       <DeployClass>iPhone_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2259,7 +2259,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
       <DeployClass>iPhone_Setting87</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2268,7 +2268,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
       <DeployClass>iPhone_Spotlight120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2277,7 +2277,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPhone_Spotlight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2286,7 +2286,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSSimARM64\Debug\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2296,7 +2296,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.dSYM">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSSimARM64\Debug\Project1.dSYM">
       <DeployClass>ProjectiOSDeviceDebug</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2305,7 +2305,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
       <RemoteName>Project1</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSSimARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2314,7 +2314,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSSimARM64\Debug\Project1.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2323,7 +2323,7 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.launchscreen">
+    <DeployFile Condition="'$(Config)'=='Debug'" Include="iOSSimARM64\Debug\Project1.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -2332,7 +2332,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
       <RemoteName>Project1.launchscreen</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2341,7 +2341,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
       <DeployClass>iPad_AppIcon167</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2350,7 +2350,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2359,7 +2359,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
       <DeployClass>iPad_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2368,7 +2368,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
       <DeployClass>iPad_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2377,7 +2377,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
       <DeployClass>iPad_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2386,7 +2386,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPad_SpotLight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2395,7 +2395,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
       <DeployClass>iOS_AppStore1024</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2404,7 +2404,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2413,7 +2413,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
       <DeployClass>iPhone_AppIcon180</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2422,7 +2422,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
       <DeployClass>iPhone_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2431,7 +2431,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2440,7 +2440,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
       <DeployClass>iPhone_Launch2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2449,7 +2449,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2458,7 +2458,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
       <DeployClass>iPhone_Notification40</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2467,7 +2467,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
       <DeployClass>iPhone_Notification60</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2476,7 +2476,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
       <DeployClass>iPhone_Setting58</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2485,7 +2485,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
       <DeployClass>iPhone_Setting87</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2494,7 +2494,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
       <DeployClass>iPhone_Spotlight120</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2503,7 +2503,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
       <DeployClass>iPhone_Spotlight80</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2512,7 +2512,7 @@
       <RemoteDir>Project1.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSSimARM64\Release\Project1">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSSimARM64\Release\Project1">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2522,7 +2522,7 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSSimARM64\Release\Project1.entitlements">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSSimARM64\Release\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2531,7 +2531,7 @@
       <RemoteDir>Project1.app\..\</RemoteDir>
       <RemoteName>Project1.entitlements</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSSimARM64\Release\Project1.info.plist">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSSimARM64\Release\Project1.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -2540,7 +2540,7 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="iOSSimARM64\Release\Project1.launchscreen">
+    <DeployFile Condition="'$(Config)'=='Release'" Include="iOSSimARM64\Release\Project1.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -2554,9 +2554,9 @@
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
   <PropertyGroup>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">2B011FDH200DHE</DeviceId>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">2B011FDH200DHE</DeviceId>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;"/>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">BABDA219-1CEE-43B2-8F32-B7242E9705B5</DeviceId>
+    <DeviceId Condition="'$(Platform)'=='Android'"/>
+    <DeviceId Condition="'$(Platform)'=='Android64'"/>
+    <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
+    <DeviceId Condition="'$(Platform)'=='iOSSimARM64'">0B0CDF57-4FA4-474F-BB9D-A481F23B323D</DeviceId>
   </PropertyGroup>
 </Project>

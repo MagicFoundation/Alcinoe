@@ -515,11 +515,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'procedure IsFocusedChanged; virtual;','//**procedure IsFocusedChanged; virtual;');
     aSrc := FindAndReplace(aSrc, 'FFocusOnMouseDown: Boolean;','//**FFocusOnMouseDown: Boolean;');
     aSrc := FindAndReplace(aSrc, 'FFocusOnMouseUp: Boolean;','//**FFocusOnMouseUp: Boolean;');
-    aSrc := FindAndReplace(aSrc, 'FFormerMarginsChangedHandler: TNotifyEvent;','//**FFormerMarginsChangedHandler: TNotifyEvent;', 'TALDynamicExtendedControl = class(TALDynamicControl)', 'end;');
-    aSrc := FindAndReplace(aSrc, 'procedure MarginsChangedHandler(Sender: TObject);','//**procedure MarginsChangedHandler(Sender: TObject);', 'TALDynamicExtendedControl = class(TALDynamicControl)', 'end;');
-    aSrc := FindAndReplace(aSrc, 'Procedure MarginsChanged; virtual;','//**Procedure MarginsChanged; virtual;', 'TALDynamicExtendedControl = class(TALDynamicControl)', 'end;');
-    aSrc := FindAndReplace(aSrc, 'FFormerMarginsChangedHandler := Margins.OnChange;','//**FFormerMarginsChangedHandler := Margins.OnChange;', 'constructor TALDynamicExtendedControl.Create(', 'end;');
-    aSrc := FindAndReplace(aSrc, 'Margins.OnChange := MarginsChangedHandler;','//**Margins.OnChange := MarginsChangedHandler;', 'constructor TALDynamicExtendedControl.Create(', 'end;');
     aSrc := FindAndReplace(aSrc, 'FAlign: TALAlignLayout;','//**FAlign: TALAlignLayout;');
     aSrc := FindAndReplace(aSrc, 'FAlign := TALAlignLayout.None;','//**FAlign := TALAlignLayout.None;');
     aSrc := FindAndReplace(aSrc, 'property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;','//**property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;');
@@ -544,7 +539,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'function GetAbsoluteDisplayedRect: TRectF; virtual;','//**function GetAbsoluteDisplayedRect: TRectF; virtual;');
     aSrc := FindAndReplace(aSrc, 'function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; virtual;','function IsReadyToDisplay(const AStrict: Boolean = False): Boolean; override;');
     aSrc := FindAndReplace(aSrc, 'procedure IContent.Changed = ContentChanged;','//**procedure IContent.Changed = ContentChanged;');
-    aSrc := FindAndReplace(aSrc, 'IsVisibleObject(const AObject: TControl)','IsVisibleObject(const AObject: TALDynamicControl)');
+    aSrc := FindAndReplace(aSrc, 'IsVisibleChild(const AChild: TControl)','IsVisibleChild(const AChild: TALDynamicControl)');
     aSrc := FindAndReplace(aSrc, 'FreeNotification(AObject: TObject);','FreeNotification(const AObject: TALDynamicControl);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);','ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);');
     aSrc := FindAndReplace(aSrc, 'ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);','ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single);');
@@ -939,6 +934,13 @@ Procedure BuildAlcinoeFMXDynamicControls;
               '        end'+#13#10+
               '        else begin'+#13#10+
               '          LALChildControl := nil;'+#13#10+
+              '          {$If defined(debug)}'+#13#10+
+              '          if LChildControl.Align in [TAlignLayout.Scale,'+#13#10+
+              '                                     TAlignLayout.Fit,'+#13#10+
+              '                                     TAlignLayout.FitLeft,'+#13#10+
+              '                                     TAlignLayout.FitRight] then'+#13#10+
+              '            Raise Exception.Create(''Error 7CB3DA13-5B18-4CD7-9C01-CC0782654B54'');'+#13#10+
+              '          {$ENDIF}'+#13#10+
               '          LChildControlAlign := TALAlignLayout(LChildControl.Align);'+#13#10+
               '        end;',
               '        //**var LALChildControl: TALDynamicControl;'+#13#10+
@@ -1293,8 +1295,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('.GetParentedVisible: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetAlign: TALAlignLayout;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.IsFocusedChanged;', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicExtendedControl.MarginsChangedHandler(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicExtendedControl.MarginsChanged;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetCanFocus(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetTabStop(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or

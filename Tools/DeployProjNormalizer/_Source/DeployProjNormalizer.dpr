@@ -106,7 +106,7 @@ uses
 //   * Do NOT add any Win64 files
 //
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if the structure of the *.deployproj didn''t changed by following the instructions in References\BlankApplication\README.md'}
 {$ENDIF}
 

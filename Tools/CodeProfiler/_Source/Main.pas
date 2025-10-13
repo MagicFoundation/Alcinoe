@@ -786,7 +786,7 @@ begin
   try
     HttpServerNameEdit.Text := LIniFile.ReadString('General','ServerName', '');
     HttpServerPortEdit.Text := LIniFile.ReadString('General','ServerPort', '8080');
-    SourcesPathMemo.Text := ALStringReplaceW(LIniFile.ReadString('General','SourcesPath', '..\..\Source\;..\..\Embarcadero\Athens\fmx\;..\..\Demos\ALFmxDynamicListBox\_Source\'), ';', #13#10, [RfReplaceALL]);
+    SourcesPathMemo.Text := ALStringReplaceW(LIniFile.ReadString('General','SourcesPath', '..\..\Source\;..\..\Embarcadero\Florence\fmx\;..\..\Demos\ALFmxDynamicListBox\_Source\'), ';', #13#10, [RfReplaceALL]);
   finally
     ALFreeAndNil(LIniFile);
   end;

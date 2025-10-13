@@ -18,6 +18,14 @@ set LocalDelphiName=
 set LocalDelphiVersion=%ALDelphiVersion%
 set LocalDelphiDir=
 IF "%LocalDelphiVersion%"=="" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\37.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
+    IF "!InitEnvironmentQuietMode!"=="" ( 
+      ECHO Found Delphi 13 Florence
+    )
+    set LocalDelphiName=Florence
+    set LocalDelphiVersion=37.0
+  ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\23.0" /v "RootDir"') do set LocalDelphiDir=%%B
   IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     IF "!InitEnvironmentQuietMode!"=="" ( 
@@ -73,9 +81,12 @@ IF "%LocalDelphiVersion%"=="" (
     )
     set LocalDelphiName=Seattle
     set LocalDelphiVersion=17.0
-  )))))))
+  ))))))))
 ) ELSE (
   for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\%LocalDelphiVersion%" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF "%LocalDelphiVersion%"=="37.0" (
+    set LocalDelphiName=Florence
+  ) ELSE (
   IF "%LocalDelphiVersion%"=="23.0" (
     set LocalDelphiName=Athens
   ) ELSE (
@@ -96,7 +107,7 @@ IF "%LocalDelphiVersion%"=="" (
   ) ELSE (
   IF "%LocalDelphiVersion%"=="17.0" (
     set LocalDelphiName=Seattle
-  )))))))
+  ))))))))
 )
 endlocal & set "ALDelphiName=%LocalDelphiName%" & set "ALDelphiVersion=%LocalDelphiVersion%" & set "ALDelphiDir=%LocalDelphiDir%"
 

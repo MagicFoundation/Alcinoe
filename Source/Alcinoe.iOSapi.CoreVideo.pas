@@ -5,32 +5,16 @@ interface
 {$I Alcinoe.inc}
 
 uses
-  Posix.StdDef,
   iOSapi.CoreVideo,
-  Macapi.CoreFoundation,
-  Macapi.Metal;
+  Macapi.CoreFoundation;
 
 {$M+}
 
-type
-
-  {*************************************}
-  {$IFNDEF ALCompilerVersionSupported123}
-    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939 has been resolved. If resolved, remove the definitions below.'}
-  {$ENDIF}
-  CVMetalTextureRef = CVImageBufferRef; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-  PCVMetalTextureRef = ^CVMetalTextureRef; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-  CVMetalTextureCacheRef = Pointer; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-  PCVMetalTextureCacheRef = ^CVMetalTextureCacheRef; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported123}
-  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939 has been resolved. If resolved, remove the functions below.'}
+{$IFNDEF ALCompilerVersionSupported130}
+  {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4333 has been resolved. If resolved, remove the functions below.'}
 {$ENDIF}
-function CVMetalTextureGetTexture(image: CVMetalTextureRef): pointer; cdecl; external libCoreVideo name _PU + 'CVMetalTextureGetTexture'; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-procedure CVMetalTextureCacheFlush(textureCache: CVMetalTextureCacheRef; options: CVOptionFlags); cdecl; external libCoreVideo name _PU + 'CVMetalTextureCacheFlush'; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-function CVMetalTextureCacheCreate(allocator: CFAllocatorRef; cacheAttributes: CFDictionaryRef; metalDevice: Pointer; textureAttributes: CFDictionaryRef; cacheOut: PCVMetalTextureCacheRef): CVReturn; cdecl; external libCoreVideo name _PU + 'CVMetalTextureCacheCreate'; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
-function CVMetalTextureCacheCreateTextureFromImage(allocator: CFAllocatorRef; textureCache: CVMetalTextureCacheRef; sourceImage: CVImageBufferRef; textureAttributes: CFDictionaryRef; pixelFormat: MTLPixelFormat; width: size_t; height: size_t; planeIndex: size_t; textureOut: PCVMetalTextureRef): CVReturn; cdecl; external libCoreVideo name _PU + 'CVMetalTextureCacheCreateTextureFromImage'; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939
+function CVOpenGLESTextureCacheCreate(allocator: CFAllocatorRef; cacheAttributes: CFDictionaryRef; eaglContext: Pointer; textureAttributes: CFDictionaryRef; cacheOut: PCVOpenGLESTextureCacheRef): CVReturn; cdecl; external libCoreVideo name _PU + 'CVOpenGLESTextureCacheCreate';
 
 implementation
 

@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FirebaseCore.pas to build
@@ -53,7 +53,7 @@ procedure FirebaseInstallationsLoader; cdecl; external framework 'FirebaseInstal
 //just after installing the app (but if we relaunch it again then everything work good)
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes check if all declarations below are still mandatories.'}
 {$ENDIF}
 {$IF Defined(IOSSIMULATOR)}
@@ -73,10 +73,8 @@ procedure libswiftCoreLoader; cdecl; external '/usr/lib/swift/libswiftCore.dylib
 procedure libswiftDarwinLoader; cdecl; external '/usr/lib/swift/libswiftDarwin.dylib';
 procedure libswiftDataDetectionLoader; cdecl; external '/usr/lib/swift/libswiftDataDetection.dylib';
 procedure libswiftDispatchLoader; cdecl; external '/usr/lib/swift/libswiftDispatch.dylib';
-procedure libswiftFileProviderLoader; cdecl; external '/usr/lib/swift/libswiftFileProvider.dylib';
 procedure libswiftMetalLoader; cdecl; external '/usr/lib/swift/libswiftMetal.dylib';
 procedure libswiftObjectiveCLoader; cdecl; external '/usr/lib/swift/libswiftObjectiveC.dylib';
 procedure libswiftQuartzCoreLoader; cdecl; external '/usr/lib/swift/libswiftQuartzCore.dylib';
-procedure libswiftUIKitLoader; cdecl; external '/usr/lib/swift/libswiftUIKit.dylib';
 
 end.

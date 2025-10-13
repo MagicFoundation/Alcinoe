@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   //Pleast update <Alcinoe>\Libraries\ios\facebook\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FacebookCoreKit.pas to build
@@ -104,7 +104,7 @@ procedure libcLoader; cdecl; external '/usr/lib/libc++.dylib';
 procedure libvDSPLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvDSP.dylib';
 procedure libvMiscLoader; cdecl; external '/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvMisc.dylib';
 
-{$IFNDEF ALCompilerVersionSupported123}
+{$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes check if all declarations below are still mandatories.'}
 {$ENDIF}
 {$IF Defined(IOSSIMULATOR)}
@@ -139,9 +139,5 @@ procedure libswiftAVFoundationLoader; cdecl; external '/usr/lib/swift/libswiftAV
 procedure libswiftCoreMediaLoader; cdecl; external '/usr/lib/swift/libswiftCoreMedia.dylib';
 procedure libswiftsimdLoader; cdecl; external '/usr/lib/swift/libswiftsimd.dylib';
 procedure libswiftCoreLocationLoader; cdecl; external '/usr/lib/swift/libswiftCoreLocation.dylib';
-//procedure libswiftFileProviderLoader; cdecl; external '/usr/lib/swift/libswiftFileProvider.dylib';
-//procedure libswiftUIKitLoader; cdecl; external '/usr/lib/swift/libswiftUIKit.dylib';
-//procedure libswiftPhotosLoader; cdecl; external '/usr/lib/swift/libswiftPhotos.dylib';
-//procedure libswiftCoreGraphicsLoader; cdecl; external '/usr/lib/swift/libswiftCoreGraphics.dylib';
 
 end.

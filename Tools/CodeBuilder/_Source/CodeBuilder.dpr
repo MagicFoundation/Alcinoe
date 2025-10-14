@@ -1400,7 +1400,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
 
     Var P1 := AlposIgnoreCaseA('  '+AClassName+' = class(', aSrc); // TALShape = class(TALControl)
     If P1 <= low(aSrc) then
-      raise Exception.Create('Error BEDEF98F-7167-459E-B26C-1F30FC4B43DC - ' + AClassName);
+      raise Exception.Create('Error BEDEF98F-7167-459E-B26C-1F30FC4B43DC - ' + String(AClassName));
     inc(P1,2); //  TALShape = class(TALControl)
                //  ^P1
     var LIndent: AnsiString := '';
@@ -1409,7 +1409,7 @@ Procedure BuildAlcinoeFMXDynamicControls;
       dec(P1); //  TALShape = class(TALControl)
                //^P1
     end;
-    If P1 <= low(aSrc) then raise Exception.Create('Error E07E2BA9-F996-4A82-ABF8-A34E822DED20 - ' + AClassName);
+    If P1 <= low(aSrc) then raise Exception.Create('Error E07E2BA9-F996-4A82-ABF8-A34E822DED20 - ' + String(AClassName));
     var P2 := AlposIgnoreCaseA(#13#10+LIndent+'end;', aSrc, P1); // end;
     If P2 <= 0 then raise Exception.Create('Error 4514C0C2-F078-4239-A711-408DA0C10BEC');
     inc(P2, length(#13#10+LIndent+'end;'));

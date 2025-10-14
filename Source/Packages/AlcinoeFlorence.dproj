@@ -258,6 +258,9 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <RcCompile Include="Resources\AlcinoeComponentIcons.rc">
+      <Form>AlcinoeComponentIcons.res</Form>
+    </RcCompile>
     <BuildConfiguration Include="Base">
       <Key>Base</Key>
     </BuildConfiguration>

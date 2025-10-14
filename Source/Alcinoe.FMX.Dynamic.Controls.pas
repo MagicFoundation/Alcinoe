@@ -2821,6 +2821,7 @@ end;
 //**      TALAlignLayout.MostBottomCenter: LLegacyAlign := TAlignLayout.MostBottom;
 //**      TALAlignLayout.MostBottomLeft: LLegacyAlign := TAlignLayout.MostBottom;
 //**      TALAlignLayout.MostBottomRight: LLegacyAlign := TAlignLayout.MostBottom;
+//**
 //**      else LLegacyAlign := TAlignLayout(Value);
 //**
 //**    end;

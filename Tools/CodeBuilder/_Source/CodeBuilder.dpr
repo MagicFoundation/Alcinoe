@@ -1725,6 +1725,12 @@ end;
 
 begin
   try
+
+    {$IFDEF DEBUG}
+    ReportMemoryleaksOnSHutdown := True;
+    {$ENDIF}
+    SetMultiByteConversionCodePage(CP_UTF8);
+
     var LParamLst := TALStringListW.Create;
     try
 
@@ -1764,6 +1770,7 @@ begin
     finally
       ALFreeandNil(LParamLst);
     end;
+
   except
     on E: Exception do begin
       Writeln(E.ClassName, ': ', E.Message);

@@ -89,6 +89,7 @@ forced to apply patches to the original Delphi source files:
 * [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
 * [FMX.VirtualKeyboard.Android: Unused variable and unnecessary logic in Delphi 13 update](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311)
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
+* [Replace Pointer-based signatures in iOS/macOS bridges with strongly typed wrappers](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4433)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
 * [need to uncomment _GetAUDIO_ATTRIBUTES_DEFAULT from JNotificationClass](https://quality.embarcadero.com/browse/RSP-21296)

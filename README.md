@@ -20,6 +20,20 @@ visibility and growth.
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
 
 
+Become a sponsor to Magic Foundation
+------------------------------------
+
+By joining MagicFoundation as an Associate, you'll enter a 
+community that's actively shaping the future of Alcinoe—while 
+unlocking a suite of exclusive perks. Associates receive priority 
+support for bugs they submit via the issue tracker or by email, 
+including faster triage, dedicated investigation, and ongoing 
+updates until resolved.
+
+<a href="https://github.com/sponsors/MagicFoundation">
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/becomeasponsor.webp?raw=true" width="800" />
+</a>
+
 Example of an App Built with Alcinoe
 ------------------------------------
 

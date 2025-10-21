@@ -1431,7 +1431,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Flore
 -  RestoreCurrent;
 +  FBackBufferSurface := nil;
 +  if Fcontext <> nil then
-+    Fcontext.Resize;
++    FreeAndNil(Fcontext);
  end;
  
  function TGlCanvas.TryMakeCurrent: Boolean;

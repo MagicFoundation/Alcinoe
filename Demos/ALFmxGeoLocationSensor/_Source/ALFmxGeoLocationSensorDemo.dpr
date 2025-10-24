@@ -1,4 +1,4 @@
-program ALGeoLocationSensorDemo;
+program ALFmxGeoLocationSensorDemo;
 
 uses
   System.StartUpCopy,

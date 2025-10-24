@@ -8,7 +8,7 @@ if "%ALBaseDir%"=="" (
   IF ERRORLEVEL 1 goto ERROR  
 )
 
-set Libraries=%ALBaseDir%\Demos\ALGeoLocationSensor\_Source\Android\App\
+set Libraries=%ALBaseDir%\Demos\ALFmxGeoLocationSensor\_Source\Android\App\
 set Libraries=%Libraries%;com.google.android.gms:play-services-base:18.2.0
 set Libraries=%Libraries%;com.google.android.gms:play-services-location:21.0.1
 
@@ -27,9 +27,9 @@ set Libraries=%Libraries%;com.google.guava:guava:32.1.3-android
 call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^
  -Libraries="%Libraries%"^
- -OutputDir="%ALBaseDir%\Demos\ALGeoLocationSensor\_Source\Android\Merged"^
- -DProj="%ALBaseDir%\Demos\ALGeoLocationSensor\_Source\ALGeoLocationSensorDemo.dproj"^
- -AndroidManifest="%ALBaseDir%\Demos\ALGeoLocationSensor\_Source\AndroidManifest.template.xml"^
+ -OutputDir="%ALBaseDir%\Demos\ALFmxGeoLocationSensor\_Source\Android\Merged"^
+ -DProj="%ALBaseDir%\Demos\ALFmxGeoLocationSensor\_Source\ALFmxGeoLocationSensorDemo.dproj"^
+ -AndroidManifest="%ALBaseDir%\Demos\ALFmxGeoLocationSensor\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 

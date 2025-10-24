@@ -566,7 +566,28 @@ to be easily customizable and extendable. On iOS,
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
 <br/>
 <br/>
-  
+
+
+TALMediaPicker — Unified Media Picker
+=====================================
+
+**TALMediaPicker** provides a unified, high-level API to select 
+images and videos from the device library or capture new media 
+with the camera across iOS and Android. It abstracts 
+platform specifics (iOS PHPickerViewController/UIImagePickerController, 
+Android ACTION_PICK_IMAGES/GET_CONTENT and camera intents), 
+handles permission flows, and normalizes 
+results into TMediaItem objects with URIs and media types. 
+The component supports multiple selection, returns streams on 
+demand (ExtractStream), and exposes clear callbacks for success, 
+cancel, and error states—letting you integrate media workflows 
+quickly without dealing with per-platform quirks like 
+FileProvider URIs, picker filters, or temporary file management.
+Learn more at [Demos/ALFmxMediaPicker](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxMediaPicker)
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/mediapicker.png?raw=true" alt="mediapicker" />
+<br/>
+
   
 Confetti Falling Animation
 ==========================
@@ -1118,6 +1139,15 @@ undesired conversions.
 History
 =======
 
+### 24/10/2025 – New Components & Enhancements  
+
+- **TALMediaPicker**: New cross-platform component to select
+  images/videos or capture media from the camera.  
+- **TALVideoPlayer**: Added `RotateAccordingToMetadataOrientation` 
+  property to automatically adjust playback orientation.  
+- **TALImage**: Added `ResourceStream` property to load 
+  images directly from a stream.
+  
 
 ### 02/10/2025 – Framework Updates
 

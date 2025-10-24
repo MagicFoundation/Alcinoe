@@ -8,7 +8,7 @@ if "%ALBaseDir%"=="" (
   IF ERRORLEVEL 1 goto ERROR  
 )
 
-set Libraries=%ALBaseDir%\Demos\ALFacebookLogin\_Source\Android\App\
+set Libraries=%ALBaseDir%\Demos\ALFmxFacebookLogin\_Source\Android\App\
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-facebook-share:1.0.2
 set Libraries=%Libraries%;com.facebook.android:facebook-login:18.0.3
 
@@ -27,9 +27,9 @@ set Libraries=%Libraries%;com.google.guava:guava:32.1.3-android
 call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^
  -Libraries="%Libraries%"^
- -OutputDir="%ALBaseDir%\Demos\ALFacebookLogin\_Source\Android\Merged"^
- -DProj="%ALBaseDir%\Demos\ALFacebookLogin\_Source\ALFacebookLoginDemo.dproj"^
- -AndroidManifest="%ALBaseDir%\Demos\ALFacebookLogin\_Source\AndroidManifest.template.xml"^
+ -OutputDir="%ALBaseDir%\Demos\ALFmxFacebookLogin\_Source\Android\Merged"^
+ -DProj="%ALBaseDir%\Demos\ALFmxFacebookLogin\_Source\ALFmxFacebookLoginDemo.dproj"^
+ -AndroidManifest="%ALBaseDir%\Demos\ALFmxFacebookLogin\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 

@@ -3184,6 +3184,6 @@
     <string name="google_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>
     <string name="google_app_id" translatable="false">1:362697684107:android:d39c4bc6df5853ec37508e</string>
     <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>
-    <string name="google_storage_bucket" translatable="false">alnotificationservicedemo.appspot.com</string>
-    <string name="project_id" translatable="false">alnotificationservicedemo</string>
+    <string name="google_storage_bucket" translatable="false">alfmxnotificationservicedemo.appspot.com</string>
+    <string name="project_id" translatable="false">alfmxnotificationservicedemo</string>
 </resources>

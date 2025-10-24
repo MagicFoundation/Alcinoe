@@ -100,13 +100,13 @@ const
 
   //The info are taken from an account (wonderful.life.photos@gmail.com) that I
   //created specifically for this demo. I retrieve it like this:
-  // * go to Firebase console project settings (ALNotificationServiceDemo)
-  //   https://console.firebase.google.com/project/alnotificationservicedemo/settings/general/android:io.magicfoundation.alcinoe.alnotificationservicedemo
+  // * go to Firebase console project settings (ALFmxNotificationServiceDemo)
+  //   https://console.firebase.google.com/project/alfmxnotificationservicedemo/settings/general/android:io.magicfoundation.alcinoe.alfmxnotificationservicedemo
   // * Then click on clound messaging and click on Manage Service Accounts under Firebase Cloud Messaging API (V1)
-  // * Then download the json key associated with the Service accounts for project "ALNotificationServiceDemo"
+  // * Then download the json key associated with the Service accounts for project "ALFmxNotificationServiceDemo"
   // * find all the info below inside the json key you just downloaded
-  FirebaseMessagingHttpV1ProjectID: AnsiString = 'alnotificationservicedemo';
-  FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-nwe4e@alnotificationservicedemo.iam.gserviceaccount.com';
+  FirebaseMessagingHttpV1ProjectID: AnsiString = 'alfmxnotificationservicedemo';
+  FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-nwe4e@alfmxnotificationservicedemo.iam.gserviceaccount.com';
   FirebaseMessagingHttpV1ServiceAccountPrivateKey: AnsiString =
     '-----BEGIN PRIVATE KEY-----'+
     'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMzhD2+LmYJrxD'+

@@ -13,11 +13,11 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>io.magicfoundation.alcinoe.alnotificationservicedemo</string>
+	<string>io.magicfoundation.alcinoe.alfmxnotificationservicedemo</string>
 	<key>PROJECT_ID</key>
-	<string>alnotificationservicedemo</string>
+	<string>alfmxnotificationservicedemo</string>
 	<key>STORAGE_BUCKET</key>
-	<string>alnotificationservicedemo.appspot.com</string>
+	<string>alfmxnotificationservicedemo.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>

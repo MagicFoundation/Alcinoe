@@ -116,6 +116,7 @@ type
     FTintColor: TAlphaColor; // 4 bytes
     FTintColorKey: String; // 8 bytes
     FResourceName: String; // 8 bytes
+    FResourceStream: TStream; // 8 bytes
     FMaskResourceName: String; // 8 bytes
     FWrapMode: TALImageWrapMode; // 1 bytes
     FExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
@@ -143,6 +144,7 @@ type
     procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure SetRotateAccordingToExifOrientation(const Value: Boolean);
     procedure setResourceName(const Value: String);
+    procedure setResourceStream(const Value: TStream);
     procedure setMaskResourceName(const Value: String);
     procedure setBackgroundColor(const Value: TAlphaColor);
     procedure setBackgroundColorKey(const Value: String);
@@ -252,6 +254,8 @@ type
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
     property DefaultBlurRadius: Single read GetDefaultBlurRadius;
+    // When you assign a stream to ResourceStream, TALDynamicImage takes ownership and will free it.
+    property ResourceStream: TStream read FResourceStream write setResourceStream;
     // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
     // prevent duplicate drawables across multiple identical controls.
     // CacheIndex specifies the slot in the cache engine where an existing
@@ -1436,6 +1440,7 @@ begin
   FTintColor := DefaultTintColor;
   FTintColorKey := DefaultTintColorKey;
   FResourceName := '';
+  FResourceStream := nil;
   FMaskResourceName := '';
   FWrapMode := TALImageWrapMode.Fit;
   FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
@@ -1464,6 +1469,7 @@ end;
 {*********************************}
 destructor TALDynamicImage.Destroy;
 begin
+  ALFreeAndNil(FResourceStream);
   ALFreeAndNil(fCropCenter);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
@@ -1762,6 +1768,17 @@ begin
   if FResourceName <> Value then begin
     ClearBufDrawable;
     FResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{****************************************************************}
+procedure TALDynamicImage.setResourceStream(const Value: TStream);
+begin
+  if FResourceStream <> Value then begin
+    ALFreeAndNil(FResourceStream);
+    ClearBufDrawable;
+    FResourceStream := Value;
     Repaint;
   end;
 end;
@@ -2387,8 +2404,8 @@ begin
 
   if //--- Do not create BufDrawable if the size is 0
      (BoundsRect.IsEmpty) or
-     //--- Do not create BufDrawable if FResourceName is empty
-     (FResourceName = '')
+     //--- Do not create BufDrawable if FResourceName and FResourceStream are empty
+     ((FResourceName = '') and (FResourceStream = nil))
   then begin
     ClearBufDrawable;
     exit;
@@ -2402,6 +2419,7 @@ begin
      (CacheEngine.HasEntry(CacheIndex{AIndex}, GetCacheSubIndex{ASubIndex})) then Exit;
 
   if (FResourceDownloadContext = nil) and
+     (FResourceStream = nil) and
      (ALIsHttpOrHttpsUrl(ResourceName)) then begin
 
     {$IFDEF debug}
@@ -2482,7 +2500,7 @@ begin
     BackGroundColor, // const AColor: TAlphaColor;
     TintColor, // const ATintColor: TAlphaColor;
     ResourceName, // const AResourceName: String;
-    nil, // const AResourceStream: TStream;
+    ResourceStream, // const AResourceStream: TStream;
     MaskResourceName, // const AMaskResourceName: String;
     WrapMode, // const AWrapMode: TALImageWrapMode;
     CropCenter.Point, // const ACropCenter: TpointF;

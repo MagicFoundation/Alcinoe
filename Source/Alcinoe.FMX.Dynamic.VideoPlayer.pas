@@ -68,6 +68,7 @@ type
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
     FWrapMode: TALImageWrapMode; // 1 byte
+    FRotateAccordingToMetadataOrientation: Boolean; // 1 bytes
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
@@ -78,6 +79,7 @@ type
     procedure setPreviewResourceName(const Value: String);
     procedure SetDataSource(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure SetRotateAccordingToMetadataOrientation(const Value: Boolean);
     function GetState: Integer;
     procedure SetAutoStartMode(const Value: TAutoStartMode);
     function GetIsPlaying: boolean;
@@ -155,6 +157,7 @@ type
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     function GetCurrentPosition: Int64;
     function GetDuration: Int64;
+    function GetVideoRotationDegrees: Integer;
     function GetVideoHeight: Integer;
     function GetVideoWidth: Integer;
     procedure Start;
@@ -212,6 +215,7 @@ type
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
     property PreviewResourceName: String read fPreviewResourceName write setPreviewResourceName;
+    property RotateAccordingToMetadataOrientation: Boolean read FRotateAccordingToMetadataOrientation write SetRotateAccordingToMetadataOrientation default false;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -323,6 +327,7 @@ begin
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
   FWrapMode := TALImageWrapMode.Fit;
+  FRotateAccordingToMetadataOrientation := False;
   FCacheIndex := 0;
   FCacheEngine := nil;
   FPreviewDownloadContext := nil;
@@ -489,6 +494,16 @@ begin
   end;
 end;
 
+{***************************************************************************************************}
+procedure TALDynamicVideoPlayerSurface.SetRotateAccordingToMetadataOrientation(const Value: Boolean);
+begin
+  if FRotateAccordingToMetadataOrientation <> Value then begin
+    ClearBufDrawable;
+    FRotateAccordingToMetadataOrientation := Value;
+    Repaint;
+  end;
+end;
+
 {******************************************************}
 function TALDynamicVideoPlayerSurface.GetState: Integer;
 begin
@@ -560,6 +575,12 @@ end;
 function TALDynamicVideoPlayerSurface.GetDuration: Int64;
 begin
   Result := fVideoPlayerEngine.GetDuration;
+end;
+
+{*********************************************************************}
+function TALDynamicVideoPlayerSurface.GetVideoRotationDegrees: Integer;
+begin
+  Result := fVideoPlayerEngine.GetVideoRotationDegrees;
 end;
 
 {************************************************************}
@@ -1268,45 +1289,75 @@ begin
       {$ENDIF}
     end;
 
+    var LVideoRotationDegrees := fVideoPlayerEngine.GetVideoRotationDegrees;
+    var LLocalRect: TRectF;
+    if (FRotateAccordingToMetadataOrientation) and
+       ((LVideoRotationDegrees = 90) or
+        (LVideoRotationDegrees = 270)) then LLocalRect := TRectF.Create(0, 0, Height, Width).CenterAt(LocalRect.ReducePrecision)
+    else LLocalRect := TRectF.Create(0, 0, Width, Height);
     var LSrcRect: TrectF;
     var LDstRect: TrectF;
     case WrapMode of
-
       TALImageWrapMode.Fit: begin
         LSrcRect := Trectf.Create(
                       0, 0,
                       ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
                       ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
         LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
-                      FitInto(LocalRect.ReducePrecision);
+                      FitInto(LLocalRect);
       end;
-
       TALImageWrapMode.Stretch: begin
         LSrcRect := Trectf.Create(
                       0, 0,
                       ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
                       ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
-        LDstRect := LocalRect.ReducePrecision;
+        LDstRect := LLocalRect;
       end;
-
       TALImageWrapMode.Place: begin
         LSrcRect := Trectf.Create(
                       0, 0,
                       ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
                       ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
         LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
-                      PlaceInto(LocalRect.ReducePrecision);
+                      PlaceInto(LLocalRect);
       end;
-
       TALImageWrapMode.FitAndCrop: begin
         LDstRect := TRectF.Create(0, 0, Width, Height);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)));
       end;
-
       else
         Raise Exception.Create('Error B0DE069F-2CFD-4719-9130-0D69A647EE2D')
+    end;
 
+    if FRotateAccordingToMetadataOrientation then begin
+      if (LVideoRotationDegrees = 180) then begin
+        var LMatrixRotationCenter: TpointF;
+        LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+        LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+        var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+        LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(180)); // matrix.setRotate(180);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+        Canvas.SetMatrix(LMatrix);
+      end
+      else if (LVideoRotationDegrees = 270) then begin
+        var LMatrixRotationCenter: TpointF;
+        LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+        LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+        var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+        LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+        Canvas.SetMatrix(LMatrix);
+      end
+      else if (LVideoRotationDegrees = 90) then begin
+        var LMatrixRotationCenter: TpointF;
+        LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+        LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+        var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+        LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+        Canvas.SetMatrix(LMatrix);
+      end;
     end;
 
     ALDrawDrawable(

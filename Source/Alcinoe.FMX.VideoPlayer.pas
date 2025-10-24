@@ -93,6 +93,7 @@ type
     destructor Destroy; override;
     function GetCurrentPosition: Int64; virtual; abstract;
     function GetDuration: Int64; virtual; abstract;
+    function GetVideoRotationDegrees: Integer; virtual; abstract;
     function GetVideoHeight: Integer; virtual; abstract;
     function GetVideoWidth: Integer; virtual; abstract;
     procedure Prepare(Const ADataSource: String); virtual; abstract;
@@ -132,6 +133,7 @@ type
     constructor Create; override;
     function GetCurrentPosition: Int64; override;
     function GetDuration: Int64; override;
+    function GetVideoRotationDegrees: Integer; override;
     function GetVideoHeight: Integer; override;
     function GetVideoWidth: Integer; override;
     procedure Prepare(Const ADataSource: String); override;
@@ -214,6 +216,7 @@ type
     {$ENDIF}
     fDrawable: TALDrawable;
     FDrawableReady: Boolean;
+    FVideoRotationDegrees: Integer;
     fVideoWidth: Integer;
     fVideoHeight: Integer;
     fState: Integer;
@@ -236,6 +239,7 @@ type
     destructor Destroy; override;
     function GetCurrentPosition: Int64; override;
     function GetDuration: Int64; override;
+    function GetVideoRotationDegrees: Integer; override;
     function GetVideoHeight: Integer; override;
     function GetVideoWidth: Integer; override;
     procedure Prepare(Const ADataSource: String); override;
@@ -330,6 +334,9 @@ type
     fOpenGLVideoTextureCacheRef: CVOpenGLESTextureCacheRef;
     fMetalTextureRef: CVMetalTextureRef;
     fMetalVideoTextureCacheRef: CVMetalTextureCacheRef;
+    FVideoRotationDegrees: Integer;
+    fVideoWidth: Integer;
+    fVideoHeight: Integer;
     fState: Integer;
     FAutoStartWhenPrepared: Boolean;
     fLooping: boolean;
@@ -356,6 +363,7 @@ type
     destructor Destroy; override;
     function GetCurrentPosition: Int64; override;
     function GetDuration: Int64; override;
+    function GetVideoRotationDegrees: Integer; override;
     function GetVideoHeight: Integer; override;
     function GetVideoWidth: Integer; override;
     procedure Prepare(Const ADataSource: String); override;
@@ -414,6 +422,7 @@ type
     destructor Destroy; override;
     function GetCurrentPosition: Int64; override;
     function GetDuration: Int64; override;
+    function GetVideoRotationDegrees: Integer; override;
     function GetVideoHeight: Integer; override;
     function GetVideoWidth: Integer; override;
     procedure Prepare(Const ADataSource: String); override;
@@ -468,6 +477,7 @@ type
         SetPlaybackSpeed,
         GetCurrentPosition,
         GetDuration,
+        GetVideoRotationDegrees,
         GetVideoHeight,
         GetVideoWidth,
         Prepare,
@@ -556,6 +566,7 @@ type
     procedure SetPlaybackSpeed(const AEngineIndex: Integer; const Value: single);
     function GetCurrentPosition(const AEngineIndex: Integer): Int64;
     function GetDuration(const AEngineIndex: Integer): Int64;
+    function GetVideoRotationDegrees(const AEngineIndex: Integer): Integer;
     function GetVideoHeight(const AEngineIndex: Integer): Integer;
     function GetVideoWidth(const AEngineIndex: Integer): Integer;
     procedure Prepare(const AEngineIndex: Integer; Const ADataSource: String);
@@ -613,6 +624,7 @@ type
     FIsFirstFrame: Boolean; // 1 Byte
     FAutoStartMode: TAutoStartMode; // 1 Byte
     FWrapMode: TALImageWrapMode; // 1 byte
+    FRotateAccordingToMetadataOrientation: Boolean; // 1 bytes
     FCacheIndex: Integer; // 4 bytes
     FCacheEngine: TALBufDrawableCacheEngine; // 8 bytes
     FPreviewDownloadContext: TPreviewDownloadContext; // [MultiThread] | 8 bytes
@@ -623,6 +635,7 @@ type
     procedure setPreviewResourceName(const Value: String);
     procedure SetDataSource(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure SetRotateAccordingToMetadataOrientation(const Value: Boolean);
     function GetState: Integer;
     procedure SetAutoStartMode(const Value: TAutoStartMode);
     function GetIsPlaying: boolean;
@@ -700,6 +713,7 @@ type
     property DefaultFadeInDuration: Single read GetDefaultFadeInDuration;
     function GetCurrentPosition: Int64;
     function GetDuration: Int64;
+    function GetVideoRotationDegrees: Integer;
     function GetVideoHeight: Integer;
     function GetVideoWidth: Integer;
     procedure Start;
@@ -757,6 +771,7 @@ type
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
     property PreviewResourceName: String read fPreviewResourceName write setPreviewResourceName;
+    property RotateAccordingToMetadataOrientation: Boolean read FRotateAccordingToMetadataOrientation write SetRotateAccordingToMetadataOrientation default false;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -813,6 +828,7 @@ uses
   iOSapi.UIKit,
   iOSapi.CoreMedia,
   iOSapi.OpenGLES,
+  iOSapi.CoreGraphics,
   Macapi.Helpers,
   Macapi.ObjCRuntime,
   FMX.Context.GLES.iOS,
@@ -940,6 +956,12 @@ end;
 
 {**********************************************}
 function TALDummyVideoPlayer.GetDuration: Int64;
+begin
+  result := 0;
+end;
+
+{************************************************************}
+function TALDummyVideoPlayer.GetVideoRotationDegrees: Integer;
 begin
   result := 0;
 end;
@@ -1453,8 +1475,18 @@ begin
     //  'height: ' + ALIntToStrW(videoSize.height));
     {$ENDIF}
 
-    fVideoPlayerEngine.FVideoWidth := videoSize.width;
-    fVideoPlayerEngine.fVideoHeight := videoSize.height;
+    // The clockwise rotation that should be applied to the video for it to be rendered in the correct
+    // orientation, or 0 if unknown or not applicable. Only 0, 90, 180 and 270 are supported.
+    fVideoPlayerEngine.FVideoRotationDegrees := fVideoPlayerEngine.fExoPlayer.getVideoFormat.rotationDegrees;
+    if (fVideoPlayerEngine.FVideoRotationDegrees = 90) or
+       (fVideoPlayerEngine.FVideoRotationDegrees = 270) then begin
+      fVideoPlayerEngine.FVideoWidth := videoSize.height;
+      fVideoPlayerEngine.fVideoHeight := videoSize.width;
+    end
+    else begin
+      fVideoPlayerEngine.FVideoWidth := videoSize.width;
+      fVideoPlayerEngine.fVideoHeight := videoSize.height;
+    end;
     if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
       fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, videoSize.width, videoSize.height);
 
@@ -1509,6 +1541,7 @@ constructor TALAndroidVideoPlayer.Create;
 begin
   inherited;
   //--
+  FVideoRotationDegrees := 0;
   fVideoWidth := 0;
   fVideoHeight := 0;
   fState := vpsIdle;
@@ -1696,6 +1729,16 @@ begin
   Result := fExoPlayer.GetDuration;
 end;
 
+{**************************************************************}
+function TALAndroidVideoPlayer.GetVideoRotationDegrees: Integer;
+begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
+    result := 0;
+    exit;
+  end;
+  Result := fVideoRotationDegrees;
+end;
+
 {*****************************************************}
 function TALAndroidVideoPlayer.GetVideoHeight: Integer;
 begin
@@ -1855,6 +1898,8 @@ begin
     var LkeyPath := NSStrToStr(keyPath);
     if LkeyPath = 'presentationSize' then begin
       var LNewSizeValue := iOSapi.UIKit.TNSValue.Wrap(change.objectForKey(NSStringToID(NSKeyValueChangeNewKey))).CGSizeValue;
+      fVideoPlayerEngine.fVideoHeight := round(LNewSizeValue.height);
+      fVideoPlayerEngine.fVideoWidth := round(LNewSizeValue.width);
       {$IF defined(DEBUG)}
       //ALLog(
       //  'TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath',
@@ -1863,7 +1908,7 @@ begin
       //  'height: ' + ALFloatToStrW(LNewSizeValue.height));
       {$ENDIF}
       if assigned(fVideoPlayerEngine.fOnVideoSizeChangedEvent) then
-        fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, round(LNewSizeValue.width), round(LNewSizeValue.height));
+        fVideoPlayerEngine.fOnVideoSizeChangedEvent(fVideoPlayerEngine, fVideoPlayerEngine.fVideoWidth, fVideoPlayerEngine.fVideoHeight);
     end
     else if LkeyPath = 'status' then begin
       {$IF defined(DEBUG)}
@@ -2011,6 +2056,9 @@ constructor TALIOSVideoPlayer.Create;
 begin
   inherited;
   //--
+  FVideoRotationDegrees := 0;
+  fVideoWidth := 0;
+  fVideoHeight := 0;
   fState := vpsIdle;
   FAutoStartWhenPrepared := False;
   fLooping := False;
@@ -2462,6 +2510,22 @@ begin
     ALLog('TALIOSVideoPlayer.DoOnReady', 'Ready');
     {$ENDIF}
 
+    fVideoRotationDegrees := 0;
+    var LAsset := FPlayerItem.asset;
+    if LAsset = nil then exit;
+    var LTracks := FPlayerItem.asset.tracksWithMediaType(AVMediaTypeVideo);
+    if (LTracks <> nil) and (LTracks.count > 0) then begin
+      var LTrack := TAVAssetTrack.Wrap(LTracks.objectAtIndex(0));
+      var LpreferredTransform := LTrack.preferredTransform;
+      var LRadians: Double := ArcTan2(LpreferredTransform.b, LpreferredTransform.a);
+      fVideoRotationDegrees := Round(LRadians * 180 / PI);
+      if fVideoRotationDegrees < 0 then fVideoRotationDegrees := fVideoRotationDegrees + 360;
+      fVideoRotationDegrees := fVideoRotationDegrees mod 360; // 0, 90, 180, 270 (typically)
+    end;
+
+    fVideoHeight := round(FPlayerItem.presentationSize.height);
+    fVideoWidth := round(FPlayerItem.presentationSize.width);
+
     //i need to do this here because of bug like :
     //https://forums.developer.apple.com/thread/27589
     //http://stackoverflow.com/questions/24800742/iosavplayeritemvideooutput-hasnewpixelbufferforitemtime-doesnt-work-correctly
@@ -2633,6 +2697,16 @@ begin
   else result := 0;
 end;
 
+{**********************************************************}
+function TALIOSVideoPlayer.GetVideoRotationDegrees: Integer;
+begin
+  if not (GetState in [vpsIdle, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then begin
+    result := 0;
+    exit;
+  end;
+  result := fVideoRotationDegrees;
+end;
+
 {*************************************************}
 function TALIOSVideoPlayer.GetVideoHeight: Integer;
 begin
@@ -2640,8 +2714,7 @@ begin
     result := 0;
     exit;
   end;
-  if FPlayerItem <> nil then Result := round(FPlayerItem.presentationSize.height)
-  else result := 0;
+  Result := fVideoHeight;
 end;
 
 {************************************************}
@@ -2651,8 +2724,7 @@ begin
     result := 0;
     exit;
   end;
-  if FPlayerItem <> nil then Result := round(FPlayerItem.presentationSize.width)
-  else result := 0;
+  Result := fVideoWidth;
 end;
 
 {*************************************************************}
@@ -2666,14 +2738,17 @@ begin
   {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4401 is corrected, if yes replace P: Pointer by LURL: NSUrl, and adjust the IFDEF'}
   {$ENDIF}
-  var P: Pointer;
-  if AlIsHttpOrHttpsUrl(ADataSource) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(ADataSource)) // Creates and returns an NSURL object initialized with a provided URL string
-  else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(ADataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
-  if P = nil then begin
+  var LURL: NSURL;
+  if AlIsHttpOrHttpsOrFileUrl(ADataSource) then LURL := TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(StrToNSStr(ADataSource))) // file:///private/var/mobile/Containers/Data/Application/60A33449-8FC7-4856-93E2-59F0C2D31258/tmp/.com.apple.Foundation.NSItemProvider.8lWULS/IMG_0084.mov
+  else begin
+    var LPath := StrToNSStr(ADataSource); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/38C9EB5E67AAF011BA8F25B41B5A9FDF.mov
+    var LStdPath := LPath.stringByStandardizingPath; // /var/mobile/Containers/Data/Application/C49B025A-DD1C-4608-A9EC-02001F868CB4/tmp/0294975468AAF011A54D39642644413B.mov
+    LURL := TNSUrl.Wrap(TNSUrl.OCClass.fileURLWithPath(LStdPath));
+  end;
+  if LURL = nil then begin
     ALLog('TALIOSVideoPlayer.Prepare', 'Failed to create NSURL from the provided data source (%s)', [ADataSource], TALLogType.ERROR);
     exit;
   end;
-  var LURL := TNSUrl.Wrap(P);
   // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
   // No release required for LURL because it wasn’t created via a method whose name starts with “alloc”, “new”, “copy”, or “mutableCopy”.
   //
@@ -2847,6 +2922,12 @@ end;
 function TALAsyncVideoPlayer.GetDuration: Int64;
 begin
   Result := TALVideoPlayerControllerThread.Instance.GetDuration(FEngineIndex);
+end;
+
+{************************************************************}
+function TALAsyncVideoPlayer.GetVideoRotationDegrees: Integer;
+begin
+  Result := TALVideoPlayerControllerThread.Instance.GetVideoRotationDegrees(FEngineIndex);
 end;
 
 {***************************************************}
@@ -3106,6 +3187,9 @@ begin
 
         TOperation.GetDuration:
           LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetDuration;
+
+        TOperation.GetVideoRotationDegrees:
+          LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetVideoRotationDegrees;
 
         TOperation.GetVideoHeight:
           LCommand.Response.ResultInt64 := LEngine.CoreVideoPlayer.GetVideoHeight;
@@ -3557,6 +3641,12 @@ begin
   Result := EnqueueCommand(AEngineIndex, TOperation.GetDuration, True{AWaitResponse}).ResultInt64;
 end;
 
+{****************************************************************************************************}
+function TALVideoPlayerControllerThread.GetVideoRotationDegrees(const AEngineIndex: Integer): Integer;
+begin
+  Result := Integer(EnqueueCommand(AEngineIndex, TOperation.GetVideoRotationDegrees, True{AWaitResponse}).ResultInt64);
+end;
+
 {*******************************************************************************************}
 function TALVideoPlayerControllerThread.GetVideoHeight(const AEngineIndex: Integer): Integer;
 begin
@@ -3638,6 +3728,7 @@ begin
   FIsFirstFrame := true;
   FAutoStartMode := TAutoStartMode.None;
   FWrapMode := TALImageWrapMode.Fit;
+  FRotateAccordingToMetadataOrientation := False;
   FCacheIndex := 0;
   FCacheEngine := nil;
   FPreviewDownloadContext := nil;
@@ -3804,6 +3895,16 @@ begin
   end;
 end;
 
+{********************************************************************************************}
+procedure TALVideoPlayerSurface.SetRotateAccordingToMetadataOrientation(const Value: Boolean);
+begin
+  if FRotateAccordingToMetadataOrientation <> Value then begin
+    ClearBufDrawable;
+    FRotateAccordingToMetadataOrientation := Value;
+    Repaint;
+  end;
+end;
+
 {***********************************************}
 function TALVideoPlayerSurface.GetState: Integer;
 begin
@@ -3875,6 +3976,12 @@ end;
 function TALVideoPlayerSurface.GetDuration: Int64;
 begin
   Result := fVideoPlayerEngine.GetDuration;
+end;
+
+{**************************************************************}
+function TALVideoPlayerSurface.GetVideoRotationDegrees: Integer;
+begin
+  Result := fVideoPlayerEngine.GetVideoRotationDegrees;
 end;
 
 {*****************************************************}
@@ -4583,45 +4690,75 @@ begin
       {$ENDIF}
     end;
 
+    var LVideoRotationDegrees := fVideoPlayerEngine.GetVideoRotationDegrees;
+    var LLocalRect: TRectF;
+    if (FRotateAccordingToMetadataOrientation) and
+       ((LVideoRotationDegrees = 90) or
+        (LVideoRotationDegrees = 270)) then LLocalRect := TRectF.Create(0, 0, Height, Width).CenterAt(LocalRect)
+    else LLocalRect := TRectF.Create(0, 0, Width, Height);
     var LSrcRect: TrectF;
     var LDstRect: TrectF;
     case WrapMode of
-
       TALImageWrapMode.Fit: begin
         LSrcRect := Trectf.Create(
                       0, 0,
                       ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
                       ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
         LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
-                      FitInto(LocalRect);
+                      FitInto(LLocalRect);
       end;
-
       TALImageWrapMode.Stretch: begin
         LSrcRect := Trectf.Create(
                       0, 0,
                       ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
                       ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
-        LDstRect := LocalRect;
+        LDstRect := LLocalRect;
       end;
-
       TALImageWrapMode.Place: begin
         LSrcRect := Trectf.Create(
                       0, 0,
                       ALGetDrawableWidth(fVideoPlayerEngine.Drawable),
                       ALGetDrawableHeight(fVideoPlayerEngine.Drawable));
         LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)).
-                      PlaceInto(LocalRect);
+                      PlaceInto(LLocalRect);
       end;
-
       TALImageWrapMode.FitAndCrop: begin
         LDstRect := TRectF.Create(0, 0, Width, Height);
         LDstRect := ALAlignDimensionToPixelRound(LDstRect, 1{Scale}, TEpsilon.Position);
         LSrcRect := ALRectFitInto(LDstRect, TrectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayerEngine.Drawable), ALGetDrawableHeight(fVideoPlayerEngine.Drawable)));
       end;
-
       else
         Raise Exception.Create('Error B0DE069F-2CFD-4719-9130-0D69A647EE2D')
+    end;
 
+    if FRotateAccordingToMetadataOrientation then begin
+      if (LVideoRotationDegrees = 180) then begin
+        var LMatrixRotationCenter: TpointF;
+        LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+        LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+        var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+        LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(180)); // matrix.setRotate(180);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+        Canvas.SetMatrix(LMatrix);
+      end
+      else if (LVideoRotationDegrees = 270) then begin
+        var LMatrixRotationCenter: TpointF;
+        LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+        LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+        var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+        LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+        Canvas.SetMatrix(LMatrix);
+      end
+      else if (LVideoRotationDegrees = 90) then begin
+        var LMatrixRotationCenter: TpointF;
+        LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+        LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+        var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+        LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
+        Canvas.SetMatrix(LMatrix);
+      end;
     end;
 
     ALDrawDrawable(

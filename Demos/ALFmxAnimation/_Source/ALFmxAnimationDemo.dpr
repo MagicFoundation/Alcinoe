@@ -1,4 +1,4 @@
-program ALAnimationDemo;
+program ALFmxAnimationDemo;
 
 uses
   System.StartUpCopy,

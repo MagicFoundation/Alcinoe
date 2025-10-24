@@ -8,7 +8,7 @@ if "%ALBaseDir%"=="" (
   IF ERRORLEVEL 1 goto ERROR  
 )
 
-set Libraries=%ALBaseDir%\Demos\ALAnimation\_Source\Android\App\
+set Libraries=%ALBaseDir%\Demos\ALFmxAnimation\_Source\Android\App\
 
 REM Required by fmx.jar, else the app crash at startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Landroidx/activity/result/contract/ActivityResultContracts$OpenDocument;
@@ -25,9 +25,9 @@ set Libraries=%Libraries%;com.google.guava:guava:32.1.3-android
 call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^
  -Libraries="%Libraries%"^
- -OutputDir="%ALBaseDir%\Demos\ALAnimation\_Source\Android\Merged"^
- -DProj="%ALBaseDir%\Demos\ALAnimation\_Source\ALAnimationDemo.dproj"^
- -AndroidManifest="%ALBaseDir%\Demos\ALAnimation\_Source\AndroidManifest.template.xml"^
+ -OutputDir="%ALBaseDir%\Demos\ALFmxAnimation\_Source\Android\Merged"^
+ -DProj="%ALBaseDir%\Demos\ALFmxAnimation\_Source\ALFmxAnimationDemo.dproj"^
+ -AndroidManifest="%ALBaseDir%\Demos\ALFmxAnimation\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 

@@ -1,4 +1,4 @@
-program ALConfettiDemo;
+program ALFmxConfettiDemo;
 
 uses
   System.StartUpCopy,

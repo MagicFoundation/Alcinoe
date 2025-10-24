@@ -8,7 +8,7 @@
     <Platform Condition="'$(Platform)'==''">iOSDevice64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
-    <MainSource>ALConfettiDemo.dpr</MainSource>
+    <MainSource>ALFmxConfettiDemo.dpr</MainSource>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
     <Base>true</Base>
@@ -136,7 +136,7 @@
     <AUP_READ_PHONE_STATE>true</AUP_READ_PHONE_STATE>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-    <SanitizedProjectName>ALConfettiDemo</SanitizedProjectName>
+    <SanitizedProjectName>ALFmxConfettiDemo</SanitizedProjectName>
     <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Florence\fmx;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <DCC_Define>SKIA;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
@@ -460,7 +460,7 @@
     <BorlandProject>
       <Delphi.Personality>
         <Source>
-          <Source Name="MainSource">ALConfettiDemo.dpr</Source>
+          <Source Name="MainSource">ALFmxConfettiDemo.dpr</Source>
         </Source>
         <Excluded_Packages>
           <Excluded_Packages Name="$(BDSBIN)\dcloffice2k370.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>

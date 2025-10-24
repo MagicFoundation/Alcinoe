@@ -1,0 +1,3 @@
+gallery RCDATA "gallery.png"
+camera RCDATA "camera.png"
+video_camera RCDATA "video_camera.png"

@@ -31,7 +31,7 @@ specific nuances of different applications.
 DEMO :
 ------
 
-https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation
+https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxAnimation
 
 *******************************************************************************}
 unit Alcinoe.FMX.Ani;

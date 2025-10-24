@@ -387,16 +387,18 @@ goto BUILD_DEMOS
 
 :DO_BUILD_DEMOS
 
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxAnimation" "_Source" "ALFmxAnimationDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxConfetti" "_Source" "ALFmxConfettiDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxControls" "_Source" "ALFmxControlsDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxDynamicListBox" "_Source" "ALFmxDynamicListBoxDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALAnimation" "_Source" "ALAnimationDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALConfetti" "_Source" "ALConfettiDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFacebookLogin" "_Source" "ALFacebookLoginDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALNotificationService" "_Source" "ALNotificationServiceDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFacebookLogin" "_Source" "ALFmxFacebookLoginDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_Source" "ALFmxFilterEffectsDemo.dproj" || PAUSE
-Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALGeoLocationSensor" "_Source" "ALGeoLocationSensorDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGeoLocationSensor" "_Source" "ALFmxGeoLocationSensorDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxMediaPicker" "_Source" "ALFmxMediaPickerDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxNotificationService" "_Source" "ALFmxNotificationServiceDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHttpServer" "_Source" "ALHttpServerDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPOP3Client" "_Source" "ALPOP3ClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_Source" "ALRTTIDemo.dproj" || PAUSE
@@ -405,7 +407,6 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSort
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHttpServer" "_Source" "ALHttpServerDemo.dproj" || PAUSE
 if "%DXVCL%"=="" goto DEPLOY_TO_APP_STORE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_Source" "ALWinHTTPClientDemo.dproj" || PAUSE

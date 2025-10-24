@@ -93,8 +93,8 @@ Example
     -DProjNormalizer=c:\Alcinoe\Tools\DProjNormalizer\DProjNormalizer.exe
 ```
  
-You can also check the ALFacebookLogin Demo and in particular the script:
-[{Alcinoe}\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin/_source/android/MergeLibraries.bat)
+You can also check the ALFmxFacebookLogin Demo and in particular the script:
+[{Alcinoe}\Demos\ALFmxFacebookLogin\_source\android\MergeLibraries.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFacebookLogin/_source/android/MergeLibraries.bat)
 
 Note
 ----
@@ -145,4 +145,4 @@ ic_launcher.png, etc. Then include this dir in the -libraries path like :
 AndroidMerger.exe -Libraries="androidx.appcompat:appcompat:1.5.1;<mydir>" ...
 ```
 
-You can look the [{Alcinoe}\Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService) as example
+You can look the [{Alcinoe}\Demos\ALFmxNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxNotificationService) as example

@@ -8,7 +8,7 @@ Setup (ANDROID)
 On android you just need to include the library io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1
 in the project. You also need to include google-services.json. You can do all
 of this with the help of AndroidMerger. you can see an exemple in
-<Alcinoe>\Demos\ALNotificationService\_source\android\MergeLibraries.bat
+<Alcinoe>\Demos\ALFmxNotificationService\_source\android\MergeLibraries.bat
 
 
 Setup (IOS)
@@ -54,7 +54,7 @@ Setup (IOS)
 
 5) You must deploy the GoogleService-Info.plist to the root of the app. You
    can use DeployMan for this. you can see an exemple in
-   <Alcinoe>\Demos\ALNotificationService\_source\ios\DeployMan.bat.
+   <Alcinoe>\Demos\ALFmxNotificationService\_source\ios\DeployMan.bat.
    All info regarding generating the GoogleService-Info.plist can be found at
    https://firebase.google.com/docs/ios/setup
 
@@ -76,7 +76,7 @@ Setup (IOS)
 
    You can use the template of an app extension:
    * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
-     all occurences of io.magicfoundation.alcinoe.alnotificationservicedemo by the bundle identifiers
+     all occurences of io.magicfoundation.alcinoe.alfmxnotificationservicedemo by the bundle identifiers
      of your delphi app
    * Copy the content of <alcinoe>\References\iOSNotification\ somewhere in
      the macos. ex: /Users/<username>/Documents/iOSNotification
@@ -85,7 +85,7 @@ Setup (IOS)
    * Copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
      in a local folder to your project and with DeployMan instruct the dproj
      to deploy those file with your app. see an exemple of the DeployMan
-     command in <Alcinoe>\Demos\ALNotificationService\_source\ios\DeployMan.bat
+     command in <Alcinoe>\Demos\ALFmxNotificationService\_source\ios\DeployMan.bat
 
    Or You can create the app extension in the following way:
    * Launch Xcode and select "create a new xcode project"
@@ -94,7 +94,7 @@ Setup (IOS)
      * Select your team (you need one just to be able to compile the
        project)
      * Enter the organization identifier of your project. Ex:
-       io.magicfoundation.alcinoe.alnotificationservicedemo, doesn't matter if not exact you will
+       io.magicfoundation.alcinoe.alfmxnotificationservicedemo, doesn't matter if not exact you will
        change it later
      * Select SwiftUI for the Interface
      * Select Swift for the language
@@ -131,7 +131,7 @@ Setup (IOS)
      * Select the signing & capabilities tab
        * Select "ALL" capabillity
        * Bundle Identifier: the bundle identifier of your delphi app
-         (without the team id) Ex: io.magicfoundation.alcinoe.alnotificationservicedemo
+         (without the team id) Ex: io.magicfoundation.alcinoe.alfmxnotificationservicedemo
    * In target select the service extension. Ex NotificationService
      * Select the General tab
        * Deployment info: iOS 11
@@ -140,7 +140,7 @@ Setup (IOS)
        * then select the signing & capabilities tab
          * Bundle Identifier: the bundle identifier of your delphi app
            (without the team id) + .notificationservice. Ex:
-           io.magicfoundation.alcinoe.alnotificationservicedemo.notificationservice
+           io.magicfoundation.alcinoe.alfmxnotificationservicedemo.notificationservice
    * in the left panel of xcode select the app extension.
      Ex NotificationService
    * Select the file NotificationService.m
@@ -158,7 +158,7 @@ Setup (IOS)
    * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
      in a local folder to your project and with DeployMan instruct the dproj
      to deploy those file with your app. see an exemple of the DeployMan
-     command in <Alcinoe>\Demos\ALNotificationService\_source\ios\DeployMan.bat
+     command in <Alcinoe>\Demos\ALFmxNotificationService\_source\ios\DeployMan.bat
 
 
 Regarding Badge

@@ -59,7 +59,7 @@ type
   //NSDirectionalRectEdge = NSUInteger;
   //TPhotosUICompletionHandler1 = procedure(param1: NSArray) of object;
 
-  {*******************************************}
+  {*********************************************}
   //PHLivePhotoViewClass = interface(UIViewClass)
     //['{F43FF751-4E8C-4A99-942E-228195274105}']
     //{class} function livePhotoBadgeImageWithOptions(badgeOptions: PHLivePhotoBadgeOptions): UIImage; cdecl;
@@ -107,7 +107,7 @@ type
   TPHPickerFilter = class(TOCGenericImport<PHPickerFilterClass, PHPickerFilter>) end;
   PPHPickerFilter = Pointer;
 
-  {*********************************************************}
+  {***********************************************************}
   //PHPickerUpdateConfigurationClass = interface(NSObjectClass)
     //['{CCD5DFA3-6C86-4B2D-BAB4-04DF368B6B22}']
   //end;
@@ -181,7 +181,7 @@ type
   TPHPickerViewController = class(TOCGenericImport<PHPickerViewControllerClass, PHPickerViewController>) end;
   PPHPickerViewController = Pointer;
 
-  {**************************************}
+  {****************************************}
   //PhotosUISupport = interface(IObjectiveC)
     //['{5220A509-13A8-467D-8B1D-BA2720AB2AF3}']
     //[MethodName('presentLimitedLibraryPickerFromViewController:')]
@@ -190,7 +190,7 @@ type
     //procedure presentLimitedLibraryPickerFromViewControllerCompletionHandler(controller: UIViewController; completionHandler: TPhotosUICompletionHandler1); cdecl;
   //end;
 
-  {*************************************************}
+  {***************************************************}
   //PHContentEditingController = interface(IObjectiveC)
     //['{5606540A-E904-4239-B7FB-1AF686CAD292}']
     //function canHandleAdjustmentData(adjustmentData: PHAdjustmentData): BOOL; cdecl;
@@ -200,7 +200,7 @@ type
     //function shouldShowCancelConfirmation: BOOL; cdecl;
   //end;
 
-  {**********************************************}
+  {************************************************}
   //PHLivePhotoViewDelegate = interface(IObjectiveC)
     //['{F99664CF-757B-4411-BB0D-4153963DFA2E}']
     //[MethodName('livePhotoView:canBeginPlaybackWithStyle:')]

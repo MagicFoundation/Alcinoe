@@ -29,14 +29,14 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
-{************************************************************************************}
+{******************************************************************************************}
 Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString): AnsiString;
 Begin
   if not AlExtbyMimeContentTypeA.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then
     result := '';
 end;
 
-{****************************************************************************}
+{**********************************************************************************}
 Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String): String;
 Begin
   if not AlExtbyMimeContentTypeW.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then

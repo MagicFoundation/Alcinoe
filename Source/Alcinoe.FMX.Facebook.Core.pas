@@ -21,7 +21,7 @@ https://developers.facebook.com/docs/android/getting-started
     <string name="facebook_client_token">56789</string>
 
    You can merge this strings.xml with the help of AndroidMerger. You can see
-   an exemple in <Alcinoe>\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
+   an exemple in <Alcinoe>\Demos\ALFmxFacebookLogin\_source\android\MergeLibraries.bat
 
 2) https://developers.facebook.com/docs/android/getting-started
    Open the /app/manifest/AndroidManifest.xml file.

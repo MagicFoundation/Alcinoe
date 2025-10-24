@@ -12,7 +12,7 @@ https://developers.facebook.com/docs/sharing/android/
 2) On android you just need to include the library
      * io.magicfoundation.alcinoe:alcinoe-facebook-share:1.0.0
    in the project. You can do this with the help of AndroidMerger. You can see
-   an exemple in <Alcinoe>\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
+   an exemple in <Alcinoe>\Demos\ALFmxFacebookLogin\_source\android\MergeLibraries.bat
 
 3) https://developers.facebook.com/docs/sharing/android/
    https://developers.facebook.com/docs/reference/android/current/class/FacebookContentProvider/

@@ -5,10 +5,11 @@
     <FrameworkType>None</FrameworkType>
     <Base>True</Base>
     <Config Condition="'$(Config)'==''">Debug</Config>
-    <Platform Condition="'$(Platform)'==''">iOSDevice64</Platform>
+    <Platform Condition="'$(Platform)'==''">Win32</Platform>
     <TargetedPlatforms>693395</TargetedPlatforms>
     <AppType>Console</AppType>
     <MainSource>ALDUnitXTests.dpr</MainSource>
+    <ProjectName Condition="'$(ProjectName)'==''">ALDUnitXTests</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
     <Base>true</Base>

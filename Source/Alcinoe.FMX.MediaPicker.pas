@@ -212,7 +212,7 @@ begin
   FMediaType := AMediaType;
 end;
 
-{***********************************}
+{********************************************************}
 function TALMediaPicker.TMediaItem.ExtractStream: TStream;
 begin
   {$IF defined(ANDROID)}
@@ -227,11 +227,11 @@ begin
       try
         LProjection.Items[0] := TJOpenableColumns.JavaClass.SIZE;
         var LCursor := TAndroidHelper.Context.getContentResolver.query(
-          LUri, // uri: Jnet_Uri
-          LProjection, // projection: TJavaObjectArray<JString>
-          nil, // selection: JString
-          nil, // selectionArgs: TJavaObjectArray<JString>
-          nil); // sortOrder: JString
+                         LUri, // uri: Jnet_Uri
+                         LProjection, // projection: TJavaObjectArray<JString>
+                         nil, // selection: JString
+                         nil, // selectionArgs: TJavaObjectArray<JString>
+                         nil); // sortOrder: JString
         if (LCursor <> nil) then begin
           if LCursor.moveToFirst then begin
             var LSizeColumnIndex := LCursor.getColumnIndex(TJOpenableColumns.JavaClass.SIZE);
@@ -579,7 +579,7 @@ begin
 end;
 {$ENDIF}
 
-{***********************************}
+{********************************}
 constructor TALMediaPicker.Create;
 begin
   inherited Create;
@@ -605,7 +605,7 @@ begin
   {$ENDIF}
 end;
 
-{***********************************}
+{********************************}
 destructor TALMediaPicker.Destroy;
 begin
   {$IF defined(IOS)}

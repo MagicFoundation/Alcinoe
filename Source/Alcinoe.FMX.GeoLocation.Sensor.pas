@@ -20,7 +20,7 @@ Setup (ANDROID)
    * com.google.android.gms:play-services-base:18.2.0
    * com.google.android.gms:play-services-location:21.0.1
    in the project. You can do this with the help of AndroidMerger. You can see
-   an exemple in <Alcinoe>\Demos\ALGeoLocationSensor\_source\Android\MergeLibraries.bat
+   an exemple in <Alcinoe>\Demos\ALFmxGeoLocationSensor\_source\Android\MergeLibraries.bat
 
 2) In the AndroidManifest.template.xml file, you need to add the following
    permissions based on your requirements:

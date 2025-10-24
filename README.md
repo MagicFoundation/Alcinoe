@@ -580,7 +580,7 @@ color, ensuring seamless integration into any project.
 Whether it's for celebrations, notifications, or 
 dynamic visual effects, **ALConfetti** delivers a 
 smooth, high-performance animation experience. 
-Learn more at [Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
+Learn more at [Demos/ALFmxConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 <br/>
@@ -698,7 +698,7 @@ far beyond the traditional ease-in or ease-out sequences.
 </p>
 
 Learn more at 
-[Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+[Demos/ALFmxAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxAnimation)
 <br/>
 <br/>
 
@@ -724,7 +724,7 @@ This version improves the flow and clarity of the description
 while keeping the markdown formatting
 
 Learn more at 
-[Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+[Demos/ALFmxAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxAnimation)
 
 <br clear="left"/>
 <br/>
@@ -771,7 +771,7 @@ to mobile users, improving engagement and communication within
 their apps.
 
 Learn more at 
-[Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)
+[Demos\ALFmxNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxNotificationService)
 <br/>
 <br/>
 
@@ -796,7 +796,7 @@ developers can seamlessly integrate location-based functionality
 into their apps without needing to manage the underlying 
 implementation details.
 
-Learn more at [Demos\ALGeoLocationSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoLocationSensor)
+Learn more at [Demos\ALFmxGeoLocationSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxGeoLocationSensor)
 <br/>
 <br/>
   
@@ -826,7 +826,7 @@ Once logged in, users can grant permissions to your app, enabling you
 to retrieve information or perform actions on VKontakte/Facebook 
 on their behalf.
 
-Learn more at [Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
+Learn more at [Demos\ALFmxFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFacebookLogin)
 <br/>
 <br/>
 

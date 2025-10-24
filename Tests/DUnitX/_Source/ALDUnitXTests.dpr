@@ -76,6 +76,7 @@ uses
   Alcinoe.iOSApi.FirebaseMessaging,
   Alcinoe.iOSApi.MessageUI,
   Alcinoe.iOSApi.Photos,
+  Alcinoe.iOSapi.PhotosUI,
   {$IFNDEF IOSSIMULATOR}
   Alcinoe.iOSApi.VKontakte,
   {$ENDIF}
@@ -129,6 +130,7 @@ uses
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.LoadingOverlay,
   Alcinoe.FMX.Materials.Canvas,
+  Alcinoe.FMX.MediaPicker,
   Alcinoe.FMX.GeoLocation.Sensor,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.NativeControl,

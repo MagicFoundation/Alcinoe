@@ -8,7 +8,7 @@ if "%ALBaseDir%"=="" (
   IF ERRORLEVEL 1 goto ERROR  
 )
 
-set Libraries=%ALBaseDir%\Demos\ALNotificationService\_Source\Android\App\
+set Libraries=%ALBaseDir%\Demos\ALFmxNotificationService\_Source\Android\App\
 set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1
 
 REM Required by fmx.jar, else the app crash at startup with 
@@ -26,10 +26,10 @@ set Libraries=%Libraries%;com.google.guava:guava:32.1.3-android
 call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^
  -Libraries="%Libraries%"^
- -OutputDir="%ALBaseDir%\Demos\ALNotificationService\_Source\Android\Merged"^
- -DProj="%ALBaseDir%\Demos\ALNotificationService\_Source\ALNotificationServiceDemo.dproj"^
- -AndroidManifest="%ALBaseDir%\Demos\ALNotificationService\_Source\AndroidManifest.template.xml"^
- -GoogleServicesJson="%ALBaseDir%\Demos\ALNotificationService\_Source\Android\GoogleServices\google-services.json"^
+ -OutputDir="%ALBaseDir%\Demos\ALFmxNotificationService\_Source\Android\Merged"^
+ -DProj="%ALBaseDir%\Demos\ALFmxNotificationService\_Source\ALFmxNotificationServiceDemo.dproj"^
+ -AndroidManifest="%ALBaseDir%\Demos\ALFmxNotificationService\_Source\AndroidManifest.template.xml"^
+ -GoogleServicesJson="%ALBaseDir%\Demos\ALFmxNotificationService\_Source\Android\GoogleServices\google-services.json"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
  -NoInteraction=%NoInteraction%
 IF ERRORLEVEL 1 goto ERROR 

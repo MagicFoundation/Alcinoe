@@ -1,4 +1,4 @@
-program ALNotificationServiceDemo;
+program ALFmxNotificationServiceDemo;
 
 uses
   System.StartUpCopy,

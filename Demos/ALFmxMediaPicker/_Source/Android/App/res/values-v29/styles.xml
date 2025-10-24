@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="Theme.App" parent="@android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:forceDarkAllowed">false</item>
+    <item name="android:windowBackground">@drawable/splashscreen</item>
+  </style>
+
+</resources>

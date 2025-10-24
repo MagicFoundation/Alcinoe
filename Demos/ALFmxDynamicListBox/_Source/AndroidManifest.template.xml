@@ -37,7 +37,7 @@
                android:debuggable="%debuggable%"
                android:largeHeap="true"
                android:icon="@mipmap/ic_launcher"
-               android:theme="@style/AppTheme"
+               android:theme="@style/Theme.App"
                android:hardwareAccelerated="%hardwareAccelerated%"
                android:usesCleartextTraffic="true"
                android:resizeableActivity="true"

@@ -741,7 +741,7 @@
     <iPad_SpotLight80>.\iOS\Icons\ipad_spotlight_search_icon_80x80.png</iPad_SpotLight80>
     <iPhone_Spotlight80>.\iOS\Icons\iphone_spotlight_search_icon_80x80.png</iPhone_Spotlight80>
     <BT_BuildType>Debug</BT_BuildType>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo</VerInfo_BundleId>
     <iPhone_Spotlight120>.\iOS\Icons\iphone_spotlight_search_icon_120x120.png</iPhone_Spotlight120>
     <iPad_AppIcon83_5>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png</iPad_AppIcon83_5>
@@ -766,7 +766,7 @@
     <DCC_iOSMinimumVersion>12.0</DCC_iOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base_iOSSimARM64)'!=''">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
@@ -902,7 +902,7 @@
     <VerInfo_Build>95</VerInfo_Build>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_iOSSimARM64)'!=''">
     <Cfg_1>true</Cfg_1>
@@ -910,7 +910,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
     <VerInfo_Build>95</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName);CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
   </PropertyGroup>
@@ -984,7 +984,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -993,7 +993,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_3_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1054,7 +1054,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1063,7 +1063,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_4_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1124,7 +1124,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1133,7 +1133,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Skia_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_5_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1194,7 +1194,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1203,7 +1203,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_6_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1264,7 +1264,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1273,7 +1273,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Vulkan;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_7_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1334,7 +1334,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1343,7 +1343,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_ALSkiaEngine_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_8_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1404,7 +1404,7 @@
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_iOSSimARM64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1413,7 +1413,7 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_Metal;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_9_OSX64)'!=''">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -1470,7 +1470,7 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
     <VerInfo_Build>95</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug</VerInfo_BundleId>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
@@ -1480,7 +1480,7 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_MajorVer>2</VerInfo_MajorVer>
     <VerInfo_Build>95</VerInfo_Build>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=D$(MSBuildProjectName)_Debug_OpenGL;CFBundleIdentifier=io.magicfoundation.alcinoe.alfmxdynamiclistboxdemo.debug;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.95;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.95;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple's speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <iOS_BackgroundColor>FF181818</iOS_BackgroundColor>
     <iOS_DarkBackgroundColor>FF181818</iOS_DarkBackgroundColor>
@@ -1772,7 +1772,7 @@
         </Excluded_Packages>
       </Delphi.Personality>
       <Deployment Version="5">
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="..\Android64\Debug\splash_image_def.xml">
+        <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="Android64\Debug\splash_image_def.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -1892,7 +1892,147 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="..\Android64\Debug\styles.xml">
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android64\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_ALSkiaEngine" LocalName="Android64\Debug_ALSkiaEngine\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_ALSkiaEngine" LocalName="Android\Debug_ALSkiaEngine\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android64\Debug_ALSkiaEngine_Metal\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android\Debug_ALSkiaEngine_Metal\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android64\Debug_ALSkiaEngine_Vulkan\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android\Debug_ALSkiaEngine_Vulkan\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Metal" LocalName="Android64\Debug_Metal\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Metal" LocalName="Android\Debug_Metal\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_OpenGL" LocalName="Android64\Debug_OpenGL\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_OpenGL" LocalName="Android\Debug_OpenGL\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Skia" LocalName="Android64\Debug_Skia\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Skia" LocalName="Android\Debug_Skia\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Skia_Metal" LocalName="Android64\Debug_Skia_Metal\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Skia_Metal" LocalName="Android\Debug_Skia_Metal\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Skia_Vulkan" LocalName="Android64\Debug_Skia_Vulkan\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug_Skia_Vulkan" LocalName="Android\Debug_Skia_Vulkan\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android64\Release\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android\Release\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android64\Debug\styles.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -2012,7 +2152,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV21" Configuration="Debug" LocalName="..\Android64\Debug\styles-v21.xml">
+        <DeployFile Class="AndroidSplashStylesV21" Configuration="Debug" LocalName="Android64\Debug\styles-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -2152,7 +2292,147 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV35" Configuration="Debug" LocalName="..\Android64\Debug\styles-v35.xml">
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android64\Debug\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android\Debug\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_ALSkiaEngine" LocalName="Android64\Debug_ALSkiaEngine\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_ALSkiaEngine" LocalName="Android\Debug_ALSkiaEngine\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android64\Debug_ALSkiaEngine_Metal\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android\Debug_ALSkiaEngine_Metal\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android64\Debug_ALSkiaEngine_Vulkan\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android\Debug_ALSkiaEngine_Vulkan\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Metal" LocalName="Android64\Debug_Metal\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Metal" LocalName="Android\Debug_Metal\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_OpenGL" LocalName="Android64\Debug_OpenGL\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_OpenGL" LocalName="Android\Debug_OpenGL\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Skia" LocalName="Android64\Debug_Skia\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Skia" LocalName="Android\Debug_Skia\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Skia_Metal" LocalName="Android64\Debug_Skia_Metal\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Skia_Metal" LocalName="Android\Debug_Skia_Metal\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Skia_Vulkan" LocalName="Android64\Debug_Skia_Vulkan\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug_Skia_Vulkan" LocalName="Android\Debug_Skia_Vulkan\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android64\Release\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android\Release\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV35" Configuration="Debug" LocalName="Android64\Debug\styles-v35.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -2292,7 +2572,687 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="..\Android64\Debug\colors.xml">
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android64\Debug\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android\Debug\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_ALSkiaEngine" LocalName="Android64\Debug_ALSkiaEngine\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_ALSkiaEngine" LocalName="Android\Debug_ALSkiaEngine\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android64\Debug_ALSkiaEngine_Metal\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android\Debug_ALSkiaEngine_Metal\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android64\Debug_ALSkiaEngine_Vulkan\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android\Debug_ALSkiaEngine_Vulkan\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Metal" LocalName="Android64\Debug_Metal\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Metal" LocalName="Android\Debug_Metal\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_OpenGL" LocalName="Android64\Debug_OpenGL\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_OpenGL" LocalName="Android\Debug_OpenGL\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Skia" LocalName="Android64\Debug_Skia\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Skia" LocalName="Android\Debug_Skia\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Skia_Metal" LocalName="Android64\Debug_Skia_Metal\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Skia_Metal" LocalName="Android\Debug_Skia_Metal\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Skia_Vulkan" LocalName="Android64\Debug_Skia_Vulkan\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug_Skia_Vulkan" LocalName="Android\Debug_Skia_Vulkan\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android64\Release\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android\Release\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android64\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_ALSkiaEngine" LocalName="Android64\Debug_ALSkiaEngine\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_ALSkiaEngine" LocalName="Android\Debug_ALSkiaEngine\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android64\Debug_ALSkiaEngine_Metal\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_ALSkiaEngine_Metal" LocalName="Android\Debug_ALSkiaEngine_Metal\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android64\Debug_ALSkiaEngine_Vulkan\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="Android\Debug_ALSkiaEngine_Vulkan\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Metal" LocalName="Android64\Debug_Metal\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Metal" LocalName="Android\Debug_Metal\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_OpenGL" LocalName="Android64\Debug_OpenGL\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_OpenGL" LocalName="Android\Debug_OpenGL\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Skia" LocalName="Android64\Debug_Skia\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Skia" LocalName="Android\Debug_Skia\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Skia_Metal" LocalName="Android64\Debug_Skia_Metal\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Skia_Metal" LocalName="Android\Debug_Skia_Metal\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Skia_Vulkan" LocalName="Android64\Debug_Skia_Vulkan\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug_Skia_Vulkan" LocalName="Android\Debug_Skia_Vulkan\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android64\Release\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android\Release\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="Android64\Debug\colors.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -2412,7 +3372,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="..\Android64\Debug\colors-night-v21.xml">
+        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="Android64\Debug\colors-night-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -4652,7 +5612,7 @@
             <RemoteName>splash_image.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Strings" Configuration="Debug" LocalName="..\Android64\Debug\strings.xml">
+        <DeployFile Class="Android_Strings" Configuration="Debug" LocalName="Android64\Debug\strings.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -4770,6 +5730,706 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_ALSkiaEngine" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_ALSkiaEngine_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_ALSkiaEngine_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_OpenGL" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Skia" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Skia_Metal" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug_Skia_Vulkan" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_low_normal.9.png">
@@ -22546,7 +24206,7 @@
     </BorlandProject>
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
-  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" />
-  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" />
-  <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')" />
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+  <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 </Project>

@@ -42,8 +42,10 @@ type
     property Anchor: AnsiString read FAnchor write FAnchor;
   end;
 
-Function  AlIsHttpOrHttpsUrl(const AUrl: AnsiString): Boolean; overload;
-Function  AlIsHttpOrHttpsUrl(const AUrl: String): Boolean; overload;
+Function AlIsHttpOrHttpsUrl(const AUrl: AnsiString): Boolean; overload;
+Function AlIsHttpOrHttpsUrl(const AUrl: String): Boolean; overload;
+Function AlIsHttpOrHttpsOrFileUrl(const AUrl: AnsiString): Boolean; overload;
+Function AlIsHttpOrHttpsOrFileUrl(const AUrl: String): Boolean; overload;
 {$IFDEF MSWINDOWS}
 function  AlCombineUrlA(const ARelativeUrl: AnsiString; const ABaseUrl: AnsiString): AnsiString;
 {$ENDIF}
@@ -435,6 +437,74 @@ begin
       Result := (AUrl[LLowUrl+4] = ':') and
                 (AUrl[LLowUrl+5] = '/') and
                 (AUrl[LLowUrl+6] = '/');
+  end;
+end;
+
+{******************************************************************}
+Function  AlIsHttpOrHttpsOrFileUrl(const AUrl: AnsiString): Boolean;
+begin
+  var LLowUrl := low(AUrl);
+  Result := (AUrl <> '') and
+            (length(AUrl) > 7) and
+            (AUrl[LLowUrl] in ['h','H']) and
+            (AUrl[LLowUrl+1] in ['t','T']) and
+            (AUrl[LLowUrl+2] in ['t','T']) and
+            (AUrl[LLowUrl+3] in ['p','P']);
+  if Result then begin
+    Result := (length(AUrl) > 8) and
+              (AUrl[LLowUrl+4] in ['s','S']) and
+              (AUrl[LLowUrl+5] = ':') and
+              (AUrl[LLowUrl+6] = '/') and
+              (AUrl[LLowUrl+7] = '/');
+    if not result then
+      Result := (AUrl[LLowUrl+4] = ':') and
+                (AUrl[LLowUrl+5] = '/') and
+                (AUrl[LLowUrl+6] = '/');
+  end
+  else begin
+    Result := (AUrl <> '') and
+              (length(AUrl) > 7) and
+              (AUrl[LLowUrl] in ['f','F']) and
+              (AUrl[LLowUrl+1] in ['i','I']) and
+              (AUrl[LLowUrl+2] in ['l','L']) and
+              (AUrl[LLowUrl+3] in ['e','E']) and
+              (AUrl[LLowUrl+4] = ':') and
+              (AUrl[LLowUrl+5] = '/') and
+              (AUrl[LLowUrl+6] = '/');
+  end;
+end;
+
+{**************************************************************}
+Function  AlIsHttpOrHttpsOrFileUrl(const AUrl: String): Boolean;
+begin
+  var LLowUrl := low(AUrl);
+  Result := (AUrl <> '') and
+            (length(AUrl) > 7) and
+            (charInSet(AUrl[LLowUrl], ['h','H'])) and
+            (charInSet(AUrl[LLowUrl+1], ['t','T'])) and
+            (charInSet(AUrl[LLowUrl+2], ['t','T'])) and
+            (charInSet(AUrl[LLowUrl+3], ['p','P']));
+  if Result then begin
+    Result := (length(AUrl) > 8) and
+              (charInSet(AUrl[LLowUrl+4], ['s','S'])) and
+              (AUrl[LLowUrl+5] = ':') and
+              (AUrl[LLowUrl+6] = '/') and
+              (AUrl[LLowUrl+7] = '/');
+    if not result then
+      Result := (AUrl[LLowUrl+4] = ':') and
+                (AUrl[LLowUrl+5] = '/') and
+                (AUrl[LLowUrl+6] = '/');
+  end
+  else begin
+    Result := (AUrl <> '') and
+              (length(AUrl) > 7) and
+              (charInSet(AUrl[LLowUrl], ['f','F'])) and
+              (charInSet(AUrl[LLowUrl+1], ['i','I'])) and
+              (charInSet(AUrl[LLowUrl+2], ['l','L'])) and
+              (charInSet(AUrl[LLowUrl+3], ['e','E'])) and
+              (AUrl[LLowUrl+4] = ':') and
+              (AUrl[LLowUrl+5] = '/') and
+              (AUrl[LLowUrl+6] = '/');
   end;
 end;
 

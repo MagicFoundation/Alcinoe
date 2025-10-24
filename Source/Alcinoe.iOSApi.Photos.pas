@@ -8,6 +8,7 @@ uses
   Macapi.ObjectiveC,
   iOSapi.CocoaTypes,
   iOSapi.Foundation,
+  iOSapi.AVFoundation,
   iOSapi.UIKit;
 
 {$M+}
@@ -138,10 +139,10 @@ const
   //PHAssetPlaybackStyleLivePhoto = 3;
   //PHAssetPlaybackStyleVideo = 4;
   //PHAssetPlaybackStyleVideoLooping = 5;
-  //PHAssetMediaTypeUnknown = 0;
-  //PHAssetMediaTypeImage = 1;
-  //PHAssetMediaTypeVideo = 2;
-  //PHAssetMediaTypeAudio = 3;
+  PHAssetMediaTypeUnknown = 0;
+  PHAssetMediaTypeImage = 1;
+  PHAssetMediaTypeVideo = 2;
+  PHAssetMediaTypeAudio = 3;
   //PHAssetMediaSubtypeNone = 0;
   //PHAssetMediaSubtypePhotoPanorama = (1 shl 0);
   //PHAssetMediaSubtypePhotoHDR = (1 shl 1);
@@ -183,7 +184,7 @@ type
   // ===== Forward declarations =====
 
   //PHAdjustmentData = interface;
-  //PHPhotoLibrary = interface;
+  PHPhotoLibrary = interface;
   PHObject = interface;
   //PHObjectPlaceholder = interface;
   PHFetchResult = interface;
@@ -210,7 +211,7 @@ type
   //PHCollectionListChangeRequest = interface;
   PHImageRequestOptions = interface;
   //PHLivePhotoRequestOptions = interface;
-  //PHVideoRequestOptions = interface;
+  PHVideoRequestOptions = interface;
   PHImageManager = interface;
   //PHCachingImageManager = interface;
   //PHLivePhotoFrame = interface;
@@ -229,7 +230,7 @@ type
   //PHAssetCollectionSubtype = NSInteger;
   //PHAssetEditOperation = NSInteger;
   //PHAssetPlaybackStyle = NSInteger;
-  //PHAssetMediaType = NSInteger;
+  PHAssetMediaType = NSInteger;
   //NSUInteger = Cardinal;
   //PNSUInteger = ^NSUInteger;
 
@@ -303,13 +304,11 @@ type
   //TPhotosResultHandler = procedure(param1: UIImage; param2: NSDictionary) of object;
   //UIImageOrientation = NSInteger;
 
-  //(void(^)(NSData *__nullable imageData, NSString *__nullable dataUTI, UIImageOrientation orientation, NSDictionary *__nullable info))
   TPHImageManagerRequestImageDataForAssetResultHandler = procedure(imageData: NSData; dataUTI: NSString; orientation: UIImageOrientation; info: NSDictionary) of object;
-
   //TPhotosResultHandler2 = procedure(param1: PHLivePhoto; param2: NSDictionary) of object;
   //TPhotosResultHandler3 = procedure(param1: AVPlayerItem; param2: NSDictionary) of object;
   //TPhotosResultHandler4 = procedure(param1: AVAssetExportSession; param2: NSDictionary) of object;
-  //TPhotosResultHandler5 = procedure(param1: AVAsset; param2: AVAudioMix; param3: NSDictionary) of object;
+  TPHImageManagerRequestAVAssetForVideoResultHandler = procedure(avAsset: AVAsset; audioMix: AVAudioMix; info: NSDictionary) of object;
   //PHLivePhotoRequestID = Int32;
   //PPHLivePhotoRequestID = ^PHLivePhotoRequestID;
   //PHLivePhotoFrameProcessingBlock = function(param1: Pointer; param2: NSError): CIImage; cdecl;
@@ -359,7 +358,7 @@ type
     ['{830554B2-EB3A-4650-A375-2BEA4ED95323}']
 
     //+ (PHPhotoLibrary *)sharedPhotoLibrary;
-    //{ class } function sharedPhotoLibrary: PHPhotoLibrary; cdecl;
+    { class } function sharedPhotoLibrary: PHPhotoLibrary; cdecl;
 
     //+ (PHAuthorizationStatus)authorizationStatus;
     { class } function authorizationStatus: PHAuthorizationStatus; cdecl;
@@ -423,10 +422,10 @@ type
     ['{4ACE8B3F-F2FC-40EB-B291-04B6EEF85CE2}']
 
     //@property (readonly) NSUInteger count;
-    //function count: NSUInteger; cdecl;
+    function count: NSUInteger; cdecl;
 
     //- (ObjectType)objectAtIndex:(NSUInteger)index;
-    //function objectAtIndex(index: NSUInteger): ObjectType; cdecl;
+    function objectAtIndex(index: NSUInteger): ObjectType; cdecl;
 
     //- (ObjectType)objectAtIndexedSubscript:(NSUInteger)idx;
     //function objectAtIndexedSubscript(idx: NSUInteger): ObjectType; cdecl;
@@ -560,7 +559,7 @@ type
     //{ class } function fetchAssetsInAssetCollection(assetCollection: PHAssetCollection; options: PHFetchOptions): PHFetchResult; cdecl;
 
     //+ (PHFetchResult<PHAsset *> *)fetchAssetsWithLocalIdentifiers:(NSArray<NSString *> *)identifiers options:(nullable PHFetchOptions *)options; // includes hidden assets by default
-    //{ class } function fetchAssetsWithLocalIdentifiers(identifiers: NSArray; options: PHFetchOptions): PHFetchResult; cdecl;
+    { class } function fetchAssetsWithLocalIdentifiers(identifiers: NSArray; options: PHFetchOptions): PHFetchResult; cdecl;
 
     //+ (nullable PHFetchResult<PHAsset *> *)fetchKeyAssetsInAssetCollection:(PHAssetCollection *)assetCollection options:(nullable PHFetchOptions *)options;
     //{ class } function fetchKeyAssetsInAssetCollection(assetCollection: PHAssetCollection; options: PHFetchOptions): PHFetchResult; cdecl;
@@ -588,7 +587,7 @@ type
     //function playbackStyle: PHAssetPlaybackStyle; cdecl;
 
     //@property (nonatomic, assign, readonly) PHAssetMediaType mediaType;
-    //function mediaType: PHAssetMediaType; cdecl;
+    function mediaType: PHAssetMediaType; cdecl;
 
     //@property (nonatomic, assign, readonly) PHAssetMediaSubtype mediaSubtypes;
     //function mediaSubtypes: PHAssetMediaSubtype; cdecl;
@@ -1031,24 +1030,21 @@ type
 
   //PPHLivePhotoRequestOptions = Pointer;
 
-  //PHVideoRequestOptionsClass = interface(NSObjectClass)
-    //['{78236BEB-FA19-4CD8-A5D4-6D31D8D6CA93}']
-  //end;
-
-  //PHVideoRequestOptions = interface(NSObject)
+  PHVideoRequestOptionsClass = interface(NSObjectClass)
+    ['{78236BEB-FA19-4CD8-A5D4-6D31D8D6CA93}']
+  end;
+  PHVideoRequestOptions = interface(NSObject)
     //['{D07B6FA6-5AC3-4886-903D-A511FBB6EBCC}']
-    //procedure setNetworkAccessAllowed(networkAccessAllowed: Boolean); cdecl;
-    //function isNetworkAccessAllowed: Boolean; cdecl;
+    procedure setNetworkAccessAllowed(networkAccessAllowed: Boolean); cdecl;
+    function isNetworkAccessAllowed: Boolean; cdecl;
     //procedure setVersion(version: PHVideoRequestOptionsVersion); cdecl;
     //function version: PHVideoRequestOptionsVersion; cdecl;
     //procedure setDeliveryMode(deliveryMode: PHVideoRequestOptionsDeliveryMode); cdecl;
     //function deliveryMode: PHVideoRequestOptionsDeliveryMode; cdecl;
     //procedure setProgressHandler(progressHandler: PHAssetVideoProgressHandler); cdecl;
     //function progressHandler: PHAssetVideoProgressHandler; cdecl;
-  //end;
-
-  //TPHVideoRequestOptions = class(TOCGenericImport<PHVideoRequestOptionsClass, PHVideoRequestOptions>)
-  //end;
+  end;
+  TPHVideoRequestOptions = class(TOCGenericImport<PHVideoRequestOptionsClass, PHVideoRequestOptions>) end;
 
   //PPHVideoRequestOptions = Pointer;
 
@@ -1099,7 +1095,7 @@ type
 
     // Everything else. The result handler is called on an arbitrary queue.
     //- (PHImageRequestID)requestAVAssetForVideo:(PHAsset *)asset options:(nullable PHVideoRequestOptions *)options resultHandler:(void (^)(AVAsset *__nullable asset, AVAudioMix *__nullable audioMix, NSDictionary *__nullable info))resultHandler;
-    //function requestAVAssetForVideo(asset: PHAsset; options: PHVideoRequestOptions; resultHandler: TPhotosResultHandler5): PHImageRequestID; cdecl;
+    function requestAVAssetForVideo(asset: PHAsset; options: PHVideoRequestOptions; resultHandler: TPHImageManagerRequestAVAssetForVideoResultHandler): PHImageRequestID; cdecl;
 
   end;
   TPHImageManager = class(TOCGenericImport<PHImageManagerClass, PHImageManager>) end;

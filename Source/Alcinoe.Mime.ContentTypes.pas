@@ -6,483 +6,2066 @@ interface
 
 uses
   System.Types,
+  System.Generics.Collections,
   Alcinoe.StringList;
 
 //From indy
-Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
-Function  ALGetDefaultMimeContentTypeFromExt(const aExt: AnsiString): AnsiString;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString): AnsiString; overload;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String): String; overload;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: AnsiString): AnsiString; overload;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: String): String; overload;
 
 Var
-  AlMimeContentTypeByExtList: TALStringsA; {.htm=text/html}
-  AlExtbyMimeContentTypeList: TALStringsA; {text/html=.htm}
+  AlMimeContentTypeByExtA: TDictionary<AnsiString, AnsiString>; {.html=text/html}
+  AlMimeContentTypeByExtW: TDictionary<String, String>; {.html=text/html}
+  AlExtbyMimeContentTypeA: TDictionary<AnsiString, AnsiString>; {text/html=.html}
+  AlExtbyMimeContentTypeW: TDictionary<String, String>; {text/html=.html}
 
 implementation
 
 uses
+  System.SysUtils,
   System.AnsiStrings,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {************************************************************************************}
-Function ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
-Var P: integer;
-    Index : Integer;
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: AnsiString): AnsiString;
 Begin
-  Result := '';
+  if not AlExtbyMimeContentTypeA.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then
+    result := '';
+end;
 
-  aContentType := ALLowerCase(aContentType);
-  P := ALPosA(';',aContentType);
-  if (P > 0) then delete(aContentType,P,MaxInt);
-  aContentType := ALTrim(AContentType);
-
-  Index := AlExtbyMimeContentTypeList.IndexOfName(aContentType);
-  if Index <> -1 then Result := AlExtbyMimeContentTypeList.ValueFromIndex[Index];
+{****************************************************************************}
+Function ALGetDefaultFileExtFromMimeContentType(const AContentType: String): String;
+Begin
+  if not AlExtbyMimeContentTypeW.TryGetValue(AlLowerCase(AContentType){Key}, Result{Value}) then
+    result := '';
 end;
 
 {******************************************************************************}
-Function ALGetDefaultMimeContentTypeFromExt(const aExt: AnsiString): AnsiString;
-var Index : Integer;
-    LExt: AnsiString;
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: AnsiString): AnsiString;
 begin
-  LExt := AlLowerCase(aExt);
+  var LExt := AlLowerCase(AExt);
   If (LExt = '') or (LExt[low(AnsiString)] <> '.') then LExt := '.' + LExt;
-  Index := AlMimeContentTypeByExtList.IndexOfName(LExt);
-  if Index <> -1 then Result := AlMimeContentTypeByExtList.ValueFromIndex[Index]
-  else Result := 'application/octet-stream';
+  if not AlMimeContentTypeByExtA.TryGetValue(LExt{Key}, Result{Value}) then
+    Result := 'application/octet-stream';
+end;
+
+{**********************************************************************}
+Function ALGetDefaultMimeContentTypeFromExt(const AExt: String): String;
+begin
+  var LExt := AlLowerCase(AExt);
+  If (LExt = '') or (LExt[low(String)] <> '.') then LExt := '.' + LExt;
+  if not AlMimeContentTypeByExtW.TryGetValue(LExt{Key}, Result{Value}) then
+    Result := 'application/octet-stream';
 end;
 
 {************************}
 procedure ALFillMimeTable;
-var I: integer;
 begin
-  {NOTE:  All of these strings should never be translated
-  because they are protocol specific and are important for some
-  web-browsers}
 
-  { Animation }
-  AlMimeContentTypeByExtList.Add('.nml=animation/narrative');    {Do not Localize}
+  // Build with IANAMediaTypesExtractor
+  // Source: https://github.com/apache/httpd/blob/trunk/docs/conf/mime.types
+  AlMimeContentTypeByExtA.Add('.123','application/vnd.lotus-1-2-3');
+  AlMimeContentTypeByExtA.Add('.3dml','text/vnd.in3d.3dml');
+  AlMimeContentTypeByExtA.Add('.3ds','image/x-3ds');
+  AlMimeContentTypeByExtA.Add('.3g2','video/3gpp2');
+  AlMimeContentTypeByExtA.Add('.3gp','video/3gpp');
+  AlMimeContentTypeByExtA.Add('.7z','application/x-7z-compressed');
+  AlMimeContentTypeByExtA.Add('.aab','application/x-authorware-bin');
+  AlMimeContentTypeByExtA.Add('.aac','audio/x-aac');
+  AlMimeContentTypeByExtA.Add('.aam','application/x-authorware-map');
+  AlMimeContentTypeByExtA.Add('.aas','application/x-authorware-seg');
+  AlMimeContentTypeByExtA.Add('.abw','application/x-abiword');
+  AlMimeContentTypeByExtA.Add('.ac','application/pkix-attr-cert');
+  AlMimeContentTypeByExtA.Add('.acc','application/vnd.americandynamics.acc');
+  AlMimeContentTypeByExtA.Add('.ace','application/x-ace-compressed');
+  AlMimeContentTypeByExtA.Add('.acu','application/vnd.acucobol');
+  AlMimeContentTypeByExtA.Add('.acutc','application/vnd.acucorp');
+  AlMimeContentTypeByExtA.Add('.adp','audio/adpcm');
+  AlMimeContentTypeByExtA.Add('.aep','application/vnd.audiograph');
+  AlMimeContentTypeByExtA.Add('.afm','application/x-font-type1');
+  AlMimeContentTypeByExtA.Add('.afp','application/vnd.ibm.modcap');
+  AlMimeContentTypeByExtA.Add('.ahead','application/vnd.ahead.space');
+  AlMimeContentTypeByExtA.Add('.ai','application/postscript');
+  AlMimeContentTypeByExtA.Add('.aif','audio/x-aiff');
+  AlMimeContentTypeByExtA.Add('.aifc','audio/x-aiff');
+  AlMimeContentTypeByExtA.Add('.aiff','audio/x-aiff');
+  AlMimeContentTypeByExtA.Add('.air','application/vnd.adobe.air-application-installer-package+zip');
+  AlMimeContentTypeByExtA.Add('.ait','application/vnd.dvb.ait');
+  AlMimeContentTypeByExtA.Add('.ami','application/vnd.amiga.ami');
+  AlMimeContentTypeByExtA.Add('.apk','application/vnd.android.package-archive');
+  AlMimeContentTypeByExtA.Add('.appcache','text/cache-manifest');
+  AlMimeContentTypeByExtA.Add('.application','application/x-ms-application');
+  AlMimeContentTypeByExtA.Add('.apr','application/vnd.lotus-approach');
+  AlMimeContentTypeByExtA.Add('.arc','application/x-freearc');
+  AlMimeContentTypeByExtA.Add('.asc','application/pgp-signature');
+  AlMimeContentTypeByExtA.Add('.asf','video/x-ms-asf');
+  AlMimeContentTypeByExtA.Add('.asm','text/x-asm');
+  AlMimeContentTypeByExtA.Add('.aso','application/vnd.accpac.simply.aso');
+  AlMimeContentTypeByExtA.Add('.asx','video/x-ms-asf');
+  AlMimeContentTypeByExtA.Add('.atc','application/vnd.acucorp');
+  AlMimeContentTypeByExtA.Add('.atom','application/atom+xml');
+  AlMimeContentTypeByExtA.Add('.atomcat','application/atomcat+xml');
+  AlMimeContentTypeByExtA.Add('.atomsvc','application/atomsvc+xml');
+  AlMimeContentTypeByExtA.Add('.atx','application/vnd.antix.game-component');
+  AlMimeContentTypeByExtA.Add('.au','audio/basic');
+  AlMimeContentTypeByExtA.Add('.avi','video/x-msvideo');
+  AlMimeContentTypeByExtA.Add('.avif','image/avif');
+  AlMimeContentTypeByExtA.Add('.aw','application/applixware');
+  AlMimeContentTypeByExtA.Add('.azf','application/vnd.airzip.filesecure.azf');
+  AlMimeContentTypeByExtA.Add('.azs','application/vnd.airzip.filesecure.azs');
+  AlMimeContentTypeByExtA.Add('.azw','application/vnd.amazon.ebook');
+  AlMimeContentTypeByExtA.Add('.bat','application/x-msdownload');
+  AlMimeContentTypeByExtA.Add('.bcpio','application/x-bcpio');
+  AlMimeContentTypeByExtA.Add('.bdf','application/x-font-bdf');
+  AlMimeContentTypeByExtA.Add('.bdm','application/vnd.syncml.dm+wbxml');
+  AlMimeContentTypeByExtA.Add('.bed','application/vnd.realvnc.bed');
+  AlMimeContentTypeByExtA.Add('.bh2','application/vnd.fujitsu.oasysprs');
+  AlMimeContentTypeByExtA.Add('.bin','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.blb','application/x-blorb');
+  AlMimeContentTypeByExtA.Add('.blorb','application/x-blorb');
+  AlMimeContentTypeByExtA.Add('.bmi','application/vnd.bmi');
+  AlMimeContentTypeByExtA.Add('.bmp','image/bmp');
+  AlMimeContentTypeByExtA.Add('.book','application/vnd.framemaker');
+  AlMimeContentTypeByExtA.Add('.box','application/vnd.previewsystems.box');
+  AlMimeContentTypeByExtA.Add('.boz','application/x-bzip2');
+  AlMimeContentTypeByExtA.Add('.bpk','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.btif','image/prs.btif');
+  AlMimeContentTypeByExtA.Add('.bz','application/x-bzip');
+  AlMimeContentTypeByExtA.Add('.bz2','application/x-bzip2');
+  AlMimeContentTypeByExtA.Add('.c','text/x-c');
+  AlMimeContentTypeByExtA.Add('.c11amc','application/vnd.cluetrust.cartomobile-config');
+  AlMimeContentTypeByExtA.Add('.c11amz','application/vnd.cluetrust.cartomobile-config-pkg');
+  AlMimeContentTypeByExtA.Add('.c4d','application/vnd.clonk.c4group');
+  AlMimeContentTypeByExtA.Add('.c4f','application/vnd.clonk.c4group');
+  AlMimeContentTypeByExtA.Add('.c4g','application/vnd.clonk.c4group');
+  AlMimeContentTypeByExtA.Add('.c4p','application/vnd.clonk.c4group');
+  AlMimeContentTypeByExtA.Add('.c4u','application/vnd.clonk.c4group');
+  AlMimeContentTypeByExtA.Add('.cab','application/vnd.ms-cab-compressed');
+  AlMimeContentTypeByExtA.Add('.caf','audio/x-caf');
+  AlMimeContentTypeByExtA.Add('.cap','application/vnd.tcpdump.pcap');
+  AlMimeContentTypeByExtA.Add('.car','application/vnd.curl.car');
+  AlMimeContentTypeByExtA.Add('.cat','application/vnd.ms-pki.seccat');
+  AlMimeContentTypeByExtA.Add('.cb7','application/x-cbr');
+  AlMimeContentTypeByExtA.Add('.cba','application/x-cbr');
+  AlMimeContentTypeByExtA.Add('.cbr','application/x-cbr');
+  AlMimeContentTypeByExtA.Add('.cbt','application/x-cbr');
+  AlMimeContentTypeByExtA.Add('.cbz','application/x-cbr');
+  AlMimeContentTypeByExtA.Add('.cc','text/x-c');
+  AlMimeContentTypeByExtA.Add('.cct','application/x-director');
+  AlMimeContentTypeByExtA.Add('.ccxml','application/ccxml+xml');
+  AlMimeContentTypeByExtA.Add('.cdbcmsg','application/vnd.contact.cmsg');
+  AlMimeContentTypeByExtA.Add('.cdf','application/x-netcdf');
+  AlMimeContentTypeByExtA.Add('.cdkey','application/vnd.mediastation.cdkey');
+  AlMimeContentTypeByExtA.Add('.cdmia','application/cdmi-capability');
+  AlMimeContentTypeByExtA.Add('.cdmic','application/cdmi-container');
+  AlMimeContentTypeByExtA.Add('.cdmid','application/cdmi-domain');
+  AlMimeContentTypeByExtA.Add('.cdmio','application/cdmi-object');
+  AlMimeContentTypeByExtA.Add('.cdmiq','application/cdmi-queue');
+  AlMimeContentTypeByExtA.Add('.cdx','chemical/x-cdx');
+  AlMimeContentTypeByExtA.Add('.cdxml','application/vnd.chemdraw+xml');
+  AlMimeContentTypeByExtA.Add('.cdy','application/vnd.cinderella');
+  AlMimeContentTypeByExtA.Add('.cer','application/pkix-cert');
+  AlMimeContentTypeByExtA.Add('.cfs','application/x-cfs-compressed');
+  AlMimeContentTypeByExtA.Add('.cgm','image/cgm');
+  AlMimeContentTypeByExtA.Add('.chat','application/x-chat');
+  AlMimeContentTypeByExtA.Add('.chm','application/vnd.ms-htmlhelp');
+  AlMimeContentTypeByExtA.Add('.chrt','application/vnd.kde.kchart');
+  AlMimeContentTypeByExtA.Add('.cif','chemical/x-cif');
+  AlMimeContentTypeByExtA.Add('.cii','application/vnd.anser-web-certificate-issue-initiation');
+  AlMimeContentTypeByExtA.Add('.cil','application/vnd.ms-artgalry');
+  AlMimeContentTypeByExtA.Add('.cla','application/vnd.claymore');
+  AlMimeContentTypeByExtA.Add('.class','application/java-vm');
+  AlMimeContentTypeByExtA.Add('.clkk','application/vnd.crick.clicker.keyboard');
+  AlMimeContentTypeByExtA.Add('.clkp','application/vnd.crick.clicker.palette');
+  AlMimeContentTypeByExtA.Add('.clkt','application/vnd.crick.clicker.template');
+  AlMimeContentTypeByExtA.Add('.clkw','application/vnd.crick.clicker.wordbank');
+  AlMimeContentTypeByExtA.Add('.clkx','application/vnd.crick.clicker');
+  AlMimeContentTypeByExtA.Add('.clp','application/x-msclip');
+  AlMimeContentTypeByExtA.Add('.cmc','application/vnd.cosmocaller');
+  AlMimeContentTypeByExtA.Add('.cmdf','chemical/x-cmdf');
+  AlMimeContentTypeByExtA.Add('.cml','chemical/x-cml');
+  AlMimeContentTypeByExtA.Add('.cmp','application/vnd.yellowriver-custom-menu');
+  AlMimeContentTypeByExtA.Add('.cmx','image/x-cmx');
+  AlMimeContentTypeByExtA.Add('.cod','application/vnd.rim.cod');
+  AlMimeContentTypeByExtA.Add('.com','application/x-msdownload');
+  AlMimeContentTypeByExtA.Add('.conf','text/plain');
+  AlMimeContentTypeByExtA.Add('.cpio','application/x-cpio');
+  AlMimeContentTypeByExtA.Add('.cpp','text/x-c');
+  AlMimeContentTypeByExtA.Add('.cpt','application/mac-compactpro');
+  AlMimeContentTypeByExtA.Add('.crd','application/x-mscardfile');
+  AlMimeContentTypeByExtA.Add('.crl','application/pkix-crl');
+  AlMimeContentTypeByExtA.Add('.crt','application/x-x509-ca-cert');
+  AlMimeContentTypeByExtA.Add('.cryptonote','application/vnd.rig.cryptonote');
+  AlMimeContentTypeByExtA.Add('.csh','application/x-csh');
+  AlMimeContentTypeByExtA.Add('.csml','chemical/x-csml');
+  AlMimeContentTypeByExtA.Add('.csp','application/vnd.commonspace');
+  AlMimeContentTypeByExtA.Add('.css','text/css');
+  AlMimeContentTypeByExtA.Add('.cst','application/x-director');
+  AlMimeContentTypeByExtA.Add('.csv','text/csv');
+  AlMimeContentTypeByExtA.Add('.cu','application/cu-seeme');
+  AlMimeContentTypeByExtA.Add('.curl','text/vnd.curl');
+  AlMimeContentTypeByExtA.Add('.cww','application/prs.cww');
+  AlMimeContentTypeByExtA.Add('.cxt','application/x-director');
+  AlMimeContentTypeByExtA.Add('.cxx','text/x-c');
+  AlMimeContentTypeByExtA.Add('.dae','model/vnd.collada+xml');
+  AlMimeContentTypeByExtA.Add('.daf','application/vnd.mobius.daf');
+  AlMimeContentTypeByExtA.Add('.dart','application/vnd.dart');
+  AlMimeContentTypeByExtA.Add('.dataless','application/vnd.fdsn.seed');
+  AlMimeContentTypeByExtA.Add('.davmount','application/davmount+xml');
+  AlMimeContentTypeByExtA.Add('.dbk','application/docbook+xml');
+  AlMimeContentTypeByExtA.Add('.dcr','application/x-director');
+  AlMimeContentTypeByExtA.Add('.dcurl','text/vnd.curl.dcurl');
+  AlMimeContentTypeByExtA.Add('.dd2','application/vnd.oma.dd2+xml');
+  AlMimeContentTypeByExtA.Add('.ddd','application/vnd.fujixerox.ddd');
+  AlMimeContentTypeByExtA.Add('.deb','application/x-debian-package');
+  AlMimeContentTypeByExtA.Add('.def','text/plain');
+  AlMimeContentTypeByExtA.Add('.deploy','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.der','application/x-x509-ca-cert');
+  AlMimeContentTypeByExtA.Add('.dfac','application/vnd.dreamfactory');
+  AlMimeContentTypeByExtA.Add('.dgc','application/x-dgc-compressed');
+  AlMimeContentTypeByExtA.Add('.dic','text/x-c');
+  AlMimeContentTypeByExtA.Add('.dir','application/x-director');
+  AlMimeContentTypeByExtA.Add('.dis','application/vnd.mobius.dis');
+  AlMimeContentTypeByExtA.Add('.dist','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.distz','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.djv','image/vnd.djvu');
+  AlMimeContentTypeByExtA.Add('.djvu','image/vnd.djvu');
+  AlMimeContentTypeByExtA.Add('.dll','application/x-msdownload');
+  AlMimeContentTypeByExtA.Add('.dmg','application/x-apple-diskimage');
+  AlMimeContentTypeByExtA.Add('.dmp','application/vnd.tcpdump.pcap');
+  AlMimeContentTypeByExtA.Add('.dms','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.dna','application/vnd.dna');
+  AlMimeContentTypeByExtA.Add('.doc','application/msword');
+  AlMimeContentTypeByExtA.Add('.docm','application/vnd.ms-word.document.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  AlMimeContentTypeByExtA.Add('.dot','application/msword');
+  AlMimeContentTypeByExtA.Add('.dotm','application/vnd.ms-word.template.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.dotx','application/vnd.openxmlformats-officedocument.wordprocessingml.template');
+  AlMimeContentTypeByExtA.Add('.dp','application/vnd.osgi.dp');
+  AlMimeContentTypeByExtA.Add('.dpg','application/vnd.dpgraph');
+  AlMimeContentTypeByExtA.Add('.dra','audio/vnd.dra');
+  AlMimeContentTypeByExtA.Add('.dsc','text/prs.lines.tag');
+  AlMimeContentTypeByExtA.Add('.dssc','application/dssc+der');
+  AlMimeContentTypeByExtA.Add('.dtb','application/x-dtbook+xml');
+  AlMimeContentTypeByExtA.Add('.dtd','application/xml-dtd');
+  AlMimeContentTypeByExtA.Add('.dts','audio/vnd.dts');
+  AlMimeContentTypeByExtA.Add('.dtshd','audio/vnd.dts.hd');
+  AlMimeContentTypeByExtA.Add('.dump','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.dvb','video/vnd.dvb.file');
+  AlMimeContentTypeByExtA.Add('.dvi','application/x-dvi');
+  AlMimeContentTypeByExtA.Add('.dwf','model/vnd.dwf');
+  AlMimeContentTypeByExtA.Add('.dwg','image/vnd.dwg');
+  AlMimeContentTypeByExtA.Add('.dxf','image/vnd.dxf');
+  AlMimeContentTypeByExtA.Add('.dxp','application/vnd.spotfire.dxp');
+  AlMimeContentTypeByExtA.Add('.dxr','application/x-director');
+  AlMimeContentTypeByExtA.Add('.ecelp4800','audio/vnd.nuera.ecelp4800');
+  AlMimeContentTypeByExtA.Add('.ecelp7470','audio/vnd.nuera.ecelp7470');
+  AlMimeContentTypeByExtA.Add('.ecelp9600','audio/vnd.nuera.ecelp9600');
+  AlMimeContentTypeByExtA.Add('.ecma','application/ecmascript');
+  AlMimeContentTypeByExtA.Add('.edm','application/vnd.novadigm.edm');
+  AlMimeContentTypeByExtA.Add('.edx','application/vnd.novadigm.edx');
+  AlMimeContentTypeByExtA.Add('.efif','application/vnd.picsel');
+  AlMimeContentTypeByExtA.Add('.ei6','application/vnd.pg.osasli');
+  AlMimeContentTypeByExtA.Add('.elc','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.emf','application/x-msmetafile');
+  AlMimeContentTypeByExtA.Add('.eml','message/rfc822');
+  AlMimeContentTypeByExtA.Add('.emma','application/emma+xml');
+  AlMimeContentTypeByExtA.Add('.emz','application/x-msmetafile');
+  AlMimeContentTypeByExtA.Add('.eol','audio/vnd.digital-winds');
+  AlMimeContentTypeByExtA.Add('.eot','application/vnd.ms-fontobject');
+  AlMimeContentTypeByExtA.Add('.eps','application/postscript');
+  AlMimeContentTypeByExtA.Add('.epub','application/epub+zip');
+  AlMimeContentTypeByExtA.Add('.es3','application/vnd.eszigno3+xml');
+  AlMimeContentTypeByExtA.Add('.esa','application/vnd.osgi.subsystem');
+  AlMimeContentTypeByExtA.Add('.esf','application/vnd.epson.esf');
+  AlMimeContentTypeByExtA.Add('.et3','application/vnd.eszigno3+xml');
+  AlMimeContentTypeByExtA.Add('.etx','text/x-setext');
+  AlMimeContentTypeByExtA.Add('.eva','application/x-eva');
+  AlMimeContentTypeByExtA.Add('.evy','application/x-envoy');
+  AlMimeContentTypeByExtA.Add('.exe','application/x-msdownload');
+  AlMimeContentTypeByExtA.Add('.exi','application/exi');
+  AlMimeContentTypeByExtA.Add('.ext','application/vnd.novadigm.ext');
+  AlMimeContentTypeByExtA.Add('.ez','application/andrew-inset');
+  AlMimeContentTypeByExtA.Add('.ez2','application/vnd.ezpix-album');
+  AlMimeContentTypeByExtA.Add('.ez3','application/vnd.ezpix-package');
+  AlMimeContentTypeByExtA.Add('.f','text/x-fortran');
+  AlMimeContentTypeByExtA.Add('.f4v','video/x-f4v');
+  AlMimeContentTypeByExtA.Add('.f77','text/x-fortran');
+  AlMimeContentTypeByExtA.Add('.f90','text/x-fortran');
+  AlMimeContentTypeByExtA.Add('.fbs','image/vnd.fastbidsheet');
+  AlMimeContentTypeByExtA.Add('.fcdt','application/vnd.adobe.formscentral.fcdt');
+  AlMimeContentTypeByExtA.Add('.fcs','application/vnd.isac.fcs');
+  AlMimeContentTypeByExtA.Add('.fdf','application/vnd.fdf');
+  AlMimeContentTypeByExtA.Add('.fe_launch','application/vnd.denovo.fcselayout-link');
+  AlMimeContentTypeByExtA.Add('.fg5','application/vnd.fujitsu.oasysgp');
+  AlMimeContentTypeByExtA.Add('.fgd','application/x-director');
+  AlMimeContentTypeByExtA.Add('.fh','image/x-freehand');
+  AlMimeContentTypeByExtA.Add('.fh4','image/x-freehand');
+  AlMimeContentTypeByExtA.Add('.fh5','image/x-freehand');
+  AlMimeContentTypeByExtA.Add('.fh7','image/x-freehand');
+  AlMimeContentTypeByExtA.Add('.fhc','image/x-freehand');
+  AlMimeContentTypeByExtA.Add('.fig','application/x-xfig');
+  AlMimeContentTypeByExtA.Add('.flac','audio/x-flac');
+  AlMimeContentTypeByExtA.Add('.fli','video/x-fli');
+  AlMimeContentTypeByExtA.Add('.flo','application/vnd.micrografx.flo');
+  AlMimeContentTypeByExtA.Add('.flv','video/x-flv');
+  AlMimeContentTypeByExtA.Add('.flw','application/vnd.kde.kivio');
+  AlMimeContentTypeByExtA.Add('.flx','text/vnd.fmi.flexstor');
+  AlMimeContentTypeByExtA.Add('.fly','text/vnd.fly');
+  AlMimeContentTypeByExtA.Add('.fm','application/vnd.framemaker');
+  AlMimeContentTypeByExtA.Add('.fnc','application/vnd.frogans.fnc');
+  AlMimeContentTypeByExtA.Add('.for','text/x-fortran');
+  AlMimeContentTypeByExtA.Add('.fpx','image/vnd.fpx');
+  AlMimeContentTypeByExtA.Add('.frame','application/vnd.framemaker');
+  AlMimeContentTypeByExtA.Add('.fsc','application/vnd.fsc.weblaunch');
+  AlMimeContentTypeByExtA.Add('.fst','image/vnd.fst');
+  AlMimeContentTypeByExtA.Add('.ftc','application/vnd.fluxtime.clip');
+  AlMimeContentTypeByExtA.Add('.fti','application/vnd.anser-web-funds-transfer-initiation');
+  AlMimeContentTypeByExtA.Add('.fvt','video/vnd.fvt');
+  AlMimeContentTypeByExtA.Add('.fxp','application/vnd.adobe.fxp');
+  AlMimeContentTypeByExtA.Add('.fxpl','application/vnd.adobe.fxp');
+  AlMimeContentTypeByExtA.Add('.fzs','application/vnd.fuzzysheet');
+  AlMimeContentTypeByExtA.Add('.g2w','application/vnd.geoplan');
+  AlMimeContentTypeByExtA.Add('.g3','image/g3fax');
+  AlMimeContentTypeByExtA.Add('.g3w','application/vnd.geospace');
+  AlMimeContentTypeByExtA.Add('.gac','application/vnd.groove-account');
+  AlMimeContentTypeByExtA.Add('.gam','application/x-tads');
+  AlMimeContentTypeByExtA.Add('.gbr','application/rpki-ghostbusters');
+  AlMimeContentTypeByExtA.Add('.gca','application/x-gca-compressed');
+  AlMimeContentTypeByExtA.Add('.gdl','model/vnd.gdl');
+  AlMimeContentTypeByExtA.Add('.geo','application/vnd.dynageo');
+  AlMimeContentTypeByExtA.Add('.gex','application/vnd.geometry-explorer');
+  AlMimeContentTypeByExtA.Add('.ggb','application/vnd.geogebra.file');
+  AlMimeContentTypeByExtA.Add('.ggs','application/vnd.geogebra.slides');
+  AlMimeContentTypeByExtA.Add('.ggt','application/vnd.geogebra.tool');
+  AlMimeContentTypeByExtA.Add('.ghf','application/vnd.groove-help');
+  AlMimeContentTypeByExtA.Add('.gif','image/gif');
+  AlMimeContentTypeByExtA.Add('.gim','application/vnd.groove-identity-message');
+  AlMimeContentTypeByExtA.Add('.gml','application/gml+xml');
+  AlMimeContentTypeByExtA.Add('.gmx','application/vnd.gmx');
+  AlMimeContentTypeByExtA.Add('.gnumeric','application/x-gnumeric');
+  AlMimeContentTypeByExtA.Add('.gph','application/vnd.flographit');
+  AlMimeContentTypeByExtA.Add('.gpx','application/gpx+xml');
+  AlMimeContentTypeByExtA.Add('.gqf','application/vnd.grafeq');
+  AlMimeContentTypeByExtA.Add('.gqs','application/vnd.grafeq');
+  AlMimeContentTypeByExtA.Add('.gram','application/srgs');
+  AlMimeContentTypeByExtA.Add('.gramps','application/x-gramps-xml');
+  AlMimeContentTypeByExtA.Add('.gre','application/vnd.geometry-explorer');
+  AlMimeContentTypeByExtA.Add('.grv','application/vnd.groove-injector');
+  AlMimeContentTypeByExtA.Add('.grxml','application/srgs+xml');
+  AlMimeContentTypeByExtA.Add('.gsf','application/x-font-ghostscript');
+  AlMimeContentTypeByExtA.Add('.gtar','application/x-gtar');
+  AlMimeContentTypeByExtA.Add('.gtm','application/vnd.groove-tool-message');
+  AlMimeContentTypeByExtA.Add('.gtw','model/vnd.gtw');
+  AlMimeContentTypeByExtA.Add('.gv','text/vnd.graphviz');
+  AlMimeContentTypeByExtA.Add('.gxf','application/gxf');
+  AlMimeContentTypeByExtA.Add('.gxt','application/vnd.geonext');
+  AlMimeContentTypeByExtA.Add('.h','text/x-c');
+  AlMimeContentTypeByExtA.Add('.h261','video/h261');
+  AlMimeContentTypeByExtA.Add('.h263','video/h263');
+  AlMimeContentTypeByExtA.Add('.h264','video/h264');
+  AlMimeContentTypeByExtA.Add('.hal','application/vnd.hal+xml');
+  AlMimeContentTypeByExtA.Add('.hbci','application/vnd.hbci');
+  AlMimeContentTypeByExtA.Add('.hdf','application/x-hdf');
+  AlMimeContentTypeByExtA.Add('.hh','text/x-c');
+  AlMimeContentTypeByExtA.Add('.hlp','application/winhlp');
+  AlMimeContentTypeByExtA.Add('.hpgl','application/vnd.hp-hpgl');
+  AlMimeContentTypeByExtA.Add('.hpid','application/vnd.hp-hpid');
+  AlMimeContentTypeByExtA.Add('.hps','application/vnd.hp-hps');
+  AlMimeContentTypeByExtA.Add('.hqx','application/mac-binhex40');
+  AlMimeContentTypeByExtA.Add('.htke','application/vnd.kenameaapp');
+  AlMimeContentTypeByExtA.Add('.htm','text/html');
+  AlMimeContentTypeByExtA.Add('.html','text/html');
+  AlMimeContentTypeByExtA.Add('.hvd','application/vnd.yamaha.hv-dic');
+  AlMimeContentTypeByExtA.Add('.hvp','application/vnd.yamaha.hv-voice');
+  AlMimeContentTypeByExtA.Add('.hvs','application/vnd.yamaha.hv-script');
+  AlMimeContentTypeByExtA.Add('.i2g','application/vnd.intergeo');
+  AlMimeContentTypeByExtA.Add('.icc','application/vnd.iccprofile');
+  AlMimeContentTypeByExtA.Add('.ice','x-conference/x-cooltalk');
+  AlMimeContentTypeByExtA.Add('.icm','application/vnd.iccprofile');
+  AlMimeContentTypeByExtA.Add('.ico','image/x-icon');
+  AlMimeContentTypeByExtA.Add('.ics','text/calendar');
+  AlMimeContentTypeByExtA.Add('.ief','image/ief');
+  AlMimeContentTypeByExtA.Add('.ifb','text/calendar');
+  AlMimeContentTypeByExtA.Add('.ifm','application/vnd.shana.informed.formdata');
+  AlMimeContentTypeByExtA.Add('.iges','model/iges');
+  AlMimeContentTypeByExtA.Add('.igl','application/vnd.igloader');
+  AlMimeContentTypeByExtA.Add('.igm','application/vnd.insors.igm');
+  AlMimeContentTypeByExtA.Add('.igs','model/iges');
+  AlMimeContentTypeByExtA.Add('.igx','application/vnd.micrografx.igx');
+  AlMimeContentTypeByExtA.Add('.iif','application/vnd.shana.informed.interchange');
+  AlMimeContentTypeByExtA.Add('.imp','application/vnd.accpac.simply.imp');
+  AlMimeContentTypeByExtA.Add('.ims','application/vnd.ms-ims');
+  AlMimeContentTypeByExtA.Add('.in','text/plain');
+  AlMimeContentTypeByExtA.Add('.ink','application/inkml+xml');
+  AlMimeContentTypeByExtA.Add('.inkml','application/inkml+xml');
+  AlMimeContentTypeByExtA.Add('.install','application/x-install-instructions');
+  AlMimeContentTypeByExtA.Add('.iota','application/vnd.astraea-software.iota');
+  AlMimeContentTypeByExtA.Add('.ipfix','application/ipfix');
+  AlMimeContentTypeByExtA.Add('.ipk','application/vnd.shana.informed.package');
+  AlMimeContentTypeByExtA.Add('.irm','application/vnd.ibm.rights-management');
+  AlMimeContentTypeByExtA.Add('.irp','application/vnd.irepository.package+xml');
+  AlMimeContentTypeByExtA.Add('.iso','application/x-iso9660-image');
+  AlMimeContentTypeByExtA.Add('.itp','application/vnd.shana.informed.formtemplate');
+  AlMimeContentTypeByExtA.Add('.ivp','application/vnd.immervision-ivp');
+  AlMimeContentTypeByExtA.Add('.ivu','application/vnd.immervision-ivu');
+  AlMimeContentTypeByExtA.Add('.jad','text/vnd.sun.j2me.app-descriptor');
+  AlMimeContentTypeByExtA.Add('.jam','application/vnd.jam');
+  AlMimeContentTypeByExtA.Add('.jar','application/java-archive');
+  AlMimeContentTypeByExtA.Add('.java','text/x-java-source');
+  AlMimeContentTypeByExtA.Add('.jisp','application/vnd.jisp');
+  AlMimeContentTypeByExtA.Add('.jlt','application/vnd.hp-jlyt');
+  AlMimeContentTypeByExtA.Add('.jnlp','application/x-java-jnlp-file');
+  AlMimeContentTypeByExtA.Add('.joda','application/vnd.joost.joda-archive');
+  AlMimeContentTypeByExtA.Add('.jpe','image/jpeg');
+  AlMimeContentTypeByExtA.Add('.jpeg','image/jpeg');
+  AlMimeContentTypeByExtA.Add('.jpg','image/jpeg');
+  AlMimeContentTypeByExtA.Add('.jpgm','video/jpm');
+  AlMimeContentTypeByExtA.Add('.jpgv','video/jpeg');
+  AlMimeContentTypeByExtA.Add('.jpm','video/jpm');
+  AlMimeContentTypeByExtA.Add('.js','text/javascript');
+  AlMimeContentTypeByExtA.Add('.json','application/json');
+  AlMimeContentTypeByExtA.Add('.jsonml','application/jsonml+json');
+  AlMimeContentTypeByExtA.Add('.jxl','image/jxl');
+  AlMimeContentTypeByExtA.Add('.kar','audio/midi');
+  AlMimeContentTypeByExtA.Add('.karbon','application/vnd.kde.karbon');
+  AlMimeContentTypeByExtA.Add('.kfo','application/vnd.kde.kformula');
+  AlMimeContentTypeByExtA.Add('.kia','application/vnd.kidspiration');
+  AlMimeContentTypeByExtA.Add('.kml','application/vnd.google-earth.kml+xml');
+  AlMimeContentTypeByExtA.Add('.kmz','application/vnd.google-earth.kmz');
+  AlMimeContentTypeByExtA.Add('.kne','application/vnd.kinar');
+  AlMimeContentTypeByExtA.Add('.knp','application/vnd.kinar');
+  AlMimeContentTypeByExtA.Add('.kon','application/vnd.kde.kontour');
+  AlMimeContentTypeByExtA.Add('.kpr','application/vnd.kde.kpresenter');
+  AlMimeContentTypeByExtA.Add('.kpt','application/vnd.kde.kpresenter');
+  AlMimeContentTypeByExtA.Add('.kpxx','application/vnd.ds-keypoint');
+  AlMimeContentTypeByExtA.Add('.ksp','application/vnd.kde.kspread');
+  AlMimeContentTypeByExtA.Add('.ktr','application/vnd.kahootz');
+  AlMimeContentTypeByExtA.Add('.ktx','image/ktx');
+  AlMimeContentTypeByExtA.Add('.ktz','application/vnd.kahootz');
+  AlMimeContentTypeByExtA.Add('.kwd','application/vnd.kde.kword');
+  AlMimeContentTypeByExtA.Add('.kwt','application/vnd.kde.kword');
+  AlMimeContentTypeByExtA.Add('.lasxml','application/vnd.las.las+xml');
+  AlMimeContentTypeByExtA.Add('.latex','application/x-latex');
+  AlMimeContentTypeByExtA.Add('.lbd','application/vnd.llamagraphics.life-balance.desktop');
+  AlMimeContentTypeByExtA.Add('.lbe','application/vnd.llamagraphics.life-balance.exchange+xml');
+  AlMimeContentTypeByExtA.Add('.les','application/vnd.hhe.lesson-player');
+  AlMimeContentTypeByExtA.Add('.lha','application/x-lzh-compressed');
+  AlMimeContentTypeByExtA.Add('.link66','application/vnd.route66.link66+xml');
+  AlMimeContentTypeByExtA.Add('.list','text/plain');
+  AlMimeContentTypeByExtA.Add('.list3820','application/vnd.ibm.modcap');
+  AlMimeContentTypeByExtA.Add('.listafp','application/vnd.ibm.modcap');
+  AlMimeContentTypeByExtA.Add('.lnk','application/x-ms-shortcut');
+  AlMimeContentTypeByExtA.Add('.log','text/plain');
+  AlMimeContentTypeByExtA.Add('.lostxml','application/lost+xml');
+  AlMimeContentTypeByExtA.Add('.lrf','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.lrm','application/vnd.ms-lrm');
+  AlMimeContentTypeByExtA.Add('.ltf','application/vnd.frogans.ltf');
+  AlMimeContentTypeByExtA.Add('.lvp','audio/vnd.lucent.voice');
+  AlMimeContentTypeByExtA.Add('.lwp','application/vnd.lotus-wordpro');
+  AlMimeContentTypeByExtA.Add('.lzh','application/x-lzh-compressed');
+  AlMimeContentTypeByExtA.Add('.m13','application/x-msmediaview');
+  AlMimeContentTypeByExtA.Add('.m14','application/x-msmediaview');
+  AlMimeContentTypeByExtA.Add('.m1v','video/mpeg');
+  AlMimeContentTypeByExtA.Add('.m21','application/mp21');
+  AlMimeContentTypeByExtA.Add('.m2a','audio/mpeg');
+  AlMimeContentTypeByExtA.Add('.m2t','video/mp2t');
+  AlMimeContentTypeByExtA.Add('.m2ts','video/mp2t');
+  AlMimeContentTypeByExtA.Add('.m2v','video/mpeg');
+  AlMimeContentTypeByExtA.Add('.m3a','audio/mpeg');
+  AlMimeContentTypeByExtA.Add('.m3u','audio/x-mpegurl');
+  AlMimeContentTypeByExtA.Add('.m3u8','application/vnd.apple.mpegurl');
+  AlMimeContentTypeByExtA.Add('.m4a','audio/mp4');
+  AlMimeContentTypeByExtA.Add('.m4u','video/vnd.mpegurl');
+  AlMimeContentTypeByExtA.Add('.m4v','video/x-m4v');
+  AlMimeContentTypeByExtA.Add('.ma','application/mathematica');
+  AlMimeContentTypeByExtA.Add('.mads','application/mads+xml');
+  AlMimeContentTypeByExtA.Add('.mag','application/vnd.ecowin.chart');
+  AlMimeContentTypeByExtA.Add('.maker','application/vnd.framemaker');
+  AlMimeContentTypeByExtA.Add('.man','text/troff');
+  AlMimeContentTypeByExtA.Add('.mar','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.mathml','application/mathml+xml');
+  AlMimeContentTypeByExtA.Add('.mb','application/mathematica');
+  AlMimeContentTypeByExtA.Add('.mbk','application/vnd.mobius.mbk');
+  AlMimeContentTypeByExtA.Add('.mbox','application/mbox');
+  AlMimeContentTypeByExtA.Add('.mc1','application/vnd.medcalcdata');
+  AlMimeContentTypeByExtA.Add('.mcd','application/vnd.mcd');
+  AlMimeContentTypeByExtA.Add('.mcurl','text/vnd.curl.mcurl');
+  AlMimeContentTypeByExtA.Add('.mdb','application/x-msaccess');
+  AlMimeContentTypeByExtA.Add('.mdi','image/vnd.ms-modi');
+  AlMimeContentTypeByExtA.Add('.me','text/troff');
+  AlMimeContentTypeByExtA.Add('.mesh','model/mesh');
+  AlMimeContentTypeByExtA.Add('.meta4','application/metalink4+xml');
+  AlMimeContentTypeByExtA.Add('.metalink','application/metalink+xml');
+  AlMimeContentTypeByExtA.Add('.mets','application/mets+xml');
+  AlMimeContentTypeByExtA.Add('.mfm','application/vnd.mfmp');
+  AlMimeContentTypeByExtA.Add('.mft','application/rpki-manifest');
+  AlMimeContentTypeByExtA.Add('.mgp','application/vnd.osgeo.mapguide.package');
+  AlMimeContentTypeByExtA.Add('.mgz','application/vnd.proteus.magazine');
+  AlMimeContentTypeByExtA.Add('.mid','audio/midi');
+  AlMimeContentTypeByExtA.Add('.midi','audio/midi');
+  AlMimeContentTypeByExtA.Add('.mie','application/x-mie');
+  AlMimeContentTypeByExtA.Add('.mif','application/vnd.mif');
+  AlMimeContentTypeByExtA.Add('.mime','message/rfc822');
+  AlMimeContentTypeByExtA.Add('.mj2','video/mj2');
+  AlMimeContentTypeByExtA.Add('.mjp2','video/mj2');
+  AlMimeContentTypeByExtA.Add('.mjs','text/javascript');
+  AlMimeContentTypeByExtA.Add('.mk3d','video/x-matroska');
+  AlMimeContentTypeByExtA.Add('.mka','audio/x-matroska');
+  AlMimeContentTypeByExtA.Add('.mks','video/x-matroska');
+  AlMimeContentTypeByExtA.Add('.mkv','video/x-matroska');
+  AlMimeContentTypeByExtA.Add('.mlp','application/vnd.dolby.mlp');
+  AlMimeContentTypeByExtA.Add('.mmd','application/vnd.chipnuts.karaoke-mmd');
+  AlMimeContentTypeByExtA.Add('.mmf','application/vnd.smaf');
+  AlMimeContentTypeByExtA.Add('.mmr','image/vnd.fujixerox.edmics-mmr');
+  AlMimeContentTypeByExtA.Add('.mng','video/x-mng');
+  AlMimeContentTypeByExtA.Add('.mny','application/x-msmoney');
+  AlMimeContentTypeByExtA.Add('.mobi','application/x-mobipocket-ebook');
+  AlMimeContentTypeByExtA.Add('.mods','application/mods+xml');
+  AlMimeContentTypeByExtA.Add('.mov','video/quicktime');
+  AlMimeContentTypeByExtA.Add('.movie','video/x-sgi-movie');
+  AlMimeContentTypeByExtA.Add('.mp2','audio/mpeg');
+  AlMimeContentTypeByExtA.Add('.mp21','application/mp21');
+  AlMimeContentTypeByExtA.Add('.mp2a','audio/mpeg');
+  AlMimeContentTypeByExtA.Add('.mp3','audio/mpeg');
+  AlMimeContentTypeByExtA.Add('.mp4','video/mp4');
+  AlMimeContentTypeByExtA.Add('.mp4a','audio/mp4');
+  AlMimeContentTypeByExtA.Add('.mp4s','application/mp4');
+  AlMimeContentTypeByExtA.Add('.mp4v','video/mp4');
+  AlMimeContentTypeByExtA.Add('.mpc','application/vnd.mophun.certificate');
+  AlMimeContentTypeByExtA.Add('.mpe','video/mpeg');
+  AlMimeContentTypeByExtA.Add('.mpeg','video/mpeg');
+  AlMimeContentTypeByExtA.Add('.mpg','video/mpeg');
+  AlMimeContentTypeByExtA.Add('.mpg4','video/mp4');
+  AlMimeContentTypeByExtA.Add('.mpga','audio/mpeg');
+  AlMimeContentTypeByExtA.Add('.mpkg','application/vnd.apple.installer+xml');
+  AlMimeContentTypeByExtA.Add('.mpm','application/vnd.blueice.multipass');
+  AlMimeContentTypeByExtA.Add('.mpn','application/vnd.mophun.application');
+  AlMimeContentTypeByExtA.Add('.mpp','application/vnd.ms-project');
+  AlMimeContentTypeByExtA.Add('.mpt','application/vnd.ms-project');
+  AlMimeContentTypeByExtA.Add('.mpy','application/vnd.ibm.minipay');
+  AlMimeContentTypeByExtA.Add('.mqy','application/vnd.mobius.mqy');
+  AlMimeContentTypeByExtA.Add('.mrc','application/marc');
+  AlMimeContentTypeByExtA.Add('.mrcx','application/marcxml+xml');
+  AlMimeContentTypeByExtA.Add('.ms','text/troff');
+  AlMimeContentTypeByExtA.Add('.mscml','application/mediaservercontrol+xml');
+  AlMimeContentTypeByExtA.Add('.mseed','application/vnd.fdsn.mseed');
+  AlMimeContentTypeByExtA.Add('.mseq','application/vnd.mseq');
+  AlMimeContentTypeByExtA.Add('.msf','application/vnd.epson.msf');
+  AlMimeContentTypeByExtA.Add('.msh','model/mesh');
+  AlMimeContentTypeByExtA.Add('.msi','application/x-msdownload');
+  AlMimeContentTypeByExtA.Add('.msl','application/vnd.mobius.msl');
+  AlMimeContentTypeByExtA.Add('.msty','application/vnd.muvee.style');
+  AlMimeContentTypeByExtA.Add('.mts','video/mp2t');
+  AlMimeContentTypeByExtA.Add('.mus','application/vnd.musician');
+  AlMimeContentTypeByExtA.Add('.musicxml','application/vnd.recordare.musicxml+xml');
+  AlMimeContentTypeByExtA.Add('.mvb','application/x-msmediaview');
+  AlMimeContentTypeByExtA.Add('.mwf','application/vnd.mfer');
+  AlMimeContentTypeByExtA.Add('.mxf','application/mxf');
+  AlMimeContentTypeByExtA.Add('.mxl','application/vnd.recordare.musicxml');
+  AlMimeContentTypeByExtA.Add('.mxml','application/xv+xml');
+  AlMimeContentTypeByExtA.Add('.mxs','application/vnd.triscape.mxs');
+  AlMimeContentTypeByExtA.Add('.mxu','video/vnd.mpegurl');
+  AlMimeContentTypeByExtA.Add('.n-gage','application/vnd.nokia.n-gage.symbian.install');
+  AlMimeContentTypeByExtA.Add('.n3','text/n3');
+  AlMimeContentTypeByExtA.Add('.nb','application/mathematica');
+  AlMimeContentTypeByExtA.Add('.nbp','application/vnd.wolfram.player');
+  AlMimeContentTypeByExtA.Add('.nc','application/x-netcdf');
+  AlMimeContentTypeByExtA.Add('.ncx','application/x-dtbncx+xml');
+  AlMimeContentTypeByExtA.Add('.nfo','text/x-nfo');
+  AlMimeContentTypeByExtA.Add('.ngdat','application/vnd.nokia.n-gage.data');
+  AlMimeContentTypeByExtA.Add('.nitf','application/vnd.nitf');
+  AlMimeContentTypeByExtA.Add('.nlu','application/vnd.neurolanguage.nlu');
+  AlMimeContentTypeByExtA.Add('.nml','application/vnd.enliven');
+  AlMimeContentTypeByExtA.Add('.nnd','application/vnd.noblenet-directory');
+  AlMimeContentTypeByExtA.Add('.nns','application/vnd.noblenet-sealer');
+  AlMimeContentTypeByExtA.Add('.nnw','application/vnd.noblenet-web');
+  AlMimeContentTypeByExtA.Add('.npx','image/vnd.net-fpx');
+  AlMimeContentTypeByExtA.Add('.nsc','application/x-conference');
+  AlMimeContentTypeByExtA.Add('.nsf','application/vnd.lotus-notes');
+  AlMimeContentTypeByExtA.Add('.ntf','application/vnd.nitf');
+  AlMimeContentTypeByExtA.Add('.nzb','application/x-nzb');
+  AlMimeContentTypeByExtA.Add('.oa2','application/vnd.fujitsu.oasys2');
+  AlMimeContentTypeByExtA.Add('.oa3','application/vnd.fujitsu.oasys3');
+  AlMimeContentTypeByExtA.Add('.oas','application/vnd.fujitsu.oasys');
+  AlMimeContentTypeByExtA.Add('.obd','application/x-msbinder');
+  AlMimeContentTypeByExtA.Add('.obj','application/x-tgif');
+  AlMimeContentTypeByExtA.Add('.oda','application/oda');
+  AlMimeContentTypeByExtA.Add('.odb','application/vnd.oasis.opendocument.database');
+  AlMimeContentTypeByExtA.Add('.odc','application/vnd.oasis.opendocument.chart');
+  AlMimeContentTypeByExtA.Add('.odf','application/vnd.oasis.opendocument.formula');
+  AlMimeContentTypeByExtA.Add('.odft','application/vnd.oasis.opendocument.formula-template');
+  AlMimeContentTypeByExtA.Add('.odg','application/vnd.oasis.opendocument.graphics');
+  AlMimeContentTypeByExtA.Add('.odi','application/vnd.oasis.opendocument.image');
+  AlMimeContentTypeByExtA.Add('.odm','application/vnd.oasis.opendocument.text-master');
+  AlMimeContentTypeByExtA.Add('.odp','application/vnd.oasis.opendocument.presentation');
+  AlMimeContentTypeByExtA.Add('.ods','application/vnd.oasis.opendocument.spreadsheet');
+  AlMimeContentTypeByExtA.Add('.odt','application/vnd.oasis.opendocument.text');
+  AlMimeContentTypeByExtA.Add('.oga','audio/ogg');
+  AlMimeContentTypeByExtA.Add('.ogg','audio/ogg');
+  AlMimeContentTypeByExtA.Add('.ogv','video/ogg');
+  AlMimeContentTypeByExtA.Add('.ogx','application/ogg');
+  AlMimeContentTypeByExtA.Add('.omdoc','application/omdoc+xml');
+  AlMimeContentTypeByExtA.Add('.onepkg','application/onenote');
+  AlMimeContentTypeByExtA.Add('.onetmp','application/onenote');
+  AlMimeContentTypeByExtA.Add('.onetoc','application/onenote');
+  AlMimeContentTypeByExtA.Add('.onetoc2','application/onenote');
+  AlMimeContentTypeByExtA.Add('.opf','application/oebps-package+xml');
+  AlMimeContentTypeByExtA.Add('.opml','text/x-opml');
+  AlMimeContentTypeByExtA.Add('.oprc','application/vnd.palm');
+  AlMimeContentTypeByExtA.Add('.opus','audio/ogg');
+  AlMimeContentTypeByExtA.Add('.org','application/vnd.lotus-organizer');
+  AlMimeContentTypeByExtA.Add('.osf','application/vnd.yamaha.openscoreformat');
+  AlMimeContentTypeByExtA.Add('.osfpvg','application/vnd.yamaha.openscoreformat.osfpvg+xml');
+  AlMimeContentTypeByExtA.Add('.otc','application/vnd.oasis.opendocument.chart-template');
+  AlMimeContentTypeByExtA.Add('.otf','font/otf');
+  AlMimeContentTypeByExtA.Add('.otg','application/vnd.oasis.opendocument.graphics-template');
+  AlMimeContentTypeByExtA.Add('.oth','application/vnd.oasis.opendocument.text-web');
+  AlMimeContentTypeByExtA.Add('.oti','application/vnd.oasis.opendocument.image-template');
+  AlMimeContentTypeByExtA.Add('.otp','application/vnd.oasis.opendocument.presentation-template');
+  AlMimeContentTypeByExtA.Add('.ots','application/vnd.oasis.opendocument.spreadsheet-template');
+  AlMimeContentTypeByExtA.Add('.ott','application/vnd.oasis.opendocument.text-template');
+  AlMimeContentTypeByExtA.Add('.oxps','application/oxps');
+  AlMimeContentTypeByExtA.Add('.oxt','application/vnd.openofficeorg.extension');
+  AlMimeContentTypeByExtA.Add('.p','text/x-pascal');
+  AlMimeContentTypeByExtA.Add('.p10','application/pkcs10');
+  AlMimeContentTypeByExtA.Add('.p12','application/x-pkcs12');
+  AlMimeContentTypeByExtA.Add('.p7b','application/x-pkcs7-certificates');
+  AlMimeContentTypeByExtA.Add('.p7c','application/pkcs7-mime');
+  AlMimeContentTypeByExtA.Add('.p7m','application/pkcs7-mime');
+  AlMimeContentTypeByExtA.Add('.p7r','application/x-pkcs7-certreqresp');
+  AlMimeContentTypeByExtA.Add('.p7s','application/pkcs7-signature');
+  AlMimeContentTypeByExtA.Add('.p8','application/pkcs8');
+  AlMimeContentTypeByExtA.Add('.pas','text/x-pascal');
+  AlMimeContentTypeByExtA.Add('.paw','application/vnd.pawaafile');
+  AlMimeContentTypeByExtA.Add('.pbd','application/vnd.powerbuilder6');
+  AlMimeContentTypeByExtA.Add('.pbm','image/x-portable-bitmap');
+  AlMimeContentTypeByExtA.Add('.pcap','application/vnd.tcpdump.pcap');
+  AlMimeContentTypeByExtA.Add('.pcf','application/x-font-pcf');
+  AlMimeContentTypeByExtA.Add('.pcl','application/vnd.hp-pcl');
+  AlMimeContentTypeByExtA.Add('.pclxl','application/vnd.hp-pclxl');
+  AlMimeContentTypeByExtA.Add('.pct','image/x-pict');
+  AlMimeContentTypeByExtA.Add('.pcurl','application/vnd.curl.pcurl');
+  AlMimeContentTypeByExtA.Add('.pcx','image/x-pcx');
+  AlMimeContentTypeByExtA.Add('.pdb','application/vnd.palm');
+  AlMimeContentTypeByExtA.Add('.pdf','application/pdf');
+  AlMimeContentTypeByExtA.Add('.pfa','application/x-font-type1');
+  AlMimeContentTypeByExtA.Add('.pfb','application/x-font-type1');
+  AlMimeContentTypeByExtA.Add('.pfm','application/x-font-type1');
+  AlMimeContentTypeByExtA.Add('.pfr','application/font-tdpfr');
+  AlMimeContentTypeByExtA.Add('.pfx','application/x-pkcs12');
+  AlMimeContentTypeByExtA.Add('.pgm','image/x-portable-graymap');
+  AlMimeContentTypeByExtA.Add('.pgn','application/x-chess-pgn');
+  AlMimeContentTypeByExtA.Add('.pgp','application/pgp-encrypted');
+  AlMimeContentTypeByExtA.Add('.pic','image/x-pict');
+  AlMimeContentTypeByExtA.Add('.pkg','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.pki','application/pkixcmp');
+  AlMimeContentTypeByExtA.Add('.pkipath','application/pkix-pkipath');
+  AlMimeContentTypeByExtA.Add('.plb','application/vnd.3gpp.pic-bw-large');
+  AlMimeContentTypeByExtA.Add('.plc','application/vnd.mobius.plc');
+  AlMimeContentTypeByExtA.Add('.plf','application/vnd.pocketlearn');
+  AlMimeContentTypeByExtA.Add('.pls','application/pls+xml');
+  AlMimeContentTypeByExtA.Add('.pml','application/vnd.ctc-posml');
+  AlMimeContentTypeByExtA.Add('.png','image/png');
+  AlMimeContentTypeByExtA.Add('.pnm','image/x-portable-anymap');
+  AlMimeContentTypeByExtA.Add('.portpkg','application/vnd.macports.portpkg');
+  AlMimeContentTypeByExtA.Add('.pot','application/vnd.ms-powerpoint');
+  AlMimeContentTypeByExtA.Add('.potm','application/vnd.ms-powerpoint.template.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.potx','application/vnd.openxmlformats-officedocument.presentationml.template');
+  AlMimeContentTypeByExtA.Add('.ppam','application/vnd.ms-powerpoint.addin.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.ppd','application/vnd.cups-ppd');
+  AlMimeContentTypeByExtA.Add('.ppm','image/x-portable-pixmap');
+  AlMimeContentTypeByExtA.Add('.pps','application/vnd.ms-powerpoint');
+  AlMimeContentTypeByExtA.Add('.ppsm','application/vnd.ms-powerpoint.slideshow.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.ppsx','application/vnd.openxmlformats-officedocument.presentationml.slideshow');
+  AlMimeContentTypeByExtA.Add('.ppt','application/vnd.ms-powerpoint');
+  AlMimeContentTypeByExtA.Add('.pptm','application/vnd.ms-powerpoint.presentation.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.pptx','application/vnd.openxmlformats-officedocument.presentationml.presentation');
+  AlMimeContentTypeByExtA.Add('.pqa','application/vnd.palm');
+  AlMimeContentTypeByExtA.Add('.prc','application/x-mobipocket-ebook');
+  AlMimeContentTypeByExtA.Add('.pre','application/vnd.lotus-freelance');
+  AlMimeContentTypeByExtA.Add('.prf','application/pics-rules');
+  AlMimeContentTypeByExtA.Add('.ps','application/postscript');
+  AlMimeContentTypeByExtA.Add('.psb','application/vnd.3gpp.pic-bw-small');
+  AlMimeContentTypeByExtA.Add('.psd','image/vnd.adobe.photoshop');
+  AlMimeContentTypeByExtA.Add('.psf','application/x-font-linux-psf');
+  AlMimeContentTypeByExtA.Add('.pskcxml','application/pskc+xml');
+  AlMimeContentTypeByExtA.Add('.ptid','application/vnd.pvi.ptid1');
+  AlMimeContentTypeByExtA.Add('.pub','application/x-mspublisher');
+  AlMimeContentTypeByExtA.Add('.pvb','application/vnd.3gpp.pic-bw-var');
+  AlMimeContentTypeByExtA.Add('.pwn','application/vnd.3m.post-it-notes');
+  AlMimeContentTypeByExtA.Add('.pya','audio/vnd.ms-playready.media.pya');
+  AlMimeContentTypeByExtA.Add('.pyv','video/vnd.ms-playready.media.pyv');
+  AlMimeContentTypeByExtA.Add('.qam','application/vnd.epson.quickanime');
+  AlMimeContentTypeByExtA.Add('.qbo','application/vnd.intu.qbo');
+  AlMimeContentTypeByExtA.Add('.qfx','application/vnd.intu.qfx');
+  AlMimeContentTypeByExtA.Add('.qps','application/vnd.publishare-delta-tree');
+  AlMimeContentTypeByExtA.Add('.qt','video/quicktime');
+  AlMimeContentTypeByExtA.Add('.qwd','application/vnd.quark.quarkxpress');
+  AlMimeContentTypeByExtA.Add('.qwt','application/vnd.quark.quarkxpress');
+  AlMimeContentTypeByExtA.Add('.qxb','application/vnd.quark.quarkxpress');
+  AlMimeContentTypeByExtA.Add('.qxd','application/vnd.quark.quarkxpress');
+  AlMimeContentTypeByExtA.Add('.qxl','application/vnd.quark.quarkxpress');
+  AlMimeContentTypeByExtA.Add('.qxt','application/vnd.quark.quarkxpress');
+  AlMimeContentTypeByExtA.Add('.ra','audio/x-pn-realaudio');
+  AlMimeContentTypeByExtA.Add('.ram','audio/x-pn-realaudio');
+  AlMimeContentTypeByExtA.Add('.rar','application/x-rar-compressed');
+  AlMimeContentTypeByExtA.Add('.ras','image/x-cmu-raster');
+  AlMimeContentTypeByExtA.Add('.rcprofile','application/vnd.ipunplugged.rcprofile');
+  AlMimeContentTypeByExtA.Add('.rdf','application/rdf+xml');
+  AlMimeContentTypeByExtA.Add('.rdz','application/vnd.data-vision.rdz');
+  AlMimeContentTypeByExtA.Add('.rep','application/vnd.businessobjects');
+  AlMimeContentTypeByExtA.Add('.res','application/x-dtbresource+xml');
+  AlMimeContentTypeByExtA.Add('.rgb','image/x-rgb');
+  AlMimeContentTypeByExtA.Add('.rif','application/reginfo+xml');
+  AlMimeContentTypeByExtA.Add('.rip','audio/vnd.rip');
+  AlMimeContentTypeByExtA.Add('.ris','application/x-research-info-systems');
+  AlMimeContentTypeByExtA.Add('.rl','application/resource-lists+xml');
+  AlMimeContentTypeByExtA.Add('.rlc','image/vnd.fujixerox.edmics-rlc');
+  AlMimeContentTypeByExtA.Add('.rld','application/resource-lists-diff+xml');
+  AlMimeContentTypeByExtA.Add('.rm','application/vnd.rn-realmedia');
+  AlMimeContentTypeByExtA.Add('.rmi','audio/midi');
+  AlMimeContentTypeByExtA.Add('.rmp','audio/x-pn-realaudio-plugin');
+  AlMimeContentTypeByExtA.Add('.rms','application/vnd.jcp.javame.midlet-rms');
+  AlMimeContentTypeByExtA.Add('.rmvb','application/vnd.rn-realmedia-vbr');
+  AlMimeContentTypeByExtA.Add('.rnc','application/relax-ng-compact-syntax');
+  AlMimeContentTypeByExtA.Add('.roa','application/rpki-roa');
+  AlMimeContentTypeByExtA.Add('.roff','text/troff');
+  AlMimeContentTypeByExtA.Add('.rp9','application/vnd.cloanto.rp9');
+  AlMimeContentTypeByExtA.Add('.rpss','application/vnd.nokia.radio-presets');
+  AlMimeContentTypeByExtA.Add('.rpst','application/vnd.nokia.radio-preset');
+  AlMimeContentTypeByExtA.Add('.rq','application/sparql-query');
+  AlMimeContentTypeByExtA.Add('.rs','application/rls-services+xml');
+  AlMimeContentTypeByExtA.Add('.rsd','application/rsd+xml');
+  AlMimeContentTypeByExtA.Add('.rss','application/rss+xml');
+  AlMimeContentTypeByExtA.Add('.rtf','application/rtf');
+  AlMimeContentTypeByExtA.Add('.rtx','text/richtext');
+  AlMimeContentTypeByExtA.Add('.s','text/x-asm');
+  AlMimeContentTypeByExtA.Add('.s3m','audio/s3m');
+  AlMimeContentTypeByExtA.Add('.saf','application/vnd.yamaha.smaf-audio');
+  AlMimeContentTypeByExtA.Add('.sbml','application/sbml+xml');
+  AlMimeContentTypeByExtA.Add('.sc','application/vnd.ibm.secure-container');
+  AlMimeContentTypeByExtA.Add('.scd','application/x-msschedule');
+  AlMimeContentTypeByExtA.Add('.scm','application/vnd.lotus-screencam');
+  AlMimeContentTypeByExtA.Add('.scq','application/scvp-cv-request');
+  AlMimeContentTypeByExtA.Add('.scs','application/scvp-cv-response');
+  AlMimeContentTypeByExtA.Add('.scurl','text/vnd.curl.scurl');
+  AlMimeContentTypeByExtA.Add('.sda','application/vnd.stardivision.draw');
+  AlMimeContentTypeByExtA.Add('.sdc','application/vnd.stardivision.calc');
+  AlMimeContentTypeByExtA.Add('.sdd','application/vnd.stardivision.impress');
+  AlMimeContentTypeByExtA.Add('.sdkd','application/vnd.solent.sdkm+xml');
+  AlMimeContentTypeByExtA.Add('.sdkm','application/vnd.solent.sdkm+xml');
+  AlMimeContentTypeByExtA.Add('.sdp','application/sdp');
+  AlMimeContentTypeByExtA.Add('.sdw','application/vnd.stardivision.writer');
+  AlMimeContentTypeByExtA.Add('.see','application/vnd.seemail');
+  AlMimeContentTypeByExtA.Add('.seed','application/vnd.fdsn.seed');
+  AlMimeContentTypeByExtA.Add('.sema','application/vnd.sema');
+  AlMimeContentTypeByExtA.Add('.semd','application/vnd.semd');
+  AlMimeContentTypeByExtA.Add('.semf','application/vnd.semf');
+  AlMimeContentTypeByExtA.Add('.ser','application/java-serialized-object');
+  AlMimeContentTypeByExtA.Add('.setpay','application/set-payment-initiation');
+  AlMimeContentTypeByExtA.Add('.setreg','application/set-registration-initiation');
+  AlMimeContentTypeByExtA.Add('.sfd-hdstx','application/vnd.hydrostatix.sof-data');
+  AlMimeContentTypeByExtA.Add('.sfs','application/vnd.spotfire.sfs');
+  AlMimeContentTypeByExtA.Add('.sfv','text/x-sfv');
+  AlMimeContentTypeByExtA.Add('.sgi','image/sgi');
+  AlMimeContentTypeByExtA.Add('.sgl','application/vnd.stardivision.writer-global');
+  AlMimeContentTypeByExtA.Add('.sgm','text/sgml');
+  AlMimeContentTypeByExtA.Add('.sgml','text/sgml');
+  AlMimeContentTypeByExtA.Add('.sh','application/x-sh');
+  AlMimeContentTypeByExtA.Add('.shar','application/x-shar');
+  AlMimeContentTypeByExtA.Add('.shf','application/shf+xml');
+  AlMimeContentTypeByExtA.Add('.sid','image/x-mrsid-image');
+  AlMimeContentTypeByExtA.Add('.sig','application/pgp-signature');
+  AlMimeContentTypeByExtA.Add('.sil','audio/silk');
+  AlMimeContentTypeByExtA.Add('.silo','model/mesh');
+  AlMimeContentTypeByExtA.Add('.sis','application/vnd.symbian.install');
+  AlMimeContentTypeByExtA.Add('.sisx','application/vnd.symbian.install');
+  AlMimeContentTypeByExtA.Add('.sit','application/x-stuffit');
+  AlMimeContentTypeByExtA.Add('.sitx','application/x-stuffitx');
+  AlMimeContentTypeByExtA.Add('.skd','application/vnd.koan');
+  AlMimeContentTypeByExtA.Add('.skm','application/vnd.koan');
+  AlMimeContentTypeByExtA.Add('.skp','application/vnd.koan');
+  AlMimeContentTypeByExtA.Add('.skt','application/vnd.koan');
+  AlMimeContentTypeByExtA.Add('.sldm','application/vnd.ms-powerpoint.slide.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.sldx','application/vnd.openxmlformats-officedocument.presentationml.slide');
+  AlMimeContentTypeByExtA.Add('.slt','application/vnd.epson.salt');
+  AlMimeContentTypeByExtA.Add('.sm','application/vnd.stepmania.stepchart');
+  AlMimeContentTypeByExtA.Add('.smf','application/vnd.stardivision.math');
+  AlMimeContentTypeByExtA.Add('.smi','application/smil+xml');
+  AlMimeContentTypeByExtA.Add('.smil','application/smil+xml');
+  AlMimeContentTypeByExtA.Add('.smv','video/x-smv');
+  AlMimeContentTypeByExtA.Add('.smzip','application/vnd.stepmania.package');
+  AlMimeContentTypeByExtA.Add('.snd','audio/basic');
+  AlMimeContentTypeByExtA.Add('.snf','application/x-font-snf');
+  AlMimeContentTypeByExtA.Add('.so','application/octet-stream');
+  AlMimeContentTypeByExtA.Add('.spc','application/x-pkcs7-certificates');
+  AlMimeContentTypeByExtA.Add('.spf','application/vnd.yamaha.smaf-phrase');
+  AlMimeContentTypeByExtA.Add('.spl','application/x-futuresplash');
+  AlMimeContentTypeByExtA.Add('.spot','text/vnd.in3d.spot');
+  AlMimeContentTypeByExtA.Add('.spp','application/scvp-vp-response');
+  AlMimeContentTypeByExtA.Add('.spq','application/scvp-vp-request');
+  AlMimeContentTypeByExtA.Add('.spx','audio/ogg');
+  AlMimeContentTypeByExtA.Add('.sql','application/x-sql');
+  AlMimeContentTypeByExtA.Add('.src','application/x-wais-source');
+  AlMimeContentTypeByExtA.Add('.srt','application/x-subrip');
+  AlMimeContentTypeByExtA.Add('.sru','application/sru+xml');
+  AlMimeContentTypeByExtA.Add('.srx','application/sparql-results+xml');
+  AlMimeContentTypeByExtA.Add('.ssdl','application/ssdl+xml');
+  AlMimeContentTypeByExtA.Add('.sse','application/vnd.kodak-descriptor');
+  AlMimeContentTypeByExtA.Add('.ssf','application/vnd.epson.ssf');
+  AlMimeContentTypeByExtA.Add('.ssml','application/ssml+xml');
+  AlMimeContentTypeByExtA.Add('.st','application/vnd.sailingtracker.track');
+  AlMimeContentTypeByExtA.Add('.stc','application/vnd.sun.xml.calc.template');
+  AlMimeContentTypeByExtA.Add('.std','application/vnd.sun.xml.draw.template');
+  AlMimeContentTypeByExtA.Add('.stf','application/vnd.wt.stf');
+  AlMimeContentTypeByExtA.Add('.sti','application/vnd.sun.xml.impress.template');
+  AlMimeContentTypeByExtA.Add('.stk','application/hyperstudio');
+  AlMimeContentTypeByExtA.Add('.stl','application/vnd.ms-pki.stl');
+  AlMimeContentTypeByExtA.Add('.str','application/vnd.pg.format');
+  AlMimeContentTypeByExtA.Add('.stw','application/vnd.sun.xml.writer.template');
+  //AlMimeContentTypeByExtA.Add('.sub','image/vnd.dvb.subtitle');
+  //AlMimeContentTypeByExtA.Add('.sub','text/vnd.dvb.subtitle');
+  AlMimeContentTypeByExtA.Add('.sus','application/vnd.sus-calendar');
+  AlMimeContentTypeByExtA.Add('.susp','application/vnd.sus-calendar');
+  AlMimeContentTypeByExtA.Add('.sv4cpio','application/x-sv4cpio');
+  AlMimeContentTypeByExtA.Add('.sv4crc','application/x-sv4crc');
+  AlMimeContentTypeByExtA.Add('.svc','application/vnd.dvb.service');
+  AlMimeContentTypeByExtA.Add('.svd','application/vnd.svd');
+  AlMimeContentTypeByExtA.Add('.svg','image/svg+xml');
+  AlMimeContentTypeByExtA.Add('.svgz','image/svg+xml');
+  AlMimeContentTypeByExtA.Add('.swa','application/x-director');
+  AlMimeContentTypeByExtA.Add('.swf','application/x-shockwave-flash');
+  AlMimeContentTypeByExtA.Add('.swi','application/vnd.aristanetworks.swi');
+  AlMimeContentTypeByExtA.Add('.sxc','application/vnd.sun.xml.calc');
+  AlMimeContentTypeByExtA.Add('.sxd','application/vnd.sun.xml.draw');
+  AlMimeContentTypeByExtA.Add('.sxg','application/vnd.sun.xml.writer.global');
+  AlMimeContentTypeByExtA.Add('.sxi','application/vnd.sun.xml.impress');
+  AlMimeContentTypeByExtA.Add('.sxm','application/vnd.sun.xml.math');
+  AlMimeContentTypeByExtA.Add('.sxw','application/vnd.sun.xml.writer');
+  AlMimeContentTypeByExtA.Add('.t','text/troff');
+  AlMimeContentTypeByExtA.Add('.t3','application/x-t3vm-image');
+  AlMimeContentTypeByExtA.Add('.taglet','application/vnd.mynfc');
+  AlMimeContentTypeByExtA.Add('.tao','application/vnd.tao.intent-module-archive');
+  AlMimeContentTypeByExtA.Add('.tar','application/x-tar');
+  AlMimeContentTypeByExtA.Add('.tcap','application/vnd.3gpp2.tcap');
+  AlMimeContentTypeByExtA.Add('.tcl','application/x-tcl');
+  AlMimeContentTypeByExtA.Add('.teacher','application/vnd.smart.teacher');
+  AlMimeContentTypeByExtA.Add('.tei','application/tei+xml');
+  AlMimeContentTypeByExtA.Add('.teicorpus','application/tei+xml');
+  AlMimeContentTypeByExtA.Add('.tex','application/x-tex');
+  AlMimeContentTypeByExtA.Add('.texi','application/x-texinfo');
+  AlMimeContentTypeByExtA.Add('.texinfo','application/x-texinfo');
+  AlMimeContentTypeByExtA.Add('.text','text/plain');
+  AlMimeContentTypeByExtA.Add('.tfi','application/thraud+xml');
+  AlMimeContentTypeByExtA.Add('.tfm','application/x-tex-tfm');
+  AlMimeContentTypeByExtA.Add('.tga','image/x-tga');
+  AlMimeContentTypeByExtA.Add('.thmx','application/vnd.ms-officetheme');
+  AlMimeContentTypeByExtA.Add('.tif','image/tiff');
+  AlMimeContentTypeByExtA.Add('.tiff','image/tiff');
+  AlMimeContentTypeByExtA.Add('.tmo','application/vnd.tmobile-livetv');
+  AlMimeContentTypeByExtA.Add('.torrent','application/x-bittorrent');
+  AlMimeContentTypeByExtA.Add('.tpl','application/vnd.groove-tool-template');
+  AlMimeContentTypeByExtA.Add('.tpt','application/vnd.trid.tpt');
+  AlMimeContentTypeByExtA.Add('.tr','text/troff');
+  AlMimeContentTypeByExtA.Add('.tra','application/vnd.trueapp');
+  AlMimeContentTypeByExtA.Add('.trm','application/x-msterminal');
+  AlMimeContentTypeByExtA.Add('.ts','video/mp2t');
+  AlMimeContentTypeByExtA.Add('.tsd','application/timestamped-data');
+  AlMimeContentTypeByExtA.Add('.tsv','text/tab-separated-values');
+  AlMimeContentTypeByExtA.Add('.ttc','font/collection');
+  AlMimeContentTypeByExtA.Add('.ttf','font/ttf');
+  AlMimeContentTypeByExtA.Add('.ttl','text/turtle');
+  AlMimeContentTypeByExtA.Add('.twd','application/vnd.simtech-mindmapper');
+  AlMimeContentTypeByExtA.Add('.twds','application/vnd.simtech-mindmapper');
+  AlMimeContentTypeByExtA.Add('.txd','application/vnd.genomatix.tuxedo');
+  AlMimeContentTypeByExtA.Add('.txf','application/vnd.mobius.txf');
+  AlMimeContentTypeByExtA.Add('.txt','text/plain');
+  AlMimeContentTypeByExtA.Add('.u32','application/x-authorware-bin');
+  AlMimeContentTypeByExtA.Add('.udeb','application/x-debian-package');
+  AlMimeContentTypeByExtA.Add('.ufd','application/vnd.ufdl');
+  AlMimeContentTypeByExtA.Add('.ufdl','application/vnd.ufdl');
+  AlMimeContentTypeByExtA.Add('.ulx','application/x-glulx');
+  AlMimeContentTypeByExtA.Add('.umj','application/vnd.umajin');
+  AlMimeContentTypeByExtA.Add('.unityweb','application/vnd.unity');
+  AlMimeContentTypeByExtA.Add('.uoml','application/vnd.uoml+xml');
+  AlMimeContentTypeByExtA.Add('.uri','text/uri-list');
+  AlMimeContentTypeByExtA.Add('.uris','text/uri-list');
+  AlMimeContentTypeByExtA.Add('.urls','text/uri-list');
+  AlMimeContentTypeByExtA.Add('.ustar','application/x-ustar');
+  AlMimeContentTypeByExtA.Add('.utz','application/vnd.uiq.theme');
+  AlMimeContentTypeByExtA.Add('.uu','text/x-uuencode');
+  AlMimeContentTypeByExtA.Add('.uva','audio/vnd.dece.audio');
+  AlMimeContentTypeByExtA.Add('.uvd','application/vnd.dece.data');
+  AlMimeContentTypeByExtA.Add('.uvf','application/vnd.dece.data');
+  AlMimeContentTypeByExtA.Add('.uvg','image/vnd.dece.graphic');
+  AlMimeContentTypeByExtA.Add('.uvh','video/vnd.dece.hd');
+  AlMimeContentTypeByExtA.Add('.uvi','image/vnd.dece.graphic');
+  AlMimeContentTypeByExtA.Add('.uvm','video/vnd.dece.mobile');
+  AlMimeContentTypeByExtA.Add('.uvp','video/vnd.dece.pd');
+  AlMimeContentTypeByExtA.Add('.uvs','video/vnd.dece.sd');
+  AlMimeContentTypeByExtA.Add('.uvt','application/vnd.dece.ttml+xml');
+  AlMimeContentTypeByExtA.Add('.uvu','video/vnd.uvvu.mp4');
+  AlMimeContentTypeByExtA.Add('.uvv','video/vnd.dece.video');
+  AlMimeContentTypeByExtA.Add('.uvva','audio/vnd.dece.audio');
+  AlMimeContentTypeByExtA.Add('.uvvd','application/vnd.dece.data');
+  AlMimeContentTypeByExtA.Add('.uvvf','application/vnd.dece.data');
+  AlMimeContentTypeByExtA.Add('.uvvg','image/vnd.dece.graphic');
+  AlMimeContentTypeByExtA.Add('.uvvh','video/vnd.dece.hd');
+  AlMimeContentTypeByExtA.Add('.uvvi','image/vnd.dece.graphic');
+  AlMimeContentTypeByExtA.Add('.uvvm','video/vnd.dece.mobile');
+  AlMimeContentTypeByExtA.Add('.uvvp','video/vnd.dece.pd');
+  AlMimeContentTypeByExtA.Add('.uvvs','video/vnd.dece.sd');
+  AlMimeContentTypeByExtA.Add('.uvvt','application/vnd.dece.ttml+xml');
+  AlMimeContentTypeByExtA.Add('.uvvu','video/vnd.uvvu.mp4');
+  AlMimeContentTypeByExtA.Add('.uvvv','video/vnd.dece.video');
+  AlMimeContentTypeByExtA.Add('.uvvx','application/vnd.dece.unspecified');
+  AlMimeContentTypeByExtA.Add('.uvvz','application/vnd.dece.zip');
+  AlMimeContentTypeByExtA.Add('.uvx','application/vnd.dece.unspecified');
+  AlMimeContentTypeByExtA.Add('.uvz','application/vnd.dece.zip');
+  AlMimeContentTypeByExtA.Add('.vcard','text/vcard');
+  AlMimeContentTypeByExtA.Add('.vcd','application/x-cdlink');
+  AlMimeContentTypeByExtA.Add('.vcf','text/x-vcard');
+  AlMimeContentTypeByExtA.Add('.vcg','application/vnd.groove-vcard');
+  AlMimeContentTypeByExtA.Add('.vcs','text/x-vcalendar');
+  AlMimeContentTypeByExtA.Add('.vcx','application/vnd.vcx');
+  AlMimeContentTypeByExtA.Add('.vis','application/vnd.visionary');
+  AlMimeContentTypeByExtA.Add('.viv','video/vnd.vivo');
+  AlMimeContentTypeByExtA.Add('.vob','video/x-ms-vob');
+  AlMimeContentTypeByExtA.Add('.vor','application/vnd.stardivision.writer');
+  AlMimeContentTypeByExtA.Add('.vox','application/x-authorware-bin');
+  AlMimeContentTypeByExtA.Add('.vrml','model/vrml');
+  AlMimeContentTypeByExtA.Add('.vsd','application/vnd.visio');
+  AlMimeContentTypeByExtA.Add('.vsf','application/vnd.vsf');
+  AlMimeContentTypeByExtA.Add('.vss','application/vnd.visio');
+  AlMimeContentTypeByExtA.Add('.vst','application/vnd.visio');
+  AlMimeContentTypeByExtA.Add('.vsw','application/vnd.visio');
+  AlMimeContentTypeByExtA.Add('.vtu','model/vnd.vtu');
+  AlMimeContentTypeByExtA.Add('.vxml','application/voicexml+xml');
+  AlMimeContentTypeByExtA.Add('.w3d','application/x-director');
+  AlMimeContentTypeByExtA.Add('.wad','application/x-doom');
+  AlMimeContentTypeByExtA.Add('.wasm','application/wasm');
+  AlMimeContentTypeByExtA.Add('.wav','audio/x-wav');
+  AlMimeContentTypeByExtA.Add('.wax','audio/x-ms-wax');
+  AlMimeContentTypeByExtA.Add('.wbmp','image/vnd.wap.wbmp');
+  AlMimeContentTypeByExtA.Add('.wbs','application/vnd.criticaltools.wbs+xml');
+  AlMimeContentTypeByExtA.Add('.wbxml','application/vnd.wap.wbxml');
+  AlMimeContentTypeByExtA.Add('.wcm','application/vnd.ms-works');
+  AlMimeContentTypeByExtA.Add('.wdb','application/vnd.ms-works');
+  AlMimeContentTypeByExtA.Add('.wdp','image/vnd.ms-photo');
+  AlMimeContentTypeByExtA.Add('.weba','audio/webm');
+  AlMimeContentTypeByExtA.Add('.webm','video/webm');
+  AlMimeContentTypeByExtA.Add('.webp','image/webp');
+  AlMimeContentTypeByExtA.Add('.wg','application/vnd.pmi.widget');
+  AlMimeContentTypeByExtA.Add('.wgt','application/widget');
+  AlMimeContentTypeByExtA.Add('.wks','application/vnd.ms-works');
+  AlMimeContentTypeByExtA.Add('.wm','video/x-ms-wm');
+  AlMimeContentTypeByExtA.Add('.wma','audio/x-ms-wma');
+  AlMimeContentTypeByExtA.Add('.wmd','application/x-ms-wmd');
+  AlMimeContentTypeByExtA.Add('.wmf','application/x-msmetafile');
+  AlMimeContentTypeByExtA.Add('.wml','text/vnd.wap.wml');
+  AlMimeContentTypeByExtA.Add('.wmlc','application/vnd.wap.wmlc');
+  AlMimeContentTypeByExtA.Add('.wmls','text/vnd.wap.wmlscript');
+  AlMimeContentTypeByExtA.Add('.wmlsc','application/vnd.wap.wmlscriptc');
+  AlMimeContentTypeByExtA.Add('.wmv','video/x-ms-wmv');
+  AlMimeContentTypeByExtA.Add('.wmx','video/x-ms-wmx');
+  //AlMimeContentTypeByExtA.Add('.wmz','application/x-ms-wmz');
+  //AlMimeContentTypeByExtA.Add('.wmz','application/x-msmetafile');
+  AlMimeContentTypeByExtA.Add('.woff','font/woff');
+  AlMimeContentTypeByExtA.Add('.woff2','font/woff2');
+  AlMimeContentTypeByExtA.Add('.wpd','application/vnd.wordperfect');
+  AlMimeContentTypeByExtA.Add('.wpl','application/vnd.ms-wpl');
+  AlMimeContentTypeByExtA.Add('.wps','application/vnd.ms-works');
+  AlMimeContentTypeByExtA.Add('.wqd','application/vnd.wqd');
+  AlMimeContentTypeByExtA.Add('.wri','application/x-mswrite');
+  AlMimeContentTypeByExtA.Add('.wrl','model/vrml');
+  AlMimeContentTypeByExtA.Add('.wsdl','application/wsdl+xml');
+  AlMimeContentTypeByExtA.Add('.wspolicy','application/wspolicy+xml');
+  AlMimeContentTypeByExtA.Add('.wtb','application/vnd.webturbo');
+  AlMimeContentTypeByExtA.Add('.wvx','video/x-ms-wvx');
+  AlMimeContentTypeByExtA.Add('.x32','application/x-authorware-bin');
+  AlMimeContentTypeByExtA.Add('.x3d','model/x3d+xml');
+  AlMimeContentTypeByExtA.Add('.x3db','model/x3d+binary');
+  AlMimeContentTypeByExtA.Add('.x3dbz','model/x3d+binary');
+  AlMimeContentTypeByExtA.Add('.x3dv','model/x3d+vrml');
+  AlMimeContentTypeByExtA.Add('.x3dvz','model/x3d+vrml');
+  AlMimeContentTypeByExtA.Add('.x3dz','model/x3d+xml');
+  AlMimeContentTypeByExtA.Add('.xaml','application/xaml+xml');
+  AlMimeContentTypeByExtA.Add('.xap','application/x-silverlight-app');
+  AlMimeContentTypeByExtA.Add('.xar','application/vnd.xara');
+  AlMimeContentTypeByExtA.Add('.xbap','application/x-ms-xbap');
+  AlMimeContentTypeByExtA.Add('.xbd','application/vnd.fujixerox.docuworks.binder');
+  AlMimeContentTypeByExtA.Add('.xbm','image/x-xbitmap');
+  AlMimeContentTypeByExtA.Add('.xdf','application/xcap-diff+xml');
+  AlMimeContentTypeByExtA.Add('.xdm','application/vnd.syncml.dm+xml');
+  AlMimeContentTypeByExtA.Add('.xdp','application/vnd.adobe.xdp+xml');
+  AlMimeContentTypeByExtA.Add('.xdssc','application/dssc+xml');
+  AlMimeContentTypeByExtA.Add('.xdw','application/vnd.fujixerox.docuworks');
+  AlMimeContentTypeByExtA.Add('.xenc','application/xenc+xml');
+  AlMimeContentTypeByExtA.Add('.xer','application/patch-ops-error+xml');
+  AlMimeContentTypeByExtA.Add('.xfdf','application/vnd.adobe.xfdf');
+  AlMimeContentTypeByExtA.Add('.xfdl','application/vnd.xfdl');
+  AlMimeContentTypeByExtA.Add('.xht','application/xhtml+xml');
+  AlMimeContentTypeByExtA.Add('.xhtml','application/xhtml+xml');
+  AlMimeContentTypeByExtA.Add('.xhvml','application/xv+xml');
+  AlMimeContentTypeByExtA.Add('.xif','image/vnd.xiff');
+  AlMimeContentTypeByExtA.Add('.xla','application/vnd.ms-excel');
+  AlMimeContentTypeByExtA.Add('.xlam','application/vnd.ms-excel.addin.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.xlc','application/vnd.ms-excel');
+  AlMimeContentTypeByExtA.Add('.xlf','application/x-xliff+xml');
+  AlMimeContentTypeByExtA.Add('.xlm','application/vnd.ms-excel');
+  AlMimeContentTypeByExtA.Add('.xls','application/vnd.ms-excel');
+  AlMimeContentTypeByExtA.Add('.xlsb','application/vnd.ms-excel.sheet.binary.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.xlsm','application/vnd.ms-excel.sheet.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  AlMimeContentTypeByExtA.Add('.xlt','application/vnd.ms-excel');
+  AlMimeContentTypeByExtA.Add('.xltm','application/vnd.ms-excel.template.macroenabled.12');
+  AlMimeContentTypeByExtA.Add('.xltx','application/vnd.openxmlformats-officedocument.spreadsheetml.template');
+  AlMimeContentTypeByExtA.Add('.xlw','application/vnd.ms-excel');
+  AlMimeContentTypeByExtA.Add('.xm','audio/xm');
+  AlMimeContentTypeByExtA.Add('.xml','application/xml');
+  AlMimeContentTypeByExtA.Add('.xo','application/vnd.olpc-sugar');
+  AlMimeContentTypeByExtA.Add('.xop','application/xop+xml');
+  AlMimeContentTypeByExtA.Add('.xpi','application/x-xpinstall');
+  AlMimeContentTypeByExtA.Add('.xpl','application/xproc+xml');
+  AlMimeContentTypeByExtA.Add('.xpm','image/x-xpixmap');
+  AlMimeContentTypeByExtA.Add('.xpr','application/vnd.is-xpr');
+  AlMimeContentTypeByExtA.Add('.xps','application/vnd.ms-xpsdocument');
+  AlMimeContentTypeByExtA.Add('.xpw','application/vnd.intercon.formnet');
+  AlMimeContentTypeByExtA.Add('.xpx','application/vnd.intercon.formnet');
+  AlMimeContentTypeByExtA.Add('.xsl','application/xml');
+  AlMimeContentTypeByExtA.Add('.xslt','application/xslt+xml');
+  AlMimeContentTypeByExtA.Add('.xsm','application/vnd.syncml+xml');
+  AlMimeContentTypeByExtA.Add('.xspf','application/xspf+xml');
+  AlMimeContentTypeByExtA.Add('.xul','application/vnd.mozilla.xul+xml');
+  AlMimeContentTypeByExtA.Add('.xvm','application/xv+xml');
+  AlMimeContentTypeByExtA.Add('.xvml','application/xv+xml');
+  AlMimeContentTypeByExtA.Add('.xwd','image/x-xwindowdump');
+  AlMimeContentTypeByExtA.Add('.xyz','chemical/x-xyz');
+  AlMimeContentTypeByExtA.Add('.xz','application/x-xz');
+  AlMimeContentTypeByExtA.Add('.yang','application/yang');
+  AlMimeContentTypeByExtA.Add('.yin','application/yin+xml');
+  AlMimeContentTypeByExtA.Add('.z1','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z2','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z3','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z4','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z5','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z6','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z7','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.z8','application/x-zmachine');
+  AlMimeContentTypeByExtA.Add('.zaz','application/vnd.zzazz.deck+xml');
+  AlMimeContentTypeByExtA.Add('.zip','application/zip');
+  AlMimeContentTypeByExtA.Add('.zir','application/vnd.zul');
+  AlMimeContentTypeByExtA.Add('.zirz','application/vnd.zul');
+  AlMimeContentTypeByExtA.Add('.zmm','application/vnd.handheld-entertainment+xml');
 
-  { Audio }
-  AlMimeContentTypeByExtList.Add('.aac=audio/mp4');
-  AlMimeContentTypeByExtList.Add('.aif=audio/x-aiff');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.aifc=audio/x-aiff');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.aiff=audio/x-aiff');    {Do not Localize}
+  // Build with IANAMediaTypesExtractor
+  // Source: https://github.com/apache/httpd/blob/trunk/docs/conf/mime.types
+  AlExtbyMimeContentTypeA.Add('application/andrew-inset','.ez');
+  AlExtbyMimeContentTypeA.Add('application/applixware','.aw');
+  AlExtbyMimeContentTypeA.Add('application/atom+xml','.atom');
+  AlExtbyMimeContentTypeA.Add('application/atomcat+xml','.atomcat');
+  AlExtbyMimeContentTypeA.Add('application/atomsvc+xml','.atomsvc');
+  AlExtbyMimeContentTypeA.Add('application/ccxml+xml','.ccxml');
+  AlExtbyMimeContentTypeA.Add('application/cdmi-capability','.cdmia');
+  AlExtbyMimeContentTypeA.Add('application/cdmi-container','.cdmic');
+  AlExtbyMimeContentTypeA.Add('application/cdmi-domain','.cdmid');
+  AlExtbyMimeContentTypeA.Add('application/cdmi-object','.cdmio');
+  AlExtbyMimeContentTypeA.Add('application/cdmi-queue','.cdmiq');
+  AlExtbyMimeContentTypeA.Add('application/cu-seeme','.cu');
+  AlExtbyMimeContentTypeA.Add('application/davmount+xml','.davmount');
+  AlExtbyMimeContentTypeA.Add('application/docbook+xml','.dbk');
+  AlExtbyMimeContentTypeA.Add('application/dssc+der','.dssc');
+  AlExtbyMimeContentTypeA.Add('application/dssc+xml','.xdssc');
+  AlExtbyMimeContentTypeA.Add('application/ecmascript','.ecma');
+  AlExtbyMimeContentTypeA.Add('application/emma+xml','.emma');
+  AlExtbyMimeContentTypeA.Add('application/epub+zip','.epub');
+  AlExtbyMimeContentTypeA.Add('application/exi','.exi');
+  AlExtbyMimeContentTypeA.Add('application/font-tdpfr','.pfr');
+  AlExtbyMimeContentTypeA.Add('application/gml+xml','.gml');
+  AlExtbyMimeContentTypeA.Add('application/gpx+xml','.gpx');
+  AlExtbyMimeContentTypeA.Add('application/gxf','.gxf');
+  AlExtbyMimeContentTypeA.Add('application/hyperstudio','.stk');
+  //AlExtbyMimeContentTypeA.Add('application/inkml+xml','.ink');
+  AlExtbyMimeContentTypeA.Add('application/inkml+xml','.inkml');
+  AlExtbyMimeContentTypeA.Add('application/ipfix','.ipfix');
+  AlExtbyMimeContentTypeA.Add('application/java-archive','.jar');
+  AlExtbyMimeContentTypeA.Add('application/java-serialized-object','.ser');
+  AlExtbyMimeContentTypeA.Add('application/java-vm','.class');
+  AlExtbyMimeContentTypeA.Add('application/json','.json');
+  AlExtbyMimeContentTypeA.Add('application/jsonml+json','.jsonml');
+  AlExtbyMimeContentTypeA.Add('application/lost+xml','.lostxml');
+  AlExtbyMimeContentTypeA.Add('application/mac-binhex40','.hqx');
+  AlExtbyMimeContentTypeA.Add('application/mac-compactpro','.cpt');
+  AlExtbyMimeContentTypeA.Add('application/mads+xml','.mads');
+  AlExtbyMimeContentTypeA.Add('application/marc','.mrc');
+  AlExtbyMimeContentTypeA.Add('application/marcxml+xml','.mrcx');
+  //AlExtbyMimeContentTypeA.Add('application/mathematica','.ma');
+  //AlExtbyMimeContentTypeA.Add('application/mathematica','.mb');
+  AlExtbyMimeContentTypeA.Add('application/mathematica','.nb');
+  AlExtbyMimeContentTypeA.Add('application/mathml+xml','.mathml');
+  AlExtbyMimeContentTypeA.Add('application/mbox','.mbox');
+  AlExtbyMimeContentTypeA.Add('application/mediaservercontrol+xml','.mscml');
+  AlExtbyMimeContentTypeA.Add('application/metalink+xml','.metalink');
+  AlExtbyMimeContentTypeA.Add('application/metalink4+xml','.meta4');
+  AlExtbyMimeContentTypeA.Add('application/mets+xml','.mets');
+  AlExtbyMimeContentTypeA.Add('application/mods+xml','.mods');
+  //AlExtbyMimeContentTypeA.Add('application/mp21','.m21');
+  AlExtbyMimeContentTypeA.Add('application/mp21','.mp21');
+  AlExtbyMimeContentTypeA.Add('application/mp4','.mp4s');
+  AlExtbyMimeContentTypeA.Add('application/msword','.doc');
+  //AlExtbyMimeContentTypeA.Add('application/msword','.dot');
+  AlExtbyMimeContentTypeA.Add('application/mxf','.mxf');
+  AlExtbyMimeContentTypeA.Add('application/octet-stream','.bin');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.bpk');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.deploy');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.dist');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.distz');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.dms');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.dump');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.elc');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.lrf');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.mar');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.pkg');
+  //AlExtbyMimeContentTypeA.Add('application/octet-stream','.so');
+  AlExtbyMimeContentTypeA.Add('application/oda','.oda');
+  AlExtbyMimeContentTypeA.Add('application/oebps-package+xml','.opf');
+  AlExtbyMimeContentTypeA.Add('application/ogg','.ogx');
+  AlExtbyMimeContentTypeA.Add('application/omdoc+xml','.omdoc');
+  AlExtbyMimeContentTypeA.Add('application/onenote','.onepkg');
+  //AlExtbyMimeContentTypeA.Add('application/onenote','.onetmp');
+  //AlExtbyMimeContentTypeA.Add('application/onenote','.onetoc');
+  //AlExtbyMimeContentTypeA.Add('application/onenote','.onetoc2');
+  AlExtbyMimeContentTypeA.Add('application/oxps','.oxps');
+  AlExtbyMimeContentTypeA.Add('application/patch-ops-error+xml','.xer');
+  AlExtbyMimeContentTypeA.Add('application/pdf','.pdf');
+  AlExtbyMimeContentTypeA.Add('application/pgp-encrypted','.pgp');
+  AlExtbyMimeContentTypeA.Add('application/pgp-signature','.asc');
+  //AlExtbyMimeContentTypeA.Add('application/pgp-signature','.sig');
+  AlExtbyMimeContentTypeA.Add('application/pics-rules','.prf');
+  AlExtbyMimeContentTypeA.Add('application/pkcs10','.p10');
+  //AlExtbyMimeContentTypeA.Add('application/pkcs7-mime','.p7c');
+  AlExtbyMimeContentTypeA.Add('application/pkcs7-mime','.p7m');
+  AlExtbyMimeContentTypeA.Add('application/pkcs7-signature','.p7s');
+  AlExtbyMimeContentTypeA.Add('application/pkcs8','.p8');
+  AlExtbyMimeContentTypeA.Add('application/pkix-attr-cert','.ac');
+  AlExtbyMimeContentTypeA.Add('application/pkix-cert','.cer');
+  AlExtbyMimeContentTypeA.Add('application/pkix-crl','.crl');
+  AlExtbyMimeContentTypeA.Add('application/pkix-pkipath','.pkipath');
+  AlExtbyMimeContentTypeA.Add('application/pkixcmp','.pki');
+  AlExtbyMimeContentTypeA.Add('application/pls+xml','.pls');
+  //AlExtbyMimeContentTypeA.Add('application/postscript','.ai');
+  //AlExtbyMimeContentTypeA.Add('application/postscript','.eps');
+  AlExtbyMimeContentTypeA.Add('application/postscript','.ps');
+  AlExtbyMimeContentTypeA.Add('application/prs.cww','.cww');
+  AlExtbyMimeContentTypeA.Add('application/pskc+xml','.pskcxml');
+  AlExtbyMimeContentTypeA.Add('application/rdf+xml','.rdf');
+  AlExtbyMimeContentTypeA.Add('application/reginfo+xml','.rif');
+  AlExtbyMimeContentTypeA.Add('application/relax-ng-compact-syntax','.rnc');
+  AlExtbyMimeContentTypeA.Add('application/resource-lists+xml','.rl');
+  AlExtbyMimeContentTypeA.Add('application/resource-lists-diff+xml','.rld');
+  AlExtbyMimeContentTypeA.Add('application/rls-services+xml','.rs');
+  AlExtbyMimeContentTypeA.Add('application/rpki-ghostbusters','.gbr');
+  AlExtbyMimeContentTypeA.Add('application/rpki-manifest','.mft');
+  AlExtbyMimeContentTypeA.Add('application/rpki-roa','.roa');
+  AlExtbyMimeContentTypeA.Add('application/rsd+xml','.rsd');
+  AlExtbyMimeContentTypeA.Add('application/rss+xml','.rss');
+  AlExtbyMimeContentTypeA.Add('application/rtf','.rtf');
+  AlExtbyMimeContentTypeA.Add('application/sbml+xml','.sbml');
+  AlExtbyMimeContentTypeA.Add('application/scvp-cv-request','.scq');
+  AlExtbyMimeContentTypeA.Add('application/scvp-cv-response','.scs');
+  AlExtbyMimeContentTypeA.Add('application/scvp-vp-request','.spq');
+  AlExtbyMimeContentTypeA.Add('application/scvp-vp-response','.spp');
+  AlExtbyMimeContentTypeA.Add('application/sdp','.sdp');
+  AlExtbyMimeContentTypeA.Add('application/set-payment-initiation','.setpay');
+  AlExtbyMimeContentTypeA.Add('application/set-registration-initiation','.setreg');
+  AlExtbyMimeContentTypeA.Add('application/shf+xml','.shf');
+  //AlExtbyMimeContentTypeA.Add('application/smil+xml','.smi');
+  AlExtbyMimeContentTypeA.Add('application/smil+xml','.smil');
+  AlExtbyMimeContentTypeA.Add('application/sparql-query','.rq');
+  AlExtbyMimeContentTypeA.Add('application/sparql-results+xml','.srx');
+  AlExtbyMimeContentTypeA.Add('application/srgs','.gram');
+  AlExtbyMimeContentTypeA.Add('application/srgs+xml','.grxml');
+  AlExtbyMimeContentTypeA.Add('application/sru+xml','.sru');
+  AlExtbyMimeContentTypeA.Add('application/ssdl+xml','.ssdl');
+  AlExtbyMimeContentTypeA.Add('application/ssml+xml','.ssml');
+  AlExtbyMimeContentTypeA.Add('application/tei+xml','.tei');
+  //AlExtbyMimeContentTypeA.Add('application/tei+xml','.teicorpus');
+  AlExtbyMimeContentTypeA.Add('application/thraud+xml','.tfi');
+  AlExtbyMimeContentTypeA.Add('application/timestamped-data','.tsd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.3gpp.pic-bw-large','.plb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.3gpp.pic-bw-small','.psb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.3gpp.pic-bw-var','.pvb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.3gpp2.tcap','.tcap');
+  AlExtbyMimeContentTypeA.Add('application/vnd.3m.post-it-notes','.pwn');
+  AlExtbyMimeContentTypeA.Add('application/vnd.accpac.simply.aso','.aso');
+  AlExtbyMimeContentTypeA.Add('application/vnd.accpac.simply.imp','.imp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.acucobol','.acu');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.acucorp','.acutc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.acucorp','.atc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.adobe.air-application-installer-package+zip','.air');
+  AlExtbyMimeContentTypeA.Add('application/vnd.adobe.formscentral.fcdt','.fcdt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.adobe.fxp','.fxp');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.adobe.fxp','.fxpl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.adobe.xdp+xml','.xdp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.adobe.xfdf','.xfdf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ahead.space','.ahead');
+  AlExtbyMimeContentTypeA.Add('application/vnd.airzip.filesecure.azf','.azf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.airzip.filesecure.azs','.azs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.amazon.ebook','.azw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.americandynamics.acc','.acc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.amiga.ami','.ami');
+  AlExtbyMimeContentTypeA.Add('application/vnd.android.package-archive','.apk');
+  AlExtbyMimeContentTypeA.Add('application/vnd.anser-web-certificate-issue-initiation','.cii');
+  AlExtbyMimeContentTypeA.Add('application/vnd.anser-web-funds-transfer-initiation','.fti');
+  AlExtbyMimeContentTypeA.Add('application/vnd.antix.game-component','.atx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.apple.installer+xml','.mpkg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.apple.mpegurl','.m3u8');
+  AlExtbyMimeContentTypeA.Add('application/vnd.aristanetworks.swi','.swi');
+  AlExtbyMimeContentTypeA.Add('application/vnd.astraea-software.iota','.iota');
+  AlExtbyMimeContentTypeA.Add('application/vnd.audiograph','.aep');
+  AlExtbyMimeContentTypeA.Add('application/vnd.blueice.multipass','.mpm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.bmi','.bmi');
+  AlExtbyMimeContentTypeA.Add('application/vnd.businessobjects','.rep');
+  AlExtbyMimeContentTypeA.Add('application/vnd.chemdraw+xml','.cdxml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.chipnuts.karaoke-mmd','.mmd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.cinderella','.cdy');
+  AlExtbyMimeContentTypeA.Add('application/vnd.claymore','.cla');
+  AlExtbyMimeContentTypeA.Add('application/vnd.cloanto.rp9','.rp9');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.clonk.c4group','.c4d');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.clonk.c4group','.c4f');
+  AlExtbyMimeContentTypeA.Add('application/vnd.clonk.c4group','.c4g');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.clonk.c4group','.c4p');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.clonk.c4group','.c4u');
+  AlExtbyMimeContentTypeA.Add('application/vnd.cluetrust.cartomobile-config','.c11amc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.cluetrust.cartomobile-config-pkg','.c11amz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.commonspace','.csp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.contact.cmsg','.cdbcmsg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.cosmocaller','.cmc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.crick.clicker','.clkx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.crick.clicker.keyboard','.clkk');
+  AlExtbyMimeContentTypeA.Add('application/vnd.crick.clicker.palette','.clkp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.crick.clicker.template','.clkt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.crick.clicker.wordbank','.clkw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.criticaltools.wbs+xml','.wbs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ctc-posml','.pml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.cups-ppd','.ppd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.curl.car','.car');
+  AlExtbyMimeContentTypeA.Add('application/vnd.curl.pcurl','.pcurl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dart','.dart');
+  AlExtbyMimeContentTypeA.Add('application/vnd.data-vision.rdz','.rdz');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.dece.data','.uvd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dece.data','.uvf');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.dece.data','.uvvd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.dece.data','.uvvf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dece.ttml+xml','.uvt');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.dece.ttml+xml','.uvvt');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.dece.unspecified','.uvvx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dece.unspecified','.uvx');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.dece.zip','.uvvz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dece.zip','.uvz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.denovo.fcselayout-link','.fe_launch');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dna','.dna');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dolby.mlp','.mlp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dpgraph','.dpg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dreamfactory','.dfac');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ds-keypoint','.kpxx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dvb.ait','.ait');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dvb.service','.svc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.dynageo','.geo');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ecowin.chart','.mag');
+  AlExtbyMimeContentTypeA.Add('application/vnd.enliven','.nml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.epson.esf','.esf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.epson.msf','.msf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.epson.quickanime','.qam');
+  AlExtbyMimeContentTypeA.Add('application/vnd.epson.salt','.slt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.epson.ssf','.ssf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.eszigno3+xml','.es3');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.eszigno3+xml','.et3');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ezpix-album','.ez2');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ezpix-package','.ez3');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fdf','.fdf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fdsn.mseed','.mseed');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.fdsn.seed','.dataless');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fdsn.seed','.seed');
+  AlExtbyMimeContentTypeA.Add('application/vnd.flographit','.gph');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fluxtime.clip','.ftc');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.framemaker','.book');
+  AlExtbyMimeContentTypeA.Add('application/vnd.framemaker','.fm');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.framemaker','.frame');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.framemaker','.maker');
+  AlExtbyMimeContentTypeA.Add('application/vnd.frogans.fnc','.fnc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.frogans.ltf','.ltf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fsc.weblaunch','.fsc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujitsu.oasys','.oas');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujitsu.oasys2','.oa2');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujitsu.oasys3','.oa3');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujitsu.oasysgp','.fg5');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujitsu.oasysprs','.bh2');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujixerox.ddd','.ddd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujixerox.docuworks','.xdw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fujixerox.docuworks.binder','.xbd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.fuzzysheet','.fzs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.genomatix.tuxedo','.txd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geogebra.file','.ggb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geogebra.slides','.ggs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geogebra.tool','.ggt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geometry-explorer','.gex');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.geometry-explorer','.gre');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geonext','.gxt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geoplan','.g2w');
+  AlExtbyMimeContentTypeA.Add('application/vnd.geospace','.g3w');
+  AlExtbyMimeContentTypeA.Add('application/vnd.gmx','.gmx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.google-earth.kml+xml','.kml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.google-earth.kmz','.kmz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.grafeq','.gqf');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.grafeq','.gqs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-account','.gac');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-help','.ghf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-identity-message','.gim');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-injector','.grv');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-tool-message','.gtm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-tool-template','.tpl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.groove-vcard','.vcg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hal+xml','.hal');
+  AlExtbyMimeContentTypeA.Add('application/vnd.handheld-entertainment+xml','.zmm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hbci','.hbci');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hhe.lesson-player','.les');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hp-hpgl','.hpgl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hp-hpid','.hpid');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hp-hps','.hps');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hp-jlyt','.jlt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hp-pcl','.pcl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hp-pclxl','.pclxl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.hydrostatix.sof-data','.sfd-hdstx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ibm.minipay','.mpy');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ibm.modcap','.afp');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ibm.modcap','.list3820');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ibm.modcap','.listafp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ibm.rights-management','.irm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ibm.secure-container','.sc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.iccprofile','.icc');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.iccprofile','.icm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.igloader','.igl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.immervision-ivp','.ivp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.immervision-ivu','.ivu');
+  AlExtbyMimeContentTypeA.Add('application/vnd.insors.igm','.igm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.intercon.formnet','.xpw');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.intercon.formnet','.xpx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.intergeo','.i2g');
+  AlExtbyMimeContentTypeA.Add('application/vnd.intu.qbo','.qbo');
+  AlExtbyMimeContentTypeA.Add('application/vnd.intu.qfx','.qfx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ipunplugged.rcprofile','.rcprofile');
+  AlExtbyMimeContentTypeA.Add('application/vnd.irepository.package+xml','.irp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.is-xpr','.xpr');
+  AlExtbyMimeContentTypeA.Add('application/vnd.isac.fcs','.fcs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.jam','.jam');
+  AlExtbyMimeContentTypeA.Add('application/vnd.jcp.javame.midlet-rms','.rms');
+  AlExtbyMimeContentTypeA.Add('application/vnd.jisp','.jisp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.joost.joda-archive','.joda');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.kahootz','.ktr');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kahootz','.ktz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.karbon','.karbon');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kchart','.chrt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kformula','.kfo');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kivio','.flw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kontour','.kon');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kpresenter','.kpr');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.kde.kpresenter','.kpt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kspread','.ksp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kde.kword','.kwd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.kde.kword','.kwt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kenameaapp','.htke');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kidspiration','.kia');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kinar','.kne');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.kinar','.knp');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.koan','.skd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.koan','.skm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.koan','.skp');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.koan','.skt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.kodak-descriptor','.sse');
+  AlExtbyMimeContentTypeA.Add('application/vnd.las.las+xml','.lasxml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.llamagraphics.life-balance.desktop','.lbd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.llamagraphics.life-balance.exchange+xml','.lbe');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-1-2-3','.123');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-approach','.apr');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-freelance','.pre');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-notes','.nsf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-organizer','.org');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-screencam','.scm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.lotus-wordpro','.lwp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.macports.portpkg','.portpkg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mcd','.mcd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.medcalcdata','.mc1');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mediastation.cdkey','.cdkey');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mfer','.mwf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mfmp','.mfm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.micrografx.flo','.flo');
+  AlExtbyMimeContentTypeA.Add('application/vnd.micrografx.igx','.igx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mif','.mif');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.daf','.daf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.dis','.dis');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.mbk','.mbk');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.mqy','.mqy');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.msl','.msl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.plc','.plc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mobius.txf','.txf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mophun.application','.mpn');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mophun.certificate','.mpc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mozilla.xul+xml','.xul');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-artgalry','.cil');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-cab-compressed','.cab');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel','.xla');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel','.xlc');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel','.xlm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel','.xls');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel','.xlt');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel','.xlw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel.addin.macroenabled.12','.xlam');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel.sheet.binary.macroenabled.12','.xlsb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel.sheet.macroenabled.12','.xlsm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-excel.template.macroenabled.12','.xltm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-fontobject','.eot');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-htmlhelp','.chm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-ims','.ims');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-lrm','.lrm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-officetheme','.thmx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-pki.seccat','.cat');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-pki.stl','.stl');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint','.pot');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint','.pps');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint','.ppt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint.addin.macroenabled.12','.ppam');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint.presentation.macroenabled.12','.pptm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint.slide.macroenabled.12','.sldm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint.slideshow.macroenabled.12','.ppsm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-powerpoint.template.macroenabled.12','.potm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-project','.mpp');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-project','.mpt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-word.document.macroenabled.12','.docm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-word.template.macroenabled.12','.dotm');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-works','.wcm');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-works','.wdb');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ms-works','.wks');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-works','.wps');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-wpl','.wpl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ms-xpsdocument','.xps');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mseq','.mseq');
+  AlExtbyMimeContentTypeA.Add('application/vnd.musician','.mus');
+  AlExtbyMimeContentTypeA.Add('application/vnd.muvee.style','.msty');
+  AlExtbyMimeContentTypeA.Add('application/vnd.mynfc','.taglet');
+  AlExtbyMimeContentTypeA.Add('application/vnd.neurolanguage.nlu','.nlu');
+  AlExtbyMimeContentTypeA.Add('application/vnd.nitf','.nitf');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.nitf','.ntf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.noblenet-directory','.nnd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.noblenet-sealer','.nns');
+  AlExtbyMimeContentTypeA.Add('application/vnd.noblenet-web','.nnw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.nokia.n-gage.data','.ngdat');
+  AlExtbyMimeContentTypeA.Add('application/vnd.nokia.n-gage.symbian.install','.n-gage');
+  AlExtbyMimeContentTypeA.Add('application/vnd.nokia.radio-preset','.rpst');
+  AlExtbyMimeContentTypeA.Add('application/vnd.nokia.radio-presets','.rpss');
+  AlExtbyMimeContentTypeA.Add('application/vnd.novadigm.edm','.edm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.novadigm.edx','.edx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.novadigm.ext','.ext');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.chart','.odc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.chart-template','.otc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.database','.odb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.formula','.odf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.formula-template','.odft');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.graphics','.odg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.graphics-template','.otg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.image','.odi');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.image-template','.oti');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.presentation','.odp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.presentation-template','.otp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.spreadsheet','.ods');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.spreadsheet-template','.ots');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.text','.odt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.text-master','.odm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.text-template','.ott');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oasis.opendocument.text-web','.oth');
+  AlExtbyMimeContentTypeA.Add('application/vnd.olpc-sugar','.xo');
+  AlExtbyMimeContentTypeA.Add('application/vnd.oma.dd2+xml','.dd2');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openofficeorg.extension','.oxt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.presentationml.presentation','.pptx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.presentationml.slide','.sldx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.presentationml.slideshow','.ppsx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.presentationml.template','.potx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xlsx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.spreadsheetml.template','.xltx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.wordprocessingml.document','.docx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.openxmlformats-officedocument.wordprocessingml.template','.dotx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.osgeo.mapguide.package','.mgp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.osgi.dp','.dp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.osgi.subsystem','.esa');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.palm','.oprc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.palm','.pdb');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.palm','.pqa');
+  AlExtbyMimeContentTypeA.Add('application/vnd.pawaafile','.paw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.pg.format','.str');
+  AlExtbyMimeContentTypeA.Add('application/vnd.pg.osasli','.ei6');
+  AlExtbyMimeContentTypeA.Add('application/vnd.picsel','.efif');
+  AlExtbyMimeContentTypeA.Add('application/vnd.pmi.widget','.wg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.pocketlearn','.plf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.powerbuilder6','.pbd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.previewsystems.box','.box');
+  AlExtbyMimeContentTypeA.Add('application/vnd.proteus.magazine','.mgz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.publishare-delta-tree','.qps');
+  AlExtbyMimeContentTypeA.Add('application/vnd.pvi.ptid1','.ptid');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.quark.quarkxpress','.qwd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.quark.quarkxpress','.qwt');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.quark.quarkxpress','.qxb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.quark.quarkxpress','.qxd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.quark.quarkxpress','.qxl');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.quark.quarkxpress','.qxt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.realvnc.bed','.bed');
+  AlExtbyMimeContentTypeA.Add('application/vnd.recordare.musicxml','.mxl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.recordare.musicxml+xml','.musicxml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.rig.cryptonote','.cryptonote');
+  AlExtbyMimeContentTypeA.Add('application/vnd.rim.cod','.cod');
+  AlExtbyMimeContentTypeA.Add('application/vnd.rn-realmedia','.rm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.rn-realmedia-vbr','.rmvb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.route66.link66+xml','.link66');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sailingtracker.track','.st');
+  AlExtbyMimeContentTypeA.Add('application/vnd.seemail','.see');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sema','.sema');
+  AlExtbyMimeContentTypeA.Add('application/vnd.semd','.semd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.semf','.semf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.shana.informed.formdata','.ifm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.shana.informed.formtemplate','.itp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.shana.informed.interchange','.iif');
+  AlExtbyMimeContentTypeA.Add('application/vnd.shana.informed.package','.ipk');
+  AlExtbyMimeContentTypeA.Add('application/vnd.simtech-mindmapper','.twd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.simtech-mindmapper','.twds');
+  AlExtbyMimeContentTypeA.Add('application/vnd.smaf','.mmf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.smart.teacher','.teacher');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.solent.sdkm+xml','.sdkd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.solent.sdkm+xml','.sdkm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.spotfire.dxp','.dxp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.spotfire.sfs','.sfs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.calc','.sdc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.draw','.sda');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.impress','.sdd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.math','.smf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.writer','.sdw');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.writer','.vor');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stardivision.writer-global','.sgl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stepmania.package','.smzip');
+  AlExtbyMimeContentTypeA.Add('application/vnd.stepmania.stepchart','.sm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.calc','.sxc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.calc.template','.stc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.draw','.sxd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.draw.template','.std');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.impress','.sxi');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.impress.template','.sti');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.math','.sxm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.writer','.sxw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.writer.global','.sxg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sun.xml.writer.template','.stw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.sus-calendar','.sus');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.sus-calendar','.susp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.svd','.svd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.symbian.install','.sis');
+  AlExtbyMimeContentTypeA.Add('application/vnd.symbian.install','.sisx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.syncml+xml','.xsm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.syncml.dm+wbxml','.bdm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.syncml.dm+xml','.xdm');
+  AlExtbyMimeContentTypeA.Add('application/vnd.tao.intent-module-archive','.tao');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.tcpdump.pcap','.cap');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.tcpdump.pcap','.dmp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.tcpdump.pcap','.pcap');
+  AlExtbyMimeContentTypeA.Add('application/vnd.tmobile-livetv','.tmo');
+  AlExtbyMimeContentTypeA.Add('application/vnd.trid.tpt','.tpt');
+  AlExtbyMimeContentTypeA.Add('application/vnd.triscape.mxs','.mxs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.trueapp','.tra');
+  AlExtbyMimeContentTypeA.Add('application/vnd.ufdl','.ufd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.ufdl','.ufdl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.uiq.theme','.utz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.umajin','.umj');
+  AlExtbyMimeContentTypeA.Add('application/vnd.unity','.unityweb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.uoml+xml','.uoml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.vcx','.vcx');
+  AlExtbyMimeContentTypeA.Add('application/vnd.visio','.vsd');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.visio','.vss');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.visio','.vst');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.visio','.vsw');
+  AlExtbyMimeContentTypeA.Add('application/vnd.visionary','.vis');
+  AlExtbyMimeContentTypeA.Add('application/vnd.vsf','.vsf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wap.wbxml','.wbxml');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wap.wmlc','.wmlc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wap.wmlscriptc','.wmlsc');
+  AlExtbyMimeContentTypeA.Add('application/vnd.webturbo','.wtb');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wolfram.player','.nbp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wordperfect','.wpd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wqd','.wqd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.wt.stf','.stf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.xara','.xar');
+  AlExtbyMimeContentTypeA.Add('application/vnd.xfdl','.xfdl');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.hv-dic','.hvd');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.hv-script','.hvs');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.hv-voice','.hvp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.openscoreformat','.osf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.openscoreformat.osfpvg+xml','.osfpvg');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.smaf-audio','.saf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yamaha.smaf-phrase','.spf');
+  AlExtbyMimeContentTypeA.Add('application/vnd.yellowriver-custom-menu','.cmp');
+  AlExtbyMimeContentTypeA.Add('application/vnd.zul','.zir');
+  //AlExtbyMimeContentTypeA.Add('application/vnd.zul','.zirz');
+  AlExtbyMimeContentTypeA.Add('application/vnd.zzazz.deck+xml','.zaz');
+  AlExtbyMimeContentTypeA.Add('application/voicexml+xml','.vxml');
+  AlExtbyMimeContentTypeA.Add('application/wasm','.wasm');
+  AlExtbyMimeContentTypeA.Add('application/widget','.wgt');
+  AlExtbyMimeContentTypeA.Add('application/winhlp','.hlp');
+  AlExtbyMimeContentTypeA.Add('application/wsdl+xml','.wsdl');
+  AlExtbyMimeContentTypeA.Add('application/wspolicy+xml','.wspolicy');
+  AlExtbyMimeContentTypeA.Add('application/x-7z-compressed','.7z');
+  AlExtbyMimeContentTypeA.Add('application/x-abiword','.abw');
+  AlExtbyMimeContentTypeA.Add('application/x-ace-compressed','.ace');
+  AlExtbyMimeContentTypeA.Add('application/x-apple-diskimage','.dmg');
+  AlExtbyMimeContentTypeA.Add('application/x-authorware-bin','.aab');
+  //AlExtbyMimeContentTypeA.Add('application/x-authorware-bin','.u32');
+  //AlExtbyMimeContentTypeA.Add('application/x-authorware-bin','.vox');
+  //AlExtbyMimeContentTypeA.Add('application/x-authorware-bin','.x32');
+  AlExtbyMimeContentTypeA.Add('application/x-authorware-map','.aam');
+  AlExtbyMimeContentTypeA.Add('application/x-authorware-seg','.aas');
+  AlExtbyMimeContentTypeA.Add('application/x-bcpio','.bcpio');
+  AlExtbyMimeContentTypeA.Add('application/x-bittorrent','.torrent');
+  //AlExtbyMimeContentTypeA.Add('application/x-blorb','.blb');
+  AlExtbyMimeContentTypeA.Add('application/x-blorb','.blorb');
+  AlExtbyMimeContentTypeA.Add('application/x-bzip','.bz');
+  //AlExtbyMimeContentTypeA.Add('application/x-bzip2','.boz');
+  AlExtbyMimeContentTypeA.Add('application/x-bzip2','.bz2');
+  //AlExtbyMimeContentTypeA.Add('application/x-cbr','.cb7');
+  //AlExtbyMimeContentTypeA.Add('application/x-cbr','.cba');
+  //AlExtbyMimeContentTypeA.Add('application/x-cbr','.cbr');
+  //AlExtbyMimeContentTypeA.Add('application/x-cbr','.cbt');
+  AlExtbyMimeContentTypeA.Add('application/x-cbr','.cbz');
+  AlExtbyMimeContentTypeA.Add('application/x-cdlink','.vcd');
+  AlExtbyMimeContentTypeA.Add('application/x-cfs-compressed','.cfs');
+  AlExtbyMimeContentTypeA.Add('application/x-chat','.chat');
+  AlExtbyMimeContentTypeA.Add('application/x-chess-pgn','.pgn');
+  AlExtbyMimeContentTypeA.Add('application/x-conference','.nsc');
+  AlExtbyMimeContentTypeA.Add('application/x-cpio','.cpio');
+  AlExtbyMimeContentTypeA.Add('application/x-csh','.csh');
+  AlExtbyMimeContentTypeA.Add('application/x-debian-package','.deb');
+  //AlExtbyMimeContentTypeA.Add('application/x-debian-package','.udeb');
+  AlExtbyMimeContentTypeA.Add('application/x-dgc-compressed','.dgc');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.cct');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.cst');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.cxt');
+  AlExtbyMimeContentTypeA.Add('application/x-director','.dcr');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.dir');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.dxr');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.fgd');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.swa');
+  //AlExtbyMimeContentTypeA.Add('application/x-director','.w3d');
+  AlExtbyMimeContentTypeA.Add('application/x-doom','.wad');
+  AlExtbyMimeContentTypeA.Add('application/x-dtbncx+xml','.ncx');
+  AlExtbyMimeContentTypeA.Add('application/x-dtbook+xml','.dtb');
+  AlExtbyMimeContentTypeA.Add('application/x-dtbresource+xml','.res');
+  AlExtbyMimeContentTypeA.Add('application/x-dvi','.dvi');
+  AlExtbyMimeContentTypeA.Add('application/x-envoy','.evy');
+  AlExtbyMimeContentTypeA.Add('application/x-eva','.eva');
+  AlExtbyMimeContentTypeA.Add('application/x-font-bdf','.bdf');
+  AlExtbyMimeContentTypeA.Add('application/x-font-ghostscript','.gsf');
+  AlExtbyMimeContentTypeA.Add('application/x-font-linux-psf','.psf');
+  AlExtbyMimeContentTypeA.Add('application/x-font-pcf','.pcf');
+  AlExtbyMimeContentTypeA.Add('application/x-font-snf','.snf');
+  //AlExtbyMimeContentTypeA.Add('application/x-font-type1','.afm');
+  //AlExtbyMimeContentTypeA.Add('application/x-font-type1','.pfa');
+  AlExtbyMimeContentTypeA.Add('application/x-font-type1','.pfb');
+  //AlExtbyMimeContentTypeA.Add('application/x-font-type1','.pfm');
+  AlExtbyMimeContentTypeA.Add('application/x-freearc','.arc');
+  AlExtbyMimeContentTypeA.Add('application/x-futuresplash','.spl');
+  AlExtbyMimeContentTypeA.Add('application/x-gca-compressed','.gca');
+  AlExtbyMimeContentTypeA.Add('application/x-glulx','.ulx');
+  AlExtbyMimeContentTypeA.Add('application/x-gnumeric','.gnumeric');
+  AlExtbyMimeContentTypeA.Add('application/x-gramps-xml','.gramps');
+  AlExtbyMimeContentTypeA.Add('application/x-gtar','.gtar');
+  AlExtbyMimeContentTypeA.Add('application/x-hdf','.hdf');
+  AlExtbyMimeContentTypeA.Add('application/x-install-instructions','.install');
+  AlExtbyMimeContentTypeA.Add('application/x-iso9660-image','.iso');
+  AlExtbyMimeContentTypeA.Add('application/x-java-jnlp-file','.jnlp');
+  AlExtbyMimeContentTypeA.Add('application/x-latex','.latex');
+  //AlExtbyMimeContentTypeA.Add('application/x-lzh-compressed','.lha');
+  AlExtbyMimeContentTypeA.Add('application/x-lzh-compressed','.lzh');
+  AlExtbyMimeContentTypeA.Add('application/x-mie','.mie');
+  AlExtbyMimeContentTypeA.Add('application/x-mobipocket-ebook','.mobi');
+  //AlExtbyMimeContentTypeA.Add('application/x-mobipocket-ebook','.prc');
+  AlExtbyMimeContentTypeA.Add('application/x-ms-application','.application');
+  AlExtbyMimeContentTypeA.Add('application/x-ms-shortcut','.lnk');
+  AlExtbyMimeContentTypeA.Add('application/x-ms-wmd','.wmd');
+  AlExtbyMimeContentTypeA.Add('application/x-ms-wmz','.wmz');
+  AlExtbyMimeContentTypeA.Add('application/x-ms-xbap','.xbap');
+  AlExtbyMimeContentTypeA.Add('application/x-msaccess','.mdb');
+  AlExtbyMimeContentTypeA.Add('application/x-msbinder','.obd');
+  AlExtbyMimeContentTypeA.Add('application/x-mscardfile','.crd');
+  AlExtbyMimeContentTypeA.Add('application/x-msclip','.clp');
+  //AlExtbyMimeContentTypeA.Add('application/x-msdownload','.bat');
+  //AlExtbyMimeContentTypeA.Add('application/x-msdownload','.com');
+  //AlExtbyMimeContentTypeA.Add('application/x-msdownload','.dll');
+  AlExtbyMimeContentTypeA.Add('application/x-msdownload','.exe');
+  //AlExtbyMimeContentTypeA.Add('application/x-msdownload','.msi');
+  //AlExtbyMimeContentTypeA.Add('application/x-msmediaview','.m13');
+  //AlExtbyMimeContentTypeA.Add('application/x-msmediaview','.m14');
+  AlExtbyMimeContentTypeA.Add('application/x-msmediaview','.mvb');
+  //AlExtbyMimeContentTypeA.Add('application/x-msmetafile','.emf');
+  //AlExtbyMimeContentTypeA.Add('application/x-msmetafile','.emz');
+  AlExtbyMimeContentTypeA.Add('application/x-msmetafile','.wmf');
+  //AlExtbyMimeContentTypeA.Add('application/x-msmetafile','.wmz');
+  AlExtbyMimeContentTypeA.Add('application/x-msmoney','.mny');
+  AlExtbyMimeContentTypeA.Add('application/x-mspublisher','.pub');
+  AlExtbyMimeContentTypeA.Add('application/x-msschedule','.scd');
+  AlExtbyMimeContentTypeA.Add('application/x-msterminal','.trm');
+  AlExtbyMimeContentTypeA.Add('application/x-mswrite','.wri');
+  //AlExtbyMimeContentTypeA.Add('application/x-netcdf','.cdf');
+  AlExtbyMimeContentTypeA.Add('application/x-netcdf','.nc');
+  AlExtbyMimeContentTypeA.Add('application/x-nzb','.nzb');
+  //AlExtbyMimeContentTypeA.Add('application/x-pkcs12','.p12');
+  AlExtbyMimeContentTypeA.Add('application/x-pkcs12','.pfx');
+  AlExtbyMimeContentTypeA.Add('application/x-pkcs7-certificates','.p7b');
+  //AlExtbyMimeContentTypeA.Add('application/x-pkcs7-certificates','.spc');
+  AlExtbyMimeContentTypeA.Add('application/x-pkcs7-certreqresp','.p7r');
+  AlExtbyMimeContentTypeA.Add('application/x-rar-compressed','.rar');
+  AlExtbyMimeContentTypeA.Add('application/x-research-info-systems','.ris');
+  AlExtbyMimeContentTypeA.Add('application/x-sh','.sh');
+  AlExtbyMimeContentTypeA.Add('application/x-shar','.shar');
+  AlExtbyMimeContentTypeA.Add('application/x-shockwave-flash','.swf');
+  AlExtbyMimeContentTypeA.Add('application/x-silverlight-app','.xap');
+  AlExtbyMimeContentTypeA.Add('application/x-sql','.sql');
+  AlExtbyMimeContentTypeA.Add('application/x-stuffit','.sit');
+  AlExtbyMimeContentTypeA.Add('application/x-stuffitx','.sitx');
+  AlExtbyMimeContentTypeA.Add('application/x-subrip','.srt');
+  AlExtbyMimeContentTypeA.Add('application/x-sv4cpio','.sv4cpio');
+  AlExtbyMimeContentTypeA.Add('application/x-sv4crc','.sv4crc');
+  AlExtbyMimeContentTypeA.Add('application/x-t3vm-image','.t3');
+  AlExtbyMimeContentTypeA.Add('application/x-tads','.gam');
+  AlExtbyMimeContentTypeA.Add('application/x-tar','.tar');
+  AlExtbyMimeContentTypeA.Add('application/x-tcl','.tcl');
+  AlExtbyMimeContentTypeA.Add('application/x-tex','.tex');
+  AlExtbyMimeContentTypeA.Add('application/x-tex-tfm','.tfm');
+  AlExtbyMimeContentTypeA.Add('application/x-texinfo','.texi');
+  //AlExtbyMimeContentTypeA.Add('application/x-texinfo','.texinfo');
+  AlExtbyMimeContentTypeA.Add('application/x-tgif','.obj');
+  AlExtbyMimeContentTypeA.Add('application/x-ustar','.ustar');
+  AlExtbyMimeContentTypeA.Add('application/x-wais-source','.src');
+  AlExtbyMimeContentTypeA.Add('application/x-x509-ca-cert','.crt');
+  //AlExtbyMimeContentTypeA.Add('application/x-x509-ca-cert','.der');
+  AlExtbyMimeContentTypeA.Add('application/x-xfig','.fig');
+  AlExtbyMimeContentTypeA.Add('application/x-xliff+xml','.xlf');
+  AlExtbyMimeContentTypeA.Add('application/x-xpinstall','.xpi');
+  AlExtbyMimeContentTypeA.Add('application/x-xz','.xz');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z1');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z2');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z3');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z4');
+  AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z5');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z6');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z7');
+  //AlExtbyMimeContentTypeA.Add('application/x-zmachine','.z8');
+  AlExtbyMimeContentTypeA.Add('application/xaml+xml','.xaml');
+  AlExtbyMimeContentTypeA.Add('application/xcap-diff+xml','.xdf');
+  AlExtbyMimeContentTypeA.Add('application/xenc+xml','.xenc');
+  //AlExtbyMimeContentTypeA.Add('application/xhtml+xml','.xht');
+  AlExtbyMimeContentTypeA.Add('application/xhtml+xml','.xhtml');
+  AlExtbyMimeContentTypeA.Add('application/xml','.xml');
+  //AlExtbyMimeContentTypeA.Add('application/xml','.xsl');
+  AlExtbyMimeContentTypeA.Add('application/xml-dtd','.dtd');
+  AlExtbyMimeContentTypeA.Add('application/xop+xml','.xop');
+  AlExtbyMimeContentTypeA.Add('application/xproc+xml','.xpl');
+  AlExtbyMimeContentTypeA.Add('application/xslt+xml','.xslt');
+  AlExtbyMimeContentTypeA.Add('application/xspf+xml','.xspf');
+  //AlExtbyMimeContentTypeA.Add('application/xv+xml','.mxml');
+  //AlExtbyMimeContentTypeA.Add('application/xv+xml','.xhvml');
+  AlExtbyMimeContentTypeA.Add('application/xv+xml','.xvm');
+  //AlExtbyMimeContentTypeA.Add('application/xv+xml','.xvml');
+  AlExtbyMimeContentTypeA.Add('application/yang','.yang');
+  AlExtbyMimeContentTypeA.Add('application/yin+xml','.yin');
+  AlExtbyMimeContentTypeA.Add('application/zip','.zip');
+  AlExtbyMimeContentTypeA.Add('audio/adpcm','.adp');
+  AlExtbyMimeContentTypeA.Add('audio/basic','.au');
+  //AlExtbyMimeContentTypeA.Add('audio/basic','.snd');
+  //AlExtbyMimeContentTypeA.Add('audio/midi','.kar');
+  AlExtbyMimeContentTypeA.Add('audio/midi','.mid');
+  //AlExtbyMimeContentTypeA.Add('audio/midi','.midi');
+  //AlExtbyMimeContentTypeA.Add('audio/midi','.rmi');
+  AlExtbyMimeContentTypeA.Add('audio/mp4','.m4a');
+  //AlExtbyMimeContentTypeA.Add('audio/mp4','.mp4a');
+  //AlExtbyMimeContentTypeA.Add('audio/mpeg','.m2a');
+  //AlExtbyMimeContentTypeA.Add('audio/mpeg','.m3a');
+  //AlExtbyMimeContentTypeA.Add('audio/mpeg','.mp2');
+  //AlExtbyMimeContentTypeA.Add('audio/mpeg','.mp2a');
+  AlExtbyMimeContentTypeA.Add('audio/mpeg','.mp3');
+  //AlExtbyMimeContentTypeA.Add('audio/mpeg','.mpga');
+  //AlExtbyMimeContentTypeA.Add('audio/ogg','.oga');
+  AlExtbyMimeContentTypeA.Add('audio/ogg','.ogg');
+  //AlExtbyMimeContentTypeA.Add('audio/ogg','.opus');
+  //AlExtbyMimeContentTypeA.Add('audio/ogg','.spx');
+  AlExtbyMimeContentTypeA.Add('audio/s3m','.s3m');
+  AlExtbyMimeContentTypeA.Add('audio/silk','.sil');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.dece.audio','.uva');
+  //AlExtbyMimeContentTypeA.Add('audio/vnd.dece.audio','.uvva');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.digital-winds','.eol');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.dra','.dra');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.dts','.dts');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.dts.hd','.dtshd');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.lucent.voice','.lvp');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.ms-playready.media.pya','.pya');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.nuera.ecelp4800','.ecelp4800');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.nuera.ecelp7470','.ecelp7470');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.nuera.ecelp9600','.ecelp9600');
+  AlExtbyMimeContentTypeA.Add('audio/vnd.rip','.rip');
+  AlExtbyMimeContentTypeA.Add('audio/webm','.weba');
+  AlExtbyMimeContentTypeA.Add('audio/x-aac','.aac');
+  //AlExtbyMimeContentTypeA.Add('audio/x-aiff','.aif');
+  //AlExtbyMimeContentTypeA.Add('audio/x-aiff','.aifc');
+  AlExtbyMimeContentTypeA.Add('audio/x-aiff','.aiff');
+  AlExtbyMimeContentTypeA.Add('audio/x-caf','.caf');
+  AlExtbyMimeContentTypeA.Add('audio/x-flac','.flac');
+  AlExtbyMimeContentTypeA.Add('audio/x-matroska','.mka');
+  AlExtbyMimeContentTypeA.Add('audio/x-mpegurl','.m3u');
+  AlExtbyMimeContentTypeA.Add('audio/x-ms-wax','.wax');
+  AlExtbyMimeContentTypeA.Add('audio/x-ms-wma','.wma');
+  AlExtbyMimeContentTypeA.Add('audio/x-pn-realaudio','.ra');
+  //AlExtbyMimeContentTypeA.Add('audio/x-pn-realaudio','.ram');
+  AlExtbyMimeContentTypeA.Add('audio/x-pn-realaudio-plugin','.rmp');
+  AlExtbyMimeContentTypeA.Add('audio/x-wav','.wav');
+  AlExtbyMimeContentTypeA.Add('audio/xm','.xm');
+  AlExtbyMimeContentTypeA.Add('chemical/x-cdx','.cdx');
+  AlExtbyMimeContentTypeA.Add('chemical/x-cif','.cif');
+  AlExtbyMimeContentTypeA.Add('chemical/x-cmdf','.cmdf');
+  AlExtbyMimeContentTypeA.Add('chemical/x-cml','.cml');
+  AlExtbyMimeContentTypeA.Add('chemical/x-csml','.csml');
+  AlExtbyMimeContentTypeA.Add('chemical/x-xyz','.xyz');
+  AlExtbyMimeContentTypeA.Add('font/collection','.ttc');
+  AlExtbyMimeContentTypeA.Add('font/otf','.otf');
+  AlExtbyMimeContentTypeA.Add('font/ttf','.ttf');
+  AlExtbyMimeContentTypeA.Add('font/woff','.woff');
+  AlExtbyMimeContentTypeA.Add('font/woff2','.woff2');
+  AlExtbyMimeContentTypeA.Add('image/avif','.avif');
+  AlExtbyMimeContentTypeA.Add('image/bmp','.bmp');
+  AlExtbyMimeContentTypeA.Add('image/cgm','.cgm');
+  AlExtbyMimeContentTypeA.Add('image/g3fax','.g3');
+  AlExtbyMimeContentTypeA.Add('image/gif','.gif');
+  AlExtbyMimeContentTypeA.Add('image/ief','.ief');
+  //AlExtbyMimeContentTypeA.Add('image/jpeg','.jpe');
+  //AlExtbyMimeContentTypeA.Add('image/jpeg','.jpeg');
+  AlExtbyMimeContentTypeA.Add('image/jpeg','.jpg');
+  AlExtbyMimeContentTypeA.Add('image/jxl','.jxl');
+  AlExtbyMimeContentTypeA.Add('image/ktx','.ktx');
+  AlExtbyMimeContentTypeA.Add('image/png','.png');
+  AlExtbyMimeContentTypeA.Add('image/prs.btif','.btif');
+  AlExtbyMimeContentTypeA.Add('image/sgi','.sgi');
+  AlExtbyMimeContentTypeA.Add('image/svg+xml','.svg');
+  //AlExtbyMimeContentTypeA.Add('image/svg+xml','.svgz');
+  AlExtbyMimeContentTypeA.Add('image/tiff','.tif');
+  //AlExtbyMimeContentTypeA.Add('image/tiff','.tiff');
+  AlExtbyMimeContentTypeA.Add('image/vnd.adobe.photoshop','.psd');
+  //AlExtbyMimeContentTypeA.Add('image/vnd.dece.graphic','.uvg');
+  //AlExtbyMimeContentTypeA.Add('image/vnd.dece.graphic','.uvi');
+  //AlExtbyMimeContentTypeA.Add('image/vnd.dece.graphic','.uvvg');
+  //AlExtbyMimeContentTypeA.Add('image/vnd.dece.graphic','.uvvi');
+  //AlExtbyMimeContentTypeA.Add('image/vnd.djvu','.djv');
+  AlExtbyMimeContentTypeA.Add('image/vnd.djvu','.djvu');
+  AlExtbyMimeContentTypeA.Add('image/vnd.dvb.subtitle','.sub');
+  AlExtbyMimeContentTypeA.Add('image/vnd.dwg','.dwg');
+  AlExtbyMimeContentTypeA.Add('image/vnd.dxf','.dxf');
+  AlExtbyMimeContentTypeA.Add('image/vnd.fastbidsheet','.fbs');
+  AlExtbyMimeContentTypeA.Add('image/vnd.fpx','.fpx');
+  AlExtbyMimeContentTypeA.Add('image/vnd.fst','.fst');
+  AlExtbyMimeContentTypeA.Add('image/vnd.fujixerox.edmics-mmr','.mmr');
+  AlExtbyMimeContentTypeA.Add('image/vnd.fujixerox.edmics-rlc','.rlc');
+  AlExtbyMimeContentTypeA.Add('image/vnd.ms-modi','.mdi');
+  AlExtbyMimeContentTypeA.Add('image/vnd.ms-photo','.wdp');
+  AlExtbyMimeContentTypeA.Add('image/vnd.net-fpx','.npx');
+  AlExtbyMimeContentTypeA.Add('image/vnd.wap.wbmp','.wbmp');
+  AlExtbyMimeContentTypeA.Add('image/vnd.xiff','.xif');
+  AlExtbyMimeContentTypeA.Add('image/webp','.webp');
+  AlExtbyMimeContentTypeA.Add('image/x-3ds','.3ds');
+  AlExtbyMimeContentTypeA.Add('image/x-cmu-raster','.ras');
+  AlExtbyMimeContentTypeA.Add('image/x-cmx','.cmx');
+  AlExtbyMimeContentTypeA.Add('image/x-freehand','.fh');
+  //AlExtbyMimeContentTypeA.Add('image/x-freehand','.fh4');
+  //AlExtbyMimeContentTypeA.Add('image/x-freehand','.fh5');
+  //AlExtbyMimeContentTypeA.Add('image/x-freehand','.fh7');
+  //AlExtbyMimeContentTypeA.Add('image/x-freehand','.fhc');
+  AlExtbyMimeContentTypeA.Add('image/x-icon','.ico');
+  AlExtbyMimeContentTypeA.Add('image/x-mrsid-image','.sid');
+  AlExtbyMimeContentTypeA.Add('image/x-pcx','.pcx');
+  //AlExtbyMimeContentTypeA.Add('image/x-pict','.pct');
+  AlExtbyMimeContentTypeA.Add('image/x-pict','.pic');
+  AlExtbyMimeContentTypeA.Add('image/x-portable-anymap','.pnm');
+  AlExtbyMimeContentTypeA.Add('image/x-portable-bitmap','.pbm');
+  AlExtbyMimeContentTypeA.Add('image/x-portable-graymap','.pgm');
+  AlExtbyMimeContentTypeA.Add('image/x-portable-pixmap','.ppm');
+  AlExtbyMimeContentTypeA.Add('image/x-rgb','.rgb');
+  AlExtbyMimeContentTypeA.Add('image/x-tga','.tga');
+  AlExtbyMimeContentTypeA.Add('image/x-xbitmap','.xbm');
+  AlExtbyMimeContentTypeA.Add('image/x-xpixmap','.xpm');
+  AlExtbyMimeContentTypeA.Add('image/x-xwindowdump','.xwd');
+  AlExtbyMimeContentTypeA.Add('message/rfc822','.eml');
+  //AlExtbyMimeContentTypeA.Add('message/rfc822','.mime');
+  //AlExtbyMimeContentTypeA.Add('model/iges','.iges');
+  AlExtbyMimeContentTypeA.Add('model/iges','.igs');
+  //AlExtbyMimeContentTypeA.Add('model/mesh','.mesh');
+  AlExtbyMimeContentTypeA.Add('model/mesh','.msh');
+  //AlExtbyMimeContentTypeA.Add('model/mesh','.silo');
+  AlExtbyMimeContentTypeA.Add('model/vnd.collada+xml','.dae');
+  AlExtbyMimeContentTypeA.Add('model/vnd.dwf','.dwf');
+  AlExtbyMimeContentTypeA.Add('model/vnd.gdl','.gdl');
+  AlExtbyMimeContentTypeA.Add('model/vnd.gtw','.gtw');
+  AlExtbyMimeContentTypeA.Add('model/vnd.vtu','.vtu');
+  //AlExtbyMimeContentTypeA.Add('model/vrml','.vrml');
+  AlExtbyMimeContentTypeA.Add('model/vrml','.wrl');
+  AlExtbyMimeContentTypeA.Add('model/x3d+binary','.x3db');
+  //AlExtbyMimeContentTypeA.Add('model/x3d+binary','.x3dbz');
+  AlExtbyMimeContentTypeA.Add('model/x3d+vrml','.x3dv');
+  //AlExtbyMimeContentTypeA.Add('model/x3d+vrml','.x3dvz');
+  AlExtbyMimeContentTypeA.Add('model/x3d+xml','.x3d');
+  //AlExtbyMimeContentTypeA.Add('model/x3d+xml','.x3dz');
+  AlExtbyMimeContentTypeA.Add('text/cache-manifest','.appcache');
+  AlExtbyMimeContentTypeA.Add('text/calendar','.ics');
+  //AlExtbyMimeContentTypeA.Add('text/calendar','.ifb');
+  AlExtbyMimeContentTypeA.Add('text/css','.css');
+  AlExtbyMimeContentTypeA.Add('text/csv','.csv');
+  //AlExtbyMimeContentTypeA.Add('text/html','.htm');
+  AlExtbyMimeContentTypeA.Add('text/html','.html');
+  AlExtbyMimeContentTypeA.Add('text/javascript','.js');
+  //AlExtbyMimeContentTypeA.Add('text/javascript','.mjs');
+  AlExtbyMimeContentTypeA.Add('text/n3','.n3');
+  //AlExtbyMimeContentTypeA.Add('text/plain','.conf');
+  //AlExtbyMimeContentTypeA.Add('text/plain','.def');
+  //AlExtbyMimeContentTypeA.Add('text/plain','.in');
+  //AlExtbyMimeContentTypeA.Add('text/plain','.list');
+  //AlExtbyMimeContentTypeA.Add('text/plain','.log');
+  //AlExtbyMimeContentTypeA.Add('text/plain','.text');
+  AlExtbyMimeContentTypeA.Add('text/plain','.txt');
+  AlExtbyMimeContentTypeA.Add('text/prs.lines.tag','.dsc');
+  AlExtbyMimeContentTypeA.Add('text/richtext','.rtx');
+  //AlExtbyMimeContentTypeA.Add('text/sgml','.sgm');
+  AlExtbyMimeContentTypeA.Add('text/sgml','.sgml');
+  AlExtbyMimeContentTypeA.Add('text/tab-separated-values','.tsv');
+  //AlExtbyMimeContentTypeA.Add('text/troff','.man');
+  //AlExtbyMimeContentTypeA.Add('text/troff','.me');
+  //AlExtbyMimeContentTypeA.Add('text/troff','.ms');
+  //AlExtbyMimeContentTypeA.Add('text/troff','.roff');
+  //AlExtbyMimeContentTypeA.Add('text/troff','.t');
+  AlExtbyMimeContentTypeA.Add('text/troff','.tr');
+  AlExtbyMimeContentTypeA.Add('text/turtle','.ttl');
+  AlExtbyMimeContentTypeA.Add('text/uri-list','.uri');
+  //AlExtbyMimeContentTypeA.Add('text/uri-list','.uris');
+  //AlExtbyMimeContentTypeA.Add('text/uri-list','.urls');
+  AlExtbyMimeContentTypeA.Add('text/vcard','.vcard');
+  AlExtbyMimeContentTypeA.Add('text/vnd.curl','.curl');
+  AlExtbyMimeContentTypeA.Add('text/vnd.curl.dcurl','.dcurl');
+  AlExtbyMimeContentTypeA.Add('text/vnd.curl.mcurl','.mcurl');
+  AlExtbyMimeContentTypeA.Add('text/vnd.curl.scurl','.scurl');
+  AlExtbyMimeContentTypeA.Add('text/vnd.dvb.subtitle','.sub');
+  AlExtbyMimeContentTypeA.Add('text/vnd.fly','.fly');
+  AlExtbyMimeContentTypeA.Add('text/vnd.fmi.flexstor','.flx');
+  AlExtbyMimeContentTypeA.Add('text/vnd.graphviz','.gv');
+  AlExtbyMimeContentTypeA.Add('text/vnd.in3d.3dml','.3dml');
+  AlExtbyMimeContentTypeA.Add('text/vnd.in3d.spot','.spot');
+  AlExtbyMimeContentTypeA.Add('text/vnd.sun.j2me.app-descriptor','.jad');
+  AlExtbyMimeContentTypeA.Add('text/vnd.wap.wml','.wml');
+  AlExtbyMimeContentTypeA.Add('text/vnd.wap.wmlscript','.wmls');
+  AlExtbyMimeContentTypeA.Add('text/x-asm','.asm');
+  //AlExtbyMimeContentTypeA.Add('text/x-asm','.s');
+  AlExtbyMimeContentTypeA.Add('text/x-c','.c');
+  //AlExtbyMimeContentTypeA.Add('text/x-c','.cc');
+  //AlExtbyMimeContentTypeA.Add('text/x-c','.cpp');
+  //AlExtbyMimeContentTypeA.Add('text/x-c','.cxx');
+  //AlExtbyMimeContentTypeA.Add('text/x-c','.dic');
+  //AlExtbyMimeContentTypeA.Add('text/x-c','.h');
+  //AlExtbyMimeContentTypeA.Add('text/x-c','.hh');
+  AlExtbyMimeContentTypeA.Add('text/x-fortran','.f');
+  //AlExtbyMimeContentTypeA.Add('text/x-fortran','.f77');
+  //AlExtbyMimeContentTypeA.Add('text/x-fortran','.f90');
+  //AlExtbyMimeContentTypeA.Add('text/x-fortran','.for');
+  AlExtbyMimeContentTypeA.Add('text/x-java-source','.java');
+  AlExtbyMimeContentTypeA.Add('text/x-nfo','.nfo');
+  AlExtbyMimeContentTypeA.Add('text/x-opml','.opml');
+  //AlExtbyMimeContentTypeA.Add('text/x-pascal','.p');
+  AlExtbyMimeContentTypeA.Add('text/x-pascal','.pas');
+  AlExtbyMimeContentTypeA.Add('text/x-setext','.etx');
+  AlExtbyMimeContentTypeA.Add('text/x-sfv','.sfv');
+  AlExtbyMimeContentTypeA.Add('text/x-uuencode','.uu');
+  AlExtbyMimeContentTypeA.Add('text/x-vcalendar','.vcs');
+  AlExtbyMimeContentTypeA.Add('text/x-vcard','.vcf');
+  AlExtbyMimeContentTypeA.Add('video/3gpp','.3gp');
+  AlExtbyMimeContentTypeA.Add('video/3gpp2','.3g2');
+  AlExtbyMimeContentTypeA.Add('video/h261','.h261');
+  AlExtbyMimeContentTypeA.Add('video/h263','.h263');
+  AlExtbyMimeContentTypeA.Add('video/h264','.h264');
+  AlExtbyMimeContentTypeA.Add('video/jpeg','.jpgv');
+  //AlExtbyMimeContentTypeA.Add('video/jpm','.jpgm');
+  AlExtbyMimeContentTypeA.Add('video/jpm','.jpm');
+  AlExtbyMimeContentTypeA.Add('video/mj2','.mj2');
+  //AlExtbyMimeContentTypeA.Add('video/mj2','.mjp2');
+  //AlExtbyMimeContentTypeA.Add('video/mp2t','.m2t');
+  //AlExtbyMimeContentTypeA.Add('video/mp2t','.m2ts');
+  //AlExtbyMimeContentTypeA.Add('video/mp2t','.mts');
+  AlExtbyMimeContentTypeA.Add('video/mp2t','.ts');
+  AlExtbyMimeContentTypeA.Add('video/mp4','.mp4');
+  //AlExtbyMimeContentTypeA.Add('video/mp4','.mp4v');
+  //AlExtbyMimeContentTypeA.Add('video/mp4','.mpg4');
+  //AlExtbyMimeContentTypeA.Add('video/mpeg','.m1v');
+  //AlExtbyMimeContentTypeA.Add('video/mpeg','.m2v');
+  //AlExtbyMimeContentTypeA.Add('video/mpeg','.mpe');
+  //AlExtbyMimeContentTypeA.Add('video/mpeg','.mpeg');
+  AlExtbyMimeContentTypeA.Add('video/mpeg','.mpg');
+  AlExtbyMimeContentTypeA.Add('video/ogg','.ogv');
+  AlExtbyMimeContentTypeA.Add('video/quicktime','.mov');
+  //AlExtbyMimeContentTypeA.Add('video/quicktime','.qt');
+  AlExtbyMimeContentTypeA.Add('video/vnd.dece.hd','.uvh');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.dece.hd','.uvvh');
+  AlExtbyMimeContentTypeA.Add('video/vnd.dece.mobile','.uvm');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.dece.mobile','.uvvm');
+  AlExtbyMimeContentTypeA.Add('video/vnd.dece.pd','.uvp');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.dece.pd','.uvvp');
+  AlExtbyMimeContentTypeA.Add('video/vnd.dece.sd','.uvs');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.dece.sd','.uvvs');
+  AlExtbyMimeContentTypeA.Add('video/vnd.dece.video','.uvv');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.dece.video','.uvvv');
+  AlExtbyMimeContentTypeA.Add('video/vnd.dvb.file','.dvb');
+  AlExtbyMimeContentTypeA.Add('video/vnd.fvt','.fvt');
+  AlExtbyMimeContentTypeA.Add('video/vnd.mpegurl','.m4u');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.mpegurl','.mxu');
+  AlExtbyMimeContentTypeA.Add('video/vnd.ms-playready.media.pyv','.pyv');
+  AlExtbyMimeContentTypeA.Add('video/vnd.uvvu.mp4','.uvu');
+  //AlExtbyMimeContentTypeA.Add('video/vnd.uvvu.mp4','.uvvu');
+  AlExtbyMimeContentTypeA.Add('video/vnd.vivo','.viv');
+  AlExtbyMimeContentTypeA.Add('video/webm','.webm');
+  AlExtbyMimeContentTypeA.Add('video/x-f4v','.f4v');
+  AlExtbyMimeContentTypeA.Add('video/x-fli','.fli');
+  AlExtbyMimeContentTypeA.Add('video/x-flv','.flv');
+  AlExtbyMimeContentTypeA.Add('video/x-m4v','.m4v');
+  //AlExtbyMimeContentTypeA.Add('video/x-matroska','.mk3d');
+  //AlExtbyMimeContentTypeA.Add('video/x-matroska','.mks');
+  AlExtbyMimeContentTypeA.Add('video/x-matroska','.mkv');
+  AlExtbyMimeContentTypeA.Add('video/x-mng','.mng');
+  AlExtbyMimeContentTypeA.Add('video/x-ms-asf','.asf');
+  //AlExtbyMimeContentTypeA.Add('video/x-ms-asf','.asx');
+  AlExtbyMimeContentTypeA.Add('video/x-ms-vob','.vob');
+  AlExtbyMimeContentTypeA.Add('video/x-ms-wm','.wm');
+  AlExtbyMimeContentTypeA.Add('video/x-ms-wmv','.wmv');
+  AlExtbyMimeContentTypeA.Add('video/x-ms-wmx','.wmx');
+  AlExtbyMimeContentTypeA.Add('video/x-ms-wvx','.wvx');
+  AlExtbyMimeContentTypeA.Add('video/x-msvideo','.avi');
+  AlExtbyMimeContentTypeA.Add('video/x-sgi-movie','.movie');
+  AlExtbyMimeContentTypeA.Add('video/x-smv','.smv');
+  AlExtbyMimeContentTypeA.Add('x-conference/x-cooltalk','.ice');
 
-  AlMimeContentTypeByExtList.Add('.au=audio/basic');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gsm=audio/x-gsm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kar=audio/midi');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.m3u=audio/mpegurl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.m4a=audio/x-mpg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mid=audio/midi');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.midi=audio/midi');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpega=audio/x-mpg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mp2=audio/x-mpg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mp3=audio/x-mpg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpga=audio/x-mpg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.m3u=audio/x-mpegurl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pls=audio/x-scpls');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.qcp=audio/vnd.qcelp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ra=audio/x-realaudio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ram=audio/x-pn-realaudio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rm=audio/x-pn-realaudio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sd2=audio/x-sd2');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sid=audio/prs.sid');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.snd=audio/basic');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wav=audio/x-wav');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wax=audio/x-ms-wax');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wma=audio/x-ms-wma');    {Do not Localize}
+  var LArray := AlMimeContentTypeByExtA.ToArray;
+  for var I := low(LArray) to high(LArray) do
+    AlMimeContentTypeByExtW.Add(String(LArray[I].Key), String(LArray[I].Value));
 
-  AlMimeContentTypeByExtList.Add('.mjf=audio/x-vnd.AudioExplosion.MjuiceMediaFile');    {Do not Localize}
-
-  { Image }
-  AlMimeContentTypeByExtList.Add('.art=image/x-jg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.bmp=image/bmp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cdr=image/x-coreldraw');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cdt=image/x-coreldrawtemplate');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cpt=image/x-corelphotopaint');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.djv=image/vnd.djvu');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.djvu=image/vnd.djvu');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gif=image/gif');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ief=image/ief');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ico=image/x-icon');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.jng=image/x-jng');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.jpg=image/jpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.jpeg=image/jpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.jpe=image/jpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pat=image/x-coreldrawpattern');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pcx=image/pcx');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pbm=image/x-portable-bitmap');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pgm=image/x-portable-graymap');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pict=image/x-pict');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.png=image/x-png');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pnm=image/x-portable-anymap');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pntg=image/x-macpaint');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ppm=image/x-portable-pixmap');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.psd=image/x-psd');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.qtif=image/x-quicktime');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ras=image/x-cmu-raster');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rf=image/vnd.rn-realflash');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rgb=image/x-rgb');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rp=image/vnd.rn-realpix');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sgi=image/x-sgi');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.svg=image/svg+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.svgz=image/svg+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.targa=image/x-targa');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tif=image/x-tiff');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wbmp=image/vnd.wap.wbmp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.webp=image/webp'); {Do not localize}
-  AlMimeContentTypeByExtList.Add('.xbm=image/xbm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xbm=image/x-xbitmap');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xpm=image/x-xpixmap');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xwd=image/x-xwindowdump');    {Do not Localize}
-
-  { Text }
-  AlMimeContentTypeByExtList.Add('.323=text/h323');    {Do not Localize}
-
-  AlMimeContentTypeByExtList.Add('.xml=text/xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.uls=text/iuls');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.txt=text/plain');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rtx=text/richtext');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wsc=text/scriptlet');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rt=text/vnd.rn-realtext');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.htt=text/webviewhtml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.htc=text/x-component');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.vcf=text/x-vcard');    {Do not Localize}
-
-  { Video }
-  AlMimeContentTypeByExtList.Add('.asf=video/x-ms-asf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.asx=video/x-ms-asf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.avi=video/x-msvideo');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dl=video/dl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dv=video/dv');  {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.flc=video/flc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.fli=video/fli');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gl=video/gl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lsf=video/x-la-asf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lsx=video/x-la-asf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mng=video/x-mng');    {Do not Localize}
-
-  AlMimeContentTypeByExtList.Add('.mp2=video/mpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mp3=video/mpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mp4=video/mpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpeg=video/x-mpeg2a');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpa=video/mpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpe=video/mpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpg=video/mpeg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ogv=video/ogg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.moov=video/quicktime');     {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mov=video/quicktime');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mxu=video/vnd.mpegurl');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.qt=video/quicktime');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.qtc=video/x-qtc'); {Do not loccalize}
-  AlMimeContentTypeByExtList.Add('.rv=video/vnd.rn-realvideo');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ivf=video/x-ivf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.webm=video/webm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wm=video/x-ms-wm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmp=video/x-ms-wmp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmv=video/x-ms-wmv');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmx=video/x-ms-wmx');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wvx=video/x-ms-wvx');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rms=video/vnd.rn-realvideo-secure');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.asx=video/x-ms-asf-plugin');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.movie=video/x-sgi-movie');    {Do not Localize}
-
-  { Application }
-  AlMimeContentTypeByExtList.Add('.7z=application/x-7z-compressed');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.a=application/x-archive');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.aab=application/x-authorware-bin');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.aam=application/x-authorware-map');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.aas=application/x-authorware-seg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.abw=application/x-abiword');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ace=application/x-ace-compressed');  {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ai=application/postscript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.alz=application/x-alz-compressed');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ani=application/x-navi-animation');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.arj=application/x-arj');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.asf=application/vnd.ms-asf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.bat=application/x-msdos-program');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.bcpio=application/x-bcpio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.boz=application/x-bzip2');     {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.bz=application/x-bzip');
-  AlMimeContentTypeByExtList.Add('.bz2=application/x-bzip2');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cab=application/vnd.ms-cab-compressed');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cat=application/vnd.ms-pki.seccat');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ccn=application/x-cnc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cco=application/x-cocoa');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cdf=application/x-cdf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cer=application/x-x509-ca-cert');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.chm=application/vnd.ms-htmlhelp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.chrt=application/vnd.kde.kchart');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cil=application/vnd.ms-artgalry');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.class=application/java-vm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.com=application/x-msdos-program');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.clp=application/x-msclip');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cpio=application/x-cpio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cpt=application/mac-compactpro');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cqk=application/x-calquick');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.crd=application/x-mscardfile');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.crl=application/pkix-crl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.csh=application/x-csh');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dar=application/x-dar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dbf=application/x-dbase');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dcr=application/x-director');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.deb=application/x-debian-package');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dir=application/x-director');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dist=vnd.apple.installer+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.distz=vnd.apple.installer+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dll=application/x-msdos-program');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dmg=application/x-apple-diskimage');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.doc=application/msword');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dot=application/msword');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dvi=application/x-dvi');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.dxr=application/x-director');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ebk=application/x-expandedbook');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.eps=application/postscript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.evy=application/envoy');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.exe=application/x-msdos-program');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.fdf=application/vnd.fdf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.fif=application/fractals');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.flm=application/vnd.kde.kivio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.fml=application/x-file-mirror-list');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gzip=application/x-gzip');  {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gnumeric=application/x-gnumeric');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gtar=application/x-gtar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.gz=application/x-gzip');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hdf=application/x-hdf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hlp=application/winhlp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hpf=application/x-icq-hpf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hqx=application/mac-binhex40');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hta=application/hta');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ims=application/vnd.ms-ims');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ins=application/x-internet-signup');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.iii=application/x-iphone');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.iso=application/x-iso9660-image');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.jar=application/java-archive');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.karbon=application/vnd.kde.karbon');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kfo=application/vnd.kde.kformula');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kon=application/vnd.kde.kontour');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kpr=application/vnd.kde.kpresenter');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kpt=application/vnd.kde.kpresenter');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kwd=application/vnd.kde.kword');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.kwt=application/vnd.kde.kword');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.latex=application/x-latex');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lha=application/x-lzh');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lcc=application/fastman');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lrm=application/vnd.ms-lrm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lz=application/x-lzip');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lzh=application/x-lzh');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lzma=application/x-lzma');  {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lzo=application/x-lzop'); {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.lzx=application/x-lzx');
-  AlMimeContentTypeByExtList.Add('.m13=application/x-msmediaview');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.m14=application/x-msmediaview');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpp=application/vnd.ms-project');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mvb=application/x-msmediaview');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.man=application/x-troff-man');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mdb=application/x-msaccess');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.me=application/x-troff-me');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ms=application/x-troff-ms');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.msi=application/x-msi');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mpkg=vnd.apple.installer+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mny=application/x-msmoney');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.nix=application/x-mix-transfer');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.o=application/x-object');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.oda=application/oda');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odb=application/vnd.oasis.opendocument.database');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odc=application/vnd.oasis.opendocument.chart');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odf=application/vnd.oasis.opendocument.formula');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odg=application/vnd.oasis.opendocument.graphics');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odi=application/vnd.oasis.opendocument.image');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odm=application/vnd.oasis.opendocument.text-master');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odp=application/vnd.oasis.opendocument.presentation');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ods=application/vnd.oasis.opendocument.spreadsheet');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ogg=application/ogg');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.odt=application/vnd.oasis.opendocument.text');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.otg=application/vnd.oasis.opendocument.graphics-template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.oth=application/vnd.oasis.opendocument.text-web');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.otp=application/vnd.oasis.opendocument.presentation-template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ots=application/vnd.oasis.opendocument.spreadsheet-template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ott=application/vnd.oasis.opendocument.text-template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p10=application/pkcs10');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p12=application/x-pkcs12');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p7b=application/x-pkcs7-certificates');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p7m=application/pkcs7-mime');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p7r=application/x-pkcs7-certreqresp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p7s=application/pkcs7-signature');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.package=application/vnd.autopackage');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pfr=application/font-tdpfr');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pkg=vnd.apple.installer+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pdf=application/pdf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pko=application/vnd.ms-pki.pko');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pl=application/x-perl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pnq=application/x-icq-pnq');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pot=application/mspowerpoint');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pps=application/mspowerpoint');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ppt=application/mspowerpoint');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ppz=application/mspowerpoint');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ps=application/postscript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pub=application/x-mspublisher');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.qpw=application/x-quattropro');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.qtl=application/x-quicktimeplayer');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rar=application/rar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rdf=application/rdf+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rjs=application/vnd.rn-realsystem-rjs');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rm=application/vnd.rn-realmedia');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rmf=application/vnd.rmf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rmp=application/vnd.rn-rn_music_package');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rmx=application/vnd.rn-realsystem-rmx');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rnx=application/vnd.rn-realplayer');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rpm=application/x-redhat-package-manager');
-  AlMimeContentTypeByExtList.Add('.rsml=application/vnd.rn-rsml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rtsp=application/x-rtsp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.rss=application/rss+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.scm=application/x-icq-scm');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ser=application/java-serialized-object');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.scd=application/x-msschedule');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sda=application/vnd.stardivision.draw');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sdc=application/vnd.stardivision.calc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sdd=application/vnd.stardivision.impress');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sdp=application/x-sdp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.setpay=application/set-payment-initiation');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.setreg=application/set-registration-initiation');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sh=application/x-sh');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.shar=application/x-shar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.shw=application/presentations');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sit=application/x-stuffit');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sitx=application/x-stuffitx');  {Do not localize}
-  AlMimeContentTypeByExtList.Add('.skd=application/x-koan');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.skm=application/x-koan');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.skp=application/x-koan');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.skt=application/x-koan');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.smf=application/vnd.stardivision.math');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.smi=application/smil');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.smil=application/smil');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.spl=application/futuresplash');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ssm=application/streamingmedia');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sst=application/vnd.ms-pki.certstore');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.stc=application/vnd.sun.xml.calc.template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.std=application/vnd.sun.xml.draw.template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sti=application/vnd.sun.xml.impress.template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.stl=application/vnd.ms-pki.stl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.stw=application/vnd.sun.xml.writer.template');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.svi=application/softvision');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sv4cpio=application/x-sv4cpio');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sv4crc=application/x-sv4crc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.swf=application/x-shockwave-flash');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.swf1=application/x-shockwave-flash');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sxc=application/vnd.sun.xml.calc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sxi=application/vnd.sun.xml.impress');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sxm=application/vnd.sun.xml.math');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sxw=application/vnd.sun.xml.writer');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sxg=application/vnd.sun.xml.writer.global');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.t=application/x-troff');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tar=application/x-tar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tcl=application/x-tcl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tex=application/x-tex');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.texi=application/x-texinfo');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.texinfo=application/x-texinfo');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tbz=application/x-bzip-compressed-tar');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tbz2=application/x-bzip-compressed-tar');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tgz=application/x-compressed-tar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tlz=application/x-lzma-compressed-tar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tr=application/x-troff');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.trm=application/x-msterminal');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.troff=application/x-troff');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.tsp=application/dsptype');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.torrent=application/x-bittorrent');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ttz=application/t-time');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.txz=application/x-xz-compressed-tar'); {Do not localize}
-  AlMimeContentTypeByExtList.Add('.udeb=application/x-debian-package');    {Do not Localize}
-
-  AlMimeContentTypeByExtList.Add('.uin=application/x-icq');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.urls=application/x-url-list');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.ustar=application/x-ustar');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.vcd=application/x-cdlink');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.vor=application/vnd.stardivision.writer');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.vsl=application/x-cnet-vsl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wcm=application/vnd.ms-works');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wb1=application/x-quattropro');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wb2=application/x-quattropro');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wb3=application/x-quattropro');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wdb=application/vnd.ms-works');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wks=application/vnd.ms-works');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmd=application/x-ms-wmd');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wms=application/x-ms-wms');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmz=application/x-ms-wmz');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wp5=application/wordperfect5.1');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wpd=application/wordperfect');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wpl=application/vnd.ms-wpl');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wps=application/vnd.ms-works');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wri=application/x-mswrite');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xfdf=application/vnd.adobe.xfdf');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xls=application/x-msexcel');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xlb=application/x-msexcel');     {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xpi=application/x-xpinstall');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xps=application/vnd.ms-xpsdocument');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xsd=application/vnd.sun.xml.draw');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xul=application/vnd.mozilla.xul+xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.z=application/x-compress');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.zoo=application/x-zoo');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.zip=application/x-zip-compressed');    {Do not Localize}
-
-  { WAP }
-  AlMimeContentTypeByExtList.Add('.wbmp=image/vnd.wap.wbmp');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wml=text/vnd.wap.wml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmlc=application/vnd.wap.wmlc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmls=text/vnd.wap.wmlscript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.wmlsc=application/vnd.wap.wmlscriptc');    {Do not Localize}
-
-  { Non-web text}
-  {
-  IMPORTANT!!
-
-  You should not use a text MIME type definition unless you are
-  extremely certain that the file will NOT be a binary.  Some browsers
-  will display the text instead of saving to disk and it looks ugly
-  if a web-browser shows all of the 8bit charactors.
-  }
-  //of course, we have to add this :-).
-  AlMimeContentTypeByExtList.Add('.asm=text/x-asm');   {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.p=text/x-pascal');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.pas=text/x-pascal');    {Do not Localize}
-
-  AlMimeContentTypeByExtList.Add('.cs=text/x-csharp'); {Do not Localize}
-
-  AlMimeContentTypeByExtList.Add('.c=text/x-csrc');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.c++=text/x-c++src');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cpp=text/x-c++src');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cxx=text/x-c++src');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.cc=text/x-c++src');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.h=text/x-chdr'); {Do not localize}
-  AlMimeContentTypeByExtList.Add('.h++=text/x-c++hdr');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hpp=text/x-c++hdr');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hxx=text/x-c++hdr');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.hh=text/x-c++hdr');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.java=text/x-java');    {Do not Localize}
-
-  { WEB }
-  AlMimeContentTypeByExtList.Add('.css=text/css');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.js=text/javascript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.htm=text/html');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.html=text/html');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xhtml=application/xhtml+xml'); {Do not localize}
-  AlMimeContentTypeByExtList.Add('.xht=application/xhtml+xml'); {Do not localize}
-  AlMimeContentTypeByExtList.Add('.rdf=application/rdf+xml'); {Do not localize}
-  AlMimeContentTypeByExtList.Add('.rss=application/rss+xml'); {Do not localize}
-
-  AlMimeContentTypeByExtList.Add('.ls=text/javascript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.mocha=text/javascript');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.shtml=server-parsed-html');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.xml=text/xml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sgm=text/sgml');    {Do not Localize}
-  AlMimeContentTypeByExtList.Add('.sgml=text/sgml');    {Do not Localize}
-
-  { Message }
-  AlMimeContentTypeByExtList.Add('.mht=message/rfc822');    {Do not Localize}
-
-
-  for I := 0 to AlMimeContentTypeByExtList.Count - 1 do
-    AlExtbyMimeContentTypeList.Add(AlMimeContentTypeByExtList.ValueFromIndex[I] + '=' + AlMimeContentTypeByExtList.Names[I]);
+  LArray := AlExtbyMimeContentTypeA.ToArray;
+  for var I := low(LArray) to high(LArray) do
+    AlExtbyMimeContentTypeW.Add(String(LArray[I].Key), String(LArray[I].Value));
 
 end;
 
@@ -490,19 +2073,19 @@ initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.Mime','initialization');
   {$ENDIF}
-  AlMimeContentTypeByExtList := TALNVStringListA.Create;
-  AlExtbyMimeContentTypeList := TALNVStringListA.Create;
+  AlMimeContentTypeByExtA := TDictionary<AnsiString, AnsiString>.Create;
+  AlMimeContentTypeByExtW := TDictionary<String, String>.Create;
+  AlExtbyMimeContentTypeA := TDictionary<AnsiString, AnsiString>.Create;
+  AlExtbyMimeContentTypeW := TDictionary<String, String>.Create;
   ALFillMimeTable;
-  TALNVStringListA(AlMimeContentTypeByExtList).Duplicates := dupAccept;
-  TALNVStringListA(AlMimeContentTypeByExtList).Sorted := true;
-  TALNVStringListA(AlExtbyMimeContentTypeList).Duplicates := dupAccept;
-  TALNVStringListA(AlExtbyMimeContentTypeList).Sorted := true;
 
 finalization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.Mime','finalization');
   {$ENDIF}
-  AlFreeandNil(AlMimeContentTypeByExtList);
-  AlFreeandNil(AlExtbyMimeContentTypeList);
+  AlFreeandNil(AlMimeContentTypeByExtA);
+  AlFreeandNil(AlMimeContentTypeByExtW);
+  AlFreeandNil(AlExtbyMimeContentTypeA);
+  AlFreeandNil(AlExtbyMimeContentTypeW);
 
 end.

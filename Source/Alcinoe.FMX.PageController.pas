@@ -510,6 +510,7 @@ type
     function AddPage(const APageViewClass: TALPageViewClass = nil): TALPageView;
     function InsertPage(const AIndex: Integer; const APageViewClass: TALPageViewClass = nil): TALPageView;
     procedure DeletePage(const AIndex: Integer);
+    procedure DeleteAllPages;
     property PageCount: Integer read GetPageCount;
     function HasActivePage: Boolean;
     property Pages[AIndex: Integer]: TALPageView read GetPage;
@@ -1173,7 +1174,7 @@ begin
       end;
 
       // Exit if only one page
-      if FPageCount = 1 then begin
+      if FPageCount <= 1 then begin
         _UpdateWithoutAnimation;
         exit;
       end;
@@ -2786,8 +2787,8 @@ begin
   if Result then SetActivePageIndex(PageCount - 1, ATransition);
 end;
 
-{**************************************************************************************}
-function TALPageController.AddPage(const APageViewClass: TALPageViewClass): TALPageView;
+{********************************************************************************************}
+function TALPageController.AddPage(const APageViewClass: TALPageViewClass = nil): TALPageView;
 begin
   Result := InsertPage(MaxInt, APageViewClass);
 end;
@@ -2823,6 +2824,13 @@ begin
     ALFreeAndNil(LPage);
     if LActivePageIndex >= 0 then ActivePageIndex := LActivePageIndex;
   end;
+end;
+
+{*****************************************}
+procedure TALPageController.DeleteAllPages;
+begin
+  while PageCount > 0 do
+    DeletePage(PageCount - 1);
 end;
 
 {*****************}

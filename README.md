@@ -20,8 +20,8 @@ visibility and growth.
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
 
 
-Become a sponsor to Magic Foundation
-------------------------------------
+Fuel the Magic, Inspire Innovation
+----------------------------------
 
 By joining MagicFoundation as an Associate, you'll enter a 
 community that's actively shaping the future of Alcinoe—while 

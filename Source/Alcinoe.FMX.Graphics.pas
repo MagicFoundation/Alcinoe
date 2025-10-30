@@ -210,14 +210,14 @@ type
     UNDEFINED);
 
 function ALIsDefaultContextOpenGL: Boolean;
-function ALGetImageDimensions(const aStream: TStream): TSize; overload;
-function ALGetImageDimensions(const AResourceName: String): TSize; overload;
-function AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo; overload;
-function AlGetExifOrientationInfo(const aStream: TStream): TalExifOrientationInfo; overload;
-function AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes; overload;
-function AlGetImageSignature(const aFileName: string; const aSignatureLength: integer = 12): Tbytes; overload;
-function AlDetectImageExtension(const aStream: TStream): String; overload;
-function AlDetectImageExtension(const aFileName: string): String; overload;
+function ALGetImageDimensions(const AStream: TStream; const ARotateAccordingToExifOrientation: boolean = false): TSize; overload;
+function ALGetImageDimensions(const AResourceName: String; const ARotateAccordingToExifOrientation: boolean = false): TSize; overload;
+function AlGetExifOrientationInfo(const AFilename: String): TalExifOrientationInfo; overload;
+function AlGetExifOrientationInfo(const AStream: TStream): TalExifOrientationInfo; overload;
+function AlGetImageSignature(const AStream: TStream; const aSignatureLength: integer = 12): Tbytes; overload;
+function AlGetImageSignature(const AFilename: string; const aSignatureLength: integer = 12): Tbytes; overload;
+function AlDetectImageExtension(const AStream: TStream): String; overload;
+function AlDetectImageExtension(const AFilename: string): String; overload;
 function ALModulateColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor): TAlphaColor; overload;
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor; const AOverlayOpacity: Single): TAlphaColor; overload;
@@ -1532,8 +1532,8 @@ begin
   result := ALDefaultContextIsOpenGL;
 end;
 
-{***********************************************************}
-function ALGetImageDimensions(const aStream: TStream): TSize;
+{*********************************************************************************************************************}
+function ALGetImageDimensions(const AStream: TStream; const ARotateAccordingToExifOrientation: boolean = false): TSize;
 begin
 
   {$REGION 'ANDROID'}
@@ -1612,7 +1612,7 @@ begin
   {$REGION 'MSWINDOWS'}
   {$IF defined(MSWINDOWS)}
   var LSavedPosition := AStream.Position;
-  var LBitmap := Tbitmap.CreateFromStream(aStream);
+  var LBitmap := Tbitmap.CreateFromStream(AStream);
   try
     Result := TSize.Create(LBitmap.Width, LBitmap.height);
   finally
@@ -1622,31 +1622,43 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
+  if (ARotateAccordingToExifOrientation) then begin
+    var LExifOrientationInfo := AlGetExifOrientationInfo(AStream);
+    if LExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
+                                TalExifOrientationInfo.ROTATE_90,
+                                TalExifOrientationInfo.TRANSVERSE,
+                                TalExifOrientationInfo.ROTATE_270] then begin
+      var LWidth: Integer := Result.Width;
+      Result.Width := Result.Height;
+      Result.Height := LWidth;
+    end;
+  end;
+
 end;
 
-{****************************************************************}
-function ALGetImageDimensions(const AResourceName: String): TSize;
+{**************************************************************************************************************************}
+function ALGetImageDimensions(const AResourceName: String; const ARotateAccordingToExifOrientation: boolean = false): TSize;
 begin
   var LFileName := ALGetResourceFilename(AResourceName);
   var LStream: TStream;
   if LFileName <> '' then LStream := TFileStream.Create(LFileName, fmOpenRead)
   else LStream := ALCreateResourceStream(AResourceName);
   try
-    Result := ALGetImageDimensions(LStream);
+    Result := ALGetImageDimensions(LStream, ARotateAccordingToExifOrientation);
   finally
     ALfreeandNil(LStream);
   end;
 end;
 
 {*********************************************************************************}
-function AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
+function AlGetExifOrientationInfo(const AFilename: String): TalExifOrientationInfo;
 begin
 
   // You can download sample images at : https://github.com/recurser/exif-orientation-examples
 
   {$REGION 'ANDROID'}
   {$IF defined(ANDROID)}
-  var LExifInterface := TJExifInterface.javaclass.init(StringToJString(aFilename));
+  var LExifInterface := TJExifInterface.javaclass.init(StringToJString(AFilename));
   var LOrientation := LExifInterface.getAttributeInt(TJExifInterface.JavaClass.TAG_ORIENTATION, TJExifInterface.JavaClass.ORIENTATION_NORMAL);
   if LOrientation = TJExifInterface.JavaClass.ORIENTATION_FLIP_HORIZONTAL then result := TalExifOrientationInfo.FLIP_HORIZONTAL
   else if LOrientation = TJExifInterface.JavaClass.ORIENTATION_FLIP_VERTICAL then result := TalExifOrientationInfo.FLIP_VERTICAL
@@ -1664,7 +1676,7 @@ begin
   {$REGION 'APPLEOS'}
   {$IF defined(ALAppleOS)}
   result := TalExifOrientationInfo.UNDEFINED;
-  var LPath := CFStringCreateWithCString(nil{alloc}, MarshaledAString(UTF8Encode(AFileName)){cStr}, kCFStringEncodingUTF8{encoding});
+  var LPath := CFStringCreateWithCString(nil{alloc}, MarshaledAString(UTF8Encode(AFilename)){cStr}, kCFStringEncodingUTF8{encoding});
   if LPath = nil then raise Exception.Create('Failed to create CFString from file name');
   try
     var LUrl := CFURLCreateWithFileSystemPath(nil{allocator}, LPath{filePath}, kCFURLPOSIXPathStyle{pathStyle}, False{isDirectory});
@@ -1739,7 +1751,7 @@ begin
 
   {$REGION 'MSWINDOWS'}
   {$IF defined(MSWINDOWS)}
-  var LImage := TGPImage.Create(AFileName);
+  var LImage := TGPImage.Create(AFilename);
   try
     var LPropSize := LImage.GetPropertyItemSize(PropertyTagOrientation);
     if LPropSize > 0 then begin
@@ -1777,7 +1789,7 @@ begin
 end;
 
 {********************************************************************************}
-function AlGetExifOrientationInfo(const aStream: TStream): TalExifOrientationInfo;
+function AlGetExifOrientationInfo(const AStream: TStream): TalExifOrientationInfo;
 begin
 
   // You can download sample images at : https://github.com/recurser/exif-orientation-examples
@@ -1906,7 +1918,7 @@ begin
   {$REGION 'MSWINDOWS'}
   {$IF defined(MSWINDOWS)}
   var LSavedPosition := AStream.Position;
-  var LImage := TGPImage.Create(TStreamAdapter.Create(aStream));
+  var LImage := TGPImage.Create(TStreamAdapter.Create(AStream));
   try
     var LPropSize := LImage.GetPropertyItemSize(PropertyTagOrientation);
     if LPropSize > 0 then begin
@@ -1945,21 +1957,21 @@ begin
 end;
 
 {*************************************************************************************************}
-function AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes;
+function AlGetImageSignature(const AStream: TStream; const aSignatureLength: integer = 12): Tbytes;
 begin
   var LSavedPosition := AStream.Position;
   SetLength(result, aSignatureLength);
-  aStream.ReadBuffer(result[0], min(length(result),aStream.Size));
-  if aStream.Size < length(Result) then
-    for var I := aStream.Size to High(result) do
+  AStream.ReadBuffer(result[0], min(length(result),AStream.Size));
+  if AStream.Size < length(Result) then
+    for var I := AStream.Size to High(result) do
       result[i] := $00;
   AStream.Position := LSavedPosition;
 end;
 
 {**************************************************************************************************}
-function AlGetImageSignature(const aFileName: string; const aSignatureLength: integer = 12): Tbytes;
+function AlGetImageSignature(const AFilename: string; const aSignatureLength: integer = 12): Tbytes;
 begin
-  var LFileStream := TFileStream.Create(aFileName, fmOpenRead);
+  var LFileStream := TFileStream.Create(AFilename, fmOpenRead);
   try
     result := AlGetImageSignature(LFileStream, aSignatureLength);
   finally
@@ -1972,10 +1984,10 @@ end;
 // https://en.wikipedia.org/wiki/List_of_file_signatures
 // https://github.com/strukturag/libheif/issues/83
 // https://nokiatech.github.io/heif/technical.html
-function AlDetectImageExtension(const aStream: Tstream): String;
+function AlDetectImageExtension(const AStream: Tstream): String;
 begin
 
-  var LFirstBytes := AlGetImageSignature(aStream);
+  var LFirstBytes := AlGetImageSignature(AStream);
   if length(LFirstBytes) < 12 then exit('');
 
   if (LFirstBytes[0] = $FF) and
@@ -2035,9 +2047,9 @@ begin
 end;
 
 {***************************************************************}
-function AlDetectImageExtension(const aFileName: string): String;
+function AlDetectImageExtension(const AFilename: string): String;
 begin
-  var LFileStream := TFileStream.Create(aFileName, fmOpenRead);
+  var LFileStream := TFileStream.Create(AFilename, fmOpenRead);
   try
     result := AlDetectImageExtension(LFileStream);
   finally
@@ -3137,7 +3149,7 @@ function ALCreateJBitmapFromResource(
   begin
     var LOptions := TJBitmapFactory_Options.Javaclass.Init;
     if TOSVersion.Check(8, 0) {API level >= 26 (Android O)} then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
-    Result := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+    Result := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFilename), LOptions);
     if Result = nil then raise Exception.create('Failed to load bitmap from file');
     LOptions := nil;
   end;

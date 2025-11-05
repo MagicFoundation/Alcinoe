@@ -1,7 +1,7 @@
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" alt="video player for FireMonkey" width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/androidmerger.jpg?raw=true"/>
                                  
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 
@@ -103,9 +103,23 @@ You cannot add the resources below via the project option.
 
   * Android_Strings
   * Android_Colors
+  * Android_ColorsDark
   * AndroidSplashImageDef
-  * AndroidSplashStylesV21
+  * AndroidSplashImageDefV21
   * AndroidSplashStyles
+  * AndroidSplashStylesV21
+  * AndroidSplashStylesV31
+  * AndroidSplashStylesV35
+  * Android_AdaptiveIcon
+  * Android_AdaptiveIconV33
+  * Android_VectorizedNotificationIcon
+  * Android_AdaptiveIconMonochrome
+  * Android_AdaptiveIconForeground
+  * Android_AdaptiveIconBackground
+  * Android_VectorizedSplash
+  * Android_VectorizedSplashDark
+  * Android_VectorizedSplashV31
+  * Android_VectorizedSplashV31Dark
   * Android_LauncherIcon36
   * Android_LauncherIcon48
   * Android_LauncherIcon72
@@ -127,19 +141,29 @@ Instead you must create a directory with this structure:
 ```
   <mydir>
     res
+      drawable
       drawable-hdpi
       drawable-mdpi
       drawable-xhdpi
       drawable-xxhdpi
       drawable-xxxhdpi
+      mipmap
+      mipmap-hdpi
+      mipmap-mdpi
+      mipmap-xhdpi
+      mipmap-xxhdpi
+      mipmap-xxxhdpi
+      values
       ...
 ```
 
-and put in it all the needed resources. for exemple in drawable-hdpi you 
-can add the file $(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png that 
-you renamed in ic_launcher.png, in drawable-hdpi the file 
-$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png that you renamed in 
-ic_launcher.png, etc. Then include this dir in the -libraries path like :
+and place all the required resources inside it.
+For example, in mipmap-hdpi you can copy:
+  c:\Program Files (x86)\Embarcadero\Studio\37.0\bin\Artwork\Android\FM_LauncherIcon_36x36.png
+rename it to ic_launcher.png, and in mipmap-xhdpi copy:
+  c:\Program Files (x86)\Embarcadero\Studio\37.0\\bin\Artwork\Android\FM_LauncherIcon_48x48.png 
+rename that one to ic_launcher.png as well, and so on for the other density folders.
+Then include this directory in the -libraries path, for example:
 
 ```
 AndroidMerger.exe -Libraries="androidx.appcompat:appcompat:1.5.1;<mydir>" ...

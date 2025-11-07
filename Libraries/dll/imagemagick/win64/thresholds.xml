@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE thresholds [
-<!ELEMENT thresholds (threshold)+>
-<!ELEMENT threshold (description , levels)>
-<!ELEMENT description (CDATA)>
-<!ELEMENT levels (CDATA)>
-<!ATTLIST threshold map ID #REQUIRED>
-<!ATTLIST levels width CDATA #REQUIRED>
-<!ATTLIST levels height CDATA #REQUIRED>
-<!ATTLIST levels divisor CDATA #REQUIRED>
+  <!ELEMENT thresholds (threshold)+>
+  <!ATTLIST thresholds xmlns CDATA #FIXED ''>
+  <!ELEMENT threshold (description,levels)>
+  <!ATTLIST threshold xmlns CDATA #FIXED '' alias NMTOKEN #IMPLIED
+    map NMTOKEN #REQUIRED>
+  <!ELEMENT description (#PCDATA)>
+  <!ATTLIST description xmlns CDATA #FIXED ''>
+  <!ELEMENT levels (#PCDATA)>
+  <!ATTLIST levels xmlns CDATA #FIXED '' divisor CDATA #REQUIRED
+    height CDATA #REQUIRED width CDATA #REQUIRED>
 ]>
 <!--
   Threshold Maps for Ordered Posterized Dither
@@ -29,7 +31,7 @@
 
   Each of the "levels" integer values (each value representing the threshold
   intensity "level/divisor" at which that pixel is turned on.  The "levels"
-  integers given can be any postive integers between "0" and the "divisor",
+  integers given can be any positive integers between "0" and the "divisor",
   excluding those limits.
 
   The "divisor" not only defines the upper limit and threshold divisor for each
@@ -91,7 +93,7 @@
   <threshold map="o4x4" alias="4x4">
     <!--
        From "Dithering Algorithms"
-       https://efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
+       http://www.efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
      -->
     <description>Ordered 4x4 (dispersed)</description>
     <levels width="4" height="4" divisor="17">
@@ -125,7 +127,7 @@
 
   These patterns initially start as circles, but then form diamonds
   pattern at the 50% threshold level, before forming negated circles,
-  as it approached the other threshold extereme.
+  as it approached the other threshold extreme.
 -->
   <threshold map="h4x4a" alias="4x1">
     <description>Halftone 4x4 (angled)</description>
@@ -167,12 +169,12 @@
   Halftones - Orthogonally Aligned, or Un-angled
 
   Initially added by Anthony Thyssen, IM v6.2.9-5 using techniques from
-  "Dithering & Halftoning" by Gernot Haffmann
-  https://fho-emden.de/~hoffmann/hilb010101.pdf
+  "Dithering & Halftoning" by Gernot Hoffmann
+  http://www.fho-emden.de/~hoffmann/hilb010101.pdf
 
   These patterns initially start as circles, but then form square
   pattern at the 50% threshold level, before forming negated circles,
-  as it approached the other threshold extereme.
+  as it approached the other threshold extreme.
 -->
   <threshold map="h4x4o">
     <description>Halftone 4x4 (orthogonal)</description>
@@ -212,7 +214,7 @@
 
   <threshold map="h16x16o">
     <!--
-       Direct extract from "Dithering & Halftoning" by Gernot Haffmann.
+       Direct extract from "Dithering & Halftoning" by Gernot Hoffmann.
        This may need some fine tuning for symmetry of the halftone dots,
        as it was a mathematically formulated pattern.
     -->

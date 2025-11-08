@@ -9,7 +9,7 @@ interface
 // https://www.imagemagick.org/script/magick-wand.php
 // https://www.imagemagick.org/MagickWand/
 //
-// This wrapper is Build from the 7.1.0-8 version of ImageMagick
+// This wrapper is Build from the 7.1.2-8 version of ImageMagick
 // dll: /Libraries/dll/imagemagick
 // include: /References/ImageMagick/include/
 //
@@ -135,6 +135,8 @@ type
     SplineFilter,
     LanczosRadiusFilter,
     CubicSplineFilter,
+    MagicKernelSharp2013Filter,
+    MagicKernelSharp2021Filter,
     SentinelFilter); // a count of all the filters, not a real filter
 
 type
@@ -177,7 +179,10 @@ type
     JzazbzColorspace,
     DisplayP3Colorspace,
     Adobe98Colorspace,
-    ProPhotoColorspace);
+    ProPhotoColorspace,
+    OklabColorspace,
+    OklchColorspace,
+    CAT02LMSColorspace);
 
 type
   StorageType = (
@@ -218,8 +223,9 @@ type
     WebPCompression,
     DWAACompression,
     DWABCompression,
-    BC7Compression
-  );
+    BC7Compression,
+    BC5Compression,
+    LERCCompression);        // https://github.com/Esri/lerc
 
 type
  PaintMethod = (
@@ -316,7 +322,9 @@ type
     SoftBurnCompositeOp,
     SoftDodgeCompositeOp,
     StampCompositeOp,
-    RMSECompositeOp);
+    RMSECompositeOp,
+    SaliencyBlendCompositeOp,
+    SeamlessBlendCompositeOp);
 
 type
   GravityType = (
@@ -349,7 +357,8 @@ type
     RemoveAlphaChannel,
     SetAlphaChannel,
     ShapeAlphaChannel,
-    TransparentAlphaChannel);
+    TransparentAlphaChannel,
+    OffIfOpaqueAlphaChannel);
 
 type
   PMagickWand = pointer;

@@ -479,9 +479,6 @@ type
     FPageViewAnimation: TALFloatAnimation;
     FCanvasColorAdjustTextureMaterialGallery2: TALCanvasColorAdjustTextureMaterial;
     procedure PageViewAnimationProcess(Sender: TObject);
-    {$IF defined(android)}
-    procedure UpdateSystemBarsAppearance;
-    {$ENDIF}
   public
     procedure InitializeNewForm; override;
   end;
@@ -534,11 +531,11 @@ begin
   // already fully loaded.
   TALFontManager.RegisterTypefaceFromResource('GoodDogPlain', 'GoodDog Plain');
   TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular', 'Ma Shan Zheng');
-
-  {$IF defined(android)}
-  UpdateSystemBarsAppearance;
-  {$ENDIF}
-
+  ALSetSystemBarsColor(
+    TALStyleManager.Instance.GetColor('Material3.Color.Surface'), // const AStatusBarColor: TAlphaColor
+    TALStyleManager.Instance.GetColor('Material3.Color.Surface'), // const ANavigationBarColor: TAlphaColor
+    TALStyleManager.Instance.IsDarkMode, // const AStatusBarUseLightIcons: TAlphaColor
+    TALStyleManager.Instance.IsDarkMode); // const ANavigationBarUseLightIcons: TAlphaColor
   inherited;
   BeginUpdate;
   ALLog('TMainForm.InitializeNewForm', 'end | Form.size: ' + FloatToStr(width) + 'x' + FloatToStr(height));
@@ -763,49 +760,6 @@ begin
   ALFreeAndNil(FCurrentTextElements);
 end;
 
-{********************}
-{$IF defined(android)}
-procedure TMainForm.UpdateSystemBarsAppearance;
-begin
-  // https://stackoverflow.com/questions/64481841/android-api-level-30-setsystembarsappearance-doesnt-overwrite-theme-data
-  var LWindow := TAndroidHelper.Activity.getWindow;
-  var LDecorView := LWindow.getDecorView;
-  LWindow.setNavigationBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
-  LWindow.setStatusBarColor(integer(TALStyleManager.Instance.GetColor('Material3.Color.Surface')));
-  if TALStyleManager.Instance.IsDarkMode then begin
-    LDecorView.setSystemUiVisibility(
-      LDecorView.getSystemUiVisibility and
-      (not TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) and
-      (not TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));
-  end
-  else begin
-    LDecorView.setSystemUiVisibility(
-      LDecorView.getSystemUiVisibility or
-      TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-      TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-  end;
-
-  if TOSVersion.Check(11{API level 30}) then begin
-    var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
-    if LInsetsController <> nil then begin
-      if TALStyleManager.Instance.IsDarkMode then begin
-        LInsetsController.setSystemBarsAppearance(
-          0, // appearance: Integer
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS);  // mask: Integer
-      end
-      else begin
-        LInsetsController.setSystemBarsAppearance(
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS, // appearance: Integer
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-          TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS); // mask: Integer
-      end;
-    end;
-  end;
-end;
-{$ENDIF}
-
 {***********************************************************}
 procedure TMainForm.ALRadioButtonThemeClick(Sender: TObject);
 begin
@@ -823,10 +777,12 @@ begin
       TThread.Synchronize(nil,
         procedure
         begin
-          {$IF defined(android)}
-          UpdateSystemBarsAppearance;
-          {$ENDIF}
           TALStyleManager.Instance.ApplyColorScheme(Self, 'Material3.Color.Surface'{AFormFillColorKey}, 'Material3.Color.Surface'{ASystemStatusBarBackgroundColorKey});
+          ALSetSystemBarsColor(
+            TALStyleManager.Instance.GetColor('Material3.Color.Surface'), // const AStatusBarColor: TAlphaColor
+            TALStyleManager.Instance.GetColor('Material3.Color.Surface'), // const ANavigationBarColor: TAlphaColor
+            TALStyleManager.Instance.IsDarkMode, // const AStatusBarUseLightIcons: TAlphaColor
+            TALStyleManager.Instance.IsDarkMode); // const ANavigationBarUseLightIcons: TAlphaColor
           fRectangle.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest');
           fRectangle.Stroke.Color := TALStyleManager.Instance.GetColor('Material3.Color.OutlineVariant');
           fCircle.Fill.Color := TALStyleManager.Instance.GetColor('Material3.Color.SurfaceContainerHighest');

@@ -92,6 +92,7 @@ Please request the resolution of these quality reports. Due
 to the unresolved issues from Embarcadero, we have been 
 forced to apply patches to the original Delphi source files:
 
+* [FMX Android: Zoom gesture (TInteractiveGesture.Zoom) only fires on very fast pinches](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4509)
 * [Enhance MouseEvent Handling by Providing Access to MotionEvent (Android) and UIEvent (iOS)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002)
 * [Improve Rendering Timing by Using Choreographer Instead of Runnable](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865)
 * [Allow TTexture to Define a Material (GLSL Shader) to Use](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549)
@@ -1138,6 +1139,32 @@ undesired conversions.
 
 History
 =======
+
+### 09/11/2025 – Framework Improvements
+
+- Renamed `RotateAccordingToMetadataOrientation` → `ApplyMetadataOrientation`
+- Renamed `RotateAccordingToExifOrientation` → `ApplyExifOrientation`
+- Added `GetSingle`, `GetDouble`, and `GetDateTime` to `TALUserPreferences`
+- `TALBrush` now includes:
+  - `ResourceStream`
+  - `OwnsResourceStream`
+  - `ApplyExifOrientation`
+- `TALImage`:
+  - Now supports `HTTPHeaders` when downloading from a URL
+  - Added `OwnsResourceStream`
+- Renamed `TalExifOrientationInfo` → `TalExifOrientation`
+- Renamed `AlGetExifOrientationInfo` → `AlGetExifOrientation`
+- Added `AApplyExifOrientation` parameter to:
+  - `ALCreateSkSurfaceFromResource`
+  - `ALCreateSkImageFromResource`
+  - `ALCreateJBitmapFromResource`
+  - `ALCreateCGContextRefFromResource`
+  - `ALCreateCGImageRefFromResource`
+  - `ALCreateTBitmapFromResource`
+  - `ALCreateBitmapFromResource`
+  - `ALCreateDrawableFromResource`
+- Updated `TALDialog`, `TALLoadingOverlay`, and `TALSheet` to emulate overlays over system bars (via system bar color adjustments)
+- Added `ALGetSystemBarsColor` and `ALSetSystemBarsColor`
 
 ### 24/10/2025 – New Components & Enhancements  
 

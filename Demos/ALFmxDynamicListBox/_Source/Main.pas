@@ -77,9 +77,6 @@ type
     FSimulateInfiniteScrollCurrentPoint: TPointF;
     procedure SimulateInfiniteScroll;
     {$ENDIF}
-    {$IF defined(android)}
-    procedure UpdateSystemBarsAppearance;
-    {$ENDIF}
     procedure StoriesCarouselDownloadItems(
                 const AContext: TALDynamicListBox.TView.TDownloadItemsContext;
                 out AData: TALJSONNodeW;
@@ -151,6 +148,12 @@ begin
 
   TALStyleManager.Instance.DarkModeBehavior := TALStyleManager.TDarkModeBehavior.AlwaysLight;
 
+  ALSetSystemBarsColor(
+    Fill.Color, // const AStatusBarColor: TAlphaColor
+    Fill.Color, // const ANavigationBarColor: TAlphaColor
+    False, // const AStatusBarUseLightIcons: TAlphaColor
+    False); // const ANavigationBarUseLightIcons: TAlphaColor
+
   {$IF defined(ALUIAutomationEnabled)}
   TThread.ForceQueue(nil,
     procedure
@@ -158,38 +161,7 @@ begin
       SimulateInfiniteScroll;
     end, 5000);
   {$ENDIF}
-
-  {$IF defined(android)}
-  UpdateSystemBarsAppearance;
-  {$ENDIF}
 end;
-
-{********************}
-{$IF defined(android)}
-procedure TMainForm.UpdateSystemBarsAppearance;
-begin
-  // https://stackoverflow.com/questions/64481841/android-api-level-30-setsystembarsappearance-doesnt-overwrite-theme-data
-  var LWindow := TAndroidHelper.Activity.getWindow;
-  var LDecorView := LWindow.getDecorView;
-  LWindow.setNavigationBarColor(integer(TAlphaColors.White));
-  LWindow.setStatusBarColor(integer(TAlphaColors.White));
-  LDecorView.setSystemUiVisibility(
-    LDecorView.getSystemUiVisibility or
-    TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
-    TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-
-  if TOSVersion.Check(11{API level 30}) then begin
-    var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
-    if LInsetsController <> nil then begin
-      LInsetsController.setSystemBarsAppearance(
-        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS, // appearance: Integer
-        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
-        TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS); // mask: Integer
-    end;
-  end;
-end;
-{$ENDIF}
 
 {*******************************************************************************************}
 procedure TMainForm.TextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);

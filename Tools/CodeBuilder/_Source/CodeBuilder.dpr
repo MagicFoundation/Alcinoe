@@ -567,14 +567,9 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'DoubleBuffered := TALDynamicControl(Source).DoubleBuffered;','//**DoubleBuffered := TALDynamicControl(Source).DoubleBuffered;');
     aSrc := FindAndReplace(aSrc, 'Pivot.Assign(TALDynamicControl(Source).Pivot);','//**Pivot.Assign(TALDynamicControl(Source).Pivot);');
     aSrc := FindAndReplace(aSrc, 'Scale.assign(TALDynamicControl(Source).Scale);','//**Scale.assign(TALDynamicControl(Source).Scale);');
-    aSrc := FindAndReplace(aSrc, 'FScale: TPosition;','//**FScale: TPosition;');
-    aSrc := FindAndReplace(aSrc, 'procedure SetScale(const AValue: TPosition);','//**procedure SetScale(const AValue: TPosition);');
-    aSrc := FindAndReplace(aSrc, 'procedure ScaleChangedHandler(Sender: TObject);','//**procedure ScaleChangedHandler(Sender: TObject);');
-    aSrc := FindAndReplace(aSrc, 'property Scale: TPosition read FScale write SetScale;','//**property Scale: TPosition read FScale write SetScale;');
-    aSrc := FindAndReplace(aSrc, 'FScale := TPosition.Create(TPointF.Create(1, 1));','//**FScale := TPosition.Create(TPointF.Create(1, 1));');
-    aSrc := FindAndReplace(aSrc, 'FScale.OnChange := ScaleChangedHandler;','//**FScale.OnChange := ScaleChangedHandler;');
-    aSrc := FindAndReplace(aSrc, 'ALFreeAndNil(FScale);','//**ALFreeAndNil(FScale);');
     aSrc := FindAndReplace(aSrc, 'Scale.Point','Scale');
+    aSrc := FindAndReplace(aSrc, 'class var FNoScale: TPosition;','//**class var FNoScale: TPosition;');
+    aSrc := FindAndReplace(aSrc, 'function GetScale: TPosition;','//**function GetScale: TPosition');
     aSrc := FindAndReplace(aSrc, 'property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;','//**property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;');
     aSrc := FindAndReplace(aSrc, 'Anchors := TALDynamicControl(Source).Anchors;','//**Anchors := TALDynamicControl(Source).Anchors;');
     aSrc := FindAndReplace(aSrc, 'CanFocus := TALDynamicControl(Source).CanFocus;','//**CanFocus := TALDynamicControl(Source).CanFocus;');
@@ -611,7 +606,6 @@ Procedure BuildAlcinoeFMXDynamicControls;
     aSrc := FindAndReplace(aSrc, 'OnResize := TALDynamicControl(Source).OnResize;','//**OnResize := TALDynamicControl(Source).OnResize;');
     aSrc := FindAndReplace(aSrc, 'OnActivate := TALDynamicControl(Source).OnActivate;','//**OnActivate := TALDynamicControl(Source).OnActivate;');
     aSrc := FindAndReplace(aSrc, 'OnDeactivate := TALDynamicControl(Source).OnDeactivate;','//**OnDeactivate := TALDynamicControl(Source).OnDeactivate;');
-    aSrc := FindAndReplace(aSrc, 'DoMatrixChanged(Sender);','Repaint; //** DoMatrixChanged(Sender);');
     aSrc := FindAndReplace(aSrc, 'Locked := True;', '//**Locked := True;');
     aSrc := FindAndReplace(aSrc, 'procedure SetNewScene(AScene: IScene); override;','//**procedure SetNewScene(AScene: IScene); override;');
     aSrc := FindAndReplace(aSrc, 'Assign(Source: TPersistent{TALDynamicControl})','Assign(Source: TALDynamicControl)');
@@ -1298,12 +1292,11 @@ Procedure BuildAlcinoeFMXDynamicControls;
            (alposIgnoreCaseA('._GetCanFocus: Boolean;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetCanFocus(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('._SetTabStop(const Value: Boolean);', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicExtendedControl.SetScale(const AValue: TPosition)', ALTrim(LSrcLine)) > 0) or
-           (alposIgnoreCaseA('TALDynamicExtendedControl.ScaleChangedHandler(Sender: TObject)', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetPivot: TPosition;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.SetPivot(const Value: TPosition);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.DoMatrixChanged(Sender: TObject);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetAbsoluteDisplayedRect: TRectF;', ALTrim(LSrcLine)) > 0) or
+           (alposIgnoreCaseA('.GetScale: TPosition;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.SetName(const Value: TComponentName);', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetItemsCount: Integer;', ALTrim(LSrcLine)) > 0) or
            (alposIgnoreCaseA('.GetItem(const AIndex: Integer)', ALTrim(LSrcLine)) > 0) or
@@ -1514,7 +1507,7 @@ begin
   var LWholeImplementation: AnsiString := '';
   //-----
   var LAlcinoeFMXControlsPas := ALGetStringFromFile(ALgetModulePathW + '\..\..\Source\Alcinoe.FMX.Controls.pas');
-  LAlcinoeFMXControlsPas := FindAndReplace(LAlcinoeFMXControlsPas, 'TALControl = class(TControl)', 'TALDynamicExtendedControl = class(TALDynamicControl)');
+  LAlcinoeFMXControlsPas := FindAndReplace(LAlcinoeFMXControlsPas, 'TALControl = class(TControl, IRotatedControl)', 'TALDynamicExtendedControl = class(TALDynamicControl)');
   LAlcinoeFMXControlsPas := FindAndReplace(LAlcinoeFMXControlsPas, ' TALControl.', ' TALDynamicExtendedControl.');
   var LOutputFMXControlsInterface: AnsiString := '';
   var LOutputFMXControlsImplementation: AnsiString := '';

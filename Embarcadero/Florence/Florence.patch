@@ -107,6 +107,34 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Forms.pas b/Embarcadero/Florence/fmx/F
      if FControls <> nil  then
        FControls.Remove(Child);
  
+Index: Embarcadero/Florence/fmx/FMX.MultiTouch.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.MultiTouch.pas b/Embarcadero/Florence/fmx/FMX.MultiTouch.pas
+--- a/Embarcadero/Florence/fmx/FMX.MultiTouch.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.MultiTouch.pas	(working copy)
+@@ -304,7 +304,7 @@
+ 
+ function TMultiTouchManager.IsZoom(const APoint1, APoint2: TPointF): Boolean;
+ var
+-  Distance1, Distance2: Single;
++  Distance1{, Distance2}: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4509
+ begin
+   Result := False;
+   // check that there was a previous 2 finger movement
+@@ -311,10 +311,11 @@
+   if not FOldPoint1.EqualsTo(UndefinedPoint) and not FOldPoint2.EqualsTo(UndefinedPoint) then
+   begin
+     Distance1 := APoint1.Distance(APoint2);
+-    Distance2 := FOldPoint1.Distance(FOldPoint2);
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4509
++    //Distance2 := FOldPoint1.Distance(FOldPoint2);
+ 
+     // Take into account an error margin (there is always a distance between two fingers pressed together).
+-    if (Abs(Distance1) > 2) and (Abs(Distance1 - Distance2) > 2) then
++    if (Abs(Distance1) > 2) {and (Abs(Distance1 - Distance2) > 2)} then // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4509
+       Result := True;
+   end;
+ 
 Index: Embarcadero/Florence/fmx/FMX.Platform.iOS.pas
 ===================================================================
 diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas

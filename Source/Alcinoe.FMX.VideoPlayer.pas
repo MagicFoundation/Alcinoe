@@ -1477,7 +1477,9 @@ begin
 
     // The clockwise rotation that should be applied to the video for it to be rendered in the correct
     // orientation, or 0 if unknown or not applicable. Only 0, 90, 180 and 270 are supported.
-    fVideoPlayerEngine.FVideoRotationDegrees := fVideoPlayerEngine.fExoPlayer.getVideoFormat.rotationDegrees;
+    var LVideoFormat := fVideoPlayerEngine.fExoPlayer.getVideoFormat;
+    if LVideoFormat = nil then fVideoPlayerEngine.FVideoRotationDegrees := 0
+    else fVideoPlayerEngine.FVideoRotationDegrees := LVideoFormat.rotationDegrees;
     if (fVideoPlayerEngine.FVideoRotationDegrees = 90) or
        (fVideoPlayerEngine.FVideoRotationDegrees = 270) then begin
       fVideoPlayerEngine.FVideoWidth := videoSize.height;

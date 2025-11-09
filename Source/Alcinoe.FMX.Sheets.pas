@@ -1823,6 +1823,7 @@ begin
      (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
   var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentSheet.Fill.Color{AOverlayColor});
   var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentSheet.Fill.Color{AOverlayColor});
+  If FCurrentSheet.DockEdge = TALSheet.TDockEdge.Bottom then LNavigationBarColor := FCurrentSheet.Container.Fill.Color;
   ALSetSystemBarsColor(
     LStatusBarColor,
     LNavigationBarColor,

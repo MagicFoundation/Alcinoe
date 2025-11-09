@@ -604,7 +604,7 @@ type
     procedure DoMouseUp; virtual;
   public
     const
-      // taken from android ViewConfiguration TOUCH_SLOP = 8;
+      // Taken from android ViewConfiguration TOUCH_SLOP = 8;
       DefaultTouchSlop = 8;
       // Instead of the android ViewConfiguration OVERFLING_DISTANCE = 6;
       DefaultOverflingDistance = 65;
@@ -615,6 +615,8 @@ type
       DefaultDragResistanceFactor = 0.4;
       // The velocity threshold (in virtual pixels per second) considered as "low".
       DefaultLowVelocityThreshold = 10;
+      // The default amount of friction applied to flings (Taken from ViewConfiguration.getScrollFriction)
+      DefaultFriction = 0.015;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -674,13 +676,36 @@ type
     /// </summary>
     property OverflingDistance: Single read FOverflingDistance write FOverflingDistance stored IsOverflingDistanceStored nodefault;
     /// <summary>
-    ///   A multiplier applied during drag operations to simulate resistance. A value
-    ///   of 1 implies normal drag behavior, while values below 1 introduce increased
-    ///   resistance, making the drag feel heavier.
+    ///   A multiplier applied during drag operations when the content is pulled
+    ///   against the minimum edge (top/left). A value of 1 implies normal drag
+    ///   behavior, while values below 1 introduce increased resistance, making
+    ///   the drag feel heavier as you approach the min edge.
     /// </summary>
     property MinEdgeDragResistanceFactor: Single read FMinEdgeDragResistanceFactor write FMinEdgeDragResistanceFactor stored IsMinEdgeDragResistanceFactorStored nodefault;
+    /// <summary>
+    ///   A multiplier applied during drag operations when the content is pulled
+    ///   against the maximum edge (bottom/right). A value of 1 implies normal drag
+    ///   behavior, while values below 1 introduce increased resistance, making
+    ///   the drag feel heavier as you approach the max edge.
+    /// </summary>
     property MaxEdgeDragResistanceFactor: Single read FMaxEdgeDragResistanceFactor write FMaxEdgeDragResistanceFactor stored IsMaxEdgeDragResistanceFactorStored nodefault;
+    /// <summary>
+    ///   Enables the elastic “spring-back” effect when the content reaches the
+    ///   minimum edge (top/left). This differs from <see cref="MinEdgeDragResistanceFactor"/>,
+    ///   as it is not applied during a drag operation but only when the scroll
+    ///   position exceeds the edge due to a scrolling animation. When <c>true</c>,
+    ///   overscrolling past the min edge animates back with a bounce. When <c>false</c>,
+    ///   the bounce is suppressed and the content simply clamps to the edge.
+    /// </summary>
     property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write FMinEdgeSpringbackEnabled default true;
+    /// <summary>
+    ///   Enables the elastic “spring-back” effect when the content reaches the
+    ///   maximum edge (bottom/right). This differs from <see cref="MaxEdgeDragResistanceFactor"/>,
+    ///   as it is not applied during a drag operation but only when the scroll
+    ///   position exceeds the edge due to a scrolling animation. When <c>true</c>,
+    ///   overscrolling past the max edge animates back with a bounce. When <c>false</c>,
+    ///   the bounce is suppressed and the content simply clamps to the edge.
+    /// </summary>
     property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write FMaxEdgeSpringbackEnabled default true;
     /// <summary>
     ///   The amount of friction applied to flings.
@@ -1743,7 +1768,7 @@ end;
 constructor TALSplineOverScroller.Create;
 begin
   inherited Create;
-  FFlingFriction := 0.015; {ViewConfiguration.getScrollFriction}
+  FFlingFriction := TALScrollEngine.DefaultFriction;
   FState := SPLINE;
   FFinished := true;
   // const ppi: Single = context.getResources().getDisplayMetrics().density * 160.0;
@@ -2695,11 +2720,13 @@ begin
     if not FOverScroller.isFinished then
       FoverScroller.abortAnimation;
 
+    var LstartX: Integer := round(startX * ALScreenScale);
+    var LstartY: Integer := round(startY * ALScreenScale);
     FOverScroller.startScroll(
-      trunc(startX * ALScreenScale), // startX: integer;
-      trunc(startY * ALScreenScale), // startY: integer;
-      trunc(dx * ALScreenScale), // dx: integer;
-      trunc(dy * ALScreenScale), // dy: integer;
+      LstartX, // startX: integer;
+      LstartY, // startY: integer;
+      round((startX + dx) * ALScreenScale) - LstartX, // dx: integer;
+      round((startY + dy) * ALScreenScale) - LstartY, // dy: integer;
       duration); // const duration: integer = DEFAULT_DURATION);
 
     StartTimer;
@@ -2941,7 +2968,7 @@ end;
 {*************************************************}
 function TALScrollEngine.IsFrictionStored: Boolean;
 begin
-  Result := Not sameValue(GetFriction, 0.015{ViewConfiguration.getScrollFriction}, TEpsilon.Scale);
+  Result := Not sameValue(GetFriction, DefaultFriction, TEpsilon.Scale);
 end;
 
 {*******************************************}

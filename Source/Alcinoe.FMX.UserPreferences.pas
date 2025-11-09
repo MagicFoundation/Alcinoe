@@ -61,6 +61,12 @@ Type
     procedure SetInt32(Const AKey: String; const AValue: Int32; const ASecure: Boolean = False);
     function getInt64(Const AKey: String; const ADefValue: Int64; const ASecure: Boolean = False): Int64;
     procedure SetInt64(Const AKey: String; const AValue: Int64; const ASecure: Boolean = False);
+    function getSingle(Const AKey: String; const ADefValue: Single; const ASecure: Boolean = False): Single;
+    procedure SetSingle(Const AKey: String; const AValue: Single; const ASecure: Boolean = False);
+    function getDouble(Const AKey: String; const ADefValue: Double; const ASecure: Boolean = False): Double;
+    procedure SetDouble(Const AKey: String; const AValue: Double; const ASecure: Boolean = False);
+    function getDateTime(Const AKey: String; const ADefValue: TDateTime; const ASecure: Boolean = False): TDateTime;
+    procedure SetDateTime(Const AKey: String; const AValue: TDateTime; const ASecure: Boolean = False);
     function getString(Const AKey: String; const ADefValue: String; const ASecure: Boolean = False): String;
     procedure SetString(Const AKey: String; const AValue: String; const ASecure: Boolean = False);
     {$IF defined(MSWindows) and (not defined(ALDPK))}
@@ -588,6 +594,42 @@ begin
   {$ELSEIF defined(MSWindows) and (not defined(ALDPK))}
   FIniFile.WriteInt64(FSection{Section}, AKey{Ident}, AValue);
   {$ENDIF}
+end;
+
+{*************************************************************************************************************************}
+function TALUserPreferences.getSingle(Const AKey: String; const ADefValue: Single; const ASecure: Boolean = False): Single;
+begin
+  PInteger(@result)^ := getInt32(AKey, PInteger(@ADefValue)^, ASecure);
+end;
+
+{***************************************************************************************************************}
+procedure TALUserPreferences.SetSingle(Const AKey: String; const AValue: Single; const ASecure: Boolean = False);
+begin
+  SetInt32(AKey, PInteger(@AValue)^, ASecure);
+end;
+
+{*************************************************************************************************************************}
+function TALUserPreferences.getDouble(Const AKey: String; const ADefValue: Double; const ASecure: Boolean = False): Double;
+begin
+  PInt64(@result)^ := getInt64(AKey, PInt64(@ADefValue)^, ASecure);
+end;
+
+{***************************************************************************************************************}
+procedure TALUserPreferences.SetDouble(Const AKey: String; const AValue: Double; const ASecure: Boolean = False);
+begin
+  SetInt64(AKey, PInt64(@AValue)^, ASecure);
+end;
+
+{*********************************************************************************************************************************}
+function TALUserPreferences.getDateTime(Const AKey: String; const ADefValue: TDateTime; const ASecure: Boolean = False): TDateTime;
+begin
+  Result := ALUnixMsToDateTime(getInt64(AKey, ALDateTimeToUnixMs(ADefValue), ASecure));
+end;
+
+{********************************************************************************************************************}
+procedure TALUserPreferences.SetDateTime(Const AKey: String; const AValue: TDateTime; const ASecure: Boolean = False);
+begin
+  SetInt64(AKey, ALDateTimeToUnixMs(AValue), ASecure);
 end;
 
 {*************************************************************************************************************************}

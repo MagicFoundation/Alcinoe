@@ -5,6 +5,10 @@ interface
 {$I Alcinoe.inc}
 
 uses
+  {$IF defined(MSWINDOWS)}
+  Winapi.Windows,
+  {$ENDIF}
+  System.Classes,
   System.UITypes,
   System.Types,
   Fmx.types,
@@ -95,6 +99,7 @@ type
     FillGradientColors: TArray<TAlphaColor>; // Default = [];
     FillGradientOffsets: TArray<Single>; // Default = [];
     FillResourceName: String; // default = ''
+    FillResourceStream: TStream; // default = nil
     FillMaskResourceName: String; // default = ''
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
@@ -295,7 +300,6 @@ function ALGetTextElementsByID(Const ATextElements: TALTextElements; Const AId: 
 implementation
 
 uses
-  System.Classes,
   System.Math.Vectors,
   system.SysUtils,
   System.Character,
@@ -327,7 +331,6 @@ uses
   Macapi.CoreFoundation,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
-  Winapi.Windows,
   FMX.TextLayout,
   FMX.Helpers.Win,
   FMX.Utils,
@@ -492,6 +495,7 @@ begin
   FillGradientColors := [];
   FillGradientOffsets := [];
   FillResourceName := '';
+  FillResourceStream := nil;
   FillMaskResourceName := '';
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
@@ -578,6 +582,7 @@ begin
   FillGradientColors := Source.FillGradientColors;
   FillGradientOffsets := Source.FillGradientOffsets;
   FillResourceName := Source.FillResourceName;
+  FillResourceStream := Source.FillResourceStream;
   FillMaskResourceName := Source.FillMaskResourceName;
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
@@ -2620,7 +2625,7 @@ begin
                                     LOptions.FillColor, // const AFillColor: TAlphaColor;
                                     LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                                     LOptions.FillResourceName, // const AFillResourceName: String;
-                                    nil, // const AFillResourceStream: TStream;
+                                    LOptions.FillResourceStream, // const AFillResourceStream: TStream;
                                     LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                                     LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                                     LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -2695,6 +2700,7 @@ begin
                   if (LOptions.FillColor <> TalphaColors.Null) or
                      (length(LOptions.FillGradientColors) > 0) or
                      (LOptions.FillResourceName <> '') or
+                     (LOptions.FillResourceStream <> nil) or
                      (LOptions.StateLayerColor <> TalphaColors.Null) or
                      (LOptions.StrokeColor <> TalphaColors.Null) or
                      (LOptions.ShadowColor <> TalphaColors.Null) then begin
@@ -2708,6 +2714,7 @@ begin
                       .SetFillGradientColors(LOptions.FillGradientColors)
                       .SetFillGradientOffsets(LOptions.FillGradientOffsets)
                       .SetFillResourceName(LOptions.FillResourceName)
+                      .SetFillResourceStream(LOptions.FillResourceStream)
                       .SetFillMaskResourceName(LOptions.FillMaskResourceName)
                       .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
                       .SetFillImageMarginsRect(LOptions.FillImageMargins)
@@ -2763,58 +2770,81 @@ begin
                                         LTextBoxes[i].rect.Bottom);
                       LDstRect.Offset(LParagraphRect.TopLeft);
                       var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+                      var LImage: sk_image_t;
+                      var LKey: TBytes;
+                      var LHash: Integer;
+                      var LIsCachedImage: Boolean {$IFDEF ALDPK} := False {$ENDIF};
                       {$IFDEF ALDPK}
-                      var LImg: sk_image_t;
-                      var LFileName := ALGetResourceFilename(LImgSrc);
-                      if LFileName <> '' then begin
-                        try
-                          LImg := ALCreateSkImageFromResource(
-                                    LImgSrc, // const AResourceName: String;
-                                    nil, // const AResourceStream: TStream;
-                                    '', // const AMaskResourceName: String;
-                                    1, // const AScale: Single;
-                                    LDstRect.Width, LDstRect.Height, // const W, H: single;
-                                    TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                                    TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
-                                    Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
-                                    0, // const ABlurRadius: single;
-                                    0, // const AXRadius: Single;
-                                    0); // const AYRadius: Single);
-                        except
-                          LImg := 0;
-                        end
-                      end
+                      if ALGetResourceFilename(LImgSrc) = '' then
+                        LImage := 0
                       else
-                        LImg := 0;
-                      {$ELSE}
-                      var LImg := ALCreateSkImageFromResource(
-                                    LImgSrc, // const AResourceName: String;
-                                    nil, // const AResourceStream: TStream;
-                                    '', // const AMaskResourceName: String;
-                                    1, // const AScale: Single;
-                                    LDstRect.Width, LDstRect.Height, // const W, H: single;
-                                    TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                                    TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
-                                    Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
-                                    0, // const ABlurRadius: single;
-                                    0, // const AXRadius: Single;
-                                    0); // const AYRadius: Single);
+                      try
                       {$ENDIF}
-                      If LImg <> 0 then begin
+                        if TThread.Current.ThreadID = MainThreadID then
+                          LImage := ALGetCachedBitmap(
+                                      ALCachedSkImages, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
+                                      LImgSrc, // const AResourceName: String;
+                                      nil, // const AResourceStream: TStream;
+                                      '', // const AMaskResourceName: String;
+                                      1, // const AScale: Single;
+                                      LDstRect.Width, LDstRect.Height, // const W, H: single;
+                                      False, // const AApplyExifOrientation: Boolean;
+                                      TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                                      TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                                      Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
+                                      0, // const ABlurRadius: single;
+                                      0, // const AXRadius: Single;
+                                      0, // const AYRadius: Single);
+                                      LKey, // out AKey: TBytes
+                                      LHash) // out AHash: Integer)
+                        else begin
+                          LImage := ALNullBitmap;
+                          SetLength(LKey, 0);
+                        end;
+                        if ALIsBitmapNull(LImage) then begin
+                          LIsCachedImage := False;
+                          LImage := ALCreateSkImageFromResource(
+                                      LImgSrc, // const AResourceName: String;
+                                      nil, // const AResourceStream: TStream;
+                                      '', // const AMaskResourceName: String;
+                                      1, // const AScale: Single;
+                                      LDstRect.Width, LDstRect.Height, // const W, H: single;
+                                      False, // const AApplyExifOrientation: Boolean;
+                                      TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                                      TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                                      Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
+                                      0, // const ABlurRadius: single;
+                                      0, // const AXRadius: Single;
+                                      0); // const AYRadius: Single);
+                        end
+                        else
+                          LIsCachedImage := True;
+                      {$IFDEF ALDPK}
+                      except
+                        LImage := 0;
+                        setlength(LKey, 0);
+                        LIsCachedImage := False;
+                      end;
+                      If LImage <> 0 then
+                      {$ENDIF}
                         try
                           var LSamplingoptions := ALGetNearestSkSamplingoptions;
                           sk4d_canvas_draw_image_rect(
                             ACanvas, // self: sk_canvas_t;
-                            LImg, // const image: sk_image_t;
+                            LImage, // const image: sk_image_t;
                             @LSrcRect, // const src: psk_rect_t;
                             @LDstRect,  // const dest: psk_rect_t;
                             @LSamplingoptions, // const sampling: psk_samplingoptions_t;
                             LPaint, // const paint: sk_paint_t;
                             FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
                         finally
-                          sk4d_refcnt_unref(LImg);
+                          if not LIsCachedImage then begin
+                            if length(LKey) > 0 then
+                              ALCacheBitmap(ALCachedSkImages, ALMaxCachedBitmaps, LKey, LHash, LImage)
+                            else
+                              sk4d_refcnt_unref(LImage);
+                          end;
                         end;
-                      end;
                     end;
                   end;
 
@@ -3959,7 +3989,7 @@ begin
                             LOptions.FillColor, // const AFillColor: TAlphaColor;
                             LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LOptions.FillResourceName, // const AFillResourceName: String;
-                            nil, // const AFillResourceStream: TStream;
+                            LOptions.FillResourceStream, // const AFillResourceStream: TStream;
                             LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                             LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                             LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -4058,6 +4088,7 @@ begin
           if (LOptions.FillColor <> TalphaColors.Null) or
              (length(LOptions.FillGradientColors) > 0) or
              (LOptions.FillResourceName <> '') or
+             (LOptions.FillResourceStream <> nil) or
              (LOptions.StateLayerColor <> TalphaColors.Null) or
              (LOptions.StrokeColor <> TalphaColors.Null) or
              (LOptions.ShadowColor <> TalphaColors.Null) then begin
@@ -4071,6 +4102,7 @@ begin
               .SetFillGradientColors(LOptions.FillGradientColors)
               .SetFillGradientOffsets(LOptions.FillGradientOffsets)
               .SetFillResourceName(LOptions.FillResourceName)
+              .SetFillResourceStream(LOptions.FillResourceStream)
               .SetFillMaskResourceName(LOptions.FillMaskResourceName)
               .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
               .SetFillImageMarginsRect(LOptions.FillImageMargins)
@@ -4110,23 +4142,60 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALCreateJbitmapFromResource(
-                            LExtendedTextElement.imgSrc, // const AResourceName: String;
-                            nil, // const AResourceStream: TStream;
-                            '', // const AMaskResourceName: String;
-                            1, // const AScale: Single;
-                            LDstRect.Width, LDstRect.Height, // const W, H: single;
-                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                            TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
-                            LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
-                            0, // const ABlurRadius: single;
-                            0, // const AXRadius: Single;
-                            0); // const AYRadius: Single);
+              var LBitmap: JBitmap;
+              var LKey: TBytes;
+              var LHash: Integer;
+              var LIsCachedBitmap: Boolean;
+              if TThread.Current.ThreadID = MainThreadID then
+                LBitmap := ALGetCachedBitmap(
+                             ALCachedJBitmaps, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
+                             LExtendedTextElement.imgSrc, // const AResourceName: String;
+                             nil, // const AResourceStream: TStream;
+                             '', // const AMaskResourceName: String;
+                             1, // const AScale: Single;
+                             LDstRect.Width, LDstRect.Height, // const W, H: single;
+                             False, // const AApplyExifOrientation: Boolean;
+                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
+                             0, // const ABlurRadius: single;
+                             0, // const AXRadius: Single;
+                             0, // const AYRadius: Single);
+                             LKey, // out AKey: TBytes
+                             LHash) // out AHash: Integer)
+              else begin
+                LBitmap := ALNullBitmap;
+                SetLength(LKey, 0);
+              end;
+              if ALIsBitmapNull(LBitmap) then begin
+                LIsCachedBitmap := False;
+                LBitmap := ALCreateJBitmapFromResource(
+                             LExtendedTextElement.imgSrc, // const AResourceName: String;
+                             nil, // const AResourceStream: TStream;
+                             '', // const AMaskResourceName: String;
+                             1, // const AScale: Single;
+                             LDstRect.Width, LDstRect.Height, // const W, H: single;
+                             False, // const AApplyExifOrientation: Boolean;
+                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
+                             0, // const ABlurRadius: single;
+                             0, // const AXRadius: Single;
+                             0); // const AYRadius: Single);
+              end
+              else
+                LIsCachedBitmap := True;
               try
-                ACanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
+                ACanvas.drawBitmap(LBitmap, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
               finally
-                LImg.recycle;
-                LImg := nil;
+                if not LIsCachedBitmap then begin
+                  if length(LKey) > 0 then
+                    ALCacheBitmap(ALCachedJBitmaps, ALMaxCachedBitmaps, LKey, LHash, LBitmap)
+                  else begin
+                    LBitmap.recycle;
+                    LBitmap := nil;
+                  end;
+                end;
               end;
             end
             else begin
@@ -4175,18 +4244,49 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALCreateCGImageRefFromResource(
+              var LImage: CGImageRef;
+              var LKey: TBytes;
+              var LHash: Integer;
+              var LIsCachedImage: Boolean;
+              if TThread.Current.ThreadID = MainThreadID then
+                LImage := ALGetCachedBitmap(
+                            ALCachedCGImageRefs, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            False, // const AApplyExifOrientation: Boolean;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                            LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0, // const AYRadius: Single);
+                            LKey, // out AKey: TBytes
+                            LHash) // out AHash: Integer)
+              else begin
+                LImage := ALNullBitmap;
+                SetLength(LKey, 0);
+              end;
+              if ALIsBitmapNull(LImage) then begin
+                LIsCachedImage := False;
+                LImage := ALCreateCGImageRefFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            False, // const AApplyExifOrientation: Boolean;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
                             0, // const ABlurRadius: single;
                             0, // const AXRadius: Single;
                             0); // const AYRadius: Single);
+              end
+              else
+                LIsCachedImage := True;
               try
                 CGContextDrawImage(
                   ACanvas, // c: The graphics context in which to draw the image.
@@ -4195,9 +4295,14 @@ begin
                     LDstRect.Width,
                     LDstRect.Height,
                     LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                  LImg); // image The image to draw.
+                  LImage); // image The image to draw.
               finally
-                CGImageRelease(LImg);
+                if not LIsCachedImage then begin
+                  if length(LKey) > 0 then
+                    ALCacheBitmap(ALCachedCGImageRefs, ALMaxCachedBitmaps, LKey, LHash, LImage)
+                  else
+                    CGImageRelease(LImage);
+                end;
               end;
             end
             else begin
@@ -4258,27 +4363,63 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALCreateTBitmapFromResource(
-                            LExtendedTextElement.imgSrc, // const AResourceName: String;
-                            nil, // const AResourceStream: TStream;
-                            '', // const AMaskResourceName: String;
-                            1, // const AScale: Single;
-                            LDstRect.Width, LDstRect.Height, // const W, H: single;
-                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
-                            TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
-                            LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
-                            0, // const ABlurRadius: single;
-                            0, // const AXRadius: Single;
-                            0); // const AYRadius: Single);
+              var LBitmap: TBitmap;
+              var LKey: TBytes;
+              var LHash: Integer;
+              var LIsCachedBitmap: Boolean;
+              if TThread.Current.ThreadID = MainThreadID then
+                LBitmap := ALGetCachedBitmap(
+                             ALCachedTBitmaps, // const ACachedBitmaps: TList<TALTriplet<TBytes, TALBitmap, Integer>>;
+                             LExtendedTextElement.imgSrc, // const AResourceName: String;
+                             nil, // const AResourceStream: TStream;
+                             '', // const AMaskResourceName: String;
+                             1, // const AScale: Single;
+                             LDstRect.Width, LDstRect.Height, // const W, H: single;
+                             False, // const AApplyExifOrientation: Boolean;
+                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
+                             0, // const ABlurRadius: single;
+                             0, // const AXRadius: Single;
+                             0, // const AYRadius: Single);
+                             LKey, // out AKey: TBytes
+                             LHash) // out AHash: Integer)
+              else begin
+                LBitmap := ALNullBitmap;
+                SetLength(LKey, 0);
+              end;
+              if ALIsBitmapNull(LBitmap) then begin
+                LIsCachedBitmap := False;
+                LBitmap := ALCreateBitmapFromResource(
+                             LExtendedTextElement.imgSrc, // const AResourceName: String;
+                             nil, // const AResourceStream: TStream;
+                             '', // const AMaskResourceName: String;
+                             1, // const AScale: Single;
+                             LDstRect.Width, LDstRect.Height, // const W, H: single;
+                             False, // const AApplyExifOrientation: Boolean;
+                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
+                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
+                             0, // const ABlurRadius: single;
+                             0, // const AXRadius: Single;
+                             0); // const AYRadius: Single);
+              end
+              else
+                LIsCachedBitmap := True;
               try
                 ACanvas.drawBitmap(
-                  LImg,
+                  LBitmap,
                   LSrcRect,
                   LDstRect,
                   1{AOpacity},
                   false{HighSpeed});
               finally
-                ALFreeAndNil(LImg);
+                if not LIsCachedBitmap then begin
+                  if length(LKey) > 0 then
+                    ALCacheBitmap(ALCachedTBitmaps, ALMaxCachedBitmaps, LKey, LHash, LBitmap)
+                  else
+                    ALFreeAndNil(LBitmap);
+                end;
               end;
             end
             else begin

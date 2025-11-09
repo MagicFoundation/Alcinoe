@@ -630,19 +630,25 @@ type
     FColorKey: String;
     FGradient: TALGradient;
     FResourceName: String;
+    FResourceStream: TStream;
+    FOwnsResourceStream: Boolean;
     FBackgroundMargins: TALBounds;
     FImageMargins: TALBounds;
     FImageNoRadius: Boolean;
     FImageTintColor: TAlphaColor;
     FImageTintColorKey: String;
     FWrapMode: TALImageWrapMode;
+    FApplyExifOrientation: Boolean;
     --- Memory Optimization ---}
     FResourceName: String; // 8 bytes
+    FResourceStream: TStream; // 8 bytes
     FGradient: TALGradient; // 8 bytes
     FBackgroundMargins: TALBounds; // 8 bytes
     FImageMargins: TALBounds; // 8 bytes
     FImageNoRadius: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 byte
+    FApplyExifOrientation: Boolean; // 1 byte
+    FOwnsResourceStream: Boolean; // 1 byte
     FColor: TAlphaColor; // 4 bytes
     FImageTintColor: TAlphaColor; // 4 Bytes
     FColorKey: String; // 8 bytes
@@ -651,12 +657,14 @@ type
     procedure SetColorKey(const Value: String);
     procedure SetGradient(const Value: TALGradient);
     procedure SetResourceName(const Value: String);
+    procedure setResourceStream(const Value: TStream);
     procedure SetBackgroundMargins(const Value: TALBounds);
     procedure SetImageMargins(const Value: TALBounds);
     procedure SetImageNoRadius(const Value: Boolean);
     procedure SetImageTintColor(const Value: TAlphaColor);
     procedure SetImageTintColorKey(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure SetApplyExifOrientation(const Value: Boolean);
     procedure GradientChanged(Sender: TObject); virtual;
     procedure BackgroundMarginsChanged(Sender: TObject); virtual;
     procedure ImageMarginsChanged(Sender: TObject); virtual;
@@ -667,6 +675,7 @@ type
     function IsImageTintColorStored: Boolean;
     function IsImageTintColorKeyStored: Boolean;
     function IsWrapModeStored: Boolean;
+    function IsApplyExifOrientationStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadKind(Reader: TReader);
@@ -685,6 +694,7 @@ type
     function GetDefaultImageTintColor: TAlphaColor; virtual;
     function GetDefaultImageTintColorKey: String; virtual;
     function GetDefaultWrapMode: TALImageWrapMode; virtual;
+    function GetDefaultApplyExifOrientation: Boolean; virtual;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -704,6 +714,12 @@ type
     property DefaultImageTintColor: TAlphaColor read GetDefaultImageTintColor;
     property DefaultImageTintColorKey: String read GetDefaultImageTintColorKey;
     property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
+    property DefaultApplyExifOrientation: Boolean read GetDefaultApplyExifOrientation;
+    /// <summary>
+    ///   When you assign a stream to ResourceStream, TALImage takes ownership and will free it.
+    /// </summary>
+    property ResourceStream: TStream read FResourceStream write setResourceStream;
+    property OwnsResourceStream: Boolean read FOwnsResourceStream write FOwnsResourceStream;
   published
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
     property ColorKey: String read FColorKey write SetColorKey stored IsColorKeyStored;
@@ -715,6 +731,7 @@ type
     property ImageTintColor: TAlphaColor read FImageTintColor write SetImageTintColor stored IsImageTintColorStored;
     property ImageTintColorKey: String read FImageTintColorKey write SetImageTintColorKey stored IsImageTintColorKeyStored;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
+    property ApplyExifOrientation: Boolean read FApplyExifOrientation write SetApplyExifOrientation stored IsApplyExifOrientationStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1121,6 +1138,25 @@ function  ALTextAlignToTextHorzAlign(const ATextAlign: TTextAlign): TALTextHorzA
 function  ALTextAlignToTextVertAlign(const ATextAlign: TTextAlign): TALTextVertAlign;
 procedure ALVibrateDevice(const ADurationMs: Integer = 500);
 procedure ALPlayClickSound;
+
+type
+  TALCapturedSystemBarsColor = record
+  private
+    class var CapturedCount: Integer;
+  public
+    class var StatusBarColor: TAlphaColor;
+    class var NavigationBarColor: TAlphaColor;
+    class var StatusBarUseLightIcons: Boolean;
+    class var NavigationBarUseLightIcons: Boolean;
+  end;
+procedure ALCaptureSystemBarsColor;
+procedure ALRestoreSystemBarsColor;
+procedure ALGetSystemBarsColor(
+            out AStatusBarColor, ANavigationBarColor: TAlphaColor;
+            out AStatusBarUseLightIcons, ANavigationBarUseLightIcons: Boolean);
+procedure ALSetSystemBarsColor(
+            const AStatusBarColor, ANavigationBarColor: TAlphaColor;
+            const AStatusBarUseLightIcons, ANavigationBarUseLightIcons: Boolean);
 
 {$IF defined(ALAppleOS)}
 type
@@ -3848,6 +3884,8 @@ begin
   FGradient := TALGradient.Create;
   FGradient.OnChanged := GradientChanged;
   FResourceName := DefaultResourceName;
+  FResourceStream := nil;
+  FOwnsResourceStream := True;
   FBackgroundMargins := CreateBackgroundMargins;
   FBackgroundMargins.OnChanged := BackgroundMarginsChanged;
   FImageMargins := CreateImageMargins;
@@ -3856,11 +3894,14 @@ begin
   FImageTintColor := DefaultImageTintColor;
   FImageTintColorKey := DefaultImageTintColorKey;
   FWrapMode := DefaultWrapMode;
+  FApplyExifOrientation := DefaultApplyExifOrientation;
 end;
 
 {**************************}
 destructor TALBrush.Destroy;
 begin
+  if FOwnsResourceStream then
+    ALFreeAndNil(FResourceStream);
   ALFreeAndNil(FGradient);
   ALFreeAndNil(FBackgroundMargins);
   ALFreeAndNil(FImageMargins);
@@ -3907,12 +3948,29 @@ begin
       ColorKey := TALBrush(Source).ColorKey;
       Gradient.Assign(TALBrush(Source).Gradient);
       ResourceName := TALBrush(Source).ResourceName;
+      if (TALBrush(Source).OwnsResourceStream) and
+         (TALBrush(Source).ResourceStream <> nil) then begin
+        var LStream := TMemoryStream.Create;
+        try
+          LStream.CopyFrom(TALBrush(Source).ResourceStream);
+          ResourceStream := LStream;
+          OwnsResourceStream := True;
+        except
+          ALFreeAndNil(LStream);
+          raise;
+        end;
+      end
+      else begin
+        ResourceStream := TALBrush(Source).ResourceStream;
+        OwnsResourceStream := TALBrush(Source).OwnsResourceStream;
+      end;
       BackgroundMargins.Assign(TALBrush(Source).BackgroundMargins);
       ImageMargins.Assign(TALBrush(Source).ImageMargins);
       ImageNoRadius := TALBrush(Source).ImageNoRadius;
       ImageTintColor := TALBrush(Source).ImageTintColor;
       ImageTintColorKey := TALBrush(Source).ImageTintColorKey;
       WrapMode := TALBrush(Source).WrapMode;
+      ApplyExifOrientation := TALBrush(Source).ApplyExifOrientation;
     Finally
       EndUpdate;
     End;
@@ -3931,12 +3989,16 @@ begin
     ColorKey := DefaultColorKey;
     Gradient.Reset;
     ResourceName := DefaultResourceName;
+    if FOwnsResourceStream then ALFreeAndNil(FResourceStream)
+    else FResourceStream := nil;
+    FOwnsResourceStream := True;
     BackgroundMargins.Rect := BackgroundMargins.DefaultValue;
     ImageMargins.Rect := ImageMargins.DefaultValue;
     ImageNoRadius := DefaultImageNoRadius;
     ImageTintColor := DefaultImageTintColor;
     ImageTintColorKey := DefaultImageTintColorKey;
     WrapMode := DefaultWrapMode;
+    ApplyExifOrientation := DefaultApplyExifOrientation;
   finally
     EndUpdate;
   end;
@@ -4002,6 +4064,24 @@ begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Gradient.Interpolate(aTo.Gradient, ANormalizedTime, AReverse);
       if not AReverse then ResourceName := ATo.ResourceName;
+      if not AReverse then begin
+        if (ATo.OwnsResourceStream) and
+           (ATo.ResourceStream <> nil) then begin
+          var LStream := TMemoryStream.Create;
+          try
+            LStream.CopyFrom(ATo.ResourceStream);
+            ResourceStream := LStream;
+            OwnsResourceStream := True;
+          except
+            ALFreeAndNil(LStream);
+            raise;
+          end;
+        end
+        else begin
+          ResourceStream := ATo.ResourceStream;
+          OwnsResourceStream := ATo.OwnsResourceStream;
+        end;
+      end;
       BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, ATo.BackgroundMargins.Left{Stop}, ANormalizedTime);
       BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, ATo.BackgroundMargins.Right{Stop}, ANormalizedTime);
       BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, ATo.BackgroundMargins.Top{Stop}, ANormalizedTime);
@@ -4013,11 +4093,16 @@ begin
       if not AReverse then ImageNoRadius := ATo.ImageNoRadius;
       ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, ATo.ImageTintColor{Stop}, ANormalizedTime);
       if not AReverse then WrapMode := ATo.WrapMode;
+      if not AReverse then ApplyExifOrientation := ATo.ApplyExifOrientation;
     end
     else begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       Gradient.Interpolate(nil, ANormalizedTime, AReverse);
       if not AReverse then ResourceName := DefaultResourceName;
+      if not AReverse then begin
+        ResourceStream := nil;
+        OwnsResourceStream := True;
+      end;
       BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, BackgroundMargins.DefaultValue.Left{Stop}, ANormalizedTime);
       BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, BackgroundMargins.DefaultValue.Right{Stop}, ANormalizedTime);
       BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, BackgroundMargins.DefaultValue.Top{Stop}, ANormalizedTime);
@@ -4029,6 +4114,7 @@ begin
       if not AReverse then ImageNoRadius := DefaultImageNoRadius;
       ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, DefaultImageTintColor{Stop}, ANormalizedTime);
       if not AReverse then WrapMode := DefaultWrapMode;
+      if not AReverse then ApplyExifOrientation := DefaultApplyExifOrientation;
     end;
     FColorKey := LPrevColorKey;
     FImageTintColorKey := LPrevImageTintColorKey;
@@ -4060,7 +4146,7 @@ begin
   Result := [];
   if (Color <> TalphaColors.Null) then result := result + [TALBrushStyle.Solid];
   if (length(Gradient.Colors) > 0) then result := result + [TALBrushStyle.Gradient];
-  if (ResourceName <> '') then result := result + [TALBrushStyle.Image];
+  if (ResourceName <> '') or (ResourceStream <> nil) then result := result + [TALBrushStyle.Image];
 end;
 
 {******************************************}
@@ -4111,6 +4197,12 @@ begin
   result := FWrapMode <> DefaultWrapMode;
 end;
 
+{******************************************************}
+function TALBrush.IsApplyExifOrientationStored: Boolean;
+begin
+  result := FApplyExifOrientation <> DefaultApplyExifOrientation;
+end;
+
 {*********************************************}
 function TALBrush.GetDefaultColor: TAlphaColor;
 begin
@@ -4153,6 +4245,12 @@ begin
   Result := TALImageWrapMode.Fit;
 end;
 
+{********************************************************}
+function TALBrush.GetDefaultApplyExifOrientation: Boolean;
+begin
+  Result := False;
+end;
+
 {****************************************************}
 procedure TALBrush.SetColor(const Value: TAlphaColor);
 begin
@@ -4183,6 +4281,17 @@ procedure TALBrush.SetResourceName(const Value: String);
 begin
   if fResourceName <> Value then begin
     fResourceName := Value;
+    Change;
+  end;
+end;
+
+{*********************************************************}
+procedure TALBrush.setResourceStream(const Value: TStream);
+begin
+  if FResourceStream <> Value then begin
+    if FOwnsResourceStream then
+      ALFreeAndNil(FResourceStream);
+    FResourceStream := Value;
     Change;
   end;
 end;
@@ -4232,6 +4341,15 @@ procedure TALBrush.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if fWrapMode <> Value then begin
     fWrapMode := Value;
+    Change;
+  end;
+end;
+
+{***************************************************************}
+procedure TALBrush.SetApplyExifOrientation(const Value: Boolean);
+begin
+  if fApplyExifOrientation <> Value then begin
+    fApplyExifOrientation := Value;
     Change;
   end;
 end;
@@ -5721,6 +5839,8 @@ begin
   end;
   {$ENDIF}
 
+  TALStyleManager.Instance.AddOrSetFontFamily(AFamilyName, AFamilyName);
+
 end;
 
 {*****************************************************************************************}
@@ -6314,6 +6434,116 @@ begin
   {$ENDIF}
 end;
 
+{*********************************}
+procedure ALCaptureSystemBarsColor;
+begin
+  Inc(TALCapturedSystemBarsColor.CapturedCount);
+  If TALCapturedSystemBarsColor.CapturedCount > 1 then exit;
+  {$IF defined(DEBUG)}
+  ALLog('ALCaptureSystemBarsColor');
+  {$ENDIF}
+  ALGetSystemBarsColor(
+    TALCapturedSystemBarsColor.StatusBarColor,
+    TALCapturedSystemBarsColor.NavigationBarColor,
+    TALCapturedSystemBarsColor.StatusBarUseLightIcons,
+    TALCapturedSystemBarsColor.NavigationBarUseLightIcons);
+end;
+
+{*********************************}
+procedure ALRestoreSystemBarsColor;
+begin
+  if TALCapturedSystemBarsColor.CapturedCount <= 0 then exit;
+  Dec(TALCapturedSystemBarsColor.CapturedCount);
+  if TALCapturedSystemBarsColor.CapturedCount > 0 then exit;
+  {$IF defined(DEBUG)}
+  ALLog('ALRestoreSystemBarsColor');
+  {$ENDIF}
+  ALSetSystemBarsColor(
+    TALCapturedSystemBarsColor.StatusBarColor,
+    TALCapturedSystemBarsColor.NavigationBarColor,
+    TALCapturedSystemBarsColor.StatusBarUseLightIcons,
+    TALCapturedSystemBarsColor.NavigationBarUseLightIcons);
+  TALCapturedSystemBarsColor.StatusBarColor := TAlphaColors.Null;
+  TALCapturedSystemBarsColor.NavigationBarColor := TAlphaColors.Null;
+  TALCapturedSystemBarsColor.StatusBarUseLightIcons := False;
+  TALCapturedSystemBarsColor.NavigationBarUseLightIcons := False;
+end;
+
+{*****************************}
+procedure ALGetSystemBarsColor(
+            out AStatusBarColor, ANavigationBarColor: TAlphaColor;
+            out AStatusBarUseLightIcons, ANavigationBarUseLightIcons: Boolean);
+begin
+
+  {$IF defined(ANDROID)}
+  var LWindow := TAndroidHelper.Activity.getWindow;
+  var LDecorView := LWindow.getDecorView;
+  AStatusBarColor := TAlphaColor(LWindow.GetStatusBarColor);
+  ANavigationBarColor := TAlphaColor(LWindow.GetNavigationBarColor);
+
+  var LVisibility: Integer := LDecorView.getSystemUiVisibility;
+  AStatusBarUseLightIcons{DarkMode} := (LVisibility and TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) = 0;
+  ANavigationBarUseLightIcons{DarkMode} := (LVisibility and TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) = 0;
+  {$ELSE}
+  Var LForm := Screen.ActiveForm;
+  if LForm = nil then LForm := Application.MainForm;
+  if LForm <> nil then begin
+    AStatusBarColor := LForm.SystemStatusBar.BackgroundColor;
+    ANavigationBarColor := TAlphaColors.Null;
+    AStatusBarUseLightIcons := False;
+    ANavigationBarUseLightIcons := False;
+  end
+  else begin
+    AStatusBarColor := TAlphacolors.Null;
+    ANavigationBarColor := TAlphacolors.Null;
+    AStatusBarUseLightIcons := False;
+    ANavigationBarUseLightIcons := False;
+  end;
+  {$ENDIF}
+
+end;
+
+{*****************************}
+procedure ALSetSystemBarsColor(
+            const AStatusBarColor, ANavigationBarColor: TAlphaColor;
+            const AStatusBarUseLightIcons, ANavigationBarUseLightIcons: Boolean);
+begin
+
+  {$IF defined(ANDROID)}
+  // https://stackoverflow.com/questions/64481841/android-api-level-30-setsystembarsappearance-doesnt-overwrite-theme-data
+  var LWindow := TAndroidHelper.Activity.getWindow;
+  var LDecorView := LWindow.getDecorView;
+  LWindow.setStatusBarColor(integer(AStatusBarColor));
+  LWindow.setNavigationBarColor(integer(ANavigationBarColor));
+
+  var LVisibility: Integer := LDecorView.getSystemUiVisibility;
+  if AStatusBarUseLightIcons{DarkMode} then LVisibility := LVisibility and (not TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+  else LVisibility := LVisibility or TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+  if ANavigationBarUseLightIcons{DarkMode} then LVisibility := LVisibility and (not TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
+  else LVisibility := LVisibility or TJView.JavaClass.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+  LDecorView.setSystemUiVisibility(LVisibility);
+
+  if TOSVersion.Check(11{API level 30}) then begin
+    var LInsetsController: JWindowInsetsController := LWindow.getInsetsController;
+    if LInsetsController <> nil then begin
+      var LAppearance: Integer := 0;
+      if not AStatusBarUseLightIcons{DarkMode} then LAppearance := LAppearance or TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS;
+      if not ANavigationBarUseLightIcons{DarkMode} then LAppearance := LAppearance or TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS;
+      var LMask: Integer := TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_STATUS_BARS or
+                            TJWindowInsetsController.JavaClass.APPEARANCE_LIGHT_NAVIGATION_BARS;
+      LInsetsController.setSystemBarsAppearance(LAppearance, LMask); // mask: Integer
+    end;
+  end;
+  {$ELSE}
+  if AStatusBarColor <> TAlphaColors.Null then begin
+    Var LForm := Screen.ActiveForm;
+    if LForm = nil then LForm := Application.MainForm;
+    if LForm <> nil then LForm.SystemStatusBar.BackgroundColor := AStatusBarColor;
+  end;
+  {$ENDIF}
+
+end;
+
 {**********************}
 {$IF defined(ALAppleOS)}
 class function TAlphaColorCGFloat.Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat;
@@ -6624,7 +6854,7 @@ begin
   // across all forms.
   //
   // On windows you can change screenscale via
-  //   FMX.Platform.Win.TWinWindowHandle.SetForcedScale
+  //   FMX.Platform.Win.TWinWindowHandle.SetForcedScaleForForm
   // --
   // On Android you can change screenscale via
   //   FMX.Platform.Screen.Android.SetScreenScaleOverrideHook
@@ -6720,6 +6950,11 @@ initialization
   {$ENDIF}
   TALFont.SansSerifFamily := 'sans-serif';
   TALBaseTextSettings.HorizontalEllipsis := '…';
+  TALCapturedSystemBarsColor.CapturedCount := 0;
+  TALCapturedSystemBarsColor.StatusBarColor := TAlphaColors.Null;
+  TALCapturedSystemBarsColor.NavigationBarColor := TAlphaColors.Null;
+  TALCapturedSystemBarsColor.StatusBarUseLightIcons := False;
+  TALCapturedSystemBarsColor.NavigationBarUseLightIcons := False;
 
 finalization
   {$IF defined(DEBUG)}

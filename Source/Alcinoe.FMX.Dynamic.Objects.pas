@@ -9,6 +9,7 @@ uses
   System.Types,
   System.UITypes,
   System.Net.HttpClient,
+  System.Net.URLClient,
   Fmx.Graphics,
   {$IF defined(ANDROID)}
   Alcinoe.FMX.Types3D,
@@ -92,7 +93,7 @@ type
         MaskResourceName: String;
         WrapMode: TALImageWrapMode;
         CropCenter: TpointF;
-        RotateAccordingToExifOrientation: Boolean;
+        ApplyExifOrientation: Boolean;
         StrokeColor: TAlphaColor;
         StrokeThickness: Single;
         ShadowBlur: Single;
@@ -109,18 +110,19 @@ type
         Property Owner: TALDynamicImage read GetOwner;
       End;
   private
+    FOwnsResourceStream: Boolean; // 1 byte
     FBackgroundColor: TAlphaColor; // 4 bytes
-    FBackgroundColorKey: String; // 8 bytes
     FLoadingColor: TAlphaColor; // 4 bytes
-    FLoadingColorKey: String; // 8 bytes
     FTintColor: TAlphaColor; // 4 bytes
+    FBackgroundColorKey: String; // 8 bytes
+    FLoadingColorKey: String; // 8 bytes
     FTintColorKey: String; // 8 bytes
     FResourceName: String; // 8 bytes
     FResourceStream: TStream; // 8 bytes
     FMaskResourceName: String; // 8 bytes
+    FHTTPHeaders: TNetHeaders; // 8 bytes
     FWrapMode: TALImageWrapMode; // 1 bytes
-    FExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
-    FRotateAccordingToExifOrientation: Boolean; // 1 bytes
+    FApplyExifOrientation: Boolean; // 1 bytes
     FCorners: TCorners; // 1 bytes
     FSides: TSides; // 1 bytes
     FXRadius: Single; // 4 bytes
@@ -142,7 +144,7 @@ type
     function GetShadow: TALShadow;
     procedure SetShadow(const Value: TALShadow);
     procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure SetRotateAccordingToExifOrientation(const Value: Boolean);
+    procedure SetApplyExifOrientation(const Value: Boolean);
     procedure setResourceName(const Value: String);
     procedure setResourceStream(const Value: TStream);
     procedure setMaskResourceName(const Value: String);
@@ -207,7 +209,6 @@ type
     class Procedure CreateBufDrawable(
                       var ABufDrawable: TALDrawable;
                       out ABufDrawableRect: TRectF;
-                      out AExifOrientationInfo: TalExifOrientationInfo;
                       const ARect: TRectF;
                       const AScale: Single;
                       const AAlignToPixel: Boolean;
@@ -218,7 +219,7 @@ type
                       const AMaskResourceName: String;
                       const AWrapMode: TALImageWrapMode;
                       const ACropCenter: TpointF;
-                      const ARotateAccordingToExifOrientation: Boolean;
+                      const AApplyExifOrientation: Boolean;
                       const AStrokeColor: TAlphaColor;
                       const AStrokeThickness: Single;
                       const AShadowBlur: Single;
@@ -254,15 +255,26 @@ type
     property DefaultXRadius: Single read GetDefaultXRadius;
     property DefaultYRadius: Single read GetDefaultYRadius;
     property DefaultBlurRadius: Single read GetDefaultBlurRadius;
-    // When you assign a stream to ResourceStream, TALDynamicImage takes ownership and will free it.
+    /// <summary>
+    ///   When you assign a stream to ResourceStream, TALDynamicImage takes ownership and will free it.
+    /// </summary>
     property ResourceStream: TStream read FResourceStream write setResourceStream;
-    // CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
-    // prevent duplicate drawables across multiple identical controls.
-    // CacheIndex specifies the slot in the cache engine where an existing
-    // drawable can be retrieved.
+    property OwnsResourceStream: Boolean read FOwnsResourceStream write FOwnsResourceStream;
+    /// <summary>
+    ///   Extra HTTP request headers to apply when downloading the image.
+    /// </summary>
+    property HTTPHeaders: TNetHeaders read FHTTPHeaders write FHTTPHeaders;
+    /// <summary>
+    ///   CacheIndex and CacheEngine are primarily used in TALDynamicListBox to
+    ///   prevent duplicate drawables across multiple identical controls.
+    ///   CacheIndex specifies the slot in the cache engine where an existing
+    ///   drawable can be retrieved.
+    /// </summary>
     property CacheIndex: Integer read FCacheIndex write FCacheIndex;
     property LoadingCacheIndex: Integer read FLoadingCacheIndex write FLoadingCacheIndex;
-    // CacheEngine is not owned by the current control.
+    /// <summary>
+    ///   CacheEngine is not owned by the current control.
+    /// </summary>
     property CacheEngine: TALBufDrawableCacheEngine read FCacheEngine write FCacheEngine;
   public
     //property Action;
@@ -283,9 +295,11 @@ type
     //**property ClipChildren;
     //property ClipParent;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
-    // CropCenter is use when wrapmode = FitIntoAndCrop. It's define the center of
-    // crop in the source image (ex: center the result on a face instead
-    // of the middle of the bounds).
+    /// <summary>
+    ///   CropCenter is use when wrapmode = FitIntoAndCrop. It's define the center of
+    ///   crop in the source image (ex: center the result on a face instead
+    ///   of the middle of the bounds).
+    /// </summary>
     property CropCenter: TALPosition read GetCropCenter write SetCropCenter;
     property Cursor;
     //property DoubleBuffered;
@@ -305,13 +319,25 @@ type
     property Padding;
     //**property PopupMenu;
     //**property Position;
-    // If a file extension (e.g., .png) is detected in ResourceName, the image is loaded from the
-    // specified file (With the full path of the file obtained using ALGetResourceFilename).
-    // If ResourceName is a URL, the image is downloaded in the background from the internet.
-    // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
-    // project directory (with the extensions .png or .jpg).
+    /// <summary>
+    ///   If a file extension (e.g., .png) is detected in ResourceName, the image is loaded from the
+    ///   specified file (With the full path of the file obtained using ALGetResourceFilename).
+    ///   If ResourceName is a URL, the image is downloaded in the background from the internet.
+    ///   In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
+    ///   project directory (with the extensions .png or .jpg).
+    /// </summary>
     property ResourceName: String read FResourceName write setResourceName;
-    property RotateAccordingToExifOrientation: Boolean read FRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
+    /// <summary>
+    ///   When <c>True</c>, applies the image’s EXIF orientation (rotate/flip)
+    ///   so the bitmap is rendered upright. When <c>False</c> (default),
+    ///   the raw pixels are used as-is without any EXIF-based transform.
+    /// </summary>
+    /// <remarks>
+    ///   On a Skia canvas this behavior is always enforced as <c>True</c>
+    ///   (the Delphi IDE uses a Skia canvas), so the property is effectively
+    ///   ignored there and images are displayed with EXIF orientation applied.
+    /// </remarks>
+    property ApplyExifOrientation: Boolean read FApplyExifOrientation write SetApplyExifOrientation default false;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -1402,7 +1428,7 @@ begin
   MaskResourceName := AOwner.MaskResourceName;
   WrapMode := AOwner.WrapMode;
   CropCenter := AOwner.CropCenter.Point;
-  RotateAccordingToExifOrientation := AOwner.RotateAccordingToExifOrientation;
+  ApplyExifOrientation := AOwner.ApplyExifOrientation;
   StrokeColor := AOwner.Stroke.Color;
   StrokeThickness := AOwner.Stroke.Thickness;
   ShadowBlur := AOwner.Shadow.Blur;
@@ -1433,18 +1459,19 @@ end;
 constructor TALDynamicImage.Create(const AOwner: TObject);
 begin
   inherited Create(AOwner);
+  FOwnsResourceStream := True;
   FBackgroundColor := DefaultBackgroundColor;
-  FBackgroundColorKey := DefaultBackgroundColorKey;
   FLoadingColor := DefaultLoadingColor;
-  FLoadingColorKey := DefaultLoadingColorKey;
   FTintColor := DefaultTintColor;
+  FBackgroundColorKey := DefaultBackgroundColorKey;
+  FLoadingColorKey := DefaultLoadingColorKey;
   FTintColorKey := DefaultTintColorKey;
   FResourceName := '';
   FResourceStream := nil;
   FMaskResourceName := '';
+  FHTTPHeaders := nil;
   FWrapMode := TALImageWrapMode.Fit;
-  FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-  FRotateAccordingToExifOrientation := False;
+  FApplyExifOrientation := False;
   FCorners := DefaultCorners;
   FSides := DefaultSides;
   FXRadius := DefaultXRadius;
@@ -1469,7 +1496,8 @@ end;
 {*********************************}
 destructor TALDynamicImage.Destroy;
 begin
-  ALFreeAndNil(FResourceStream);
+  if FOwnsResourceStream then
+    ALFreeAndNil(FResourceStream);
   ALFreeAndNil(fCropCenter);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
@@ -1497,9 +1525,26 @@ begin
       TintColor := TALDynamicImage(Source).TintColor;
       TintColorKey := TALDynamicImage(Source).TintColorKey;
       ResourceName := TALDynamicImage(Source).ResourceName;
+      if (TALDynamicImage(Source).OwnsResourceStream) and
+         (TALDynamicImage(Source).ResourceStream <> nil) then begin
+        var LStream := TMemoryStream.Create;
+        try
+          LStream.CopyFrom(TALDynamicImage(Source).ResourceStream);
+          ResourceStream := LStream;
+          OwnsResourceStream := True;
+        except
+          ALFreeAndNil(LStream);
+          raise;
+        end;
+      end
+      else begin
+        ResourceStream := TALDynamicImage(Source).ResourceStream;
+        OwnsResourceStream := TALDynamicImage(Source).OwnsResourceStream;
+      end;
       MaskResourceName := TALDynamicImage(Source).MaskResourceName;
+      HTTPHeaders := TALDynamicImage(Source).HTTPHeaders;
       WrapMode := TALDynamicImage(Source).WrapMode;
-      RotateAccordingToExifOrientation := TALDynamicImage(Source).RotateAccordingToExifOrientation;
+      ApplyExifOrientation := TALDynamicImage(Source).ApplyExifOrientation;
       Corners := TALDynamicImage(Source).Corners;
       Sides := TALDynamicImage(Source).Sides;
       XRadius := TALDynamicImage(Source).XRadius;
@@ -1752,12 +1797,12 @@ begin
   end;
 end;
 
-{**********************************************************************************}
-procedure TALDynamicImage.SetRotateAccordingToExifOrientation(const Value: Boolean);
+{**********************************************************************}
+procedure TALDynamicImage.SetApplyExifOrientation(const Value: Boolean);
 begin
-  if FRotateAccordingToExifOrientation <> Value then begin
+  if FApplyExifOrientation <> Value then begin
     ClearBufDrawable;
-    FRotateAccordingToExifOrientation := Value;
+    FApplyExifOrientation := Value;
     Repaint;
   end;
 end;
@@ -1776,7 +1821,8 @@ end;
 procedure TALDynamicImage.setResourceStream(const Value: TStream);
 begin
   if FResourceStream <> Value then begin
-    ALFreeAndNil(FResourceStream);
+    if FOwnsResourceStream then
+      ALFreeAndNil(FResourceStream);
     ClearBufDrawable;
     FResourceStream := Value;
     Repaint;
@@ -2117,7 +2163,7 @@ begin
   LContext.MaskResourceName := '';
   LContext.WrapMode := TALImageWrapMode.Fit;
   //LContext.CropCenter: TpointF;
-  //LContext.RotateAccordingToExifOrientation: Boolean;
+  //LContext.ApplyExifOrientation: Boolean;
   LContext.StrokeColor := TalphaColors.Null;
   //LContext.StrokeThickness: Single;
   //LContext.ShadowBlur: Single;
@@ -2151,12 +2197,10 @@ begin
   if LContext.FOwner = nil then exit;
   var LBufDrawable: TALDrawable := ALNullDrawable;
   var LBufDrawableRect: TRectF;
-  var LExifOrientationInfo: TalExifOrientationInfo;
   Try
     CreateBufDrawable(
       LBufDrawable, // var ABufDrawable: TALDrawable;
       LBufDrawableRect, // out ABufDrawableRect: TRectF;
-      LExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
       LContext.Rect, // const ARect: TRectF;
       LContext.Scale, // const AScale: Single;
       LContext.AlignToPixel, // const AAlignToPixel: Boolean;
@@ -2167,7 +2211,7 @@ begin
       LContext.MaskResourceName, // const AMaskResourceName: String;
       LContext.WrapMode, // const AWrapMode: TALImageWrapMode;
       LContext.CropCenter, // const ACropCenter: TpointF;
-      LContext.RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
+      LContext.ApplyExifOrientation, // const AApplyExifOrientation: Boolean;
       LContext.StrokeColor, // const AStrokeColor: TAlphaColor;
       LContext.StrokeThickness, // const AStrokeThickness: Single;
       LContext.ShadowBlur, // const AShadowBlur: Single;
@@ -2202,7 +2246,6 @@ begin
         ALFreeAndNilDrawable(LOwner.fBufDrawable);
         LOwner.fBufDrawable := LBufDrawable;
         LOwner.FBufDrawableRect := LBufDrawableRect;
-        LOwner.FExifOrientationInfo := LExifOrientationInfo;
         LOwner.FResourceDownloadContext := nil;
         LOwner.Repaint;
       end;
@@ -2216,7 +2259,6 @@ end;
 class Procedure TALDynamicImage.CreateBufDrawable(
                   var ABufDrawable: TALDrawable;
                   out ABufDrawableRect: TRectF;
-                  out AExifOrientationInfo: TalExifOrientationInfo;
                   const ARect: TRectF;
                   const AScale: Single;
                   const AAlignToPixel: Boolean;
@@ -2227,7 +2269,7 @@ class Procedure TALDynamicImage.CreateBufDrawable(
                   const AMaskResourceName: String;
                   const AWrapMode: TALImageWrapMode;
                   const ACropCenter: TpointF;
-                  const ARotateAccordingToExifOrientation: Boolean;
+                  const AApplyExifOrientation: Boolean;
                   const AStrokeColor: TAlphaColor;
                   const AStrokeThickness: Single;
                   const AShadowBlur: Single;
@@ -2249,42 +2291,6 @@ begin
   var LFileName := ALGetResourceFilename(lResourceName);
 
   ABufDrawableRect := ARect;
-  if (ARotateAccordingToExifOrientation) then begin
-    {$IF defined(ALSkiaEngine)}
-    // SkImage automatically loads the image with the correct orientation based on EXIF data.
-    // Therefore, if we apply ExifOrientationInfo to rotate the image again, the result will be incorrect.
-    AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-    {$ELSE}
-    if LFileName <> '' then AExifOrientationInfo := AlGetExifOrientationInfo(LFilename)
-    else if AResourceStream <> nil then AExifOrientationInfo := AlGetExifOrientationInfo(AResourceStream)
-    else AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-    if AExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
-                                TalExifOrientationInfo.ROTATE_90,
-                                TalExifOrientationInfo.TRANSVERSE,
-                                TalExifOrientationInfo.ROTATE_270] then begin
-      ABufDrawableRect.Width := ARect.Height;
-      ABufDrawableRect.Height := ARect.Width;
-    end;
-    {$ENDIF}
-  end
-  else begin
-    {$IF defined(ALSkiaEngine)}
-    // SkImage automatically loads the image with the correct orientation based on EXIF data.
-    // If we want to disable this behavior, we need to manually rotate the image to its original orientation.
-    if LFileName <> '' then AExifOrientationInfo := AlGetExifOrientationInfo(LFilename)
-    else if AResourceStream <> nil then AExifOrientationInfo := AlGetExifOrientationInfo(AResourceStream)
-    else AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-    if AExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
-                                TalExifOrientationInfo.ROTATE_90,
-                                TalExifOrientationInfo.TRANSVERSE,
-                                TalExifOrientationInfo.ROTATE_270] then begin
-      ABufDrawableRect.Width := ARect.Height;
-      ABufDrawableRect.Height := ARect.Width;
-    end;
-    {$ELSE}
-    AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-    {$ENDIF}
-  end;
 
   {$REGION 'Use ALCreateDrawableFromResource'}
   if ((AResourceStream <> nil) or (LFileName <> '') or (LResourceName <> '')) and
@@ -2302,7 +2308,8 @@ begin
                         AResourceStream, // const AResourceStream: TStream;
                         AMaskResourceName, // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
-                        ARect.Width, ARect.Height, // const W, H: single;
+                        ABufDrawableRect.Width, ABufDrawableRect.Height, // const W, H: single;
+                        AApplyExifOrientation, // const AApplyExifOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         ACropCenter, // const ACropCenter: TpointF;
                         ATintColor, // const ATintColor: TAlphaColor;
@@ -2366,6 +2373,7 @@ begin
         .SetFillResourceName(LResourceName)
         .SetFillResourceStream(AResourceStream)
         .SetFillMaskResourceName(AMaskResourceName)
+        .SetFillApplyExifOrientation(AApplyExifOrientation)
         .SetFillImageTintColor(ATintColor)
         .SetFillWrapMode(AWrapMode)
         .SetFillCropCenter(ACropCenter)
@@ -2435,7 +2443,8 @@ begin
         HandleResourceDownloadError, // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
         FResourceDownloadContext, // const AContext: Tobject; // Context will be free by the worker thread
         true, // const AUseCache: Boolean = True;
-        GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+        GetResourceDownloadPriority, // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+        HTTPHeaders); // const AHeaders: TNetHeaders = nil;
     except
       ALFreeAndNil(FResourceDownloadContext);
       Raise;
@@ -2457,7 +2466,6 @@ begin
       CreateBufDrawable(
         FBufLoadingDrawable, // var ABufDrawable: TALDrawable;
         FBufLoadingDrawableRect, // out ABufDrawableRect: TRectF;
-        FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
         LocalRect.ReducePrecision, // const ARect: TRectF;
         ALGetScreenScale, // const AScale: Single;
         AutoAlignToPixel, // const AAlignToPixel: Boolean;
@@ -2468,7 +2476,7 @@ begin
         '', // const AMaskResourceName: String;
         WrapMode, // const AWrapMode: TALImageWrapMode;
         TpointF.Zero, // const ACropCenter: TpointF;
-        false, // const ARotateAccordingToExifOrientation: Boolean;
+        false, // const AApplyExifOrientation: Boolean;
         TAlphaColors.Null, // const AStrokeColor: TAlphaColor;
         0, // const AStrokeThickness: Single;
         0, // const AShadowBlur: Single;
@@ -2493,7 +2501,6 @@ begin
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // out ABufDrawableRect: TRectF;
-    FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
     LocalRect.ReducePrecision, // const ARect: TRectF;
     ALGetScreenScale, // const AScale: Single;
     AutoAlignToPixel, // const AAlignToPixel: Boolean;
@@ -2504,7 +2511,7 @@ begin
     MaskResourceName, // const AMaskResourceName: String;
     WrapMode, // const AWrapMode: TALImageWrapMode;
     CropCenter.Point, // const ACropCenter: TpointF;
-    RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
+    ApplyExifOrientation, // const AApplyExifOrientation: Boolean;
     Stroke.Color, // const AStrokeColor: TAlphaColor;
     Stroke.Thickness, // const AStrokeThickness: Single;
     Shadow.Blur, // const AShadowBlur: Single;
@@ -2647,87 +2654,6 @@ begin
   // Clear fBufLoadingDrawable
   if FFadeInStartTimeNano <= 0 then
     ALFreeAndNilDrawable(fBufLoadingDrawable);
-
-  // Handle the FExifOrientationInfo
-  case FExifOrientationInfo of
-    TalExifOrientationInfo.FLIP_HORIZONTAL: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      LMatrix := LMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.FLIP_VERTICAL: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      LMatrix := LMatrix * TMatrix.CreateScaling(1, -1); // matrix.setRotate(180); matrix.setScale(-1, 1);
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.NORMAL:;
-    TalExifOrientationInfo.ROTATE_180: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(180)); // matrix.setRotate(180);
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.ROTATE_270: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      {$IF defined(ALSkiaEngine)}
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
-      {$ELSE}
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
-      {$ENDIF}
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.ROTATE_90: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      {$IF defined(ALSkiaEngine)}
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
-      {$ELSE}
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
-      {$ENDIF}
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.TRANSPOSE: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
-      LMatrix := LMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.TRANSVERSE: begin
-      var LMatrixRotationCenter: TpointF;
-      LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
-      LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
-      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
-      LMatrix := LMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
-      LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
-      Canvas.SetMatrix(LMatrix);
-    end;
-    TalExifOrientationInfo.UNDEFINED:;
-    else
-      Raise Exception.Create('Error 015D39FD-8A61-4F7F-A8AA-639A91FCBC37');
-  end;
 
   // Draw the LDrawable
   ALDrawDrawable(
@@ -3715,7 +3641,6 @@ begin
                         ABufDrawableRect, // const ARect: TRectF;
                         AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
-                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -3808,7 +3733,6 @@ begin
               ARect, // const ARect: TRectF;
               AutoAlignToPixel, // const AAlignToPixel: Boolean;
               Fill, // const AFill: TALBrush;
-              nil, // const AFillResourceStream: TStream;
               nil, // const AStateLayer: TALStateLayer;
               Shadow); // const AShadow: TALShadow): TRectF;
 end;
@@ -4024,7 +3948,6 @@ begin
                         ABufDrawableRect, // const ARect: TRectF;
                         AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
-                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -4113,7 +4036,6 @@ begin
               ARect, // const ARect: TRectF;
               AutoAlignToPixel, // const AAlignToPixel: Boolean;
               Fill, // const AFill: TALBrush;
-              nil, // const AFillResourceStream: TStream;
               nil, // const AStateLayer: TALStateLayer;
               Shadow); // const AShadow: TALShadow): TRectF;
 end;
@@ -5182,7 +5104,6 @@ begin
               ARect, // const ARect: TRectF;
               AutoAlignToPixel, // const AAlignToPixel: Boolean;
               Fill, // const AFill: TALBrush;
-              nil, // const AFillResourceStream: TStream;
               nil, // const AStateLayer: TALStateLayer;
               Shadow); // const AShadow: TALShadow): TRectF;
 end;
@@ -5494,6 +5415,7 @@ begin
     Result.FillGradientColors := AFill.Gradient.Colors;
     Result.FillGradientOffsets := AFill.Gradient.Offsets;
     Result.FillResourceName := AFill.ResourceName;
+    Result.FillResourceStream := AFill.ResourceStream;
     Result.FillMaskResourceName := '';
     Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
     Result.FillImageMargins := AFill.ImageMargins.Rect;
@@ -5510,6 +5432,7 @@ begin
     Result.FillGradientColors := [];
     Result.FillGradientOffsets := [];
     Result.FillResourceName := '';
+    Result.FillResourceStream := nil;
     Result.FillMaskResourceName := '';
     Result.FillBackgroundMargins := TRectF.Empty;
     Result.FillImageMargins := TRectF.Empty;
@@ -5822,7 +5745,6 @@ begin
                           ABufDrawableRect, // const ARect: TRectF;
                           AutoAlignToPixel, // const AAlignToPixel: Boolean;
                           AFill, // const AFill: TALBrush;
-                          nil, // const AFillResourceStream: TStream;
                           AStateLayer, // const AStateLayer: TALStateLayer;
                           AShadow); // const AShadow: TALShadow): TRectF;
     var LEffectiveMaxSize := GetEffectiveMaxSize;

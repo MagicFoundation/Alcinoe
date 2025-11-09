@@ -5413,6 +5413,7 @@ begin
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
+    //LOptions.FillResourceStream: TStream; // default = nil
     //LOptions.FillMaskResourceName: String; // default = ''
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
@@ -5541,6 +5542,7 @@ begin
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
+    //LOptions.FillResourceStream: TStream; // default = nil
     //LOptions.FillMaskResourceName: String; // default = ''
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
@@ -5669,6 +5671,7 @@ begin
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
+    //LOptions.FillResourceStream: TStream; // default = nil
     //LOptions.FillMaskResourceName: String; // default = ''
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
@@ -6004,7 +6007,6 @@ begin
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
-                                nil, // const AFillResourceStream: TStream;
                                 _TALBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                                 _TALBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -6014,7 +6016,6 @@ begin
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
                               _TALBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                               _TALBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -6027,7 +6028,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
                   LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
     end
@@ -6036,7 +6036,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
                   Shadow); // const AShadow: TALShadow): TRectF;
     end;

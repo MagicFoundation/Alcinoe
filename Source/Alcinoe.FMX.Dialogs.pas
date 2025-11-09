@@ -204,6 +204,7 @@ type
     FFrozenNativeControls: TArray<TALNativeControl>;
     procedure FreezeNativeViews;
     procedure UnfreezeNativeViews;
+    procedure SyncSystemBarsColor;
     { IFreeNotification }
     procedure FreeNotification(AObject: TObject);
   protected
@@ -260,7 +261,7 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
-  Alcinoe.fmx.LoadingOverlay,
+  Alcinoe.FMX.LoadingOverlay,
   Alcinoe.Common;
 
 {************************************}
@@ -1139,6 +1140,20 @@ begin
   ALUnfreezeNativeViews(FFrozenNativeControls)
 end;
 
+{*********************************************}
+procedure TALDialogManager.SyncSystemBarsColor;
+begin
+  if (FCurrentDialog = nil) or
+     (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
+  var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentDialog.Fill.Color{AOverlayColor});
+  var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentDialog.Fill.Color{AOverlayColor});
+  ALSetSystemBarsColor(
+    LStatusBarColor,
+    LNavigationBarColor,
+    TALCapturedSystemBarsColor.StatusBarUseLightIcons,
+    TALCapturedSystemBarsColor.NavigationBarUseLightIcons);
+end;
+
 {************************************************************}
 procedure TALDialogManager.FreeNotification(AObject: TObject);
 begin
@@ -1150,6 +1165,7 @@ begin
     FScrimAnimation.Enabled := False;
     FContainerAnimation.Enabled := False;
     FCurrentDialog := Nil;
+    ALRestoreSystemBarsColor;
   end;
 end;
 
@@ -1240,13 +1256,16 @@ begin
   if assigned(LCurrentDialog.FOnClosedRefProc) then
     LCurrentDialog.FOnClosedRefProc();
   ProcessPendingDialogs;
+  ALRestoreSystemBarsColor;
   if not IsShowingDialog then
     UnfreezeNativeViews
   else begin
     FScrimAnimation.Stop;
     if assigned(FCurrentDialog.CustomDialogRefProc) or
-       assigned(FCurrentDialog.CustomDialogObjProc) then
+       assigned(FCurrentDialog.CustomDialogObjProc) then begin
       FCurrentDialog.Fill.Color := LCurrentDialog.Fill.Color;
+      SyncSystemBarsColor;
+    end;
   end;
   TThread.ForceQueue(nil,
     procedure
@@ -1320,6 +1339,9 @@ end;
 {**************************************************************}
 procedure TALDialogManager.ShowDialog(const ADialog: TALDialog);
 begin
+
+  // Capture the system bars color
+  ALCaptureSystemBarsColor;
 
   // Init LForm & LClientWidth
   Var LForm: TCommonCustomForm;
@@ -1606,6 +1628,10 @@ begin
         FScrimAnimation.StartValue := 0;
         FScrimAnimation.StopValue := 1;
         FScrimAnimation.Start;
+      end
+      else begin
+        ScrimAnimationFinish(nil);
+        SyncSystemBarsColor;
       end;
 
       FContainerAnimation.Enabled := False;
@@ -1617,8 +1643,10 @@ begin
       FContainerAnimation.Start;
 
     end
-    else
+    else begin
       ContainerAnimationFinish(nil);
+      SyncSystemBarsColor;
+    end;
 
   end;
 end;
@@ -1628,6 +1656,7 @@ procedure TALDialogManager.ScrimAnimationProcess(Sender: TObject);
 begin
   if FCurrentDialog = nil then exit;
   FCurrentDialog.Fill.Color := ALSetColorAlpha(FCurrentDialog.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
+  SyncSystemBarsColor;
 end;
 
 {********************************************************************}
@@ -1654,10 +1683,12 @@ end;
 procedure TALDialogManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentDialog = nil then exit;
-  if FContainerAnimation.StopValue < 0.5 then DoCloseCurrentDialog
+  if (TALDialog.TAnimateOption.AnimateContainer in FCurrentDialog.ShowAnimateOptions) and
+     (FContainerAnimation.StopValue < 0.5) then DoCloseCurrentDialog
   else begin
     FCurrentDialog.Container.Align := TalAlignLayout.Center;
-    FCurrentDialog.FTouchBlocker.Visible := false;
+    if FCurrentDialog.FTouchBlocker <> nil then
+      FCurrentDialog.FTouchBlocker.Visible := false;
   end;
 end;
 

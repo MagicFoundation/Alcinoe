@@ -332,10 +332,11 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicExtendedControl = class(TALDynamicControl)
   private
+    //**class var FNoScale: TPosition;
+  private
     //**FForm: TCommonCustomForm; // 8 bytes
     //**FOwner: TALDynamicControl; // 8 bytes
     FControlAbsolutePosAtMouseDown: TALPointD; // 8 bytes
-    //**FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     //**FFocusOnMouseDown: Boolean; // 1 byte
     //**FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtRest: Boolean; // 1 byte
@@ -344,14 +345,14 @@ type
     //**FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
-    //**procedure SetScale(const AValue: TPosition);
     //**function GetPivot: TPosition;
     //**procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     //**procedure DelayOnResize(Sender: TObject);
     //**procedure DelayOnResized(Sender: TObject);
-    //**procedure ScaleChangedHandler(Sender: TObject);
+    { IRotatedControl }
+    //**function GetScale: TPosition
   protected
     FClickSound: TALClickSoundMode; // 1 byte
     FAutoSize: TALAutoSizeMode; // 1 byte
@@ -361,7 +362,6 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
-    //**property Scale: TPosition read FScale write SetScale;
     //**property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: TALAutoSizeMode; virtual;
     procedure SetAutoSize(const Value: TALAutoSizeMode); virtual;
@@ -2599,8 +2599,6 @@ begin
   //**FForm := nil;
   //**FOwner := nil;
   FControlAbsolutePosAtMouseDown := TALPointD.zero;
-  //**FScale := TPosition.Create(TPointF.Create(1, 1));
-  //**FScale.OnChange := ScaleChangedHandler;
   //**FFocusOnMouseDown := False;
   //**FFocusOnMouseUp := False;
   FMouseDownAtRest := True;
@@ -2620,7 +2618,6 @@ end;
 destructor TALDynamicExtendedControl.Destroy;
 begin
   ClearBufDrawable;
-  //**ALFreeAndNil(FScale);
   inherited;
 end;
 
@@ -2646,7 +2643,6 @@ begin
       //**AutoSize := TALDynamicControl(Source).AutoSize;
       //**DoubleBuffered := TALDynamicControl(Source).DoubleBuffered;
       //**Pivot.Assign(TALDynamicControl(Source).Pivot);
-      //**Scale.assign(TALDynamicControl(Source).Scale);
       // --TControl
       //**Anchors := TALDynamicControl(Source).Anchors;
       //**CanFocus := TALDynamicControl(Source).CanFocus;
@@ -2667,6 +2663,7 @@ begin
       //**ParentShowHint := TALDynamicControl(Source).ParentShowHint;
       //**Position.Assign(TALDynamicControl(Source).Position);
       RotationAngle := TALDynamicControl(Source).RotationAngle;
+      //**Scale.assign(TALDynamicControl(Source).Scale);
       //**ShowHint := TALDynamicControl(Source).ShowHint;
       //**Size.Assign(TALDynamicControl(Source).Size);
       //**StyleName := TALDynamicControl(Source).StyleName;
@@ -3614,6 +3611,23 @@ end;
 //**  Include(TALDynamicControlAccessPrivate(Self).FDelayedEvents, TALDynamicControlAccessPrivate.TDelayedEvent.Resized);
 //**end;
 
+{*********************************************************}
+//**function TALDynamicExtendedControl.GetScale: TPosition;
+//**begin
+//**  {$IFNDEF ALCompilerVersionSupported130}
+//**    {$MESSAGE WARN 'Check if FMX.Types.ArrangeControl(const Control: IAlignableObject... was not updated and adjust the IFDEF'}
+//**  {$ENDIF}
+//**  // ArrangeControl calls IRotatedControl.GetScale to determine the control’s scale
+//**  // and uses that value to align the control. However, this is conceptually wrong —
+//**  // the alignment process should not depend on the current scale. To prevent scaled
+//**  // alignment behavior, this hack temporarily returns a scale object with a value
+//**  // of 1 when the parent is realigning, so no scaling is applied during alignment.
+//**  var LParentRealigning := (((Owner <> nil) and (Owner.FDisableAlign)) or
+//**                            ((Owner = nil) and (Host <> nil) and (Host.FDisableAlign)));
+//**  if LParentRealigning then Result := FNoScale
+//**  else result := Inherited Scale;
+//**end;
+
 {************************************************************}
 function TALDynamicExtendedControl.GetDoubleBuffered: boolean;
 begin
@@ -3625,12 +3639,6 @@ procedure TALDynamicExtendedControl.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not supported
 end;
-
-{************************************************************************}
-//**procedure TALDynamicExtendedControl.SetScale(const AValue: TPosition);
-//**begin
-//**  FScale.Assign(AValue);
-//**end;
 
 {**************************************************************}
 function TALDynamicExtendedControl.GetAutoSize: TALAutoSizeMode;
@@ -4152,12 +4160,6 @@ begin
   //**else
   //**  FOwner := nil;
 end;
-
-{***************************************************************************}
-//**procedure TALDynamicExtendedControl.ScaleChangedHandler(Sender: TObject);
-//**begin
-//**  Repaint; //** DoMatrixChanged(Sender);
-//**end;
 
 {**********************************************************}
 constructor TALDynamicContent.Create(const AOwner: TObject);

@@ -578,7 +578,7 @@ uses
 
 {**}
 Type
-  _TControlProtectedAccess = class(Tcontrol);
+  _TControlProtectedAccess = class(TControl);
 
 {***********************************************}
 constructor TALLayout.Create(AOwner: TComponent);
@@ -621,23 +621,54 @@ function TALCustomScrollBox.TContent.IsVisibleChild(const AChild: TControl): Boo
 begin
   if AChild.Visible then begin
 
-    If Height > ScrollBox.Height then
-      Result := (AChild.Position.Y < -Position.Y + FscrollBox.Height) and
-                (AChild.Position.Y + (AChild.Height * _TControlProtectedAccess(AChild).scale.y) > -Position.Y)
-    else
-      // Handle the maxContentHeight
-      Result := (AChild.Position.Y < Height) and
-                (AChild.Position.Y + (AChild.Height * _TControlProtectedAccess(AChild).scale.y) > 0);
+    var LScale := _TControlProtectedAccess(AChild).scale;
+    if samevalue(LScale.x, 1, TEpsilon.Scale) and samevalue(LScale.y, 1, TEpsilon.Scale) then begin
 
-    If Width > ScrollBox.Width then
-      Result := Result and
-                (AChild.Position.X < -Position.X + FscrollBox.Width) and
-                (AChild.Position.X + (AChild.Width * _TControlProtectedAccess(AChild).scale.x) > -Position.X)
-    else
-      // Handle the maxContentWidth
-      Result := Result and
-                (AChild.Position.X < Width) and
-                (AChild.Position.X + (AChild.Width * _TControlProtectedAccess(AChild).scale.x) > 0);
+      If Height > ScrollBox.Height then
+        Result := (AChild.Position.Y < -Position.Y + FscrollBox.Height) and
+                  (AChild.Position.Y + AChild.Height > -Position.Y)
+      else
+        // Handle the maxContentHeight
+        Result := (AChild.Position.Y < Height) and
+                  (AChild.Position.Y + AChild.Height > 0);
+
+      If Width > ScrollBox.Width then
+        Result := Result and
+                  (AChild.Position.X < -Position.X + FscrollBox.Width) and
+                  (AChild.Position.X + AChild.Width > -Position.X)
+      else
+        // Handle the maxContentWidth
+        Result := Result and
+                  (AChild.Position.X < Width) and
+                  (AChild.Position.X + AChild.Width > 0);
+
+    end
+    else begin
+
+      // AbsoluteRect returns a rectangle already multiplied by Scale
+      {$IFNDEF ALCompilerVersionSupported130}
+        {$MESSAGE WARN 'Check the status of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4523 and adjust the IFDEF'}
+      {$ENDIF}
+      var LChildRect := AbsoluteToLocal(AChild.AbsoluteRect);
+      If Height > ScrollBox.Height then
+        Result := (LChildRect.Top < -Position.Y + FscrollBox.Height) and
+                  (LChildRect.Top + LChildRect.Height > -Position.Y)
+      else
+        // Handle the maxContentHeight
+        Result := (LChildRect.Top < Height) and
+                  (LChildRect.Top + LChildRect.Height > 0);
+
+      If Width > ScrollBox.Width then
+        Result := Result and
+                  (LChildRect.Left < -Position.X + FscrollBox.Width) and
+                  (LChildRect.Left + LChildRect.Width > -Position.X)
+      else
+        // Handle the maxContentWidth
+        Result := Result and
+                  (LChildRect.Left < Width) and
+                  (LChildRect.Left + LChildRect.Width > 0);
+
+    end;
 
   end
   else

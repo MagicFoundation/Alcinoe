@@ -117,6 +117,7 @@ type
     FFrozenNativeControls: TArray<TALNativeControl>;
     procedure FreezeNativeViews;
     procedure UnfreezeNativeViews;
+    procedure SyncSystemBarsColor;
     { IFreeNotification }
     procedure FreeNotification(AObject: TObject);
   protected
@@ -149,6 +150,7 @@ uses
   FMX.Forms,
   Alcinoe.fmx.Styles,
   Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.Common,
   Alcinoe.Common;
 
 {********************************************}
@@ -473,6 +475,20 @@ begin
   ALUnfreezeNativeViews(FFrozenNativeControls)
 end;
 
+{*****************************************************}
+procedure TALLoadingOverlayManager.SyncSystemBarsColor;
+begin
+  if (FCurrentLoadingOverlay = nil) or
+     (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
+  var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentLoadingOverlay.Fill.Color{AOverlayColor});
+  var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentLoadingOverlay.Fill.Color{AOverlayColor});
+  ALSetSystemBarsColor(
+    LStatusBarColor,
+    LNavigationBarColor,
+    TALCapturedSystemBarsColor.StatusBarUseLightIcons,
+    TALCapturedSystemBarsColor.NavigationBarUseLightIcons);
+end;
+
 {********************************************************************}
 procedure TALLoadingOverlayManager.FreeNotification(AObject: TObject);
 begin
@@ -484,6 +500,7 @@ begin
     FScrimAnimation.Enabled := False;
     FContainerAnimation.Enabled := False;
     FCurrentLoadingOverlay := Nil;
+    ALRestoreSystemBarsColor;
   end;
 end;
 
@@ -536,6 +553,7 @@ begin
   if assigned(LCurrentLoadingOverlay.FOnClosedRefProc) then
     LCurrentLoadingOverlay.FOnClosedRefProc();
   ProcessPendingLoadingOverlays;
+  ALRestoreSystemBarsColor;
   if not IsShowingLoadingOverlay then
     UnfreezeNativeViews
   else if not LCurrentLoadingOverlay.IsStealthMode then
@@ -593,6 +611,9 @@ end;
 procedure TALLoadingOverlayManager.ShowLoadingOverlay(const ALoadingOverlay: TALLoadingOverlay);
 begin
 
+  // Capture the system bars color
+  ALCaptureSystemBarsColor;
+
   // by default show AnimatedImage
   if (not ALoadingOverlay.HasAnimatedImage) and
      (not ALoadingOverlay.HasAniIndicator) and
@@ -637,6 +658,10 @@ begin
       FScrimAnimation.StartValue := 0;
       FScrimAnimation.StopValue := 1;
       FScrimAnimation.Start;
+    end
+    else begin
+      ScrimAnimationFinish(nil);
+      SyncSystemBarsColor;
     end;
 
     // Start the ContainerAnimation
@@ -648,6 +673,10 @@ begin
     FContainerAnimation.StopValue := 1;
     FContainerAnimation.Start;
 
+  end
+  else begin
+    ContainerAnimationFinish(nil);
+    SyncSystemBarsColor;
   end;
 
 end;
@@ -657,6 +686,7 @@ procedure TALLoadingOverlayManager.ScrimAnimationProcess(Sender: TObject);
 begin
   if FCurrentLoadingOverlay = nil then exit;
   FCurrentLoadingOverlay.Fill.Color := ALSetColorAlpha(FCurrentLoadingOverlay.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
+  SyncSystemBarsColor;
 end;
 
 {****************************************************************************}
@@ -676,7 +706,9 @@ end;
 procedure TALLoadingOverlayManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentLoadingOverlay = nil then exit;
-  if FContainerAnimation.StopValue < 0.5 then DoCloseCurrentLoadingOverlay;
+  if (not FCurrentLoadingOverlay.IsStealthMode) and
+     (TALLoadingOverlay.TAnimateOption.AnimateContainer in FCurrentLoadingOverlay.ShowAnimateOptions) and
+     (FContainerAnimation.StopValue < 0.5) then DoCloseCurrentLoadingOverlay;
 end;
 
 initialization

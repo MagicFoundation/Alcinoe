@@ -342,6 +342,7 @@ type
     FFrozenNativeControls: TArray<TALNativeControl>;
     procedure FreezeNativeViews;
     procedure UnfreezeNativeViews;
+    procedure SyncSystemBarsColor;
     { IFreeNotification }
     procedure FreeNotification(AObject: TObject);
   protected
@@ -863,24 +864,28 @@ begin
       TDockEdge.Left: begin
         var LProgress: Single := abs(ViewPortPosition.X) / Max(1, abs(FSheet.ScrollEngine.MinScrollLimit.X));
         FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
+        TALSheetManager.Instance.SyncSystemBarsColor;
         If compareValue(FSheet.Container.Position.X, -FSheet.Container.Width + 1{*}, TEpsilon.Position) <= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
       TDockEdge.Right: begin
         var LProgress: Single := abs(ViewPortPosition.X) / Max(1, abs(FSheet.ScrollEngine.MaxScrollLimit.X));
         FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
+        TALSheetManager.Instance.SyncSystemBarsColor;
         If compareValue(FSheet.Container.Position.X, FSheet.Width - 1{*}, TEpsilon.Position) >= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
       TDockEdge.Top: begin
         var LProgress: Single := abs(ViewPortPosition.Y) / Max(1, abs(FSheet.ScrollEngine.MinScrollLimit.Y));
         FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
+        TALSheetManager.Instance.SyncSystemBarsColor;
         If compareValue(FSheet.Container.Position.Y, -FSheet.Container.Height + 1{*}, TEpsilon.Position) <= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
       TDockEdge.Bottom: begin
         var LProgress: Single := abs(ViewPortPosition.Y) / Max(1, abs(FSheet.ScrollEngine.MaxScrollLimit.Y));
         FSheet.Fill.Color := ALSetColorAlpha(FSheet.Fill.Color, FSheet.FFillAlphaAtPeek * LProgress);
+        TALSheetManager.Instance.SyncSystemBarsColor;
         If compareValue(FSheet.Container.Position.Y, FSheet.Height - 1{*}, TEpsilon.Position) >= 0 then
           TALSheetManager.Instance.DoCloseCurrentSheet;
       end;
@@ -1811,6 +1816,20 @@ begin
   ALUnfreezeNativeViews(FFrozenNativeControls)
 end;
 
+{********************************************}
+procedure TALSheetManager.SyncSystemBarsColor;
+begin
+  if (FCurrentSheet = nil) or
+     (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
+  var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentSheet.Fill.Color{AOverlayColor});
+  var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentSheet.Fill.Color{AOverlayColor});
+  ALSetSystemBarsColor(
+    LStatusBarColor,
+    LNavigationBarColor,
+    TALCapturedSystemBarsColor.StatusBarUseLightIcons,
+    TALCapturedSystemBarsColor.NavigationBarUseLightIcons);
+end;
+
 {***********************************************************}
 procedure TALSheetManager.FreeNotification(AObject: TObject);
 begin
@@ -1822,6 +1841,7 @@ begin
     FScrimAnimation.Enabled := False;
     FContainerAnimation.Enabled := False;
     FCurrentSheet := Nil;
+    ALRestoreSystemBarsColor;
   end;
 end;
 
@@ -1905,6 +1925,7 @@ begin
   if assigned(LCurrentSheet.FOnClosedRefProc) then
     LCurrentSheet.FOnClosedRefProc();
   ProcessPendingSheets;
+  ALRestoreSystemBarsColor;
   if not IsShowingSheet then
     UnfreezeNativeViews
   else
@@ -1924,14 +1945,34 @@ begin
     procedure
     begin
       if (TALLoadingOverlayManager.HasInstance) and
-         (TALLoadingOverlayManager.Instance.IsShowingLoadingOverlay) then
-        TALLoadingOverlay.CloseCurrent;
-
-      if (TALDialogManager.HasInstance) and
-         (TALDialogManager.Instance.IsShowingDialog) then
-        TALDialog.CloseCurrent;
-
-      if TALSheetManager.HasInstance then begin
+         (TALLoadingOverlayManager.Instance.IsShowingLoadingOverlay) then begin
+        TALLoadingOverlay.CloseCurrent(
+          procedure
+          begin
+            if TALSheetManager.HasInstance then begin
+              ASheet.ShowAnimateOptions := ASheet.ShowAnimateOptions - [TALSheet.TAnimateOption.AnimateScrim];
+              TALSheetManager.Instance.RequestSheet(ASheet);
+            end
+            else
+              ALFreeAndNil(ASheet);
+          end,
+          TALLoadingOverlayManager.Instance.CurrentLoadingOverlay.CloseAnimateOptions - [TALLoadingOverlay.TAnimateOption.AnimateScrim])
+      end
+      else if (TALDialogManager.HasInstance) and
+              (TALDialogManager.Instance.IsShowingDialog) then begin
+        TALDialog.CloseCurrent(
+          procedure
+          begin
+            if TALSheetManager.HasInstance then begin
+              ASheet.ShowAnimateOptions := ASheet.ShowAnimateOptions - [TALSheet.TAnimateOption.AnimateScrim];
+              TALSheetManager.Instance.RequestSheet(ASheet);
+            end
+            else
+              ALFreeAndNil(ASheet);
+          end,
+          TALDialogManager.Instance.CurrentDialog.CloseAnimateOptions - [TALDialog.TAnimateOption.AnimateScrim])
+      end
+      else if TALSheetManager.HasInstance then begin
         with TALSheetManager.Instance do begin
           FQueue.Enqueue(ASheet);
           if IsShowingSheet then
@@ -1970,6 +2011,9 @@ end;
 procedure TALSheetManager.ShowSheet(const ASheet: TALSheet);
 begin
 
+  // Capture the system bars color
+  ALCaptureSystemBarsColor;
+
   // Attach ASheet
   if ASheet.ParentControl = nil then begin
     Var LForm := Screen.ActiveForm;
@@ -2006,6 +2050,10 @@ begin
       FScrimAnimation.StartValue := 0;
       FScrimAnimation.StopValue := 1;
       FScrimAnimation.Start;
+    end
+    else begin
+      ScrimAnimationFinish(nil);
+      SyncSystemBarsColor;
     end;
 
     // Start the ContainerAnimation
@@ -2040,8 +2088,10 @@ begin
     FContainerAnimation.Start;
 
   end
-  else
+  else begin
     ContainerAnimationFinish(nil);
+    SyncSystemBarsColor;
+  end;
 
 end;
 
@@ -2050,6 +2100,7 @@ procedure TALSheetManager.ScrimAnimationProcess(Sender: TObject);
 begin
   if FCurrentSheet = nil then exit;
   FCurrentSheet.Fill.Color := ALSetColorAlpha(FCurrentSheet.Fill.Color, FScrimAnimation.CurrentValue * FScrimAnimation.TagFloat);
+  SyncSystemBarsColor;
 end;
 
 {**************************************************************}
@@ -2088,7 +2139,8 @@ end;
 procedure TALSheetManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentSheet = nil then exit;
-  if FContainerAnimation.tag = Integer(True) then DoCloseCurrentSheet
+  if (TALSheet.TAnimateOption.AnimateContainer in FCurrentSheet.ShowAnimateOptions) and
+     (FContainerAnimation.tag = Integer(True)) then DoCloseCurrentSheet
   else begin
     case FCurrentSheet.FDockEdge of
       TALSheet.TDockEdge.Left: begin

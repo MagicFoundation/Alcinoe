@@ -741,7 +741,8 @@ end;
 procedure TALSnackbarManager.ContainerAnimationFinish(Sender: TObject);
 begin
   if FCurrentSnackbar = nil then exit;
-  if FContainerAnimation.StopValue < 0.5 then DoCloseCurrentSnackbar
+  if (TALSnackbar.TAnimateOption.AnimateContainer in FCurrentSnackbar.ShowAnimateOptions) and
+     (FContainerAnimation.StopValue < 0.5) then DoCloseCurrentSnackbar
   else begin
     if FCurrentSnackbar.FAutoDismissTimer.Interval > 0 then
       FCurrentSnackbar.FAutoDismissTimer.Start;

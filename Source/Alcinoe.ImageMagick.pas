@@ -13,10 +13,10 @@ interface
 // dll: /Libraries/dll/imagemagick
 // include: /References/ImageMagick/include/
 //
-// When updating the dll to a new version of imagemagick always
-// compare and update the include located in
-// /References/ImageMagick/include/ with the include provided with
-// the new version of imagemagick
+// When updating to a new ImageMagick DLL version,
+// compare the existing include files in /References/ImageMagick/include/
+// with the new include files found in the ImageMagick installation directory,
+// and update the code below accordingly based on any differences.
 //
 
 {$MINENUMSIZE 4} // https://stackoverflow.com/questions/48953749/why-this-c-to-pascal-conversion-crash

@@ -84,12 +84,13 @@ type
   {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
-  TALControl = class(TControl)
+  TALControl = class(TControl, IRotatedControl)
+  private
+    class var FNoScale: TPosition;
   private
     FForm: TCommonCustomForm; // 8 bytes
     FALParentControl: TALControl; // 8 bytes
     FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
-    FScale: TPosition; // 8 bytes | TPosition instead of TALPosition to avoid circular reference
     FFocusOnMouseDown: Boolean; // 1 byte
     FFocusOnMouseUp: Boolean; // 1 byte
     FMouseDownAtRest: Boolean; // 1 byte
@@ -98,14 +99,14 @@ type
     FAlign: TALAlignLayout; // 1 byte
     FIsSetBoundsLocked: Boolean; // 1 byte
     FBeforeDestructionExecuted: Boolean; // 1 byte
-    procedure SetScale(const AValue: TPosition);
     function GetPivot: TPosition;
     procedure SetPivot(const Value: TPosition);
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
-    procedure ScaleChangedHandler(Sender: TObject);
+    { IRotatedControl }
+    function GetScale: TPosition;
   protected
     FClickSound: TALClickSoundMode; // 1 byte
     FAutoSize: TALAutoSizeMode; // 1 byte
@@ -115,7 +116,6 @@ type
     property BeforeDestructionExecuted: Boolean read FBeforeDestructionExecuted;
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
-    property Scale: TPosition read FScale write SetScale;
     property Pivot: TPosition read GetPivot write SetPivot;
     function GetAutoSize: TALAutoSizeMode; virtual;
     procedure SetAutoSize(const Value: TALAutoSizeMode); virtual;
@@ -318,8 +318,6 @@ begin
   FForm := nil;
   FALParentControl := nil;
   FControlAbsolutePosAtMouseDown := TpointF.zero;
-  FScale := TPosition.Create(TPointF.Create(1, 1));
-  FScale.OnChange := ScaleChangedHandler;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownAtRest := True;
@@ -339,7 +337,6 @@ end;
 destructor TALControl.Destroy;
 begin
   ClearBufDrawable;
-  ALFreeAndNil(FScale);
   inherited;
 end;
 
@@ -365,7 +362,6 @@ begin
       AutoSize := TALControl(Source).AutoSize;
       DoubleBuffered := TALControl(Source).DoubleBuffered;
       Pivot.Assign(TALControl(Source).Pivot);
-      Scale.assign(TALControl(Source).Scale);
       // --TControl
       Anchors := TALControl(Source).Anchors;
       CanFocus := TALControl(Source).CanFocus;
@@ -386,6 +382,7 @@ begin
       ParentShowHint := TALControl(Source).ParentShowHint;
       Position.Assign(TALControl(Source).Position);
       RotationAngle := TALControl(Source).RotationAngle;
+      Scale.assign(TALControl(Source).Scale);
       ShowHint := TALControl(Source).ShowHint;
       Size.Assign(TALControl(Source).Size);
       StyleName := TALControl(Source).StyleName;
@@ -1333,6 +1330,23 @@ begin
   Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resized);
 end;
 
+{**************************************}
+function TALControl.GetScale: TPosition;
+begin
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if FMX.Types.ArrangeControl(const Control: IAlignableObject... was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  // ArrangeControl calls IRotatedControl.GetScale to determine the control’s scale
+  // and uses that value to align the control. However, this is conceptually wrong —
+  // the alignment process should not depend on the current scale. To prevent scaled
+  // alignment behavior, this hack temporarily returns a scale object with a value
+  // of 1 when the parent is realigning, so no scaling is applied during alignment.
+  var LParentRealigning := (((ParentControl <> nil) and (_TControlProtectedAccess(ParentControl).FDisableAlign)) or
+                            ((ParentControl = nil) and (FForm <> nil) and (_TCustomFormProtectedAccess(FForm).FDisableAlign)));
+  if LParentRealigning then Result := FNoScale
+  else result := Inherited Scale;
+end;
+
 {*********************************************}
 function TALControl.GetDoubleBuffered: boolean;
 begin
@@ -1343,12 +1357,6 @@ end;
 procedure TALControl.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not supported
-end;
-
-{*****************************************************}
-procedure TALControl.SetScale(const AValue: TPosition);
-begin
-  FScale.Assign(AValue);
 end;
 
 {***********************************************}
@@ -1870,12 +1878,6 @@ begin
     FALParentControl := nil;
 end;
 
-{********************************************************}
-procedure TALControl.ScaleChangedHandler(Sender: TObject);
-begin
-  DoMatrixChanged(Sender);
-end;
-
 {*************************************}
 {$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if FMX.Controls.TContentTabList was not updated and adjust the IFDEF'}
@@ -2017,5 +2019,12 @@ initialization
   ALLog('Alcinoe.FMX.Controls','initialization');
   {$ENDIF}
   ALGlobalClickSoundEnabled := False;
+  TALControl.FNoScale := TPosition.Create(TPointF.Create(1, 1));
+
+finalization
+  {$IF defined(DEBUG)}
+  ALLog('Alcinoe.FMX.Controls','finalization');
+  {$ENDIF}
+  ALFreeAndNil(TALControl.FNoScale);
 
 end.

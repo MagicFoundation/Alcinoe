@@ -3698,6 +3698,7 @@ begin
                       1, // const AScale: Single;
                       Width * (fframeCount div fRowCount) * ALGetScreenScale,
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
+                      False, // const AApplyExifOrientation: Boolean;
                       TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
                       TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                       FTintColor, // const ATintColor: TalphaColor;
@@ -5512,7 +5513,6 @@ begin
                         ABufDrawableRect, // const ARect: TRectF;
                         AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
-                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   if ACheckMark.HasCheckMark then begin
@@ -5586,7 +5586,6 @@ begin
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
-                                nil, // const AFillResourceStream: TStream;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -5596,7 +5595,6 @@ begin
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -5609,7 +5607,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
                   LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
     end
@@ -5618,7 +5615,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
                   Shadow); // const AShadow: TALShadow): TRectF;
     end;
@@ -5735,7 +5731,7 @@ begin
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
-                            nil, // const AFillResourceStream: TStream;
+                            LCurrentAdjustedStateStyle.Fill.ResourceStream, // const AFillResourceStream: TStream;
                             LCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
@@ -7125,7 +7121,6 @@ begin
                         ABufDrawableRect, // const ARect: TRectF;
                         AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
-                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -7184,7 +7179,6 @@ begin
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
-                                nil, // const AFillResourceStream: TStream;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -7194,7 +7188,6 @@ begin
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -7207,7 +7200,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
                   LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
     end
@@ -7216,7 +7208,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
                   Shadow); // const AShadow: TALShadow): TRectF;
     end;
@@ -7333,7 +7324,7 @@ begin
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
-                            nil, // const AFillResourceStream: TStream;
+                            LCurrentAdjustedStateStyle.Fill.ResourceStream, // const AFillResourceStream: TStream;
                             LCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
@@ -9391,7 +9382,6 @@ begin
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
-                                nil, // const AFillResourceStream: TStream;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -9401,7 +9391,6 @@ begin
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -9414,7 +9403,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
                   LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
     end
@@ -9423,7 +9411,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
                   Shadow); // const AShadow: TALShadow): TRectF;
     end;
@@ -11077,7 +11064,6 @@ begin
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
-                                nil, // const AFillResourceStream: TStream;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -11087,7 +11073,6 @@ begin
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -11100,7 +11085,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
                   LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
     end
@@ -11109,7 +11093,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
                   Shadow); // const AShadow: TALShadow): TRectF;
     end;
@@ -12163,7 +12146,6 @@ begin
                                 ARect, // const ARect: TRectF;
                                 AutoAlignToPixel, // const AAlignToPixel: Boolean;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Fill, // const AFill: TALBrush;
-                                nil, // const AFillResourceStream: TStream;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                                 _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.FromStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -12173,7 +12155,6 @@ begin
                               ARect, // const ARect: TRectF;
                               AutoAlignToPixel, // const AAlignToPixel: Boolean;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Fill, // const AFill: TALBrush;
-                              nil, // const AFillResourceStream: TStream;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).StateLayer, // const AStateLayer: TALStateLayer;
                               _TALDynamicBaseStateStyleProtectedAccess(StateStyles.Transition.ToStateStyle).Shadow); // const AShadow: TALShadow): TRectF;
       Result := TRectF.Union(Result, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -12186,7 +12167,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   LStateStyle.Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
                   LStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
     end
@@ -12195,7 +12175,6 @@ begin
                   ARect, // const ARect: TRectF;
                   AutoAlignToPixel, // const AAlignToPixel: Boolean;
                   Fill, // const AFill: TALBrush;
-                  nil, // const AFillResourceStream: TStream;
                   nil, // const AStateLayer: TALStateLayer;
                   Shadow); // const AShadow: TALShadow): TRectF;
     end;
@@ -13556,7 +13535,6 @@ begin
                         ABufDrawableRect, // const ARect: TRectF;
                         AutoAlignToPixel, // const AAlignToPixel: Boolean;
                         AFill, // const AFill: TALBrush;
-                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);

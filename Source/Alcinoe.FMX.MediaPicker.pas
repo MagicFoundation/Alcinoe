@@ -7,6 +7,7 @@ interface
 uses
   System.Classes,
   System.Messaging,
+  System.Generics.Collections,
   {$IF defined(android)}
   Androidapi.JNI.Net,
   {$ENDIF}
@@ -73,16 +74,26 @@ type
   private
     {$IF defined(IOS)}
     type
+      // --------------------------------------------
+      // TItemProviderloadFileRepresentationForwarder
+      TItemProviderloadFileRepresentationForwarder = class(TObject)
+      private
+        FMediaPicker: TALMediaPicker;
+        FMediaType: TMediaType;
+        FMediaIndex: Integer;
+      public
+        constructor Create(const AMediaPicker: TALMediaPicker; const AMediaType: TMediaType; const AMediaIndex: Integer);
+        procedure CompletionHandler(url: NSURL; error: NSError);
+      end;
       // -----------------------------
       // TPickerViewControllerDelegate
       TPickerViewControllerDelegate = class(TOCLocal, PHPickerViewControllerDelegate)
       private
         FMediaPicker: TALMediaPicker;
-        procedure loadFileRepresentationCompletionHandler(url: NSURL; error: NSError; mediaType: TMediaType);
-        procedure loadFileRepresentationForVideoCompletionHandler(url: NSURL; error: NSError);
-        procedure loadFileRepresentationForImageCompletionHandler(url: NSURL; error: NSError);
+        FItemProviderloadFileRepresentationForwarders: TObjectList<TItemProviderloadFileRepresentationForwarder>;
       public
         constructor Create(const AMediaPicker: TALMediaPicker);
+        destructor Destroy; override;
         procedure picker(picker: PHPickerViewController; didFinishPicking: NSArray); cdecl;
       end;
       // ------------------------------
@@ -277,84 +288,26 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-constructor TALMediaPicker.TPickerViewControllerDelegate.Create(const AMediaPicker: TALMediaPicker);
+constructor TALMediaPicker.TItemProviderloadFileRepresentationForwarder.Create(const AMediaPicker: TALMediaPicker; const AMediaType: TMediaType; const AMediaIndex: Integer);
 begin
   inherited Create;
   FMediaPicker := AMediaPicker;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-procedure TALMediaPicker.TPickerViewControllerDelegate.picker(picker: PHPickerViewController; didFinishPicking: NSArray);
-begin
-  try
-
-    {$IF defined(DEBUG)}
-    ALLog('TALMediaPicker.TPickerViewControllerDelegate.picker');
-    {$ENDIF}
-
-    // UnblockUserInteraction
-    var LWindow := SharedApplication.keyWindow;
-    if (LWindow <> nil) and (LWindow.rootViewController <> nil) then
-      LWindow.rootViewController.dismissViewControllerAnimated(true{flag}, nil{completion});
-
-    // Empty selection = cancel
-    if (didFinishPicking = nil) or (didFinishPicking.count = 0) then begin
-      TALLoadingOverlay.CloseCurrent;
-      if Assigned(FMediaPicker.FOnCancel) then
-        FMediaPicker.FOnCancel;
-      Exit;
-    end;
-
-    // Init some vars
-    FMediaPicker.FLoadFileRepresentationFailed := False;
-    FMediaPicker.FLoadFileRepresentationErrorMessage := '';
-    FMediaPicker.FPendingMediaItemCount := didFinishPicking.count;
-    For var I := low(FMediaPicker.FMediaItems) to high(FMediaPicker.FMediaItems) do
-      ALFreeAndNil(FMediaPicker.FMediaItems[i]);
-    setlength(FMediaPicker.FMediaItems, 0);
-
-    // loadFileRepresentationForTypeIdentifier for each PHPickerResult
-    ALMonitorEnter(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TPickerViewControllerDelegate.picker'{$ENDIF});
-    Try
-      TALLoadingOverlay.Builder.Show;
-      for var I := 0 to didFinishPicking.count - 1 do begin
-        var LPHPickerResult := TPHPickerResult.Wrap(didFinishPicking.objectAtIndex(I));
-        if LPHPickerResult.itemProvider.hasItemConformingToTypeIdentifier(StrToNSStr('public.image')) then
-          LPHPickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(StrToNSStr('public.image'), loadFileRepresentationForImageCompletionHandler)
-        else if LPHPickerResult.itemProvider.hasItemConformingToTypeIdentifier(StrToNSStr('public.movie')) then
-          LPHPickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(StrToNSStr('public.movie'), loadFileRepresentationForVideoCompletionHandler)
-        else
-          Dec(FMediaPicker.FPendingMediaItemCount);
-      end;
-      if FMediaPicker.FPendingMediaItemCount = 0 then
-        raise Exception.Create('Error 297888FC-B3A7-460C-81BE-83D5DAFC7903');
-    finally
-      ALMonitorExit(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TPickerViewControllerDelegate.picker'{$ENDIF});
-    end;
-
-  except
-    on E: Exception do begin
-      TALLoadingOverlay.CloseCurrent;
-      if Assigned(FMediaPicker.FOnError) then
-        FMediaPicker.FOnError(E.Message);
-    end;
-  end;
+  FMediaType := AMediaType;
+  FMediaIndex := AMediaIndex;
 end;
 {$ENDIF}
 
 {*************}
 //[MultiThread]
 {$IF defined(IOS)}
-procedure TALMediaPicker.TPickerViewControllerDelegate.loadFileRepresentationCompletionHandler(url: NSURL; error: NSError; mediaType: TMediaType);
+procedure TALMediaPicker.TItemProviderloadFileRepresentationForwarder.CompletionHandler(url: NSURL; error: NSError);
 begin
 
   {$IF defined(DEBUG)}
-  ALLog('TALMediaPicker.TPickerViewControllerDelegate.loadFileRepresentationCompletionHandler');
+  ALLog('TALMediaPicker.TItemProviderloadFileRepresentationForwarder.CompletionHandler');
   {$ENDIF}
 
-  ALMonitorEnter(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TPickerViewControllerDelegate.loadFileRepresentationForTypeIdentifierCompletionHandler'{$ENDIF});
+  ALMonitorEnter(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TItemProviderloadFileRepresentationForwarder.CompletionHandler'{$ENDIF});
   Try
 
     Try
@@ -371,10 +324,11 @@ begin
         var LDestFileName := TPath.Combine(TPath.GetTempPath, ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}) + ALExtractFileExt(LSourceFileName)); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/38C9EB5E67AAF011BA8F25B41B5A9FDF.mov
         if AlPosW(TPath.GetTempPath, LSourceFileName) = 1 then TFile.move(LSourceFileName{SourceFileName}, LDestFileName{DestFileName})
         else TFile.copy(LSourceFileName{SourceFileName}, LDestFileName{DestFileName});
-        SetLength(FMediaPicker.FMediaItems, length(FMediaPicker.FMediaItems) + 1);
-        FMediaPicker.FMediaItems[high(FMediaPicker.FMediaItems)] := TMediaItem.Create(
-                                                                      LDestFileName,
-                                                                      mediaType);
+        {$IF defined(DEBUG)}
+        if FMediaIndex > high(FMediaPicker.FMediaItems) then raise Exception.Create('Error 698683F0-D90B-4DCD-B935-5C930DFD14AE');
+        if FMediaPicker.FMediaItems[FMediaIndex] <> nil then raise Exception.Create('Error 3D2522A6-7156-4174-A21A-D6CBFF731EFF');
+        {$ENDIF}
+        FMediaPicker.FMediaItems[FMediaIndex] := TMediaItem.Create(LDestFileName, FMediaType);
       end;
 
       if FMediaPicker.FPendingMediaItemCount = 0 then begin
@@ -416,26 +370,100 @@ begin
     end;
 
   finally
-    ALMonitorExit(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TPickerViewControllerDelegate.loadFileRepresentationForTypeIdentifierCompletionHandler'{$ENDIF});
+    ALMonitorExit(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TItemProviderloadFileRepresentationForwarder.CompletionHandler'{$ENDIF});
   end;
 end;
 {$ENDIF}
 
-{*************}
-//[MultiThread]
+{****************}
 {$IF defined(IOS)}
-procedure TALMediaPicker.TPickerViewControllerDelegate.loadFileRepresentationForVideoCompletionHandler(url: NSURL; error: NSError);
+constructor TALMediaPicker.TPickerViewControllerDelegate.Create(const AMediaPicker: TALMediaPicker);
 begin
-  loadFileRepresentationCompletionHandler(url, error, TMediaType.video);
+  inherited Create;
+  FMediaPicker := AMediaPicker;
+  FItemProviderloadFileRepresentationForwarders := TObjectList<TItemProviderloadFileRepresentationForwarder>.Create(true{AOwnsObjects});
 end;
 {$ENDIF}
 
-{*************}
-//[MultiThread]
+{****************}
 {$IF defined(IOS)}
-procedure TALMediaPicker.TPickerViewControllerDelegate.loadFileRepresentationForImageCompletionHandler(url: NSURL; error: NSError);
+destructor TALMediaPicker.TPickerViewControllerDelegate.Destroy;
 begin
-  loadFileRepresentationCompletionHandler(url, error, TMediaType.Image);
+  ALFreeAndNil(FItemProviderloadFileRepresentationForwarders);
+  inherited;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+procedure TALMediaPicker.TPickerViewControllerDelegate.picker(picker: PHPickerViewController; didFinishPicking: NSArray);
+begin
+  try
+
+    {$IF defined(DEBUG)}
+    ALLog('TALMediaPicker.TPickerViewControllerDelegate.picker');
+    {$ENDIF}
+
+    // UnblockUserInteraction
+    var LWindow := SharedApplication.keyWindow;
+    if (LWindow <> nil) and (LWindow.rootViewController <> nil) then
+      LWindow.rootViewController.dismissViewControllerAnimated(true{flag}, nil{completion});
+
+    // Empty selection = cancel
+    if (didFinishPicking = nil) or (didFinishPicking.count = 0) then begin
+      TALLoadingOverlay.CloseCurrent;
+      if Assigned(FMediaPicker.FOnCancel) then
+        FMediaPicker.FOnCancel;
+      Exit;
+    end;
+
+    // Init some vars
+    FMediaPicker.FLoadFileRepresentationFailed := False;
+    FMediaPicker.FLoadFileRepresentationErrorMessage := '';
+    FMediaPicker.FPendingMediaItemCount := didFinishPicking.count;
+    For var I := low(FMediaPicker.FMediaItems) to high(FMediaPicker.FMediaItems) do
+      ALFreeAndNil(FMediaPicker.FMediaItems[i]);
+    setlength(FMediaPicker.FMediaItems, didFinishPicking.count);
+    For var I := low(FMediaPicker.FMediaItems) to high(FMediaPicker.FMediaItems) do
+      FMediaPicker.FMediaItems[i] := nil;
+    FItemProviderloadFileRepresentationForwarders.Clear;
+
+    // loadFileRepresentationForTypeIdentifier for each PHPickerResult
+    ALMonitorEnter(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TPickerViewControllerDelegate.picker'{$ENDIF});
+    Try
+      TALLoadingOverlay.Builder.Show;
+      var LMediaIndex: integer := 0;
+      for var I := 0 to didFinishPicking.count - 1 do begin
+        var LPHPickerResult := TPHPickerResult.Wrap(didFinishPicking.objectAtIndex(I));
+        if LPHPickerResult.itemProvider.hasItemConformingToTypeIdentifier(StrToNSStr('public.image')) then begin
+          var LItemProviderloadFileRepresentationForwarder := TItemProviderloadFileRepresentationForwarder.Create(FMediaPicker, TMediaType.Image, LMediaIndex);
+          FItemProviderloadFileRepresentationForwarders.Add(LItemProviderloadFileRepresentationForwarder);
+          LPHPickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(StrToNSStr('public.image'), LItemProviderloadFileRepresentationForwarder.CompletionHandler);
+          inc(LMediaIndex);
+        end
+        else if LPHPickerResult.itemProvider.hasItemConformingToTypeIdentifier(StrToNSStr('public.movie')) then begin
+          var LItemProviderloadFileRepresentationForwarder := TItemProviderloadFileRepresentationForwarder.Create(FMediaPicker, TMediaType.Video, LMediaIndex);
+          FItemProviderloadFileRepresentationForwarders.Add(LItemProviderloadFileRepresentationForwarder);
+          LPHPickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(StrToNSStr('public.movie'), LItemProviderloadFileRepresentationForwarder.CompletionHandler);
+          inc(LMediaIndex);
+        end
+        else
+          Dec(FMediaPicker.FPendingMediaItemCount);
+      end;
+      setlength(FMediaPicker.FMediaItems, LMediaIndex);
+      if FMediaPicker.FPendingMediaItemCount = 0 then
+        raise Exception.Create('Error 297888FC-B3A7-460C-81BE-83D5DAFC7903');
+    finally
+      ALMonitorExit(FMediaPicker{$IF defined(DEBUG)}, 'TALMediaPicker.TPickerViewControllerDelegate.picker'{$ENDIF});
+    end;
+
+  except
+    on E: Exception do begin
+      TALLoadingOverlay.CloseCurrent;
+      if Assigned(FMediaPicker.FOnError) then
+        FMediaPicker.FOnError(E.Message);
+    end;
+  end;
 end;
 {$ENDIF}
 

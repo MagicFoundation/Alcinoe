@@ -23,8 +23,12 @@ interface
 uses
   winapi.windows;
 
-{$IF not defined(MAGICKCORE_QUANTUM_DEPTH)}
+{$IF (not defined(MAGICKCORE_QUANTUM_DEPTH_8)) and (not defined(MAGICKCORE_QUANTUM_DEPTH_16)) and (not defined(MAGICKCORE_QUANTUM_DEPTH_32)) and (not defined(MAGICKCORE_QUANTUM_DEPTH_64))}
   {$define MAGICKCORE_QUANTUM_DEPTH_16}
+{$ENDIF}
+
+{$IF not defined(MAGICKCORE_NO_HDRI_SUPPORT)}
+  {$define MAGICKCORE_HDRI_SUPPORT}
 {$ENDIF}
 
 {$IF defined(WIN64)}

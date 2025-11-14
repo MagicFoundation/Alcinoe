@@ -497,8 +497,8 @@ function  ALCopyStr(
             const aEndStr: String;
             const aOffset: integer = 1;
             const aRaiseExceptionIfNotFound: Boolean = True): String; overload;
-function  ALStringReplaceA(const Source, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString; inline;
-function  ALStringReplaceW(const Source, OldPattern, NewPattern: string; Flags: TReplaceFlags): string; inline;
+function  ALStringReplaceA(const Source, OldPattern, NewPattern: AnsiString; const Flags: TReplaceFlags = [rfReplaceAll, rfIgnoreCase]): AnsiString; inline;
+function  ALStringReplaceW(const Source, OldPattern, NewPattern: string; const Flags: TReplaceFlags = [rfReplaceAll, rfIgnoreCase]): string; inline;
 function  ALRandomStrA(const aLength: Longint; const aCharset: Array of ansiChar): AnsiString; overload;
 function  ALRandomStrA(const aLength: Longint): AnsiString; overload;
 function  ALRandomStrW(const aLength: Longint; const aCharset: Array of Char): String; overload;
@@ -8524,14 +8524,14 @@ begin
   result := ALCopyStr(aSourceString, P1, P2 - P1);
 end;
 
-{*************************************************************************************************************}
-function  ALStringReplaceA(const Source, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
+{**************************************************************************************************************************************************}
+function  ALStringReplaceA(const Source, OldPattern, NewPattern: AnsiString; const Flags: TReplaceFlags = [rfReplaceAll, rfIgnoreCase]): AnsiString;
 begin
   result := System.AnsiStrings.StringReplace(Source, OldPattern, NewPattern, Flags);
 end;
 
-{*****************************************************************************************************}
-function  ALStringReplaceW(const Source, OldPattern, NewPattern: string; Flags: TReplaceFlags): string;
+{******************************************************************************************************************************************}
+function  ALStringReplaceW(const Source, OldPattern, NewPattern: string; const Flags: TReplaceFlags = [rfReplaceAll, rfIgnoreCase]): string;
 begin
   result := system.sysutils.StringReplace(Source, OldPattern, NewPattern, Flags);
 end;

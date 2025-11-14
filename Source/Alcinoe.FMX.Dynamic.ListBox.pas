@@ -944,7 +944,11 @@ Procedure ALDynamicListBoxMakeBufDrawables(const AControl: TALDynamicControl; co
 begin
   if AEnsureDoubleBuffered then
     AControl.DoubleBuffered := true;
-  AControl.MakeBufDrawable;
+  // We cannot call MakeBufDrawable when the control is not visible,
+  // because alignment is not applied while Visible = False.
+  // This would result in an incorrect layout.
+  If AControl.Visible then
+    AControl.MakeBufDrawable;
 
   for var I := 0 to AControl.ControlsCount - 1 do
     ALDynamicListBoxMakeBufDrawables(AControl.Controls[I], AEnsureDoubleBuffered);

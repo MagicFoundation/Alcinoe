@@ -977,30 +977,30 @@ Example :
 
 ```
     //Create the ImageMagick Library
-    ALCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
+    ALCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\imagemagick\win32\imagemagick');
     try
     
       //create the wand pointer
-      var LWand := ALImageMagickLib.NewMagickWand;
+      var LWand := NewMagickWand;
       try
     
         //load the image
-        if ALImageMagickLib.MagickReadImage(LWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(LWand);
+        if MagickReadImage(LWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(LWand);
         
         //Set the compression quality
-        if ALImageMagickLib.MagickSetImageCompressionQuality(LWand,80) <> MagickTrue then RaiseLastMagickWandError(LWand);
+        if MagickSetImageCompressionQuality(LWand,80) <> MagickTrue then RaiseLastMagickWandError(LWand);
     
         //autorate the image
-        if ALImageMagickLib.MagickAutoOrientImage(LWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
+        if MagickAutoOrientImage(LWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
     
         //Resize the image using the Lanczos filter
-        if ALImageMagickLib.MagickResizeImage(LWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
+        if MagickResizeImage(LWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
            
         //save the image
-        ALImageMagickLib.MagickWriteImage(LWand, pansiChar(aOutputFilename));
+        MagickWriteImage(LWand, pansiChar(aOutputFilename));
     
       finally
-        ALImageMagickLib.DestroyMagickWand(LWand);
+        DestroyMagickWand(LWand);
       end;
   
     finally
@@ -1009,7 +1009,7 @@ Example :
 
 ```
 
-Learn more at [Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
+Learn more at [Demos\ALImageMagick](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALImageMagick)
 <br/>
 <br/>
 
@@ -1139,6 +1139,13 @@ undesired conversions.
 
 History
 =======
+
+### 14/11/2025 – Full ImageMagick Wrapper Integration
+
+- Added the complete ImageMagick wrapper, including all functions 
+  and types from MagickCore and MagickWand. This wrapper was 
+  generated automagically using the ImageMagickWrapperGenerator 
+  project.
 
 ### 09/11/2025 – Framework Improvements
 

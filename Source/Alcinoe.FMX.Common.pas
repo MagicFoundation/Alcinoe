@@ -6245,7 +6245,11 @@ begin
     var LControl := TALControl(AControl);
     if AEnsureDoubleBuffered then
       LControl.DoubleBuffered := true;
-    LControl.MakeBufDrawable;
+    // We cannot call MakeBufDrawable when the control is not visible,
+    // because alignment is not applied while Visible = False.
+    // This would result in an incorrect layout.
+    If LControl.Visible then
+      LControl.MakeBufDrawable;
   end;
 
   for var LChild in aControl.Controls do

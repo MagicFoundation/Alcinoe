@@ -31,7 +31,7 @@ call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Sou
 IF ERRORLEVEL 1 goto ERROR
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tools\" -CreateBackup="false"
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tools\" -CreateBackup="false" -FilesToIgnore="ImageMagickWrapperGenerator.dpr"
 IF ERRORLEVEL 1 goto ERROR
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false"

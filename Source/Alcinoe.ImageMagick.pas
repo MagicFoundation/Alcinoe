@@ -608,26 +608,26 @@ Type
 
   CommandOptionFlags = (
     UndefinedOptionFlag       = $0000,  { option flag is not in use }
-    
+
     ImageInfoOptionFlag       = $0001,  { Setting stored in ImageInfo }
     DrawInfoOptionFlag        = $0002,  { Setting stored in DrawInfo }
     QuantizeInfoOptionFlag    = $0004,  { Setting stored in QuantizeInfo }
     GlobalOptionFlag          = $0008,  { Global Setting or Control }
     SettingOptionFlags        = $000F,  { mask any setting option }
-    
+
     NoImageOperatorFlag       = $0010,  { Images not required operator }
     SimpleOperatorFlag        = $0020,  { Simple Image processing operator }
     ListOperatorFlag          = $0040,  { Multi-Image processing operator }
     GenesisOptionFlag         = $0080,  { MagickCommandGenesis() Only Option }
-    
+
     SpecialOptionFlag         = $0100,  { Operator with Special Requirements }
     { EG: for specific CLI commands }
-    
+
     AlwaysInterpretArgsFlag   = $0400,  { Always Interpret escapes in Args }
     { CF: "convert" compatibility mode }
     NeverInterpretArgsFlag    = $0800,  { Never Interpret escapes in Args }
     { EG: filename, or delayed escapes }
-    
+
     NonMagickOptionFlag       = $1000,  { Option not used by Magick Command }
     FireOptionFlag            = $2000,  { Convert operation seq firing point }
     DeprecateOptionFlag       = $4000,  { Deprecate option (no code) }
@@ -18721,7 +18721,7 @@ end;
 
 {$ENDREGION}
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{*************************************************************}
 procedure ALRaiseLastMagickWandError(const AWand: PMagickWand);
 begin
   var LSeverity: ExceptionType;
@@ -18731,7 +18731,7 @@ begin
   raise Exception.create(string(LDescription));
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{***********************************************************}
 procedure ALRaiseLastPixelWandError(const AWand: PPixelWand);
 begin
   var LSeverity: ExceptionType;
@@ -18741,7 +18741,7 @@ begin
   raise Exception.create(string(LDescription));
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{***************************************************************}
 procedure ALRaiseLastDrawingWandError(const AWand: PDrawingWand);
 begin
   var LSeverity: ExceptionType;
@@ -18751,53 +18751,53 @@ begin
   raise Exception.create(string(LDescription));
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{********************************************************************************************}
 procedure ALCheckMagickWandResult(const AResult: MagickBooleanType; const AWand: PMagickWand);
 begin
   if AResult <> MagickTrue then ALRaiseLastMagickWandError(AWand);
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{************************************************************************}
 function ALCheckMagickWandResult(const AResult: PMagickWand): PMagickWand;
 begin
   if AResult = Nil then raise Exception.create('MagickWand operation failed: returned a nil wand pointer');
   Result := AResult;
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{******************************************************************************************}
 procedure ALCheckPixelWandResult(const AResult: MagickBooleanType; const AWand: PPixelWand);
 begin
   if AResult <> MagickTrue then ALRaiseLastPixelWandError(AWand);
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{*********************************************************************}
 function ALCheckPixelWandResult(const AResult: PPixelWand): PPixelWand;
 begin
   if AResult = nil then raise Exception.create('PixelWand operation failed: returned a nil wand pointer');
   Result := AResult;
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{**********************************************************************************************}
 procedure ALCheckDrawingWandResult(const AResult: MagickBooleanType; const AWand: PDrawingWand);
 begin
   if AResult <> MagickTrue then ALRaiseLastDrawingWandError(AWand);
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{***************************************************************************}
 function ALCheckDrawingWandResult(const AResult: PDrawingWand): PDrawingWand;
 begin
   if AResult = nil then raise Exception.create('DrawingWand operation failed: returned a nil wand pointer');
   Result := AResult;
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{****************************************************************************************************}
 procedure ALCreateImageMagickLibrary(const AImageMagickHome: String; const AThreadLimit: integer = 0);
 begin
   if assigned(ALImageMagickLib) then exit;
   ALImageMagickLib := TALImageMagickLibrary.Create(AImageMagickHome, AThreadLimit);
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{*********************************}
 procedure ALFreeImageMagickLibrary;
 begin
   alFreeAndNil(ALImageMagickLib);

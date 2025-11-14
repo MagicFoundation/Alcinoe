@@ -24,10 +24,10 @@ Copy the extracted content of:
 
 ---
 
-## 3) Copy `magick-baseconfig.h`
+## 3) Copy the `include` folder
 
-(x86) → Alcinoe/References/ImageMagick/win32/include/MagickCore/magick-baseconfig.h  
-(x64) → Alcinoe/References/ImageMagick/win64/include/MagickCore/magick-baseconfig.h
+(x86)/include/ → Alcinoe/References/ImageMagick/win32/include/
+(x64)/include/ → Alcinoe/References/ImageMagick/win64/include/
 
 ---
 

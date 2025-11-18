@@ -1087,6 +1087,9 @@ begin
   var LHttpClient := TALWinHttpClient.Create;
   Try
 
+    // https://github.com/MagicFoundation/Alcinoe/issues/456
+    LHttpClient.RequestHeaders.UserAgent := 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0';
+
     //try to download from the ARemoteRepositoryBaseUrl
     Var LUrl := ARemoteRepositoryBaseUrl +
                 ALStringReplaceA(AGroupId,'.','/',[RfReplaceALL])+'/'+
@@ -1133,6 +1136,7 @@ begin
     finally
       ALFreeAndNil(LPomXmlDoc);
     end;
+
   Finally
     ALFreeAndNil(LHttpClient);
   End;
@@ -1577,14 +1581,14 @@ begin
       for var I := 1 to ParamCount do
         LParamLst.Add(ParamStr(i));
       {$IF defined(DEBUG)}
-      LParamLst.Clear;
-      LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
-      LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1');
-      LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
-      LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
-      LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
-      LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
-      LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
+      //LParamLst.Clear;
+      //LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
+      //LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1');
+      //LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
+      //LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
+      //LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
+      //LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
+      //LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
       {$ENDIF}
       {$ENDREGION}
 
@@ -1885,6 +1889,10 @@ begin
           Try
             LLst.LineBreak := ':';
             LLst.Text := LLine;
+            if LLst.Count = 2 then begin // androidx.annotation:annotation -> 1.3.0
+              LLine := ALStringReplaceA(LLine,' -> ', ':0.0.0 -> ', []); // androidx.annotation:annotation:0.0.0 -> 1.3.0
+              LLst.Text := LLine;
+            end;
             if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE ('+String(LLine)+')');
             var LDependencyGroupID := LLst[0]; // androidx.annotation
             var LDependencyArtifactID := LLst[1]; // annotation
@@ -2776,6 +2784,11 @@ begin
   except
     on E: Exception do begin
       Writeln(E.ClassName+': '+E.Message, TALConsoleColor.ccRed);
+      Writeln('');
+      Writeln('Command line used:', TALConsoleColor.ccRed);
+      {$WARN SYMBOL_PLATFORM OFF}
+      Writeln(CmdLine, TALConsoleColor.ccRed);
+      {$WARN SYMBOL_PLATFORM ON}
       Writeln('');
       Writeln('Usage:');
       Writeln('  AndroidMerger.exe');

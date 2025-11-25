@@ -101,6 +101,7 @@ forced to apply patches to the original Delphi source files:
 * [Missing ResetUpdatingState call in TCustomForm.DoRemoveObject](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4302)
 * [Effect ProcessTexture is not working and function TFilter.InputTexture: TTexture do unecessary work](https://quality.embarcadero.com/browse/RSP-20825)
 * [TAndroidMotionManager does not handle AMOTION_EVENT_ACTION_CANCEL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3762)
+* [Add ExtractContentStream to TURLResponse / IURLResponse to allow taking ownership without copying.](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664)
 * [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
 * [FMX.VirtualKeyboard.Android: Unused variable and unnecessary logic in Delphi 13 update](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311)
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
@@ -661,6 +662,29 @@ DeployMan / DeployProjNormalizer / DProjNormalizer
 <br/>
 
 
+ALFmxHttpWorker - Upload and download data reliably in the background — even when the app is killed.
+====================================================================================================
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/backgroundhttptransfer.png?raw=true"/>
+  
+Imagine you're building a chat app: when the user taps **Send**, 
+you could send the message on the **main thread**, but this freezes 
+the UI and is forbidden by mobile operating systems. Another option 
+is a **background thread**, however this fails when the user switches 
+apps (incoming phone call, home button, etc.), since iOS and Android 
+suspend or kill HTTP networking in background mode. You also have to 
+deal with unreliable mobile connectivity (temporary loss of Wi-Fi / 
+4G / 5G) and manually manage retries and server unavailability.
+
+**TALFmxHttpWorker** solves all these problems. Simply enqueue the 
+upload using **`TALFmxHttpWorker.enqueue`**, and you no longer need 
+to worry about network reliability, app switching, app termination, 
+or temporary server errors (`HTTP 5xx`, unreachable host, etc.). 
+**TALFmxHttpWorker** handles everything automatically and posts a 
+**`TWorkResultMessage`** when the job is completed.
+<br/>
+
+
 Alcinoe Code Profiler
 =====================
 
@@ -1139,6 +1163,11 @@ undesired conversions.
 
 History
 =======
+
+### 16/11/2025 – Framework Improvements
+
+- Renamed TALImage.ApplyExifOrientation to TALImage.ApplyMetadataOrientation
+  for consistency with TALVideoPlayer.ApplyMetadataOrientation.
 
 ### 14/11/2025 – Full ImageMagick Wrapper Integration
 

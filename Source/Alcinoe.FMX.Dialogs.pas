@@ -519,6 +519,8 @@ begin
   end;
   FVirtualKeyboardAnimation.Enabled := False;
   if TVKStateChangeMessage(Msg).KeyboardVisible then begin
+    if FVirtualKeyboardAnimation.Tag = 1 then exit;
+    FVirtualKeyboardAnimation.Tag := 1;
     {$IF defined(ANDROID)}
     FVirtualKeyboardAnimation.Duration := 0.300;
     {$ELSE}
@@ -529,6 +531,8 @@ begin
     FVirtualKeyboardAnimation.StopValue := TVKStateChangeMessage(Msg).KeyboardBounds.Height;
   end
   else begin
+    if FVirtualKeyboardAnimation.Tag = 0 then exit;
+    FVirtualKeyboardAnimation.Tag := 0;
     FVirtualKeyboardAnimation.Duration := 0.200;
     FVirtualKeyboardAnimation.InterpolationType := TALInterpolationType.Material3StandardDefaultEffects;
     FVirtualKeyboardAnimation.StartValue := margins.Bottom;

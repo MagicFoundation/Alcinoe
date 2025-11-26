@@ -27,6 +27,6 @@ begin
   {$ENDIF}
   Application.Initialize;
   Application.FormFactor.Orientations := [TFormOrientation.Portrait, TFormOrientation.InvertedPortrait];
-  Application.CreateForm(TForm2, Form2);
+  Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.

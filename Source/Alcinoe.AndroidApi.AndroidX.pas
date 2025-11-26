@@ -14,13 +14,48 @@ uses
 
 type
 
-  {*********************************}
+  {************************}
+  JALHttpWorker = interface;
   JLocalBroadcastManager = interface;
   JLifecycleOwner = interface;
   Jlifecycle_Observer = interface;
   JLiveData = interface;
   JMutableLiveData = interface;
   JPreferenceManager = interface;
+
+  {************************************}
+  JWorkerClass = interface(JObjectClass)
+    ['{CDDDECF7-16C2-4C4B-8792-978E3BEDFE1B}']
+  end;
+  [JavaSignature('androidx/work/Worker')]
+  JWorker = interface(JObject)
+    ['{45387655-3B07-476D-AA6E-6DFE96BBE83E}']
+  end;
+  TJWorker = class(TJavaGenericImport<JWorkerClass, JWorker>) end;
+
+  {******************************************}
+  JALHttpWorkerClass = interface(JWorkerClass)
+    ['{E793143E-6277-4C10-AA0A-B79330756F93}']
+    {class} function _GetACTION_HTTP_COMPLETED: JString; cdecl;
+    {class} function _GetEXTRA_HTTP_SUCCESS: JString; cdecl;
+    {class} function _GetEXTRA_HTTP_REQUEST_ID: JString; cdecl;
+    {class} function _GetEXTRA_HTTP_RESPONSE_STATUS_CODE: JString; cdecl;
+    {class} function _GetEXTRA_HTTP_RESPONSE_HEADERS: JString; cdecl;
+    {class} function _GetEXTRA_HTTP_RESPONSE_BODY_FILE_PATH: JString; cdecl;
+    {class} property ACTION_HTTP_COMPLETED: JString read _GetACTION_HTTP_COMPLETED;
+    {class} property EXTRA_HTTP_SUCCESS: JString read _GetEXTRA_HTTP_SUCCESS;
+    {class} property EXTRA_HTTP_REQUEST_ID: JString read _GetEXTRA_HTTP_REQUEST_ID;
+    {class} property EXTRA_HTTP_RESPONSE_STATUS_CODE: JString read _GetEXTRA_HTTP_RESPONSE_STATUS_CODE;
+    {class} property EXTRA_HTTP_RESPONSE_HEADERS: JString read _GetEXTRA_HTTP_RESPONSE_HEADERS;
+    {class} property EXTRA_HTTP_RESPONSE_BODY_FILE_PATH: JString read _GetEXTRA_HTTP_RESPONSE_BODY_FILE_PATH;
+    {class} function enqueue(context: JContext; url: JString; method: JString; bodyFilePath: JString; deleteBodyFile: Boolean; headers: JString): JUUID; overload; cdecl;
+    {class} function enqueue(context: JContext; url: JString; method: JString; bodyString: JString; headers: JString): JUUID; overload; cdecl;
+  end;
+  [JavaSignature('io/magicfoundation/alcinoe/http/ALHttpWorker')]
+  JALHttpWorker = interface(JWorker)
+    ['{ED46E1D7-D8B5-4B78-8EF2-0E8A5BE2F64F}']
+  end;
+  TJALHttpWorker = class(TJavaGenericImport<JALHttpWorkerClass, JALHttpWorker>) end;
 
   {*************************************************************************}
   //https://developer.android.com/reference/androidx/lifecycle/LifecycleOwner
@@ -113,6 +148,7 @@ uses
 {**********************}
 procedure RegisterTypes;
 begin
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.JALHttpWorker', TypeInfo(Alcinoe.AndroidApi.AndroidX.JALHttpWorker));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.JLocalBroadcastManager', TypeInfo(Alcinoe.AndroidApi.AndroidX.JLocalBroadcastManager));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.JLifecycleOwner', TypeInfo(Alcinoe.AndroidApi.AndroidX.JLifecycleOwner));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Jlifecycle_Observer', TypeInfo(Alcinoe.AndroidApi.AndroidX.Jlifecycle_Observer));

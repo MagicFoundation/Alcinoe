@@ -108,7 +108,9 @@ uses
 constructor TALUserPreferences.Create;
 begin
   {$IF defined(Android)}
-  FSharedPreferences := TAndroidHelper.Activity.getPreferences(TJContext.JavaClass.MODE_PRIVATE);
+  FSharedPreferences := TAndroidHelper.Activity.getSharedPreferences(
+                          StringToJString(JStringToString(TAndroidHelper.Activity.getPackageName) + '.user_preferences'),
+                          TJContext.JavaClass.MODE_PRIVATE);
   FAESKey := nil;
   {$ENDIF}
   {$IF defined(ALAppleOS)}

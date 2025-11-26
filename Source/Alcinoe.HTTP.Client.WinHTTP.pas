@@ -15,8 +15,8 @@ uses
 
 type
 
-  {-------------------------------------}
-  TALWinHttpClient = class(TALHTTPClient)
+  {--------------------------------------}
+  TALWinHttpClient = class(TALHttpClientA)
   public
     type
       // ---------------
@@ -201,19 +201,19 @@ type
     procedure SetUsername(const AValue: AnsiString); override;
     procedure SetPassword(const AValue: AnsiString); override;
     procedure OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer); override;
-    procedure SetOnRedirect(const Value: TALHTTPClient.TRedirectEvent); override;
+    procedure SetOnRedirect(const Value: TALHttpClientA.TRedirectEvent); override;
     function Execute(
                const AUrl: AnsiString;
                const AVerb: AnsiString;
                const ABodyStream: TStream;
                const AHeaders: TALNameValueArrayA;
-               const AResponseBodyStream: TStream): TALHTTPClientResponse; override;
+               const AResponseBodyStream: TStream): TALHttpClientResponseA; override;
     function Send(
                const AVerb: AnsiString;
                const ABodyStream: TStream): HINTERNET; virtual;
     procedure Receive(
                 const AContext: HINTERNET;
-                const AResponse: TALHTTPClientResponse); virtual;
+                const AResponse: TALHttpClientResponseA); virtual;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -779,7 +779,7 @@ end;
 {*********************************}
 procedure TALWinHttpClient.Receive(
             const AContext: HINTERNET;
-            const AResponse: TALHTTPClientResponse);
+            const AResponse: TALHttpClientResponseA);
 begin
 
   // Read the header
@@ -937,7 +937,7 @@ function TALWinHttpClient.Execute(
            const AVerb: AnsiString;
            const ABodyStream: TStream;
            const AHeaders: TALNameValueArrayA;
-           const AResponseBodyStream: TStream): TALHTTPClientResponse;
+           const AResponseBodyStream: TStream): TALHttpClientResponseA;
 begin
   if AURL = '' then raise Exception.Create('Empty URL');
   SetURL(AUrl);
@@ -963,7 +963,7 @@ begin
 
   try
 
-    Result := TALHTTPClientResponse.Create;
+    Result := TALHttpClientResponseA.Create;
     Try
 
       if AResponseBodyStream <> nil then begin
@@ -1006,8 +1006,8 @@ begin
   FOnStatus := Value;
 end;
 
-{**********************************************************************************}
-procedure TALWinHttpClient.SetOnRedirect(const Value: TALHTTPClient.TRedirectEvent);
+{***********************************************************************************}
+procedure TALWinHttpClient.SetOnRedirect(const Value: TALHttpClientA.TRedirectEvent);
 begin
   disconnect;
   inherited;

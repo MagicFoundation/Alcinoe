@@ -215,6 +215,7 @@ type
       //--
       FGeoLocationUpdatesDelayed: Boolean;
       FGeoLocationUpdatesActive: Boolean;
+      FGeoLocationUpdatesStartedAt: TDateTime;
       //--
       FRequestCoarseGeoLocation: Boolean;
       FRequestPreciseGeoLocation: Boolean;
@@ -272,6 +273,7 @@ type
       property OnShowRequestPermissionRationale: TShowRequestPermissionRationaleEvent read fOnShowRequestPermissionRationale write fOnShowRequestPermissionRationale;
       property IsListeningGeoLocationUpdates: Boolean read GetIsListeningGeoLocationUpdates; // Set to true in StartGeoLocationUpdates and set to false only in StopGeoLocationUpdates
       property IsActivatingGpsAndGrantingGeoLocationAccess: Boolean read FIsActivatingGpsAndGrantingGeoLocationAccess; // set to true in ActivateGpsAndGrantGeoLocationAccess and set to false in OnAuthorizationStatus
+      property GeoLocationUpdatesStartedAt: TDateTime read FGeoLocationUpdatesStartedAt;
     end;
 
 implementation
@@ -351,6 +353,7 @@ begin
   //--
   FGeoLocationUpdatesDelayed := False;
   FGeoLocationUpdatesActive := False;
+  FGeoLocationUpdatesStartedAt := 0;
   //--
   FRequestCoarseGeoLocation := False;
   FRequestPreciseGeoLocation := False;
@@ -1028,6 +1031,7 @@ begin
 
   FGeoLocationUpdatesDelayed := False;
   FGeoLocationUpdatesActive := True;
+  FGeoLocationUpdatesStartedAt := Now;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}

@@ -12,15 +12,30 @@ uses
 
 type
 
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664 was corrected'}
+    // If https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4664 has been fixed then
+    // replace
+    //   TALNetHttpClientPoolOnSuccessRefProc = reference to procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
+    //   TALNetHttpClientPoolOnSuccessObjProc = procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject) of object;
+    // with
+    //   TALNetHttpClientPoolOnSuccessRefProc = reference to procedure (const AResponse: IHTTPResponse; var AContext: TObject);
+    //   TALNetHttpClientPoolOnSuccessObjProc = procedure (const AResponse: IHTTPResponse; var AContext: TObject) of object;
+    // You will need also to replace
+    //   ALDecompressHttpResponseBody(LHTTPResponse.ContentEncoding, LResponseContent);
+    // with
+    //   ALDecompressHttpResponseBody(LHTTPResponse);
+  {$ENDIF}
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALNetHttpClientPoolCanStartRefFunc = reference to function (var AContext: Tobject): boolean;
   TALNetHttpClientPoolCanStartObjFunc = function (var AContext: Tobject): boolean of object;
   TALNetHttpClientPoolOnSuccessRefProc = reference to procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
   TALNetHttpClientPoolOnSuccessObjProc = procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject) of object;
-  TALNetHttpClientPoolOnErrorRefProc = reference to procedure (const AErrMessage: string; var AContext: Tobject);
-  TALNetHttpClientPoolOnErrorObjProc = procedure (const AErrMessage: string; var AContext: Tobject) of object;
-  TALNetHttpClientPoolCacheDataProc = procedure(const aUrl: String; const AHTTPResponse: IHTTPResponse; const aData: TMemoryStream) of object;
-  TALNetHttpClientPoolRetrieveCachedDataProc = function(const aUrl: String; out AHTTPResponse: IHTTPResponse; const aData: TMemoryStream): boolean of object;
+  TALNetHttpClientPoolOnErrorRefProc = reference to procedure (const AResponse: IHTTPResponse; const AErrMessage: string; var AContext: Tobject);
+  TALNetHttpClientPoolOnErrorObjProc = procedure (const AResponse: IHTTPResponse; const AErrMessage: string; var AContext: Tobject) of object;
+  TALNetHttpClientPoolCacheDataProc = procedure(const AUrl: String; const AHeaders: TNetHeaders; const AResponse: IHTTPResponse) of object;
+  TALNetHttpClientPoolRetrieveCachedDataProc = function(const AUrl: String; const AHeaders: TNetHeaders; out AResponse: IHTTPResponse): boolean of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALNetHttpClientPoolRequest = Class(Tobject)
@@ -332,29 +347,12 @@ end;
 {*************}
 //[MultiThread]
 procedure TALNetHttpClientPool.DoGet(var AContext: Tobject);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _HttpGetUrl(const aUrl: String; const LResponseContent: TStream; const AHeaders: TNetHeaders): IHTTPResponse;
-  begin
-    Var LUri := Turi.Create(aUrl);
-    var LNetHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
-    try
-      // In case we lose the connection, this might return success with
-      // partial content. What a mess!
-      result := LNetHttpClient.Get(aUrl, LResponseContent, AHeaders);
-    finally
-      ALReleaseKeepAliveNetHttpClient(LUri, LNetHttpClient);
-    end;
-  end;
-
 begin
 
   var LNetHttpClientPoolRequest := TALNetHttpClientPoolRequest(AContext);
-
-  //protect the following code from exception
   try
 
-    //init the http
+    // Check whether this request is allowed to start
     if ((not assigned(LNetHttpClientPoolRequest.CanStartObjFunc)) and
         (not assigned(LNetHttpClientPoolRequest.CanStartRefFunc))) or
        (assigned(LNetHttpClientPoolRequest.CanStartObjFunc) and
@@ -367,32 +365,47 @@ begin
       var LResponseContent := TMemoryStream.Create;
       try
 
-        //get from the url
+        // Prepare HTTP call
         if LNetHttpClientPoolRequest.Url <> '' then begin
           if AlIsHttpOrHttpsUrl(LNetHttpClientPoolRequest.Url) then begin
             if (not LNetHttpClientPoolRequest.UseCache) or
                (not assigned(RetrieveCachedData)) or
-               (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent)) then begin
-              LHTTPResponse := _HttpGetUrl(LNetHttpClientPoolRequest.Url, LResponseContent, LNetHttpClientPoolRequest.Headers);
-              // Client error responses (400 – 499)
-              // Server error responses (500 – 599)
-              if (LHTTPResponse = nil) or
-                 ((LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599)) then begin
+               (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LNetHttpClientPoolRequest.Headers, LHTTPResponse)) then begin
+
+              Var LUri := Turi.Create(LNetHttpClientPoolRequest.Url);
+              var LNetHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
+              try
+                // Note: if the connection drops, the server may close the socket
+                // and the client can still return "success" with partial content.
+                LHTTPResponse := LNetHttpClient.Get(LNetHttpClientPoolRequest.Url, LResponseContent, LNetHttpClientPoolRequest.Headers);
+              finally
+                ALReleaseKeepAliveNetHttpClient(LUri, LNetHttpClient);
+              end;
+
+              // Handle Content-Encoding (gzip, deflate, br, ...)
+              ALDecompressHttpResponseBody(LHTTPResponse.ContentEncoding, LResponseContent);
+
+              // Treat 4xx (client error) and 5xx (server error) as failures
+              if (LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599) then begin
                 if assigned(LNetHttpClientPoolRequest.OnErrorObjProc) then
-                  LNetHttpClientPoolRequest.OnErrorObjProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext)
+                  LNetHttpClientPoolRequest.OnErrorObjProc(LHTTPResponse, ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext)
                 else if assigned(LNetHttpClientPoolRequest.OnErrorRefProc) then
-                  LNetHttpClientPoolRequest.OnErrorRefProc(ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext);
+                  LNetHttpClientPoolRequest.OnErrorRefProc(LHTTPResponse, ALFormatW('HTTP request failed (%d)', [LHTTPResponse.StatusCode]), LNetHttpClientPoolRequest.FContext);
                 exit;
               end;
-              ALDecompressHttpResponseBody(LHTTPResponse.ContentEncoding, LResponseContent);
+
+              // Store successful HTTP responses in the cache (if enabled)
               if (LNetHttpClientPoolRequest.UseCache) and
-                 (assigned(CacheData)) then CacheData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent);
+                 (assigned(CacheData)) then CacheData(LNetHttpClientPoolRequest.Url, LNetHttpClientPoolRequest.Headers, LHTTPResponse);
+
             end;
           end
-          else LResponseContent.LoadFromFile(LNetHttpClientPoolRequest.Url);
+          else
+            // Non-HTTP(S) URL: treat it as a local file path
+            LResponseContent.LoadFromFile(LNetHttpClientPoolRequest.Url);
         end;
 
-        //fire the OnSuccess
+        // Notify the caller that the request completed successfully
         if assigned(LNetHttpClientPoolRequest.OnSuccessObjProc) then
           LNetHttpClientPoolRequest.OnSuccessObjProc(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FContext)
         else if assigned(LNetHttpClientPoolRequest.OnSuccessRefProc) then
@@ -408,9 +421,9 @@ begin
   except
     on E: exception do begin
       if assigned(LNetHttpClientPoolRequest.OnErrorObjProc) then
-        LNetHttpClientPoolRequest.OnErrorObjProc(E.Message, LNetHttpClientPoolRequest.FContext)
+        LNetHttpClientPoolRequest.OnErrorObjProc(nil{AResponse}, E.Message, LNetHttpClientPoolRequest.FContext)
       else if assigned(LNetHttpClientPoolRequest.OnErrorRefProc) then
-        LNetHttpClientPoolRequest.OnErrorRefProc(E.Message, LNetHttpClientPoolRequest.FContext);
+        LNetHttpClientPoolRequest.OnErrorRefProc(nil{AResponse}, E.Message, LNetHttpClientPoolRequest.FContext);
     end;
   end;
 

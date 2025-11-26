@@ -638,7 +638,7 @@ type
     FImageTintColor: TAlphaColor;
     FImageTintColorKey: String;
     FWrapMode: TALImageWrapMode;
-    FApplyExifOrientation: Boolean;
+    FApplyMetadataOrientation: Boolean;
     --- Memory Optimization ---}
     FResourceName: String; // 8 bytes
     FResourceStream: TStream; // 8 bytes
@@ -647,7 +647,7 @@ type
     FImageMargins: TALBounds; // 8 bytes
     FImageNoRadius: Boolean; // 1 byte
     FWrapMode: TALImageWrapMode; // 1 byte
-    FApplyExifOrientation: Boolean; // 1 byte
+    FApplyMetadataOrientation: Boolean; // 1 byte
     FOwnsResourceStream: Boolean; // 1 byte
     FColor: TAlphaColor; // 4 bytes
     FImageTintColor: TAlphaColor; // 4 Bytes
@@ -664,7 +664,7 @@ type
     procedure SetImageTintColor(const Value: TAlphaColor);
     procedure SetImageTintColorKey(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure SetApplyExifOrientation(const Value: Boolean);
+    procedure SetApplyMetadataOrientation(const Value: Boolean);
     procedure GradientChanged(Sender: TObject); virtual;
     procedure BackgroundMarginsChanged(Sender: TObject); virtual;
     procedure ImageMarginsChanged(Sender: TObject); virtual;
@@ -675,7 +675,7 @@ type
     function IsImageTintColorStored: Boolean;
     function IsImageTintColorKeyStored: Boolean;
     function IsWrapModeStored: Boolean;
-    function IsApplyExifOrientationStored: Boolean;
+    function IsApplyMetadataOrientationStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadKind(Reader: TReader);
@@ -694,7 +694,7 @@ type
     function GetDefaultImageTintColor: TAlphaColor; virtual;
     function GetDefaultImageTintColorKey: String; virtual;
     function GetDefaultWrapMode: TALImageWrapMode; virtual;
-    function GetDefaultApplyExifOrientation: Boolean; virtual;
+    function GetDefaultApplyMetadataOrientation: Boolean; virtual;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -714,7 +714,7 @@ type
     property DefaultImageTintColor: TAlphaColor read GetDefaultImageTintColor;
     property DefaultImageTintColorKey: String read GetDefaultImageTintColorKey;
     property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
-    property DefaultApplyExifOrientation: Boolean read GetDefaultApplyExifOrientation;
+    property DefaultApplyMetadataOrientation: Boolean read GetDefaultApplyMetadataOrientation;
     /// <summary>
     ///   When you assign a stream to ResourceStream, TALImage takes ownership and will free it.
     /// </summary>
@@ -731,7 +731,7 @@ type
     property ImageTintColor: TAlphaColor read FImageTintColor write SetImageTintColor stored IsImageTintColorStored;
     property ImageTintColorKey: String read FImageTintColorKey write SetImageTintColorKey stored IsImageTintColorKeyStored;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
-    property ApplyExifOrientation: Boolean read FApplyExifOrientation write SetApplyExifOrientation stored IsApplyExifOrientationStored;
+    property ApplyMetadataOrientation: Boolean read FApplyMetadataOrientation write SetApplyMetadataOrientation stored IsApplyMetadataOrientationStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -3894,7 +3894,7 @@ begin
   FImageTintColor := DefaultImageTintColor;
   FImageTintColorKey := DefaultImageTintColorKey;
   FWrapMode := DefaultWrapMode;
-  FApplyExifOrientation := DefaultApplyExifOrientation;
+  FApplyMetadataOrientation := DefaultApplyMetadataOrientation;
 end;
 
 {**************************}
@@ -3970,7 +3970,7 @@ begin
       ImageTintColor := TALBrush(Source).ImageTintColor;
       ImageTintColorKey := TALBrush(Source).ImageTintColorKey;
       WrapMode := TALBrush(Source).WrapMode;
-      ApplyExifOrientation := TALBrush(Source).ApplyExifOrientation;
+      ApplyMetadataOrientation := TALBrush(Source).ApplyMetadataOrientation;
     Finally
       EndUpdate;
     End;
@@ -3998,7 +3998,7 @@ begin
     ImageTintColor := DefaultImageTintColor;
     ImageTintColorKey := DefaultImageTintColorKey;
     WrapMode := DefaultWrapMode;
-    ApplyExifOrientation := DefaultApplyExifOrientation;
+    ApplyMetadataOrientation := DefaultApplyMetadataOrientation;
   finally
     EndUpdate;
   end;
@@ -4093,7 +4093,7 @@ begin
       if not AReverse then ImageNoRadius := ATo.ImageNoRadius;
       ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, ATo.ImageTintColor{Stop}, ANormalizedTime);
       if not AReverse then WrapMode := ATo.WrapMode;
-      if not AReverse then ApplyExifOrientation := ATo.ApplyExifOrientation;
+      if not AReverse then ApplyMetadataOrientation := ATo.ApplyMetadataOrientation;
     end
     else begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
@@ -4114,7 +4114,7 @@ begin
       if not AReverse then ImageNoRadius := DefaultImageNoRadius;
       ImageTintColor := ALInterpolateColor(ImageTintColor{Start}, DefaultImageTintColor{Stop}, ANormalizedTime);
       if not AReverse then WrapMode := DefaultWrapMode;
-      if not AReverse then ApplyExifOrientation := DefaultApplyExifOrientation;
+      if not AReverse then ApplyMetadataOrientation := DefaultApplyMetadataOrientation;
     end;
     FColorKey := LPrevColorKey;
     FImageTintColorKey := LPrevImageTintColorKey;
@@ -4197,10 +4197,10 @@ begin
   result := FWrapMode <> DefaultWrapMode;
 end;
 
-{******************************************************}
-function TALBrush.IsApplyExifOrientationStored: Boolean;
+{**********************************************************}
+function TALBrush.IsApplyMetadataOrientationStored: Boolean;
 begin
-  result := FApplyExifOrientation <> DefaultApplyExifOrientation;
+  result := FApplyMetadataOrientation <> DefaultApplyMetadataOrientation;
 end;
 
 {*********************************************}
@@ -4245,8 +4245,8 @@ begin
   Result := TALImageWrapMode.Fit;
 end;
 
-{********************************************************}
-function TALBrush.GetDefaultApplyExifOrientation: Boolean;
+{************************************************************}
+function TALBrush.GetDefaultApplyMetadataOrientation: Boolean;
 begin
   Result := False;
 end;
@@ -4345,11 +4345,11 @@ begin
   end;
 end;
 
-{***************************************************************}
-procedure TALBrush.SetApplyExifOrientation(const Value: Boolean);
+{*******************************************************************}
+procedure TALBrush.SetApplyMetadataOrientation(const Value: Boolean);
 begin
-  if fApplyExifOrientation <> Value then begin
-    fApplyExifOrientation := Value;
+  if fApplyMetadataOrientation <> Value then begin
+    fApplyMetadataOrientation := Value;
     Change;
   end;
 end;

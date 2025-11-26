@@ -153,6 +153,8 @@ uses
   Alcinoe.HTTP.Client.Net,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.HTTP.Server,
+  Alcinoe.HTTP.Worker,
+  Alcinoe.BroadcastReceiver,
   Alcinoe.JSONDoc,
   Alcinoe.Localization,
   Alcinoe.Net,
@@ -220,6 +222,16 @@ begin
       //Generate an NUnit compatible XML File
       nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);
       runner.AddLogger(nunitLogger);
+
+      // When the test executable is started under the Delphi debugger,
+      // DebugHook is non-zero. In that case we enable the Pause exit behavior
+      // so the console window stays open and the results remain visible.
+      {$IF defined(WIN32) or defined(WIN64)}
+      {$WARN SYMBOL_PLATFORM OFF}
+      if DebugHook <> 0 then
+        TDUnitX.Options.ExitBehavior := TDUnitXExitBehavior.Pause;
+      {$WARN SYMBOL_PLATFORM ON}
+      {$ENDIF}
 
       //Run tests
       results := runner.Execute;

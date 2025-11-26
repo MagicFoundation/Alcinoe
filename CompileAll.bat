@@ -396,6 +396,7 @@ Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFacebookLogin" "_Source" "ALFmxFace
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_Source" "ALFmxFilterEffectsDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGeoLocationSensor" "_Source" "ALFmxGeoLocationSensorDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj" || PAUSE
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxHttpWorker" "_Source" "ALFmxHttpWorkerDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxMediaPicker" "_Source" "ALFmxMediaPickerDemo.dproj" || PAUSE
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxNotificationService" "_Source" "ALFmxNotificationServiceDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE

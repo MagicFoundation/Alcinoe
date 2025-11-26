@@ -2788,7 +2788,7 @@ begin
                                       '', // const AMaskResourceName: String;
                                       1, // const AScale: Single;
                                       LDstRect.Width, LDstRect.Height, // const W, H: single;
-                                      False, // const AApplyExifOrientation: Boolean;
+                                      False, // const AApplyMetadataOrientation: Boolean;
                                       TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                                       TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                                       Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
@@ -2809,7 +2809,7 @@ begin
                                       '', // const AMaskResourceName: String;
                                       1, // const AScale: Single;
                                       LDstRect.Width, LDstRect.Height, // const W, H: single;
-                                      False, // const AApplyExifOrientation: Boolean;
+                                      False, // const AApplyMetadataOrientation: Boolean;
                                       TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                                       TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                                       Cardinal(LPlaceHolders.Objects[i]), // const ATintColor: TalphaColor;
@@ -4154,7 +4154,7 @@ begin
                              '', // const AMaskResourceName: String;
                              1, // const AScale: Single;
                              LDstRect.Width, LDstRect.Height, // const W, H: single;
-                             False, // const AApplyExifOrientation: Boolean;
+                             False, // const AApplyMetadataOrientation: Boolean;
                              TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                              TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                              LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
@@ -4175,7 +4175,7 @@ begin
                              '', // const AMaskResourceName: String;
                              1, // const AScale: Single;
                              LDstRect.Width, LDstRect.Height, // const W, H: single;
-                             False, // const AApplyExifOrientation: Boolean;
+                             False, // const AApplyMetadataOrientation: Boolean;
                              TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                              TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                              LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
@@ -4256,7 +4256,7 @@ begin
                             '', // const AMaskResourceName: String;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
-                            False, // const AApplyExifOrientation: Boolean;
+                            False, // const AApplyMetadataOrientation: Boolean;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
@@ -4277,7 +4277,7 @@ begin
                             '', // const AMaskResourceName: String;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
-                            False, // const AApplyExifOrientation: Boolean;
+                            False, // const AApplyMetadataOrientation: Boolean;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                             TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                             LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
@@ -4375,7 +4375,7 @@ begin
                              '', // const AMaskResourceName: String;
                              1, // const AScale: Single;
                              LDstRect.Width, LDstRect.Height, // const W, H: single;
-                             False, // const AApplyExifOrientation: Boolean;
+                             False, // const AApplyMetadataOrientation: Boolean;
                              TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                              TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                              LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;
@@ -4396,7 +4396,7 @@ begin
                              '', // const AMaskResourceName: String;
                              1, // const AScale: Single;
                              LDstRect.Width, LDstRect.Height, // const W, H: single;
-                             False, // const AApplyExifOrientation: Boolean;
+                             False, // const AApplyMetadataOrientation: Boolean;
                              TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
                              TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                              LExtendedTextElement.ImgTintColor, // const ATintColor: TalphaColor;

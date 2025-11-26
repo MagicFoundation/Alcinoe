@@ -164,7 +164,48 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
    end;
  
    TiOSOpenApplicationContext = class
-@@ -3879,11 +3883,22 @@
+@@ -324,6 +328,10 @@
+       application: PUIApplication; deviceToken: PNSData); cdecl; static;
+     class procedure applicationDidReceiveRemoteNotificationWithFetchCompletionHandler(self: id; _cmd: SEL;
+       application: PUIApplication; userInfo: PNSDictionary; completionHandler: Pointer); cdecl; static;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669
++    { Background URLSession events }
++    class procedure applicationHandleEventsForBackgroundURLSessionCompletionHandler(self: id; _cmd: SEL;
++      application: PUIApplication; handleEventsForBackgroundURLSession: PNSString; completionHandler: Pointer); cdecl; static;
+     { Opening a URL-Specified Resource }
+     class function applicationOpenURLWithOptions(self: id; _cmd: SEL; application: PUIApplication; url: Pointer;
+       options: PNSDictionary): Boolean; cdecl; static;
+@@ -1242,6 +1250,17 @@
+   end;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669
++class procedure TApplicationDelegate.applicationHandleEventsForBackgroundURLSessionCompletionHandler(self: id; _cmd: SEL;
++  application: PUIApplication; handleEventsForBackgroundURLSession: PNSString; completionHandler: Pointer);
++var
++  Message: TBackgroundNetworkTaskMessage;
++begin
++  Message := TBackgroundNetworkTaskMessage.Create(TBackgroundNetworkTaskData.create(
++    NSStrToStr(TNSString.Wrap(handleEventsForBackgroundURLSession)), completionHandler));
++  TMessageManager.DefaultManager.SendMessage(nil, Message);
++end;
++
+ class function TApplicationDelegate.applicationOpenURLWithOptions(self: id; _cmd: SEL; application: PUIApplication;
+   url: Pointer; options: PNSDictionary): Boolean;
+ var
+@@ -1346,6 +1365,11 @@
+   class_addMethod(DelegateClass, sel_getUid('application:didReceiveRemoteNotification:fetchCompletionHandler:'),
+     @applicationDidReceiveRemoteNotificationWithFetchCompletionHandler, 'v@:@@?'); // iOS 7.0
+ 
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669
++  // Background URLSession events
++  class_addMethod(DelegateClass, sel_getUid('application:handleEventsForBackgroundURLSession:completionHandler:'),
++    @applicationHandleEventsForBackgroundURLSessionCompletionHandler, 'v@:@@?');
++
+   // Opening a URL-Specified Resource
+   class_addMethod(DelegateClass, sel_getUid('application:openURL:options:'),
+     @applicationOpenURLWithOptions, 'B@:@@@@');
+@@ -3879,11 +3903,22 @@
    TextInput: ITextInput;
    Obj: IControl;
    Touch: UITouch;
@@ -187,7 +228,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
      // find the control from under the gesture
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
      SendTouches(withEvent.allTouches, TTouchAction.Down, Obj);
-@@ -3913,6 +3928,11 @@
+@@ -3913,6 +3948,11 @@
        FClickedAnotherControl := (Obj <> nil) and (FContextMenu.Control <> Obj.GetObject);
        View.touchesBegan(touches, withEvent);
      end;
@@ -199,7 +240,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
    except
      Application.HandleException(Form);
    end;
-@@ -3934,6 +3954,7 @@
+@@ -3934,6 +3974,7 @@
    X, Y : single;
    Obj: IControl;
    LPoint: TPointF;
@@ -207,7 +248,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
  const
    LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
  begin
-@@ -3940,6 +3961,17 @@
+@@ -3940,6 +3981,17 @@
    try
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
@@ -225,7 +266,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
      LPoint := TPointF.Create(X, Y);
      FShouldIgnoreNextClick := False;
      FAdditionalShift := [];
-@@ -3952,6 +3984,11 @@
+@@ -3952,6 +4004,11 @@
      finally
        View.touchesCancelled(touches, withEvent);
      end;
@@ -237,7 +278,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
    except
      Application.HandleException(Form);
    end;
-@@ -3974,6 +4011,7 @@
+@@ -3974,6 +4031,7 @@
    X, Y : single;
    Touch: UITouch;
    Obj: IControl;
@@ -245,7 +286,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
  const
    LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
  begin
-@@ -3981,6 +4019,16 @@
+@@ -3981,6 +4039,16 @@
      if not GetTouchCoord(touches, View, X, Y) then
        Exit;
  
@@ -262,7 +303,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
      // find the control from under the gesture
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(TPointF.Create(X, Y)));
      SendTouches(withEvent.allTouches, TTouchAction.Up, Obj);
-@@ -3997,6 +4045,11 @@
+@@ -3997,6 +4065,11 @@
        if Form <> nil then
          View.touchesEnded(touches, withEvent);
      end;
@@ -274,7 +315,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
    except
      Application.HandleException(Form);
    end;
-@@ -4007,11 +4060,22 @@
+@@ -4007,11 +4080,22 @@
    X, Y : single;
    Obj: IControl;
    LPoint: TPointF;
@@ -297,7 +338,7 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
      LPoint := TPointF.Create(X, Y);
      Obj := Form.ObjectAtPoint(Form.ClientToScreen(LPoint));
      SendTouches(withEvent.allTouches, TTouchAction.Move, Obj);
-@@ -4021,6 +4085,11 @@
+@@ -4021,6 +4105,11 @@
      finally
        View.touchesMoved(touches, withEvent);
      end;
@@ -309,6 +350,42 @@ diff --git a/Embarcadero/Florence/fmx/FMX.Platform.iOS.pas b/Embarcadero/Florenc
    except
      Application.HandleException(Form);
    end;
+Index: Embarcadero/Florence/fmx/FMX.Platform.pas
+===================================================================
+diff --git a/Embarcadero/Florence/fmx/FMX.Platform.pas b/Embarcadero/Florence/fmx/FMX.Platform.pas
+--- a/Embarcadero/Florence/fmx/FMX.Platform.pas	(revision 1)
++++ b/Embarcadero/Florence/fmx/FMX.Platform.pas	(working copy)
+@@ -477,6 +477,14 @@
+   end;
+   TPushFailToRegisterMessage = class (System.Messaging.TMessage<TPushFailToRegisterData>);
+ 
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669
++  TBackgroundNetworkTaskData = record
++    Identifier: string;
++    CompletionHandler: Pointer;
++    constructor Create(const AIdentifier: string; ACompletionHandler: Pointer);
++  end;
++  TBackgroundNetworkTaskMessage = class(System.Messaging.TMessage<TBackgroundNetworkTaskData>);
++
+ implementation
+ 
+ uses
+@@ -726,6 +734,15 @@
+   ErrorMessage := AErrorMessage;
+ end;
+ 
++{ TBackgroundNetworkTaskData }
++
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669
++constructor TBackgroundNetworkTaskData.Create(const AIdentifier: string; ACompletionHandler: Pointer);
++begin
++  Identifier := AIdentifier;
++  CompletionHandler := ACompletionHandler;
++end;
++
+ { TSystemAppearance }
+ 
+ function TSystemAppearance.GetSystemColor(const Index: TSystemColorType): TAlphaColor;
 Index: Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Florence/fmx/FMX.Platform.UI.Android.pas

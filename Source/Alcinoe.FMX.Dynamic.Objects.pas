@@ -93,7 +93,7 @@ type
         MaskResourceName: String;
         WrapMode: TALImageWrapMode;
         CropCenter: TpointF;
-        ApplyExifOrientation: Boolean;
+        ApplyMetadataOrientation: Boolean;
         StrokeColor: TAlphaColor;
         StrokeThickness: Single;
         ShadowBlur: Single;
@@ -122,7 +122,7 @@ type
     FMaskResourceName: String; // 8 bytes
     FHTTPHeaders: TNetHeaders; // 8 bytes
     FWrapMode: TALImageWrapMode; // 1 bytes
-    FApplyExifOrientation: Boolean; // 1 bytes
+    FApplyMetadataOrientation: Boolean; // 1 bytes
     FCorners: TCorners; // 1 bytes
     FSides: TSides; // 1 bytes
     FXRadius: Single; // 4 bytes
@@ -144,7 +144,7 @@ type
     function GetShadow: TALShadow;
     procedure SetShadow(const Value: TALShadow);
     procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure SetApplyExifOrientation(const Value: Boolean);
+    procedure SetApplyMetadataOrientation(const Value: Boolean);
     procedure setResourceName(const Value: String);
     procedure setResourceStream(const Value: TStream);
     procedure setMaskResourceName(const Value: String);
@@ -203,7 +203,7 @@ type
     procedure CancelResourceDownload;
     class function CanStartResourceDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
     class procedure HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject); virtual; // [MultiThread]
-    class procedure HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
+    class procedure HandleResourceDownloadError(const AResponse: IHTTPResponse; const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
     class function GetResourceDownloadPriority(const AContext: Tobject): Int64; virtual; // [MultiThread]
     class Procedure CreateBufDrawable(var AContext: TObject); overload; virtual; // [MultiThread]
     class Procedure CreateBufDrawable(
@@ -219,7 +219,7 @@ type
                       const AMaskResourceName: String;
                       const AWrapMode: TALImageWrapMode;
                       const ACropCenter: TpointF;
-                      const AApplyExifOrientation: Boolean;
+                      const AApplyMetadataOrientation: Boolean;
                       const AStrokeColor: TAlphaColor;
                       const AStrokeThickness: Single;
                       const AShadowBlur: Single;
@@ -337,7 +337,7 @@ type
     ///   (the Delphi IDE uses a Skia canvas), so the property is effectively
     ///   ignored there and images are displayed with EXIF orientation applied.
     /// </remarks>
-    property ApplyExifOrientation: Boolean read FApplyExifOrientation write SetApplyExifOrientation default false;
+    property ApplyMetadataOrientation: Boolean read FApplyMetadataOrientation write SetApplyMetadataOrientation default false;
     property RotationAngle;
     //property RotationCenter;
     property Pivot;
@@ -1428,7 +1428,7 @@ begin
   MaskResourceName := AOwner.MaskResourceName;
   WrapMode := AOwner.WrapMode;
   CropCenter := AOwner.CropCenter.Point;
-  ApplyExifOrientation := AOwner.ApplyExifOrientation;
+  ApplyMetadataOrientation := AOwner.ApplyMetadataOrientation;
   StrokeColor := AOwner.Stroke.Color;
   StrokeThickness := AOwner.Stroke.Thickness;
   ShadowBlur := AOwner.Shadow.Blur;
@@ -1471,7 +1471,7 @@ begin
   FMaskResourceName := '';
   FHTTPHeaders := nil;
   FWrapMode := TALImageWrapMode.Fit;
-  FApplyExifOrientation := False;
+  FApplyMetadataOrientation := False;
   FCorners := DefaultCorners;
   FSides := DefaultSides;
   FXRadius := DefaultXRadius;
@@ -1544,7 +1544,7 @@ begin
       MaskResourceName := TALDynamicImage(Source).MaskResourceName;
       HTTPHeaders := TALDynamicImage(Source).HTTPHeaders;
       WrapMode := TALDynamicImage(Source).WrapMode;
-      ApplyExifOrientation := TALDynamicImage(Source).ApplyExifOrientation;
+      ApplyMetadataOrientation := TALDynamicImage(Source).ApplyMetadataOrientation;
       Corners := TALDynamicImage(Source).Corners;
       Sides := TALDynamicImage(Source).Sides;
       XRadius := TALDynamicImage(Source).XRadius;
@@ -1797,12 +1797,12 @@ begin
   end;
 end;
 
-{**********************************************************************}
-procedure TALDynamicImage.SetApplyExifOrientation(const Value: Boolean);
+{**************************************************************************}
+procedure TALDynamicImage.SetApplyMetadataOrientation(const Value: Boolean);
 begin
-  if FApplyExifOrientation <> Value then begin
+  if FApplyMetadataOrientation <> Value then begin
     ClearBufDrawable;
-    FApplyExifOrientation := Value;
+    FApplyMetadataOrientation := Value;
     Repaint;
   end;
 end;
@@ -2112,7 +2112,7 @@ end;
 
 {*************}
 //[MultiThread]
-class procedure TALDynamicImage.HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject);
+class procedure TALDynamicImage.HandleResourceDownloadError(const AResponse: IHTTPResponse; const AErrMessage: string; var AContext: Tobject);
 begin
   var LContext := TResourceDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
@@ -2163,7 +2163,7 @@ begin
   LContext.MaskResourceName := '';
   LContext.WrapMode := TALImageWrapMode.Fit;
   //LContext.CropCenter: TpointF;
-  //LContext.ApplyExifOrientation: Boolean;
+  //LContext.ApplyMetadataOrientation: Boolean;
   LContext.StrokeColor := TalphaColors.Null;
   //LContext.StrokeThickness: Single;
   //LContext.ShadowBlur: Single;
@@ -2211,7 +2211,7 @@ begin
       LContext.MaskResourceName, // const AMaskResourceName: String;
       LContext.WrapMode, // const AWrapMode: TALImageWrapMode;
       LContext.CropCenter, // const ACropCenter: TpointF;
-      LContext.ApplyExifOrientation, // const AApplyExifOrientation: Boolean;
+      LContext.ApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
       LContext.StrokeColor, // const AStrokeColor: TAlphaColor;
       LContext.StrokeThickness, // const AStrokeThickness: Single;
       LContext.ShadowBlur, // const AShadowBlur: Single;
@@ -2225,7 +2225,7 @@ begin
       LContext.BlurRadius); // const ABlurRadius: Single)
   except
     On E: Exception do begin
-      HandleResourceDownloadError(E.Message, AContext);
+      HandleResourceDownloadError(nil{AResponse}, E.Message, AContext);
       exit;
     end;
   End;
@@ -2269,7 +2269,7 @@ class Procedure TALDynamicImage.CreateBufDrawable(
                   const AMaskResourceName: String;
                   const AWrapMode: TALImageWrapMode;
                   const ACropCenter: TpointF;
-                  const AApplyExifOrientation: Boolean;
+                  const AApplyMetadataOrientation: Boolean;
                   const AStrokeColor: TAlphaColor;
                   const AStrokeThickness: Single;
                   const AShadowBlur: Single;
@@ -2309,7 +2309,7 @@ begin
                         AMaskResourceName, // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
                         ABufDrawableRect.Width, ABufDrawableRect.Height, // const W, H: single;
-                        AApplyExifOrientation, // const AApplyExifOrientation: Boolean;
+                        AApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         ACropCenter, // const ACropCenter: TpointF;
                         ATintColor, // const ATintColor: TAlphaColor;
@@ -2373,7 +2373,7 @@ begin
         .SetFillResourceName(LResourceName)
         .SetFillResourceStream(AResourceStream)
         .SetFillMaskResourceName(AMaskResourceName)
-        .SetFillApplyExifOrientation(AApplyExifOrientation)
+        .SetFillApplyMetadataOrientation(AApplyMetadataOrientation)
         .SetFillImageTintColor(ATintColor)
         .SetFillWrapMode(AWrapMode)
         .SetFillCropCenter(ACropCenter)
@@ -2476,7 +2476,7 @@ begin
         '', // const AMaskResourceName: String;
         WrapMode, // const AWrapMode: TALImageWrapMode;
         TpointF.Zero, // const ACropCenter: TpointF;
-        false, // const AApplyExifOrientation: Boolean;
+        false, // const AApplyMetadataOrientation: Boolean;
         TAlphaColors.Null, // const AStrokeColor: TAlphaColor;
         0, // const AStrokeThickness: Single;
         0, // const AShadowBlur: Single;
@@ -2511,7 +2511,7 @@ begin
     MaskResourceName, // const AMaskResourceName: String;
     WrapMode, // const AWrapMode: TALImageWrapMode;
     CropCenter.Point, // const ACropCenter: TpointF;
-    ApplyExifOrientation, // const AApplyExifOrientation: Boolean;
+    ApplyMetadataOrientation, // const AApplyMetadataOrientation: Boolean;
     Stroke.Color, // const AStrokeColor: TAlphaColor;
     Stroke.Thickness, // const AStrokeThickness: Single;
     Shadow.Blur, // const AShadowBlur: Single;

@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{6D5AF37A-7981-4B15-83CA-3F66A99BAE94}</ProjectGuid>
+    <ProjectGuid>{541F8433-B536-44C1-ACE1-75551F6561B8}</ProjectGuid>
     <ProjectVersion>20.3</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>PlatformApiInterfaceDiff.dpr</MainSource>

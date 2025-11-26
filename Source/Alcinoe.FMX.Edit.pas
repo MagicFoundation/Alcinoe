@@ -1410,7 +1410,16 @@ begin
     FEditView.Control.DoReturnKey;
 
   end
-  else result := false;
+  else begin
+    // When using TYPE_CLASS_NUMBER: pressing Return can make Android switch to
+    // the default keyboard during the dismiss animation. To avoid this, set the
+    // Return key to IME_ACTION_DONE, handle the action manually (clear focus and
+    // hide the keyboard), and return true to consume the event so Android does
+    // not move focus to another control (which would trigger a keyboard type
+    // change).
+    result := True;
+    FEditView.ResetFocus;
+  end;
 end;
 
 {************************************************************************************************************************************************************************}
@@ -3193,6 +3202,7 @@ end;
 procedure TALWinEditView.SetText(const Value: String);
 begin
   SetWindowText(Handle, PChar(Value));
+  if Value <> '' then setSelection(length(Value));
 end;
 
 {*************************************************************************}

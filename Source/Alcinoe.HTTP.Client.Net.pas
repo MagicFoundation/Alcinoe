@@ -33,7 +33,6 @@ Function ALCreateNetHTTPClient(Const AAllowcookies: Boolean = False): THttpClien
 Begin
   Result := THttpClient.Create;
   Result.AllowCookies := AAllowcookies;
-  Result.Accept := '*/*';
   Result.AutomaticDecompression := [THTTPCompressionMethod.Any];
   Result.UserAgent := 'ALNetHTTPClient/1.0';
   Result.ConnectionTimeout := ALCreateHttpClientConnectTimeout;

@@ -10,7 +10,7 @@ uses
   Alcinoe.FMX.Controls, Alcinoe.FMX.Objects;
 
 type
-  TForm2 = class(TForm)
+  TForm1 = class(TForm)
     Image1: TImage;
     ALTrackBarContrast: TALTrackBar;
     ALTrackBarSaturation: TALTrackBar;
@@ -51,7 +51,7 @@ type
   end;
 
 var
-  Form2: TForm2;
+  Form1: TForm1;
 
 implementation
 
@@ -62,61 +62,61 @@ uses
   Alcinoe.Common;
 
 {*********************************************************}
-procedure TForm2.ALTrackBarContrastChange(Sender: TObject);
+procedure TForm1.ALTrackBarContrastChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.contrast := ALTrackBarcontrast.Value;
 end;
 
 {***********************************************************}
-procedure TForm2.ALTrackBarSaturationChange(Sender: TObject);
+procedure TForm1.ALTrackBarSaturationChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.Saturation := ALTrackBarSaturation.Value;
 end;
 
 {*********************************************************}
-procedure TForm2.ALTrackBarVibranceChange(Sender: TObject);
+procedure TForm1.ALTrackBarVibranceChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.Vibrance := ALTrackBarVibrance.Value;
 end;
 
 {*******************************************************}
-procedure TForm2.ALTrackBarWhitesChange(Sender: TObject);
+procedure TForm1.ALTrackBarWhitesChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.Whites := ALTrackBarWhites.Value;
 end;
 
 {*******************************************************}
-procedure TForm2.ALTrackBarBlacksChange(Sender: TObject);
+procedure TForm1.ALTrackBarBlacksChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.Blacks := ALTrackBarBlacks.Value;
 end;
 
 {************************************************************}
-procedure TForm2.ALTrackBarTemperatureChange(Sender: TObject);
+procedure TForm1.ALTrackBarTemperatureChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.temperature := ALTrackBartemperature.Value;
 end;
 
 {*****************************************************}
-procedure TForm2.ALTrackBarTintChange(Sender: TObject);
+procedure TForm1.ALTrackBarTintChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.tint := ALTrackBartint.Value;
 end;
 
 {*********************************************************}
-procedure TForm2.ALTrackBarExposureChange(Sender: TObject);
+procedure TForm1.ALTrackBarExposureChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.Exposure := ALTrackBarExposure.Value;
 end;
 
 {******************************************************}
-procedure TForm2.ALTrackBarGammaChange(Sender: TObject);
+procedure TForm1.ALTrackBarGammaChange(Sender: TObject);
 begin
   ALColorAdjustEffect1.gamma := ALTrackBargamma.Value;
 end;
 
 {**************************************************************}
-procedure TForm2.ButtonActivateDeactivateClick(Sender: TObject);
+procedure TForm1.ButtonActivateDeactivateClick(Sender: TObject);
 begin
   ALColorAdjustEffect1.Enabled := not ALColorAdjustEffect1.Enabled;
   if ALColorAdjustEffect1.Enabled then ButtonActivateDeactivate.Text := 'Deactivate'
@@ -124,13 +124,13 @@ begin
 end;
 
 {*************************************************}
-procedure TForm2.ALLayout1Resized(Sender: TObject);
+procedure TForm1.ALLayout1Resized(Sender: TObject);
 begin
   ALLayout1.Height := ALLayout1.Width / (720 / 404)
 end;
 
 {*******************************************}
-procedure TForm2.FormCreate(Sender: TObject);
+procedure TForm1.FormCreate(Sender: TObject);
 begin
   TALErrorReporting.Instance;
   ALColorAdjustEffect1.Enabled := true;

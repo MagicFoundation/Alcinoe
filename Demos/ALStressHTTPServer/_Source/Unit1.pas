@@ -508,7 +508,7 @@ begin
         FSendStopWatch := TStopWatch.Create;
         FWaitStopWatch := TStopWatch.Create;
         FReceiveStopWatch := TStopWatch.Create;
-        var LHttpclientResponse: TALHTTPClientResponse;
+        var LHttpclientResponse: TALHttpClientResponseA;
         if FBodyStream.Size > 0 then begin
           FBytesSent := FBodyStream.Size;
           LHttpclientResponse := LHttpClient.Post(LUrl, FBodyStream)

@@ -1,4 +1,4 @@
-(*******************************************************************************
+(******************************************************
 TALJSONDocument is a Delphi parser/writer for JSON/BSON
 data formats. It supports both DOM and SAX parsers. (Note
 that a better name for SAX could be SAJ for Simple API for
@@ -28,8 +28,9 @@ Exemple :
   phones: []
 }
 
-------------------------------
-To access the document nodes :
+
+To access the document nodes
+----------------------------
 
 MyJsonDoc := TALJsonDocumentW.CreateFromJSONString('{...}');
 MyJsonDoc.GetChildNodeValueInt32('_id', 0{default if node not exists});
@@ -38,8 +39,9 @@ MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
 for i := 0 to MyJsonDoc.childnodes['contribs'].ChildNodes.count - 1 do
   MyJsonDoc.childnodes['contribs'].childnodes[i].text;
 
-------------------------------
-To create the document nodes :
+
+To create the document nodes
+----------------------------
 
 MyJsonDoc := TALJsonDocumentW.Create;
 MyJsonDoc.addchild('_id').int32 := 1;
@@ -70,90 +72,67 @@ MyJsonDoc.addchild('spouse');
 MyJsonDoc.addchild('address', ntObject);
 MyJsonDoc.addchild('phones', ntArray);
 
-----------------------------
-To load and save from BSON :
+
+To load and save from BSON
+--------------------------
 
 MyJsonDoc := TALJsonDocumentW.CreateFromBSONBytes(Bytes);
 MyJsonDoc.SaveToBSONFile(FileName);
 
----------------------------------------
-To parse an JSON document in Sax Mode :
+
+To parse an JSON document in Sax Mode
+-------------------------------------
 
 TALJSONDocumentW.ParseJSONString(
-      '{...}',
-      //--
-      procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
-      begin
-        case NodeSubType of
-          nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
-          nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstObject: ;
-          nstArray: ;
-          nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
-          nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
-          nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
-          nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
-          nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
-          nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
-          nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberInt('+ALIntToStrW(Args[0].VInteger)+')');
-          nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'Timestamp('+ALIntToStrW(int64(cardinal(Args[0].VInteger)))+', '+ALIntToStrW(int64(cardinal(Args[1].VInteger)))+')');
-          nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
-        end;
-      end{onParseText},
-      //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
-      begin
-        MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
-      end{onParseStartObject},
-      //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
-      begin
-        MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
-      end{onParseEndObject},
-      //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
-      begin
-        MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
-      end{onParseStartArray},
-      //--
-      procedure (Sender: TObject; const Path: String; const Name: String)
-      begin
-        MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
-      end{onParseEndArray});
+  '{...}',
+  //--
+  procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+  begin
+    case NodeSubType of
+      nstFloat:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFloatToStrW(Args[0].VExtended^));
+      nstText:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
+      nstObject: ;
+      nstArray: ;
+      nstObjectID:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
+      nstBoolean:    MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALBoolToStrW(Args[0].VBoolean,'true','false'));
+      nstDateTime:   MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^));
+      nstNull:       MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'null');
+      nstRegEx:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
+      nstBinary:     MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'BinData('+ALIntToStrW(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
+      nstJavascript: MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + String(Args[0].VUnicodeString));
+      nstInt32:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberInt('+ALIntToStrW(Args[0].VInteger)+')');
+      nstTimestamp:  MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'Timestamp('+ALIntToStrW(int64(cardinal(Args[0].VInteger)))+', '+ALIntToStrW(int64(cardinal(Args[1].VInteger)))+')');
+      nstInt64:      MemoSaxModeEvents.Lines.Add('TEXT         =>  ' + Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+    end;
+  end{onParseText},
+  //--
+  procedure (Sender: TObject; const Path: String; const Name: String)
+  begin
+    MemoSaxModeEvents.Lines.Add('STARTOBJECT  =>  ' + Name);
+  end{onParseStartObject},
+  //--
+  procedure (Sender: TObject; const Path: String; const Name: String)
+  begin
+    MemoSaxModeEvents.Lines.Add('ENDOBJECT    =>  ' + Name);
+  end{onParseEndObject},
+  //--
+  procedure (Sender: TObject; const Path: String; const Name: String)
+  begin
+    MemoSaxModeEvents.Lines.Add('STARTARRAY   =>  ' + Name);
+  end{onParseStartArray},
+  //--
+  procedure (Sender: TObject; const Path: String; const Name: String)
+  begin
+    MemoSaxModeEvents.Lines.Add('ENDARRAY     =>  ' + Name);
+  end{onParseEndArray});
 
--------------------------------------------------------
-list of changes made with the 1.0.5 release of Alcinoe:
 
-* The support for doNodeAutoCreate has been removed.
-* The properties TALJsonDocument.Duplicates and TALJsonDocument.Sorted are now
-  only applied to the child nodes list and are not inherited anymore.
-* The properties TALJsonDocument.ParseOptions and TALJsonDocument.Options have
-  been moved as parameters for the methods loadFromJson/saveToJson and
-  loadFromBson/saveToBson.
-* TALJsonDocument.Duplicates has been moved to the child nodes list.
-* The ClearChildNodes parameter from loadFromJson/saveToJson has been moved to
-  the options of loadFromJson/saveToJson.
-* The property TALJSONNode.ownerDocument has been removed.
-* FormatSettings has been removed.
-* The property TALJsonDocument.Tag has been removed.
-* TALJsonDocument.PathSeparator has been replaced by ALDefaultJsonPathSeparator.
-* TALJsonDocument.NodeIndentStr has been replaced by ALDefaultJsonNodeIndentA.
-* TALJsonDocument.node has been removed.
-* TALJsonDocument.create now returns a TALJsonNode.
-* TALJsonDocument.IsEmptyDoc has been replaced by hasChildNodes.
-* The method TALJsonDocument.ExtractNode has been removed.
-* The property TALJsonDocument.Active has been removed.
-* The method TALJsonDocument.ReleaseDoc has been removed.
-* The ParseStartDocument and ParseEndDocument events have been removed.
-* TALJsonDocument.clear has been moved to childnodes.clear.
-* The events onParseText, onParseStartObject, onParseEndObject,
-  onParseStartArray, and onParseEndArray have been moved to ParseBSON/ParseJSON.
+DEMO
+----
 
-------
-DEMO :
 https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALJsonDoc
-*******************************************************************************)
+*********************************************************************)
+
 unit Alcinoe.JSONDoc;
 
 interface

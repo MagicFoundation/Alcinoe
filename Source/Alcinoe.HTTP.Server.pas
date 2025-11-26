@@ -14,8 +14,8 @@ type
   EALHttpServerBodySizeTooBig = Class(Exception);
   EALHttpServerConnectionDropped = class(Exception);
 
-  {------------------------------------------}
-  TALHttpServerRequest = class(TALHTTPRequest)
+  {--------------------------------------------}
+  TALHttpServerRequestA = class(TALHTTPRequestA)
   protected
     function GetRemoteAddress: TALNetEndpoint; virtual; abstract;
     procedure SetRemoteAddress(const AValue: TALNetEndpoint); virtual; abstract;
@@ -28,8 +28,8 @@ type
     property IsSecure: Boolean read GetIsSecure;
   end;
 
-  {--------------------------------------------}
-  TALHttpServerResponse = class(TALHTTPResponse)
+  {----------------------------------------------}
+  TALHttpServerResponseA = class(TALHTTPResponseA)
   public
     type
       TCachePolicyType = (
@@ -55,11 +55,11 @@ type
     property CacheSecondsToLive: Cardinal read GetCacheSecondsToLive write SetCacheSecondsToLive;
   end;
 
-  {-------------------}
-  TALHttpServer = class
+  {--------------------}
+  TALHttpServerA = class
   public
     Type
-      TRequestEvent = procedure(Const ARequest: TALHttpServerRequest; Const AResponse: TALHttpServerResponse) of object;
+      TRequestEvent = procedure(Const ARequest: TALHttpServerRequestA; Const AResponse: TALHttpServerResponseA) of object;
   private
     FMaxBodySize: Int64;
     FOnRequest: TRequestEvent;
@@ -77,8 +77,8 @@ type
 
 implementation
 
-{*******************************}
-constructor TALHttpServer.Create;
+{********************************}
+constructor TALHttpServerA.Create;
 begin
   inherited;
   FRunning := False;
@@ -86,8 +86,8 @@ begin
   FOnRequest := nil;
 end;
 
-{*******************************}
-destructor TALHttpServer.Destroy;
+{********************************}
+destructor TALHttpServerA.Destroy;
 begin
   Stop;
   inherited;

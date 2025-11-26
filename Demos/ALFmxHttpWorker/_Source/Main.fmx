@@ -1,0 +1,159 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 819
+  ClientWidth = 360
+  Fill.Color = xFFFEF7FF
+  Fill.Kind = Solid
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object ButtonUpload: TALButton
+    Align = TopCenter
+    Fill.Color = xFF6750A4
+    Fill.ColorKey = 'Material3.Color.Primary'
+    Margins.Left = 16.000000000000000000
+    Margins.Top = 16.000000000000000000
+    Margins.Right = 16.000000000000000000
+    Margins.Bottom = 16.000000000000000000
+    Padding.Left = 30.860000610351560000
+    Padding.Top = 12.859999656677250000
+    Padding.Right = 30.860000610351560000
+    Padding.Bottom = 12.859999656677250000
+    Position.X = 119.500000000000000000
+    Position.Y = 321.000000000000000000
+    Size.Width = 121.000000000000000000
+    Size.Height = 52.000000000000000000
+    Size.PlatformDefault = False
+    StateStyles.Disabled.Fill.Color = x1F1D1B20
+    StateStyles.Disabled.Fill.ColorKey = 'Material3.Color.OnSurface.Alpha12'
+    StateStyles.Disabled.Fill.Inherit = False
+    StateStyles.Disabled.TextSettings.Inherit = False
+    StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
+    StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
+    StateStyles.Disabled.TextSettings.Font.ColorKey = 'Material3.Color.OnSurface.Alpha38'
+    StateStyles.Disabled.Opacity = 1.000000000000000000
+    StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+    StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
+    StateStyles.Hovered.Shadow.Color = x80000000
+    StateStyles.Hovered.Shadow.ColorKey = 'Material3.Color.Shadow.Alpha50'
+    StateStyles.Hovered.Shadow.Inherit = False
+    StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
+    StateStyles.Hovered.StateLayer.UseContentColor = True
+    StateStyles.Pressed.StateLayer.Opacity = 0.119999997317791000
+    StateStyles.Pressed.StateLayer.UseContentColor = True
+    StateStyles.Focused.StateLayer.Opacity = 0.119999997317791000
+    StateStyles.Focused.StateLayer.UseContentColor = True
+    StateStyles.Transition.Duration = 0.200000002980232200
+    StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
+    Stroke.Color = claNull
+    Stroke.Thickness = 1.289999961853027000
+    TabOrder = 1
+    Text = 'Upload'
+    TextSettings.Font.Size = 18.000000000000000000
+    TextSettings.Font.Color = claWhite
+    TextSettings.Font.ColorKey = 'Material3.Color.OnPrimary'
+    TextSettings.LineHeightMultiplier = 1.440000057220459000
+    XRadius = -50.000000000000000000
+    YRadius = -50.000000000000000000
+    OnClick = ButtonUploadClick
+  end
+  object ALText1: TALText
+    Align = Top
+    Margins.Left = 16.000000000000000000
+    Margins.Top = 16.000000000000000000
+    Margins.Right = 16.000000000000000000
+    Margins.Bottom = 16.000000000000000000
+    Position.X = 16.000000000000000000
+    Position.Y = 16.000000000000000000
+    Size.Width = 328.000000000000000000
+    Size.Height = 273.000000000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'This demo shows how to <b>upload data reliably in the background' +
+      '</b>.'#13#10'On Android/iOS, users may switch apps or even close the a' +
+      'pp '#8212' the upload'#13#10'continues and automatically retries on network ' +
+      'errors. The API is simple: just call'#13#10'<span background-color="{M' +
+      'aterial3.Color.SurfaceContainerHigh}" font-weight=500>'#13#10'TALUploa' +
+      'dWorker.enqueue'#13#10'</span> '#8212' the OS takes care of the rest.<br>'#13#10'<' +
+      'br>'#13#10'To test it, disconnect the device from the internet and pre' +
+      'ss the Upload or Download '#13#10'button. Even if you close the app an' +
+      'd reopen it later, the upload will'#13#10'continue in the background.'
+    TextSettings.Font.Size = 16.000000000000000000
+    TextSettings.Font.Color = xFF1D1B20
+    TextSettings.Font.ColorKey = 'Material3.Color.OnSurface'
+  end
+  object LoadingContainer: TALLayout
+    Align = Top
+    Margins.Top = 50.000000000000000000
+    Position.Y = 523.000000000000000000
+    Size.Width = 360.000000000000000000
+    Size.Height = 150.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object LoadingAnimatedImage: TALAnimatedImage
+      Align = HorzCenter
+      Position.X = 105.000000000000000000
+      ResourceName = 'alcinoe_loading_indicator'
+      Size.Width = 150.000000000000000000
+      Size.Height = 150.000000000000000000
+      Size.PlatformDefault = False
+      TintColor = xFF6750A4
+      TintColorKey = 'Material3.Color.Primary'
+    end
+  end
+  object ButtonDownload: TALButton
+    Align = TopCenter
+    Fill.Color = xFF6750A4
+    Fill.ColorKey = 'Material3.Color.Primary'
+    Margins.Left = 16.000000000000000000
+    Margins.Top = 16.000000000000000000
+    Margins.Right = 16.000000000000000000
+    Margins.Bottom = 16.000000000000000000
+    Padding.Left = 31.000000000000000000
+    Padding.Top = 13.000000000000000000
+    Padding.Right = 31.000000000000000000
+    Padding.Bottom = 13.000000000000000000
+    Position.X = 107.000000000000000000
+    Position.Y = 405.000000000000000000
+    Size.Width = 146.000000000000000000
+    Size.Height = 52.000000000000000000
+    Size.PlatformDefault = False
+    StateStyles.Disabled.Fill.Color = x1F1D1B20
+    StateStyles.Disabled.Fill.ColorKey = 'Material3.Color.OnSurface.Alpha12'
+    StateStyles.Disabled.Fill.Inherit = False
+    StateStyles.Disabled.TextSettings.Inherit = False
+    StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
+    StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
+    StateStyles.Disabled.TextSettings.Font.ColorKey = 'Material3.Color.OnSurface.Alpha38'
+    StateStyles.Disabled.Opacity = 1.000000000000000000
+    StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+    StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
+    StateStyles.Hovered.Shadow.Color = x80000000
+    StateStyles.Hovered.Shadow.ColorKey = 'Material3.Color.Shadow.Alpha50'
+    StateStyles.Hovered.Shadow.Inherit = False
+    StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
+    StateStyles.Hovered.StateLayer.UseContentColor = True
+    StateStyles.Pressed.StateLayer.Opacity = 0.119999997317791000
+    StateStyles.Pressed.StateLayer.UseContentColor = True
+    StateStyles.Focused.StateLayer.Opacity = 0.119999997317791000
+    StateStyles.Focused.StateLayer.UseContentColor = True
+    StateStyles.Transition.Duration = 0.200000002980232200
+    StateStyles.Transition.InterpolationType = Material3StandardDefaultEffects
+    Stroke.Color = claNull
+    Stroke.Thickness = 1.289999961853027000
+    TabOrder = 0
+    Text = 'Download'
+    TextSettings.Font.Size = 18.000000000000000000
+    TextSettings.Font.Color = claWhite
+    TextSettings.Font.ColorKey = 'Material3.Color.OnPrimary'
+    TextSettings.LineHeightMultiplier = 1.440000057220459000
+    XRadius = -50.000000000000000000
+    YRadius = -50.000000000000000000
+    OnClick = ButtonDownloadClick
+  end
+end

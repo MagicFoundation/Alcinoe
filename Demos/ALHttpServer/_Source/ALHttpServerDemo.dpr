@@ -31,11 +31,11 @@ Type
   {*************************}
   THttpRequestHandler = class
   public
-    class procedure OnRequest(Const ARequest: TALHttpServerRequest; Const AResponse: TALHttpServerResponse);
+    class procedure OnRequest(Const ARequest: TALHttpServerRequestA; Const AResponse: TALHttpServerResponseA);
   end;
 
-{**************************************************************************************************************************}
-class procedure THttpRequestHandler.OnRequest(const ARequest: TALHttpServerRequest; const AResponse: TALHttpServerResponse);
+{****************************************************************************************************************************}
+class procedure THttpRequestHandler.OnRequest(const ARequest: TALHttpServerRequestA; const AResponse: TALHttpServerResponseA);
 begin
 
   {$REGION '/hello'}
@@ -148,7 +148,7 @@ begin
 
   {$REGION '/cache'}
   else If ALSameTextA(ARequest.CookedUrl.Path, '/cache') then begin
-    Aresponse.CachePolicyType := TALHttpServerResponse.TCachePolicyType.TimeToLive;
+    Aresponse.CachePolicyType := TALHttpServerResponseA.TCachePolicyType.TimeToLive;
     Aresponse.CacheSecondsToLive := 60;
     AResponse.Headers.ContentType := 'text/html; charset=UTF-8';
     AResponse.BodyString :=

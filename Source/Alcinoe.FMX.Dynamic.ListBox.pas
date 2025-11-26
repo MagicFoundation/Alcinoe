@@ -748,6 +748,7 @@ type
     FRefreshingView: TView;
     FRefreshTransitionKind: TRefreshTransitionKind;
     FPreloadItemsCount: Integer;
+    FOrientation: TOrientation;
     FInitialInt64ItemID: Int64;
     FInitialTextItemID: String;
     FItemIdNodeName: String;
@@ -791,6 +792,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure InitMainView(const AView: TView);
+    procedure RecalcOpacity; override;
     function GetControlAtPos(
                const APos: TALPointD; // APos is local to the control
                out AControlPos: TALPointD; // AControlPos is local to the founded control
@@ -837,6 +839,7 @@ type
     property Locked;
     property Margins;
     property Opacity;
+    property Orientation: TOrientation read FOrientation write FOrientation default TOrientation.Vertical;
     property Padding;
     property PopupMenu;
     property Position;
@@ -5101,6 +5104,7 @@ begin
   inherited create(AOwner);
   FRefreshTransitionKind := TRefreshTransitionKind.CrossFade;
   FPreloadItemsCount := TView.DefaultPreloadItemsCount;
+  FOrientation := TOrientation.Vertical;
   FInitialInt64ItemID := 0;
   FInitialTextItemID := '';
   FItemIdNodeName := '';
@@ -5149,6 +5153,7 @@ begin
   AView.InitialTextItemID := InitialTextItemID;
   AView.ItemIdNodeName := ItemIdNodeName;
   AView.PreloadItemsCount := PreloadItemsCount;
+  AView.Orientation := Orientation;
   //OnDownloadData
   //OnCreateMainContent
   AView.OnCreateLoadingContent := OnCreateLoadingContent;
@@ -5221,6 +5226,14 @@ begin
     MainView.Prepare;
     FHasBeenPrepared := True;
   end;
+end;
+
+{****************************************}
+procedure TALDynamicListBox.RecalcOpacity;
+begin
+  Inherited;
+  if MainView <> nil then
+    MainView.RefreshAbsoluteOpacity;
 end;
 
 {***********************************************************}

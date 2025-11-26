@@ -97,7 +97,7 @@ type
     procedure ButtonOptionsClick(Sender: TObject);
     procedure ButtonPutClick(Sender: TObject);
     procedure ButtonDeleteClick(Sender: TObject);
-    function GetStatusLine(const AHttpClientResponse: TALHttpclientResponse): String;
+    function GetStatusLine(const AHttpClientResponse: TALHttpClientResponseA): String;
   private
     FWinHttpClient: TalWinHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -354,7 +354,7 @@ begin
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  var LHTTPClientResponse: TALHTTPClientResponse := nil;
+  var LHTTPClientResponse: TALHttpClientResponseA := nil;
   try
 
     if (MemoPostDataFiles.Lines.Count > 0) and (CheckBoxURLEncodePostData.Checked) then begin
@@ -433,7 +433,7 @@ begin
   initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  var LHTTPClientResponse: TALHTTPClientResponse := nil;
+  var LHTTPClientResponse: TALHttpClientResponseA := nil;
   try
 
     if (MemoPostDataFiles.Lines.Count > 0) and (CheckBoxURLEncodePostData.Checked) then begin
@@ -527,8 +527,8 @@ begin
   MemoContentBody.Height := MemoContentBody.Parent.Height - MemoContentBody.top - 6;
 end;
 
-{**************************************************************************************}
-function TForm1.GetStatusLine(const AHttpClientResponse: TALHttpclientResponse): String;
+{***************************************************************************************}
+function TForm1.GetStatusLine(const AHttpClientResponse: TALHttpClientResponseA): String;
 begin
   case AHttpClientResponse.Version of
     TALHttpVersion.Unspecified: Result := 'Unspecified ';

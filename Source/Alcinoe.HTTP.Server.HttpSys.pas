@@ -77,8 +77,8 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALHttpSysServerRequestHeaders = Class(TALHTTPRequestHeaders)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALHttpSysServerRequestHeaders = Class(TALHttpRequestHeadersA)
   private
     FHeaders: PHTTP_REQUEST_HEADERS;
     FKnownHeaders: array[0..Ord(HTTP_HEADER_ID.HttpHeaderRequestMaximum)-1] of AnsiString;
@@ -98,15 +98,15 @@ type
     procedure Clear; override;
   End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALHttpSysServerResponseHeaders = Class(TALHTTPResponseHeaders)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALHttpSysServerResponseHeaders = Class(TALHttpResponseHeadersA)
   private
     FKnownHeaders: array[0..Ord(HTTP_HEADER_ID.HttpHeaderResponseMaximum)-1] of AnsiString;
-    FCookies: TObjectList<TALHTTPCookie>;
+    FCookies: TObjectList<TALHttpCookieA>;
     FUnknownHeaders: TALStringsA;
     function PropertyIndexToHeaderID(const APropertyIndex: Integer): HTTP_HEADER_ID;
   protected
-    function GetCookies: TObjectList<TALHTTPCookie>; override;
+    function GetCookies: TObjectList<TALHttpCookieA>; override;
     function GetUnknownHeaders: TALStringsA; override;
     function GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString; override;
     procedure SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString); override;
@@ -118,8 +118,8 @@ type
     procedure Clear; override;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALHttpSysServerRequest = class(TALHttpServerRequest)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALHttpSysServerRequest = class(TALHttpServerRequestA)
   private
     FHttpRequest: PHTTP_REQUEST;
     FRawUrl: AnsiString;
@@ -137,7 +137,7 @@ type
     function GetRawUrl: AnsiString; override;
     procedure SetRawUrl(const AValue: AnsiString); override;
     function GetCookedUrl: TALCookedUrlA; override;
-    function GetHeaders: TALHTTPRequestHeaders; override;
+    function GetHeaders: TALHttpRequestHeadersA; override;
     function GetBodyStream: TStream; override;
     procedure SetBodyStream(const AValue: TStream); override;
     function GetOwnsBodyStream: Boolean; override;
@@ -154,8 +154,8 @@ type
     destructor Destroy; override;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALHttpSysServerResponse = class(TALHttpServerResponse)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALHttpSysServerResponse = class(TALHttpServerResponseA)
   private
     FVersion: TALHttpVersion;
     FStatusCode: Integer;
@@ -166,7 +166,7 @@ type
     FBodyFileHandle: THandle;
     FBodyByteRangeStartingOffset: UInt64;
     FBodyByteRangeLength: UInt64;
-    FCachePolicyType: TALHttpServerResponse.TCachePolicyType;
+    FCachePolicyType: TALHttpServerResponseA.TCachePolicyType;
     FCacheSecondsToLive: Cardinal;
   protected
     function GetVersion: TALHttpVersion; override;
@@ -175,7 +175,7 @@ type
     procedure SetStatusCode(const AValue: Integer); override;
     function GetReason: AnsiString; override;
     procedure SetReason(const AValue: AnsiString); override;
-    function GetHeaders: TALHTTPResponseHeaders; override;
+    function GetHeaders: TALHttpResponseHeadersA; override;
     function GetBodyStream: TStream; override;
     procedure SetBodyStream(const AValue: TStream); override;
     function GetOwnsBodyStream: Boolean; override;
@@ -188,8 +188,8 @@ type
     procedure SetBodyByteRangeStartingOffset(const AValue: UInt64); override;
     function GetBodyByteRangeLength: UInt64; override;
     procedure SetBodyByteRangeLength(const AValue: UInt64); override;
-    function GetCachePolicyType: TALHttpServerResponse.TCachePolicyType; override;
-    procedure SetCachePolicyType(const AValue: TALHttpServerResponse.TCachePolicyType); override;
+    function GetCachePolicyType: TALHttpServerResponseA.TCachePolicyType; override;
+    procedure SetCachePolicyType(const AValue: TALHttpServerResponseA.TCachePolicyType); override;
     function GetCacheSecondsToLive: Cardinal; override;
     procedure SetCacheSecondsToLive(const AValue: Cardinal); override;
   public
@@ -197,8 +197,8 @@ type
     destructor Destroy; override;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALHttpSysServer = class(TALHttpServer)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALHttpSysServer = class(TALHttpServerA)
   private
     class var FHttpApiModuleHandle: HMODULE;
   public
@@ -648,11 +648,11 @@ begin
   end;
 end;
 
-{******************************************************************************}
-function TALHttpSysServerResponseHeaders.GetCookies: TObjectList<TALHTTPCookie>;
+{*******************************************************************************}
+function TALHttpSysServerResponseHeaders.GetCookies: TObjectList<TALHttpCookieA>;
 begin
   if FCookies = nil then
-    FCookies := TObjectList<TALHTTPCookie>.Create(True{AOwnsObjects});
+    FCookies := TObjectList<TALHttpCookieA>.Create(True{AOwnsObjects});
   Result := FCookies;
 end;
 
@@ -803,8 +803,8 @@ begin
   Result := FCookedUrl;
 end;
 
-{*****************************************************************}
-function TALHttpSysServerRequest.GetHeaders: TALHTTPRequestHeaders;
+{******************************************************************}
+function TALHttpSysServerRequest.GetHeaders: TALHttpRequestHeadersA;
 begin
   Result := FHeaders;
 end;
@@ -893,7 +893,7 @@ begin
   FBodyFileHandle := INVALID_HANDLE_VALUE;
   FBodyByteRangeStartingOffset := 0;
   FBodyByteRangeLength := HTTP_BYTE_RANGE_TO_EOF;
-  FCachePolicyType := TALHttpServerResponse.TCachePolicyType.Nocache;
+  FCachePolicyType := TALHttpServerResponseA.TCachePolicyType.Nocache;
   FCacheSecondsToLive := 0;
 end;
 
@@ -946,8 +946,8 @@ begin
   FReason := AValue;
 end;
 
-{*******************************************************************}
-function TALHttpSysServerResponse.GetHeaders: TALHTTPResponseHeaders;
+{********************************************************************}
+function TALHttpSysServerResponse.GetHeaders: TALHttpResponseHeadersA;
 begin
   if FHeaders = nil then
     FHeaders := TALHttpSysServerResponseHeaders.Create;
@@ -1058,14 +1058,14 @@ begin
   FBodyByteRangeLength := AValue;
 end;
 
-{*******************************************************************************************}
-function TALHttpSysServerResponse.GetCachePolicyType: TALHttpServerResponse.TCachePolicyType;
+{********************************************************************************************}
+function TALHttpSysServerResponse.GetCachePolicyType: TALHttpServerResponseA.TCachePolicyType;
 begin
   Result := FCachePolicyType;
 end;
 
-{**********************************************************************************************************}
-procedure TALHttpSysServerResponse.SetCachePolicyType(const AValue: TALHttpServerResponse.TCachePolicyType);
+{***********************************************************************************************************}
+procedure TALHttpSysServerResponse.SetCachePolicyType(const AValue: TALHttpServerResponseA.TCachePolicyType);
 begin
   FCachePolicyType := AValue;
 end;
@@ -1690,9 +1690,9 @@ begin
           {$REGION 'Build HttpApiCachePolicy'}
           ZeroMemory(LOverlappedContext^.HttpApiCachePolicy, SizeOf(HTTP_CACHE_POLICY));
           case LOverlappedContext^.HttpSysResponse.CachePolicyType of
-            TALHttpServerResponse.TCachePolicyType.Nocache: LOverlappedContext^.HttpApiCachePolicy^.Policy := HTTP_CACHE_POLICY_TYPE.HttpCachePolicyNocache;
-            TALHttpServerResponse.TCachePolicyType.UserInvalidates: LOverlappedContext^.HttpApiCachePolicy^.Policy := HTTP_CACHE_POLICY_TYPE.HttpCachePolicyUserInvalidates;
-            TALHttpServerResponse.TCachePolicyType.TimeToLive: LOverlappedContext^.HttpApiCachePolicy^.Policy := HTTP_CACHE_POLICY_TYPE.HttpCachePolicyTimeToLive;
+            TALHttpServerResponseA.TCachePolicyType.Nocache: LOverlappedContext^.HttpApiCachePolicy^.Policy := HTTP_CACHE_POLICY_TYPE.HttpCachePolicyNocache;
+            TALHttpServerResponseA.TCachePolicyType.UserInvalidates: LOverlappedContext^.HttpApiCachePolicy^.Policy := HTTP_CACHE_POLICY_TYPE.HttpCachePolicyUserInvalidates;
+            TALHttpServerResponseA.TCachePolicyType.TimeToLive: LOverlappedContext^.HttpApiCachePolicy^.Policy := HTTP_CACHE_POLICY_TYPE.HttpCachePolicyTimeToLive;
             else raise Exception.Create('Error 0F4DCF43-E7A9-47F8-A308-3146865D13BA');
           end;
           LOverlappedContext^.HttpApiCachePolicy^.SecondsToLive := LOverlappedContext^.HttpSysResponse.CacheSecondsToLive;

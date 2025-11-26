@@ -20,24 +20,24 @@ type
 
   {*******************************************************}
   JALBroadcastReceiverListenerClass = interface(IJavaClass)
-    ['{64D38904-11AB-4B0E-B9C1-D5038273BC0D}']
+    ['{C4B00A4E-9785-45DD-B05A-8553501C51F5}']
   end;
   [JavaSignature('io/magicfoundation/alcinoe/broadcastreceiver/ALBroadcastReceiverListener')]
   JALBroadcastReceiverListener = interface(IJavaInstance)
-    ['{8AD95D78-A7FC-4613-8D94-55CC19EB1565}']
+    ['{4461603A-5503-4B0A-A8B0-227AD9481BBD}']
     procedure onReceive(context: JContext; intent: JIntent); cdecl;
   end;
   TJALBroadcastReceiverListener = class(TJavaGenericImport<JALBroadcastReceiverListenerClass, JALBroadcastReceiverListener>) end;
 
   {************************************************************}
   JALBroadcastReceiverClass = interface(JBroadcastReceiverClass)
-    ['{23BF821F-A433-4564-AD56-7704A58D66C9}']
-    {class} function init: JALBroadcastReceiver; cdecl;
+    ['{AECB6BD7-3500-4627-A217-F9CBFBAB68D5}']
+    {class} procedure setListener(listener: JALBroadcastReceiverListener); cdecl;
+    {class} procedure deliverPendingBroadcasts(context: JContext); cdecl;
   end;
   [JavaSignature('io/magicfoundation/alcinoe/broadcastreceiver/ALBroadcastReceiver')]
   JALBroadcastReceiver = interface(JBroadcastReceiver)
-    ['{42427B26-C270-4832-8645-F788FCB549CB}']
-    procedure setListener(listener: JALBroadcastReceiverListener); cdecl;
+    ['{BD2257E5-250E-4A74-9E6D-C2CA7A6536DC}']
   end;
   TJALBroadcastReceiver = class(TJavaGenericImport<JALBroadcastReceiverClass, JALBroadcastReceiver>) end;
 

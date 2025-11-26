@@ -67,6 +67,27 @@ begin
           ALCheckMagickWandResult(ALImageMagickLib.MagickExtentImage(LWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY), LWand);
         end;
 
+        // References:
+        //   https://imagick-filters-comparison.netlify.app/
+        //   https://usage.imagemagick.org/filter/
+        //
+        // There is no universally "best" resize filter. For example, Lanczos is
+        // excellent for downscaling photographs because it preserves fine detail,
+        // but it often produces visible halos or ringing on flat artwork such as
+        // monochrome or cartoon-style icons.
+        //
+        // After comparing against Photoshop’s bilinear downscale, the closest match
+        // I found is the Box filter:
+        //   https://entropymine.com/resamplescope/notes/photoshop/
+        //
+        // The Box filter has two advantages for icons:
+        //   - It avoids excessive blurring.
+        //   - It does not introduce harsh edge artifacts.
+        //
+        // This is particularly useful because the image will be resized again later
+        // by the application.
+        //
+
         // Resize the image to the specified icon size
         if (ALImageMagickLib.MagickGetImageWidth(LWand) < aDstIconSizes[I]) or
            (ALImageMagickLib.MagickGetImageHeight(LWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(ALImageMagickLib.MagickGetImageWidth(LWand))+'x'+AlIntToStrW(ALImageMagickLib.MagickGetImageHeight(LWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');

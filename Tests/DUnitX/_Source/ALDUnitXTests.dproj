@@ -658,7 +658,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
-    <Debugger_RunParams>--run:ALDUnitXTestStringUtils.TALDUnitXTestStringUtils.TestALTryStrToDateTimeA</Debugger_RunParams>
+    <Debugger_RunParams>--run:ALDUnitXTestHttp.TALDUnitXTestHttp.TestALTryRfc822DateStrToUtcDateTimeW</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
     <Debugger_RunParams>--run:ALDUnitXTestStringUtils.TALDUnitXTestStringUtils.TestALStringBuilderW</Debugger_RunParams>

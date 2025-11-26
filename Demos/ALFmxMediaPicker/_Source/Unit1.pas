@@ -106,7 +106,7 @@ begin
       LVideoPlayerSurface.Align := TALAlignLayout.Client;
       LVideoPlayerSurface.Looping := True;
       LVideoPlayerSurface.DataSource := AItems[I].Uri;
-      LVideoPlayerSurface.RotateAccordingToMetadataOrientation := true;
+      LVideoPlayerSurface.ApplyMetadataOrientation := true;
       LVideoPlayerSurface.AutoStartMode := TALVideoPlayerSurface.TAutoStartMode.WhenDisplayed;
     end
     else if AItems[I].MediaType = TALMediaPicker.TMediaType.Image then begin
@@ -114,7 +114,7 @@ begin
       var LImage := TALImage.Create(LPageView);
       LImage.Parent := LPageView;
       LImage.Align := TALAlignLayout.Client;
-      LImage.RotateAccordingToExifOrientation := True;
+      LImage.ApplyMetadataOrientation := True;
       LImage.ResourceStream := AItems[I].ExtractStream;
     end;
   end;

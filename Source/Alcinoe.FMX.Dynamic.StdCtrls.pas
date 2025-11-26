@@ -3698,7 +3698,7 @@ begin
                       1, // const AScale: Single;
                       Width * (fframeCount div fRowCount) * ALGetScreenScale,
                       Height * fRowCount * ALGetScreenScale, // const W, H: single;
-                      False, // const AApplyExifOrientation: Boolean;
+                      False, // const AApplyMetadataOrientation: Boolean;
                       TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
                       TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                       FTintColor, // const ATintColor: TalphaColor;
@@ -5713,6 +5713,11 @@ begin
       exit;
     end;
 
+    {$IF defined(DEBUG)}
+    ALDisableResourceScaleMismatchLog := true;
+    try
+    {$ENDIF}
+
     {$IF DEFINED(ALSkiaCanvas)}
 
     var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
@@ -5943,6 +5948,12 @@ begin
       LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
       AbsoluteOpacity); // const AOpacity: Single)
 
+    {$ENDIF}
+
+    {$IF defined(DEBUG)}
+    finally
+      ALDisableResourceScaleMismatchLog := False;
+    end;
     {$ENDIF}
 
     exit;
@@ -7306,6 +7317,11 @@ begin
       exit;
     end;
 
+    {$IF defined(DEBUG)}
+    ALDisableResourceScaleMismatchLog := true;
+    try
+    {$ENDIF}
+
     {$IF DEFINED(ALSkiaCanvas)}
 
     var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
@@ -7428,6 +7444,12 @@ begin
       LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
       AbsoluteOpacity); // const AOpacity: Single)
 
+    {$ENDIF}
+
+    {$IF defined(DEBUG)}
+    finally
+      ALDisableResourceScaleMismatchLog := False;
+    end;
     {$ENDIF}
 
     exit;
@@ -9496,6 +9518,11 @@ begin
         exit;
       end;
 
+      {$IF defined(DEBUG)}
+      ALDisableResourceScaleMismatchLog := true;
+      try
+      {$ENDIF}
+
       {$IF DEFINED(ALSkiaCanvas)}
 
       // Using a matrix on the canvas results in smoother animations compared to using
@@ -9617,6 +9644,12 @@ begin
         LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
         AbsoluteOpacity); // const AOpacity: Single)
 
+      {$ENDIF}
+
+      {$IF defined(DEBUG)}
+      finally
+        ALDisableResourceScaleMismatchLog := False;
+      end;
       {$ENDIF}
 
       exit;
@@ -11168,6 +11201,11 @@ begin
       exit;
     end;
 
+    {$IF defined(DEBUG)}
+    ALDisableResourceScaleMismatchLog := true;
+    try
+    {$ENDIF}
+
     {$IF DEFINED(ALSkiaCanvas)}
 
     // Using a matrix on the canvas results in smoother animations compared to using
@@ -11439,6 +11477,12 @@ begin
       LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
       AbsoluteOpacity); // const AOpacity: Single)
 
+    {$ENDIF}
+
+    {$IF defined(DEBUG)}
+    finally
+      ALDisableResourceScaleMismatchLog := False;
+    end;
     {$ENDIF}
 
     exit;
@@ -12219,6 +12263,11 @@ begin
       exit;
     end;
 
+    {$IF defined(DEBUG)}
+    ALDisableResourceScaleMismatchLog := true;
+    try
+    {$ENDIF}
+
     {$IF DEFINED(ALSkiaCanvas)}
 
     // Using a matrix on the canvas results in smoother animations compared to using
@@ -12318,6 +12367,12 @@ begin
       LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
       AbsoluteOpacity); // const AOpacity: Single)
 
+    {$ENDIF}
+
+    {$IF defined(DEBUG)}
+    finally
+      ALDisableResourceScaleMismatchLog := False;
+    end;
     {$ENDIF}
 
     exit;

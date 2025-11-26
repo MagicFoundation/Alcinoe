@@ -136,8 +136,6 @@ end;
 {*****************************}
 destructor TALConfetti.Destroy;
 begin
-  if self = TALConfetti.FInstance then
-    TALConfetti.FInstance := nil;
   AlFreeAndNil(FParticules);
   AlFreeAndNil(FDisplayAnimation);
   inherited;

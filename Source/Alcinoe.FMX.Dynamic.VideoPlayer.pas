@@ -124,7 +124,7 @@ type
     procedure CancelPreviewDownload;
     class function CanStartPreviewDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
     class procedure HandlePreviewDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject); virtual; // [MultiThread]
-    class procedure HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
+    class procedure HandlePreviewDownloadError(const AResponse: IHTTPResponse; const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
     class function GetPreviewDownloadPriority(const AContext: Tobject): Int64; virtual; // [MultiThread]
     class Procedure CreateBufDrawable(var AContext: TObject); overload; virtual; // [MultiThread]
     class Procedure CreateBufDrawable(
@@ -854,7 +854,7 @@ end;
 
 {*************}
 //[MultiThread]
-class procedure TALDynamicVideoPlayerSurface.HandlePreviewDownloadError(const AErrMessage: string; var AContext: Tobject);
+class procedure TALDynamicVideoPlayerSurface.HandlePreviewDownloadError(const AResponse: IHTTPResponse; const AErrMessage: string; var AContext: Tobject);
 begin
   var LContext := TPreviewDownloadContext(AContext);
   if LContext.FOwner = nil then exit;
@@ -935,7 +935,7 @@ begin
       LContext.WrapMode); // const AWrapMode: TALImageWrapMode;
   except
     On E: Exception do begin
-      HandlePreviewDownloadError(E.Message, AContext);
+      HandlePreviewDownloadError(nil{AResponse}, E.Message, AContext);
       exit;
     end;
   End;
@@ -996,7 +996,7 @@ begin
                         '', // AMaskResourceName, // const AMaskResourceName: String;
                         AScale, // const AScale: Single;
                         ARect.Width, ARect.Height, // const W, H: single;
-                        False, // const AApplyExifOrientation: Boolean;
+                        False, // const AApplyMetadataOrientation: Boolean;
                         AWrapMode, // const AWrapMode: TALImageWrapMode;
                         TpointF.Create(0.5,0.5), // const ACropCenter: TpointF;
                         TalphaColors.Null, // const ATintColor: TalphaColor;

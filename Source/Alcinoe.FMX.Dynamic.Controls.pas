@@ -110,7 +110,6 @@ Type
     function GetBottom: Double;
     procedure SetOpacity(const Value: Single); // [TControl] procedure SetOpacity(const Value: Single);
     procedure SetDisabledOpacity(const Value: Single); // [TControl] procedure SetDisabledOpacity(const Value: Single);
-    procedure RefreshAbsoluteOpacity;
     function GetCursor: TCursor; // [TControl] function GetCursor: TCursor;
     procedure SetCursor(const Value: TCursor); // [TControl] procedure SetCursor(const Value: TCursor);
     function GetAbsoluteCursor: TCursor; // [TControl] function GetInheritedCursor: TCursor;
@@ -168,6 +167,7 @@ Type
     function GetLastVisibleObjectIndex: Integer; virtual; // [TControl] function GetLastVisibleObjectIndex: Integer; virtual;
     function IsVisibleChild(const AChild: TALDynamicControl): Boolean; virtual;
     procedure RefreshAbsoluteVisible;
+    procedure RefreshAbsoluteOpacity;
     procedure SetAlign(const Value: TALAlignLayout); virtual; // [TControl] procedure SetAlign(const Value: TAlignLayout); virtual;
     function DoGetDownloadPriority: Int64; virtual;
     class function GetDownloadPriority(const AContext: Tobject): Int64; virtual;
@@ -1179,7 +1179,7 @@ begin
   if (FIsDestroying) or (not FAbsoluteVisible) or (Host = nil) then Exit(TRectF.Empty);
   // This function assumes that ClipChildren is not implemented.
   // If this changes, use the implementation found in TALControl.GetAbsoluteDisplayedRect.
-  Result := TRectF.Intersect(Host.LocalToAbsolute(Host.DisplayedRect), AbsoluteRect.ReducePrecision);
+  Result := TRectF.Intersect(Host.DisplayedRect, AbsoluteRect.ReducePrecision);
 end;
 
 {*********************************************************}
@@ -1462,6 +1462,7 @@ procedure TALDynamicControl.RefreshAbsoluteOpacity;
 begin
   var LNewAbsoluteOpacity: Single;
   if Owner <> nil then LNewAbsoluteOpacity := Opacity * Owner.AbsoluteOpacity
+  else if Host <> nil then LNewAbsoluteOpacity := Opacity * Host.AbsoluteOpacity
   else LNewAbsoluteOpacity := Opacity;
   if not Enabled then
     LNewAbsoluteOpacity := LNewAbsoluteOpacity * DisabledOpacity;
@@ -1972,7 +1973,7 @@ begin
         end;
         {$ENDREGION}
 
-        {$REGION 'None,Center,VertCenter,HorzCenter,Horizontal,Vertical,Client'}
+        {$REGION 'None,Contents,Center,VertCenter,HorzCenter,Horizontal,Vertical,Client'}
         TALAlignLayout.None,
         TALAlignLayout.Top,
         TALAlignLayout.Bottom,
@@ -1990,6 +1991,7 @@ begin
         TALAlignLayout.BottomCenter,
         TALAlignLayout.BottomLeft,
         TALAlignLayout.BottomRight,
+        TALAlignLayout.Contents,
         TALAlignLayout.Center,
         TALAlignLayout.VertCenter,
         TALAlignLayout.HorzCenter,
@@ -2239,6 +2241,7 @@ begin
         TALAlignLayout.MostBottomCenter,
         TALAlignLayout.MostBottomLeft,
         TALAlignLayout.MostBottomRight,
+        TALAlignLayout.Contents,
         TALAlignLayout.Center,
         TALAlignLayout.VertCenter,
         TALAlignLayout.HorzCenter,
@@ -2272,6 +2275,18 @@ begin
               LClientRect.Top + LControl.Margins.Top, {Top}
               LClientRect.Right - LControl.Margins.Right, {Right}
               LClientRect.Bottom - LControl.Margins.Bottom)); {Bottom}
+        end;
+        {$ENDREGION}
+
+        {$REGION 'Contents'}
+        TALAlignLayout.Contents:
+        begin
+          LControl.SetBoundsRect(
+            TALRectD.Create(
+              0, {Left}
+              0, {Top}
+              Width, {Right}
+              Height)); {Bottom}
         end;
         {$ENDREGION}
 

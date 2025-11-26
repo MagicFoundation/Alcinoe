@@ -87,7 +87,7 @@ object Form1: TForm1
             Transparent = True
           end
           object editURL: TcxComboBox
-            Left = 40
+            Left = 41
             Top = 7
             Anchors = [akLeft, akTop, akRight]
             ParentFont = False
@@ -97,16 +97,18 @@ object Form1: TForm1
               'https://echo-http-requests.appspot.com/echo'
               'https://browserleaks.com/http2'
               'https://http3.is/'
-              'https://ash-speed.hetzner.com/10GB.bin'
+              'https://ash-speed.hetzner.com/100MB.bin'
+              'https://ash-speed.hetzner.com/1GB.bin'
+              'https://ash-speed.hetzner.com/100MB.bin'
               'http://localhost:23456/hello'
               'http://localhost:23456/echo'
               'http://localhost:23456/stats'
-              'http://localhost:23456/1mb'#11
-              'http://localhost:23456/10mb'#11
+              'http://localhost:23456/1mb'
+              'http://localhost:23456/10mb'
               'https://localhost:34567/hello'
               'https://localhost:34567/echo'
               'https://localhost:34567/stats'
-              'https://localhost:34567/1mb'#11
+              'https://localhost:34567/1mb'
               'https://localhost:34567/10mb')
             Style.Font.Charset = DEFAULT_CHARSET
             Style.Font.Color = clWindowText
@@ -116,10 +118,10 @@ object Form1: TForm1
             Style.IsFontAssigned = True
             TabOrder = 0
             Text = 'https://echo.free.beeceptor.com/'
-            Width = 285
+            Width = 279
           end
           object ButtonPost: TcxButton
-            Left = 387
+            Left = 381
             Top = 6
             Width = 50
             Height = 25
@@ -135,7 +137,7 @@ object Form1: TForm1
             OnClick = ButtonPostClick
           end
           object ButtonGet: TcxButton
-            Left = 332
+            Left = 326
             Top = 6
             Width = 50
             Height = 25
@@ -151,7 +153,7 @@ object Form1: TForm1
             OnClick = ButtonGetClick
           end
           object ButtonHead: TcxButton
-            Left = 442
+            Left = 436
             Top = 6
             Width = 50
             Height = 25
@@ -167,7 +169,7 @@ object Form1: TForm1
             OnClick = ButtonHeadClick
           end
           object ButtonTrace: TcxButton
-            Left = 498
+            Left = 492
             Top = 6
             Width = 50
             Height = 25
@@ -183,7 +185,7 @@ object Form1: TForm1
             OnClick = ButtonTraceClick
           end
           object ButtonOptions: TcxButton
-            Left = 554
+            Left = 548
             Top = 6
             Width = 50
             Height = 25
@@ -199,7 +201,7 @@ object Form1: TForm1
             OnClick = ButtonOptionsClick
           end
           object ButtonPut: TcxButton
-            Left = 610
+            Left = 604
             Top = 6
             Width = 50
             Height = 25
@@ -215,7 +217,7 @@ object Form1: TForm1
             OnClick = ButtonPutClick
           end
           object ButtonDelete: TcxButton
-            Left = 666
+            Left = 660
             Top = 6
             Width = 50
             Height = 25
@@ -475,7 +477,7 @@ object Form1: TForm1
             Style.IsFontAssigned = True
             TabOrder = 1
             Height = 0
-            Width = 485
+            Width = 479
           end
         end
         object cxSplitter1: TcxSplitter
@@ -986,7 +988,7 @@ object Form1: TForm1
           Style.Font.Style = []
           Style.IsFontAssigned = True
           TabOrder = 0
-          Height = 357
+          Height = 339
           Width = 459
         end
       end

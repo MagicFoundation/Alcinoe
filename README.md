@@ -92,6 +92,7 @@ Please request the resolution of these quality reports. Due
 to the unresolved issues from Embarcadero, we have been 
 forced to apply patches to the original Delphi source files:
 
+* [iOS: Missing application:handleEventsForBackgroundURLSession:completionHandler: delegate in FMX](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4669)
 * [FMX Android: Zoom gesture (TInteractiveGesture.Zoom) only fires on very fast pinches](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4509)
 * [Enhance MouseEvent Handling by Providing Access to MotionEvent (Android) and UIEvent (iOS)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3002)
 * [Improve Rendering Timing by Using Choreographer Instead of Runnable](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2865)
@@ -591,6 +592,29 @@ Learn more at [Demos/ALFmxMediaPicker](https://github.com/MagicFoundation/Alcino
 <br/>
 
   
+ALHttpWorker - Upload and download data reliably in the background — even when the app is killed
+================================================================================================
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/backgroundhttptransfer.png?raw=true"/>
+  
+Imagine you're building a chat app: when the user taps **Send**, 
+you could send the message on the **main thread**, but this freezes 
+the UI and is forbidden by mobile operating systems. Another option 
+is a **background thread**, however this fails when the user switches 
+apps (incoming phone call, home button, etc.), since iOS and Android 
+suspend or kill HTTP networking in background mode. You also have to 
+deal with unreliable mobile connectivity (temporary loss of Wi-Fi / 
+4G / 5G) and manually manage retries and server unavailability.
+
+**TALFmxHttpWorker** solves all these problems. Simply enqueue the 
+upload using **`TALFmxHttpWorker.enqueue`**, and you no longer need 
+to worry about network reliability, app switching, app termination, 
+or temporary server errors (`HTTP 5xx`, unreachable host, etc.). 
+**TALFmxHttpWorker** handles everything automatically and posts a 
+**`TWorkResultMessage`** when the job is completed.
+<br/>
+  
+  
 Confetti Falling Animation
 ==========================
 
@@ -659,29 +683,6 @@ DeployMan / DeployProjNormalizer / DProjNormalizer
   file, ensuring consistency across commits and simplifying 
   the comparison of changes. 
   Learn more at [Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer).
-<br/>
-
-
-ALFmxHttpWorker - Upload and download data reliably in the background — even when the app is killed.
-====================================================================================================
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/backgroundhttptransfer.png?raw=true"/>
-  
-Imagine you're building a chat app: when the user taps **Send**, 
-you could send the message on the **main thread**, but this freezes 
-the UI and is forbidden by mobile operating systems. Another option 
-is a **background thread**, however this fails when the user switches 
-apps (incoming phone call, home button, etc.), since iOS and Android 
-suspend or kill HTTP networking in background mode. You also have to 
-deal with unreliable mobile connectivity (temporary loss of Wi-Fi / 
-4G / 5G) and manually manage retries and server unavailability.
-
-**TALFmxHttpWorker** solves all these problems. Simply enqueue the 
-upload using **`TALFmxHttpWorker.enqueue`**, and you no longer need 
-to worry about network reliability, app switching, app termination, 
-or temporary server errors (`HTTP 5xx`, unreachable host, etc.). 
-**TALFmxHttpWorker** handles everything automatically and posts a 
-**`TWorkResultMessage`** when the job is completed.
 <br/>
 
 
@@ -1163,6 +1164,23 @@ undesired conversions.
 
 History
 =======
+
+### 25/11/2025 – TALHttpWorker Added
+
+- Added `TALHttpWorker` component to support background upload/download operations
+- Refactoring of HTTP-related types to explicitly separate ANSI (A) 
+  and Unicode (W) variants:
+  - `TALHttpServerRequest` → `TALHttpServerRequestA`
+  - `TALHttpServerResponse` → `TALHttpServerResponseA`
+  - `TALHttpServer` → `TALHttpServerA`
+  - `TALHTTPCookie` → `TALHTTPCookieA` and `TALHTTPCookieW`
+  - `TALHTTPRequestHeaders` → `TALHTTPRequestHeadersA` and `TALHTTPRequestHeadersW`
+  - `TALHTTPResponseHeaders` → `TALHTTPResponseHeadersA` and `TALHTTPResponseHeadersW`
+  - `TALHTTPRequest` → `TALHTTPRequestA` and `TALHTTPRequestW`
+  - `TALHTTPResponse` → `TALHTTPResponseA` and `TALHTTPResponseW`
+  - `AlRfc822DayOfWeekNames` → `AlRfc822DayOfWeekNamesA` and `AlRfc822DayOfWeekNamesW`
+  - `ALRfc822MonthOfTheYearNames` → `ALRfc822MonthOfTheYearNamesA` and `ALRfc822MonthOfTheYearNamesW`
+- `TALUserPreferences` now saves its settings in the file `{PackageName}.user_preferences`
 
 ### 16/11/2025 – Framework Improvements
 

@@ -784,8 +784,7 @@ begin
       //MaskResourceName
       //ReadyAfterResourcesLoaded
       //WrapMode
-      //ExifOrientationInfo
-      //RotateAccordingToExifOrientation
+      //ApplyMetadataOrientation
       Corners := DefaultCorners;
       Sides := DefaultSides;
       XRadius := DefaultXRadius;
@@ -13790,8 +13789,7 @@ begin
       //MaskResourceName
       //ReadyAfterResourcesLoaded
       //WrapMode
-      //ExifOrientationInfo
-      //RotateAccordingToExifOrientation
+      //ApplyMetadataOrientation
       Corners := DefaultCorners;
       Sides := DefaultSides;
       XRadius := DefaultXRadius;

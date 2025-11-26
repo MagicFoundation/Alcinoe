@@ -606,11 +606,11 @@ suspend or kill HTTP networking in background mode. You also have to
 deal with unreliable mobile connectivity (temporary loss of Wi-Fi / 
 4G / 5G) and manually manage retries and server unavailability.
 
-**TALFmxHttpWorker** solves all these problems. Simply enqueue the 
-upload using **`TALFmxHttpWorker.enqueue`**, and you no longer need 
+**TALHttpWorker** solves all these problems. Simply enqueue the 
+upload using **`TALHttpWorker.enqueue`**, and you no longer need 
 to worry about network reliability, app switching, app termination, 
 or temporary server errors (`HTTP 5xx`, unreachable host, etc.). 
-**TALFmxHttpWorker** handles everything automatically and posts a 
+**TALHttpWorker** handles everything automatically and posts a 
 **`TWorkResultMessage`** when the job is completed.
 <br/>
   

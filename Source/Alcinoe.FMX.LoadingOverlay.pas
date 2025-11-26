@@ -569,6 +569,18 @@ end;
 //[MultiThread]
 procedure TALLoadingOverlayManager.RequestLoadingOverlay(const ALoadingOverlay: TALLoadingOverlay);
 begin
+
+  // If one part of the code calls TALLoadingOverlay.CloseCurrent
+  // and another part wants to cancel that close, it can do:
+  //   if TALLoadingOverlay.Current <> nil then
+  //     TALLoadingOverlayManager.Instance.RequestLoadingOverlay(TALLoadingOverlay.Current);
+  If (TThread.Current.ThreadID = MainThreadID) and
+     (ALoadingOverlay = FCurrentLoadingOverlay) then begin
+    FScrimAnimation.Enabled := False;
+    FContainerAnimation.Enabled := False;
+    Exit;
+  end;
+
   TThread.queue(nil,
     procedure
     begin

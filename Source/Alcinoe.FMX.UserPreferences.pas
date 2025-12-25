@@ -122,10 +122,7 @@ begin
   {$ENDIF}
   {$IF defined(MSWindows) and (not defined(ALDPK))}
   FSection := 'Settings';
-  var LHomePath := TPath.Combine(TPath.GetHomePath, ALGetModuleFileNameW(true{AWithoutExtension}));
-  if not TDirectory.Exists(LHomePath) then
-    TDirectory.CreateDirectory(LHomePath);
-  FIniFile := TALIniFileW.Create(TPath.Combine(LHomePath, 'UserPreferences.ini'));
+  FIniFile := TALIniFileW.Create(TPath.Combine(ALGetAppDataPathW, 'UserPreferences.ini'));
   {$ENDIF}
   inherited;
 end;

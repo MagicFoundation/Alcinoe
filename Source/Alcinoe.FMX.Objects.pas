@@ -455,7 +455,7 @@ type
         property StopProgress: Single read FStopProgress write SetStopProgress stored IsStopProgressStored nodefault;
       end;
   private
-    fAnimation: TAnimation;
+    fAnimation: TAnimation; // 8 bytes
     {$IF defined(ALSkiaAvailable)}
       fSkottieAnimation: sk_skottieanimation_t;
       fAnimcodecplayer: sk_animcodecplayer_t;
@@ -471,14 +471,17 @@ type
       {$ENDIF}
     {$ENDIF}
     FResourceName: String; // 8 bytes
+    FResourceStream: TStream; // 8 bytes
     FTintColor: TAlphaColor; // 4 bytes
     FTintColorKey: String; // 8 bytes
     FWrapMode: TALImageWrapMode; // 1 byte
+    FOwnsResourceStream: Boolean; // 1 byte
     FOnAnimationFirstFrame: TNotifyEvent; // 16 bytes
     FOnAnimationProcess: TNotifyEvent; // 16 bytes
     FOnAnimationFinish: TNotifyEvent; // 16 bytes
     procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure setResourceName(const Value: String);
+    procedure setResourceStream(const Value: TStream);
     procedure SetAnimation(const Value: TAnimation);
     procedure SetTintColor(const Value: TAlphaColor);
     procedure setTintColorKey(const Value: String);
@@ -500,6 +503,11 @@ type
     procedure ReleaseCodec; virtual;
     property DefaultTintColor: TAlphaColor read GetDefaultTintColor;
     property DefaultTintColorKey: String read GetDefaultTintColorKey;
+    /// <summary>
+    ///   When you assign a stream to ResourceStream, TALImage takes ownership and will free it.
+    /// </summary>
+    property ResourceStream: TStream read FResourceStream write setResourceStream;
+    property OwnsResourceStream: Boolean read FOwnsResourceStream write FOwnsResourceStream;
   published
     //property Action;
     property Align;
@@ -3029,9 +3037,11 @@ begin
     {$ENDIF}
   {$ENDIF}
   FResourceName := '';
+  FResourceStream := nil;
   FTintColor := DefaultTintColor;
   FTintColorKey := DefaultTintColorKey;
   FWrapMode := TALImageWrapMode.Fit;
+  FOwnsResourceStream := True;
   FOnAnimationFirstFrame := nil;
   FOnAnimationProcess := nil;
   FOnAnimationFinish := nil;
@@ -3042,6 +3052,8 @@ end;
 destructor TALAnimatedImage.Destroy;
 begin
   ReleaseCodec;
+  if FOwnsResourceStream then
+    ALFreeAndNil(FResourceStream);
   AlFreeAndNil(FAnimation);
   inherited;
 end;
@@ -3064,6 +3076,22 @@ begin
     if Source is TALAnimatedImage then begin
       Animation.Assign(TALAnimatedImage(Source).Animation);
       ResourceName := TALAnimatedImage(Source).ResourceName;
+      if (TALAnimatedImage(Source).OwnsResourceStream) and
+         (TALAnimatedImage(Source).ResourceStream <> nil) then begin
+        var LStream := TMemoryStream.Create;
+        try
+          LStream.CopyFrom(TALAnimatedImage(Source).ResourceStream);
+          ResourceStream := LStream;
+          OwnsResourceStream := True;
+        except
+          ALFreeAndNil(LStream);
+          raise;
+        end;
+      end
+      else begin
+        ResourceStream := TALAnimatedImage(Source).ResourceStream;
+        OwnsResourceStream := TALAnimatedImage(Source).OwnsResourceStream;
+      end;
       TintColor := TALAnimatedImage(Source).TintColor;
       TintColorKey := TALAnimatedImage(Source).TintColorKey;
       WrapMode := TALAnimatedImage(Source).WrapMode;
@@ -3111,8 +3139,8 @@ begin
 
   if //--- Do not create Codec if the size is 0
      (Size.Size.IsZero) or
-     //--- Do not create Codec if FResourceName is empty
-     (FResourceName = '')
+     //--- Do not create Codec if FResourceName and FResourceStream are empty
+     ((FResourceName = '') and (FResourceStream = nil))
   then begin
     ReleaseCodec;
     exit;
@@ -3122,7 +3150,7 @@ begin
 
   var LFileName := ALGetResourceFilename(FResourceName);
 
-  if (LFileName <> '') and (FTintColor = TAlphaColors.Null) then begin
+  if (LFileName <> '') and (FResourceStream = nil) and (FTintColor = TAlphaColors.Null) then begin
     fSkottieAnimation := sk4d_skottieanimation_make_from_file(MarshaledAString(UTF8String(LFileName)), TSkDefaultProviders.TypefaceFont.Handle)
   end
   else begin
@@ -3130,7 +3158,8 @@ begin
     fSkottieAnimation := 0
     {$ELSE}
     var LStream: TStream;
-    if (FTintColor <> TAlphaColors.Null) then begin
+    if FResourceStream <> nil then LStream := FResourceStream
+    else if (FTintColor <> TAlphaColors.Null) then begin
       LStream := TALStringStreamA.Create('');
       try
         if (LFileName <> '') then TALStringStreamA(LStream).LoadFromFile(LFileName)
@@ -3206,8 +3235,10 @@ begin
       end;
     end
     else LStream := ALCreateResourceStream(FResourceName);
+
     try
 
+      LStream.Position := 0;
       var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LStream));
       try
         var LStreamadapterProcs: sk_streamadapter_procs_t;
@@ -3223,23 +3254,30 @@ begin
       finally
         sk4d_streamadapter_destroy(LSKStream);
       end;
+
     finally
-      ALfreeandNil(LStream);
+      If LStream <> FResourceStream then
+        ALfreeandNil(LStream);
     end;
     {$ENDIF}
   end;
 
   if fSkottieAnimation = 0 then begin
-    if LFileName <> '' then begin
+    if (LFileName <> '') and (FResourceStream = nil) then begin
       fAnimCodecPlayer := sk4d_animcodecplayer_make_from_file(MarshaledAString(UTF8String(LFileName)))
     end
     else begin
       {$IFDEF ALDPK}
       fAnimCodecPlayer := 0
       {$ELSE}
-      var LResourceStream := ALCreateResourceStream(FResourceName);
+      var LStream: TStream;
+      if FResourceStream <> nil then LStream := FResourceStream
+      else LStream := ALCreateResourceStream(FResourceName);
+
       try
-        var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
+
+        LStream.Position := 0;
+        var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LStream));
         try
           var LStreamadapterProcs: sk_streamadapter_procs_t;
           LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
@@ -3251,19 +3289,25 @@ begin
         finally
           sk4d_streamadapter_destroy(LSKStream);
         end;
+
       finally
-        ALfreeandNil(LResourceStream);
+        If LStream <> FResourceStream then
+          ALfreeandNil(LStream);
       end;
       {$ENDIF}
     end;
   end;
 
-  if (fSkottieAnimation = 0) and (fAnimCodecPlayer = 0) then
+  if (fSkottieAnimation = 0) and (fAnimCodecPlayer = 0) then begin
     {$IF not defined(ALDPK)}
-    Raise Exception.CreateFmt('Failed to create the animation codec for resource "%s". Please ensure the resource exists and is in a valid format', [FResourceName]);
+    if FResourceName <> '' then
+      Raise Exception.CreateFmt('Failed to create the animation codec for resource "%s". Please ensure the resource exists and is in a valid format', [FResourceName])
+    else
+      Raise Exception.Create('Failed to create the animation codec. Please ensure the resource is in a valid format');
     {$ELSE}
     Exit;
     {$ENDIF}
+  end;
 
   var LSize: TSizeF;
   if fSkottieAnimation <> 0 then begin
@@ -3281,7 +3325,10 @@ begin
   if SameValue(LSize.width, 0, Tepsilon.Position) or
      SameValue(LSize.Height, 0, Tepsilon.Position) then begin
     {$IF not defined(ALDPK)}
-    Raise Exception.CreateFmt('The animation "%s" has invalid dimensions (width or height is zero)', [FResourceName]);
+    if FResourceName <> '' then
+      Raise Exception.CreateFmt('The animation "%s" has invalid dimensions (width or height is zero)', [FResourceName])
+    else
+      Raise Exception.Create('The animation has invalid dimensions (width or height is zero)');
     {$ELSE}
     ReleaseCodec;
     Exit;
@@ -3329,6 +3376,7 @@ begin
   ALLog(
     'TALAnimatedImage.CreateCodec',
     'ResourceName: '+ FResourceName + ' | '+
+    'ResourceStream: '+ ALIntToStrW(Integer(FResourceStream)) + ' | '+
     'Duration: '+ALFloatTostrW(LDuration) + ' | '+
     'Width: ' + ALFloatTostrW(LSize.Width) + ' | '+
     'Height: ' + ALFloatTostrW(LSize.Height),
@@ -3513,6 +3561,18 @@ begin
   if FResourceName <> Value then begin
     releaseCodec;
     FResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{*****************************************************************}
+procedure TALAnimatedImage.setResourceStream(const Value: TStream);
+begin
+  if FResourceStream <> Value then begin
+    if FOwnsResourceStream then
+      ALFreeAndNil(FResourceStream);
+    ClearBufDrawable;
+    FResourceStream := Value;
     Repaint;
   end;
 end;

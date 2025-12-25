@@ -39,6 +39,12 @@ type
       // ----------------
       // TOnActionObjProc
       TOnActionObjProc = procedure(Const ASheet: TALSheet; const AAction: Integer; var ACanClose: Boolean) of object;
+      // ---------------
+      // TOnShownRefProc
+      TOnShownRefProc = reference to procedure(Const ASheet: TALSheet);
+      // ----------------
+      // TOnClosedRefProc
+      TOnClosedRefProc = reference to procedure(Const ASheet: TALSheet);
       // ------------------------
       // TViewportPositionChangeEvent
       TViewportPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TALPointD) of object;
@@ -59,6 +65,7 @@ type
         constructor Create; virtual;
         destructor Destroy; override;
         function SetOwnerAndParent(const AValue: TALControl): TBuilder;
+        function SetWrapContentInScrollBox(const AValue: Boolean): TBuilder;
         function SetContent(const AValue: TALControl): TBuilder;
         function SetContainerMargins(const AValue: TRectF): TBuilder;
         function SetContainerCorners(const AValue: TCorners): TBuilder;
@@ -66,6 +73,8 @@ type
         function SetOnViewportPositionChange(const AValue: TViewportPositionChangeEvent): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
+        function SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
+        function SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
         /// <summary>
         ///   Requests the TALSheetManager to display this sheet.
         ///   The Builder instance will be released during this operation.
@@ -92,6 +101,21 @@ type
         constructor Create(const ASheet: TALSheet); reintroduce;
         property Sheet: TALSheet read FSheet;
       end;
+      // ----------
+      // TScrollBox
+      TScrollBox = class(TALVertScrollBox)
+      private
+        FMaxWidth: Single;
+        FMaxHeight: Single;
+        /// <summary>
+        ///   The area covered by the virtual keyboard
+        /// </summary>
+        FVirtualKeyboardOverlapHeight: Single;
+      protected
+        procedure DoRealign; override;
+      public
+        constructor Create(AOwner: TComponent); override;
+      end;
   private
     FDockEdge: TDockEdge;
     FScrollEngine: TALScrollEngine;
@@ -100,6 +124,8 @@ type
     fScrollCapturedByMe: boolean;
     FFillAlphaAtPeek: Single;
     FContainer: TALRectangle;
+    FScrollBox: TScrollBox;
+    FWrapContentInScrollBox: Boolean;
     FContent: TALControl;
     FTouchBlocker: TALLayout;
     FDisableScrollRealign: Boolean;
@@ -108,9 +134,11 @@ type
     FOnActionRefProc: TALSheet.TOnActionRefProc;
     FOnActionObjProc: TALSheet.TOnActionObjProc;
     FOnViewportPositionChange: TViewportPositionChangeEvent;
-    FOnClosedRefProc: TProc;
+    FOnShownRefProc: TOnShownRefProc;
+    FOnClosedRefProc: TOnClosedRefProc;
     function GetCloseOnScrimClick: boolean;
     procedure SetCloseOnScrimClick(const AValue: Boolean);
+    procedure SetWrapContentInScrollBox(const AValue: Boolean);
     procedure SetContent(const AValue: TALControl);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -134,19 +162,38 @@ type
     destructor Destroy; override;
     procedure BeforeDestruction; override;
     class function Current: TALSheet;
-    class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
-    function IsTransitioning: Boolean;
+    class procedure CloseCurrent(const AOnClosedCallback: TOnClosedRefProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+    function IsTransitioning: Boolean; virtual;
+    function IsVirtualKeyboardAnimationRunning: Boolean; virtual;
     property CloseOnScrimClick: Boolean read GetCloseOnScrimClick write SetCloseOnScrimClick;
     procedure ActionButtonClick(Sender: TObject); virtual;
     property Container: TALRectangle read FContainer;
+    property ScrollBox: TScrollBox read FScrollBox;
+    /// <summary>
+    ///   Specifies whether the sheet content is automatically wrapped inside
+    ///   a vertical scroll box.
+    ///   When True (default), the content is placed inside an internal
+    ///   TScrollBox to enable scrolling.
+    ///   When False, the content is hosted directly in the sheet container
+    ///   without any scrolling behavior.
+    /// </summary>
+    property WrapContentInScrollBox: Boolean read FWrapContentInScrollBox write SetWrapContentInScrollBox;
     property Content: TALControl read FContent write SetContent;
+    /// <summary>
+    ///   Gets or sets the scroll/drag engine used by the sheet itself to control
+    ///   presentation and dismissal (dragging the sheet up/down).
+    ///   This engine drives the sheet's interactive motion and state transitions,
+    ///   and is independent from any scroll engine used by the optional content
+    ///   scroll box.
+    /// </summary>
     property ScrollEngine: TALScrollEngine read GetScrollEngine write SetScrollEngine;
     property ShowAnimateOptions: TAnimateOptions read FShowAnimateOptions write FShowAnimateOptions;
     property CloseAnimateOptions: TAnimateOptions read FCloseAnimateOptions write FCloseAnimateOptions;
     property OnActionRefProc: TALSheet.TOnActionRefProc read FOnActionRefProc write FOnActionRefProc;
     property OnActionObjProc: TALSheet.TOnActionObjProc read FOnActionObjProc write FOnActionObjProc;
     property OnViewportPositionChange: TViewportPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
+    property OnShownRefProc: TOnShownRefProc read FOnShownRefProc write FOnShownRefProc;
+    property OnClosedRefProc: TOnClosedRefProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -211,13 +258,17 @@ type
     class function Builder: TBuilder;
   private
     FVirtualKeyboardAnimation: TALFloatAnimation;
+    FVirtualKeyboardAnimationInitialViewportPositionY: Double;
+    FVirtualKeyboardAnimationViewportPositionY: Double;
+    FVirtualKeyboardAnimationInitialContentMarginBottom: Double;
+    FVirtualKeyboardAnimationContentMarginBottom: Double;
     procedure VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage); virtual;
     procedure VirtualKeyboardAnimationProcess(Sender: TObject);
   public
     constructor Create(const AOwner: TComponent); reintroduce; virtual;
     destructor Destroy; override;
     procedure BeforeDestruction; override;
-    function IsVirtualKeyboardAnimationRunning: Boolean;
+    function IsVirtualKeyboardAnimationRunning: Boolean; override;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -335,6 +386,7 @@ type
     FDefaultRightSheetHeadline: TALText;
     FDefaultLeftSheetCloseButton: TALButton;
     FDefaultRightSheetCloseButton: TALButton;
+    FDefaultScrollBox: TALSheet.TScrollBox;
     FCurrentSheet: TALSheet;
     FScrimAnimation: TALFloatAnimation;
     FContainerAnimation: TALFloatAnimation;
@@ -374,6 +426,7 @@ type
     property DefaultRightSheetHeadline: TALText read FDefaultRightSheetHeadline;
     property DefaultLeftSheetCloseButton: TALButton read FDefaultLeftSheetCloseButton;
     property DefaultRightSheetCloseButton: TALButton read FDefaultRightSheetCloseButton;
+    property DefaultScrollBox: TALSheet.TScrollBox read FDefaultScrollBox;
     property CurrentSheet: TALSheet read fCurrentSheet write fCurrentSheet;
     function IsShowingSheet: Boolean;
     procedure CloseCurrentSheet;
@@ -419,6 +472,13 @@ begin
   AValue.InsertComponent(FSheet);
   FSheet.Parent := AValue;
   FSheet.BeginUpdate;
+  Result := Self;
+end;
+
+{************************************************************************************}
+function TALSheet.TBuilder.SetWrapContentInScrollBox(const AValue: Boolean): TBuilder;
+begin
+  FSheet.WrapContentInScrollBox := AValue;
   Result := Self;
 end;
 
@@ -468,6 +528,20 @@ end;
 function TALSheet.TBuilder.SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder;
 begin
   FSheet.OnActionObjProc := AValue;
+  Result := Self;
+end;
+
+{*************************************************************************************}
+function TALSheet.TBuilder.SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
+begin
+  FSheet.OnShownRefProc := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************************}
+function TALSheet.TBuilder.SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
+begin
+  FSheet.OnClosedRefProc := AValue;
   Result := Self;
 end;
 
@@ -898,6 +972,53 @@ begin
 
 end;
 
+{*********************************************************}
+constructor TALSheet.TScrollBox.Create(AOwner: TComponent);
+begin
+  inherited;
+  FMaxWidth := 0;
+  FMaxHeight := 0;
+  FVirtualKeyboardOverlapHeight := 0;
+end;
+
+{**************************************}
+procedure TALSheet.TScrollBox.DoRealign;
+begin
+  inherited;
+  if (comparevalue(FMaxWidth, 0, TEpsilon.Position) > 0) and
+     (comparevalue(FMaxHeight, 0, TEpsilon.Position) > 0) and
+     (Content.ControlsCount = 1) then begin
+
+    // Init ScrollBox.Width/ScrollBox.Height
+    case Align of
+      //TALSheet.TDockEdge.Left
+      TALAlignLayout.Right,
+      //TALSheet.TDockEdge.Right
+      TALAlignLayout.Left: begin
+        Width := Min(FMaxWidth, Content.Controls[0].Width);
+      end;
+      //TALSheet.TDockEdge.Top
+      TALAlignLayout.Bottom: begin
+        Height := Min(FMaxHeight, Content.Controls[0].Height);
+      end;
+      //TALSheet.TDockEdge.Bottom
+      TALAlignLayout.Top: begin
+        Height := Min(FMaxHeight, Content.Controls[0].Height);
+      end
+      else
+        Raise Exception.Create('Error 2D1FEC06-4883-4D80-865A-CACDD3D56F1A')
+    end;
+
+    // Init ScrollBox.ScrollEngine.TouchMode
+    if (CompareValue(Height, FMaxHeight, TEpsilon.Position) < 0) and
+       (CompareValue(FVirtualKeyboardOverlapHeight, 0, TEpsilon.Position) <= 0) then
+      ScrollEngine.TouchMode := TALScrollEngine.TTouchMode.Disabled
+    else
+      ScrollEngine.TouchMode := TALScrollEngine.TTouchMode.Auto;
+
+  end;
+end;
+
 {********************************************************************************}
 constructor TALSheet.Create(const AOwner: TComponent; const ADockEdge: TDockEdge);
 begin
@@ -924,6 +1045,8 @@ begin
   end;
   FContainer.Name := 'ALSheetContainer';
   //--
+  FScrollBox := nil;
+  FWrapContentInScrollBox := True;
   FContent := nil;
   //--
   FTouchBlocker := TALLayout.Create(Self);
@@ -936,6 +1059,7 @@ begin
   FOnActionRefProc := nil;
   FOnActionObjProc := nil;
   FOnViewportPositionChange := nil;
+  FOnShownRefProc := nil;
   FOnClosedRefProc := nil;
   //--
   case FDockEdge of
@@ -982,13 +1106,14 @@ begin
   Result := TALSheetManager.Instance.CurrentSheet;
 end;
 
-{***********************************************************************************************************************************************************************************}
-class procedure TALSheet.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
+{**********************************************************************************************************************************************************************************************}
+class procedure TALSheet.CloseCurrent(const AOnClosedCallback: TOnClosedRefProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateScrim, TAnimateOption.AnimateContainer]);
 begin
   if not TALSheetManager.HasInstance then exit;
   var LCurrentSheet := TALSheetManager.Instance.CurrentSheet;
   if LCurrentSheet <> nil then begin
-    LCurrentSheet.OnClosedRefProc := AOnClosedCallback;
+    if Assigned(AOnClosedCallback) then
+      LCurrentSheet.OnClosedRefProc := AOnClosedCallback;
     LCurrentSheet.CloseAnimateOptions := AAnimateOptions;
     TALSheetManager.Instance.CloseCurrentSheet;
   end;
@@ -999,6 +1124,12 @@ function TALSheet.IsTransitioning: Boolean;
 begin
   Result := (TALSheetManager.Instance.CurrentSheet = Self) and
             (TALSheetManager.Instance.FContainerAnimation.Running or TALSheetManager.Instance.FScrimAnimation.Running);
+end;
+
+{***********************************************************}
+function TALSheet.IsVirtualKeyboardAnimationRunning: Boolean;
+begin
+  Result := False;
 end;
 
 {**************************************************}
@@ -1032,22 +1163,65 @@ begin
   else Onclick := nil;
 end;
 
+{******************************************************************}
+procedure TALSheet.SetWrapContentInScrollBox(const AValue: Boolean);
+begin
+  if FScrollBox <> nil then
+    raise Exception.Create('WrapContentInScrollBox must be set before setting the sheet content');
+  FWrapContentInScrollBox := AValue;
+end;
+
 {******************************************************}
 procedure TALSheet.SetContent(const AValue: TALControl);
 begin
   if FContent <> AValue then begin
     if FContent <> nil then
       raise Exception.Create('The content has already been set and cannot be changed');
+    if FScrollBox <> nil then
+      Raise Exception.Create('Error E9DA2CFD-7849-479C-BDDF-DCBD52D64D9B');
     Fcontent := AValue;
-    if FContent.Owner <> Container then
-      Container.InsertComponent(FContent);
-    FContent.parent := Container;
-    case FDockEdge of
-      TDockEdge.Left: FContent.Align := TALAlignLayout.Right;
-      TDockEdge.Right: FContent.Align := TALAlignLayout.Left;
-      TDockEdge.Top: FContent.Align := TALAlignLayout.Bottom;
-      TDockEdge.Bottom: FContent.Align := TALAlignLayout.Top;
-      else Raise Exception.Create('Error DDE223EF-CCB7-41DD-BC36-EE052F440537')
+    if FWrapContentInScrollBox then begin
+      FScrollBox := TScrollBox.Create(Container);
+      FScrollBox.Parent := Container;
+      FScrollBox.Assign(TALSheetManager.Instance.DefaultScrollBox);
+      case FDockEdge of
+        TDockEdge.Left: begin
+          FScrollBox.Align := TALAlignLayout.Right;
+          FContent.Align := TALAlignLayout.None;
+        end;
+        TDockEdge.Right: begin
+          FScrollBox.Align := TALAlignLayout.Left;
+          FContent.Align := TALAlignLayout.None;
+        end;
+        TDockEdge.Top: begin
+          FScrollBox.Align := TALAlignLayout.Bottom;
+          FScrollBox.ScrollEngine.MaxEdgeSpringbackEnabled := False;
+          FScrollBox.ScrollEngine.MaxEdgeDragResistanceFactor := 0;
+          FContent.Align := TALAlignLayout.Top;
+        end;
+        TDockEdge.Bottom: begin
+          FScrollBox.Align := TALAlignLayout.Top;
+          FScrollBox.ScrollEngine.MinEdgeSpringbackEnabled := False;
+          FScrollBox.ScrollEngine.MinEdgeDragResistanceFactor := 0;
+          FContent.Align := TALAlignLayout.Top;
+        end;
+        else Raise Exception.Create('Error A7A2780D-FF2D-45BB-BD2B-696E8F93A502')
+      end;
+      if FContent.Owner <> FScrollBox then
+        FScrollBox.InsertComponent(FContent);
+      FContent.parent := FScrollBox;
+    end
+    else begin
+      if FContent.Owner <> Container then
+        Container.InsertComponent(FContent);
+      FContent.parent := Container;
+      case FDockEdge of
+        TDockEdge.Left: FContent.Align := TALAlignLayout.Right;
+        TDockEdge.Right: FContent.Align := TALAlignLayout.Left;
+        TDockEdge.Top: FContent.Align := TALAlignLayout.Bottom;
+        TDockEdge.Bottom: FContent.Align := TALAlignLayout.Top;
+        else Raise Exception.Create('Error DDE223EF-CCB7-41DD-BC36-EE052F440537')
+      end;
     end;
   end;
 end;
@@ -1266,7 +1440,7 @@ begin
     TALSheetManager.Instance.FScrimAnimation.StopAtCurrent;
     TALSheetManager.Instance.FContainerAnimation.StopAtCurrent;
   end;
-  if not FTouchBlocker.Visible then begin
+  if (not FTouchBlocker.Visible) and (not IsVirtualKeyboardAnimationRunning) then begin
     if not aObject.AutoCapture then begin
       {$IF defined(MSWindows)}
       // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
@@ -1453,6 +1627,10 @@ constructor TALBottomSheet.Create(const AOwner: TComponent);
 begin
   inherited create(AOwner, TALSheet.TDockEdge.Bottom);
   FVirtualKeyboardAnimation := nil;
+  FVirtualKeyboardAnimationInitialViewportPositionY := 0;
+  FVirtualKeyboardAnimationViewportPositionY := 0;
+  FVirtualKeyboardAnimationInitialContentMarginBottom := 0;
+  FVirtualKeyboardAnimationContentMarginBottom := 0;
   TMessageManager.DefaultManager.SubscribeToMessage(TVKStateChangeMessage, VirtualKeyboardChangeHandler);
 end;
 
@@ -1491,6 +1669,8 @@ end;
 {*****************************************************************************************************************}
 procedure TALBottomSheet.VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
 begin
+  if Msg is not TVKStateChangeMessage then
+    exit;
   if FVirtualKeyboardAnimation = nil then begin
     FVirtualKeyboardAnimation := TALFloatAnimation.Create;
     FVirtualKeyboardAnimation.OnProcess := VirtualKeyboardAnimationProcess;
@@ -1500,21 +1680,51 @@ begin
     if FVirtualKeyboardAnimation.Tag = 1 then exit;
     FVirtualKeyboardAnimation.Tag := 1;
     {$IF defined(ANDROID)}
-    FVirtualKeyboardAnimation.Duration := 0.300;
+    FVirtualKeyboardAnimation.Duration := {$IF defined(DEBUG)}0.300{$ELSE}0.300{$ENDIF};
     {$ELSE}
-    FVirtualKeyboardAnimation.Duration := 0.500;
+    FVirtualKeyboardAnimation.Duration := {$IF defined(DEBUG)}0.500{$ELSE}0.500{$ENDIF};
     {$ENDIF}
     FVirtualKeyboardAnimation.InterpolationType := TALInterpolationType.Material3StandardDefaultEffects;
     FVirtualKeyboardAnimation.StartValue := margins.Bottom;
     FVirtualKeyboardAnimation.StopValue := TVKStateChangeMessage(Msg).KeyboardBounds.Height;
+
+    if (FscrollBox <> nil) then begin
+      var LContainerPositionY := Fcontainer.LocalToAbsolute(TPointF.Create(0,0)).y;
+      var LVirtualKeyboardOverlapHeight := TVKStateChangeMessage(Msg).KeyboardBounds.Height - LContainerPositionY;
+      if CompareValue(LVirtualKeyboardOverlapHeight, 0, TEpsilon.Position)> 0 then begin
+        var LForm := Screen.ActiveForm;
+        if LForm = nil then LForm := Application.MainForm;
+        if LForm = nil then Raise Exception.Create('Error 4BCA940A-A899-48F3-B37B-B30049284723');
+        if (LForm.Focused <> nil) and FscrollBox.IsAncestorOf(LForm.Focused) and (LForm.Focused.GetObject is TControl) then begin
+
+          var LMaxVisiblePosY := LForm.ClientHeight - TVKStateChangeMessage(Msg).KeyboardBounds.Height;
+          var LFocusedControl := TControl(LForm.Focused.GetObject);
+          var LFocusedControlBottomY := LFocusedControl.LocalToAbsolute(TPointF.Create(0,0)).y + LFocusedControl.Height + 16;
+
+          FVirtualKeyboardAnimationInitialViewportPositionY := FscrollBox.ScrollEngine.ViewportPosition.y;
+          if LFocusedControlBottomY - LMaxVisiblePosY - LContainerPositionY > 0 then
+            FVirtualKeyboardAnimationViewportPositionY := LFocusedControlBottomY - LMaxVisiblePosY - LContainerPositionY
+          else
+            FVirtualKeyboardAnimationViewportPositionY := 0;
+
+          FScrollBox.FVirtualKeyboardOverlapHeight := LVirtualKeyboardOverlapHeight;
+          FVirtualKeyboardAnimationInitialContentMarginBottom := Fcontent.Margins.Bottom;
+          FVirtualKeyboardAnimationContentMarginBottom := LVirtualKeyboardOverlapHeight;
+
+        end;
+      end;
+    end;
+
   end
   else begin
     if FVirtualKeyboardAnimation.Tag = 0 then exit;
     FVirtualKeyboardAnimation.Tag := 0;
-    FVirtualKeyboardAnimation.Duration := 0.200;
+    FVirtualKeyboardAnimation.Duration := {$IF defined(DEBUG)}0.200{$ELSE}0.200{$ENDIF};
     FVirtualKeyboardAnimation.InterpolationType := TALInterpolationType.Material3StandardDefaultEffects;
     FVirtualKeyboardAnimation.StartValue := margins.Bottom;
     FVirtualKeyboardAnimation.StopValue := 0;
+    if FScrollBox <> nil then
+      FScrollBox.FVirtualKeyboardOverlapHeight := 0;
   end;
   FVirtualKeyboardAnimation.Start;
 end;
@@ -1523,6 +1733,22 @@ end;
 procedure TALBottomSheet.VirtualKeyboardAnimationProcess(Sender: TObject);
 begin
   margins.Bottom := FVirtualKeyboardAnimation.CurrentValue;
+  if (FscrollBox <> nil) and (Fcontent <> nil) then begin
+    if (CompareValue(FVirtualKeyboardAnimationContentMarginBottom, 0, TEpsilon.Position) > 0) then begin
+      Var LDelta: Single;
+      if FVirtualKeyboardAnimation.Tag = 0 then LDelta := FVirtualKeyboardAnimationContentMarginBottom * (1 - FVirtualKeyboardAnimation.NormalizedTime)
+      else LDelta := FVirtualKeyboardAnimationContentMarginBottom * FVirtualKeyboardAnimation.NormalizedTime;
+      Fcontent.Margins.Bottom := FVirtualKeyboardAnimationInitialContentMarginBottom + LDelta;
+    end;
+    if (FVirtualKeyboardAnimation.Tag = 1) and (CompareValue(FVirtualKeyboardAnimationViewportPositionY, 0, TEpsilon.Position) > 0) then begin
+      Var LDelta: Single := FVirtualKeyboardAnimationViewportPositionY * FVirtualKeyboardAnimation.NormalizedTime;
+      FscrollBox.ScrollEngine.SetViewportPosition(
+        TALPointD.Create(
+          FscrollBox.ScrollEngine.ViewportPosition.x,
+          FVirtualKeyboardAnimationInitialViewportPositionY + LDelta),
+        False{EnforceLimits});
+    end;
+  end;
 end;
 
 {***********************************************************************************}
@@ -1730,6 +1956,9 @@ begin
   FDefaultRightSheetHeadline := TALText.Create(nil);
   FDefaultLeftSheetCloseButton := TALButton.Create(nil);
   FDefaultRightSheetCloseButton := TALButton.Create(nil);
+  FDefaultScrollBox := TALSheet.TScrollBox.Create(nil);
+  // To unsubscribe from TALScrollCapturedMessage
+  FDefaultScrollBox.BeforeDestruction;
   FCurrentSheet := Nil;
   FScrimAnimation := TALFloatAnimation.Create;
   FScrimAnimation.OnProcess := ScrimAnimationProcess;
@@ -1759,6 +1988,7 @@ begin
   AlFreeAndNil(FDefaultRightSheetHeadline);
   AlFreeAndNil(FDefaultLeftSheetCloseButton);
   AlFreeAndNil(FDefaultRightSheetCloseButton);
+  AlFreeAndNil(FDefaultScrollBox);
   ALFreeAndNil(FScrimAnimation);
   ALFreeAndNil(FContainerAnimation);
   ALFreeAndNil(FQueue);
@@ -1928,7 +2158,7 @@ begin
   FScrimAnimation.Enabled := False;
   FContainerAnimation.Enabled := False;
   if assigned(LCurrentSheet.FOnClosedRefProc) then
-    LCurrentSheet.FOnClosedRefProc();
+    LCurrentSheet.FOnClosedRefProc(LCurrentSheet);
   ProcessPendingSheets;
   ALRestoreSystemBarsColor;
   if not IsShowingSheet then
@@ -1952,7 +2182,7 @@ begin
       if (TALLoadingOverlayManager.HasInstance) and
          (TALLoadingOverlayManager.Instance.IsShowingLoadingOverlay) then begin
         TALLoadingOverlay.CloseCurrent(
-          procedure
+          procedure (Const ALoadingOverlay: TALLoadingOverlay)
           begin
             if TALSheetManager.HasInstance then begin
               ASheet.ShowAnimateOptions := ASheet.ShowAnimateOptions - [TALSheet.TAnimateOption.AnimateScrim];
@@ -1966,7 +2196,7 @@ begin
       else if (TALDialogManager.HasInstance) and
               (TALDialogManager.Instance.IsShowingDialog) then begin
         TALDialog.CloseCurrent(
-          procedure
+          procedure (Const ADialog: TALDialog)
           begin
             if TALSheetManager.HasInstance then begin
               ASheet.ShowAnimateOptions := ASheet.ShowAnimateOptions - [TALSheet.TAnimateOption.AnimateScrim];
@@ -2019,11 +2249,82 @@ begin
   // Capture the system bars color
   ALCaptureSystemBarsColor;
 
-  // Attach ASheet
+  // Init LForm & LClientWidth/LClientHeight
+  Var LForm: TCommonCustomForm;
+  var LClientWidth: Single;
+  var LClientHeight: Single;
   if ASheet.ParentControl = nil then begin
-    Var LForm := Screen.ActiveForm;
+    LForm := Screen.ActiveForm;
     if LForm = nil then LForm := Application.MainForm;
     if LForm = nil then Raise Exception.Create('Error 0B1C5551-F59D-46FA-8E9B-A10AB6A65FDE');
+    LClientWidth := LForm.ClientWidth;
+    LClientHeight := LForm.ClientHeight;
+  end
+  else begin
+    LForm := nil;
+    LClientWidth := ASheet.ParentControl.Width;
+    LClientHeight := ASheet.ParentControl.Height;
+  end;
+
+  // Handle WrapContentInScrollBox
+  if ASheet.ScrollBox <> nil then begin
+
+    // Init Container size
+    if ASheet.ParentControl = nil then begin
+      ASheet.Width := LClientWidth;
+      ASheet.Height := LClientHeight;
+    end;
+
+    // BeginUpdate was called when the dialog was created.
+    // Calling EndUpdate now will adjust the size of content.
+    ASheet.EndUpdate;
+
+    // Align all elements properly.
+    ASheet.BeginUpdate;
+
+    // Init LMaxScrollBoxHeight/LMaxScrollBoxWidth
+    var LMaxScrollBoxWidth := LClientWidth
+                              - ASheet.Container.Padding.Left - Asheet.Container.Padding.Right
+                              - ASheet.Container.Margins.Left - Asheet.Container.Margins.Right;
+    var LMaxScrollBoxHeight := LClientHeight
+                               - ASheet.Container.Padding.Top - Asheet.Container.Padding.Bottom
+                               - ASheet.Container.Margins.Top - Asheet.Container.Margins.Bottom;
+    For var I := 0 to ASheet.Container.ControlsCount - 1 do begin
+      var LControl := ASheet.Container.Controls[I];
+      if LControl <> ASheet.ScrollBox then
+        LMaxScrollBoxHeight := LMaxScrollBoxHeight - LControl.Height - LControl.Margins.Top - LControl.Margins.Bottom;
+    end;
+
+    // Init ScrollBox.Width/ScrollBox.Height
+    case ASheet.DockEdge of
+      TALSheet.TDockEdge.Left,
+      TALSheet.TDockEdge.Right: begin
+        ASheet.ScrollBox.Width := Min(LMaxScrollBoxWidth, ASheet.Content.Width);
+        ASheet.content.Height := LMaxScrollBoxHeight;
+      end;
+      TALSheet.TDockEdge.Top: begin
+        ASheet.ScrollBox.Height := Min(LMaxScrollBoxHeight, ASheet.Content.Height);
+        ASheet.ScrollBox.ScrollEngine.ViewportPosition := ASheet.ScrollBox.ScrollEngine.MaxScrollLimit;
+      end;
+      TALSheet.TDockEdge.Bottom: begin
+        ASheet.ScrollBox.Height := Min(LMaxScrollBoxHeight, ASheet.Content.Height);
+      end
+      else
+        Raise Exception.Create('Error 97D38738-0392-46A5-A093-55BCBE034B1A')
+    end;
+
+    // Init ScrollBox.ScrollEngine.TouchMode
+    if CompareValue(ASheet.ScrollBox.Height, LMaxScrollBoxHeight, TEpsilon.Position) < 0 then
+      ASheet.ScrollBox.ScrollEngine.TouchMode := TALScrollEngine.TTouchMode.Disabled;
+
+    // Init ASheet.ScrollBox.FMaxWidth/FMaxHeight
+    ASheet.ScrollBox.FMaxWidth := LMaxScrollBoxWidth;
+    ASheet.ScrollBox.FMaxHeight := LMaxScrollBoxHeight;
+
+  end;
+
+  // Attach ASheet
+  if ASheet.ParentControl = nil then begin
     LForm.Focused := nil;
     FreezeNativeViews;
     ASheet.Align := TALAlignLayout.Contents;
@@ -2043,13 +2344,18 @@ begin
   FCurrentSheet := ASheet;
   FCurrentSheet.AddFreeNotify(Self);
 
+  if assigned(FCurrentSheet.FOnShownRefProc) then
+    FCurrentSheet.FOnShownRefProc(FCurrentSheet);
+
+  FScrimAnimation.Enabled := False;
+  FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentSheet.Fill.Color).A / 255;
+  FContainerAnimation.Enabled := False;
+
   // ShowAnimateOptions
   if TALSheet.TAnimateOption.AnimateContainer in FCurrentSheet.ShowAnimateOptions then begin
 
     // Start the ScrimAnimation
     if (TALSheet.TAnimateOption.AnimateScrim in FCurrentSheet.ShowAnimateOptions) then begin
-      FScrimAnimation.Enabled := False;
-      FScrimAnimation.TagFloat := TAlphaColorRec(FCurrentSheet.Fill.Color).A / 255;
       FScrimAnimation.InterpolationType := TALInterpolationType.Linear;
       FScrimAnimation.Duration := 0.4;
       FScrimAnimation.StartValue := 0;
@@ -2062,7 +2368,6 @@ begin
     end;
 
     // Start the ContainerAnimation
-    FContainerAnimation.Enabled := False;
     FContainerAnimation.Tag := Integer(False);
     FContainerAnimation.InterpolationType := TALInterpolationType.Material3ExpressiveDefaultSpatial;
     FContainerAnimation.Duration := 0.500;

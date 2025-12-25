@@ -205,6 +205,12 @@ type
     property PropagateMouseEvents: Boolean read FPropagateMouseEvents write FPropagateMouseEvents default True;
   end;
 
+  {******************************************}
+  TALControlHelper = class helper for TControl
+  public
+    function IsAncestorOf(const AControl: IControl): Boolean;
+  end;
+
   {*************************************}
   {$IFNDEF ALCompilerVersionSupported130}
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
@@ -1876,6 +1882,19 @@ begin
     FALParentControl := TALControl(ParentControl)
   else
     FALParentControl := nil;
+end;
+
+{************************************************************************}
+function TALControlHelper.IsAncestorOf(const AControl: IControl): Boolean;
+begin
+  Result := False;
+  if AControl = nil then Exit;
+  var LObject := AControl.GetObject;
+  while LObject <> nil do begin
+    if LObject.Parent = Self then Exit(True);
+    LObject := LObject.Parent;
+  end;
+  Result := False;
 end;
 
 {*************************************}

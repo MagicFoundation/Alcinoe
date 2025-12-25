@@ -46,11 +46,13 @@ implementation
 uses
   System.Net.URLClient,
   System.IOUtils,
+  System.TypInfo,
   Alcinoe.FMX.UserPreferences,
   Alcinoe.FMX.Styles,
   Alcinoe.FMX.Snackbar,
   Alcinoe.Http.Worker,
   Alcinoe.Common,
+  Alcinoe.Files,
   Alcinoe.FMX.ErrorReporting,
   Alcinoe.Localization,
   Alcinoe.StringUtils;
@@ -112,7 +114,7 @@ begin
   LoadingAnimatedImage.Enabled := True;
   try
     TALUserPreferences.Instance.SetBoolean('uploading', true);
-    var Lfilename := TPath.Combine(TPath.GetTempPath, '100mb.tmp');
+    var Lfilename := TPath.Combine(ALGetTempPathW, '100mb.tmp');
     if not TFile.Exists(Lfilename) then begin
       var LBytes: TBytes;
       SetLength(Lbytes, 10_000_000);
@@ -163,7 +165,7 @@ procedure TMainForm.HttpWorkResultHandler(const Sender: TObject; const Msg: Syst
 begin
   var LWorkResultMessage := TALHttpWorker.TWorkResultMessage(Msg);
 
-  ALLog('TMainForm.HttpWorkResultHandler', 'Request ID: ' + LWorkResultMessage.RequestId + ' | Success: ' + ALBoolToStrW(LWorkResultMessage.Value, 'True', 'False'));
+  ALLog('TMainForm.HttpWorkResultHandler', 'Request ID: ' + LWorkResultMessage.RequestId + ' | Result: ' + GetEnumName(TypeInfo(TALHttpWorker.TWorkResult), Ord(LWorkResultMessage.Value)));
   TALUserPreferences.Instance.SetBoolean('uploading', False);
   TALUserPreferences.Instance.SetBoolean('downloading', False);
 
@@ -175,7 +177,8 @@ begin
   LoadingAnimatedImage.Enabled := False;
 
   var LMessageText: string;
-  if LWorkResultMessage.Value then LMessageText  := 'Job complete'
+  if LWorkResultMessage.Value = TALHttpWorker.TWorkResult.Success then LMessageText  := 'Job complete'
+  else if LWorkResultMessage.Value = TALHttpWorker.TWorkResult.canceled then LMessageText  := 'Job canceled'
   else LMessageText  := 'Job failed';
   TALSnackBar.Builder.SetMessageText(LMessageText).Show;
 end;

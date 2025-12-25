@@ -446,14 +446,6 @@ type
 
 type
 
-  TALPointFHelper = record helper for TPointF
-    function RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
-  end;
-
-  TALRectFHelper = record helper for TRectF
-    function RoundTo(const ADigit: TRoundToEXRangeExtended): TRectF;
-  end;
-
   TALPointDType = array [0..1] of Double;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -526,10 +518,21 @@ type
 
     function Abs: Double;
 
+    function ToString: String;
+
     case Integer of
       0: (V: TALPointDType;);
       1: (X: Double;
           Y: Double;);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
+  {$ENDIF}
+  TALPointFHelper = record helper for TPointF
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
+    function ToString: String;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -573,6 +576,16 @@ type
     // properties
     property Width: Double read cx write cx;
     property Height: Double read cy write cy;
+
+    function ToString: String;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
+  {$ENDIF}
+  TALSizeFHelper = record helper for TSizeF
+    function ToString: String;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -720,9 +733,20 @@ type
 
     property Location: TALPointD read GetLocation write SetLocation;
 
+    function ToString: String;
+
   case Integer of
     0: (Left, Top, Right, Bottom: Double);
     1: (TopLeft, BottomRight: TALPointD);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
+  {$ENDIF}
+  TALRectFHelper = record helper for TRectF
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TRectF;
+    function ToString: String;
   end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2041,20 +2065,6 @@ begin
   Result := ALRectPlaceInto(R, Bounds, LRatio, AHorzAlign, AVertAlign);
 end;
 
-{*******************************************************************************}
-function TALPointFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
-begin
-  Result.X := System.math.RoundTo(X, ADigit);
-  Result.Y := System.math.RoundTo(Y, ADigit);
-end;
-
-{*****************************************************************************}
-function TALRectFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TRectF;
-begin
-  Result.TopLeft := TopLeft.RoundTo(ADigit);
-  Result.BottomRight := BottomRight.RoundTo(ADigit);
-end;
-
 {***************************************************************}
 class function TALPointD.Create(const AX, AY: Double): TALPointD;
 begin
@@ -2417,6 +2427,31 @@ begin
     Result := Self.DotProduct(APoint) / Epsilon;
 
   Result := Max(Min(Result, 1), -1);
+end;
+
+{**********************************}
+function TALPointD.ToString: String;
+begin
+  Result := ALFormatW(
+              'X=%g Y=%g',
+              [x, y],
+              ALDefaultFormatSettingsW);
+end;
+
+{*******************************************************************************}
+function TALPointFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
+begin
+  Result.X := System.math.RoundTo(X, ADigit);
+  Result.Y := System.math.RoundTo(Y, ADigit);
+end;
+
+{****************************************}
+function TALPointFHelper.ToString: String;
+begin
+  Result := ALFormatW(
+              'X=%g Y=%g',
+              [x, y],
+              ALDefaultFormatSettingsW);
 end;
 
 {*****************************************************************}
@@ -2890,6 +2925,31 @@ begin
   end;
 end;
 
+{*********************************}
+function TALRectD.ToString: String;
+begin
+  Result := ALFormatW(
+              'L=%g T=%g R=%g B=%g',
+              [Left, Top, Right, Bottom],
+              ALDefaultFormatSettingsW);
+end;
+
+{*****************************************************************************}
+function TALRectFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TRectF;
+begin
+  Result.TopLeft := TopLeft.RoundTo(ADigit);
+  Result.BottomRight := BottomRight.RoundTo(ADigit);
+end;
+
+{***************************************}
+function TALRectFHelper.ToString: String;
+begin
+  Result := ALFormatW(
+              'L=%g T=%g R=%g B=%g',
+              [Left, Top, Right, Bottom],
+              ALDefaultFormatSettingsW);
+end;
+
 {*****************************************************}
 function TALSizeD.Add(const Point: TALSizeD): TALSizeD;
 begin
@@ -3030,6 +3090,24 @@ class operator TALSizeD.Implicit(const Size: TSize): TALSizeD;
 begin
   Result.cx := Size.cx;
   Result.cy := Size.cy;
+end;
+
+{*********************************}
+function TALSizeD.ToString: String;
+begin
+  Result := ALFormatW(
+              'W=%g H=%g',
+              [Width, Height],
+              ALDefaultFormatSettingsW);
+end;
+
+{***************************************}
+function TALSizeFHelper.ToString: String;
+begin
+  Result := ALFormatW(
+              'W=%g H=%g',
+              [Width, Height],
+              ALDefaultFormatSettingsW);
 end;
 
 {*****************************************************}

@@ -34,6 +34,11 @@ Function  AlEmptyDirectoryW(
             Const FileNameMask: String = '*';
             Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 
+function ALGetAppDataPathW: String;
+function ALGetTempPathW: String;
+function ALGetTempFilenameW(Const AExt: String = '.tmp'): String;
+function ALGetCachePathW: String;
+
 {$IF defined(MSWINDOWS)}
 Function  AlCopyDirectoryA(
             SrcDirectory,
@@ -49,10 +54,8 @@ Function  AlCopyDirectoryW(
             Const FileNameMask: String = '*';
             Const FailIfExists: Boolean = True;
             Const SkipIfExists: Boolean = False): Boolean;
-function  ALGetModuleFileNameA(const AWithoutExtension: boolean = True): ansistring;
-function  ALGetModuleFileNameW(const AWithoutExtension: boolean = True): String;
-function  ALGetModuleNameA: ansistring;
-function  ALGetModuleNameW: String;
+function  ALGetModuleNameA(const AWithoutExtension: boolean = False): ansistring;
+function  ALGetModuleNameW(const AWithoutExtension: boolean = False): String;
 function  ALGetModulePathA: ansiString;
 function  ALGetModulePathW: String;
 Function  AlGetFileSize(const AFileName: ansistring): int64; overload; deprecated 'Use Tfile.GetSize Instead';
@@ -100,6 +103,17 @@ uses
   Winapi.ShLwApi,
   {$ELSE}
   Posix.Unistd,
+  {$ENDIF}
+  {$IF defined(Android)}
+  Androidapi.IOUtils,
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
+  Macapi.Helpers,
+  Macapi.Foundation,
+  {$ENDIF}
+  {$IF defined(IOS)}
+  Macapi.Helpers,
+  iOSapi.Foundation,
   {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.StringList;
@@ -219,6 +233,112 @@ begin
               MinFileAge);
 end;
 
+{*********************************}
+function ALGetAppDataPathW: String;
+begin
+
+  {$IF defined(MSWindows)}
+  // Windows XP:             C:\Documents and Settings\<username>\Application Data\<AppName>\
+  // Windows Vista or later: C:\Users\<username>\AppData\Roaming\<AppName>\
+  Result := TPath.Combine(System.IOUtils.TPath.GetHomePath, ALGetModuleNameW(True{AWithoutExtension}));
+  {$ELSEIF defined(ALAppleOS)}
+  // OS X:          /Users/<username>/Library/Application Support/
+  // iOS Device:    /var/mobile/Containers/Data/Application/<application ID>/Library/Application Support/
+  var LNSFile := TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager);
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4412 was corrected and adjust the IFDEF'}
+  {$ENDIF}
+  var LErrorPtr: Pointer := nil;
+  var LURL := LNSFile.URLForDirectory(
+                NSApplicationSupportDirectory, // directory: NSSearchPathDirectory;
+                NSUserDomainMask, // inDomain: NSSearchPathDomainMask;
+                nil, // appropriateForURL: NSURL;
+                true, // create: Boolean;
+                @LErrorPtr); // error: PPointer
+  if LErrorPtr <> nil then
+    Raise Exception.Create(NSStrToStr(TNSError.Wrap(LErrorPtr).localizedDescription));
+  if (LURL <> nil) then Result := UTF8ToString(LURL.path.UTF8String)
+  else Raise Exception.Create('Error CBDF8B31-4AE2-4805-AD52-3678D3450A6A');
+  {$ELSEIF defined(ANDROID)}
+  // Android: /data/data/<application ID>/files
+  Result := GetFilesDir;
+  {$ELSE}
+  raise Exception.Create('ALGetAppDataPathW is not supported on this platform.');
+  {$ENDIF}
+
+  If (length(result) > 0) and (result[length(result)] <> TPath.DirectorySeparatorChar) then result := result + TPath.DirectorySeparatorChar;
+  If not TDirectory.Exists(result) then TDirectory.CreateDirectory(Result);
+
+end;
+
+{******************************}
+function ALGetTempPathW: String;
+begin
+
+  {$IF defined(MSWindows)}
+  // Windows XP:             C:\Documents and Settings\<User name>\Local Settings\Temp\
+  // Windows Vista or later: C:\Users\<User name>\AppData\Local\Temp\
+  Result := System.IOUtils.TPath.GetTempPath;
+  {$ELSEIF defined(ALAppleOS)}
+  // OS X:          /var/folders/<random folder name>/
+  // iOS Device:    /private/var/mobile/Containers/Data/Application/<application ID>/tmp/
+  Result := NSStrToStr(TNSString.Wrap(NSTemporaryDirectory));
+  {$ELSEIF defined(ANDROID)}
+  // Android: /data/data/<application ID>/cache/tmp/
+  Result := TPath.Combine(Androidapi.IOUtils.GetCacheDir, 'tmp/');
+  {$ELSE}
+  raise Exception.Create('ALGetAppDataPathW is not supported on this platform.');
+  {$ENDIF}
+
+  If (length(result) > 0) and (result[length(result)] <> TPath.DirectorySeparatorChar) then result := result + TPath.DirectorySeparatorChar;
+  If not TDirectory.Exists(result) then TDirectory.CreateDirectory(Result);
+
+end;
+
+{***************************************************************}
+function ALGetTempFilenameW(Const AExt: String = '.tmp'): String;
+begin
+  Result := TPath.Combine(ALGetTempPathW, ALLowercase(ALNewGUIDStringW(True{WithoutBracket}, False{WithoutHyphen}))+AExt)
+end;
+
+{*******************************}
+function ALGetCachePathW: String;
+begin
+
+  {$IF defined(MSWindows)}
+  // Windows XP:             C:\Documents and Settings\<username>\Local Settings\Application Data\<AppName>\
+  // Windows Vista or later: C:\Users\<username>\AppData\Local\<AppName>\
+  Result := TPath.Combine(System.IOUtils.TPath.GetCachePath, ALGetModuleNameW(True{AWithoutExtension}));
+  {$ELSEIF defined(ALAppleOS)}
+  // OS X:          /Users/<username>/Library/Caches/
+  // iOS Device:    /var/mobile/Containers/Data/Application/<application ID>/Library/Caches/
+  var LNSFile := TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager);
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4412 was corrected and adjust the IFDEF'}
+  {$ENDIF}
+  var LErrorPtr: Pointer := nil;
+  var LURL := LNSFile.URLForDirectory(
+                NSCachesDirectory, // directory: NSSearchPathDirectory;
+                NSUserDomainMask, // inDomain: NSSearchPathDomainMask;
+                nil, // appropriateForURL: NSURL;
+                true, // create: Boolean;
+                @LErrorPtr); // error: PPointer
+  if LErrorPtr <> nil then
+    Raise Exception.Create(NSStrToStr(TNSError.Wrap(LErrorPtr).localizedDescription));
+  if (LURL <> nil) then Result := UTF8ToString(LURL.path.UTF8String)
+  else Raise Exception.Create('Error 557E87B9-4887-47F4-83F0-E65939AE4704');
+  {$ELSEIF defined(ANDROID)}
+  // Android: /data/data/<application ID>/cache/
+  Result := Androidapi.IOUtils.GetCacheDir;
+  {$ELSE}
+  raise Exception.Create('ALGetAppDataPathW is not supported on this platform.');
+  {$ENDIF}
+
+  If (length(result) > 0) and (result[length(result)] <> TPath.DirectorySeparatorChar) then result := result + TPath.DirectorySeparatorChar;
+  If not TDirectory.Exists(result) then TDirectory.CreateDirectory(Result);
+
+end;
+
 {**********************}
 {$IF defined(MSWINDOWS)}
 Function AlCopyDirectoryA(
@@ -298,47 +418,29 @@ end;
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-function ALGetModuleFileNameA(const AWithoutExtension: boolean = True): ansiString;
-Var Ln: Integer;
+function ALGetModuleNameA(const AWithoutExtension: boolean = False): ansiString;
 begin
-  result := ALExtractFileName(ALGetModuleNameA);
-  if AWithoutExtension then begin
-    ln := Length(ALExtractFileExt(Result));
-    if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
-  end;
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWINDOWS)}
-function ALGetModuleFileNameW(const AWithoutExtension: boolean = True): String;
-Var Ln: Integer;
-begin
-  result := ALExtractFileName(ALGetModuleNameW);
-  if AWithoutExtension then begin
-    ln := Length(ALExtractFileExt(Result));
-    if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
-  end;
-end;
-{$ENDIF}
-
-{**********************}
-{$IF defined(MSWINDOWS)}
-function ALGetModuleNameA: ansiString;
-var ModName: array[0..MAX_PATH] of AnsiChar;
-begin
+  var ModName: array[0..MAX_PATH] of AnsiChar;
   SetString(Result, ModName, Winapi.Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
-  If ALPosA('\\?\',result) = 1 then delete(Result,1,4);
+  result := ALExtractFileName(result);
+  if AWithoutExtension then begin
+    Var ln := Length(ALExtractFileExt(Result));
+    if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
+  end;
 end;
 {$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-function ALGetModuleNameW: String;
-var ModName: array[0..MAX_PATH] of Char;
+function ALGetModuleNameW(const AWithoutExtension: boolean = False): String;
 begin
+  var ModName: array[0..MAX_PATH] of Char;
   SetString(Result, ModName, Winapi.Windows.GetModuleFileNameW(HInstance, ModName, SizeOf(ModName)));
-  If ALPosW('\\?\',result) = 1 then delete(Result,1,4);
+  result := ALExtractFileName(result);
+  if AWithoutExtension then begin
+    Var ln := Length(ALExtractFileExt(Result));
+    if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
+  end;
 end;
 {$ENDIF}
 
@@ -346,8 +448,11 @@ end;
 {$IF defined(MSWINDOWS)}
 function ALGetModulePathA: ansiString;
 begin
-  Result:=ALExtractFilePath(ALGetModuleNameA);
-  If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
+  var ModName: array[0..MAX_PATH] of AnsiChar;
+  SetString(Result, ModName, Winapi.Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
+  If ALPosA('\\?\',result) = 1 then delete(Result,1,4);
+  Result:=ALExtractFilePath(Result);
+  If (length(result) > 0) and (result[length(result)] <> AnsiChar(TPath.DirectorySeparatorChar)) then result := result + AnsiChar(TPath.DirectorySeparatorChar);
 end;
 {$ENDIF}
 
@@ -355,8 +460,11 @@ end;
 {$IF defined(MSWINDOWS)}
 function ALGetModulePathW: String;
 begin
-  Result:=ALExtractFilePath(ALGetModuleNameW);
-  If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
+  var ModName: array[0..MAX_PATH] of Char;
+  SetString(Result, ModName, Winapi.Windows.GetModuleFileNameW(HInstance, ModName, SizeOf(ModName)));
+  If ALPosW('\\?\',result) = 1 then delete(Result,1,4);
+  Result:=ALExtractFilePath(Result);
+  If (length(result) > 0) and (result[length(result)] <> TPath.DirectorySeparatorChar) then result := result + TPath.DirectorySeparatorChar;
 end;
 {$ENDIF}
 
@@ -763,5 +871,13 @@ begin
   Result := MoveFileW(PChar(OldName), PChar(NewName));
 end;
 {$ENDIF}
+
+initialization
+  {$IF defined(DEBUG)}
+  //ALLog('Alcinoe.Files','initialization');
+  //ALLog('ALGetAppDataPathW', ALGetAppDataPathW);
+  //ALLog('ALGetTempPathW', ALGetTempPathW);
+  //ALLog('ALGetCachePathW', ALGetCachePathW);
+  {$ENDIF}
 
 end.

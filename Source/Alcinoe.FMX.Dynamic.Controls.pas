@@ -8,6 +8,7 @@ uses
   System.UITypes,
   system.Types,
   System.Classes,
+  System.SysUtils,
   System.Generics.Collections,
   FMX.Forms,
   FMX.Controls,
@@ -197,11 +198,11 @@ Type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // [TControl] procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // [TControl] procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual; // [TControl] procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual;
-    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseEnter(const AObject: TALDynamicControl); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
-    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); virtual; abstract; // https://quality.embarcadero.com/browse/RSP-24397
+    procedure ChildrenMouseDown(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; abstract;
+    procedure ChildrenMouseMove(const AObject: TALDynamicControl; Shift: TShiftState; X, Y: Single); virtual; abstract;
+    procedure ChildrenMouseUp(const AObject: TALDynamicControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; abstract;
+    procedure ChildrenMouseEnter(const AObject: TALDynamicControl); virtual; abstract;
+    procedure ChildrenMouseLeave(const AObject: TALDynamicControl); virtual; abstract;
     procedure Click; virtual; // [TControl] procedure Click; virtual;
     procedure DblClick; virtual; // [TControl] procedure DblClick; virtual;
     function IsInMotion: Boolean; virtual; abstract;
@@ -305,6 +306,7 @@ Type
     function GetControlAtPos(
                const APos: TALPointD; // APos is local to the control
                const ACheckHitTest: Boolean = true): TALDynamicControl; overload; virtual; // [TControl] function ObjectAtPoint(AScreenPoint: TPointF): IControl; virtual;
+    procedure EnumControls(const Proc: TFunc<TALDynamicControl, TEnumControlsResult>);
     property Controls[const Index: Integer]: TALDynamicControl read GetControlByIndex; default; // [TControl] property Controls: TControlList read GetControls;
     property Controls[const Name: String]: TALDynamicControl read GetControlByName; default; // [TControl] property Controls: TControlList read GetControls;
     property ControlsCount: Integer read FControlsCount; // [TControl] property ControlsCount: Integer read GetControlsCount;
@@ -529,7 +531,6 @@ type
 implementation
 
 uses
-  System.SysUtils,
   System.Math,
   System.Math.Vectors,
   Fmx.utils,
@@ -884,11 +885,11 @@ begin
   for var I := AControl.FUpdating to FUpdating - 1 do AControl.BeginUpdate;
   //--
   var LIndex := Max(0, Min(AIndex, FControlsCount));
-  If length(FControls) <= FControlsCount then
-    Setlength(FControls, FControlsCount + 1);
+  If length(FControls) < FControlsCount + 1{AControl} then
+    Setlength(FControls, FControlsCount + 1{AControl});
   if LIndex <= FControlsCount - 1 then begin
-    ALMove(FControls[LIndex], FControls[LIndex+1], (FControlsCount - 1 - LIndex) * SizeOf(Pointer));
-    For var I := LIndex + 1 to FControlsCount - 1 do
+    ALMove(FControls[LIndex], FControls[LIndex+1], (FControlsCount - LIndex) * SizeOf(Pointer));
+    For var I := LIndex + 1{AControl} to FControlsCount {+ 1(AControl) - 1} do
       FControls[I].FIndex := I;
   end;
   Inc(FControlsCount);
@@ -1031,6 +1032,30 @@ function TALDynamicControl.GetControlAtPos(
 begin
   Var LControlPos: TALPointD;
   result := GetControlAtPos(aPos, LControlPos, ACheckHitTest);
+end;
+
+{**************************************************************************************************}
+procedure TALDynamicControl.EnumControls(const Proc: TFunc<TALDynamicControl, TEnumControlsResult>);
+
+  {$IFNDEF ALCompilerVersionSupported130}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.EnumControls was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure EnumChildControls(const AParentControl: TALDynamicControl; var AProcResult: TEnumControlsResult);
+  begin
+    for var I := 0 to AParentControl.ControlsCount - 1 do begin
+      var LControl := AParentControl.Controls[I];
+      AProcResult := Proc(LControl);
+      if AProcResult = TEnumProcResult.Continue then EnumChildControls(LControl, AProcResult);
+      if AProcResult = TEnumProcResult.Stop then Break;
+      if AProcResult = TEnumProcResult.Discard then AProcResult := TEnumProcResult.Continue;
+    end;
+  end;
+
+begin
+  var LProcResult := TEnumProcResult.Continue;
+  EnumChildControls(Self, LProcResult);
 end;
 
 {***************************************************************************}
@@ -2408,7 +2433,6 @@ begin
   FIsMouseOver := True;
   if Assigned(FOnMouseEnter) then
     FOnMouseEnter(Self);
-  if fOwner <> nil then fOwner.ChildrenMouseEnter(Self); // https://quality.embarcadero.com/browse/RSP-24397
 end;
 
 {*************************************}
@@ -2420,7 +2444,6 @@ begin
   FIsMouseOver := False;
   if Assigned(FOnMouseLeave) then
     FOnMouseLeave(Self);
-  if fOwner <> nil then fOwner.ChildrenMouseLeave(Self); // https://quality.embarcadero.com/browse/RSP-24397
 end;
 
 {********************************************************************************************}
@@ -2431,7 +2454,6 @@ begin
   {$ENDIF}
   if Assigned(FOnMouseDown) then
     FOnMouseDown(Self, Button, Shift, X, Y);
-  if fOwner <> nil then fOwner.ChildrenMouseDown(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
   if FAutoCapture then
     Capture;
   if Button = TMouseButton.mbLeft then begin
@@ -2448,7 +2470,6 @@ begin
   {$ENDIF}
   if Assigned(FOnMouseMove) then
     FOnMouseMove(Self, Shift, X, Y);
-  if fOwner <> nil then fOwner.ChildrenMouseMove(Self, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
 end;
 
 {******************************************************************************************}
@@ -2460,7 +2481,6 @@ begin
   ReleaseCapture;
   if Assigned(FOnMouseUp) then
     FOnMouseUp(Self, Button, Shift, X, Y);
-  if fOwner <> nil then fOwner.ChildrenMouseUp(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
   FPressed := False;
 end;
 

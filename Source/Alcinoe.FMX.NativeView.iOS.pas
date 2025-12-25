@@ -416,7 +416,9 @@ begin
   //ALLog(classname + '.touchesCancelled');
   {$ENDIF}
   if (Form <> nil) and
-     (not view.isFirstResponder) and
+     // iOS may deliver touchesCancelled (mouse up) instead of touchesEnded
+     // in some cases, even when the view remains the first responder.
+     //(not view.isFirstResponder) and
      (touches.count > 0) then begin
 
     var LHandle: TiOSWindowHandle;

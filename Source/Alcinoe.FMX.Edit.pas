@@ -160,7 +160,7 @@ Type
     property View: JALEditText read GetView;
     property Control: TALBaseEdit read GetControl;
     function getLineCount: integer; virtual;
-    function getLineHeight: Single; virtual; // It includes the line spacing
+    function getLineHeight: Single; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -212,7 +212,7 @@ Type
     procedure SetMaxLength(const Value: integer); virtual; abstract;
   public
     function getLineCount: integer; virtual; abstract;
-    function getLineHeight: Single; virtual; abstract; // It includes the line spacing
+    function getLineHeight: Single; virtual; abstract;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
     Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -313,7 +313,7 @@ Type
     property Control: TALBaseEdit read GetControl;
     procedure SetEnabled(const value: Boolean); override;
     function getLineCount: integer; override;
-    function getLineHeight: Single; override; // It includes the line spacing
+    function getLineHeight: Single; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
@@ -353,7 +353,7 @@ Type
     procedure SetMaxLength(const Value: integer); virtual; abstract;
   public
     function getLineCount: integer; virtual; abstract;
-    function getLineHeight: Single; virtual; abstract; // It includes the line spacing
+    function getLineHeight: Single; virtual; abstract;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
     Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -449,7 +449,7 @@ Type
     property Control: TALBaseEdit read GetControl;
     procedure SetEnabled(const value: Boolean); override;
     function getLineCount: integer; override;
-    function getLineHeight: Single; override; // It includes the line spacing
+    function getLineHeight: Single; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
   end;
@@ -520,7 +520,7 @@ Type
     destructor Destroy; override;
     property Control: TALBaseEdit read GetControl;
     function getLineCount: integer; virtual;
-    function getLineHeight: Single; virtual; // It includes the line spacing
+    function getLineHeight: Single; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -882,6 +882,7 @@ Type
     {$ENDIF}
     FStateStyles: TStateStyles;
     FIsTextEmpty: Boolean;
+    FNativeViewFrozenByPaint: Boolean;
     //--
     FDummyFillColor: TAlphaColor;
     fDummyReturnKeyType: TReturnKeyType;
@@ -1037,7 +1038,7 @@ Type
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
     function getLineCount: integer;
-    function getLineHeight: Single; // It includes the line spacing
+    function getLineHeight: Single;
     procedure MakeBufDrawable; override;
     procedure MakeBufPromptTextDrawable; virtual;
     procedure MakeBufLabelTextDrawable; virtual;
@@ -1856,8 +1857,12 @@ begin
   LTypeface := nil;
   view.setgravity(LGravity);
   //-----
-  if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-    view.setLineSpacing(0{add}, textsettings.LineHeightMultiplier{mult});
+  var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(LFontSize, textsettings.LineHeightMultiplier);
+  if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then
+    // To mirror Skia’s behavior, the line height is calculated as: lineHeight = fontSize * LineHeightMultiplier
+    view.setLineHeight(Round(LFontSize * LTmpLineHeightMultiplier * ALGetScreenScale))
+  else
+    view.setLinespacing(0{add},1{mult});
 
 end;
 
@@ -2368,11 +2373,12 @@ end;
 {********************************************}
 function TALIosEditView.getLineHeight: Single;
 begin
-  if View.font = nil then
-    TextSettingsChanged(nil);
-  result := View.font.lineHeight;
-  if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-    result := result * textsettings.LineHeightMultiplier;
+  var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.font.size, textsettings.LineHeightMultiplier);
+  if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then result := textsettings.Font.Size * LTmpLineHeightMultiplier
+  else begin
+    if View.font = nil then TextSettingsChanged(nil);
+    result := View.font.lineHeight;
+  end;
 end;
 
 {*********************************************************************************}
@@ -2757,14 +2763,16 @@ end;
 {********************************************}
 function TALMacEditView.getLineHeight: Single;
 begin
-  var LfontMetrics := ALGetFontMetrics(
-                        ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
-                        TextSettings.Font.Size, // const AFontSize: single;
-                        TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
-                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
-  result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
-  if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-    result := result * textsettings.LineHeightMultiplier;
+  var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.font.size, textsettings.LineHeightMultiplier);
+  if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then result := textsettings.Font.Size * LTmpLineHeightMultiplier
+  else begin
+    var LfontMetrics := ALGetFontMetrics(
+                          ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
+                          TextSettings.Font.Size, // const AFontSize: single;
+                          TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
+                          TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
+    result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
+  end;
 end;
 
 {*********************************************************************************}
@@ -3234,15 +3242,20 @@ end;
 {********************************************}
 function TALWinEditView.getLineHeight: Single;
 begin
+
+  //
+  // The classic Windows edit control doesn't natively support line spacing adjustments
+  // var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.font.size, textsettings.LineHeightMultiplier);
+  // if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then result := textsettings.Font.Size * LTmpLineHeightMultiplier
+  //
+
   var LfontMetrics := ALGetFontMetrics(
                         ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
                         TextSettings.Font.Size, // const AFontSize: single;
                         TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
                         TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
-  // The classic Edit control doesn't natively support line spacing adjustments
-  // if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-  //   result := result * textsettings.LineHeightMultiplier;
+
 end;
 
 {*********************************************************************************}
@@ -4258,6 +4271,7 @@ begin
   FSupportingTextMarginBottomUpdated := False;
   //--
   FIsTextEmpty := True;
+  FNativeViewFrozenByPaint := False;
   //--
   FDummyFillColor := $ffffffff;
   fDummyReturnKeyType := tReturnKeyType.Default;
@@ -4692,6 +4706,10 @@ begin
   {$IF defined(DEBUG)}
   //ALLog(Classname + '.DoEnter', 'control.name: ' + Name);
   {$ENDIF}
+  if FNativeViewFrozenByPaint then begin
+    UnfreezeNativeView;
+    FNativeViewFrozenByPaint := False;
+  end;
   inherited DoEnter;
   StateStyles.Transition.start;
   //--
@@ -6057,6 +6075,31 @@ end;
 procedure TALBaseEdit.Paint;
 begin
 
+  // Simulate z-order handling:
+  // Freeze the native view when it moves out of the visible area.
+  // • Top overflow: freeze only if the control’s top differs from the
+  //   form’s top (otherwise z-order simulation is not required).
+  // • Bottom overflow: freeze only when the control is not focused, since
+  //   a focused edit is already obscured by the virtual keyboard.
+  var LAbsoluteDisplayedRect := GetAbsoluteDisplayedRect;
+  var LAbsoluteRect := AbsoluteRect;
+  var LHasTopOffset := not sameValue(LAbsoluteDisplayedRect.Top, LAbsoluteRect.top, TEpsilon.Position);
+  If (not LAbsoluteDisplayedRect.EqualsTo(LAbsoluteRect)) and
+     ((LHasTopOffset and (CompareValue(LAbsoluteDisplayedRect.Top, 0, TEpsilon.Position) >= 0)) or
+      ((not LHasTopOffset) and (not IsFocused))) then begin
+    if not FNativeViewFrozenByPaint then begin
+      FNativeViewFrozenByPaint := True;
+      if IsFocused then resetfocus;
+      FreezeNativeView;
+    end
+  end
+  else begin
+    if FNativeViewFrozenByPaint then begin
+      FNativeViewFrozenByPaint := False;
+      UnfreezeNativeView;
+    end;
+  end;
+
   StateStyles.UpdateLastPaintedRawStyle;
   MakeBufDrawable;
   var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
@@ -6448,18 +6491,22 @@ end;
 {*****************************************}
 function TALBaseEdit.getLineHeight: single;
 begin
-  if NativeView <> nil then
-    result := NativeView.getLineHeight
+  if NativeView <> nil then result := NativeView.getLineHeight
   else begin
-    var LfontMetrics := ALGetFontMetrics(
-                          ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
-                          TextSettings.Font.Size, // const AFontSize: single;
-                          TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
-                          TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
-    result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
-    // The classic Edit control doesn't natively support line spacing adjustments
-    // if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-    //   result := result * textsettings.LineHeightMultiplier;
+    {$IF not defined(MSWindows)}
+    var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.font.size, textsettings.LineHeightMultiplier);
+    if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then result := textsettings.Font.Size * LTmpLineHeightMultiplier
+    else begin
+    {$ENDIF}
+      var LfontMetrics := ALGetFontMetrics(
+                            ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
+                            TextSettings.Font.Size, // const AFontSize: single;
+                            TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
+                            TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
+      result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
+    {$IF not defined(MSWindows)}
+    end;
+    {$ENDIF}
   end;
 end;
 

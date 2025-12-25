@@ -136,6 +136,11 @@ end;
 {*****************************}
 destructor TALConfetti.Destroy;
 begin
+  // TALConfetti is owned by the main form, so it will be destroyed as part of
+  // the form's destruction. Clear the singleton reference to avoid leaving
+  // FInstance pointing to a freed object.
+  if self = TALConfetti.FInstance then
+    TALConfetti.FInstance := nil;
   AlFreeAndNil(FParticules);
   AlFreeAndNil(FDisplayAnimation);
   inherited;

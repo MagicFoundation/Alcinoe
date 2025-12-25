@@ -5794,7 +5794,7 @@ begin
   {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
   var LStream := ALCreateResourceStream(AResourceName);
   try
-    Var LfileName := TPath.GetTempFileName;
+    Var LfileName := ALGetTempFilenameW;
     Lstream.SaveToFile(LfileName);
     try
       var LtypeFace := TJtypeFace.JavaClass.createFromFile(StringToJstring(Lfilename));
@@ -6156,7 +6156,7 @@ begin
   if LVersionObject <> nil then Result := NSStrToStr(TNSString.Wrap(LVersionObject)) // 1.0.8
   else Result := 'x.x.x';
   {$ELSEIF defined(MSWINDOWS)}
-  Result := AlGetFileVersion(ALGetModuleNameW);
+  Result := AlGetFileVersion(ALGetModulePathW+ALGetModuleNameW);
   {$ELSE}
   Result := 'x.x.x';
   {$ENDIF}

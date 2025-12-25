@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import android.os.Build;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.net.URL;
 import java.net.URI;
 import java.util.UUID;
@@ -36,11 +38,13 @@ public class ALHttpWorker extends Worker {
 
   public static final String ACTION_HTTP_COMPLETED = "io.magicfoundation.alcinoe.http.action.HTTP_COMPLETED";
   public static final String EXTRA_HTTP_SUCCESS = "io.magicfoundation.alcinoe.http.extra.HTTP_SUCCESS";
+  public static final String EXTRA_HTTP_CANCELED = "io.magicfoundation.alcinoe.http.extra.HTTP_CANCELED";
   public static final String EXTRA_HTTP_REQUEST_ID = "io.magicfoundation.alcinoe.http.extra.HTTP_REQUEST_ID";
   public static final String EXTRA_HTTP_RESPONSE_STATUS_CODE = "io.magicfoundation.alcinoe.http.extra.HTTP_RESPONSE_STATUS_CODE";
   public static final String EXTRA_HTTP_RESPONSE_HEADERS = "io.magicfoundation.alcinoe.http.extra.HTTP_RESPONSE_HEADERS";
   public static final String EXTRA_HTTP_RESPONSE_BODY_FILE_PATH = "io.magicfoundation.alcinoe.http.extra.HTTP_RESPONSE_BODY_FILE_PATH";
 
+  private static final String PREF_NAME = "ALHttpWorker";
   private static final String TAG = "ALHttpWorker";
   private static final String KEY_REQUEST_BODY_FILE_PATH = "request_body_file_path";
   private static final String KEY_DELETE_REQUEST_BODY_FILE = "delete_request_body_file";
@@ -49,8 +53,11 @@ public class ALHttpWorker extends Worker {
   private static final String KEY_REQUEST_METHOD = "request_method";
   private static final String KEY_REQUEST_HEADERS = "request_headers";
   private static final String KEY_ENQUEUE_TIME = "enqueue_time";
-  private static final long MAX_AGE = 7L * 24L * 60L * 60L * 1000L; // 7 days in milliseconds
+  private static final long MAX_AGE_MS = 7L * 24L * 60L * 60L * 1000L; // 7 days in milliseconds
+  private static final long ONE_DAY_MS = 24L * 60L * 60L * 1000L; // 1 day in milliseconds
   private static final int BUFFER_SIZE = 64 * 1024; // 64 KB
+  
+  private static volatile long sLastCleanupTime = 0L;
 
   public ALHttpWorker(
           @NonNull Context context,
@@ -62,6 +69,7 @@ public class ALHttpWorker extends Worker {
   @Override
   public Result doWork() {    
 
+    boolean canceled = false;
     boolean deleteRequestBodyFile = false;
     File requestBodyFile = null;
     File responseBodyFile = null;
@@ -88,8 +96,15 @@ public class ALHttpWorker extends Worker {
       if (requestUrl == null || requestUrl.isEmpty())
         throw new IllegalArgumentException("URL is missing");
 
+      /* Check if this work has been canceled by client before starting HTTP */
+      cleanupExpiredCancellationFlags();
+      if (isCanceled()) {
+        canceled = true;
+        throw new IllegalStateException("HTTP request \"" + getId().toString() + "\" has been canceled; skipping execution.");  
+      }  
+
       /* Abort if request has been queued for too long (expired) */
-      if ((enqueueTime > 0) && (System.currentTimeMillis() - enqueueTime > MAX_AGE))
+      if ((enqueueTime > 0) && (System.currentTimeMillis() - enqueueTime > MAX_AGE_MS))
         throw new IllegalStateException("work request expired (enqueued too long ago)");
       
       /* Default to POST if method not specified */
@@ -210,7 +225,8 @@ public class ALHttpWorker extends Worker {
         if (responseStatusCode >= 200 && responseStatusCode < 300) { 
           Log.d(TAG, "HTTP request \""+getId().toString()+"\" completed successfully (HTTP " + responseStatusCode + ")");
           if (deleteRequestBodyFile && requestBodyFile != null) requestBodyFile.delete();
-          sendCompletionBroadcast(true, responseStatusCode, responseHeaders, responseBodyFilePath);
+          clearCancellationFlag();
+          sendCompletionBroadcast(true/*success*/, false/*canceled*/, responseStatusCode, responseHeaders, responseBodyFilePath);
           return Result.success(); 
         } 
         // Server-side error (5xx) -> retry
@@ -223,7 +239,8 @@ public class ALHttpWorker extends Worker {
         else { 
           Log.e(TAG, "HTTP request \""+getId().toString()+"\" failed with non-retriable error (HTTP " + responseStatusCode + ")");
           if (deleteRequestBodyFile && requestBodyFile != null) requestBodyFile.delete();
-          sendCompletionBroadcast(false, responseStatusCode, responseHeaders, responseBodyFilePath);
+          clearCancellationFlag();
+          sendCompletionBroadcast(false/*success*/, false/*canceled*/, responseStatusCode, responseHeaders, responseBodyFilePath);
           return Result.failure(); 
         }
 
@@ -237,10 +254,12 @@ public class ALHttpWorker extends Worker {
       }
  
     } catch (Exception e) {
-      Log.e(TAG, "HTTP request \""+getId().toString()+"\" failed with non-retriable error", e);
+      if (canceled) Log.d(TAG, "HTTP request \"" + getId().toString() + "\" has been canceled; skipping execution.");
+      else Log.e(TAG, "HTTP request \""+getId().toString()+"\" failed with non-retriable error", e);
       if (deleteRequestBodyFile && requestBodyFile != null) requestBodyFile.delete();
       if (responseBodyFile != null) responseBodyFile.delete();
-      sendCompletionBroadcast(false/*success*/, -1/*responseStatusCode*/, ""/*responseHeaders*/, ""/*responseBodyFilePath*/);
+      clearCancellationFlag();
+      sendCompletionBroadcast(false/*success*/, canceled/*canceled*/, -1/*responseStatusCode*/, ""/*responseHeaders*/, ""/*responseBodyFilePath*/);
       return Result.failure();
     }
 
@@ -248,6 +267,7 @@ public class ALHttpWorker extends Worker {
     
   private void sendCompletionBroadcast(
                  boolean success,
+                 boolean canceled,
                  int responseStatusCode,
                  String responseHeaders,
                  String responseBodyFilePath) {
@@ -256,6 +276,7 @@ public class ALHttpWorker extends Worker {
     intent.setClass(getApplicationContext(), io.magicfoundation.alcinoe.broadcastreceiver.ALBroadcastReceiver.class);
 
     intent.putExtra(EXTRA_HTTP_SUCCESS, success);
+    intent.putExtra(EXTRA_HTTP_CANCELED, canceled);
     intent.putExtra(EXTRA_HTTP_REQUEST_ID, getId().toString());
     intent.putExtra(EXTRA_HTTP_RESPONSE_STATUS_CODE, responseStatusCode);  
     intent.putExtra(EXTRA_HTTP_RESPONSE_HEADERS, responseHeaders != null ? responseHeaders : "");
@@ -359,6 +380,65 @@ public class ALHttpWorker extends Worker {
              false, // boolean deleteRequestBodyFile,
              requestBodyString, // String requestBodyString,
              headers); // String headers)
+  }
+  
+  private boolean isCanceled() {
+    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    return sharedPref.contains(getId().toString());
+  }
+
+  private void clearCancellationFlag() {
+    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    sharedPref.edit().remove(getId().toString()).apply();
+  }
+  
+  private void cleanupExpiredCancellationFlags() {
+    long now = System.currentTimeMillis();
+    if (now - sLastCleanupTime < ONE_DAY_MS) return;
+    sLastCleanupTime = now;
+    try {
+      SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+      Map<String, ?> all = sharedPref.getAll();
+      if (!all.isEmpty()) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        boolean hasChanges = false;
+        for (Map.Entry<String, ?> entry : all.entrySet()) {
+          Object value = entry.getValue();
+          if (value instanceof Long) {
+            long timestamp = (Long) value;
+            if (now - timestamp > MAX_AGE_MS) {
+              editor.remove(entry.getKey());
+              hasChanges = true;
+            }
+          }
+        }
+        if (hasChanges) editor.apply();
+      }     
+    } catch (Exception e) {
+      Log.e(TAG, "Error while cleaning ALHttpWorker SharedPreferences", e);
+      try {
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        sharedPref.edit().clear().apply();
+      } catch (Exception ignored) {
+        // Swallow secondary failure
+        Log.e(TAG, "Error while clearing ALHttpWorker SharedPreferences after previous failure", ignored);
+      }  
+    }
+  }
+  
+  /**
+   * Cancel a previously enqueued HTTP request.
+   *
+   * @param context   Android context
+   * @param requestId The request ID returned by the enqueue(...) methods.
+   *
+   * Note: This just requests cancellation; the work may still finish if it is already completing.
+   */
+  public static void cancel(
+                      @NonNull Context context,
+                      @NonNull UUID requestId) {
+    SharedPreferences sharedPref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    sharedPref.edit().putLong(requestId.toString(), System.currentTimeMillis()).apply();
   }
 
 }

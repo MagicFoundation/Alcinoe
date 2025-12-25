@@ -8,6 +8,7 @@ object Form1: TForm1
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   DesignerMasterStyle = 0
   object MemoLog: TMemo
@@ -30,12 +31,10 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'Get Token'
-    TextSettings.Trimming = None
     OnClick = ButtonGetTokenClick
   end
   object TextIntro: TALText
     Align = Top
-    AutoSize = Both
     Margins.Left = 15.000000000000000000
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
@@ -54,7 +53,6 @@ object Form1: TForm1
       'raries.bat</b>.'#13#10'Additionally, you will need to update the '#13#10'con' +
       'stant <b>FirebaseMessaging**</b> declared '#13#10'in Main.pas.'
     TextSettings.HorzAlign = Center
-    TextSettings.IsHtml = True
   end
   object EditToken: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -74,7 +72,6 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Send Alert Notification (Http V1)'
-    TextSettings.Trimming = None
     OnClick = ButtonSendAlertNotificationViaHttpV1Click
   end
   object ButtonSendDataNotificationViaHttpV1: TButton
@@ -85,7 +82,6 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Send Data Notification (Http V1)'
-    TextSettings.Trimming = None
     OnClick = ButtonSendDataNotificationViaHttpV1Click
   end
   object ButtonSendAlertDataNotificationViaHttpV1: TButton
@@ -96,7 +92,6 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Send Alert + Data Notification (Http V1)'
-    TextSettings.Trimming = None
     OnClick = ButtonSendAlertDataNotificationViaHttpV1Click
   end
   object ButtonShowNotification: TButton
@@ -107,7 +102,6 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 0
     Text = 'Show Alert Notification'
-    TextSettings.Trimming = None
     OnClick = ButtonShowNotificationClick
   end
   object ButtonDeleteToken: TButton
@@ -118,7 +112,6 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Delete Token'
-    TextSettings.Trimming = None
     OnClick = ButtonDeleteTokenClick
   end
 end

@@ -262,7 +262,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFirebaseMessaging = class(TObject)
 
-    {$REGION ' ANDROID'}
+    {$REGION 'ANDROID'}
     {$IF defined(android)}
 
     //FNewMessageObserver
@@ -324,7 +324,7 @@ type
     {$ENDIF}
     {$ENDREGION}
 
-    {$REGION ' IOS'}
+    {$REGION 'IOS'}
     {$IF defined(IOS)}
 
     //FUserNotificationCenterDelegate
@@ -334,7 +334,7 @@ type
         strict private
           fFirebaseMessaging: TALFirebaseMessaging;
         public
-          constructor Create(const aFirebaseMessaging: TALFirebaseMessaging);
+          constructor Create(const AFirebaseMessaging: TALFirebaseMessaging);
           procedure userNotificationCenter(center: UNUserNotificationCenter; openSettingsForNotification: UNNotification); overload; cdecl;
           procedure userNotificationCenter(center: UNUserNotificationCenter; didReceiveNotificationResponse: UNNotificationResponse; withCompletionHandler: Pointer); overload; cdecl;
           procedure userNotificationCenter(center: UNUserNotificationCenter; willPresentNotification: UNNotification; withCompletionHandler: Pointer); overload; cdecl;
@@ -368,8 +368,8 @@ type
     Type
       TGetTokenEvent = procedure(const AToken: String; const AErrorMessage: String) of object;
       TDeleteTokenEvent = procedure(const AIsSuccessful: Boolean; const AErrorMessage: String) of object;
-      TTokenRefreshEvent = procedure(const aToken: String) of object;
-      TMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
+      TTokenRefreshEvent = procedure(const AToken: String) of object;
+      TMessageReceivedEvent = procedure(const APayload: TALStringListW) of object;
   private
     FDeliveredMessageIDs: TDictionary<String,boolean>;
     FGetTokenTaskIsRunning: Boolean;
@@ -383,10 +383,10 @@ type
     class var CanDeliverStartupNotificationMessages: Boolean;
     class procedure StartupNotificationMessageHandler(const Sender: TObject; const M: TMessage);
     class procedure DeliverStartupNotificationMessages;
-    procedure doTokenRefresh(const aToken: String);
-    procedure doMessageReceived(const aPayload: TALStringListW); overload;
-    procedure doMessageReceived(const aPayload: TALJSONNodeW); overload;
-    procedure doMessageReceived(const aPayload: String); overload;
+    procedure doTokenRefresh(const AToken: String);
+    procedure doMessageReceived(const APayload: TALStringListW); overload;
+    procedure doMessageReceived(const APayload: TALJSONNodeW); overload;
+    procedure doMessageReceived(const APayload: String); overload;
   public
     const MessageIdKeys: Array[0..2] of String = ('google.message_id','gcm.message_id','fcm_options.gcm.message_id');
   public
@@ -438,7 +438,7 @@ begin
   fOnTokenRefresh := nil;
   fOnMessageReceived := nil;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   FNewMessageObserver := TNewMessageObserver.Create(self);
   FNewTokenObserver := TNewTokenObserver.Create(self);
@@ -452,7 +452,7 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   fUserNotificationCenterDelegate := TUserNotificationCenterDelegate.Create(self);
   {$IFNDEF ALCompilerVersionSupported130}
@@ -497,7 +497,7 @@ begin
 
   TALFirebaseMessaging.CanDeliverStartupNotificationMessages := False;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   TJALFirebaseMessagingService.JavaClass.newMessageDispatcher.removeObserver(FNewMessageObserver);
   TJALFirebaseMessagingService.JavaClass.newTokenDispatcher.removeObserver(FNewTokenObserver);
@@ -509,7 +509,7 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(nil);
   alfreeAndNil(fUserNotificationCenterDelegate);
@@ -540,7 +540,7 @@ begin
   FGetTokenTaskIsRunning := true;
   if FDeleteTokenTaskIsRunning then exit;
 
-  {$REGION ' android'}
+  {$REGION 'android'}
   {$IF defined(android)}
   ALFreeAndNil(FGetTokenTaskCompleteListener);
   FGetTokenTaskCompleteListener := TGetTokenTaskCompleteListener.Create(self);
@@ -548,7 +548,7 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).tokenWithCompletion(FIRMessagingTokenWithCompletionHandler);
   {$ENDIF}
@@ -568,7 +568,7 @@ begin
   FDeleteTokenTaskIsRunning := true;
   if FGetTokenTaskIsRunning then exit;
 
-  {$REGION ' android'}
+  {$REGION 'android'}
   {$IF defined(android)}
   ALFreeAndNil(FDeleteTokenTaskCompleteListener);
   FDeleteTokenTaskCompleteListener := TDeleteTokenTaskCompleteListener.Create(self);
@@ -576,7 +576,7 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).deleteTokenWithCompletion(FIRMessagingDeleteTokenWithCompletionHandler);
   {$ENDIF}
@@ -585,14 +585,14 @@ begin
 end;
 
 {******************************************************************}
-procedure TALFirebaseMessaging.doTokenRefresh(const aToken: String);
+procedure TALFirebaseMessaging.doTokenRefresh(const AToken: String);
 begin
   if assigned(fOnTokenRefresh) then
     fOnTokenRefresh(aToken);
 end;
 
 {*******************************************************************************}
-procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALStringListW);
+procedure TALFirebaseMessaging.doMessageReceived(const APayload: TALStringListW);
 begin
   if assigned(fOnMessageReceived) then begin
     //under ios, when the app is not running and the user click on an alert notification
@@ -625,7 +625,7 @@ begin
 end;
 
 {*****************************************************************************}
-procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALJSONNodeW);
+procedure TALFirebaseMessaging.doMessageReceived(const APayload: TALJSONNodeW);
 begin
   var LPayload := TALStringListW.Create;
   try
@@ -636,7 +636,7 @@ begin
   end;
 end;
 {***********************************************************************}
-procedure TALFirebaseMessaging.doMessageReceived(const aPayload: String);
+procedure TALFirebaseMessaging.doMessageReceived(const APayload: String);
 begin
   var LJsonDoc := TALJSONDocumentW.create;
   try
@@ -656,7 +656,7 @@ end;
 class procedure TALFirebaseMessaging.StartupNotificationMessageHandler(const Sender: TObject; const M: TMessage);
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   var LBundle: JBundle := nil;
   if (M is TApplicationEventMessage) then begin
@@ -713,7 +713,7 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   if (M is TPushStartupNotificationMessage) then begin
     Setlength(StartupNotificationMessages, length(StartupNotificationMessages) + 1);
@@ -752,7 +752,7 @@ begin
         allog('TALFirebaseMessaging.DeliverStartupNotificationMessages', LJsonDoc.JSON);
         {$ENDIF}
 
-        {$REGION ' ANDROID'}
+        {$REGION 'ANDROID'}
         {$IF defined(ANDROID)}
         LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
         var LPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
@@ -760,7 +760,7 @@ begin
         {$ENDIF}
         {$ENDREGION}
 
-        {$REGION ' IOS'}
+        {$REGION 'IOS'}
         {$IF defined(IOS)}
         //under ios data message can (if you are lucky) wake up the app and fire this method
         //so we must detect if it's an alert or a pure data message. I use content-available that I
@@ -910,7 +910,7 @@ end;
 {$IF defined(IOS)}
 
 {**********************************************************************************************************************}
-constructor TALFirebaseMessaging.TUserNotificationCenterDelegate.Create(const aFirebaseMessaging: TALFirebaseMessaging);
+constructor TALFirebaseMessaging.TUserNotificationCenterDelegate.Create(const AFirebaseMessaging: TALFirebaseMessaging);
 begin
   inherited Create;
   fFirebaseMessaging := aFirebaseMessaging;
@@ -1144,14 +1144,14 @@ initialization
   setlength(TALFirebaseMessaging.StartupNotificationMessages, 0);
   TALFirebaseMessaging.CanDeliverStartupNotificationMessages := False;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, TALFirebaseMessaging.StartupNotificationMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, TALFirebaseMessaging.StartupNotificationMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   TMessageManager.DefaultManager.SubscribeToMessage(TPushStartupNotificationMessage, TALFirebaseMessaging.StartupNotificationMessageHandler);
   {$ENDIF}
@@ -1162,14 +1162,14 @@ finalization
   ALLog('Alcinoe.FMX.Firebase.Messaging','finalization');
   {$ENDIF}
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, TALFirebaseMessaging.StartupNotificationMessageHandler);
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, TALFirebaseMessaging.StartupNotificationMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TPushStartupNotificationMessage, TALFirebaseMessaging.StartupNotificationMessageHandler);
   {$ENDIF}

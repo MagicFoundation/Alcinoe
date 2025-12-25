@@ -66,22 +66,22 @@ type
     FVisibility: TALNotificationVisibility;
   public
     constructor Create(const ATag: String);
-    function SetChannelId(const aChannelId: String): TALNotification; //Specifies the channel the notification should be delivered on. No-op on versions prior to O.
-    function SetTitle(const aTitle: String): TALNotification; //Set the title (first row) of the notification, in a standard notification.
-    function SetText(const aText: String): TALNotification; //Set the text (second row) of the notification, in a standard notification.
-    function setTicker(const aTicker: String): TALNotification; //Sets the "ticker" text which is sent to accessibility services.
-    function SetLargeIconStream(const aLargeIconStream: TMemoryStream): TALNotification; //Sets the large icon that is shown in the notification.
-    function SetLargeIconUrl(const aLargeIconUrl: String): TALNotification; //Sets the large icon that is shown in the notification.
-    function setSmallIconResName(const aSmallIconResName: String): TALNotification; //Set the small icon to use in the notification layouts.
-    function SetPayload(const aPayload: TALStringListW): TALNotification;
-    function AddPayload(const aName, aValue: String): TALNotification;
-    function setNumber(const aNumber: integer): TALNotification; //Sets the number of items this notification represents. On the latest platforms, this may be displayed as a badge count for Launchers that support badging.
-    function setSound(const aSound: boolean): TALNotification;
-    function setVibrate(const aVibrate: boolean): TALNotification;
-    function setLights(const aLights: boolean): TALNotification;
-    function setAutoCancel(const aAutoCancel: boolean): TALNotification;
-    function setImportance(const aImportance: TALNotificationImportance): TALNotification;
-    function setVisibility(const aVisibility: TALNotificationVisibility): TALNotification;
+    function SetChannelId(const AChannelId: String): TALNotification; //Specifies the channel the notification should be delivered on. No-op on versions prior to O.
+    function SetTitle(const ATitle: String): TALNotification; //Set the title (first row) of the notification, in a standard notification.
+    function SetText(const AText: String): TALNotification; //Set the text (second row) of the notification, in a standard notification.
+    function setTicker(const ATicker: String): TALNotification; //Sets the "ticker" text which is sent to accessibility services.
+    function SetLargeIconStream(const ALargeIconStream: TMemoryStream): TALNotification; //Sets the large icon that is shown in the notification.
+    function SetLargeIconUrl(const ALargeIconUrl: String): TALNotification; //Sets the large icon that is shown in the notification.
+    function setSmallIconResName(const ASmallIconResName: String): TALNotification; //Set the small icon to use in the notification layouts.
+    function SetPayload(const APayload: TALStringListW): TALNotification;
+    function AddPayload(const AName, aValue: String): TALNotification;
+    function setNumber(const ANumber: integer): TALNotification; //Sets the number of items this notification represents. On the latest platforms, this may be displayed as a badge count for Launchers that support badging.
+    function setSound(const ASound: boolean): TALNotification;
+    function setVibrate(const AVibrate: boolean): TALNotification;
+    function setLights(const ALights: boolean): TALNotification;
+    function setAutoCancel(const AAutoCancel: boolean): TALNotification;
+    function setImportance(const AImportance: TALNotificationImportance): TALNotification;
+    function setVisibility(const AVisibility: TALNotificationVisibility): TALNotification;
     //--
     property Tag: String read FTag;
     property ChannelId: String read FChannelId;
@@ -129,7 +129,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALNotificationService = class(TObject)
 
-    {$REGION ' ANDROID'}
+    {$REGION 'ANDROID'}
     {$IF defined(android)}
     private
       const
@@ -139,7 +139,7 @@ type
     {$ENDIF}
     {$ENDREGION}
 
-    {$REGION ' IOS'}
+    {$REGION 'IOS'}
     {$IF defined(IOS)}
     private
       procedure UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
@@ -159,49 +159,91 @@ type
     class function HasInstance: Boolean; inline;
   public
     type
-      TGetTokenEvent = procedure(const AToken: String; const AErrorMessage: String) of object;
-      TDeleteTokenEvent = procedure(const AIsSuccessful: Boolean; const AErrorMessage: String) of object;
-      TTokenRefreshEvent = procedure(const aToken: String) of object;
-      TNotificationReceivedEvent = procedure(const aPayload: TALStringListW) of object;
+      // -------------------------
+      // TGeoLocationUpdateMessage
+      TNotificationReceivedMessage = class(TMessage)
+      private
+        FPayload: TALStringListW;
+      public
+        /// <summary>
+        ///   APayload is not owned by TNotificationReceivedMessage.
+        ///   The caller remains responsible for its lifetime.
+        /// </summary>
+        constructor Create(const APayload: TALStringListW);
+        property Payload: TALStringListW read FPayload;
+      end;
+      // -------------------------
+      // TGetTokenMessage
+      TGetTokenMessage = class(TMessage)
+      private
+        FToken: String;
+        FErrorMessage: String;
+      public
+        constructor Create(const AToken: String; const AErrorMessage: String);
+        property Token: String read FToken;
+        property ErrorMessage: String read FErrorMessage;
+      end;
+      // -------------------------
+      // TDeleteTokenMessage
+      TDeleteTokenMessage = class(TMessage)
+      private
+        FIsSuccessful: Boolean;
+        FErrorMessage: String;
+      public
+        constructor Create(const AIsSuccessful: Boolean; const AErrorMessage: String);
+        property IsSuccessful: Boolean read FIsSuccessful;
+        property ErrorMessage: String read FErrorMessage;
+      end;
+      // -------------------------
+      // TTokenRefreshMessage
+      TTokenRefreshMessage = class(TMessage)
+      private
+        FToken: String;
+      public
+        constructor Create(const AToken: String);
+        property Token: String read FToken;
+      end;
+      // ------------------------------------
+      // TNotificationPermissionResultMessage
+      TNotificationPermissionResultMessage = class(TMessage)
+      private
+        FGranted: Boolean;
+      public
+        constructor Create(const AGranted: Boolean);
+        property Granted: Boolean read FGranted;
+      end;
+      // -------------
+      // TPushProvider
       TPushProvider = (FCM, APNs, PushKit);
   private
     FPushProvider: TPushProvider;
     FFirebaseMessaging: TALFirebaseMessaging;
-    fOnAuthorizationRefused: TNotifyEvent;
-    fOnAuthorizationGranted: TNotifyEvent;
-    fOnGetToken: TGetTokenEvent;
-    fOnDeleteToken: TDeleteTokenEvent;
-    fOnTokenRefresh: TTokenRefreshEvent;
-    fOnNotificationReceived: TNotificationReceivedEvent;
     FLastGeneratedUniqueID: integer;
     FIsRequestingNotificationPermission: Boolean;
     procedure HandleGetToken(const AToken: String; const AErrorMessage: String);
     procedure HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
-    procedure HandleTokenRefresh(const aToken: String);
-    procedure HandleMessageReceived(const aPayload: TALStringListW);
+    procedure HandleTokenRefresh(const AToken: String);
+    procedure HandleMessageReceived(const APayload: TALStringListW);
     {$HINTS OFF}
     function GenerateUniqueID: integer;
     {$HINTS ON}
   public
     class var TmpPath: String;
   public
-    constructor Create(const aPushProvider: TPushProvider = TPushProvider.FCM); virtual;
+    constructor Create(const APushProvider: TPushProvider = TPushProvider.FCM); virtual;
     destructor Destroy; override;
     procedure RequestNotificationPermission; virtual;
     procedure CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel); virtual;
-    procedure SetBadgeCount(const aNewValue: integer); virtual;
+    procedure SetBadgeCount(const ANewValue: integer); virtual;
     procedure ShowNotification(const ANotification: TALNotification); virtual;
     procedure GetToken;
     procedure DeleteToken;
     procedure removeAllDeliveredNotifications;
     property PushProvider: TPushProvider read FPushProvider write FPushProvider;
-    property OnAuthorizationRefused: TNotifyEvent read fOnAuthorizationRefused write fOnAuthorizationRefused;
-    property OnAuthorizationGranted: TNotifyEvent read fOnAuthorizationGranted write fOnAuthorizationGranted;
-    property OnGetToken: TGetTokenEvent read fOnGetToken write fOnGetToken;
-    property OnDeleteToken: TDeleteTokenEvent read fOnDeleteToken write fOnDeleteToken;
-    property OnTokenRefresh: TTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
-    property OnNotificationReceived: TNotificationReceivedEvent read fOnNotificationReceived write fOnNotificationReceived;
-    property IsRequestingNotificationPermission: Boolean read FIsRequestingNotificationPermission; // set to true in RequestNotificationPermission and set to false in OnAuthorizationRefused/OnAuthorizationGranted
+    /// <summary>
+    ///   Set to true in RequestNotificationPermission and set to false in OnAuthorizationRefused/OnAuthorizationGranted
+    /// </summary>
+    property IsRequestingNotificationPermission: Boolean read FIsRequestingNotificationPermission;
   end;
 
 {$REGION ' ANDROID'}
@@ -243,6 +285,7 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Common,
   Alcinoe.HTTP.Client.Net.Pool,
+  Alcinoe.Files,
   Alcinoe.stringUtils,
   Alcinoe.Common;
 
@@ -268,56 +311,56 @@ begin
 end;
 
 {*******************************************************************************}
-function TALNotification.SetChannelId(const aChannelId: String): TALNotification;
+function TALNotification.SetChannelId(const AChannelId: String): TALNotification;
 begin
   FChannelId := aChannelId;
   result := Self;
 end;
 
 {***********************************************************************}
-function TALNotification.SetTitle(const aTitle: String): TALNotification;
+function TALNotification.SetTitle(const ATitle: String): TALNotification;
 begin
   FTitle := aTitle;
   result := Self;
 end;
 
 {*********************************************************************}
-function TALNotification.SetText(const aText: String): TALNotification;
+function TALNotification.SetText(const AText: String): TALNotification;
 begin
   FText := aText;
   result := Self;
 end;
 
 {*************************************************************************}
-function TALNotification.setTicker(const aTicker: String): TALNotification;
+function TALNotification.setTicker(const ATicker: String): TALNotification;
 begin
   FTicker := aTicker;
   result := Self;
 end;
 
 {**************************************************************************************************}
-function TALNotification.SetLargeIconStream(const aLargeIconStream: TMemoryStream): TALNotification;
+function TALNotification.SetLargeIconStream(const ALargeIconStream: TMemoryStream): TALNotification;
 begin
   FLargeIconStream := aLargeIconStream;
   result := Self;
 end;
 
 {*************************************************************************************}
-function TALNotification.SetLargeIconUrl(const aLargeIconUrl: String): TALNotification;
+function TALNotification.SetLargeIconUrl(const ALargeIconUrl: String): TALNotification;
 begin
   FLargeIconUrl := aLargeIconUrl;
   result := Self;
 end;
 
 {*********************************************************************************************}
-function TALNotification.setSmallIconResName(const aSmallIconResName: String): TALNotification;
+function TALNotification.setSmallIconResName(const ASmallIconResName: String): TALNotification;
 begin
   FSmallIconResName := aSmallIconResName;
   result := Self;
 end;
 
 {***********************************************************************************}
-function TALNotification.SetPayload(const aPayload: TALStringListW): TALNotification;
+function TALNotification.SetPayload(const APayload: TALStringListW): TALNotification;
 begin
   setlength(FPayload, aPayload.Count);
   for var I := 0 to aPayload.Count - 1 do
@@ -326,7 +369,7 @@ begin
 end;
 
 {********************************************************************************}
-function TALNotification.AddPayload(const aName, aValue: String): TALNotification;
+function TALNotification.AddPayload(const AName, aValue: String): TALNotification;
 begin
   setlength(FPayload, length(FPayload) + 1);
   FPayload[high(FPayload)] := TPair<String, String>.create(aName, aValue);
@@ -334,49 +377,49 @@ begin
 end;
 
 {**************************************************************************}
-function TALNotification.setNumber(const aNumber: integer): TALNotification;
+function TALNotification.setNumber(const ANumber: integer): TALNotification;
 begin
   FNumber := aNumber;
   result := Self;
 end;
 
 {************************************************************************}
-function TALNotification.setSound(const aSound: boolean): TALNotification;
+function TALNotification.setSound(const ASound: boolean): TALNotification;
 begin
   FSound := aSound;
   result := Self;
 end;
 
 {****************************************************************************}
-function TALNotification.setVibrate(const aVibrate: boolean): TALNotification;
+function TALNotification.setVibrate(const AVibrate: boolean): TALNotification;
 begin
   FVibrate := aVibrate;
   result := Self;
 end;
 
 {**************************************************************************}
-function TALNotification.setLights(const aLights: boolean): TALNotification;
+function TALNotification.setLights(const ALights: boolean): TALNotification;
 begin
   FLights := aLights;
   result := Self;
 end;
 
 {**********************************************************************************}
-function TALNotification.setAutoCancel(const aAutoCancel: boolean): TALNotification;
+function TALNotification.setAutoCancel(const AAutoCancel: boolean): TALNotification;
 begin
   FAutoCancel := aAutoCancel;
   result := Self;
 end;
 
 {****************************************************************************************************}
-function TALNotification.setImportance(const aImportance: TALNotificationImportance): TALNotification;
+function TALNotification.setImportance(const AImportance: TALNotificationImportance): TALNotification;
 begin
   FImportance := aImportance;
   result := Self;
 end;
 
 {****************************************************************************************************}
-function TALNotification.setVisibility(const aVisibility: TALNotificationVisibility): TALNotification;
+function TALNotification.setVisibility(const AVisibility: TALNotificationVisibility): TALNotification;
 begin
   FVisibility := aVisibility;
   result := Self;
@@ -444,8 +487,45 @@ begin
   result := Self;
 end;
 
+{*****************************************************************************************************}
+constructor TALNotificationService.TNotificationReceivedMessage.Create(const APayload: TALStringListW);
+begin
+  Inherited Create;
+  FPayload := APayload;
+end;
+
+{************************************************************************************************************}
+constructor TALNotificationService.TGetTokenMessage.Create(const AToken: String; const AErrorMessage: String);
+begin
+  Inherited Create;
+  FToken := AToken;
+  FErrorMessage := AErrorMessage;
+end;
+
+{***********************************************************************************************************************}
+constructor TALNotificationService.TDeleteTokenMessage.Create(const AIsSuccessful: Boolean; const AErrorMessage: String);
+begin
+  Inherited Create;
+  FIsSuccessful := AIsSuccessful;
+  FErrorMessage := AErrorMessage;
+end;
+
+{***********************************************************************************}
+constructor TALNotificationService.TTokenRefreshMessage.Create(const AToken: String);
+begin
+  Inherited Create;
+  FToken := AToken;
+end;
+
+{******************************************************************************************************}
+constructor TALNotificationService.TNotificationPermissionResultMessage.Create(const AGranted: Boolean);
+begin
+  Inherited Create;
+  FGranted := AGranted;
+end;
+
 {************************************************************************************************}
-constructor TALNotificationService.Create(const aPushProvider: TPushProvider = TPushProvider.FCM);
+constructor TALNotificationService.Create(const APushProvider: TPushProvider = TPushProvider.FCM);
 begin
 
   inherited Create;
@@ -460,16 +540,10 @@ begin
   FFirebaseMessaging.OnDeleteToken := HandleDeleteToken;
   FFirebaseMessaging.OnTokenRefresh := HandleTokenRefresh;
   FFirebaseMessaging.OnMessageReceived := HandleMessageReceived;
-  fOnAuthorizationRefused := nil;
-  fOnAuthorizationGranted := nil;
-  fOnGetToken := nil;
-  fOnDeleteToken := nil;
-  fOnTokenRefresh := nil;
-  fOnNotificationReceived := nil;
   FLastGeneratedUniqueID := integer(ALDateTimeToUnixms(ALUTCNow) mod Maxint);
   FIsRequestingNotificationPermission := False;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   TMessageManager.DefaultManager.SubscribeToMessage(TPermissionsRequestResultMessage, PermissionsRequestResultHandler);
   {$ENDIF}
@@ -483,7 +557,7 @@ begin
 
   AlFreeAndNil(FFirebaseMessaging);
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
   TMessageManager.DefaultManager.Unsubscribe(TPermissionsRequestResultMessage, PermissionsRequestResultHandler);
   {$ENDIF}
@@ -524,7 +598,7 @@ begin
     raise Exception.Create('RequestNotificationPermission is already running');
   FIsRequestingNotificationPermission := True;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(ANDROID)}
   if (TOSVersion.Check(13, 0) {API level >= 33 (TIRAMISU)}) and
      (MainActivity.checkSelfPermission(StringToJString('android.permission.POST_NOTIFICATIONS')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED) then begin
@@ -538,13 +612,12 @@ begin
   end
   else begin
     FIsRequestingNotificationPermission := False;
-    if assigned(fOnAuthorizationGranted) then
-      fOnAuthorizationGranted(self);
+    TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(True{AGranted}));
   end;
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   var LOptions := UNAuthorizationOptionSound or
                   UNAuthorizationOptionAlert or
@@ -560,7 +633,7 @@ end;
 procedure TALNotificationService.CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel);
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(ANDROID)}
   // Create the NotificationChannel, but only on API 26+ (Android 8.0 oreo)
   if TOSVersion.Check(8) {API level >= 26 (Android O)} then begin
@@ -589,10 +662,10 @@ begin
 end;
 
 {***********************************************************************}
-procedure TALNotificationService.SetBadgeCount(const aNewValue: integer);
+procedure TALNotificationService.SetBadgeCount(const ANewValue: integer);
 begin
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   SharedApplication.setApplicationIconBadgeNumber(aNewValue);
   {$ENDIF}
@@ -779,10 +852,10 @@ begin
     if ANotification.FLargeIconStream <> nil then begin
       var LFileExt := AlDetectImageExtension(ANotification.FLargeIconStream);
       Var LTmpPath := TALNotificationService.TmpPath;
-      if LTmpPath = '' then LTmpPath := Tpath.GetTempPath;
+      if LTmpPath = '' then LTmpPath := ALGetTempPathW;
       var LFileName := Tpath.Combine(
                          LTmpPath,
-                         'alcinoe_notification_'+ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}).tolower + ALIfThenW(LFileExt <> '', '.') + LFileExt);
+                         'alcinoe_notification_'+ALNewGUIDStringW(true{WithoutBracket}, false{WithoutHyphen}).tolower + ALIfThenW(LFileExt <> '', '.') + LFileExt);
       ANotification.FLargeIconStream.SaveToFile(LFileName);
       var LErrorPtr: PNSError := nil;
       {$IFNDEF ALCompilerVersionSupported130}
@@ -874,29 +947,25 @@ end;
 {*************************************************************************************************}
 procedure TALNotificationService.HandleGetToken(const AToken: String; const AErrorMessage: String);
 begin
-  if assigned(FOnGetToken) then
-    FOnGetToken(AToken, AErrorMessage);
+  TMessageManager.DefaultManager.SendMessage(nil, TGetTokenMessage.create(AToken, AErrorMessage));
 end;
 
 {************************************************************************************************************}
 procedure TALNotificationService.HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
 begin
-  if assigned(FOnDeleteToken) then
-    FOnDeleteToken(AIsSuccessful, AErrorMessage);
+  TMessageManager.DefaultManager.SendMessage(nil, TDeleteTokenMessage.create(AIsSuccessful, AErrorMessage));
 end;
 
 {************************************************************************}
-procedure TALNotificationService.HandleTokenRefresh(const aToken: String);
+procedure TALNotificationService.HandleTokenRefresh(const AToken: String);
 begin
-  if assigned(FOnTokenRefresh) then
-    FOnTokenRefresh(aToken);
+  TMessageManager.DefaultManager.SendMessage(nil, TTokenRefreshMessage.create(AToken));
 end;
 
 {*************************************************************************************}
-procedure TALNotificationService.HandleMessageReceived(const aPayload: TALStringListW);
+procedure TALNotificationService.HandleMessageReceived(const APayload: TALStringListW);
 begin
-  if assigned(FOnNotificationReceived) then
-    FOnNotificationReceived(aPayload);
+  TMessageManager.DefaultManager.SendMessage(nil, TNotificationReceivedMessage.create(aPayload));
 end;
 
 {$REGION ' ANDROID'}
@@ -940,16 +1009,14 @@ begin
       allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False));
       {$ENDIF}
       FIsRequestingNotificationPermission := False;
-      if assigned(fOnAuthorizationRefused) then
-        fOnAuthorizationRefused(self);
+      TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(False{AGranted}));
     end
     else begin
       {$IFDEF DEBUG}
       allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True));
       {$ENDIF}
       FIsRequestingNotificationPermission := False;
-      if assigned(fOnAuthorizationGranted) then
-        fOnAuthorizationGranted(self);
+      TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(True{AGranted}));
     end;
 
   end;
@@ -984,8 +1051,7 @@ begin
      procedure
      begin
        FIsRequestingNotificationPermission := False;
-       if assigned(fOnAuthorizationRefused) then
-         fOnAuthorizationRefused(self);
+       TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(False{AGranted}));
      end);
   end
   else begin
@@ -993,8 +1059,7 @@ begin
      procedure
      begin
        FIsRequestingNotificationPermission := False;
-       if assigned(fOnAuthorizationGranted) then
-         fOnAuthorizationGranted(self);
+       TMessageManager.DefaultManager.SendMessage(nil, TNotificationPermissionResultMessage.create(True{AGranted}));
      end);
   end;
 

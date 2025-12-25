@@ -185,6 +185,7 @@ uses
   Alcinoe.Mime.ContentTypes,
   {$ENDIF}
   FMX.Platform,
+  Alcinoe.Files,
   Alcinoe.StringUtils,
   Alcinoe.FMX.LoadingOverlay,
   ALcinoe.Common;
@@ -321,8 +322,8 @@ begin
       end
       else begin
         var LSourceFileName := NSStrToStr(URL.path); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/.com.apple.Foundation.NSItemProvider.QJqOFE/IMG_0084.mov
-        var LDestFileName := TPath.Combine(TPath.GetTempPath, ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}) + ALExtractFileExt(LSourceFileName)); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/38C9EB5E67AAF011BA8F25B41B5A9FDF.mov
-        if AlPosW(TPath.GetTempPath, LSourceFileName) = 1 then TFile.move(LSourceFileName{SourceFileName}, LDestFileName{DestFileName})
+        var LDestFileName := ALGetTempFilenameW(ALExtractFileExt(LSourceFileName)); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/d85c5ff6-7822-4732-b104-1bb055004c51.mov
+        if AlPosW(ALGetTempPathW, LSourceFileName) = 1 then TFile.move(LSourceFileName{SourceFileName}, LDestFileName{DestFileName})
         else TFile.copy(LSourceFileName{SourceFileName}, LDestFileName{DestFileName});
         {$IF defined(DEBUG)}
         if FMediaIndex > high(FMediaPicker.FMediaItems) then raise Exception.Create('Error 698683F0-D90B-4DCD-B935-5C930DFD14AE');
@@ -516,8 +517,8 @@ begin
       {$IF defined(DEBUG)}
       ALLog('TALMediaPicker.TImagePickerControllerDelegate.imagePickerController:picker:didFinishPickingMediaWithInfo', LSourceFileName);
       {$ENDIF}
-      var LDestFileName := TPath.Combine(TPath.GetTempPath, ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}) + ALExtractFileExt(LSourceFileName)); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/38C9EB5E67AAF011BA8F25B41B5A9FDF.mov
-      if AlPosW(TPath.GetTempPath, LSourceFileName) = 1 then TFile.move(LSourceFileName{SourceFileName}, LDestFileName{DestFileName})
+      var LDestFileName := ALGetTempFilenameW(ALExtractFileExt(LSourceFileName)); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/d85c5ff6-7822-4732-b104-1bb055004c51.mov
+      if AlPosW(ALGetTempPathW, LSourceFileName) = 1 then TFile.move(LSourceFileName{SourceFileName}, LDestFileName{DestFileName})
       else TFile.copy(LSourceFileName{SourceFileName}, LDestFileName{DestFileName});
       var LItems: TArray<TMediaItem>;
       SetLength(LItems, 1);
@@ -538,7 +539,7 @@ begin
       if LImage = nil then raise Exception.Create('No image returned by the camera');
       var LData := TNSData.wrap(UIImageJPEGRepresentation(NSObjectTOID(LImage), 0.85));
       if LData = nil then raise Exception.Create('Failed to encode image to JPEG.');
-      var LDestFileName := TPath.Combine(TPath.GetTempPath, ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}) + '.jpg'); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/38C9EB5E67AAF011BA8F25B41B5A9FDF.jpg
+      var LDestFileName := ALGetTempFilenameW('.jpg'); // /private/var/mobile/Containers/Data/Application/0E36F73C-10B8-4047-A4A1-34EE38567FDD/tmp/d85c5ff6-7822-4732-b104-1bb055004c51.jpg
       var LUrl := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(LDestFileName)));
       if not LData.writeToURL(LURL, True{atomically}) then raise Exception.Create('Failed to write image file');
       var LItems: TArray<TMediaItem>;
@@ -831,7 +832,7 @@ begin
     {$REGION 'ANDROID'}
     {$IF defined(ANDROID)}
     if FCaptureFromCameraMediaType = TMediaType.Image then begin
-      var LFileName := TPath.Combine(TPath.GetTempPath, ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}) + '.jpg');  // /storage/emulated/0/Android/data/io.magicfoundation.alcinoe.ALFmxMediaPickerDemo/files/tmp/A760A5A5BD814689AF0F1357C104B303.jpg
+      var LFileName := ALGetTempFilenameW('.jpg');  // /data/data/io.magicfoundation.alcinoe.ALFmxMediaPickerDemo/cache/tmp/d85c5ff6-7822-4732-b104-1bb055004c51.jpg
       var LFile := TJFile.JavaClass.init(StringToJString(LFileName));
       FCaptureUri := TAndroidHelper.JFileToJURI(LFile);
       var LIntent := TJIntent.JavaClass.init(TJMediaStore.JavaClass.ACTION_IMAGE_CAPTURE);
@@ -840,7 +841,7 @@ begin
       TAndroidHelper.Activity.startActivityForResult(LIntent, REQUEST_CODE_CAPTURE_IMAGE);
     end
     else if FCaptureFromCameraMediaType = TMediaType.Video then begin
-      var LFileName := TPath.Combine(TPath.GetTempPath, ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}) + '.mp4');  // /storage/emulated/0/Android/data/io.magicfoundation.alcinoe.ALFmxMediaPickerDemo/files/tmp/A760A5A5BD814689AF0F1357C104B303.mp4
+      var LFileName := ALGetTempFilenameW('.mp4');  // /data/data/io.magicfoundation.alcinoe.ALFmxMediaPickerDemo/cache/tmp/d85c5ff6-7822-4732-b104-1bb055004c51.mp4
       var LFile := TJFile.JavaClass.init(StringToJString(LFileName));
       FCaptureUri := TAndroidHelper.JFileToJURI(LFile);
       var LIntent := TJIntent.JavaClass.init(TJMediaStore.JavaClass.ACTION_VIDEO_CAPTURE);

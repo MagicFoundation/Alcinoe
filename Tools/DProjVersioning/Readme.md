@@ -1,37 +1,106 @@
 DProjVersioning
 ===============
 
-This tool allows you to get or update the app version directly within 
-a .dproj file. It ensures synchronization of the app version across 
-all targets (ios32, ios64, android, android64, win32, win64, macOS, 
-macOS64) so that all platforms use the same version.
+**DProjVersioning** is a command-line tool to read and update application versioning
+directly inside a Delphi `.dproj` file. It keeps **all platforms in sync**:
 
-Usage: 
+- Windows: `VerInfo_*`, `FileVersion`, `ProductVersion`
+- Android: `versionName`, `versionCode`
+- iOS / macOS: `CFBundleShortVersionString`, `CFBundleVersion`
 
-```
-  DProjVersioning.exe 
-    -DProj="<DprojFilename>" 
-    -Action=<getVersionName/incMajorMinorPatchVersion/decMajorMinorPatchVersion> 
-    -MajorNumber=<x> 
-    -MinorNumber=<y> 
-    -PatchBase=<z> 
-    -CreateBackup=<true/false>
-```
 
-Note: In the project options, you must include version information and enable 
-auto-increment for the build number (this can be done only for release builds).
-
-Given a version number MAJOR.MINOR.PATCH, increment the:
-  1. MAJOR version when you make incompatible API changes,
-  2. MINOR version when you add functionality in a backwards compatible manner, and
-  3. PATCH version when you make backwards compatible bug fixes.
-
-Example: If the current VerInfo_Build is 215 and the version name is 2.0.5:
+## Usage
 
 ```
-DProjVersioning.exe -DProj="{DprojFilename}" -Action=incMajorMinorPatchVersion -MajorNumber=2 -MinorNumber=0 -PatchBase=210
+DProjVersioning.exe
+  -DProj="<file.dproj>"
+  -GetVersionName | -GetVersionInfo | -IncVersion
+  -SetVersionInfo="<VersionName>+<BuildNumber>"
+  [-CreateBackup=false]
 ```
 
-This will increment the VerInfo_Build by 1 (from 215 to 216) and update the 
-version name to 2.0.6, where the patch version 6 is calculated as 
-216 (VerInfo_Build) - 210 (PatchBase).
+
+## Commands
+
+### `-GetVersionName`
+
+Prints the semantic version name.
+
+```
+2.0.5
+```
+
+
+### `-GetVersionInfo`
+
+Prints combined version info.
+
+```
+2.0.5+190
+```
+
+
+### `-SetVersionInfo`
+
+Sets version name **and** build number across all targets.
+
+```
+DProjVersioning.exe -DProj="MyApp.dproj" -SetVersionInfo="2.0.5+190"
+```
+
+Updates:
+- Windows version resources
+- Android `versionName` / `versionCode`
+- iOS / macOS bundle versions
+
+
+### `-IncVersion`
+
+Increments patch version and build number:
+
+```
+x.y.z   -> x.y.(z+1)
+build   -> build+1
+```
+
+Example:
+
+```
+2.0.5+190 -> 2.0.6+191
+```
+
+Optional overrides:
+
+- `-MajorNumber=<x>`
+- `-MinorNumber=<y>`
+
+When major or minor is overridden, the patch number is reset.
+
+
+## Backup behavior
+
+By default a backup is created:
+
+```
+<Project>.dproj.bak
+```
+
+Disable with:
+
+```
+-CreateBackup=false
+```
+
+
+## Requirements
+
+- `.dproj` must contain version information
+- Build number must be enabled in Project Options
+
+
+## CI example
+
+```
+DProjVersioning.exe -DProj="MyApp.dproj" -GetVersionInfo
+DProjVersioning.exe -DProj="MyApp.dproj" -IncVersion -CreateBackup=false
+```

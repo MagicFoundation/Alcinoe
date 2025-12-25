@@ -40,26 +40,28 @@ type
     FBoundary: AnsiString;
     FStream: TProxyAggregateStream;
     FSection: TALStringStreamA;
-    FLastBoundaryWrited: Boolean;
+    FLastBoundaryWritten: Boolean;
     function GetMimeTypeHeader: AnsiString;
     function GenerateBoundary: AnsiString;
-    procedure WriteStringLn(const AString: AnsiString);
+    procedure WriteString(const AString: AnsiString);
     function GetStream: TStream;
     procedure AdjustLastBoundary;
-    procedure BeginPart;
+    procedure BeginPart(const ASize: Int64);
     procedure EndPart;
   public
     /// <summary>Create a multipart form data object</summary>
     constructor Create(AOwnsOutputStream: Boolean = True);
     destructor Destroy; override;
+    procedure SaveToFile(const AFileName: String);
     /// <summary>Add a form data field</summary>
     procedure AddField(
-                const AField, AValue: AnsiString;
+                const AFieldName: AnsiString;
+                const AValue: AnsiString;
                 const AContentType: AnsiString = '';
                 const AHeaders: TALNameValueArrayA = nil);
     /// <summary>Add a form data stream. Allows to specify ownership of a stream</summary>
     procedure AddStream(
-                const AField: AnsiString;
+                const AFieldName: AnsiString;
                 const AStream: TStream;
                 const AOwnsStream: Boolean;
                 const AFileName: AnsiString = '';
@@ -67,13 +69,13 @@ type
                 const AHeaders: TALNameValueArrayA = nil); overload;
     /// <summary>Add a form data file</summary>
     procedure AddFile(
-                const AField: AnsiString;
+                const AFieldName: AnsiString;
                 const AFilePath: String;
                 const AContentType: AnsiString = '';
                 const AHeaders: TALNameValueArrayA = nil);
     /// <summary>Add a form data bytes</summary>
     procedure AddBytes(
-                const AField: AnsiString;
+                const AFieldName: AnsiString;
                 const ABytes: TBytes;
                 const AFileName: AnsiString = '';
                 const AContentType: AnsiString = '';
@@ -89,6 +91,7 @@ type
 implementation
 
 Uses
+  System.IOUtils,
   System.AnsiStrings,
   System.NetConsts,
   ALcinoe.Cipher,
@@ -102,7 +105,7 @@ begin
   FBoundary := GenerateBoundary;
   FStream := TProxyAggregateStream.Create;
   FSection := nil;
-  FLastBoundaryWrited := False;
+  FLastBoundaryWritten := False;
 end;
 
 {**********************************************}
@@ -115,16 +118,32 @@ begin
   inherited;
 end;
 
-{***********************************************}
-procedure TALMultipartFormDataEncoderA.BeginPart;
+{*************************************************************************}
+procedure TALMultipartFormDataEncoderA.SaveToFile(const AFileName: String);
+begin
+  If TFile.Exists(AFilename) then
+    TFile.Delete(AFileName);
+  var LFileStream := TFileStream.Create(AFileName, fmCreate or fmShareExclusive);
+  try
+    LFileStream.CopyFrom(Stream);
+  finally
+    ALFreeAndNil(LFileStream);
+  end;
+end;
+
+{*******************************************************************}
+procedure TALMultipartFormDataEncoderA.BeginPart(const ASize: Int64);
 begin
   FSection := TALStringStreamA.Create('');
+  FSection.Size := ASize;
 end;
 
 {*********************************************}
 procedure TALMultipartFormDataEncoderA.EndPart;
 begin
   try
+    if FSection.Size <> FSection.Position then
+      FSection.Size := FSection.Position;
     FStream.AddStream(FSection, True);
   finally
     FSection := nil;
@@ -133,95 +152,148 @@ end;
 
 {**********************************************}
 procedure TALMultipartFormDataEncoderA.AddField(
-            const AField, AValue: AnsiString;
+            const AFieldName: AnsiString;
+            const AValue: AnsiString;
             const AContentType: AnsiString = '';
             const AHeaders: TALNameValueArrayA = nil);
 begin
+
   AdjustLastBoundary;
-  BeginPart;
+
+  Var LContentLength: AnsiString := ALInttostrA(length(AValue));
+
+  var LSize: int64 := 0;
+  LSize := LSize + 2{--} + Length(FBoundary) + 2{#13#10};
+  LSize := LSize + Length(sContentDisposition) + 19{: form-data; name="} + Length(AFieldName) + 1{"} + 2{#13#10};
+  if AContentType <> '' then begin
+    LSize := LSize + Length(sContentType) + 2{: } + Length(AContentType) + 2{#13#10};
+  end;
+  LSize := LSize + Length(sContentLength) + 2{: } + Length(LContentLength) + 2{#13#10};
+  if AHeaders <> nil then
+    for var I := low(AHeaders) to high(AHeaders) do begin
+      LSize := LSize + Length(AHeaders[I].Name) + 2{: } + Length(AHeaders[I].Value) + 2{#13#10};
+    end;
+  LSize := LSize + 2{#13#10};
+  LSize := LSize + Length(AValue);
+  LSize := LSize + 2{#13#10};
+
+  BeginPart(LSize);
   try
-    WriteStringLn('--' + FBoundary);
-    WriteStringLn(sContentDisposition + ': form-data; name="' + AField + '"'); // do not localize
-    if AContentType <> '' then
-      WriteStringLn(sContentType + ': ' + AContentType);
+    WriteString('--'); WriteString(FBoundary); WriteString(#13#10);
+    WriteString(sContentDisposition); WriteString(': form-data; name="'); WriteString(AFieldName); WriteString('"'); WriteString(#13#10);
+    if AContentType <> '' then begin
+      WriteString(sContentType); WriteString(': '); WriteString(AContentType); WriteString(#13#10);
+    end;
+    WriteString(sContentLength); WriteString(': '); WriteString(LContentLength); WriteString(#13#10);
     if AHeaders <> nil then
-      for var I := low(AHeaders) to high(AHeaders) do
-        WriteStringLn(AHeaders[I].Name + ': ' + AHeaders[I].Value);
-    // We need 2 line breaks here
-    WriteStringLn('');
-    WriteStringLn(AValue);
+      for var I := low(AHeaders) to high(AHeaders) do begin
+        WriteString(AHeaders[I].Name); WriteString(': '); WriteString(AHeaders[I].Value); WriteString(#13#10);
+      end;
+    WriteString(#13#10);
+    WriteString(AValue);
+    WriteString(#13#10);
   finally
     EndPart;
   end;
+
 end;
 
 {***********************************************}
 procedure TALMultipartFormDataEncoderA.AddStream(
-            const AField: AnsiString;
+            const AFieldName: AnsiString;
             const AStream: TStream;
             const AOwnsStream: Boolean;
             const AFileName: AnsiString = '';
             const AContentType: AnsiString = '';
             const AHeaders: TALNameValueArrayA = nil);
 begin
+
   AdjustLastBoundary;
-  BeginPart;
+
+  Var LContentLength: AnsiString := ALInttostrA(AStream.Size);
+
+  var LContentType := AContentType;
+  if LContentType = '' then LContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AFileName));
+
+  var LSize: int64 := 0;
+  LSize := LSize + 2{--} + Length(FBoundary) + 2{#13#10};
+  LSize := LSize + Length(sContentDisposition) + 19{: form-data; name="} + Length(AFieldName) + Length('"');
+  if AFileName <> '' then begin
+    LSize := LSize + 12{; filename="} + Length(AFileName) + 1{"};
+  end;
+  LSize := LSize + 2{#13#10};
+  if LContentType <> '' then begin
+    LSize := LSize + Length(sContentType) + Length(': ') + Length(LContentType) + 2{#13#10};
+  end;
+  LSize := LSize + Length(sContentLength) + 2{: } + Length(LContentLength) + 2{#13#10};
+  if AHeaders <> nil then
+    for var I := low(AHeaders) to high(AHeaders) do begin
+      LSize := LSize + Length(AHeaders[I].Name) + 2{: } + Length(AHeaders[I].Value) + 2{#13#10};
+    end;
+  LSize := LSize + 2{#13#10};
+
+  BeginPart(Lsize);
   try
-    WriteStringLn('--' + FBoundary);
-    var LLine: AnsiString := sContentDisposition + ': form-data; name="' + AField + '"'; // do not localize
-    if AFileName <> '' then
-      LLine := LLine + '; filename="' + AFileName + '"'; // do not localize
-    WriteStringLn(LLine);
-    var LType := AContentType;
-    if LType = '' then LType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AFileName));
-    WriteStringLn(sContentType + ': ' + LType);
+    WriteString('--'); WriteString(FBoundary); WriteString(#13#10);
+    WriteString(sContentDisposition); WriteString(': form-data; name="'); WriteString(AFieldName); WriteString('"');
+    if AFileName <> '' then begin
+      WriteString('; filename="'); WriteString(AFileName); WriteString('"');
+    end;
+    WriteString(#13#10);
+    if LContentType <> '' then begin
+      WriteString(sContentType); WriteString(': '); WriteString(LContentType); WriteString(#13#10);
+    end;
+    WriteString(sContentLength); WriteString(': '); WriteString(LContentLength); WriteString(#13#10);
     if AHeaders <> nil then
-      for var I := low(AHeaders) to high(AHeaders) do
-        WriteStringLn(AHeaders[I].Name + ': ' + AHeaders[I].Value);
-    // We need 2 line breaks here
-    WriteStringLn('');
+      for var I := low(AHeaders) to high(AHeaders) do begin
+        WriteString(AHeaders[I].Name); WriteString(': '); WriteString(AHeaders[I].Value); WriteString(#13#10);
+      end;
+    WriteString(#13#10);
   finally
     EndPart;
   end;
+
   FStream.AddStream(AStream, AOwnsStream);
-  BeginPart;
+
+  BeginPart(2{#13#10});
   try
-    WriteStringLn('');
+    WriteString(#13#10);
   finally
     EndPart;
   end;
+
 end;
 
 {*********************************************}
 procedure TALMultipartFormDataEncoderA.AddFile(
-            const AField: AnsiString;
+            const AFieldName: AnsiString;
             const AFilePath: String;
             const AContentType: AnsiString = '';
             const AHeaders: TALNameValueArrayA = nil);
 begin
   var LFileStream := TFileStream.Create(AFilePath, fmOpenRead or fmShareDenyWrite);
-  AddStream(AField, LFileStream, True, AnsiString(ALExtractFileName(AFilePath)), AContentType, AHeaders);
+  AddStream(AFieldName, LFileStream, True, AnsiString(ALExtractFileName(AFilePath)), AContentType, AHeaders);
 end;
 
 {**********************************************}
 procedure TALMultipartFormDataEncoderA.AddBytes(
-            const AField: AnsiString;
+            const AFieldName: AnsiString;
             const ABytes: TBytes;
             const AFileName: AnsiString = '';
             const AContentType: AnsiString = '';
             const AHeaders: TALNameValueArrayA = nil);
 begin
   var LBytesStream := TBytesStream.Create(ABytes);
-  AddStream(AField, LBytesStream, True, AFileName, AContentType, AHeaders);
+  AddStream(AFieldName, LBytesStream, True, AFileName, AContentType, AHeaders);
 end;
 
 {********************************************************}
 procedure TALMultipartFormDataEncoderA.AdjustLastBoundary;
 begin
-  if FLastBoundaryWrited then
+  if FLastBoundaryWritten then
   begin
     FStream.RemoveStream(FStream.Count - 1);
-    FLastBoundaryWrited := False;
+    FLastBoundaryWritten := False;
   end;
 end;
 
@@ -234,29 +306,29 @@ end;
 {*******************************************************}
 function TALMultipartFormDataEncoderA.GetStream: TStream;
 begin
-  if not FLastBoundaryWrited then
+  if not FLastBoundaryWritten then
   begin
-    BeginPart;
+    BeginPart(2{--} + length(FBoundary) + 2{--} + 2{#13#10});
     try
-      WriteStringLn('--' + FBoundary + '--');
+      WriteString('--'); WriteString(FBoundary); WriteString('--'); WriteString(#13#10);
     finally
       EndPart;
     end;
-    FLastBoundaryWrited := True;
+    FLastBoundaryWritten := True;
   end;
   Result := FStream;
 end;
 
-{******************************************************************************}
-procedure TALMultipartFormDataEncoderA.WriteStringLn(const AString: AnsiString);
+{****************************************************************************}
+procedure TALMultipartFormDataEncoderA.WriteString(const AString: AnsiString);
 begin
-  FSection.WriteString(AString + #13#10);
+  FSection.WriteString(AString);
 end;
 
 {*****************************************************************}
 function TALMultipartFormDataEncoderA.GenerateBoundary: AnsiString;
 begin
-  Result := '----------------------' + ALIntToHexA(ALRandom64(ALMaxInt64), 16);
+  Result := '----------------------' + ALNewGUIDStringA(True{WithoutBracket}, true{WithoutHyphen});
 end;
 
 end.

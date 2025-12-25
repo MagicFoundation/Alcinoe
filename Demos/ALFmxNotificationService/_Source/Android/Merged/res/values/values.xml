@@ -3179,11 +3179,10 @@
         
         <attr name="android:drawable"/>
     </declare-styleable>
-    <string name="default_web_client_id" translatable="false">362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com</string>
-    <string name="gcm_defaultSenderId" translatable="false">362697684107</string>
-    <string name="google_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>
-    <string name="google_app_id" translatable="false">1:362697684107:android:d39c4bc6df5853ec37508e</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>
-    <string name="google_storage_bucket" translatable="false">alfmxnotificationservicedemo.appspot.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">270839631468</string>
+    <string name="google_api_key" translatable="false">AIzaSyDPkqlxpUAtDHbZAzf0z2g9v7jQtMhPV50</string>
+    <string name="google_app_id" translatable="false">1:270839631468:android:a8cf58be89f242cc359249</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDPkqlxpUAtDHbZAzf0z2g9v7jQtMhPV50</string>
+    <string name="google_storage_bucket" translatable="false">alfmxnotificationservicedemo.firebasestorage.app</string>
     <string name="project_id" translatable="false">alfmxnotificationservicedemo</string>
 </resources>

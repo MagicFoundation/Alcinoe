@@ -9275,7 +9275,9 @@ end;
 {**********************************************}
 procedure TALDynamicButton.HideLoadingIndicator;
 begin
-  if (FLoadingIndicator = nil) or (not FLoadingIndicator.visible) then exit;
+  if (FLoadingIndicator = nil) then exit;
+  if (not FLoadingIndicator.TransitionAnimation.Running) and (not FLoadingIndicator.visible) then exit;
+  FLoadingIndicator.TransitionAnimation.Stop;
   FLoadingIndicator.TransitionPhase := TLoadingIndicator.TTransitionPhase.LoadingIndicatorOut;
   FLoadingIndicator.TransitionAnimation.Enabled := False;
   FLoadingIndicator.TransitionAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedAccelerate;

@@ -19,12 +19,14 @@ uses
   System.Skia.API,
   {$ENDIF}
   {$IF defined(ios)}
+  Macapi.CoreFoundation,
   iOSapi.CoreGraphics,
   iOSapi.CocoaTypes,
   iOSapi.UIKit,
   fmx.surfaces,
   {$ENDIF}
   {$IF defined(ALMacOS)}
+  Macapi.CoreFoundation,
   Macapi.CoreGraphics,
   Macapi.CocoaTypes,
   Macapi.AppKit,
@@ -148,6 +150,16 @@ function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 procedure ALReleaseMemPixelBufferProc(const pixels: Pointer; context: Pointer); cdecl;
+{$ENDIF}
+
+{$IF defined(ALSkiaAvailable)}
+function ALFileExtensionToSkEncodedImageFormat(const AExt: string): sk_encodedimageformat_t;
+{$ENDIF}
+{$IF defined(ANDROID)}
+function ALFileExtensionToJBitmapCompressFormat(const AExt: string): JBitmap_CompressFormat;
+{$ENDIF}
+{$IF defined(ALAppleOS)}
+function ALFileExtensionToUTTypeImage(const AExt: string): CFStringRef;
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -434,6 +446,10 @@ function ALCreateBitmapFromResource(
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TALBitmap; inline;
+procedure ALSaveBitmapToFile(
+            const AFilename: String;
+            const ABitmap: TALBitmap;
+            const AQuality: integer);
 
 {***********************}
 procedure ALDrawDrawable(
@@ -697,6 +713,7 @@ implementation
 uses
   system.math,
   system.Hash,
+  System.IOUtils,
   {$IF defined(ALSkiaAvailable)}
   System.Skia,
   FMX.Skia,
@@ -726,7 +743,6 @@ uses
   iOSapi.Helpers,
   iOSapi.ImageIO,
   Macapi.ObjectiveC,
-  Macapi.CoreFoundation,
   Macapi.Helpers,
   Alcinoe.iOSapi.CoreFoundation,
   {$ENDIF}
@@ -735,7 +751,6 @@ uses
   Macapi.Foundation,
   Macapi.QuartzCore,
   Macapi.ObjectiveC,
-  Macapi.CoreFoundation,
   Macapi.Helpers,
   Macapi.ImageIO,
   Alcinoe.Macapi.QuartzCore,
@@ -743,11 +758,11 @@ uses
   {$IF defined(DEBUG)}
   System.TypInfo,
   Alcinoe.Localization,
-  Alcinoe.StringUtils,
   {$ENDIF}
   FMX.Effects,
   System.UIConsts,
   Alcinoe.Url,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Types3D;
 
 {$IFNDEF ALCompilerVersionSupported130}
@@ -1538,6 +1553,76 @@ begin
   ALLog('ALCreateSkImageFromJBitmap.ReleaseJavaPixelBufferProc');
   {$ENDIF}
   TJavaArray<Integer>(context).Free;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALFileExtensionToSkEncodedImageFormat(const AExt: string): sk_encodedimageformat_t;
+begin
+  var LExt := ALLowerCase(AExt);
+  if LExt = '' then raise Exception.Create('Empty extension');
+  if LExt[low(LExt)] <> '.' then LExt := '.' + LExt;
+
+  if LExt = '.png' then Result := PNG_SK_ENCODEDIMAGEFORMAT
+  else if (LExt = '.jpg') or
+          (LExt = '.jpeg') or
+          (LExt = '.jpe') then Result := JPEG_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.webp' then Result := WEBP_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.gif' then Result := GIF_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.bmp' then Result := BMP_SK_ENCODEDIMAGEFORMAT
+  else if (LExt = '.heif') or
+          (LExt = '.heic') then Result := HEIF_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.avif' then Result := AVIF_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.ico' then Result := ICO_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.wbmp' then Result := WBMP_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.pkm' then Result := PKM_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.ktx' then Result := KTX_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.astc' then Result := ASTC_SK_ENCODEDIMAGEFORMAT
+  else if LExt = '.dng' then Result := DNG_SK_ENCODEDIMAGEFORMAT
+  else raise Exception.CreateFmt('Unknown extension "%s"', [AExt]);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALFileExtensionToJBitmapCompressFormat(const AExt: string): JBitmap_CompressFormat;
+begin
+  var LExt := ALLowerCase(AExt);
+  if LExt = '' then raise Exception.Create('Empty extension');
+  if LExt[low(LExt)] <> '.' then LExt := '.' + LExt;
+
+  if LExt = '.png' then Result := TJBitmap_CompressFormat.JavaClass.PNG
+  else if (LExt = '.jpg') or
+          (LExt = '.jpeg') or
+          (LExt = '.jpe') then Result := TJBitmap_CompressFormat.JavaClass.JPEG
+  else if LExt = '.webp' then Result := TJBitmap_CompressFormat.JavaClass.WEBP_LOSSY
+  else raise Exception.CreateFmt('Unknown extension "%s"', [AExt]);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALFileExtensionToUTTypeImage(const AExt: string): CFStringRef;
+begin
+  var LExt := ALLowerCase(AExt);
+  if LExt = '' then raise Exception.Create('Empty extension');
+  if LExt[low(LExt)] <> '.' then LExt := '.' + LExt;
+
+  if LExt = '.png' then Result := CFSTR('public.png') // UTTypePNG
+  else if (LExt = '.jpg') or
+          (LExt = '.jpeg') or
+          (LExt = '.jpe') then Result := CFSTR('public.jpeg') // UTTypeJPEG
+  else if LExt = '.webp' then Result := CFSTR('org.webmproject.webp') // UTTypeWebP
+  else if LExt = '.gif' then Result := CFSTR('com.compuserve.gif') // UTTypeGIF
+  else if LExt = '.bmp' then Result := CFSTR('com.microsoft.bmp') // UTTypeBMP
+  else if LExt = '.heif' then Result := CFSTR('public.heif') // UTTypeHEIF
+  else if LExt = '.heic' then Result := CFSTR('public.heic')  // UTTypeHEIC
+  else if LExt = '.ico' then Result := CFSTR('com.microsoft.ico') // UTTypeICO
+  else if LExt = '.dng' then Result := CFSTR('com.adobe.raw-image') // UTTypeDNG
+  else if (LExt = '.tif') or
+          (LExt = '.tiff') then Result := CFSTR('public.tiff') // UTTypeTIFF
+  else raise Exception.CreateFmt('Unknown extension "%s"', [AExt]);
 end;
 {$ENDIF}
 
@@ -4807,6 +4892,105 @@ begin
               AXRadius, // const AXRadius: Single;
               AYRadius); // const AYRadius: Single);;
   {$ENDIF}
+end;
+
+{***************************}
+procedure ALSaveBitmapToFile(
+            const AFilename: String;
+            const ABitmap: TALBitmap;
+            const AQuality: integer);
+begin
+
+  if AFilename = '' then
+    raise Exception.Create('AFilename must not be empty');
+  TDirectory.CreateDirectory(TPath.GetDirectoryName(AFilename));
+
+  if ALIsBitmapNull(ABitmap) then
+    raise Exception.Create('ABitmap must not be nil');
+
+  var LQuality: Integer := EnsureRange(AQuality, 0, 100);
+
+  {$IF defined(ALSkiaEngine)}
+
+  if not sk4d_image_encode_to_file(
+           ABitmap, // const self: sk_image_t;
+           MarshaledAString(UTF8String(AFilename)), // const file_name: MarshaledAString;
+           ALFileExtensionToSkEncodedImageFormat(ALExtractFileExt(AFileName)), // format: sk_encodedimageformat_t;
+           LQuality) then // quality: int32_t
+    raise Exception.Create('sk4d_image_encode_to_file failed');
+
+  {$ELSEIF defined(ANDROID)}
+
+  var LFileOutputStream := TJFileOutputStream.JavaClass.init(TJFile.JavaClass.init(StringToJString(AFilename)));
+  try
+    if not ABitmap.compress(
+             ALFileExtensionToJBitmapCompressFormat(ALExtractFileExt(AFileName)), // format: JBitmap_CompressFormat
+             LQuality, // quality: Integer
+             LFileOutputStream) then // stream: JOutputStream
+      raise Exception.Create('JBitmap.compress failed');
+    LFileOutputStream.flush;
+  finally
+    LFileOutputStream.close;
+  end;
+
+  {$ELSEIF defined(ALAppleOS)}
+
+  var LPath: CFStringRef := CFStringCreateWithCString(nil{alloc}, MarshaledAString(UTF8Encode(AFileName)){cStr}, kCFStringEncodingUTF8{encoding});
+  if LPath = nil then raise Exception.Create('Unable to convert filename to CFString');
+  try
+    var LUrl: CFURLRef := CFURLCreateWithFileSystemPath(nil{allocator}, LPath{filePath}, kCFURLPOSIXPathStyle{pathStyle}, False{isDirectory});
+    if LUrl = nil then raise Exception.Create('Unable to create file URL');
+    try
+      var LImageDestinationRef := CGImageDestinationCreateWithURL(
+                                    LURL, // url: CFURLRef;
+                                    ALFileExtensionToUTTypeImage(ALExtractFileExt(AFileName)), // &type: CFStringRef;
+                                    1, // count: NativeUInt;
+                                    nil); // options: CFDictionaryRef
+      if LImageDestinationRef = nil then raise Exception.Create('Unable to create CGImageDestination');
+      try
+        var LKeys: array [0..0] of Pointer;
+        var LValue: array [0..0] of Pointer;
+        var LFloatVal: Single := LQuality / 100;
+        LKeys[0] := kCGImageDestinationLossyCompressionQuality;
+        LValue[0] := CFNumberCreate(nil{allocator}, kCFNumberFloat32Type{theType}, @LFloatVal{valuePtr});
+        try
+          var LProperties := CFDictionaryCreate(nil{allocator}, @LKeys[0]{keys}, @LValue[0]{values}, 1{numValues}, nil{keyCallBacks}, nil{valueCallBacks});
+          if LProperties = nil then raise Exception.Create('Unable to create export properties');
+          try
+            CGImageDestinationAddImage(LImageDestinationRef{idst}, ABitmap{image}, LProperties{properties});
+            {$IFNDEF ALCompilerVersionSupported130}
+              {$MESSAGE WARN 'Check the status of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714 and adjust the IFDEF'}
+            {$ENDIF}
+            {$IF defined(IOS)}
+            if not CGImageDestinationFinalize(LImageDestinationRef{idst}) then
+            {$ELSE}
+            if not Boolean(CGImageDestinationFinalize(LImageDestinationRef{idst})) then
+            {$ENDIF}
+              raise Exception.Create('Unable to finalize image export');
+          finally
+            CFRelease(LProperties);
+          end;
+        finally
+          CFRelease(LValue[0]);
+        end;
+      finally
+        CFRelease(LImageDestinationRef);
+      end;
+    finally
+      CFRelease(LUrl);
+    end;
+  finally
+    CFRelease(LPath);
+  end;
+
+  {$ELSE}
+
+  var LBitmapCodecSaveParams: TBitmapCodecSaveParams;
+  LBitmapCodecSaveParams.Quality := LQuality;
+  Abitmap.SaveToFile(AFilename, @LBitmapCodecSaveParams);
+
+  {$ENDIF}
+
 end;
 
 {***********************}

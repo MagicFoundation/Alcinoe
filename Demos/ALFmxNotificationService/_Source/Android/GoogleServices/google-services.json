@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "362697684107",
+    "project_number": "270839631468",
     "project_id": "alfmxnotificationservicedemo",
-    "storage_bucket": "alfmxnotificationservicedemo.appspot.com"
+    "storage_bucket": "alfmxnotificationservicedemo.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:362697684107:android:d39c4bc6df5853ec37508e",
+        "mobilesdk_app_id": "1:270839631468:android:a8cf58be89f242cc359249",
         "android_client_info": {
           "package_name": "io.magicfoundation.alcinoe.alfmxnotificationservicedemo"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI"
+          "current_key": "AIzaSyDPkqlxpUAtDHbZAzf0z2g9v7jQtMhPV50"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "362697684107-s2bk1sotd1d815eg3756nnqleulcs5ki.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "io.magicfoundation.alcinoe.alfmxnotificationservicedemo"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

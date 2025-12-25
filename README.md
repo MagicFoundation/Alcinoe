@@ -142,6 +142,7 @@ forced to apply patches to the original Delphi source files:
 * [macOS/iOS: Inconsistent CIImageClass.imageWithCGImage return type (macOS = Pointer, iOS = CIImage)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4347)
 * [Missing Functions in Macapi.QuartzCore.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4346)
 * [macOS: Add missing NSTextField APIs (delegate getter/setter + placeholder getters/setter)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4353)
+* [iOS vs macOS mismatch in CGImageDestinationFinalize declaration (Boolean vs Integer return type)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714)
 
 
 Install Alcinoe
@@ -1164,6 +1165,37 @@ undesired conversions.
 
 History
 =======
+
+## 24/12/2025 – Versioning Alignment, API Additions & Behavior Updates
+
+- Align **Alcinoe** versioning with the Delphi compiler version (e.g. Alcinoe built 
+  with Delphi 13.0 now uses version `13.0.x`).
+- Added `HttpWorker.Cancel` method.
+- Added `ToString` helpers for `TRectF`, `TSizeF`, `TPointF`, `TALRectD`, `TALSizeD`, 
+  and `TALPointD`.
+- Added unified path helper functions:
+  - `ALGetAppDataPathW`
+  - `ALGetTempPathW`
+  - `ALGetTempFilenameW`
+  - `ALGetCachePathW`
+- Added `ResourceStream` property to `TALAnimatedImage`.
+- Added `PrependItem`, `AppendItem`, and `DeleteItem` methods to `TALDynamicListBox`.
+- Removed `AddItem` from `TALDynamicListBox` (use `PrependItem` or `AppendItem` instead).
+- `TALEdit` controls are now automatically frozen (using a screenshot for rendering) 
+  when partially visible, improving Z-order simulation.
+- `TALMemo` and `TALEdit` now use `ALResolveLineHeightMultiplier`, ensuring the same 
+  line-height algorithm as `TALText`.
+- Updated `TALNotificationService` to use `TMessage`-based notifications:
+  - `TNotificationReceivedMessage`
+  - `TGetTokenMessage`
+  - `TDeleteTokenMessage`
+  - `TTokenRefreshMessage`
+  - `TNotificationPermissionResultMessage`
+  This replaces event-based callbacks (`OnNotificationReceived`, `OnGetToken`, etc.) and 
+  better aligns with the singleton design.
+- Added an internal `ScrollBox` to `TALBottomSheet` to support content larger than the 
+  maximum visible area.
+- Added `IsAncestorOf` method to `TControl`.
 
 ### 25/11/2025 – TALHttpWorker Added
 

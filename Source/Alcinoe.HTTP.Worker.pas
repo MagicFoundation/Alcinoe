@@ -12,6 +12,7 @@ uses
   {$IF defined(IOS)}
   Macapi.ObjectiveC,
   iOSapi.Foundation,
+  Alcinoe.StringList,
   {$ENDIF}
   Alcinoe.HTTP.Client;
 
@@ -86,15 +87,22 @@ Type
     {$ENDREGION}
 
   public
+    const
+      // !! This value is also hardcoded in ALHttpWorker.java !!
+      REQUEST_EXPIRATION_DAYS = 7;
+  public
     type
+      // -----------
+      // TWorkResult
+      TWorkResult = (Success, Failure, Canceled);
       // ------------------
       // TWorkResultMessage
-      TWorkResultMessage  = class(TMessage<Boolean>)
+      TWorkResultMessage  = class(TMessage<TWorkResult>)
       private
         FRequestId: String;
         FResponse: TALHttpClientResponseW;
       public
-        constructor Create(const ASuccess: Boolean; const ARequestId: String; AResponse: TALHttpClientResponseW); virtual;
+        constructor Create(const AResult: TWorkResult; const ARequestId: String; AResponse: TALHttpClientResponseW); virtual;
         destructor Destroy; override;
         property RequestId: String read FRequestId;
         property Response: TALHttpClientResponseW read FResponse;
@@ -114,40 +122,45 @@ Type
     FHandleEventsForBackgroundURLSessionCompletionHandlerImpl: Pointer;
     FURLSession: NSURLSession;
     FURLSessionDelegate: TURLSessionDelegate;
+    class var FRequestIdsToCancel: TALStringListW;
     class procedure BackgroundNetworkTaskMessageHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
+    procedure getAllTasksCompletionHandler(tasks: NSArray);
     {$ENDIF}
     {$ENDREGION}
 
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    class function GetTempFilename(Const AExt: String = '.tmp'): String;
     property DefaultUserAgent: String read FDefaultUserAgent write FDefaultUserAgent;
-    function enqueue(
+    function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyString: String;
                const AHeaders: TNetHeaders): String; overload; virtual;
-    function enqueue(
+    function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyFilePath: String;
                const ADeleteBodyFile: Boolean;
                const AHeaders: TNetHeaders): String; overload; virtual;
-    function enqueue(
+    function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyBytes: TBytes;
                const AHeaders: TNetHeaders): String; overload; virtual;
-    function enqueue(
+    function Enqueue(
                const AUrl: String;
                const AMethod: String;
                const ABodyStream: Tstream;
                const AHeaders: TNetHeaders): String; overload; virtual;
+    procedure Cancel(const ARequestID: String); virtual;
   End;
 
 implementation
 
 uses
+  System.DateUtils,
   system.IOUtils,
   {$IF defined(ANDROID)}
   AndroidApi.JNI.JavaTypes,
@@ -157,16 +170,15 @@ uses
   {$ENDIF}
   {$IF defined(IOS)}
   System.Math,
-  System.DateUtils,
   Macapi.ObjCRuntime,
   Macapi.Helpers,
   FMX.Platform,
-  Alcinoe.StringList,
   {$ENDIF}
   {$IF defined(MSWindows) or defined(ALMacOS)}
   system.net.HttpClient,
   Alcinoe.HTTP.Client.Net,
   {$ENDIF}
+  Alcinoe.Files,
   Alcinoe.StringUtils,
   Alcinoe.HTTP,
   Alcinoe.Common;
@@ -430,6 +442,7 @@ begin
     allog(Classname + '.URLSession:session:task:didCompleteWithError');
   {$ENDIF}
 
+  var LCanceled: Boolean := (didCompleteWithError <> nil) and (didCompleteWithError.code = NSURLErrorCancelled);
   var LRequestID: String := '';
   var LResponseBodyfilePath: String := '';
   var LRequestBodyFilePath: String := '';
@@ -457,14 +470,14 @@ begin
 
       // IOException -> retry
       // Server-side error (5xx) -> retry
-      if (LHTTPURLResponse = nil) or
-         ((LHTTPURLResponse.statusCode >= 500) and (LHTTPURLResponse.statusCode < 600)) then begin
+      if (not LCanceled) and
+         ((LHTTPURLResponse = nil) or ((LHTTPURLResponse.statusCode >= 500) and (LHTTPURLResponse.statusCode < 600))) then begin
 
         // If task.originalRequest = nil => non-retriable error
         if task.originalRequest = nil then raise Exception.Create('Error 1B60A279-AE73-48F9-B09F-74629596CE04');
 
         // More than 7 days => non-retriable error
-        If DaysBetween(ALUTCNow, ALUnixMsToDateTime(ALStrToInt64Def(LLst.Values[TALHttpWorker.KEY_ENQUEUE_TIME], 0))) > 7
+        If DaysBetween(ALUTCNow, ALUnixMsToDateTime(ALStrToInt64Def(LLst.Values[TALHttpWorker.KEY_ENQUEUE_TIME], 0))) > REQUEST_EXPIRATION_DAYS
           then raise Exception.Create('Request expired: it has been pending for more than 7 days and will not be retried');
 
         var LNewTask: NSURLSessionTask := nil;
@@ -510,20 +523,21 @@ begin
 
       // Successful HTTP 2xx, 4xx, etc.
       LResponse := TALHttpClientResponseW.Create;
-      LResponse.StatusCode := LHTTPURLResponse.statusCode;
-
-      var LAllHeaderFields := LHTTPURLResponse.allHeaderFields;
-      if LAllHeaderFields <> nil then begin
-        var LAllKeys := LAllHeaderFields.allKeys;
-        var LAllValues := LAllHeaderFields.allValues;
-        for var I := 0 to LAllKeys.count - 1 do begin
-          var LName := NSStrToStr(TNSString.Wrap(LAllKeys.objectAtIndex(I)));
-          var LValue := NSStrToStr(TNSString.Wrap(LAllValues.objectAtIndex(I)));
-          LResponse.Headers.Values[LName] := LValue;
+      if LHTTPURLResponse <> nil then begin
+        LResponse.StatusCode := LHTTPURLResponse.statusCode;
+        var LAllHeaderFields := LHTTPURLResponse.allHeaderFields;
+        if LAllHeaderFields <> nil then begin
+          var LAllKeys := LAllHeaderFields.allKeys;
+          var LAllValues := LAllHeaderFields.allValues;
+          for var I := 0 to LAllKeys.count - 1 do begin
+            var LName := NSStrToStr(TNSString.Wrap(LAllKeys.objectAtIndex(I)));
+            var LValue := NSStrToStr(TNSString.Wrap(LAllValues.objectAtIndex(I)));
+            LResponse.Headers.Values[LName] := LValue;
+          end;
         end;
       end;
 
-      if LResponseBodyfilePath <> '' then
+      if (LResponseBodyfilePath <> '') and TFile.Exists(LResponseBodyfilePath) then
         LResponse.BodyStream := TFileStream.Create(LResponseBodyfilePath, FmOpenRead or fmShareDenyWrite); // /.nofollow/private/var/mobile/Containers/Data/Application/99F12BF0-0410-456C-B242-5F6198735633/Library/Caches/com.apple.nsurlsessiond/Downloads/ALFmxHttpWorkerDemo/CFNetworkDownload_ml1euK.tmp
 
       if LDeleteRequestBodyFile and (LRequestBodyfilePath <> '') and Tfile.Exists(LRequestBodyfilePath) then
@@ -534,9 +548,13 @@ begin
         Begin
           try
             try
+              var LWorkResult: TWorkResult;
+              If (LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300) then LWorkResult := TWorkResult.Success
+              else if LCanceled then LWorkResult := TWorkResult.Canceled
+              else LWorkResult := TWorkResult.Failure;
               TMessageManager.DefaultManager.SendMessage(
                 TALHttpWorker.Instance, // const Sender: TObject
-                TWorkResultMessage.Create((LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300){ASuccess}, LRequestID{ARequestId}, LResponse), // AMessage: TMessage
+                TWorkResultMessage.Create(LWorkResult, LRequestID, LResponse), // AMessage: TMessage
                 True); // ADispose: Boolean
             finally
               If (LResponseBodyfilePath <> '') and Tfile.Exists(LResponseBodyfilePath) then
@@ -566,7 +584,7 @@ begin
           try
             TMessageManager.DefaultManager.SendMessage(
               TALHttpWorker.Instance, // const Sender: TObject
-              TWorkResultMessage.Create(False{ASuccess}, LRequestID{ARequestId}, nil), // AMessage: TMessage
+              TWorkResultMessage.Create(TWorkResult.Failure, LRequestID, nil), // AMessage: TMessage
               True); // ADispose: Boolean
           Except
             On E: Exception do
@@ -859,7 +877,7 @@ begin
       var LFileStream: TFileStream;
       var LResponseBodyFilePath := LLst.Values[TALHttpWorker.KEY_RESPONSE_BODY_FILE_PATH];
       if LResponseBodyFilePath = '' then begin
-        LResponseBodyFilePath := Tpath.GetTempFileName; // /private/var/mobile/Containers/Data/Application/E7193C5D-99A8-4E33-BB55-2074B3475A69/tmp/tmp.xZgDFq
+        LResponseBodyFilePath := TALHttpWorker.GetTempFilename;
         LLst.Values[TALHttpWorker.KEY_RESPONSE_BODY_FILE_PATH] := LResponseBodyFilePath;
         dataTask.setTaskDescription(StrToNSStr(LLst.Text));
         LFileStream := TfileStream.Create(LResponseBodyFilePath, fmCreate or fmShareExclusive)
@@ -1048,10 +1066,8 @@ begin
     var LSourceFileName := NSStrToStr(didFinishDownloadingToURL.path); // /.nofollow/private/var/mobile/Containers/Data/Application/99F12BF0-0410-456C-B242-5F6198735633/Library/Caches/com.apple.nsurlsessiond/Downloads/ALFmxHttpWorkerDemo/CFNetworkDownload_ml1euK.tmp
     if LSourceFileName <> '' then begin
 
-      var LResponseBodyfilePath := TPath.GetTempFileName; // /private/var/mobile/Containers/Data/Application/E7193C5D-99A8-4E33-BB55-2074B3475A69/tmp/tmp.xZgDFq
-
-      if AlPosW(TPath.GetTempPath, LSourceFileName) = 1 then TFile.move(LSourceFileName{SourceFileName}, LResponseBodyfilePath{DestFileName})
-      else TFile.copy(LSourceFileName{SourceFileName}, LResponseBodyfilePath{DestFileName});
+      var LResponseBodyfilePath := TALHttpWorker.GetTempFilename; // /var/mobile/Containers/Data/Application/E7193C5D-99A8-4E33-BB55-2074B3475A69/Library/Application Support/ALHttpWorker/e6dafe6d-8675-4779-9f50-79c750dab32e.tmp
+      TFile.copy(LSourceFileName{SourceFileName}, LResponseBodyfilePath{DestFileName});
 
       var LLst := TALStringListW.create;
       Try
@@ -1070,10 +1086,10 @@ begin
 end;
 {$ENDIF}
 
-{****************************************************************************************************************************************}
-constructor TALHttpWorker.TWorkResultMessage.Create(const ASuccess: Boolean; const ARequestId: String; AResponse: TALHttpClientResponseW);
+{*******************************************************************************************************************************************}
+constructor TALHttpWorker.TWorkResultMessage.Create(const AResult: TWorkResult; const ARequestId: String; AResponse: TALHttpClientResponseW);
 begin
-  Inherited Create(ASuccess);
+  Inherited Create(AResult);
   FRequestId := ARequestId;
   FResponse := AResponse;
 end;
@@ -1092,10 +1108,17 @@ begin
   inherited Create;
 
   FDefaultUserAgent := 'ALHttpWorker/1.0';
+  var LTmpPath := ALExtractFilePath(GetTempFilename);
+  If not TDirectory.Exists(LTmpPath) then TDirectory.CreateDirectory(LTmpPath);
+  AlEmptyDirectoryW(
+    LTmpPath, // const Directory: String;
+    false, // SubDirectory: Boolean;
+    false, // Const RemoveEmptySubDirectory: Boolean = True;
+    '*', // Const FileNameMask: String = '*';
+    IncDay(Now, -1 * REQUEST_EXPIRATION_DAYS * 2)); // Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 
   {$REGION 'IOS'}
   {$IF defined(IOS)}
-
   FHandleEventsForBackgroundURLSessionCompletionHandlerImpl := nil;
 
   // An NSURLSessionConfiguration object defines the behavior and policies to use when
@@ -1131,7 +1154,6 @@ begin
                    FURLSessionDelegate.GetObjectID, // delegate: Pointer;
                    nil); // delegateQueue: NSOperationQueue
   FURLSession.retain;
-
   {$ENDIF}
   {$ENDREGION}
 
@@ -1182,6 +1204,13 @@ begin
   result := FInstance <> nil;
 end;
 
+{*************}
+//[MultiThread]
+class function TALHttpWorker.GetTempFilename(Const AExt: String = '.tmp'): String;
+begin
+  Result := TPath.Combine(ALGetAppDataPathW, 'ALHttpWorker', ALLowercase(ALNewGUIDStringW(True{WithoutBracket}, False{WithoutHyphen})) + AExt);
+end;
+
 {********************}
 {$IF defined(ANDROID)}
 class procedure TALHttpWorker.BroadcastReceivedHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
@@ -1191,6 +1220,7 @@ begin
     var LResponse := TALHttpClientResponseW.Create;
     Try
       var LSuccess := LBroadcastReceivedMessage.Value.getExtras.getBoolean(TJALHttpWorker.JavaClass.EXTRA_HTTP_SUCCESS, false);
+      var LCanceled := LBroadcastReceivedMessage.Value.getExtras.getBoolean(TJALHttpWorker.JavaClass.EXTRA_HTTP_CANCELED, false);
       var LRequestID := JstringToString(LBroadcastReceivedMessage.Value.getExtras.getString(TJALHttpWorker.JavaClass.EXTRA_HTTP_REQUEST_ID, StringToJstring('')));
       var LResponseStatusCode := LBroadcastReceivedMessage.Value.getExtras.getInt(TJALHttpWorker.JavaClass.EXTRA_HTTP_RESPONSE_STATUS_CODE, 0);
       var LResponseHeaders := JstringToString(LBroadcastReceivedMessage.Value.getExtras.getString(TJALHttpWorker.JavaClass.EXTRA_HTTP_RESPONSE_HEADERS, StringToJstring('')));
@@ -1203,9 +1233,13 @@ begin
         end
         else
           ALFreeAndNil(LResponse);
+        var LWorkResult: TWorkResult;
+        If LSuccess then LWorkResult := TWorkResult.Success
+        else if LCanceled then LWorkResult := TWorkResult.Canceled
+        else LWorkResult := TWorkResult.Failure;
         TMessageManager.DefaultManager.SendMessage(
           TALHttpWorker.Instance, // const Sender: TObject
-          TWorkResultMessage.Create(LSuccess, LRequestID, LResponse), // AMessage: TMessage
+          TWorkResultMessage.Create(LWorkResult, LRequestID, LResponse), // AMessage: TMessage
           True); // ADispose: Boolean
       finally
         If (LResponseBodyfilePath <> '') and Tfile.Exists(LResponseBodyfilePath) then
@@ -1234,6 +1268,40 @@ begin
 
   if LBackgroundNetworkTaskMessage.value.identifier = TALHttpWorker.KEY_BACKGROUND_SESSION_IDENTIFIER then
     TALHttpWorker.Instance.FHandleEventsForBackgroundURLSessionCompletionHandlerImpl := imp_implementationWithBlock(LBackgroundNetworkTaskMessage.value.CompletionHandler);
+end;
+{$ENDIF}
+
+{*************}
+//[MultiThread]
+{$IF defined(IOS)}
+procedure TALHttpWorker.getAllTasksCompletionHandler(tasks: NSArray);
+begin
+  if not TALHttpWorker.HasInstance then exit;
+  ALMonitorEnter(TALHttpWorker.FRequestIdsToCancel{$IF defined(DEBUG)}, 'TALHttpWorker.Cancel'{$ENDIF});
+  Try
+    for var I := 0 to Tasks.count - 1 do begin
+      var LTask := TNSURLSessionTask.Wrap(Tasks.objectAtIndex(I));
+      var LLst := TALStringListW.create;
+      Try
+        LLst.LineBreak := ';';
+        LLst.TrailingLineBreak := False;
+        LLst.Text := NSStrToStr(LTask.taskDescription);
+        var LRequestId: String := LLst.Values[TALHttpWorker.KEY_REQUEST_ID];
+        var LIdx := TALHttpWorker.FRequestIdsToCancel.IndexOf(LRequestId);
+        if LIdx >= 0 then begin
+          {$IF defined(DEBUG)}
+          ALLog('TALHttpWorker.getAllTasksCompletionHandler', 'Cancelling task with RequestId=' + LRequestId);
+          {$ENDIF}
+          TALHttpWorker.FRequestIdsToCancel.Delete(LIdx);
+          LTask.cancel;
+        end;
+      finally
+        ALFreeAndNil(LLst);
+      end;
+    end;
+  finally
+    ALMonitorExit(TALHttpWorker.FRequestIdsToCancel{$IF defined(DEBUG)}, 'TALHttpWorker.Cancel'{$ENDIF});
+  end;
 end;
 {$ENDIF}
 
@@ -1309,9 +1377,12 @@ begin
             Procedure
             Begin
               try
+                var LWorkResult: TWorkResult;
+                If (LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300) then LWorkResult := TWorkResult.Success
+                else LWorkResult := TWorkResult.Failure;
                 TMessageManager.DefaultManager.SendMessage(
                   TALHttpWorker.Instance, // const Sender: TObject
-                  TWorkResultMessage.Create((LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300){ASuccess}, LRequestID{ARequestId}, LResponse), // AMessage: TMessage
+                  TWorkResultMessage.Create(LWorkResult, LRequestID, LResponse), // AMessage: TMessage
                   True); // ADispose: Boolean
               Except
                 On E: Exception do
@@ -1329,7 +1400,7 @@ begin
                 try
                   TMessageManager.DefaultManager.SendMessage(
                     TALHttpWorker.Instance, // const Sender: TObject
-                    TWorkResultMessage.Create(False{ASuccess}, LRequestID{ARequestId}, nil), // AMessage: TMessage
+                    TWorkResultMessage.Create(TWorkResult.Failure, LRequestID, nil), // AMessage: TMessage
                     True); // ADispose: Boolean
                 Except
                   On E: Exception do
@@ -1455,9 +1526,12 @@ begin
             Procedure
             Begin
               try
+                var LWorkResult: TWorkResult;
+                If (LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300) then LWorkResult := TWorkResult.Success
+                else LWorkResult := TWorkResult.Failure;
                 TMessageManager.DefaultManager.SendMessage(
                   TALHttpWorker.Instance, // const Sender: TObject
-                  TWorkResultMessage.Create((LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300){ASuccess}, LRequestID{ARequestId}, LResponse), // AMessage: TMessage
+                  TWorkResultMessage.Create(LWorkResult, LRequestID, LResponse), // AMessage: TMessage
                   True); // ADispose: Boolean
               Except
                 On E: Exception do
@@ -1477,7 +1551,7 @@ begin
                 try
                   TMessageManager.DefaultManager.SendMessage(
                     TALHttpWorker.Instance, // const Sender: TObject
-                    TWorkResultMessage.Create(False{ASuccess}, LRequestID{ARequestId}, nil), // AMessage: TMessage
+                    TWorkResultMessage.Create(TWorkResult.Failure, LRequestID, nil), // AMessage: TMessage
                     True); // ADispose: Boolean
                 Except
                   On E: Exception do
@@ -1516,7 +1590,7 @@ begin
                 AHeaders); // const AHeaders: TNetHeaders)
   end
   else begin
-    var LFilename := TPath.GetTempFileName;
+    var LFilename := GetTempFilename;
     try
       TFile.WriteAllBytes(LFilename, ABodyBytes);
       result := enqueue(
@@ -1538,7 +1612,7 @@ begin
   {$REGION 'IOS'}
   {$IF defined(IOS)}
   If length(ABodyBytes) > 4096 then begin
-    var LFilename := TPath.GetTempFileName;
+    var LFilename := GetTempFilename;
     try
       TFile.WriteAllBytes(LFilename, ABodyBytes);
       result := enqueue(
@@ -1625,9 +1699,12 @@ begin
             Procedure
             Begin
               try
+                var LWorkResult: TWorkResult;
+                If (LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300) then LWorkResult := TWorkResult.Success
+                else LWorkResult := TWorkResult.Failure;
                 TMessageManager.DefaultManager.SendMessage(
                   TALHttpWorker.Instance, // const Sender: TObject
-                  TWorkResultMessage.Create((LResponse.StatusCode >= 200) and (LResponse.StatusCode < 300){ASuccess}, LRequestID{ARequestId}, LResponse), // AMessage: TMessage
+                  TWorkResultMessage.Create(LWorkResult, LRequestID, LResponse), // AMessage: TMessage
                   True); // ADispose: Boolean
               Except
                 On E: Exception do
@@ -1645,7 +1722,7 @@ begin
                 try
                   TMessageManager.DefaultManager.SendMessage(
                     TALHttpWorker.Instance, // const Sender: TObject
-                    TWorkResultMessage.Create(False{ASuccess}, LRequestID{ARequestId}, nil), // AMessage: TMessage
+                    TWorkResultMessage.Create(TWorkResult.Failure, LRequestID, nil), // AMessage: TMessage
                     True); // ADispose: Boolean
                 Except
                   On E: Exception do
@@ -1684,7 +1761,7 @@ begin
                 AHeaders); // const AHeaders: TNetHeaders)
   end
   else begin
-    var LFilename := TPath.GetTempFileName;
+    var LFilename := GetTempFilename;
     Try
       var LFileStream := TFileStream.Create(LFilename, fmCreate or fmShareExclusive);
       try
@@ -1723,7 +1800,7 @@ begin
                 AHeaders); // const AHeaders: TNetHeaders)
   end
   else begin
-    var LFilename := TPath.GetTempFileName;
+    var LFilename := GetTempFilename;
     Try
       var LFileStream := TFileStream.Create(LFilename, fmCreate or fmShareExclusive);
       try
@@ -1764,6 +1841,38 @@ begin
 
 end;
 
+{*******************************************************}
+procedure TALHttpWorker.Cancel(const ARequestID: String);
+begin
+
+  {$REGION 'ANDROID'}
+  {$IF defined(ANDROID)}
+  TJALHttpWorker.JavaClass.Cancel(
+    TAndroidHelper.Context, // context: JContext;
+    TJUUID.JavaClass.fromString(StringToJstring(ARequestID))); // requestId: JUUID
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+  ALMonitorEnter(TALHttpWorker.FRequestIdsToCancel{$IF defined(DEBUG)}, 'TALHttpWorker.Cancel'{$ENDIF});
+  Try
+    TALHttpWorker.FRequestIdsToCancel.add(ARequestID);
+  finally
+    ALMonitorExit(TALHttpWorker.FRequestIdsToCancel{$IF defined(DEBUG)}, 'TALHttpWorker.Cancel'{$ENDIF});
+  end;
+  FURLSession.getAllTasksWithCompletionHandler(getAllTasksCompletionHandler);
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'MSWindows/MacOS'}
+  {$IF defined(MSWindows) or defined(ALMacOS)}
+  // Not implemented under Windows
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
 initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.HTTP.Worker','initialization');
@@ -1776,6 +1885,7 @@ initialization
   {$ENDIF}
   {$IF defined(IOS)}
   TMessageManager.DefaultManager.SubscribeToMessage(TBackgroundNetworkTaskMessage, TALHttpWorker.BackgroundNetworkTaskMessageHandler);
+  TALHttpWorker.FRequestIdsToCancel := TALStringListW.Create;
   {$ENDIF}
   TThread.ForceQueue(nil,
     Procedure
@@ -1796,6 +1906,7 @@ finalization
   {$ENDIF}
   {$IF defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TBackgroundNetworkTaskMessage, TALHttpWorker.BackgroundNetworkTaskMessageHandler);
+  ALFreeAndNil(TALHttpWorker.FRequestIdsToCancel);
   {$ENDIF}
 
 end.

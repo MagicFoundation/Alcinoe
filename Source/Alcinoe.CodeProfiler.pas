@@ -60,6 +60,7 @@ uses
   System.Generics.Collections,
   System.Diagnostics,
   System.IOUtils,
+  Alcinoe.Files,
   Alcinoe.Common;
 
 {**}
@@ -247,7 +248,7 @@ begin
     end
     else
     {$ENDIF}
-      ALProcMetricsFilename := TPath.Combine(TPath.GetDocumentsPath, ALCodeProfilerProcMetricsFilename);
+      ALProcMetricsFilename := TPath.Combine(ALGetTempPathW, ALCodeProfilerProcMetricsFilename);
     if TFile.Exists(ALProcMetricsFilename) then TFile.Delete(ALProcMetricsFilename);
   end;
   //--

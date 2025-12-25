@@ -38,18 +38,21 @@ type
     ['{E793143E-6277-4C10-AA0A-B79330756F93}']
     {class} function _GetACTION_HTTP_COMPLETED: JString; cdecl;
     {class} function _GetEXTRA_HTTP_SUCCESS: JString; cdecl;
+    {class} function _GetEXTRA_HTTP_CANCELED: JString; cdecl;
     {class} function _GetEXTRA_HTTP_REQUEST_ID: JString; cdecl;
     {class} function _GetEXTRA_HTTP_RESPONSE_STATUS_CODE: JString; cdecl;
     {class} function _GetEXTRA_HTTP_RESPONSE_HEADERS: JString; cdecl;
     {class} function _GetEXTRA_HTTP_RESPONSE_BODY_FILE_PATH: JString; cdecl;
     {class} property ACTION_HTTP_COMPLETED: JString read _GetACTION_HTTP_COMPLETED;
     {class} property EXTRA_HTTP_SUCCESS: JString read _GetEXTRA_HTTP_SUCCESS;
+    {class} property EXTRA_HTTP_CANCELED: JString read _GetEXTRA_HTTP_CANCELED;
     {class} property EXTRA_HTTP_REQUEST_ID: JString read _GetEXTRA_HTTP_REQUEST_ID;
     {class} property EXTRA_HTTP_RESPONSE_STATUS_CODE: JString read _GetEXTRA_HTTP_RESPONSE_STATUS_CODE;
     {class} property EXTRA_HTTP_RESPONSE_HEADERS: JString read _GetEXTRA_HTTP_RESPONSE_HEADERS;
     {class} property EXTRA_HTTP_RESPONSE_BODY_FILE_PATH: JString read _GetEXTRA_HTTP_RESPONSE_BODY_FILE_PATH;
     {class} function enqueue(context: JContext; url: JString; method: JString; bodyFilePath: JString; deleteBodyFile: Boolean; headers: JString): JUUID; overload; cdecl;
     {class} function enqueue(context: JContext; url: JString; method: JString; bodyString: JString; headers: JString): JUUID; overload; cdecl;
+    {class} procedure cancel(context: JContext; requestId: JUUID); overload; cdecl;
   end;
   [JavaSignature('io/magicfoundation/alcinoe/http/ALHttpWorker')]
   JALHttpWorker = interface(JWorker)

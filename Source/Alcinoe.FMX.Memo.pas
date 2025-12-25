@@ -16,6 +16,7 @@ uses
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Alcinoe.FMX.NativeView.iOS,
+  Alcinoe.FMX.BreakText,
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
   Macapi.Foundation,
@@ -25,6 +26,7 @@ uses
   Macapi.CocoaTypes,
   Alcinoe.Macapi.AppKit,
   Alcinoe.FMX.NativeView.Mac,
+  Alcinoe.FMX.BreakText,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.Messages,
   FMX.Controls.Win,
@@ -903,11 +905,14 @@ begin
   try
 
     // LineHeightMultiplier
-    if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then begin
+    var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.Font.Size, textsettings.LineHeightMultiplier);
+    if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then begin
       var LParagraphStyle: NSMutableParagraphStyle := TNSMutableParagraphStyle.Alloc;
       try
         LParagraphStyle.init;
-        LParagraphStyle.setlineHeightMultiple(TextSettings.LineHeightMultiplier);
+        // To mirror Skia’s behavior, the line height is calculated as: lineHeight = fontSize * LineHeightMultiplier
+        LParagraphStyle.setMinimumLineHeight(textsettings.Font.Size * LTmpLineHeightMultiplier);
+        LParagraphStyle.setMaximumLineHeight(textsettings.Font.Size * LTmpLineHeightMultiplier);
 
         var LObjects := TNSMutableArray.Create;
         var LForKeys := TNSMutableArray.Create;
@@ -1004,11 +1009,12 @@ end;
 {********************************************}
 function TALIosMemoView.getLineHeight: Single;
 begin
-  if View.font = nil then
-    TextSettingsChanged(nil);
-  result := View.font.lineHeight;
-  if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-    result := result * textsettings.LineHeightMultiplier;
+  var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.font.size, textsettings.LineHeightMultiplier);
+  if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then result := textsettings.Font.Size * LTmpLineHeightMultiplier
+  else begin
+    if View.font = nil then TextSettingsChanged(nil);
+    result := View.font.lineHeight;
+  end;
 end;
 
 {*********************************************************************************}
@@ -1384,11 +1390,14 @@ begin
   try
 
     // LineHeightMultiplier
-    if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then begin
+    var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(TextSettings.Font.Size, textsettings.LineHeightMultiplier);
+    if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then begin
       var LParagraphStyle: NSMutableParagraphStyle := TNSMutableParagraphStyle.Alloc;
       try
         LParagraphStyle.init;
-        LParagraphStyle.setlineHeightMultiple(TextSettings.LineHeightMultiplier);
+        // To mirror Skia’s behavior, the line height is calculated as: lineHeight = fontSize * LineHeightMultiplier
+        LParagraphStyle.setMinimumLineHeight(textsettings.Font.Size * LTmpLineHeightMultiplier);
+        LParagraphStyle.setMaximumLineHeight(textsettings.Font.Size * LTmpLineHeightMultiplier);
 
         var LObjects := TNSMutableArray.Create;
         var LForKeys := TNSMutableArray.Create;
@@ -1488,14 +1497,16 @@ end;
 {********************************************}
 function TALMacMemoView.getLineHeight: Single;
 begin
-  var LfontMetrics := ALGetFontMetrics(
-                        ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
-                        TextSettings.Font.Size, // const AFontSize: single;
-                        TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
-                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
-  result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
-  if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
-    result := result * textsettings.LineHeightMultiplier;
+  var LTmpLineHeightMultiplier: Single := ALResolveLineHeightMultiplier(textsettings.font.size, textsettings.LineHeightMultiplier);
+  if CompareValue(LTmpLineHeightMultiplier, 0, TEpsilon.Scale) > 0 then result := textsettings.Font.Size * LTmpLineHeightMultiplier
+  else begin
+    var LfontMetrics := ALGetFontMetrics(
+                          ALResolveFontFamily(TextSettings.Font.Family), // const AFontFamily: String;
+                          TextSettings.Font.Size, // const AFontSize: single;
+                          TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
+                          TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
+    result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
+  end;
 end;
 
 {*********************************************************************************}

@@ -73,7 +73,7 @@ echo -------------------------------
 echo.
 
 set ALNoPrompts=
-set /P ALNoPrompts="Perform all steps automatically without prompts? (Y/N, default=Y)?:" %=%
+set /P ALNoPrompts="Perform all steps automatically without prompts? (Y/N, default=Y)?: " %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 echo.
 
@@ -96,7 +96,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALCopyAndPatchDelphiSource=Y
 ) else (
   set ALCopyAndPatchDelphiSource=
-  set /P ALCopyAndPatchDelphiSource="Copy the Delphi source code and patch it locally (Y/N, default=Y)?:" %=%
+  set /P ALCopyAndPatchDelphiSource="Copy the Delphi source code and patch it locally (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -130,7 +130,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALDownloadLibraries=Y
 ) else (
   set ALDownloadLibraries=
-  set /P ALDownloadLibraries="Download libraries (Y/N, default=Y)?:" %=%
+  set /P ALDownloadLibraries="Download libraries (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -162,6 +162,11 @@ REM ----------------
 echo ----------------
 echo Build Core Tools
 echo ----------------
+echo.
+
+echo [36mMSBuild DProjVersioning.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
+MSBuild "%ALBaseDir%\Tools\DProjVersioning\_Source\DProjVersioning.dproj" /p:DCC_UseMSBuildExternally=true /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
 echo.
 
 echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:Platform=Win64 /t:Build[0m
@@ -213,6 +218,21 @@ IF ERRORLEVEL 1 goto ERROR
 echo.
 
 
+REM -------------------
+REM Update Version Info 
+REM -------------------
+
+echo -------------------
+echo Update Version Info
+echo -------------------
+echo.
+
+call "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe" -DProj="%ALBaseDir%\Source\Packages\Alcinoe%ALDelphiName%.dproj" -IncVersion -MajorNumber="13" -MinorNumber="0" -CreateBackup="false"
+FOR /F "tokens=* delims=" %%a IN ('cmd /C "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe -DProj=%ALBaseDir%\Source\Packages\Alcinoe%ALDelphiName%.dproj -GetVersionInfo"') DO (SET Alcinoe_VersionInfo=%%a)
+FOR /F "tokens=* delims=" %%a IN ('cmd /C "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe -DProj=%ALBaseDir%\Source\Packages\Alcinoe%ALDelphiName%.dproj -GetVersionName"') DO (SET Alcinoe_VersionName=%%a)
+Echo New Alcinoe version: %Alcinoe_VersionName% 
+echo.
+
 REM -----------------
 REM Build & Run Tests
 REM -----------------
@@ -228,7 +248,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALRunTests=Y
 ) else (
   set ALRunTests=
-  set /P ALRunTests="Run tests (Y/N, default=Y)?:" %=%
+  set /P ALRunTests="Run tests (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -294,7 +314,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALBuildJars=Y
 ) else (
   set ALBuildJars=
-  set /P ALBuildJars="Build Jars (Y/N, default=Y)?:" %=%
+  set /P ALBuildJars="Build Jars (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -328,7 +348,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALBuildTools=Y
 ) else (
   set ALBuildTools=
-  set /P ALBuildTools="Build tools (Y/N, default=Y)?:" %=%
+  set /P ALBuildTools="Build tools (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -374,7 +394,7 @@ if "%ALNoPrompts%"=="Y" (
   set ALBuildDemos=Y
 ) else (
   set ALBuildDemos=
-  set /P ALBuildDemos="Build demos (Y/N, default=Y)?:" %=%
+  set /P ALBuildDemos="Build demos (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -420,6 +440,9 @@ REM -----------------------
 
 :DEPLOY_TO_APP_STORE
 
+REM Temporarily disable DEPLOY_TO_APP_STORE
+GOTO CREATE_COMPILED_ARCHIVES
+
 if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CREATE_COMPILED_ARCHIVES
 
 SET ALTOOL_USERNAME=
@@ -458,7 +481,7 @@ if "%ALNoPrompts%"=="Y" (
   set DEPLOYTOAPPSTORE=Y
 ) else (
   set DEPLOYTOAPPSTORE=
-  set /P DEPLOYTOAPPSTORE="Upload the Binary to the App Store (Y/N, default=Y)?:" %=%
+  set /P DEPLOYTOAPPSTORE="Upload the Binary to the App Store (Y/N, default=Y)?: " %=%
   more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
   echo.
 )
@@ -509,7 +532,7 @@ REM ------------------------
 
 :CREATE_COMPILED_ARCHIVES
 
-if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CLEANUP_TEMP_FILES
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CREATE_GITHUB_RELEASE
 
 echo ------------------------
 echo Create Compiled Archives
@@ -636,6 +659,47 @@ if exist "%FileName%" goto ERROR
 
 echo.
 
+
+REM ---------------------
+REM Create Github Release
+REM ---------------------
+
+if "%Alcinoe_Mac_Connection_Profile_Name%"=="" GOTO CLEANUP_TEMP_FILES
+
+:CREATE_GITHUB_RELEASE
+
+echo --------------
+echo Github Release
+echo --------------
+echo.  
+
+set CREATEGITHUBRELEASE=
+set /P CREATEGITHUBRELEASE="Create a Github Release (Y/N, default=Y)?: " %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
+
+if "%CREATEGITHUBRELEASE%"=="n" (SET CREATEGITHUBRELEASE=N)
+if "%CREATEGITHUBRELEASE%"=="y" (SET CREATEGITHUBRELEASE=Y)
+if "%CREATEGITHUBRELEASE%"=="" (SET CREATEGITHUBRELEASE=Y)
+
+if "%CREATEGITHUBRELEASE%"=="Y" (
+  goto DO_CREATE_GITHUB_RELEASE
+)
+if "%CREATEGITHUBRELEASE%"=="N" (
+  echo.
+  goto CLEANUP_TEMP_FILES
+)
+echo.
+goto CREATE_GITHUB_RELEASE
+
+:DO_CREATE_GITHUB_RELEASE
+
+set ASSETS="%ALBaseDir%\Compiled\Demos-Compiled.zip" "%ALBaseDir%\Compiled\Tools-Compiled.zip"
+
+echo gh release create v%Alcinoe_VersionName%
+gh release create v%Alcinoe_VersionName% %ASSETS% --title "Alcinoe %Alcinoe_VersionName%" --generate-notes 
+IF ERRORLEVEL 1 goto ERROR
+echo.
 goto CLEANUP_TEMP_FILES
 
 
@@ -685,9 +749,6 @@ if exist "%FileName%" EXIT /B 1
 SET FileName=%~1\OSXARM64\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" EXIT /B 1
-
-call "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe" -DProj="%~1\%~2\%~3" -Action=incMajorMinorPatchVersion -MajorNumber=2 -MinorNumber=0 -PatchBase=0 -CreateBackup="false"
-IF ERRORLEVEL 1 EXIT /B 1
 
 Call :BUILD_VCL_DEMO "%~1" "%~2" "%~3"
 IF ERRORLEVEL 1 EXIT /B 1
@@ -746,10 +807,10 @@ REM ----------------------
 
 :BUILD_PROJECT
 
-REM %~1 the base directory
-REM %~2 the source directory relative to the base directory
-REM %~3 the dproj filename without path
-REM %~4 the platform
+REM %~1 The base directory
+REM %~2 The source directory relative to the base directory
+REM %~3 The dproj filename without path
+REM %~4 The platform
 
 SET FileName=%~1\*.rsm
 if exist "%FileName%" del "%FileName%" /s >nul
@@ -783,6 +844,9 @@ SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" EXIT /B 1
 mkdir "%FileName%"
+
+call "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe" -DProj="%~1\%~2\%~3" -SetVersionInfo="%Alcinoe_VersionInfo%" -CreateBackup="false"
+IF ERRORLEVEL 1 EXIT /B 1
 
 REM if "%~4"=="Android64" (
 REM   echo [36mMerge Android Libraries for %~3[0m

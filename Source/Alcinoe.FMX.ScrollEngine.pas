@@ -2784,7 +2784,8 @@ end;
 {***************************************************}
 function TALScrollEngine.GetCurrentVelocity: TPointF;
 begin
-  result := Foverscroller.getCurrVelocity / ALScreenScale;
+  If not FTimerActive then result := TpointF.Zero
+  else result := Foverscroller.getCurrVelocity / ALScreenScale;
 end;
 
 {*************************************************}

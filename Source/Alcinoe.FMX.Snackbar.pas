@@ -31,6 +31,12 @@ type
       // ----------------
       // TOnActionObjProc
       TOnActionObjProc = procedure(Const ASnackbar: TALSnackbar; const AAction: Integer; var ACanClose: Boolean) of object;
+      // ---------------
+      // TOnShownRefProc
+      TOnShownRefProc = reference to procedure(Const ASnackbar: TALSnackbar);
+      // ----------------
+      // TOnClosedRefProc
+      TOnClosedRefProc = reference to procedure(Const ASnackbar: TALSnackbar);
       // --------------
       // TAnimateOption
       TAnimateOption = (AnimateContainer);
@@ -54,6 +60,8 @@ type
         function AddCloseButton(const ATag: NativeInt): TBuilder;
         function SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
+        function SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
+        function SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
         /// <summary>
         ///   Shows the snackbar and schedules its automatic dismissal,
         ///   mirroring Android behavior: pass
@@ -90,7 +98,8 @@ type
     FCloseAnimateOptions: TAnimateOptions;
     FOnActionRefProc: TOnActionRefProc;
     FOnActionObjProc: TOnActionObjProc;
-    FOnClosedRefProc: TProc;
+    FOnShownRefProc: TOnShownRefProc;
+    FOnClosedRefProc: TOnClosedRefProc;
     procedure AutoDismissTimerProcess(Sender: TObject);
     procedure ContainerMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure ContainerMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -101,7 +110,7 @@ type
     destructor Destroy; override;
     procedure BeforeDestruction; override;
     class function Current: TALSnackbar;
-    class procedure CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateContainer]);
+    class procedure CloseCurrent(const AOnClosedCallback: TOnClosedRefProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateContainer]);
     function IsTransitioning: Boolean;
     function HasActionButton: Boolean;
     function HasCloseButton: Boolean;
@@ -116,7 +125,8 @@ type
     property CloseAnimateOptions: TAnimateOptions read FCloseAnimateOptions write FCloseAnimateOptions;
     property OnActionRefProc: TOnActionRefProc read FOnActionRefProc write FOnActionRefProc;
     property OnActionObjProc: TOnActionObjProc read FOnActionObjProc write FOnActionObjProc;
-    property OnClosedRefProc: TProc read FOnClosedRefProc write FOnClosedRefProc;
+    property OnShownRefProc: TOnShownRefProc read FOnShownRefProc write FOnShownRefProc;
+    property OnClosedRefProc: TOnClosedRefProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -271,6 +281,20 @@ begin
   Result := Self;
 end;
 
+{****************************************************************************************}
+function TALSnackbar.TBuilder.SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
+begin
+  FSnackbar.OnShownRefProc := AValue;
+  Result := Self;
+end;
+
+{******************************************************************************************}
+function TALSnackbar.TBuilder.SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
+begin
+  FSnackbar.OnClosedRefProc := AValue;
+  Result := Self;
+end;
+
 {******************************************************************************************************************************}
 procedure TALSnackbar.TBuilder.Show(const ADuration: Integer = DURATION_LENGTH_LONG; const AForceImmediateShow: Boolean = True);
 begin
@@ -316,6 +340,7 @@ begin
   FCloseAnimateOptions := [TAnimateOption.AnimateContainer];
   FOnActionRefProc := nil;
   FOnActionObjProc := nil;
+  FOnShownRefProc := nil;
   FOnClosedRefProc := nil;
   Align := TALAlignLayout.Contents;
   Name := 'ALSnackbarScrim';
@@ -343,13 +368,14 @@ begin
   Result := TALSnackbarManager.Instance.CurrentSnackbar;
 end;
 
-{*********************************************************************************************************************************************************}
-class procedure TALSnackbar.CloseCurrent(const AOnClosedCallback: TProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateContainer]);
+{********************************************************************************************************************************************************************}
+class procedure TALSnackbar.CloseCurrent(const AOnClosedCallback: TOnClosedRefProc = nil; const AAnimateOptions: TAnimateOptions = [TAnimateOption.AnimateContainer]);
 begin
   if not TALSnackbarManager.HasInstance then exit;
   var LCurrentSnackbar := TALSnackbarManager.Instance.CurrentSnackbar;
   if LCurrentSnackbar <> nil then begin
-    LCurrentSnackbar.OnClosedRefProc := AOnClosedCallback;
+    if Assigned(AOnClosedCallback) then
+      LCurrentSnackbar.OnClosedRefProc := AOnClosedCallback;
     LCurrentSnackbar.CloseAnimateOptions := AAnimateOptions;
     TALSnackbarManager.Instance.CloseCurrentSnackbar;
   end;
@@ -592,7 +618,7 @@ begin
   FCurrentSnackbar := nil;
   FContainerAnimation.Enabled := False;
   if assigned(LCurrentSnackbar.FOnClosedRefProc) then
-    LCurrentSnackbar.FOnClosedRefProc();
+    LCurrentSnackbar.FOnClosedRefProc(LCurrentSnackbar);
   ProcessPendingSnackbars;
   if not IsShowingSnackbar then
     UnfreezeNativeViews;
@@ -710,12 +736,16 @@ begin
   FCurrentSnackbar := ASnackbar;
   FCurrentSnackbar.AddFreeNotify(Self);
 
+  if assigned(FCurrentSnackbar.FOnShownRefProc) then
+    FCurrentSnackbar.FOnShownRefProc(FCurrentSnackbar);
+
+  FContainerAnimation.Enabled := False;
+
   // ShowAnimateOptions
   if TALSnackbar.TAnimateOption.AnimateContainer in FCurrentSnackbar.ShowAnimateOptions then begin
 
     FCurrentSnackbar.Container.Scale.Y := 0;
     FCurrentSnackbar.Container.Pivot.Point := TpointF.Create(0,1);
-    FContainerAnimation.Enabled := False;
     FContainerAnimation.InterpolationType := TALInterpolationType.Material3EmphasizedDecelerate;
     FContainerAnimation.Duration := 0.400;
     FContainerAnimation.StartValue := 0;

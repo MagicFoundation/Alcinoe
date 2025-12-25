@@ -247,17 +247,17 @@ type
     public
       constructor Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True); virtual;
       destructor Destroy; override;
-      function  IsGpsEnabled: Boolean; // If your device GPS is on
+      function  IsGpsEnabled: Boolean; virtual; // If your device GPS is on
       procedure  GetPermissionsGranted(
                    out ARestricted: boolean; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
                    out ACoarseGeoLocation: Boolean; // If you have granted the app access to your coarse geolocation
                    out APreciseGeoLocation: boolean; // If you have granted the app access to your precise geolocation
-                   out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time
-      function  IsGeoLocationAccessGranted: Boolean; // If you have granted the app access to your geolocation
-      function  IsPreciseGeoLocationAccessGranted: Boolean; // If you have granted the app access to your precise geolocation
-      function  IsGpsEnabledAndGeoLocationAccessGranted: Boolean; overload; // If your device GPS is on and if your have granted the app access to your geolocation
-      function  IsGpsEnabledAndGeoLocationAccessGranted(out ARestricted: boolean): Boolean; overload; // If your device GPS is on and if your have granted the app access to your geolocation
-      function  IsRestricted: Boolean; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
+                   out AAuthorizedAlways: Boolean); virtual; // This app is authorized to start location services at any time
+      function  IsGeoLocationAccessGranted: Boolean; virtual; // If you have granted the app access to your geolocation
+      function  IsPreciseGeoLocationAccessGranted: Boolean; virtual; // If you have granted the app access to your precise geolocation
+      function  IsGpsEnabledAndGeoLocationAccessGranted: Boolean; overload; virtual; // If your device GPS is on and if your have granted the app access to your geolocation
+      function  IsGpsEnabledAndGeoLocationAccessGranted(out ARestricted: boolean): Boolean; overload; virtual; // If your device GPS is on and if your have granted the app access to your geolocation
+      function  IsRestricted: Boolean; virtual; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
       procedure ActivateGpsAndGrantGeoLocationAccess(
                   const ACoarseGeoLocation: boolean = True;  // when ACoarseGeoLocation = true and APreciseGeoLocation = true
                   const APreciseGeoLocation: boolean = True; // then user can choose either ACoarseGeoLocation or APreciseGeoLocation

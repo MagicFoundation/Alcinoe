@@ -75,18 +75,16 @@ type
     procedure ButtonSendAlertDataNotificationViaHttpV1Click(Sender: TObject);
     procedure ButtonShowNotificationClick(Sender: TObject);
     procedure ButtonDeleteTokenClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
-    { Private declarations }
     FBadge: integer;
-    procedure onGetToken(const AToken: String; const AErrorMessage: String);
-    procedure onDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
-    procedure onTokenRefresh(const aToken: String);
-    procedure OnNotificationReceived(const aPayload: TALStringListW);
-    procedure OnAuthorizationRefused(Sender: TObject);
-    procedure OnAuthorizationGranted(Sender: TObject);
+    procedure NotificationReceivedMessageHandler(const Sender: TObject; const AMessage: TMessage);
+    procedure GetTokenMessageHandler(const Sender: TObject; const AMessage: TMessage);
+    procedure DeleteTokenMessageHandler(const Sender: TObject; const AMessage: TMessage);
+    procedure TokenRefreshMessageHandler(const Sender: TObject; const AMessage: TMessage);
+    procedure NotificationPermissionResultMessageHandler(const Sender: TObject; const AMessage: TMessage);
     procedure ShowLog(const aLog: String);
   public
-    { Public declarations }
   end;
 
 var
@@ -98,43 +96,43 @@ implementation
 
 const
 
-  //The info are taken from an account (wonderful.life.photos@gmail.com) that I
-  //created specifically for this demo. I retrieve it like this:
-  // * go to Firebase console project settings (ALFmxNotificationServiceDemo)
-  //   https://console.firebase.google.com/project/alfmxnotificationservicedemo/settings/general/android:io.magicfoundation.alcinoe.alfmxnotificationservicedemo
-  // * Then click on clound messaging and click on Manage Service Accounts under Firebase Cloud Messaging API (V1)
-  // * Then download the json key associated with the Service accounts for project "ALFmxNotificationServiceDemo"
-  // * find all the info below inside the json key you just downloaded
+  // The info are taken from an account (st...e@magicfoundation.io) that I
+  // created specifically for this demo. I retrieve it like this:
+  //  * go to Firebase console project settings (ALFmxNotificationServiceDemo)
+  //    https://console.firebase.google.com/project/alfmxnotificationservicedemo/settings/general/android:io.magicfoundation.alcinoe.alfmxnotificationservicedemo
+  //  * Then click on clound messaging and click on Manage Service Accounts under Firebase Cloud Messaging API (V1)
+  //  * Then download the json key associated with the Service accounts for project "ALFmxNotificationServiceDemo"
+  //  * find all the info below inside the json key you just downloaded
   FirebaseMessagingHttpV1ProjectID: AnsiString = 'alfmxnotificationservicedemo';
-  FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-nwe4e@alfmxnotificationservicedemo.iam.gserviceaccount.com';
+  FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-fbsvc@alfmxnotificationservicedemo.iam.gserviceaccount.com';
   FirebaseMessagingHttpV1ServiceAccountPrivateKey: AnsiString =
     '-----BEGIN PRIVATE KEY-----'+
-    'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMzhD2+LmYJrxD'+
-    'RtUqQkHPwQRDjRC0AyD5JBJjuvtpgZoBEfYAd8CYuS2ah2dY7jGgzjqrQ7ovyv8H'+
-    'gs1gKLXZXC8VHxKn/VtGqpqBWm65M3CvlFN3/aFCw2PV8YC/dq4NuVr3/bowJbha'+
-    'hL+LUhFzXRqKQAhGajO/wZJQkjaO48F9zNbXuuyRf60Sj6aPjqOJjHJeFHEq9Kij'+
-    'Dam4R/IJVMMeoOXhyX26xPrqRBoPxuJwlSZg6lZBzGCXxXxMUTCHvO5Ki15TeJef'+
-    'Fo4EpXkZrw3VfsLF2+ucbSzByRctjqyU3m7/kOp0hxiZ5wRolSyIwX9N9NIbw4lO'+
-    'FJu5/jeRAgMBAAECggEABnckWZkMhFGqi9ASRTSGQ1fUAnMBxrXAZOi34nIartFw'+
-    'ZeZutX4plFc6Bvakx6rWEMmx47jCuB8qEHIXYg0yl7hnpNP2HHLMu8XS/WIJpSgu'+
-    'BTz0k24PO+zeyibG3qGRaROvRMSNOoYQgADcGPTv7Yw44s+t8zJkjI21GgiX+iVM'+
-    'xW7bvii0sC7v+QSmfKpdmHtjc0QcdGz02dQ2m0uaNyGSYQzqn21D+vS7vbCUpr5X'+
-    'QdQ+TEp4lDsa3Wf2b4avDEVnMFrag1bPO9mjo8M+9NkpMQbA/SvFv78He4DZpljJ'+
-    'Rp6I+cJ6xWyxdNR4PPVV89Dsk34XQS/TytMlSZipKQKBgQDo3iuOAKshh/m8uiwm'+
-    'uT2NuvKuvqbuDgwTgKd7Nr9tKTbJcfHfBaiPRdrgYDu30YOHsxFfL80HUIv15CDe'+
-    'DNeufp8UVEqXl6EzOAgcXm3BWFqOjkgFWpcgQeBevYlJYhdzLUF6WeO6gBpYhr2F'+
-    'mnIxHtsn+y7jRSDyoLBmPF8tEwKBgQDhJkGjBP3B+R+wxcjphoZZgobraFFm+DKk'+
-    '5eJKu9f5O3BJfIk57pFnGzfhrjEKKKe3Ub7i0f1SV7jkCROSxRtUXB8zWi6adQkK'+
-    'fPN3CGCkU//yQz0PUcwX7XPzS/PvMMkvQ690LAgxHTBwEKEHHxF0zZcw6dRUNkA+'+
-    'NCA61+NRSwKBgHqZvcSdhXu54zoBqo0YqdecvXhS2AAtVR5Pdd3hDRejwzx7ySPq'+
-    'DryfwoSvJcG5hM5E8Lh0qjVXqthiqws9J7Cu6YICfuMg6bXVoi+NZ6uLoOG89x4a'+
-    'e8Z36HD4yPbhtgblpLuN59+g4j4Jcm6MyeIipK+AB0eQdbBH+ZdZ4aIRAoGAQbeB'+
-    '5wxY6RpHFrjUSN1cL5o6uVGMmQqO9bSn1Xp4sqWXw8tW3pL02+yE5hmK9NUjBw4U'+
-    'Mm5qi3NRYzYHAYsIzBnLfZiwC6NnjSklgzPtyWk/Rr47f1I3yTAk7PnZbJKH1oTi'+
-    'HH2Rsow7jCo+Zi66UKaFn+BQengPTli2o5ZKInsCgYEAzuEA7iz6mxj4Tl14/EHl'+
-    'lXPOUUZ8a1T+hkiV4IHg5sacRoyIF8LtlQdx4LL8tNiCj0p1Y6vVzmFDDrOdGww2'+
-    'TENN4jneIB6Y2Gzh7KLfiD543aLOd5RJc6hNGbBHJ5jd5E8VxnswUd0L6v0LrG9o'+
-    'RVNesy22JS69CCX39m8T2MU='+
+    'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCx3yog0e8Te7T4'+
+    'cYip3yggOnfsKJCZsEb1mhHoZF/rtCogqFSCRbFNQ/QkpY3GrPf8gB/Ge0rBGiBN'+
+    'hqKof8mPSa3h/CmmfAyVK/wothnnBU99KFcPW06ythe6m0pIYFGhBLmdBrJ1Zy0E'+
+    'hPs8UikFHkylClzilD3tEtPrOvcBXgaTFVPwmHGYGtRVNRF5YdElbHQYH2XocIPo'+
+    'Z2Do83KwzsJ4aXI/E0MYOa1wYgWRJUk3sUEzjtEGv89ARvaoWuQN6qzODabbFXnJ'+
+    'AsaaBvdtnpMurscDRN9OnymCqyyfM5WcXED4C89Y/mlYDJ67zmUuL6KOtCOsd5YF'+
+    '9UhnR39RAgMBAAECggEAULraExVVbkFabNySy47WVnJTFaN/pdGlEzm/YPuVsZQO'+
+    '/s2HtazOASSTfcKKK5872qWIRnyU/DnQaX9u+g0tvVQSkJvzh3WL/HR/OTcVYI4/'+
+    'eq3Bfd3SRThyYqayu1DEG9HaMNPmUXTnsMJuiP09Uu5imRGwAMKJrL074+raSwrP'+
+    'X378Xvk1bLxc/PzLytKBzXRgRdEB7Utz20t5SgAMq1RPsmTKcVMGf8SQu5HwBZmg'+
+    'TBZj7Vn4wB/PDamearB9/bU53N6Nmg8bd1rRlLyzPj3b8s2j05tYAbvmnfO1gR9g'+
+    'gbzVVhS/SsLLno4GlOJnnoq/wvV05iaKTPZJTjkZdQKBgQD1Ds/tC/PBwpuJQH1O'+
+    'yeTJ98bLb7dR3zN41wH2CLUKTQv0aPkgKK6s49M0+8Oio9Mt9IVebg281M3GrLgm'+
+    'NEDvA/Dam/hvRN3j1tK30XkcUiMt9u+af1K13ihFgdaZVHSMm0aqhAHAvuak1Yt6'+
+    'NumGNXL42IsGnYHT9hLef11GEwKBgQC50F3Yco8vNeIUuCX1uarTjpJkKDpLQLIF'+
+    'dW0xVmY7m1vqBEfR5sTpfdAlMfkPLmfxKXMG5SjlW5ZhqHl1/PICNIZD9JPMHL9m'+
+    'c5NBtjp+XUTlv/20Bb9epNpYHVl21yLkDjtr03nVvAcIiE7sML+eJeRcr54nhMmj'+
+    'Jt4H2z4hiwKBgA4PO36uIN4M/D9zo7zReH7d6FnjnvDjjWBxdXtYJIriwLzVCPX/'+
+    'X4YrzAJOL3s1Svhn/v7b8Y3T57puTmJivRb5cugX6rj3ioN3378MFZa6X6pTcIu8'+
+    'olIs3MKgIF/LqKQohHVj/XXBfhoW5lmsrNk2V9JPGirW/ovaolqBlChhAoGBAJV4'+
+    'BWWNkZxabchY8UAe4ElZkGy851eNbSZy9SkQ5R/hsygl1VgFmDRynjKtZjlODRKz'+
+    'UvIi+Ki26dsY2MuOc2ZOtgqH/TPdlCFnqvbbDWaExF1D+WMMlIofdfwXb9Xm7Qwi'+
+    'Xq436PODUu0MKOBZvmoK9Q2Rv1juufxh0YzkUbBNAoGAO/HLbDQDqzaRltO/P6bq'+
+    'aFwqF/1WkMWk3TooCIW28Cbu54CFvm2wQ/Vd3UUoSTebyqW8MNjyvzni+u20wtb5'+
+    'bBcafbSpanrof4a6NdbOdT/Ee7F8Xmm0U4JuKW8XRrl3grP2huKkaOXyuMtuhQ2w'+
+    'Wy+2QvL7BOj5OGCS4mODqRg='+
     '-----END PRIVATE KEY-----';
 
 {*******************************************}
@@ -142,16 +140,25 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   TALErrorReporting.Instance;
   FBadge := 0;
-  TALNotificationService.Instance.OnGetToken := onGetToken;
-  TALNotificationService.Instance.OnDeleteToken := onDeleteToken;
-  TALNotificationService.Instance.OnTokenRefresh := onTokenRefresh;
-  TALNotificationService.Instance.OnNotificationReceived := OnNotificationReceived;
-  TALNotificationService.Instance.OnAuthorizationRefused := OnAuthorizationRefused;
-  TALNotificationService.Instance.OnAuthorizationGranted := OnAuthorizationGranted;
+  TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TNotificationReceivedMessage, NotificationReceivedMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TGetTokenMessage, GetTokenMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TDeleteTokenMessage, DeleteTokenMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TTokenRefreshMessage, TokenRefreshMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TALNotificationService.TNotificationPermissionResultMessage, NotificationPermissionResultMessageHandler);
   TALNotificationService.Instance.CreateNotificationChannel(
     TALNotificationChannel.create('demo'{AID})
       .SetImportance(TALNotificationImportance.High));
   TALNotificationService.Instance.setBadgeCount(0);
+end;
+
+{********************************************}
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TNotificationReceivedMessage, NotificationReceivedMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TGetTokenMessage, GetTokenMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TDeleteTokenMessage, DeleteTokenMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TTokenRefreshMessage, TokenRefreshMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TALNotificationService.TNotificationPermissionResultMessage, NotificationPermissionResultMessageHandler);
 end;
 
 {*****************************************}
@@ -160,49 +167,53 @@ begin
   TALNotificationService.Instance.RequestNotificationPermission;
 end;
 
-{*****************************************************************************}
-procedure TForm1.onGetToken(const AToken: String; const AErrorMessage: String);
+{***************************************************************************************}
+procedure TForm1.GetTokenMessageHandler(const Sender: TObject; const AMessage: TMessage);
 begin
-  ALLog('onGetToken', 'Token: ' + aToken + ' | ErrorMessage: ' + AErrorMessage);
-  if AToken = '' then ShowLog('onGetToken: ' + aErrorMessage)
-  else ShowLog('onGetToken: Success');
+  var LGetTokenMessage := TALNotificationService.TGetTokenMessage(AMessage);
+  ALLog('GetToken', 'Token: ' + LGetTokenMessage.Token + ' | ErrorMessage: ' + LGetTokenMessage.ErrorMessage);
+  if LGetTokenMessage.Token = '' then ShowLog('GetToken: ' + LGetTokenMessage.ErrorMessage)
+  else ShowLog('GetToken: Success');
 end;
 
-{****************************************************************************************}
-procedure TForm1.onDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
+{******************************************************************************************}
+procedure TForm1.DeleteTokenMessageHandler(const Sender: TObject; const AMessage: TMessage);
 begin
-  ALLog('onDeleteToken', 'IsSuccessful: ' + ALBoolToStrW(AIsSuccessful) + ' | ErrorMessage: ' + AErrorMessage);
-  if not AIsSuccessful then ShowLog('onGetToken: ' + aErrorMessage)
-  else ShowLog('onDeleteToken: Success');
+  var LDeleteTokenMessage := TALNotificationService.TDeleteTokenMessage(AMessage);
+  ALLog('DeleteToken', 'IsSuccessful: ' + ALBoolToStrW(LDeleteTokenMessage.IsSuccessful) + ' | ErrorMessage: ' + LDeleteTokenMessage.ErrorMessage);
+  if not LDeleteTokenMessage.IsSuccessful then ShowLog('DeleteToken: ' + LDeleteTokenMessage.ErrorMessage)
+  else ShowLog('DeleteToken: Success');
 end;
 
-{****************************************************}
-procedure TForm1.onTokenRefresh(const aToken: String);
+{*******************************************************************************************}
+procedure TForm1.TokenRefreshMessageHandler(const Sender: TObject; const AMessage: TMessage);
 begin
-  ALLog('onTokenRefresh', 'Token: ' + aToken);
-  EditToken.text := aToken;
-  ShowLog('onTokenRefresh: ' + aToken);
+  var LTokenRefreshMessage := TALNotificationService.TTokenRefreshMessage(AMessage);
+  ALLog('TokenRefresh', 'Token: ' + LTokenRefreshMessage.Token);
+  EditToken.text := LTokenRefreshMessage.Token;
+  ShowLog('TokenRefresh: ' + LTokenRefreshMessage.Token);
 end;
 
-{**********************************************************************}
-procedure TForm1.OnNotificationReceived(const aPayload: TALStringListW);
+{***************************************************************************************************}
+procedure TForm1.NotificationReceivedMessageHandler(const Sender: TObject; const AMessage: TMessage);
 begin
-  ALLog('OnNotificationReceived', aPayload.Text);
-  ShowLog('OnNotificationReceived'#13#10+aPayload.Text);
+  var LNotificationReceivedMessage := TALNotificationService.TNotificationReceivedMessage(AMessage);
+  ALLog('NotificationReceived', LNotificationReceivedMessage.Payload.Text);
+  ShowLog('NotificationReceived'#13#10+LNotificationReceivedMessage.Payload.Text);
 end;
 
-{*******************************************************}
-procedure TForm1.OnAuthorizationRefused(Sender: TObject);
+{***********************************************************************************************************}
+procedure TForm1.NotificationPermissionResultMessageHandler(const Sender: TObject; const AMessage: TMessage);
 begin
-  ALLog('OnAuthorizationRefused');
-  ShowLog('OnAuthorizationRefused');
-end;
-
-{*******************************************************}
-procedure TForm1.OnAuthorizationGranted(Sender: TObject);
-begin
-  ALLog('OnAuthorizationGranted');
-  ShowLog('OnAuthorizationGranted');
+  var LNotificationPermissionResultMessage := TALNotificationService.TNotificationPermissionResultMessage(AMessage);
+  if not LNotificationPermissionResultMessage.Granted then begin
+    ALLog('AuthorizationRefused');
+    ShowLog('AuthorizationRefused');
+  end
+  else begin
+    ALLog('AuthorizationGranted');
+    ShowLog('AuthorizationGranted');
+  end;
 end;
 
 {*******************************************}
@@ -227,7 +238,7 @@ begin
                        '"message":{'+
                          '"token":"'+EditToken.Text+'",'+
                          '"data":{'+
-                           '"one_sample_key": "one_sample_value"'+
+                           '"sample_key": "sample_value"'+
                          '}'+
                        '}'+
                      '}',
@@ -348,7 +359,7 @@ begin
                            '}'+
                          '},'+
                          '"data":{'+
-                           '"one_sample_key": "one_sample_value"'+
+                           '"sample_key": "sample_value"'+
                          '}'+
                        '}'+
                      '}',
@@ -388,7 +399,7 @@ begin
       .setTicker('Sample ticker')
       .SetLargeIconUrl('https://i.stack.imgur.com/EwPfY.jpg?s=64&g=1')
       .setSmallIconResName('notification_icon')
-      .AddPayload('one_sample_key'{aName}, 'one_sample_value'{aValue})
+      .AddPayload('sample_key'{aName}, 'sample_value'{aValue})
       .AddPayload('another_sample_key'{aName}, 'another_sample_value'{aValue}));
 end;
 
@@ -405,15 +416,6 @@ begin
 end;
 
 initialization
-
-  {$IF defined(IOS)}
-  {$IFDEF DEBUG}
-  //https://stackoverflow.com/questions/74777909/nslog-dont-write-all-desired-lines-when-the-app-is-starting
-  //when I click on a notification when the app is not running, then i miss a lot of log in the console.app.
-  //I do not know why but adding a sleep of 2s here seam to correct this problem
-  sleep(2000);
-  {$ENDIF}
-  {$ENDIF}
 
   {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;

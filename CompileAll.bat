@@ -672,6 +672,8 @@ echo --------------
 echo Github Release
 echo --------------
 echo.  
+echo IMPORTANT: Please make sure ALL your changes are committed (and pushed) BEFORE creating a release.
+echo.
 
 set CREATEGITHUBRELEASE=
 set /P CREATEGITHUBRELEASE="Create a Github Release (Y/N, default=Y)?: " %=%

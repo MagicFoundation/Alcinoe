@@ -267,7 +267,22 @@ begin
           if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
           Tfile.move(LDProjFilename, LDProjFilename+ '.bak');
         end;
-        AlSaveStringToFile(LSrcStr, LDProjFilename);
+        // Workaround: AlSaveStringToFile occasionally fails with:
+        //   EFCreateError: Cannot create file "MyProject.dproj".
+        //   The process cannot access the file because it is being used by another process.
+        // Pause briefly to give the lock time to clear (e.g., Git or another background tool
+        // may still be touching the file).
+        For var i := 1 to 100 do begin
+          try
+            AlSaveStringToFile(LSrcStr, LDProjFilename);
+          Except
+            on E: Exception do begin
+              if i >= 100 then Raise;
+              Sleep(100);
+            end;
+          end;
+          Break;
+        end;
       end
 
       // -IncVersion
@@ -301,7 +316,22 @@ begin
           if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
           Tfile.move(LDProjFilename, LDProjFilename+ '.bak');
         end;
-        AlSaveStringToFile(LSrcStr, LDProjFilename);
+        // Workaround: AlSaveStringToFile occasionally fails with:
+        //   EFCreateError: Cannot create file "MyProject.dproj".
+        //   The process cannot access the file because it is being used by another process.
+        // Pause briefly to give the lock time to clear (e.g., Git or another background tool
+        // may still be touching the file).
+        For var i := 1 to 100 do begin
+          try
+            AlSaveStringToFile(LSrcStr, LDProjFilename);
+          Except
+            on E: Exception do begin
+              if i >= 100 then Raise;
+              Sleep(100);
+            end;
+          end;
+          Break;
+        end;
       end
 
       // Error

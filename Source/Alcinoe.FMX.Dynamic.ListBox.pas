@@ -885,6 +885,24 @@ type
     property OnCreateItemErrorContent: TItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
     property OnDownloadItemData: TItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
     //--
+    /// <summary>
+    ///   This event is executed without holding <c>AContext.FLock</c>.
+    ///   If the handler needs to access <c>AContext.FOwner</c> (or any data
+    ///   protected by this lock), it must explicitly call
+    ///   <c>ALMonitorEnter(AContext.FLock)</c> before accessing it, and
+    ///   <c>ALMonitorExit(AContext.FLock)</c> afterward.
+    ///
+    ///   Example:
+    ///   <code>
+    ///     ALMonitorEnter(AContext.FLock);
+    ///     try
+    ///       if AContext.FOwner = nil then Exit(nil);
+    ///       // Safe access to AContext.FOwner
+    ///     finally
+    ///       ALMonitorExit(AContext.FLock);
+    ///     end;
+    ///   </code>
+    /// </summary>
     property OnDownloadItems: TView.TDownloadItemsEvent read FOnDownloadItems write FOnDownloadItems; // [MultiThread]
     property OnRealignItems: TView.TMainContent.TRealignEvent read FOnRealignItems write FOnRealignItems;
     property OnViewportPositionChange: TView.TViewportPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;

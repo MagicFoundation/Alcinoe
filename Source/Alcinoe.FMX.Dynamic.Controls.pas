@@ -3503,6 +3503,7 @@ begin
               LSize.Width := Max(LSize.Width, LChildControl.Left + LChildControl.width + LChildControl.Margins.right + padding.right)
             else
               LSize.Width := Max(LSize.Width, Width);
+            LSize.height := Max(LSize.height, LChildControl.Margins.top + padding.top + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom);
           End;
 
           //--
@@ -3512,6 +3513,7 @@ begin
               LSize.height := Max(LSize.height, LChildControl.Top + LChildControl.Height + LChildControl.Margins.bottom + padding.bottom)
             else
               LSize.height := Max(LSize.Height, Height);
+            LSize.Width := Max(LSize.Width, LChildControl.Margins.left + padding.left + LChildControl.width + LChildControl.Margins.right + padding.right);
           End;
 
           //--

@@ -30,7 +30,7 @@ type
     function TryGetEntry(const AIndex, ASubIndex: Integer; out ADrawable: TALDrawable): Boolean; overload;
     function TryGetEntry(const AIndex, ASubIndex: Integer; out ARect: TRectF): Boolean; overload;
     function TrySetEntry(const AIndex, ASubIndex: Integer; Const ADrawable: TALDrawable; const ARect: TRectF): Boolean;
-    procedure CLearEntries;
+    procedure ClearEntries;
     function IncreaseRefCount: TALBufDrawableCacheEngine; reintroduce; virtual;
   end;
 
@@ -56,7 +56,7 @@ end;
 {*******************************************}
 destructor TALBufDrawableCacheEngine.Destroy;
 begin
-  CLearEntries;
+  ClearEntries;
   inherited;
 end;
 
@@ -147,7 +147,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALBufDrawableCacheEngine.CLearEntries;
+procedure TALBufDrawableCacheEngine.ClearEntries;
 begin
   FLock.BeginWrite;
   try

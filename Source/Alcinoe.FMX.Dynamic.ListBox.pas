@@ -113,18 +113,6 @@ type
           // TErrorContent
           TErrorContent = class(TContent);
       public
-        type
-          TDownloadDataContext = class;
-          TDownloadDataEvent = procedure(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: String) of object;
-          TDownloadDataContext = Class(TALWorkerContext)
-          private
-            FOnDownloadData: TDownloadDataEvent;
-            function GetOwner: TItem;
-          public
-            constructor Create(const AOwner: TItem); reintroduce; virtual;
-            Property Owner: TItem read GetOwner;
-          end;
-      public
         const
           MainContentType = 1; {core content}
           LoadingContentType = 2; {core content}
@@ -159,12 +147,7 @@ type
           end;
       private
         FCacheEngine: TALBufDrawableCacheEngine;
-        //--
         FData: TALJSONNodeW; // 8 bytes
-        FDownloadDataContext: TDownloadDataContext; // 8 bytes
-        FDownloadDataErrorCode: String; // 8 bytes
-        FOnDownloadData: TDownloadDataEvent; // 16 bytes
-        //--
         FContentBuilderContext: TContentBuilderContext; // 8 bytes
         FMainContent: TContent; // 8 bytes
         FLoadingContent: TContent; // 8 bytes
@@ -175,23 +158,9 @@ type
         FOnShowLoadingContent: TNotifyEvent; // 16 bytes
         FOnShowMainContent: TNotifyEvent; // 16 bytes
         FOnShowErrorContent: TNotifyEvent; // 16 bytes
-        //--
         function GetCacheEngine: TALBufDrawableCacheEngine;
         Function _GetHost: TALDynamicListBox;
       protected
-        function DownloadData(const AForceReload: Boolean = False): boolean; virtual;
-        function CreateDownloadDataContext: TDownloadDataContext; virtual;
-        class procedure DownloadDataBackgroundProc(var AContext: Tobject); virtual; // [MultiThread]
-        class procedure DownloadDataBackgroundProcFetchData(const AContext: TDownloadDataContext; out AData: TALJSONNodeW; var AErrorCode: String); virtual; // [MultiThread]
-        class procedure DownloadDataBackgroundProcInitData(const AContext: TDownloadDataContext; const AErrorCode: String; const AData: TALJSONNodeW); virtual; // [MultiThread]
-        class function DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; virtual; // [MultiThread]
-        procedure DownloadDataProcessData(const AContext: TDownloadDataContext; const AErrorCode: String; var AData: TALJSONNodeW); virtual;
-        procedure DownloadDataFinished(const AContext: TDownloadDataContext); virtual;
-        function CanDownloadData: Boolean; virtual;
-        function IsDownloadDataRunning: Boolean;
-        Function HasDataBeenDownloaded: Boolean;
-        procedure CancelDownloadData;
-        //--
         function CanCreateContent(const AContentType: Integer): Boolean; virtual;
         function CreateContentBuilderContext(const AContentType: Integer): TContentBuilderContext; virtual;
         class function CreateContent(const AContentType: Integer; const AContext: TContentBuilderContext): TContent; virtual;
@@ -235,7 +204,6 @@ type
         property MainContent: TContent read FMainContent;
         property LoadingContent: TContent read FLoadingContent;
         property ErrorContent: TContent read FErrorContent;
-        property OnDownloadData: TDownloadDataEvent read FOnDownloadData write FOnDownloadData; // [MultiThread]
         property OnCreateMainContent: TCreateMainContentEvent read FOnCreateMainContent write FOnCreateMainContent; // [MultiThread]
         property OnCreateLoadingContent: TCreateLoadingContentEvent read FOnCreateLoadingContent write FOnCreateLoadingContent; // [MultiThread]
         property OnCreateErrorContent: TCreateErrorContentEvent read FOnCreateErrorContent write FOnCreateErrorContent; // [MultiThread]
@@ -433,7 +401,6 @@ type
             FOnCreateItemMainContent: TCreateMainContentEvent;
             FOnCreateItemLoadingContent: TCreateLoadingContentEvent;
             FOnCreateItemErrorContent: TCreateErrorContentEvent;
-            FOnDownloadItemData: TDownloadDataEvent;
             function GetOwner: TView;
           public
             MaxItems: integer;
@@ -488,7 +455,6 @@ type
             function GetCreateContentMethod(const AContentType: Integer): TMethod; override;
           public
             DownloadItemsErrorCode: String;
-            DownloadDataErrorCode: String;
             constructor Create(const AOwner: TView; const AContentType: Integer); reintroduce; virtual;
             destructor Destroy; override;
           end;
@@ -558,7 +524,6 @@ type
         FOnCreateItemMainContent: TItem.TCreateMainContentEvent; // 16 bytes
         FOnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent; // 16 bytes
         FOnCreateItemErrorContent: TItem.TCreateErrorContentEvent; // 16 bytes
-        FOnDownloadItemData: TItem.TDownloadDataEvent; // 16 bytes
         FOnCreateNoItemsContent: TCreateNoItemsContentEvent; // 16 bytes
         FOnCreateBackgroundContent: TCreateBackgroundContentEvent; // 16 bytes
         FOnCreateForegroundContent: TCreateForegroundContentEvent; // 16 bytes
@@ -735,7 +700,6 @@ type
         property OnCreateItemMainContent: TItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
         property OnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent read FOnCreateItemLoadingContent write FOnCreateItemLoadingContent; // [MultiThread]
         property OnCreateItemErrorContent: TItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
-        property OnDownloadItemData: TItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
         property OnCreateMainContent: TCreateMainContentEvent read GetOnCreateMainContent write SetOnCreateMainContent; // [MultiThread]
         property OnCreateLoadingContent: TCreateLoadingContentEvent read GetOnCreateLoadingContent write SetOnCreateLoadingContent; // [MultiThread]
         property OnCreateErrorContent: TCreateErrorContentEvent read GetOnCreateErrorContent write SetOnCreateErrorContent; // [MultiThread]
@@ -767,7 +731,6 @@ type
     FDisableMouseWheel: Boolean;
     FHasBeenPrepared: Boolean;
     FOnDownloadItems: TView.TDownloadItemsEvent; // [MultiThread]
-    FOnDownloadItemData: TItem.TDownloadDataEvent; // [MultiThread]
     FOnCreateMainView: TCreateMainViewEvent; // [MultiThread]
     FOnCreateLoadingContent: TView.TCreateLoadingContentEvent; // [MultiThread]
     FOnCreateErrorContent: TView.TCreateErrorContentEvent; // [MultiThread]
@@ -803,6 +766,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure InitMainView(const AView: TView);
+    procedure ApplyColorScheme; override;
     procedure RecalcOpacity; override;
     function GetControlAtPos(
                const APos: TALPointD; // APos is local to the control
@@ -883,7 +847,6 @@ type
     property OnCreateItemMainContent: TItem.TCreateMainContentEvent read FOnCreateItemMainContent write FOnCreateItemMainContent; // [MultiThread]
     property OnCreateItemLoadingContent: TItem.TCreateLoadingContentEvent read FOnCreateItemLoadingContent write FOnCreateItemLoadingContent;
     property OnCreateItemErrorContent: TItem.TCreateErrorContentEvent read FOnCreateItemErrorContent write FOnCreateItemErrorContent; // [MultiThread]
-    property OnDownloadItemData: TItem.TDownloadDataEvent read FOnDownloadItemData write FOnDownloadItemData; // [MultiThread]
     //--
     /// <summary>
     ///   This event is executed without holding <c>AContext.FLock</c>.
@@ -1243,19 +1206,6 @@ begin
   else result := Owner.IsReadyToDisplay(False{AStrict});
 end;
 
-{***********************************************************************************}
-constructor TALDynamicListBox.TItem.TDownloadDataContext.Create(const AOwner: TItem);
-begin
-  inherited Create(AOwner);
-  FOnDownloadData := AOwner.OnDownloadData;
-end;
-
-{********************************************************************}
-function TALDynamicListBox.TItem.TDownloadDataContext.GetOwner: TItem;
-begin
-  Result := TItem(FOwner);
-end;
-
 {******************************************************************************************************************}
 constructor TALDynamicListBox.TItem.TContentBuilderContext.Create(const AOwner: TItem; const AContentType: Integer);
 begin
@@ -1335,12 +1285,7 @@ begin
   AutoSize := TALAutoSizeMode.Both;
   Align := TALAlignLayout.None;
   //IsEphemeral := False;
-  //--
   FData := nil;
-  FDownloadDataContext := nil;
-  FDownloadDataErrorCode := '';
-  FOnDownloadData := nil;
-  //--
   FContentBuilderContext := nil;
   FMainContent := nil;
   FLoadingContent := nil;
@@ -1364,7 +1309,6 @@ end;
 procedure TALDynamicListBox.TItem.BeforeDestruction;
 begin
   if BeforeDestructionExecuted then exit;
-  CancelDownloadData;
   CancelPreloadContent;
   inherited;
 end;
@@ -1397,11 +1341,7 @@ end;
 function TALDynamicListBox.TItem.IsReadyToDisplay(const AStrict: Boolean = False): Boolean;
 begin
   Result := (FMainContent <> nil) or (FErrorContent <> nil);
-  If not result then begin
-    if (FDownloadDataErrorCode <> '') then
-      FetchContent;
-    exit;
-  end;
+  If not result then exit;
   Result := Inherited;
 end;
 
@@ -1462,8 +1402,6 @@ begin
   {$IFDEF DEBUG}
   ALLog(ClassName+'.Prepare', 'Index: ' + ALintToStrW(Index));
   {$ENDIF}
-  // FetchContent will invoke DownloadData, and its execution
-  // may potentially be deferred until DownloadData is completed.
   FetchContent;
 end;
 
@@ -1473,7 +1411,6 @@ begin
   {$IFDEF DEBUG}
   ALLog(ClassName+'.Unprepare', 'Index: ' + ALintToStrW(Index));
   {$ENDIF}
-  CancelDownloadData;
   CancelPreloadContent;
   for Var I := FControlsCount - 1 downto 0 do
     If Fcontrols[i].IsEphemeral then begin
@@ -1557,248 +1494,6 @@ begin
   Finally
     EndUpdate;
   End;
-end;
-
-{******************************************************************************************}
-function TALDynamicListBox.TItem.DownloadData(const AForceReload: Boolean = False): boolean;
-begin
-
-  // Exit if the last download resulted in an error, unless AForceReload is True
-  // (e.g., when triggered by a "Reload" button click)
-  if (not AForceReload) and
-     (FDownloadDataErrorCode <> '') then exit(False);
-
-  // Exit if no data is needed
-  if not CanDownloadData then exit(false);
-
-  // Exit if a thread is already performing the task
-  if IsDownloadDataRunning then exit(true);
-
-  // Before starting the background thread
-  {$IFDEF DEBUG}
-  ALLog(ClassName+'.DownloadData', 'ForceReload: ' + ALBoolToStrW(AForceReload));
-  {$ENDIF}
-  FDownloadDataErrorCode := '';
-
-  // Load the data in a separate thread to avoid blocking the calling thread
-  FDownloadDataContext := CreateDownloadDataContext;
-  Try
-    TALNetHttpClientPool.Instance.ExecuteProc(
-      DownloadDataBackgroundProc, // const AProc: TALWorkerThreadObjProc;
-      FDownloadDataContext, // const AContext: Tobject; // Context will be free by the worker thread
-      GetDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
-  except
-    ALFreeAndNil(FDownloadDataContext);
-    Raise;
-  End;
-
-  // Return True
-  result := true;
-
-end;
-
-{*******************************************************************************}
-function TALDynamicListBox.TItem.CreateDownloadDataContext: TDownloadDataContext;
-begin
-  Result := TDownloadDataContext.Create(Self);
-end;
-
-{****************************************************************************************}
-class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProc(var AContext: Tobject);
-begin
-  var LContext := TDownloadDataContext(AContext);
-  if LContext.FOwner = nil then exit;
-  try
-
-    var LFreeData := True;
-    var LData: TALJSONNodeW := nil;
-    Try
-
-      var LDownloadDataErrorCode: String := '';
-      DownloadDataBackgroundProcFetchData(LContext, LData, LDownloadDataErrorCode);
-
-      if LContext.FOwner = nil then exit;
-      DownloadDataBackgroundProcInitData(LContext, LDownloadDataErrorCode, LData);
-
-      while not DownloadDataBackgroundProcCanProcessData(LContext) do begin
-        if LContext.FOwner = nil then exit;
-        sleep(250);
-      end;
-
-      if LContext.FOwner = nil then exit;
-      TThread.queue(nil,
-        procedure
-        begin
-          Try
-            if LContext.FOwner <> nil then begin
-              var LOwner := LContext.Owner;
-              LOwner.DownloadDataProcessData(LContext, LDownloadDataErrorCode, LData);
-              LOwner.FDownloadDataContext := nil;
-              LOwner.DownloadDataFinished(LContext);
-            end;
-          finally
-            ALFreeAndNil(LContext);
-            ALfreeAndNil(LData);
-          End;
-        end);
-      AContext := nil; // AContext will be free by TThread.queue
-      LFreeData := False; // LData will be free by TThread.queue
-
-    finally
-      if LFreeData then
-        ALfreeAndNil(LData);
-    end;
-
-  Except
-    On E: Exception do begin
-      ALLog('TALDynamicListBox.TItem.DownloadDataBackgroundProc', E);
-      ALMonitorEnter(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProc'{$ENDIF});
-      try
-        if LContext.FOwner <> nil then begin
-          LContext.FManagedByWorkerThread := False;
-          AContext := nil; // AContext will be free by CancelResourceDownload
-        end;
-      finally
-        ALMonitorExit(LContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProc'{$ENDIF});
-      end;
-    end;
-  end;
-end;
-
-{**************}
-// [MultiThread]
-class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProcFetchData(
-                  const AContext: TDownloadDataContext;
-                  out AData: TALJSONNodeW;
-                  var AErrorCode: String);
-begin
-
-  // We cannot call ALMonitorEnter(AContext.FLock) here because
-  // AContext.FOnDownloadData performs a long HTTP request.
-  // In the meantime, CancelDownloadData might be called, and it
-  // also needs to acquire the same lock to set AContext.FOwner to nil.
-  // Therefore, it's the responsibility of FOnDownloadData to call
-  // ALMonitorEnter(AContext.FLock) if it needs to access AContext.FOwner.
-
-  if AContext.FOwner = nil then exit;
-  if not assigned(AContext.FOnDownloadData) then
-    Raise Exception.Create('Error DF2328CA-BCF7-46D6-B100-AFD222FF8873');
-  //var LMethod: TMethod;
-  //LMethod.Code := TMethod(AContext.FOnDownloadData).Code;
-  // Set Self to nil to prevent accidental access to instance members,
-  // as we are in a multithreaded context where most members are not thread-safe.
-  // Self can still be accessed via AContext.Owner, but this should be done with caution.
-  //LMethod.Data := nil;
-  //TDownloadDataEvent(LMethod)(
-  //  AContext, // const AContext: TDownloadDataContext;
-  //  AData, // Const AData: TALJSONNodeW;
-  //  AErrorCode); // var AErrorCode: String
-  AContext.FOnDownloadData(
-    AContext, // const AContext: TDownloadDataContext;
-    AData, // Const AData: TALJSONNodeW;
-    AErrorCode); // var AErrorCode: String
-
-end;
-
-{**************}
-// [MultiThread]
-class procedure TALDynamicListBox.TItem.DownloadDataBackgroundProcInitData(
-                  const AContext: TDownloadDataContext;
-                  const AErrorCode: String;
-                  const AData: TALJSONNodeW);
-begin
-  if (AErrorCode = '') and (AData <> nil) then begin
-    AData.ChildNodes.SetSorted(true{Value},true{recurse});
-    AData.MultiThreadPrepare(true{aOnlyChildList});
-  end;
-end;
-
-{**************}
-// [MultiThread]
-class function TALDynamicListBox.TItem.DownloadDataBackgroundProcCanProcessData(const AContext: TDownloadDataContext): boolean; // [MultiThread]
-begin
-  if TThread.Current.ThreadID = MainThreadID then exit(true);
-  ALMonitorEnter(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProcCanProcessData'{$ENDIF});
-  try
-    // Primarily because we want to prevent the list
-    // from being updated during the bottom-bound animation.
-    var LOwner := AContext.Owner;
-    result := (LOwner = nil) or
-              (LOwner.Host = nil) or
-              (not LOwner.Host.HasActiveScrollEngines);
-  finally
-    ALMonitorExit(AContext.FLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.DownloadDataBackgroundProcCanProcessData'{$ENDIF});
-  end;
-end;
-
-{********************************************************}
-procedure TALDynamicListBox.TItem.DownloadDataProcessData(
-            const AContext: TDownloadDataContext;
-            const AErrorCode: String;
-            var AData: TALJSONNodeW);
-begin
-  FDownloadDataErrorCode := AErrorCode;
-  if FDownloadDataErrorCode = '' then begin
-    ALfreeAndNil(FData);
-    Fdata := AData;
-    AData := nil;
-    FOnDownloadData := Nil;
-  end
-  else ALfreeAndNil(AData);
-end;
-
-{*******************************************************************************************}
-procedure TALDynamicListBox.TItem.DownloadDataFinished(const AContext: TDownloadDataContext);
-begin
-  if FDownloadDataErrorCode <> '' then begin
-    if Host <> nil then
-      Host.ShowErrorMessageBanner(FDownloadDataErrorCode)
-  end
-  else
-    FetchContent;
-end;
-
-{********************************************************}
-function TALDynamicListBox.TItem.CanDownloadData: Boolean;
-begin
-  // Once the data has been downloaded,
-  // FOnDownloadData will be set to nil
-  Result := assigned(FOnDownloadData);
-end;
-
-{**************************************************************}
-function TALDynamicListBox.TItem.IsDownloadDataRunning: Boolean;
-begin
-  result := FDownloadDataContext <> nil;
-end;
-
-{**************************************************************}
-function TALDynamicListBox.TItem.HasDataBeenDownloaded: Boolean;
-begin
-  result := (not CanDownloadData) or
-            (FDownloadDataErrorCode <> '');
-end;
-
-{***************************************************}
-procedure TALDynamicListBox.TItem.CancelDownloadData;
-begin
-  // The FDownloadDataContext pointer can only be
-  // updated in the main thread, so there is no need
-  // to lock its access for reading or updating.
-  if FDownloadDataContext <> nil then begin
-    var LContextToFree: TDownloadDataContext;
-    var LLock := FDownloadDataContext.FLock;
-    ALMonitorEnter(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelDownloadData'{$ENDIF});
-    try
-      if not FDownloadDataContext.FManagedByWorkerThread then LContextToFree := FDownloadDataContext
-      else LContextToFree := nil;
-      FDownloadDataContext.FOwner := nil;
-      FDownloadDataContext := nil;
-    Finally
-      ALMonitorExit(LLock{$IF defined(DEBUG)}, 'TALDynamicListBox.TItem.CancelDownloadData'{$ENDIF});
-    End;
-    ALFreeAndNil(LContextToFree);
-  end;
 end;
 
 {**************************************************************************************}
@@ -2053,23 +1748,9 @@ begin
   // If the item is not visible, do nothing
   if not Visible then exit;
 
-  // If data must be downloaded first, fetch loading content
-  if DownloadData then begin
-    if not APreload then
-      TryCreateAndActivateContent(LoadingContentType);
-  end
-
-  // fetch error Content
-  else if FDownloadDataErrorCode <> '' then begin
-    if APreload then TryPreloadContent(ErrorContentType)
-    else TryCreateAndActivateContent(ErrorContentType);
-  end
-
   // fetch main content
-  else begin
-    if APreload then TryPreloadContent(MainContentType)
-    else TryCreateAndActivateContent(MainContentType);
-  end;
+  if APreload then TryPreloadContent(MainContentType)
+  else TryCreateAndActivateContent(MainContentType);
 
 end;
 
@@ -2650,7 +2331,6 @@ begin
   FOnCreateItemMainContent := AOwner.OnCreateItemMainContent;
   FOnCreateItemLoadingContent := AOwner.OnCreateItemLoadingContent;
   FOnCreateItemErrorContent := AOwner.OnCreateItemErrorContent;
-  FOnDownloadItemData := AOwner.OnDownloadItemData;
 end;
 
 {*********************************************************************}
@@ -2665,7 +2345,6 @@ begin
   inherited create(AOwner, AContentType);
   //-
   DownloadItemsErrorCode := AOwner.FDownloadItemsErrorCode;
-  DownloadDataErrorCode := AOwner.FDownloadDataErrorCode;
   //-
   OwnerIsMainView := AOwner.IsMainView;
   if (OwnerIsMainView) and (AContentType = MainContentType) and (AOwner.Host <> nil) then Padding := AOwner.Host.Padding.Rect
@@ -2844,7 +2523,6 @@ begin
   FOnCreateItemMainContent := nil;
   FOnCreateItemLoadingContent := nil;
   FOnCreateItemErrorContent := nil;
-  FOnDownloadItemData := nil;
   FOnCreateNoItemsContent := nil;
   FOnCreateBackgroundContent := nil;
   FOnCreateForegroundContent := nil;
@@ -2894,8 +2572,7 @@ function TALDynamicListBox.TView.IsReadyToDisplay(const AStrict: Boolean = False
 begin
   Result := (FMainContent <> nil) or (FErrorContent <> nil) or (FNoItemsContent <> nil);
   If not result then begin
-    if (FDownloadDataErrorCode <> '') or (FDownloadItemsErrorCode <> '') then
-      FetchContent;
+    if FDownloadItemsErrorCode <> '' then FetchContent;
     exit;
   end;
   For var I := FirstVisibleItemIndex to LastVisibleItemIndex do begin
@@ -4918,7 +4595,6 @@ begin
         LItem.OnCreateMainContent := AContext.FOnCreateItemMainContent;
         LItem.OnCreateLoadingContent := AContext.FOnCreateItemLoadingContent;
         LItem.OnCreateErrorContent := AContext.FOnCreateItemErrorContent;
-        LItem.OnDownloadData := AContext.FOnDownloadItemData;
       end;
       if LItem.FData = nil then LItem.FData := LData
       else ALFreeAndNil(LData);
@@ -5273,22 +4949,16 @@ begin
   // If the item is not visible, do nothing
   if not Visible then exit;
 
-  // If data must be downloaded first, fetch loading content
-  if DownloadData then begin
-    if APreload then TryPreloadContent(0{preload surrounding content})
-    else TryCreateAndActivateContent(LoadingContentType);
-  end
-
   // If the items have never been downloaded, download them
   // first and fetch the loading content
-  else if (FMainContent = nil) and (DownloadItems) then begin
+  If (FMainContent = nil) and (DownloadItems) then begin
     if APreload then TryPreloadContent(0{preload surrounding content})
     else TryCreateAndActivateContent(LoadingContentType);
   end
 
   // If the items were never successfully downloaded and an
   // error occurred during the last download, fetch the error content
-  else if (FMainContent = nil) and ((FDownloadDataErrorCode <> '') or (FDownloadItemsErrorCode <> '')) then begin
+  else if (FMainContent = nil) and (FDownloadItemsErrorCode <> '') then begin
     if APreload then TryPreloadContent(ErrorContentType)
     else TryCreateAndActivateContent(ErrorContentType);
   end
@@ -5322,7 +4992,6 @@ begin
   FDisableMouseWheel := False;
   FHasBeenPrepared := False;
   FOnDownloadItems := nil;
-  FOnDownloadItemData := nil;
   FOnCreateMainView := nil;
   FOnCreateLoadingContent := nil;
   FOnCreateErrorContent := nil;
@@ -5355,6 +5024,20 @@ begin
   inherited Destroy;
 end;
 
+{*******************************************}
+procedure TALDynamicListBox.ApplyColorScheme;
+begin
+  inherited;
+  CacheEngine.ClearEntries;
+  if MainView <> nil then begin
+    FMainView.SetHost(nil);
+    FMainView.ParentChanged;
+    ALFreeAndNil(FMainView,true{ADelayed});
+    FHasBeenPrepared := False;
+    Prepare;
+  end;
+end;
+
 {***********************************************************}
 procedure TALDynamicListBox.InitMainView(const AView: TView);
 begin
@@ -5364,7 +5047,6 @@ begin
   AView.ItemIdNodeName := ItemIdNodeName;
   AView.PreloadItemsCount := PreloadItemsCount;
   AView.Orientation := Orientation;
-  //OnDownloadData
   //OnCreateMainContent
   AView.OnCreateLoadingContent := OnCreateLoadingContent;
   AView.OnCreateErrorContent := OnCreateErrorContent;
@@ -5373,7 +5055,6 @@ begin
   AView.OnCreateItemMainContent := OnCreateItemMainContent;
   AView.OnCreateItemLoadingContent := OnCreateItemLoadingContent;
   AView.OnCreateItemErrorContent := OnCreateItemErrorContent;
-  AView.OnDownloadItemData := OnDownloadItemData;
   AView.OnCreateNoItemsContent := OnCreateNoItemsContent;
   AView.OnCreateBackgroundContent := OnCreateBackgroundContent;
   AView.OnCreateForegroundContent := OnCreateForegroundContent;

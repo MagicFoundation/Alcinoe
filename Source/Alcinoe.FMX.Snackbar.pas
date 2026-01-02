@@ -296,7 +296,7 @@ begin
   Result := Self;
 end;
 
-{***************************************************************************************}
+{*******************************************************************************************}
 function TALSnackbar.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
 begin
   FSnackbar.ShowAnimateOptions := AValue;

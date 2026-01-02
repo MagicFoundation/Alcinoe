@@ -475,7 +475,7 @@ begin
   Result := Self;
 end;
 
-{***************************************************************************************}
+{*****************************************************************************************}
 function TALDialog.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
 begin
   FDialog.ShowAnimateOptions := AValue;

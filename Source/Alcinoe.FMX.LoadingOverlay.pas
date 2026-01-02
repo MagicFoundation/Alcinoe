@@ -310,7 +310,7 @@ begin
   Result := Self;
 end;
 
-{***************************************************************************************}
+{*************************************************************************************************}
 function TALLoadingOverlay.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
 begin
   FLoadingOverlay.ShowAnimateOptions := AValue;

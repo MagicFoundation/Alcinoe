@@ -546,7 +546,7 @@ begin
   Result := Self;
 end;
 
-{***************************************************************************************}
+{****************************************************************************************}
 function TALSheet.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
 begin
   FSheet.ShowAnimateOptions := AValue;

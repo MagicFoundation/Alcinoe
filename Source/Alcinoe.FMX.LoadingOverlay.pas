@@ -62,6 +62,7 @@ type
         function SetContainerShadowOffsetY(const AValue: Single): TBuilder;
         function SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
         function SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
+        function SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
         /// <summary>
         ///   The Builder instance will be released during this operation.
         /// </summary>
@@ -306,6 +307,13 @@ end;
 function TALLoadingOverlay.TBuilder.SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
 begin
   FLoadingOverlay.OnClosedRefProc := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************************}
+function TALLoadingOverlay.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
+begin
+  FLoadingOverlay.ShowAnimateOptions := AValue;
   Result := Self;
 end;
 

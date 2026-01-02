@@ -34,6 +34,12 @@ type
       // ----------------
       // TOnActionObjProc
       TOnActionObjProc = procedure(Const ADialog: TALDialog; const AAction: Integer; var ACanClose: Boolean) of object;
+      // ---------------------------
+      // TOnRadioButtonChangeRefProc
+      TOnRadioButtonChangeRefProc = reference to procedure(Const ADialog: TALDialog; const ARadioButton: TALRadioButton);
+      // ------------------------
+      // TOnCheckBoxChangeRefProc
+      TOnCheckBoxChangeRefProc = reference to procedure(Const ADialog: TALDialog; const ACheckBox: TALCheckBox);
       // ---------------
       // TOnShownRefProc
       TOnShownRefProc = reference to procedure(Const ADialog: TALDialog);
@@ -80,8 +86,11 @@ type
         function SetCustomDialogProc(const AValue: TCustomDialogObjProc): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionRefProc): TBuilder; overload;
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
+        function SetOnRadioButtonChangeCallback(const AValue: TOnRadioButtonChangeRefProc): TBuilder; overload;
+        function SetOnCheckBoxChangeCallback(const AValue: TOnCheckBoxChangeRefProc): TBuilder; overload;
         function SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
         function SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
+        function SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
         /// <summary>
         ///   The Builder instance will be released during this operation.
         ///   If a dialog is already being shown and <c>AForceImmediateShow</c> is <c>false</c>,
@@ -115,6 +124,8 @@ type
     FCustomDialogObjProc: TCustomDialogObjProc;
     FOnActionRefProc: TOnActionRefProc;
     FOnActionObjProc: TOnActionObjProc;
+    FOnRadioButtonChangeRefProc: TOnRadioButtonChangeRefProc;
+    FOnCheckBoxChangeRefProc: TOnCheckBoxChangeRefProc;
     FOnShownRefProc: TOnShownRefProc;
     FOnClosedRefProc: TOnClosedRefProc;
     FVirtualKeyboardAnimation: TALFloatAnimation;
@@ -127,6 +138,8 @@ type
     function GetMessage: TALText;
     function GetButtonBar: TALRectangle;
     procedure SetCustomContainer(const AValue: TALControl);
+    procedure RadioButtonChange(Sender: TObject);
+    procedure CheckBoxChange(Sender: TObject);
     procedure VirtualKeyboardChangeHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
     procedure VirtualKeyboardAnimationProcess(Sender: TObject);
   protected
@@ -174,6 +187,8 @@ type
     property CustomDialogObjProc: TCustomDialogObjProc read FCustomDialogObjProc write FCustomDialogObjProc;
     property OnActionRefProc: TOnActionRefProc read FOnActionRefProc write FOnActionRefProc;
     property OnActionObjProc: TOnActionObjProc read FOnActionObjProc write FOnActionObjProc;
+    property OnRadioButtonChangeRefProc: TOnRadioButtonChangeRefProc read FOnRadioButtonChangeRefProc write FOnRadioButtonChangeRefProc;
+    property OnCheckBoxChangeRefProc: TOnCheckBoxChangeRefProc read FOnCheckBoxChangeRefProc write FOnCheckBoxChangeRefProc;
     property OnShownRefProc: TOnShownRefProc read FOnShownRefProc write FOnShownRefProc;
     property OnClosedRefProc: TOnClosedRefProc read FOnClosedRefProc write FOnClosedRefProc;
   end;
@@ -432,6 +447,20 @@ begin
   Result := Self;
 end;
 
+{**************************************************************************************************************}
+function TALDialog.TBuilder.SetOnRadioButtonChangeCallback(const AValue: TOnRadioButtonChangeRefProc): TBuilder;
+begin
+  FDialog.OnRadioButtonChangeRefProc := AValue;
+  Result := Self;
+end;
+
+{********************************************************************************************************}
+function TALDialog.TBuilder.SetOnCheckBoxChangeCallback(const AValue: TOnCheckBoxChangeRefProc): TBuilder;
+begin
+  FDialog.OnCheckBoxChangeRefProc := AValue;
+  Result := Self;
+end;
+
 {**************************************************************************************}
 function TALDialog.TBuilder.SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
 begin
@@ -443,6 +472,13 @@ end;
 function TALDialog.TBuilder.SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
 begin
   FDialog.OnClosedRefProc := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************************}
+function TALDialog.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
+begin
+  FDialog.ShowAnimateOptions := AValue;
   Result := Self;
 end;
 
@@ -478,6 +514,8 @@ begin
   FCustomDialogObjProc := nil;
   FOnActionRefProc := nil;
   FOnActionObjProc := nil;
+  FOnRadioButtonChangeRefProc := nil;
+  FOnCheckBoxChangeRefProc := nil;
   FOnShownRefProc := nil;
   FOnClosedRefProc := nil;
   FVirtualKeyboardAnimation := nil;
@@ -532,6 +570,20 @@ function TALDialog.IsTransitioning: Boolean;
 begin
   Result := (TALDialogManager.Instance.CurrentDialog = Self) and
             (TALDialogManager.Instance.FContainerAnimation.Running or TALDialogManager.Instance.FScrimAnimation.Running);
+end;
+
+{*****************************************************}
+procedure TALDialog.RadioButtonChange(Sender: TObject);
+begin
+  if assigned(FOnRadioButtonChangeRefProc) then
+    FOnRadioButtonChangeRefProc(Self, TALRadioButton(Sender));
+end;
+
+{**************************************************}
+procedure TALDialog.CheckBoxChange(Sender: TObject);
+begin
+  if assigned(FOnCheckBoxChangeRefProc) then
+    FOnCheckBoxChangeRefProc(Self, TALCheckBox(Sender));
 end;
 
 {************************************************************************************************************}
@@ -725,6 +777,7 @@ begin
   LRadioButton.Mandatory := AMandatory;
   LRadioButton.GroupName := 'ALDialogGroup';
   LRadioButton.Name := 'ALDialogRadioButton'+ALIntToStrW(ATag);
+  LRadioButton.OnChange := RadioButtonChange;
   var LLabel := TALText.Create(LLayout);
   LLabel.Parent := LLayout;
   LLabel.Assign(TALDialogManager.Instance.DefaultLabel);
@@ -745,6 +798,7 @@ begin
   LCheckBox.Tag := ATag;
   LCheckBox.Checked := AChecked;
   LCheckBox.Name := 'ALDialogCheckBox'+ALIntToStrW(ATag);
+  LCheckBox.OnChange := CheckBoxChange;
   var LLabel := TALText.Create(LLayout);
   LLabel.Parent := LLayout;
   LLabel.Assign(TALDialogManager.Instance.DefaultLabel);

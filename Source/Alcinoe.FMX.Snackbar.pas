@@ -62,6 +62,7 @@ type
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
         function SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
         function SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
+        function SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
         /// <summary>
         ///   Shows the snackbar and schedules its automatic dismissal,
         ///   mirroring Android behavior: pass
@@ -292,6 +293,13 @@ end;
 function TALSnackbar.TBuilder.SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
 begin
   FSnackbar.OnClosedRefProc := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************************}
+function TALSnackbar.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
+begin
+  FSnackbar.ShowAnimateOptions := AValue;
   Result := Self;
 end;
 

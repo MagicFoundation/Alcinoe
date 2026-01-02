@@ -75,6 +75,7 @@ type
         function SetOnActionCallback(const AValue: TOnActionObjProc): TBuilder; overload;
         function SetOnShownCallback(const AValue: TOnShownRefProc): TBuilder;
         function SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
+        function SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
         /// <summary>
         ///   Requests the TALSheetManager to display this sheet.
         ///   The Builder instance will be released during this operation.
@@ -542,6 +543,13 @@ end;
 function TALSheet.TBuilder.SetOnClosedCallback(const AValue: TOnClosedRefProc): TBuilder;
 begin
   FSheet.OnClosedRefProc := AValue;
+  Result := Self;
+end;
+
+{***************************************************************************************}
+function TALSheet.TBuilder.SetShowAnimateOptions(const AValue: TAnimateOptions): TBuilder;
+begin
+  FSheet.ShowAnimateOptions := AValue;
   Result := Self;
 end;
 

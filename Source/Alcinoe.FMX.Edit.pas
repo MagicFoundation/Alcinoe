@@ -5382,7 +5382,8 @@ begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  var LMaxSize := TSizeF.Create(Width-padding.Left-padding.Right, 65535);
+  var LNativeAbsoluteRect := GetNativeViewAbsoluteRect;
+  var LMaxSize := TSizeF.Create(LNativeAbsoluteRect.Width, LNativeAbsoluteRect.Height);
 
   //init ABufDrawableRect
   ABufDrawableRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
@@ -5407,7 +5408,7 @@ begin
     //LOptions.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
     //LOptions.DecorationColor := ADecoration.Color;
     //--
-    //LOptions.EllipsisText := TextSettings.Ellipsis;
+    LOptions.EllipsisText := '';
     //LOptions.EllipsisInheritSettings := TextSettings.EllipsisSettings.inherit;
     //--
     //LOptions.EllipsisFontFamily := AEllipsisfont.Family;
@@ -5424,7 +5425,7 @@ begin
     //--
     LOptions.AutoSize := TALAutoSizeMode.Both;
     //--
-    LOptions.MaxLines := 1;
+    //LOptions.MaxLines := 65535;
     //LOptions.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
     //LOptions.LetterSpacing := TextSettings.LetterSpacing;
     //LOptions.Trimming := TextSettings.Trimming;

@@ -251,6 +251,28 @@ begin
             var Lvalue := LLst[3];  // 0x00000001
             for J := 4 to LLst.Count - 1 do
               Lvalue := Lvalue + ' ' + LLst[J];
+            P1 := ALPosIgnoreCaseA('(HRESULT)', Lvalue);
+            if P1 > 0 then begin
+              Lvalue := ALStringReplaceA(Lvalue, '(HRESULT)', '');
+              if (Lvalue <> '') and (LValue[low(Lvalue)] <> '(') then Lvalue := '(' + Lvalue + ')';
+              Lvalue := ALStringReplaceA(Lvalue, 'L)', ')');
+              Lvalue := 'HRESULT' + Lvalue;
+              LLst[2] := LLst[2] + ': HRESULT';
+            end;
+            P1 := ALPosIgnoreCaseA('_HRESULT_TYPEDEF_(', Lvalue);
+            if P1 = 1 then begin
+              Lvalue := ALStringReplaceA(Lvalue, '_HRESULT_TYPEDEF_(', '(');
+              Lvalue := ALStringReplaceA(Lvalue, 'L)', ')');
+              Lvalue := 'HRESULT' + Lvalue;
+              LLst[2] := LLst[2] + ': HRESULT';
+            end;
+            P1 := ALPosIgnoreCaseA('(SECURITY_STATUS)', Lvalue);
+            if P1 > 0 then begin
+              Lvalue := ALStringReplaceA(Lvalue, '(SECURITY_STATUS)', '');
+              if (Lvalue <> '') and (LValue[low(Lvalue)] <> '(') then Lvalue := '(' + Lvalue + ')';
+              Lvalue := 'SECURITY_STATUS' + Lvalue;
+              LLst[2] := LLst[2] + ': SECURITY_STATUS';
+            end;
             P1 := ALPosIgnoreCaseA('(ULONGLONG)', Lvalue);
             if P1 > 0 then begin
               Lvalue := ALStringReplaceA(Lvalue, '(ULONGLONG)', '');
@@ -282,6 +304,8 @@ begin
             if (AlposA('(',LLst[2]) <= 0) and
                ((AlposA('0x',Lvalue) = 1) or
                 ((Lvalue <> '') and (Lvalue[low(Lvalue)] = '(') and (Lvalue[high(Lvalue)] = ')')) or
+                (AlposA('SECURITY_STATUS(',Lvalue) = 1) or
+                (AlposA('HRESULT(',Lvalue) = 1) or
                 (AlposA('ULONGLONG(',Lvalue) = 1) or
                 (AlposA('ULONG(',Lvalue) = 1) or
                 (AlposA('ULONG_PTR(',Lvalue) = 1) or
@@ -290,11 +314,13 @@ begin
                 (AlposA('"',Lvalue) = 1) or
                 (AlposA('L"',Lvalue) = 1) or
                 (AlposA('TEXT("',Lvalue) = 1) or
+                ((ALPosA('L', LValue) = length(Lvalue)) and (ALIsNumeric(AlcopyStr(Lvalue, 1, length(LValue)-1)))) or
                 (ALIsNumeric(Lvalue)) or
                 (alposA('const '+Lvalue+' = ', LLstSrc.Text) > 0)) then begin // const SP_PROT_TLS1_SERVER = $00000040;
                                                                             // const SP_PROT_TLS1_0_SERVER = SP_PROT_TLS1_SERVER;
-              if (AlposA('0x',Lvalue) = 1) and (AlposA('L',Lvalue) = Length(Lvalue)) then
-                LValue := 'DWORD(' + ALStringReplaceA(Lvalue, 'L', '', [RfIgnoreCase]) + ')'; // 0x800000001L => DWORD(0x800000001)
+              if (AlposA('0x',Lvalue) = 1) and (AlposA('L',Lvalue) = Length(Lvalue)) or
+                 ((ALPosA('L', LValue) = length(Lvalue)) and (ALIsNumeric(AlcopyStr(Lvalue, 1, length(LValue)-1)))) then
+                LValue := ALStringReplaceA(Lvalue, 'L', '', [RfIgnoreCase]); // 0x800000001L => 0x800000001
               LValue := ALStringReplaceA(Lvalue, '0x', '$', [RfIgnoreCase]); // $00000001
               LValue := ALStringReplaceA(Lvalue, ' | ', ' or '); // (HTTP_AUTH_ENABLE_BASIC or HTTP_AUTH_ENABLE_DIGEST)
               IF AlposA('TEXT("',Lvalue) = 1 then begin
@@ -1068,15 +1094,16 @@ begin
     Writeln('  1) sspi.h     -> Alcinoe.WinApi.SSPI.pas');
     Writeln('  2) schannel.h -> Alcinoe.WinApi.SChannel.pas');
     Writeln('  3) http.h     -> Alcinoe.WinApi.Http.pas');
+    Writeln('  4) winerror.h -> Alcinoe.WinApi.WinError.h');
     Writeln;
-    Write('Choice [1-3, empty = all]: ');
+    Write('Choice [1-4, empty = all]: ');
 
     var LChoiceStr: string;
     Readln(LChoiceStr);
     Var LChoices: TArray<Integer>;
     var LInt: integer;
     if ALTryStrToInt(LChoiceStr, LInt) then LChoices := [LInt]
-    else LChoices := [1,2,3];
+    else LChoices := [1,2,3,4];
 
     for var LChoice in LChoices do begin
 
@@ -1126,6 +1153,16 @@ begin
           Winapi.Winsock2,
           Alcinoe.WinApi.Windows;
         ''';
+        LExtraTypes := '';
+      end;
+      {$ENDREGION}
+
+      {$REGION 'winerror.h'}
+      if LChoice = 4 then begin
+        Writeln('Converting winerror.h -> Alcinoe.WinApi.WinError.pas');
+        LSrcfileName := ALGetModulePathW + 'winerror.h';
+        LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.WinError.pas';
+        LExtraUses := '';
         LExtraTypes := '';
       end;
       {$ENDREGION}
@@ -1257,6 +1294,7 @@ begin
       LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN8');
       LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN10');
       LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= 0x0501');
+      LSrc := RemoveSection(LSrc, '!defined(_WIN32) && !defined(_MAC)');
       LSrc := RemoveSection(LSrc, '_WIN32_WINNT < 0x0600');
 
       {$REGION 'sspi.h'}
@@ -1330,6 +1368,20 @@ begin
       end;
       {$ENDREGION}
 
+      {$REGION 'winerror.h'}
+      if LChoice = 4 then begin
+        LSrc := RemoveSection(LSrc, '_WINERROR_');
+        LSrc := RemoveSection(LSrc, '!defined (_MSC_VER) && (_MSC_VER >= 1020) && !defined(__midl)');
+        LSrc := RemoveSection(LSrc, '!FORCEINLINE');
+        LSrc := RemoveSection(LSrc, 'WSABASEERR');
+        LSrc := RemoveSection(LSrc, '!defined(_HRESULT_DEFINED) && !defined(__midl)');
+        LSrc := RemoveSection(LSrc, '!__midl');
+        LSrc := RemoveSection(LSrc, '!RC_INVOKED');
+        LSrc := RemoveSection(LSrc, 'WIN_OMIT_TSS_TPM_RETURN_CODES');
+        LSrc := AlStringReplaceA(LSrc, 'WINAPI', 'W!I!N!A!P!I');
+      end;
+      {$ENDREGION}
+
       {$REGION 'wincrypt.h'}
       //LSrc := ALStringReplaceA(LSrc,' WINADVAPI'#13#10,' WINAPI'#13#10);
       //LSrc := ALStringReplaceA(LSrc,' WINCRYPT32API'#13#10,' WINAPI'#13#10);
@@ -1380,9 +1432,9 @@ begin
       //          '// } CERT_SERVER_OCSP_RESPONSE_CONTEXT, * PCERT_SERVER_OCSP_RESPONSE_CONTEXT;');
       //LSrc := ALStringReplaceA(LSrc, '#define AUTHTYPE_CLIENT 1','// #define AUTHTYPE_CLIENT 1');
       //LSrc := ALStringReplaceA(LSrc, '#define AUTHTYPE_SERVER 2','// #define AUTHTYPE_SERVER 2');
-      //LSrc := ALStringReplaceA(LSrc, 'BOOL WINAPI CryptDllCreateCOMObject', 'BOOL WIN-API CryptDllCreateCOMObject');
-      //LSrc := ALStringReplaceA(LSrc, 'BOOL WINAPI SchemeDllRetrieveEncodedObjectW', 'BOOL WIN-API SchemeDllRetrieveEncodedObjectW');
-      //LSrc := ALStringReplaceA(LSrc, 'BOOL WINAPI ContextDllCreateObjectContext', 'BOOL WIN-API ContextDllCreateObjectContext');
+      //LSrc := ALStringReplaceA(LSrc, 'BOOL WINAPI CryptDllCreateCOMObject', 'BOOL W!I!N!A!P!I CryptDllCreateCOMObject');
+      //LSrc := ALStringReplaceA(LSrc, 'BOOL WINAPI SchemeDllRetrieveEncodedObjectW', 'BOOL W!I!N!A!P!I SchemeDllRetrieveEncodedObjectW');
+      //LSrc := ALStringReplaceA(LSrc, 'BOOL WINAPI ContextDllCreateObjectContext', 'BOOL W!I!N!A!P!I ContextDllCreateObjectContext');
       //LSrc := ALStringReplaceA(LSrc,'(CALLBACK * ','(WINAPI * ');
       {$ENDREGION}
 
@@ -1400,6 +1452,8 @@ begin
       LSrc := ConvertSimpleType(LSrc);
       LSrc := ConvertRecords(LSrc);
       LSrc := Convertfunctions(LSrc);
+
+      LSrc := AlStringReplaceA(LSrc, 'W!I!N!A!P!I', 'WINAPI');
 
       LSrc := '''
         unit

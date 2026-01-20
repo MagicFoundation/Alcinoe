@@ -895,11 +895,32 @@ Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alci
 </p>
 <br/>
   
-  
+
+Native HTTP Client (WinHTTP)
+============================  
+
+Designed for robust and secure HTTP communication, `TALWinHttpClient` is a Delphi
+HTTP client component built directly on top of the native **WinHTTP** API provided
+by Windows. By relying on the operating system’s integrated networking and security
+stack, it delivers production-grade reliability, performance, and compatibility
+without requiring any external libraries or additional DLLs to be deployed.
+
+`TALWinHttpClient` supports modern web standards with **HTTP/1.1, HTTP/2, and HTTP/3
+(where supported by the underlying Windows WinHTTP stack)**, along with secure
+communication via **TLS 1.2 and TLS 1.3**, automatically negotiating the best
+protocol versions and cipher suites supported by both client and server according
+to Windows security policy. It transparently handles connection management,
+redirects, proxies, authentication, and secure transports, making it well suited
+for REST APIs, RPC services, and high-reliability HTTP integrations that require
+native Windows behavior and long-term maintainability.
+
+Learn more at [Demos\ALWinHTTPClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPClient)
+<br/>
+<br/>
+
+
 High-Performance HTTP Server (http.sys)
 =======================================
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/http3.png?raw=true" width="540" style="width:540px;"/>
 
 TALHttpSysServer is a high-performance HTTP server component for 
 Delphi that runs directly on top of http.sys, the kernel-mode HTTP 
@@ -909,6 +930,8 @@ and security without requiring an external web server. With
 TALHttpSysServer, you can build lightweight yet powerful REST APIs, 
 RPC services, or custom HTTP applications while letting the Windows 
 kernel handle the heavy lifting.
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/http3.png?raw=true" width="540" style="width:540px;"/>
 
 Advantages of using http.sys:
 
@@ -1133,16 +1156,6 @@ a fully **Ansi** string list, optimized for performance.
 
 You can start exploring this feature with the demo located at 
 [Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
-<br/>
-<br/>
-  
-
-And Much More
-=============
-
-* HTTP Client (WinHTTP)
-* Xml Parser 
-* Etc ...
 <br/>
 <br/>
 

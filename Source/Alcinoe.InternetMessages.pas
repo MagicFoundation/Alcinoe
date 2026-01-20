@@ -424,7 +424,7 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{**********************************************}
+{*********************************}
 constructor TALMailHeadersA.Create;
 Begin
   inherited;
@@ -434,14 +434,14 @@ Begin
   FAutoFillDefaults := True;
 end;
 
-{**********************************************}
+{*********************************}
 destructor TALMailHeadersA.Destroy;
 begin
   AlFreeAndNil(FUnknownHeaders);
   inherited;
 end;
 
-{*************************************************************************************}
+{******************************************************************************}
 function TALMailHeadersA.PropertyIndexToName(const AIndex: Integer): AnsiString;
 begin
   Case AIndex of
@@ -467,7 +467,7 @@ begin
   End;
 end;
 
-{************************************************************************************}
+{*****************************************************************************}
 function TALMailHeadersA.NameToPropertyIndex(const AName: AnsiString): Integer;
 begin
   var LLowerName := ALLowerCase(AName);
@@ -491,7 +491,7 @@ begin
   else Result := -1;
 end;
 
-{****************************************************************************************}
+{*********************************************************************************}
 function TALMailHeadersA.GetHeaderValueByName(const AName: AnsiString): AnsiString;
 begin
   Var LIndex := NameToPropertyIndex(AName);
@@ -499,7 +499,7 @@ begin
   else Result := UnknownHeaders.Values[AName];
 end;
 
-{*******************************************************************************************************}
+{************************************************************************************************}
 procedure TALMailHeadersA.SetHeaderValueByName(const AName: AnsiString; const AValue: AnsiString);
 begin
   Var LIndex := NameToPropertyIndex(AName);
@@ -509,13 +509,13 @@ begin
     UnknownHeaders.Values[AName] := AValue;
 end;
 
-{************************************************************}
+{*****************************************************}
 function TALMailHeadersA.GetContentCharset: AnsiString;
 begin
   Result := ALExtractHttpCharsetFromContentType(ContentType);
 end;
 
-{*******************************************}
+{******************************}
 procedure TALMailHeadersA.Clear;
 begin
   for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
@@ -523,7 +523,7 @@ begin
   if FUnknownHeaders <> nil then FUnknownHeaders.Clear;
 end;
 
-{*******************************************************************}
+{******************************************************}
 function TALMailHeadersA.GetUnknownHeaders: TALStringsA;
 begin
   if FUnknownHeaders = nil then begin
@@ -534,7 +534,7 @@ begin
   Result := FUnknownHeaders;
 end;
 
-{****************************************************************************************************}
+{***************************************************************************************}
 function TALMailHeadersA.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
 begin
   {$IF defined(DEBUG)}
@@ -544,7 +544,7 @@ begin
   Result := FKnownHeaders[Index];
 end;
 
-{******************************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALMailHeadersA.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
 begin
   {$IF defined(DEBUG)}
@@ -554,7 +554,7 @@ begin
   FKnownHeaders[Index] := Value;
 end;
 
-{*****************************************************************}
+{****************************************************}
 Function TALMailHeadersA.GetRawHeaderText: AnsiString;
 begin
 
@@ -604,7 +604,7 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{***************************************************************************}
 procedure TALMailHeadersA.SetRawHeaderText(const ARawHeaderText: AnsiString);
 begin
   Clear;

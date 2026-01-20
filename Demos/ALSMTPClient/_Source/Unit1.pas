@@ -111,7 +111,7 @@ begin
   ALFreeAndNil(FSMTPCLient);
 end;
 
-{***************************************************}
+{********************************************************}
 procedure TForm1.ConnectPlainButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(
@@ -122,7 +122,7 @@ begin
         False{AStartTLS})));
 end;
 
-{***************************************************}
+{******************************************************}
 procedure TForm1.ConnectTslButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(
@@ -190,7 +190,7 @@ begin
 
 end;
 
-{************************************************}
+{****************************************************}
 procedure TForm1.StartTLSButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(

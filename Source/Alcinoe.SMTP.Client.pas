@@ -550,7 +550,7 @@ begin
   FTSLClient.SendTimeout := Value;
 end;
 
-{**************************************************************}
+{************************************************}
 function TAlSmtpClient.GetReceiveTimeout: integer;
 begin
   Result := FTSLClient.ReceiveTimeout;
@@ -562,7 +562,7 @@ begin
   FTSLClient.ReceiveTimeout := Value;
 end;
 
-{*********************************************************}
+{*******************************************}
 function TAlSmtpClient.GetKeepAlive: boolean;
 begin
   Result := FTSLClient.KeepAlive;
@@ -574,7 +574,7 @@ begin
   FTSLClient.KeepAlive := Value;
 end;
 
-{**********************************************************}
+{********************************************}
 function TAlSmtpClient.GetTCPNoDelay: boolean;
 begin
   Result := FTSLClient.TCPNoDelay;

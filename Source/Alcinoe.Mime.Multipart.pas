@@ -248,7 +248,7 @@ begin
   Result := '----------------------' + ALNewGUIDStringA(True{WithoutBracket}, true{WithoutHyphen});
 end;
 
-{*************************************************************************}
+{*********************************************************************}
 procedure TALMultipartBaseEncoderA.SaveToFile(const AFileName: String);
 begin
   If TFile.Exists(AFilename) then
@@ -261,14 +261,14 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{***************************************************************}
 procedure TALMultipartBaseEncoderA.BeginPart(const ASize: Int64);
 begin
   FSection := TALStringStreamA.Create('');
   FSection.Size := ASize;
 end;
 
-{*********************************************}
+{*****************************************}
 procedure TALMultipartBaseEncoderA.EndPart;
 begin
   try
@@ -317,7 +317,7 @@ begin
   LStream.ReadBuffer(Result[low(Result)], LStream.Size);
 end;
 
-{****************************************************************************}
+{************************************************************************}
 procedure TALMultipartBaseEncoderA.WriteString(const AString: AnsiString);
 begin
   FSection.WriteString(AString);
@@ -329,7 +329,7 @@ begin
   Result := 'multipart/form-data; boundary=' + FBoundary; // do not localize
 end;
 
-{**********************************************}
+{*********************************************}
 procedure TALMultipartFormDataEncoderA.AddText(
             const AFieldName: AnsiString;
             const AText: AnsiString;
@@ -470,7 +470,7 @@ begin
   AddStream(AFieldName, LBytesStream, True, AFileName, AContentType, AHeaders);
 end;
 
-{******************************************************************}
+{*********************************************************************}
 function TALMultipartAlternativeEncoderA.GetMimeTypeHeader: AnsiString;
 begin
   Result := 'multipart/alternative; boundary=' + Boundary; // do not localize
@@ -536,7 +536,7 @@ begin
 
 end;
 
-{******************************************************************}
+{***************************************************************}
 function TALMultipartMixedEncoderA.GetMimeTypeHeader: AnsiString;
 begin
   Result := 'multipart/mixed; boundary=' + Boundary; // do not localize
@@ -602,7 +602,7 @@ begin
 
 end;
 
-{***********************************************}
+{********************************************}
 procedure TALMultipartMixedEncoderA.AddStream(
             const AStream: TStream;
             const AFileName: AnsiString;
@@ -643,7 +643,7 @@ begin
 
 end;
 
-{*********************************************}
+{******************************************}
 procedure TALMultipartMixedEncoderA.AddFile(
             const AFilePath: String;
             const AContentType: AnsiString = '';
@@ -657,7 +657,7 @@ begin
   end;
 end;
 
-{**********************************************}
+{*******************************************}
 procedure TALMultipartMixedEncoderA.AddBytes(
             const ABytes: TBytes;
             const AFileName: AnsiString;

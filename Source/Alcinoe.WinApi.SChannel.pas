@@ -873,8 +873,8 @@ type
     dwFlags: DWORD): BOOL; stdcall;
 
 function SslEmptyCacheA(
-  pszTargetName: LPSTR;
-  dwFlags: DWORD): BOOL; stdcall; external 'schannel.dll';
+           pszTargetName: LPSTR;
+           dwFlags: DWORD): BOOL; stdcall; external 'schannel.dll';
 
 type
   SSL_EMPTY_CACHE_FN_W = function (
@@ -882,8 +882,8 @@ type
     dwFlags: DWORD): BOOL; stdcall;
 
 function SslEmptyCacheW(
-  pszTargetName: LPWSTR;
-  dwFlags: DWORD): BOOL; stdcall; external 'schannel.dll';
+           pszTargetName: LPWSTR;
+           dwFlags: DWORD): BOOL; stdcall; external 'schannel.dll';
 
 // #define SSL_EMPTY_CACHE_FN SSL_EMPTY_CACHE_FN_W
 // #define SslEmptyCache SslEmptyCacheW
@@ -999,24 +999,24 @@ type
 // Pre NT4.0 SP2 calls. Call CAPI1 or CAPI2
 // to get the same functionality instead.
 procedure SslGenerateRandomBits(
-  pRandomData: PUCHAR;
-  cRandomData: LONG); stdcall; external 'schannel.dll';
+            pRandomData: PUCHAR;
+            cRandomData: LONG); stdcall; external 'schannel.dll';
 
 // Pre NT4.0 SP2 calls. Call CAPI1 or CAPI2
 // to get the same functionality instead.
 function SslCrackCertificate(
-  pbCertificate: PUCHAR;
-  cbCertificate: DWORD;
-  dwFlags: DWORD;
-  ppCertificate: PPX509Certificate): BOOL; stdcall; external 'schannel.dll';
+           pbCertificate: PUCHAR;
+           cbCertificate: DWORD;
+           dwFlags: DWORD;
+           ppCertificate: PPX509Certificate): BOOL; stdcall; external 'schannel.dll';
 
 // Pre NT4.0 SP2 calls. Call CAPI1 or CAPI2
 // to get the same functionality instead.
 procedure SslFreeCertificate(
-  pCertificate: PX509Certificate); stdcall; external 'schannel.dll';
+            pCertificate: PX509Certificate); stdcall; external 'schannel.dll';
 
 function SslGetMaximumKeySize(
-  Reserved: DWORD): DWORD; stdcall; external 'schannel.dll';
+           Reserved: DWORD): DWORD; stdcall; external 'schannel.dll';
 
 // BOOL
 // WINAPI
@@ -1051,11 +1051,11 @@ type
     Flags: DWORD): SECURITY_STATUS; stdcall;
 
 function SslGetServerIdentity(
-  ClientHello: PBYTE;
-  ClientHelloSize: DWORD;
-  ServerIdentity: PPBYTE;
-  ServerIdentitySize: PDWORD;
-  Flags: DWORD): SECURITY_STATUS; stdcall; external 'schannel.dll';
+           ClientHello: PBYTE;
+           ClientHelloSize: DWORD;
+           ServerIdentity: PPBYTE;
+           ServerIdentitySize: PDWORD;
+           Flags: DWORD): SECURITY_STATUS; stdcall; external 'schannel.dll';
 
 type
   _SCH_EXTENSION_DATA = record
@@ -1083,12 +1083,12 @@ type
     flags: SchGetExtensionsOptions): SECURITY_STATUS; stdcall;
 
 function SslGetExtensions(
-  clientHello: PBYTE;
-  clientHelloByteSize: DWORD;
-  genericExtensions: PSCH_EXTENSION_DATA;
-  genericExtensionsCount: BYTE;
-  bytesToRead: PDWORD;
-  flags: SchGetExtensionsOptions): SECURITY_STATUS; stdcall; external 'schannel.dll';
+           clientHello: PBYTE;
+           clientHelloByteSize: DWORD;
+           genericExtensions: PSCH_EXTENSION_DATA;
+           genericExtensionsCount: BYTE;
+           bytesToRead: PDWORD;
+           flags: SchGetExtensionsOptions): SECURITY_STATUS; stdcall; external 'schannel.dll';
 
 type
   SslDeserializeCertificateStoreFn = function (

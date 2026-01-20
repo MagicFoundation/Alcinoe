@@ -115,49 +115,49 @@ begin
   fTCPNoDelay := False;
 end;
 
-{*********************************}
+{***********************************************}
 function TALSocketClient.GetSendTimeout: integer;
 begin
   result := FSendTimeout;
 end;
 
-{*********************************}
+{*************************************************************}
 procedure TALSocketClient.SetSendTimeout(const Value: integer);
 begin
   FSendTimeout := Value;
 end;
 
-{*********************************}
+{**************************************************}
 function TALSocketClient.GetReceiveTimeout: integer;
 begin
   result := FReceiveTimeout;
 end;
 
-{*********************************}
+{****************************************************************}
 procedure TALSocketClient.SetReceiveTimeout(const Value: integer);
 begin
   FReceiveTimeout := Value;
 end;
 
-{*********************************}
+{*********************************************}
 function TALSocketClient.GetKeepAlive: boolean;
 begin
   result := FKeepAlive;
 end;
 
-{*********************************}
+{***********************************************************}
 procedure TALSocketClient.SetKeepAlive(const Value: boolean);
 begin
   FKeepAlive := Value;
 end;
 
-{*********************************}
+{**********************************************}
 function TALSocketClient.GetTCPNoDelay: boolean;
 begin
   result := FTCPNoDelay;
 end;
 
-{*********************************}
+{************************************************************}
 procedure TALSocketClient.SetTCPNoDelay(const Value: boolean);
 begin
   FTCPNoDelay := Value;

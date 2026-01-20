@@ -165,7 +165,7 @@ begin
 
 end;
 
-{**************************************************************************************}
+{************************************************************************************}
 function CType2Delphi(const ACtype: AnsiString; const AUseCaret: Boolean): AnsiString;
 begin
   Result := ACtype;

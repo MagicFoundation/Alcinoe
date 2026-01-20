@@ -26,6 +26,7 @@ Uses
 
 {$R *.DFM}
 
+{**********************************************}
 procedure TForm1.GoButtonClick(Sender: TObject);
 begin
   var LTSLClient := TAlSChannelTlsClient.Create;

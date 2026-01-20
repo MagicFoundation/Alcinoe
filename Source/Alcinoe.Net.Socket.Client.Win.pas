@@ -133,7 +133,7 @@ begin
   end;
 end;
 
-{******************************************************************************}
+{********************************************************************************}
 class function TALWinSocketClient.GetSendTimeout(const ASocket: TSocket): integer;
 begin
   Result := 0;
@@ -148,20 +148,20 @@ begin
       LOptLen)); // [in, out] int *optlen
 end;
 
-{******************************************************************************}
+{**********************************************************************************************}
 class procedure TALWinSocketClient.SetSendTimeout(const ASocket: TSocket; const Value: integer);
 begin
   ALCheckWinApiWSAErrorCode(
     'setsockopt(SO_SNDTIMEO)',
     Winapi.Winsock2.setsockopt(
-       ASocket, // [in] SOCKET s,
-       SOL_SOCKET, // [in] int level,
-       SO_SNDTIMEO, // [in] int optname,
-       PAnsiChar(@Value), // in] const char *optval,
-       SizeOf(Value))); // [in] int optlen
+      ASocket, // [in] SOCKET s,
+      SOL_SOCKET, // [in] int level,
+      SO_SNDTIMEO, // [in] int optname,
+      PAnsiChar(@Value), // in] const char *optval,
+      SizeOf(Value))); // [in] int optlen
 end;
 
-{******************************************************************************}
+{***********************************************************************************}
 class function TALWinSocketClient.GetReceiveTimeout(const ASocket: TSocket): integer;
 begin
   Result := 0;
@@ -176,17 +176,17 @@ begin
       LOptLen)); // [in, out] int *optlen
 end;
 
-{******************************************************************************}
+{*************************************************************************************************}
 class procedure TALWinSocketClient.SetReceiveTimeout(const ASocket: TSocket; const Value: integer);
 begin
   ALCheckWinApiWSAErrorCode(
     'setsockopt(SO_RCVTIMEO)',
     Winapi.Winsock2.setsockopt(
-       ASocket, // [in] SOCKET s,
-       SOL_SOCKET, // [in] int level,
-       SO_RCVTIMEO, // [in] int optname,
-       PAnsiChar(@Value), // in] const char *optval,
-       SizeOf(Value))); // [in] int optlen
+      ASocket, // [in] SOCKET s,
+      SOL_SOCKET, // [in] int level,
+      SO_RCVTIMEO, // [in] int optname,
+      PAnsiChar(@Value), // in] const char *optval,
+      SizeOf(Value))); // [in] int optlen
 end;
 
 
@@ -206,21 +206,21 @@ begin
   Result := LOpt <> 0;
 end;
 
-{******************************************************************************}
+{********************************************************************************************}
 class procedure TALWinSocketClient.SetKeepAlive(const ASocket: TSocket; const Value: boolean);
 begin
   var LOpt: Integer := Ord(Value);
   ALCheckWinApiWSAErrorCode(
     'setsockopt(SO_KEEPALIVE)',
     Winapi.Winsock2.setsockopt(
-       ASocket, // [in] SOCKET s,
-       SOL_SOCKET, // [in] int level,
-       SO_KEEPALIVE, // [in] int optname,
-       PAnsiChar(@LOpt), // in] const char *optval,
-       SizeOf(LOpt))); // [in] int optlen
+      ASocket, // [in] SOCKET s,
+      SOL_SOCKET, // [in] int level,
+      SO_KEEPALIVE, // [in] int optname,
+      PAnsiChar(@LOpt), // in] const char *optval,
+      SizeOf(LOpt))); // [in] int optlen
 end;
 
-{******************************************************************************}
+{*******************************************************************************}
 class function TALWinSocketClient.GetTCPNoDelay(const ASocket: TSocket): boolean;
 begin
   var LOpt: Integer := 0;
@@ -236,21 +236,21 @@ begin
   Result := LOpt <> 0;
 end;
 
-{******************************************************************************}
+{*********************************************************************************************}
 class procedure TALWinSocketClient.SetTCPNoDelay(const ASocket: TSocket; const Value: boolean);
 begin
   var LOpt: Integer := Ord(Value);
   ALCheckWinApiWSAErrorCode(
     'setsockopt(TCP_NODELAY)',
     Winapi.Winsock2.setsockopt(
-       ASocket, // [in] SOCKET s,
-       IPPROTO_TCP, // [in] int level,
-       TCP_NODELAY, // [in] int optname,
-       PAnsiChar(@LOpt), // in] const char *optval,
-       SizeOf(LOpt))); // [in] int optlen
+      ASocket, // [in] SOCKET s,
+      IPPROTO_TCP, // [in] int level,
+      TCP_NODELAY, // [in] int optname,
+      PAnsiChar(@LOpt), // in] const char *optval,
+      SizeOf(LOpt))); // [in] int optlen
 end;
 
-{******************************************************************************}
+{***********************************************************************************************}
 class function TALWinSocketClient.Send(const ASocket: TSocket; const Buf; Len: Integer): Integer;
 begin
   if Len <= 0 then Exit(0);
@@ -282,7 +282,7 @@ begin
 
 end;
 
-{******************************************************************************}
+{************************************************************************************************}
 class function TALWinSocketClient.Receive(const ASocket: TSocket; var Buf; Len: Integer): Integer;
 begin
   if Len <= 0 then Exit(0);
@@ -294,7 +294,7 @@ begin
   end;
 end;
 
-{******************************************************************************}
+{*************************************************************************************}
 class procedure TALWinSocketClient.ReceiveAll(const ASocket: TSocket; var Buf: TBytes);
 begin
 
@@ -328,7 +328,7 @@ begin
 
 end;
 
-{******************************************************************************}
+{*****************************************************************************************}
 class procedure TALWinSocketClient.ReceiveAll(const ASocket: TSocket; var Buf: AnsiString);
 begin
 
@@ -378,7 +378,7 @@ begin
   Disconnect(FSocket);
 end;
 
-{**************************************}
+{****************************************************************}
 procedure TALWinSocketClient.SetSendTimeout(const Value: integer);
 begin
   inherited;
@@ -386,7 +386,7 @@ begin
     SetSendTimeout(FSocket, Value);
 end;
 
-{**************************************}
+{*******************************************************************}
 procedure TALWinSocketClient.SetReceiveTimeout(const Value: integer);
 begin
   inherited;
@@ -394,7 +394,7 @@ begin
     SetReceiveTimeout(FSocket, Value);
 end;
 
-{**************************************}
+{**************************************************************}
 procedure TALWinSocketClient.SetKeepAlive(const Value: boolean);
 begin
   inherited;
@@ -402,7 +402,7 @@ begin
     SetKeepAlive(FSocket, Value);
 end;
 
-{**************************************}
+{***************************************************************}
 procedure TALWinSocketClient.SetTCPNoDelay(const Value: boolean);
 begin
   inherited;
@@ -416,13 +416,13 @@ begin
   Result := FSocket <> INVALID_SOCKET;
 end;
 
-{**************************************}
+{*****************************************************************}
 function TALWinSocketClient.Send(const Buf; Len: Integer): Integer;
 begin
   Result := Send(FSocket, Buf, Len);
 end;
 
-{**************************************}
+{******************************************************************}
 function TALWinSocketClient.Receive(var Buf; Len: Integer): Integer;
 begin
   Result := Receive(FSocket, Buf, Len);

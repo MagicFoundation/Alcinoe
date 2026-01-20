@@ -176,8 +176,8 @@ begin
 
       if not (LServiceStatus.dwCurrentState = SERVICE_RUNNING) then
         Raise Exception.CreateFmt(
-          'Failed to start service "%s" (current state: %d).',
-          [AServiceName, LServiceStatus.dwCurrentState]);
+                'Failed to start service "%s" (current state: %d).',
+                [AServiceName, LServiceStatus.dwCurrentState]);
 
     finally
       CloseServiceHandle(LService);
@@ -224,8 +224,8 @@ begin
 
       if not (LServiceStatus.dwCurrentState = SERVICE_STOPPED) then
         Raise Exception.CreateFmt(
-          'Failed to stop service "%s" (current state: %d).',
-          [AServiceName, LServiceStatus.dwCurrentState]);
+                'Failed to stop service "%s" (current state: %d).',
+                [AServiceName, LServiceStatus.dwCurrentState]);
 
     finally
       CloseServiceHandle(LService);
@@ -296,11 +296,11 @@ begin
     ALStopServiceEvent := TEvent.Create(nil{EventAttributes}, false{ManualReset}, false{InitialState}, ''{Name});
     try
       _ServiceStatusHandle := ALCheckWinApiHandle(
-                              'RegisterServiceCtrlHandlerExW',
-                              RegisterServiceCtrlHandlerExW(
-                                PWideChar(_ServiceName), // LPCWSTR               lpServiceName,
-                                @_ServiceCtrlHandlerEx, // LPHANDLER_FUNCTION_EX lpHandlerProc,
-                                nil)); // LPVOID                lpContext
+                                'RegisterServiceCtrlHandlerExW',
+                                RegisterServiceCtrlHandlerExW(
+                                  PWideChar(_ServiceName), // LPCWSTR               lpServiceName,
+                                  @_ServiceCtrlHandlerEx, // LPHANDLER_FUNCTION_EX lpHandlerProc,
+                                  nil)); // LPVOID                lpContext
       _SetServiceStatus(SERVICE_START_PENDING);
       _SetServiceStatus(SERVICE_RUNNING);
       _ServiceProc();

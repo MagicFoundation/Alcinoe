@@ -457,7 +457,7 @@ begin
   end;
 end;
 
-{***************************}
+{**************************}
 {$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeDrawables;
 begin
@@ -499,7 +499,7 @@ begin
 end;
 {$ENDIF}
 
-{***************************}
+{**************************}
 {$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeDrawable(var aDrawable: TALDrawable);
 begin
@@ -522,7 +522,7 @@ begin
 end;
 {$ENDIF}
 
-{***************************}
+{**************************}
 {$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeBitmaps;
 begin
@@ -564,7 +564,7 @@ begin
 end;
 {$ENDIF}
 
-{***************************}
+{**************************}
 {$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeBitmap(var aBitmap: TALBitmap);
 begin

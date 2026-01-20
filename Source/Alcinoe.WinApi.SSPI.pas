@@ -1266,15 +1266,15 @@ const SECPKG_CONTEXT_EXPORT_DELETE_OLD = $00000002; // Old context is deleted du
 const SECPKG_CONTEXT_EXPORT_TO_KERNEL = $00000004; // Context is to be transferred to the kernel
 
 function AcquireCredentialsHandleW(
-  pszPrincipal: LPWSTR; // Name of principal
-  pszPackage: LPWSTR; // Name of package
-  fCredentialUse: ULONG; // Flags indicating use
-  pvLogonId: Pvoid; // Pointer to logon ID
-  pAuthData: Pvoid; // Package specific data
-  pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
-  pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
-  phCredential: PCredHandle; // (out) Cred Handle
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
+           pszPrincipal: LPWSTR; // Name of principal
+           pszPackage: LPWSTR; // Name of package
+           fCredentialUse: ULONG; // Flags indicating use
+           pvLogonId: Pvoid; // Pointer to logon ID
+           pAuthData: Pvoid; // Package specific data
+           pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
+           pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
+           phCredential: PCredHandle; // (out) Cred Handle
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
 
 type
   ACQUIRE_CREDENTIALS_HANDLE_FN_W = function (
@@ -1291,15 +1291,15 @@ type
 // end_ntifs
 
 function AcquireCredentialsHandleA(
-  pszPrincipal: LPSTR; // Name of principal
-  pszPackage: LPSTR; // Name of package
-  fCredentialUse: ULONG; // Flags indicating use
-  pvLogonId: Pvoid; // Pointer to logon ID
-  pAuthData: Pvoid; // Package specific data
-  pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
-  pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
-  phCredential: PCredHandle; // (out) Cred Handle
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
+           pszPrincipal: LPSTR; // Name of principal
+           pszPackage: LPSTR; // Name of package
+           fCredentialUse: ULONG; // Flags indicating use
+           pvLogonId: Pvoid; // Pointer to logon ID
+           pAuthData: Pvoid; // Package specific data
+           pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
+           pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
+           phCredential: PCredHandle; // (out) Cred Handle
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
 
 type
   ACQUIRE_CREDENTIALS_HANDLE_FN_A = function (
@@ -1319,21 +1319,21 @@ type
 // begin_ntifs
 
 function FreeCredentialsHandle(
-  phCredential: PCredHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Handle to free
+           phCredential: PCredHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Handle to free
 
 type
   FREE_CREDENTIALS_HANDLE_FN = function (
     param0: PCredHandle): SECURITY_STATUS; stdcall;
 
 function AddCredentialsW(
-  hCredentials: PCredHandle;
-  pszPrincipal: LPWSTR; // Name of principal
-  pszPackage: LPWSTR; // Name of package
-  fCredentialUse: ULONG; // Flags indicating use
-  pAuthData: Pvoid; // Package specific data
-  pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
-  pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
+           hCredentials: PCredHandle;
+           pszPrincipal: LPWSTR; // Name of principal
+           pszPackage: LPWSTR; // Name of package
+           fCredentialUse: ULONG; // Flags indicating use
+           pAuthData: Pvoid; // Package specific data
+           pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
+           pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
 
 type
   ADD_CREDENTIALS_FN_W = function (
@@ -1347,14 +1347,14 @@ type
     param7: PTimeStamp): SECURITY_STATUS; stdcall;
 
 function AddCredentialsA(
-  hCredentials: PCredHandle;
-  pszPrincipal: LPSTR; // Name of principal
-  pszPackage: LPSTR; // Name of package
-  fCredentialUse: ULONG; // Flags indicating use
-  pAuthData: Pvoid; // Package specific data
-  pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
-  pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
+           hCredentials: PCredHandle;
+           pszPrincipal: LPSTR; // Name of principal
+           pszPackage: LPSTR; // Name of package
+           fCredentialUse: ULONG; // Flags indicating use
+           pAuthData: Pvoid; // Package specific data
+           pGetKeyFn: SEC_GET_KEY_FN; // Pointer to GetKey() func
+           pvGetKeyArgument: Pvoid; // Value to pass to GetKey()
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Lifetime (optional)
 
 type
   ADD_CREDENTIALS_FN_A = function (
@@ -1383,14 +1383,14 @@ type
 ////////////////////////////////////////////////////////////////////////
 
 function ChangeAccountPasswordW(
-  pszPackageName: PSEC_WCHAR;
-  pszDomainName: PSEC_WCHAR;
-  pszAccountName: PSEC_WCHAR;
-  pszOldPassword: PSEC_WCHAR;
-  pszNewPassword: PSEC_WCHAR;
-  bImpersonating: BOOLEAN;
-  dwReserved: ULONG;
-  pOutput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszPackageName: PSEC_WCHAR;
+           pszDomainName: PSEC_WCHAR;
+           pszAccountName: PSEC_WCHAR;
+           pszOldPassword: PSEC_WCHAR;
+           pszNewPassword: PSEC_WCHAR;
+           bImpersonating: BOOLEAN;
+           dwReserved: ULONG;
+           pOutput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 type
   CHANGE_PASSWORD_FN_W = function (
@@ -1404,14 +1404,14 @@ type
     param7: PSecBufferDesc): SECURITY_STATUS; stdcall;
 
 function ChangeAccountPasswordA(
-  pszPackageName: PSEC_CHAR;
-  pszDomainName: PSEC_CHAR;
-  pszAccountName: PSEC_CHAR;
-  pszOldPassword: PSEC_CHAR;
-  pszNewPassword: PSEC_CHAR;
-  bImpersonating: BOOLEAN;
-  dwReserved: ULONG;
-  pOutput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszPackageName: PSEC_CHAR;
+           pszDomainName: PSEC_CHAR;
+           pszAccountName: PSEC_CHAR;
+           pszOldPassword: PSEC_CHAR;
+           pszNewPassword: PSEC_CHAR;
+           bImpersonating: BOOLEAN;
+           dwReserved: ULONG;
+           pOutput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 type
   CHANGE_PASSWORD_FN_A = function (
@@ -1434,18 +1434,18 @@ type
 ////////////////////////////////////////////////////////////////////////
 
 function InitializeSecurityContextW(
-  phCredential: PCredHandle; // Cred to base context
-  phContext: PCtxtHandle; // Existing context (OPT)
-  pszTargetName: PSEC_WCHAR; // Name of target
-  fContextReq: ULONG; // Context Requirements
-  Reserved1: ULONG; // Reserved, MBZ
-  TargetDataRep: ULONG; // Data rep of target
-  pInput: PSecBufferDesc; // Input Buffers
-  Reserved2: ULONG; // Reserved, MBZ
-  phNewContext: PCtxtHandle; // (out) New Context handle
-  pOutput: PSecBufferDesc; // (inout) Output Buffers
-  pfContextAttr: PULONG; // (out) Context attrs
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
+           phCredential: PCredHandle; // Cred to base context
+           phContext: PCtxtHandle; // Existing context (OPT)
+           pszTargetName: PSEC_WCHAR; // Name of target
+           fContextReq: ULONG; // Context Requirements
+           Reserved1: ULONG; // Reserved, MBZ
+           TargetDataRep: ULONG; // Data rep of target
+           pInput: PSecBufferDesc; // Input Buffers
+           Reserved2: ULONG; // Reserved, MBZ
+           phNewContext: PCtxtHandle; // (out) New Context handle
+           pOutput: PSecBufferDesc; // (inout) Output Buffers
+           pfContextAttr: PULONG; // (out) Context attrs
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
 
 type
   INITIALIZE_SECURITY_CONTEXT_FN_W = function (
@@ -1465,18 +1465,18 @@ type
 // end_ntifs
 
 function InitializeSecurityContextA(
-  phCredential: PCredHandle; // Cred to base context
-  phContext: PCtxtHandle; // Existing context (OPT)
-  pszTargetName: PSEC_CHAR; // Name of target
-  fContextReq: ULONG; // Context Requirements
-  Reserved1: ULONG; // Reserved, MBZ
-  TargetDataRep: ULONG; // Data rep of target
-  pInput: PSecBufferDesc; // Input Buffers
-  Reserved2: ULONG; // Reserved, MBZ
-  phNewContext: PCtxtHandle; // (out) New Context handle
-  pOutput: PSecBufferDesc; // (inout) Output Buffers
-  pfContextAttr: PULONG; // (out) Context attrs
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
+           phCredential: PCredHandle; // Cred to base context
+           phContext: PCtxtHandle; // Existing context (OPT)
+           pszTargetName: PSEC_CHAR; // Name of target
+           fContextReq: ULONG; // Context Requirements
+           Reserved1: ULONG; // Reserved, MBZ
+           TargetDataRep: ULONG; // Data rep of target
+           pInput: PSecBufferDesc; // Input Buffers
+           Reserved2: ULONG; // Reserved, MBZ
+           phNewContext: PCtxtHandle; // (out) New Context handle
+           pOutput: PSecBufferDesc; // (inout) Output Buffers
+           pfContextAttr: PULONG; // (out) Context attrs
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
 
 type
   INITIALIZE_SECURITY_CONTEXT_FN_A = function (
@@ -1499,15 +1499,15 @@ type
 // begin_ntifs
 
 function AcceptSecurityContext(
-  phCredential: PCredHandle; // Cred to base context
-  phContext: PCtxtHandle; // Existing context (OPT)
-  pInput: PSecBufferDesc; // Input buffer
-  fContextReq: ULONG; // Context Requirements
-  TargetDataRep: ULONG; // Target Data Rep
-  phNewContext: PCtxtHandle; // (out) New context handle
-  pOutput: PSecBufferDesc; // (inout) Output buffers
-  pfContextAttr: PULONG; // (out) Context attributes
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
+           phCredential: PCredHandle; // Cred to base context
+           phContext: PCtxtHandle; // Existing context (OPT)
+           pInput: PSecBufferDesc; // Input buffer
+           fContextReq: ULONG; // Context Requirements
+           TargetDataRep: ULONG; // Target Data Rep
+           phNewContext: PCtxtHandle; // (out) New context handle
+           pOutput: PSecBufferDesc; // (inout) Output buffers
+           pfContextAttr: PULONG; // (out) Context attributes
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
 
 type
   ACCEPT_SECURITY_CONTEXT_FN = function (
@@ -1522,8 +1522,8 @@ type
     param8: PTimeStamp): SECURITY_STATUS; stdcall;
 
 function CompleteAuthToken(
-  phContext: PCtxtHandle; // Context to complete
-  pToken: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Token to complete
+           phContext: PCtxtHandle; // Context to complete
+           pToken: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Token to complete
 
 type
   COMPLETE_AUTH_TOKEN_FN = function (
@@ -1531,22 +1531,22 @@ type
     param1: PSecBufferDesc): SECURITY_STATUS; stdcall;
 
 function ImpersonateSecurityContext(
-  phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Context to impersonate
+           phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Context to impersonate
 
 type
   IMPERSONATE_SECURITY_CONTEXT_FN = function (
     param0: PCtxtHandle): SECURITY_STATUS; stdcall;
 
 function RevertSecurityContext(
-  phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Context from which to re
+           phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Context from which to re
 
 type
   REVERT_SECURITY_CONTEXT_FN = function (
     param0: PCtxtHandle): SECURITY_STATUS; stdcall;
 
 function QuerySecurityContextToken(
-  phContext: PCtxtHandle;
-  Token: PPvoid): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           phContext: PCtxtHandle;
+           Token: PPvoid): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 type
   QUERY_SECURITY_CONTEXT_TOKEN_FN = function (
@@ -1554,15 +1554,15 @@ type
     param1: PPvoid): SECURITY_STATUS; stdcall;
 
 function DeleteSecurityContext(
-  phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Context to delete
+           phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Context to delete
 
 type
   DELETE_SECURITY_CONTEXT_FN = function (
     param0: PCtxtHandle): SECURITY_STATUS; stdcall;
 
 function ApplyControlToken(
-  phContext: PCtxtHandle; // Context to modify
-  pInput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Input token to apply
+           phContext: PCtxtHandle; // Context to modify
+           pInput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Input token to apply
 
 type
   APPLY_CONTROL_TOKEN_FN = function (
@@ -1570,9 +1570,9 @@ type
     param1: PSecBufferDesc): SECURITY_STATUS; stdcall;
 
 function QueryContextAttributesW(
-  phContext: PCtxtHandle; // Context to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
+           phContext: PCtxtHandle; // Context to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
 
 type
   QUERY_CONTEXT_ATTRIBUTES_FN_W = function (
@@ -1581,10 +1581,10 @@ type
     param2: Pvoid): SECURITY_STATUS; stdcall;
 
 function QueryContextAttributesExW(
-  phContext: PCtxtHandle; // Context to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
+           phContext: PCtxtHandle; // Context to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
 
 type
   QUERY_CONTEXT_ATTRIBUTES_EX_FN_W = function (
@@ -1596,9 +1596,9 @@ type
 // end_ntifs
 
 function QueryContextAttributesA(
-  phContext: PCtxtHandle; // Context to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
+           phContext: PCtxtHandle; // Context to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
 
 type
   QUERY_CONTEXT_ATTRIBUTES_FN_A = function (
@@ -1607,10 +1607,10 @@ type
     param2: Pvoid): SECURITY_STATUS; stdcall;
 
 function QueryContextAttributesExA(
-  phContext: PCtxtHandle; // Context to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
+           phContext: PCtxtHandle; // Context to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
 
 type
   QUERY_CONTEXT_ATTRIBUTES_EX_FN_A = function (
@@ -1627,10 +1627,10 @@ type
 // begin_ntifs
 
 function SetContextAttributesW(
-  phContext: PCtxtHandle; // Context to Set
-  ulAttribute: ULONG; // Attribute to Set
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
+           phContext: PCtxtHandle; // Context to Set
+           ulAttribute: ULONG; // Attribute to Set
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
 
 type
   SET_CONTEXT_ATTRIBUTES_FN_W = function (
@@ -1642,10 +1642,10 @@ type
 // end_ntifs
 
 function SetContextAttributesA(
-  phContext: PCtxtHandle; // Context to Set
-  ulAttribute: ULONG; // Attribute to Set
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
+           phContext: PCtxtHandle; // Context to Set
+           ulAttribute: ULONG; // Attribute to Set
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
 
 type
   SET_CONTEXT_ATTRIBUTES_FN_A = function (
@@ -1660,9 +1660,9 @@ type
 // begin_ntifs
 
 function QueryCredentialsAttributesW(
-  phCredential: PCredHandle; // Credential to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
+           phCredential: PCredHandle; // Credential to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
 
 type
   QUERY_CREDENTIALS_ATTRIBUTES_FN_W = function (
@@ -1671,10 +1671,10 @@ type
     param2: Pvoid): SECURITY_STATUS; stdcall;
 
 function QueryCredentialsAttributesExW(
-  phCredential: PCredHandle; // Credential to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
+           phCredential: PCredHandle; // Credential to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
 
 type
   QUERY_CREDENTIALS_ATTRIBUTES_EX_FN_W = function (
@@ -1686,9 +1686,9 @@ type
 // end_ntifs
 
 function QueryCredentialsAttributesA(
-  phCredential: PCredHandle; // Credential to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
+           phCredential: PCredHandle; // Credential to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Buffer for attributes
 
 type
   QUERY_CREDENTIALS_ATTRIBUTES_FN_A = function (
@@ -1697,10 +1697,10 @@ type
     param2: Pvoid): SECURITY_STATUS; stdcall;
 
 function QueryCredentialsAttributesExA(
-  phCredential: PCredHandle; // Credential to query
-  ulAttribute: ULONG; // Attribute to query
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
+           phCredential: PCredHandle; // Credential to query
+           ulAttribute: ULONG; // Attribute to query
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll'; // Length of buffer
 
 type
   QUERY_CREDENTIALS_ATTRIBUTES_EX_FN_A = function (
@@ -1717,10 +1717,10 @@ type
 // begin_ntifs
 
 function SetCredentialsAttributesW(
-  phCredential: PCredHandle; // Credential to Set
-  ulAttribute: ULONG; // Attribute to Set
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
+           phCredential: PCredHandle; // Credential to Set
+           ulAttribute: ULONG; // Attribute to Set
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
 
 type
   SET_CREDENTIALS_ATTRIBUTES_FN_W = function (
@@ -1732,10 +1732,10 @@ type
 // end_ntifs
 
 function SetCredentialsAttributesA(
-  phCredential: PCredHandle; // Credential to Set
-  ulAttribute: ULONG; // Attribute to Set
-  pBuffer: Pvoid; // Buffer for attributes
-  cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
+           phCredential: PCredHandle; // Credential to Set
+           ulAttribute: ULONG; // Attribute to Set
+           pBuffer: Pvoid; // Buffer for attributes
+           cbBuffer: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Size (in bytes) of Buffer
 
 type
   SET_CREDENTIALS_ATTRIBUTES_FN_A = function (
@@ -1750,7 +1750,7 @@ type
 // begin_ntifs
 
 function FreeContextBuffer(
-  pvContextBuffer: PVOID): SECURITY_STATUS; stdcall; external 'secur32.dll'; // buffer to free
+           pvContextBuffer: PVOID): SECURITY_STATUS; stdcall; external 'secur32.dll'; // buffer to free
 
 type
   FREE_CONTEXT_BUFFER_FN = function (
@@ -1789,10 +1789,10 @@ type
 //////////////////////////////////////////////////////////////////
 
 function MakeSignature(
-  phContext: PCtxtHandle; // Context to use
-  fQOP: ULONG; // Quality of Protection
-  pMessage: PSecBufferDesc; // Message to sign
-  MessageSeqNo: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Message Sequence Num.
+           phContext: PCtxtHandle; // Context to use
+           fQOP: ULONG; // Quality of Protection
+           pMessage: PSecBufferDesc; // Message to sign
+           MessageSeqNo: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Message Sequence Num.
 
 type
   MAKE_SIGNATURE_FN = function (
@@ -1802,10 +1802,10 @@ type
     param3: ULONG): SECURITY_STATUS; stdcall;
 
 function VerifySignature(
-  phContext: PCtxtHandle; // Context to use
-  pMessage: PSecBufferDesc; // Message to verify
-  MessageSeqNo: ULONG; // Sequence Num.
-  pfQOP: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // QOP used
+           phContext: PCtxtHandle; // Context to use
+           pMessage: PSecBufferDesc; // Message to verify
+           MessageSeqNo: ULONG; // Sequence Num.
+           pfQOP: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll'; // QOP used
 
 type
   VERIFY_SIGNATURE_FN = function (
@@ -1819,10 +1819,10 @@ const SECQOP_WRAP_NO_ENCRYPT = $80000001;
 const SECQOP_WRAP_OOB_DATA = $40000000;
 
 function EncryptMessage(
-  phContext: PCtxtHandle;
-  fQOP: ULONG;
-  pMessage: PSecBufferDesc;
-  MessageSeqNo: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           phContext: PCtxtHandle;
+           fQOP: ULONG;
+           pMessage: PSecBufferDesc;
+           MessageSeqNo: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 type
   ENCRYPT_MESSAGE_FN = function (
@@ -1832,10 +1832,10 @@ type
     param3: ULONG): SECURITY_STATUS; stdcall;
 
 function DecryptMessage(
-  phContext: PCtxtHandle;
-  pMessage: PSecBufferDesc;
-  MessageSeqNo: ULONG;
-  pfQOP: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           phContext: PCtxtHandle;
+           pMessage: PSecBufferDesc;
+           MessageSeqNo: ULONG;
+           pfQOP: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 type
   DECRYPT_MESSAGE_FN = function (
@@ -1854,8 +1854,8 @@ type
 ///////////////////////////////////////////////////////////////////////////
 
 function EnumerateSecurityPackagesW(
-  pcPackages: PULONG; // Receives num. packages
-  ppPackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives array of info
+           pcPackages: PULONG; // Receives num. packages
+           ppPackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives array of info
 
 type
   ENUMERATE_SECURITY_PACKAGES_FN_W = function (
@@ -1865,8 +1865,8 @@ type
 // end_ntifs
 
 function EnumerateSecurityPackagesA(
-  pcPackages: PULONG; // Receives num. packages
-  ppPackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives array of info
+           pcPackages: PULONG; // Receives num. packages
+           ppPackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives array of info
 
 type
   ENUMERATE_SECURITY_PACKAGES_FN_A = function (
@@ -1879,8 +1879,8 @@ type
 // begin_ntifs
 
 function QuerySecurityPackageInfoW(
-  pszPackageName: LPWSTR; // Name of package
-  ppPackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives package info
+           pszPackageName: LPWSTR; // Name of package
+           ppPackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives package info
 
 type
   QUERY_SECURITY_PACKAGE_INFO_FN_W = function (
@@ -1890,8 +1890,8 @@ type
 // end_ntifs
 
 function QuerySecurityPackageInfoA(
-  pszPackageName: LPSTR; // Name of package
-  ppPackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives package info
+           pszPackageName: LPSTR; // Name of package
+           ppPackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll'; // Receives package info
 
 type
   QUERY_SECURITY_PACKAGE_INFO_FN_A = function (
@@ -1939,10 +1939,10 @@ type
 ///////////////////////////////////////////////////////////////////////////
 
 function ExportSecurityContext(
-  phContext: PCtxtHandle; // (in) context to export
-  fFlags: ULONG; // (in) option flags
-  pPackedContext: PSecBuffer; // (out) marshalled context
-  pToken: PPvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out, optional) token handle for impersonation
+           phContext: PCtxtHandle; // (in) context to export
+           fFlags: ULONG; // (in) option flags
+           pPackedContext: PSecBuffer; // (out) marshalled context
+           pToken: PPvoid): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out, optional) token handle for impersonation
 
 type
   EXPORT_SECURITY_CONTEXT_FN = function (
@@ -1952,10 +1952,10 @@ type
     param3: PPvoid): SECURITY_STATUS; stdcall;
 
 function ImportSecurityContextW(
-  pszPackage: LPWSTR;
-  pPackedContext: PSecBuffer; // (in) marshalled context
-  Token: Pvoid; // (in, optional) handle to token for context
-  phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) new context handle
+           pszPackage: LPWSTR;
+           pPackedContext: PSecBuffer; // (in) marshalled context
+           Token: Pvoid; // (in, optional) handle to token for context
+           phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) new context handle
 
 type
   IMPORT_SECURITY_CONTEXT_FN_W = function (
@@ -1965,10 +1965,10 @@ type
     param3: PCtxtHandle): SECURITY_STATUS; stdcall;
 
 function ImportSecurityContextA(
-  pszPackage: LPSTR;
-  pPackedContext: PSecBuffer; // (in) marshalled context
-  Token: PVOID; // (in, optional) handle to token for context
-  phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) new context handle
+           pszPackage: LPSTR;
+           pPackedContext: PSecBuffer; // (in) marshalled context
+           Token: PVOID; // (in, optional) handle to token for context
+           phContext: PCtxtHandle): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) new context handle
 
 type
   IMPORT_SECURITY_CONTEXT_FN_A = function (
@@ -2127,75 +2127,75 @@ type
 //
 
 function SaslEnumerateProfilesA(
-  ProfileList: PLPSTR;
-  ProfileCount: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           ProfileList: PLPSTR;
+           ProfileCount: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SaslEnumerateProfilesW(
-  ProfileList: PLPWSTR;
-  ProfileCount: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           ProfileList: PLPWSTR;
+           ProfileCount: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 // #define SaslEnumerateProfiles SaslEnumerateProfilesW
 
 function SaslGetProfilePackageA(
-  ProfileName: LPSTR;
-  PackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           ProfileName: LPSTR;
+           PackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SaslGetProfilePackageW(
-  ProfileName: LPWSTR;
-  PackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           ProfileName: LPWSTR;
+           PackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 // #define SaslGetProfilePackage SaslGetProfilePackageW
 
 function SaslIdentifyPackageA(
-  pInput: PSecBufferDesc;
-  PackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pInput: PSecBufferDesc;
+           PackageInfo: PPSecPkgInfoA): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SaslIdentifyPackageW(
-  pInput: PSecBufferDesc;
-  PackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pInput: PSecBufferDesc;
+           PackageInfo: PPSecPkgInfoW): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 // #define SaslIdentifyPackage SaslIdentifyPackageW
 
 function SaslInitializeSecurityContextW(
-  phCredential: PCredHandle; // Cred to base context
-  phContext: PCtxtHandle; // Existing context (OPT)
-  pszTargetName: LPWSTR; // Name of target
-  fContextReq: ULONG; // Context Requirements
-  Reserved1: ULONG; // Reserved, MBZ
-  TargetDataRep: ULONG; // Data rep of target
-  pInput: PSecBufferDesc; // Input Buffers
-  Reserved2: ULONG; // Reserved, MBZ
-  phNewContext: PCtxtHandle; // (out) New Context handle
-  pOutput: PSecBufferDesc; // (inout) Output Buffers
-  pfContextAttr: PULONG; // (out) Context attrs
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
+           phCredential: PCredHandle; // Cred to base context
+           phContext: PCtxtHandle; // Existing context (OPT)
+           pszTargetName: LPWSTR; // Name of target
+           fContextReq: ULONG; // Context Requirements
+           Reserved1: ULONG; // Reserved, MBZ
+           TargetDataRep: ULONG; // Data rep of target
+           pInput: PSecBufferDesc; // Input Buffers
+           Reserved2: ULONG; // Reserved, MBZ
+           phNewContext: PCtxtHandle; // (out) New Context handle
+           pOutput: PSecBufferDesc; // (inout) Output Buffers
+           pfContextAttr: PULONG; // (out) Context attrs
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
 
 function SaslInitializeSecurityContextA(
-  phCredential: PCredHandle; // Cred to base context
-  phContext: PCtxtHandle; // Existing context (OPT)
-  pszTargetName: LPSTR; // Name of target
-  fContextReq: ULONG; // Context Requirements
-  Reserved1: ULONG; // Reserved, MBZ
-  TargetDataRep: ULONG; // Data rep of target
-  pInput: PSecBufferDesc; // Input Buffers
-  Reserved2: ULONG; // Reserved, MBZ
-  phNewContext: PCtxtHandle; // (out) New Context handle
-  pOutput: PSecBufferDesc; // (inout) Output Buffers
-  pfContextAttr: PULONG; // (out) Context attrs
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
+           phCredential: PCredHandle; // Cred to base context
+           phContext: PCtxtHandle; // Existing context (OPT)
+           pszTargetName: LPSTR; // Name of target
+           fContextReq: ULONG; // Context Requirements
+           Reserved1: ULONG; // Reserved, MBZ
+           TargetDataRep: ULONG; // Data rep of target
+           pInput: PSecBufferDesc; // Input Buffers
+           Reserved2: ULONG; // Reserved, MBZ
+           phNewContext: PCtxtHandle; // (out) New Context handle
+           pOutput: PSecBufferDesc; // (inout) Output Buffers
+           pfContextAttr: PULONG; // (out) Context attrs
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
 
 // #define SaslInitializeSecurityContext SaslInitializeSecurityContextW
 
 function SaslAcceptSecurityContext(
-  phCredential: PCredHandle; // Cred to base context
-  phContext: PCtxtHandle; // Existing context (OPT)
-  pInput: PSecBufferDesc; // Input buffer
-  fContextReq: ULONG; // Context Requirements
-  TargetDataRep: ULONG; // Target Data Rep
-  phNewContext: PCtxtHandle; // (out) New context handle
-  pOutput: PSecBufferDesc; // (inout) Output buffers
-  pfContextAttr: PULONG; // (out) Context attributes
-  ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
+           phCredential: PCredHandle; // Cred to base context
+           phContext: PCtxtHandle; // Existing context (OPT)
+           pInput: PSecBufferDesc; // Input buffer
+           fContextReq: ULONG; // Context Requirements
+           TargetDataRep: ULONG; // Target Data Rep
+           phNewContext: PCtxtHandle; // (out) New context handle
+           pOutput: PSecBufferDesc; // (inout) Output buffers
+           pfContextAttr: PULONG; // (out) Context attributes
+           ptsExpiry: PTimeStamp): SECURITY_STATUS; stdcall; external 'secur32.dll'; // (out) Life span (OPT)
 
 const SASL_OPTION_SEND_SIZE = 1; // Maximum size to send to peer
 const SASL_OPTION_RECV_SIZE = 2; // Maximum size willing to receive
@@ -2209,17 +2209,17 @@ type
   SASL_AUTHZID_STATE = _SASL_AUTHZID_STATE;
 
 function SaslSetContextOption(
-  ContextHandle: PCtxtHandle;
-  Option: ULONG;
-  Value: PVOID;
-  Size: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           ContextHandle: PCtxtHandle;
+           Option: ULONG;
+           Value: PVOID;
+           Size: ULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SaslGetContextOption(
-  ContextHandle: PCtxtHandle;
-  Option: ULONG;
-  Value: PVOID;
-  Size: ULONG;
-  Needed: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           ContextHandle: PCtxtHandle;
+           Option: ULONG;
+           Value: PVOID;
+           Size: ULONG;
+           Needed: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // This is the legacy credentials structure.
@@ -2741,19 +2741,19 @@ type
 // );
 
 function SspiPrepareForCredRead(
-  AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  pszTargetName: PCWSTR;
-  pCredmanCredentialType: PULONG;
-  ppszCredmanTargetName: PPCWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           pszTargetName: PCWSTR;
+           pCredmanCredentialType: PULONG;
+           ppszCredmanTargetName: PPCWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SspiPrepareForCredWrite(
-  AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  pszTargetName: PCWSTR; // supply NULL for username-target credentials
-  pCredmanCredentialType: PULONG;
-  ppszCredmanTargetName: PPCWSTR;
-  ppszCredmanUserName: PPCWSTR;
-  ppCredentialBlob: PPUCHAR;
-  pCredentialBlobSize: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           pszTargetName: PCWSTR; // supply NULL for username-target credentials
+           pCredmanCredentialType: PULONG;
+           ppszCredmanTargetName: PPCWSTR;
+           ppszCredmanUserName: PPCWSTR;
+           ppCredentialBlob: PPUCHAR;
+           pCredentialBlobSize: PULONG): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // Input flags for SspiEncryptAuthIdentityEx and
@@ -2765,21 +2765,21 @@ const SEC_WINNT_AUTH_IDENTITY_ENCRYPT_SAME_PROCESS = $2;
 const SEC_WINNT_AUTH_IDENTITY_ENCRYPT_FOR_SYSTEM = $4;
 
 function SspiEncryptAuthIdentity(
-  AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SspiEncryptAuthIdentityEx(
-  Options: ULONG;
-  AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'sspicli.dll';
+           Options: ULONG;
+           AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'sspicli.dll';
 
 function SspiDecryptAuthIdentity(
-  EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SspiDecryptAuthIdentityEx(
-  Options: ULONG;
-  EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'sspicli.dll';
+           Options: ULONG;
+           EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'sspicli.dll';
 
 function SspiIsAuthIdentityEncrypted(
-  EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): BOOLEAN; stdcall; external 'secur32.dll';
+           EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): BOOLEAN; stdcall; external 'secur32.dll';
 
 // begin_ntifs
 
@@ -2799,21 +2799,21 @@ function SspiIsAuthIdentityEncrypted(
 //
 
 function SspiEncodeAuthIdentityAsStrings(
-  pAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  ppszUserName: PPCWSTR;
-  ppszDomainName: PPCWSTR;
-  ppszPackedCredentialsString: PPCWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pAuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           ppszUserName: PPCWSTR;
+           ppszDomainName: PPCWSTR;
+           ppszPackedCredentialsString: PPCWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SspiValidateAuthIdentity(
-  AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // free the returned memory using SspiFreeAuthIdentity()
 //
 
 function SspiCopyAuthIdentity(
-  AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  AuthDataCopy: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           AuthDataCopy: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // use only for the memory returned by SspiCopyAuthIdentity().
@@ -2821,13 +2821,13 @@ function SspiCopyAuthIdentity(
 //
 
 procedure SspiFreeAuthIdentity(
-  AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE); stdcall; external 'secur32.dll';
+            AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE); stdcall; external 'secur32.dll';
 
 procedure SspiZeroAuthIdentity(
-  AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE); stdcall; external 'secur32.dll';
+            AuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE); stdcall; external 'secur32.dll';
 
 procedure SspiLocalFree(
-  DataBuffer: PVOID); stdcall; external 'secur32.dll';
+            DataBuffer: PVOID); stdcall; external 'secur32.dll';
 
 //
 // call SspiFreeAuthIdentity to free the returned AuthIdentity
@@ -2835,16 +2835,16 @@ procedure SspiLocalFree(
 //
 
 function SspiEncodeStringsAsAuthIdentity(
-  pszUserName: PCWSTR;
-  pszDomainName: PCWSTR;
-  pszPackedCredentialsString: PCWSTR;
-  ppAuthIdentity: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszUserName: PCWSTR;
+           pszDomainName: PCWSTR;
+           pszPackedCredentialsString: PCWSTR;
+           ppAuthIdentity: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SspiCompareAuthIdentities(
-  AuthIdentity1: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  AuthIdentity2: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  SameSuppliedUser: PBOOLEAN;
-  SameSuppliedIdentity: PBOOLEAN): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthIdentity1: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           AuthIdentity2: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           SameSuppliedUser: PBOOLEAN;
+           SameSuppliedIdentity: PBOOLEAN): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // zero out the returned AuthIdentityByteArray then
@@ -2852,18 +2852,18 @@ function SspiCompareAuthIdentities(
 //
 
 function SspiMarshalAuthIdentity(
-  AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  AuthIdentityLength: PULONG;
-  AuthIdentityByteArray: PPAnsiChar): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           AuthIdentityLength: PULONG;
+           AuthIdentityByteArray: PPAnsiChar): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // free the returned auth identity using SspiFreeAuthIdentity()
 //
 
 function SspiUnmarshalAuthIdentity(
-  AuthIdentityLength: ULONG;
-  AuthIdentityByteArray: PAnsiChar;
-  ppAuthIdentity: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthIdentityLength: ULONG;
+           AuthIdentityByteArray: PAnsiChar;
+           ppAuthIdentity: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 // BOOLEAN
 // WINAPI
@@ -2872,13 +2872,13 @@ function SspiUnmarshalAuthIdentity(
 // );
 
 function SspiGetTargetHostName(
-  pszTargetName: PCWSTR;
-  pszHostName: PPWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszTargetName: PCWSTR;
+           pszHostName: PPWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function SspiExcludePackage(
-  AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
-  pszPackageName: PCWSTR;
-  ppNewAuthIdentity: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           AuthIdentity: PSEC_WINNT_AUTH_IDENTITY_OPAQUE;
+           pszPackageName: PCWSTR;
+           ppNewAuthIdentity: PPSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 //
 // Common types used by negotiable security packages
@@ -2894,8 +2894,8 @@ const SEC_WINNT_AUTH_IDENTITY_ONLY = $8; // these credentials are for identity o
 // Set the requested flags in the channel bindings. pBindings->Bindings may change if the structure gets
 // larger, but the caller's obligation to call FreeContextBuffer is unchanged.
 function SspiSetChannelBindingFlags(
-  pBindings: PSecPkgContext_Bindings;
-  flags: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll';
+           pBindings: PSecPkgContext_Bindings;
+           flags: ULONG): SECURITY_STATUS; stdcall; external 'sspicli.dll';
 
 //
 // Routines for manipulating packages
@@ -2919,20 +2919,20 @@ const SECPKG_OPTIONS_TYPE_SSPI = 2;
 const SECPKG_OPTIONS_PERMANENT = $00000001;
 
 function AddSecurityPackageA(
-  pszPackageName: LPSTR;
-  pOptions: PSECURITY_PACKAGE_OPTIONS): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszPackageName: LPSTR;
+           pOptions: PSECURITY_PACKAGE_OPTIONS): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function AddSecurityPackageW(
-  pszPackageName: LPWSTR;
-  pOptions: PSECURITY_PACKAGE_OPTIONS): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszPackageName: LPWSTR;
+           pOptions: PSECURITY_PACKAGE_OPTIONS): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 // #define AddSecurityPackage AddSecurityPackageW
 
 function DeleteSecurityPackageA(
-  pszPackageName: LPSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszPackageName: LPSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 function DeleteSecurityPackageW(
-  pszPackageName: LPWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
+           pszPackageName: LPWSTR): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
 // #define DeleteSecurityPackage DeleteSecurityPackageW
 

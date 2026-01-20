@@ -535,7 +535,7 @@ begin
 end;
 {$ENDIF}
 
-{***************************************}
+{**************************************************************************}
 function ALTryGetLocalDnsFullyQualifiedName(out AName: AnsiString): Boolean;
 begin
   {$IF defined(MSWindows)}
@@ -545,7 +545,7 @@ begin
   {$ENDIF}
 end;
 
-{***************************************}
+{**********************************************************************}
 function ALTryGetLocalDnsFullyQualifiedName(out AName: String): Boolean;
 begin
   {$IF defined(MSWindows)}
@@ -555,7 +555,7 @@ begin
   {$ENDIF}
 end;
 
-{***************************************}
+{****************************************************************}
 function ALTryGetLocalDnsHostName(out AName: AnsiString): Boolean;
 begin
   {$IF defined(MSWindows)}
@@ -565,7 +565,7 @@ begin
   {$ENDIF}
 end;
 
-{***************************************}
+{************************************************************}
 function ALTryGetLocalDnsHostName(out AName: String): Boolean;
 begin
   {$IF defined(MSWindows)}
@@ -586,7 +586,7 @@ begin
   Result := 'localhost';
 end;
 
-{**************************************}
+{******************************************}
 function ALGetLocalDnsIdentityA: AnsiString;
 begin
   // Prefer FQDN

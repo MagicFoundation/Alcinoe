@@ -109,7 +109,7 @@ begin
   FHost := '';
 end;
 
-{**************************************}
+{******************************************************************}
 procedure TAlSChannelTlsClient.SetSendTimeout(const Value: integer);
 begin
   inherited;
@@ -117,7 +117,7 @@ begin
     _TALWinSocketClientProtectedAccess.SetSendTimeout(FSocket, Value);
 end;
 
-{**************************************}
+{*********************************************************************}
 procedure TAlSChannelTlsClient.SetReceiveTimeout(const Value: integer);
 begin
   inherited;
@@ -125,7 +125,7 @@ begin
     _TALWinSocketClientProtectedAccess.SetReceiveTimeout(FSocket, Value);
 end;
 
-{**************************************}
+{****************************************************************}
 procedure TAlSChannelTlsClient.SetKeepAlive(const Value: boolean);
 begin
   inherited;
@@ -133,7 +133,7 @@ begin
     _TALWinSocketClientProtectedAccess.SetKeepAlive(FSocket, Value);
 end;
 
-{**************************************}
+{*****************************************************************}
 procedure TAlSChannelTlsClient.SetTCPNoDelay(const Value: boolean);
 begin
   inherited;

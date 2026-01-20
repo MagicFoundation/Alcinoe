@@ -899,6 +899,8 @@ Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alci
 High-Performance HTTP Server (http.sys)
 =======================================
 
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/http3.png?raw=true" width="540" style="width:540px;"/>
+
 TALHttpSysServer is a high-performance HTTP server component for 
 Delphi that runs directly on top of http.sys, the kernel-mode HTTP 
 stack built into Windows. By leveraging the same foundation that 
@@ -935,7 +937,7 @@ Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tr
 TLS Socket Client (SChannel)
 ============================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/TLS1_3.webp?raw=true" width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/tsl_1_3.webp?raw=true" width="540" style="width:540px;"/>
 
 `TAlSChannelTlsClient` is a high-performance TLS socket client component for
 Delphi that runs directly on top of the Windows **SChannel** security package,

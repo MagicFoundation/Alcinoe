@@ -118,10 +118,10 @@ object Form1: TForm1
             Style.IsFontAssigned = True
             TabOrder = 0
             Text = 'https://echo.free.beeceptor.com/'
-            Width = 279
+            Width = 277
           end
           object ButtonPost: TcxButton
-            Left = 381
+            Left = 379
             Top = 6
             Width = 50
             Height = 25
@@ -137,7 +137,7 @@ object Form1: TForm1
             OnClick = ButtonPostClick
           end
           object ButtonGet: TcxButton
-            Left = 326
+            Left = 324
             Top = 6
             Width = 50
             Height = 25
@@ -153,7 +153,7 @@ object Form1: TForm1
             OnClick = ButtonGetClick
           end
           object ButtonHead: TcxButton
-            Left = 436
+            Left = 434
             Top = 6
             Width = 50
             Height = 25
@@ -169,7 +169,7 @@ object Form1: TForm1
             OnClick = ButtonHeadClick
           end
           object ButtonTrace: TcxButton
-            Left = 492
+            Left = 490
             Top = 6
             Width = 50
             Height = 25
@@ -185,7 +185,7 @@ object Form1: TForm1
             OnClick = ButtonTraceClick
           end
           object ButtonOptions: TcxButton
-            Left = 548
+            Left = 546
             Top = 6
             Width = 50
             Height = 25
@@ -201,7 +201,7 @@ object Form1: TForm1
             OnClick = ButtonOptionsClick
           end
           object ButtonPut: TcxButton
-            Left = 604
+            Left = 602
             Top = 6
             Width = 50
             Height = 25
@@ -217,7 +217,7 @@ object Form1: TForm1
             OnClick = ButtonPutClick
           end
           object ButtonDelete: TcxButton
-            Left = 660
+            Left = 658
             Top = 6
             Width = 50
             Height = 25
@@ -477,7 +477,7 @@ object Form1: TForm1
             Style.IsFontAssigned = True
             TabOrder = 1
             Height = 0
-            Width = 479
+            Width = 477
           end
         end
         object cxSplitter1: TcxSplitter
@@ -988,7 +988,8 @@ object Form1: TForm1
           Style.Font.Style = []
           Style.IsFontAssigned = True
           TabOrder = 0
-          Height = 339
+          ExplicitHeight = 339
+          Height = 333
           Width = 459
         end
       end

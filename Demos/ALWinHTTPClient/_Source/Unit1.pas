@@ -367,7 +367,7 @@ begin
               MemoPostDataFiles.Lines.ValueFromIndex[I]); // const AFilePath: String;
         For var I := 0 To MemoPostDataStrings.Lines.Count - 1 do
           if MemoPostDataStrings.Lines[I] <> '' then
-            LMultiPartFormDataEncoder.AddField(
+            LMultiPartFormDataEncoder.AddText(
               AnsiString(MemoPostDataStrings.Lines.Names[I]), // const AField, AValue: AnsiString;
               AnsiString(MemoPostDataStrings.Lines.ValueFromIndex[I])); // const AField, AValue: AnsiString;
         LHTTPClientResponse := FWinHttpClient.PostMultiPartFormData(
@@ -446,7 +446,7 @@ begin
               MemoPostDataFiles.Lines.ValueFromIndex[I]); // const AFilePath: String;
         For var I := 0 To MemoPostDataStrings.Lines.Count - 1 do
           if MemoPostDataStrings.Lines[I] <> '' then
-            LMultiPartFormDataEncoder.AddField(
+            LMultiPartFormDataEncoder.AddText(
               AnsiString(MemoPostDataStrings.Lines.Names[I]), // const AField, AValue: AnsiString;
               AnsiString(MemoPostDataStrings.Lines.ValueFromIndex[I])); // const AField, AValue: AnsiString;
         LHTTPClientResponse := FWinHttpClient.PutMultiPartFormData(

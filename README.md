@@ -932,6 +932,50 @@ Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tr
 <br/>
 
 
+TLS Socket Client (SChannel)
+============================
+
+`TAlSChannelTlsClient` is a high-performance TLS socket client component for  
+Delphi that runs directly on top of the Windows **SChannel** security package,  
+the native TLS/SSL implementation built into the Windows operating system.  
+By leveraging the same kernel-integrated cryptographic stack used by Windows,  
+IIS, WinHTTP, and .NET, it provides production-grade security, compatibility,  
+and performance without requiring any external libraries or DLLs, with **no  
+external dependencies** such as OpenSSL or third-party components and no  
+redistribution or licensing concerns.
+
+`TAlSChannelTlsClient` transparently upgrades an existing TCP socket to TLS  
+and handles encryption, decryption, handshake, renegotiation, and shutdown  
+entirely through the Windows SSPI/SChannel APIs. It supports **TLS 1.2 and  
+TLS 1.3**, automatically negotiating the best protocol version supported by  
+both client and server in accordance with Windows security policy, and is  
+designed for building robust SMTP, HTTPS, WebSocket, or custom protocol  
+clients where full control over the transport layer is required.
+
+Learn more at [Demos\ALTSLClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALTSLClient)
+<br/>
+<br/>
+
+
+TALSMTPClient
+=============
+    
+Designed for reliable and secure email delivery, `TALSMTPClient` is a Delphi  
+SMTP client component that sends messages directly over the SMTP protocol  
+while leveraging the native Windows TLS stack for transport security. By  
+relying on the operating system’s integrated security infrastructure, it  
+provides production-grade reliability, security, and compatibility without  
+requiring any external libraries or additional DLLs to be deployed.
+
+`TALSMTPClient` supports modern email security requirements with full  
+**TLS 1.2 and TLS 1.3** support, automatically negotiating the best protocol  
+version supported by both client and server in accordance with Windows  
+security policy. It works seamlessly with the **Multipart Alternative** and  
+**Multipart Mixed** encoders, enabling the creation of emails with plain-text  
+and HTML alternatives as well as file attachments, while giving developers  
+full control over the SMTP session and message composition.
+
+
 Json Parser
 ===========
 
@@ -1040,7 +1084,7 @@ Learn more at [Demos\ALImageMagick](https://github.com/MagicFoundation/Alcinoe/t
 <br/>
 
 
-MongoDb client
+MongoDb Client
 ==============
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/mongodb.webp?raw=true"  width="600" style="width:600px;"/>
@@ -1083,42 +1127,10 @@ You can start exploring this feature with the demo located at
 <br/>
   
 
-Memcached Client
-================
-
-**What is Memcached?** Memcached is a free, open-source, 
-high-performance, distributed memory object caching system. 
-It is generic in nature but is primarily used to speed up 
-dynamic web applications by reducing database load. By 
-caching frequently accessed data in memory, Memcached helps 
-improve the performance and scalability of applications.
-
-Learn more at [Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
-<br/>
-<br/>
-  
-
-SQLite3 Client
-==============
-
-The **SQLite3 Client** for Delphi allows you to query an 
-**SQLite3** database and retrieve the results in multiple 
-formats, including **XML**, **JSON**, and **BSON**. 
-This flexibility makes it ideal for applications that 
-require data exchange in different formats, enabling 
-smooth integration with various systems and APIs.
-
-Learn more at [Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
-<br/>
-<br/>
-  
-
 And Much More
 =============
 
 * HTTP Client (WinHTTP)
-* POP3 Client
-* SMTP Client
 * Xml Parser 
 * Etc ...
 <br/>

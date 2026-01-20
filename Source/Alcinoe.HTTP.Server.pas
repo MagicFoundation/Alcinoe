@@ -65,6 +65,7 @@ type
     FOnRequest: TRequestEvent;
   protected
     FRunning: Boolean;
+    procedure DoRequest(Const ARequest: TALHttpServerRequestA; Const AResponse: TALHttpServerResponseA); virtual;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -91,6 +92,13 @@ destructor TALHttpServerA.Destroy;
 begin
   Stop;
   inherited;
+end;
+
+{*****************************************************************************************************************}
+procedure TALHttpServerA.DoRequest(Const ARequest: TALHttpServerRequestA; Const AResponse: TALHttpServerResponseA);
+begin
+  If Assigned(FOnRequest) then
+    FOnRequest(ARequest, AResponse);
 end;
 
 end.

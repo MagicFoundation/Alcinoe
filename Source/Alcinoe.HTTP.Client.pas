@@ -1452,7 +1452,7 @@ Begin
     Result := Execute(
                 AUrl, // const AUrl: AnsiString;
                 AVerb, // const AVerb: AnsiString;
-                AFormDataEncoder.Stream, // const ABodyStream: TStream;
+                AFormDataEncoder.PayloadStream, // const ABodyStream: TStream;
                 AHeaders, // const AHeaders: TALNameValueArrayA
                 AResponseBodyStream); // const AResponseBodyStream: TStream)
   finally

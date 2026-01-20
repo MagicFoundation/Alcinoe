@@ -7,8 +7,10 @@ interface
 uses
   system.classes,
   system.SyncObjs,
-  system.Generics.Collections,
-  Alcinoe.FMX.Common;
+  system.Generics.Collections
+  {$IF defined(FRAMEWORK_FMX)}
+  ,Alcinoe.FMX.Common
+  {$ENDIF};
 
 type
 
@@ -44,6 +46,7 @@ type
     FFreeObjectsCurrList: TObjectList<Tobject>;
     fFreeObjectsEmptyList: TObjectList<Tobject>;
     //-
+    {$IF defined(FRAMEWORK_FMX)}
     FFreeDrawablesLock: TObject;
     FFreeDrawablesCurrList: TList<TALDrawable>;
     fFreeDrawablesEmptyList: TList<TALDrawable>;
@@ -51,6 +54,7 @@ type
     FFreeBitmapsLock: TObject;
     FFreeBitmapsCurrList: TList<TALBitmap>;
     fFreeBitmapsEmptyList: TList<TALBitmap>;
+    {$ENDIF}
     //-
     FCanExecute: boolean;
     FForceExecute: Boolean;
@@ -60,11 +64,13 @@ type
     procedure FreeObjects;
     procedure FreeObject(var aObject: Tobject);
     //-
+    {$IF defined(FRAMEWORK_FMX)}
     procedure FreeDrawables;
     procedure FreeDrawable(var aDrawable: TALDrawable);
     //-
     procedure FreeBitmaps;
     procedure FreeBitmap(var aBitmap: TALBitmap);
+    {$ENDIF}
     //-
     procedure PurgeRefCountObjectsList;
   protected
@@ -101,13 +107,15 @@ uses
   {$IF defined(ALSkiaAvailable)}
   System.Skia.API,
   {$ENDIF}
+  {$IF defined(FRAMEWORK_FMX)}
   Fmx.Types,
   Fmx.Types3D,
   Fmx.Graphics,
-  Alcinoe.Common,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Graphics,
-  Alcinoe.FMX.Dynamic.Controls;
+  Alcinoe.FMX.Dynamic.Controls,
+  {$ENDIF}
+  Alcinoe.Common;
 
 {***********************************}
 constructor TALRefCountObject.Create;
@@ -156,6 +164,7 @@ begin
   FFreeObjectsCurrList := TObjectList<Tobject>.create(false{aOwnObject});
   FFreeObjectsEmptyList := TObjectList<Tobject>.Create(false{aOwnObject});
   //-
+  {$IF defined(FRAMEWORK_FMX)}
   FFreeDrawablesLock := TObject.Create;
   FFreeDrawablesCurrList := TList<TALDrawable>.create;
   FFreeDrawablesEmptyList := TList<TALDrawable>.Create;
@@ -163,6 +172,7 @@ begin
   FFreeBitmapsLock := TObject.Create;
   FFreeBitmapsCurrList := TList<TALBitmap>.create;
   FFreeBitmapsEmptyList := TList<TALBitmap>.Create;
+  {$ENDIF}
   //-
   FCanExecute := True;
   FForceExecute := False;
@@ -190,6 +200,7 @@ begin
   FFreeObjectsEmptyList.OwnsObjects := True;
   ALfreeandnil(FFreeObjectsEmptyList);
   //-
+  {$IF defined(FRAMEWORK_FMX)}
   ALFreeAndNil(FFreeDrawablesLock);
   for var I := FFreeDrawablesCurrList.Count - 1 downto 0 do begin
     var LDrawable := FFreeDrawablesCurrList[I];
@@ -213,6 +224,7 @@ begin
     ALFreeAndNilBitmap(LBitmap);
   end;
   ALfreeandnil(FFreeBitmapsEmptyList);
+  {$ENDIF}
   //-
   inherited;
 end;
@@ -233,8 +245,10 @@ begin
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
     else begin
       ALCustomDelayedFreeObjectProc := FInstance.FreeObject;
+      {$IF defined(FRAMEWORK_FMX)}
       ALCustomDelayedFreeDrawableProc := FInstance.FreeDrawable;
       ALCustomDelayedFreeBitmapProc := FInstance.FreeBitmap;
+      {$ENDIF}
       FInstance.start;
     end;
   end;
@@ -282,12 +296,16 @@ begin
     if Terminated then Break;
 
     // Free the drawables
+    {$IF defined(FRAMEWORK_FMX)}
     FreeDrawables;
     if Terminated then Break;
+    {$ENDIF}
 
     // Free the bitmaps
+    {$IF defined(FRAMEWORK_FMX)}
     FreeBitmaps;
     if Terminated then Break;
+    {$ENDIF}
 
     // Execute custom logic
     DoExecute;
@@ -406,14 +424,20 @@ begin
 
     // Prepare the object for release
     if aObject is TComponent then begin
+      {$IF defined(FRAMEWORK_FMX)}
       if aObject is TFMXObject then TFMXObject(aObject).Parent := nil;
+      {$ENDIF}
       if assigned(TComponent(aObject).Owner) then TComponent(aObject).Owner.RemoveComponent(TComponent(aObject));
+      {$IF defined(FRAMEWORK_FMX)}
       If aObject is TALControl then aObject.BeforeDestruction;
+      {$ENDIF}
     end
+    {$IF defined(FRAMEWORK_FMX)}
     else if (aObject is TALDynamicControl) then begin
       aObject.BeforeDestruction;
       TALDynamicControl(aObject).Owner := nil;
-    end;
+    end
+    {$ENDIF};
 
     // Add the object to the queue
     ALMonitorEnter(FFreeObjectsLock{$IF defined(DEBUG)}, 'TALGuardianThread.FreeObject'{$ENDIF});
@@ -433,7 +457,8 @@ begin
   end;
 end;
 
-{****************************************}
+{***************************}
+{$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeDrawables;
 begin
 
@@ -472,8 +497,10 @@ begin
   end;
 
 end;
+{$ENDIF}
 
-{*******************************************************************}
+{***************************}
+{$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeDrawable(var aDrawable: TALDrawable);
 begin
   if terminated then ALFreeAndNilDrawable(aDrawable)
@@ -493,8 +520,10 @@ begin
 
   end;
 end;
+{$ENDIF}
 
-{**************************************}
+{***************************}
+{$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeBitmaps;
 begin
 
@@ -533,8 +562,10 @@ begin
   end;
 
 end;
+{$ENDIF}
 
-{*************************************************************}
+{***************************}
+{$IF defined(FRAMEWORK_FMX)}
 procedure TALGuardianThread.FreeBitmap(var aBitmap: TALBitmap);
 begin
   if terminated then ALFreeAndNilBitmap(aBitmap)
@@ -554,6 +585,7 @@ begin
 
   end;
 end;
+{$ENDIF}
 
 {***************************************************}
 procedure TALGuardianThread.PurgeRefCountObjectsList;
@@ -602,8 +634,10 @@ finalization
   {$ENDIF}
   if TALGuardianThread.HasInstance then begin
     ALCustomDelayedFreeObjectProc := nil;
+    {$IF defined(FRAMEWORK_FMX)}
     ALCustomDelayedFreeDrawableProc := nil;
     ALCustomDelayedFreeBitmapProc := nil;
+    {$ENDIF}
   end;
   ALFreeAndNil(TALGuardianThread.FInstance);
 

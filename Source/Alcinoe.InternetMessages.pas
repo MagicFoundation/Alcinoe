@@ -5,55 +5,52 @@ interface
 {$I Alcinoe.inc}
 
 uses
-  system.Classes,
   Alcinoe.StringList;
 
 Type
 
-  {-----------------------------}
-  TALEMailHeader = Class(Tobject)
-  Private
-    fSendTo: AnsiString;
-    fSender: AnsiString;
-    fMessageID: AnsiString;
-    fbcc: AnsiString;
-    fContentTransferEncoding: AnsiString;
-    fComments: AnsiString;
-    fMIMEVersion: AnsiString;
-    fPriority: AnsiString;
-    fReplyTo: AnsiString;
-    fSubject: AnsiString;
-    fFrom: AnsiString;
-    fDate: AnsiString;
-    fDispositionNotificationTo: AnsiString;
-    fReferences: AnsiString;
-    fcc: AnsiString;
-    fContentType: AnsiString;
-    FCustomHeaders: TALStringsA;
-    Function GetRawHeaderText: AnsiString;
-    procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
+  {------------------------------}
+  TALMailHeadersA = Class(TObject)
+  private
+    FKnownHeaders: array[0..39] of AnsiString;
+    FUnknownHeaders: TALStringsA;
+    FAutoFillDefaults: Boolean;
+  protected
+    function PropertyIndexToName(const AIndex: Integer): AnsiString; virtual;
+    function NameToPropertyIndex(const AName: AnsiString): Integer; virtual;
+    function GetUnknownHeaders: TALStringsA; virtual;
+    function GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString; virtual;
+    procedure SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString); virtual;
+    function GetHeaderValueByName(const AName: AnsiString): AnsiString; virtual;
+    procedure SetHeaderValueByName(const AName: AnsiString; const AValue: AnsiString); virtual;
+    Function GetRawHeaderText: AnsiString; virtual;
+    procedure SetRawHeaderText(const ARawHeaderText: AnsiString); virtual;
+    function GetContentCharset: AnsiString; virtual;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure Clear;
-    property From: AnsiString read fFrom write fFrom; {From: John Doe <jdoe@machine.example> - Author(s) or person(s) taking responsibility for the message 4.4.1; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
-    property Sender: AnsiString read fSender write fSender; {Sender: Michael Jones <mjones@machine.example> - The person or agent submitting the message to the network, if other than shown by the From header RFC 822: 4.4.2; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
-    property SendTo: AnsiString read fSendTo write fSendTo; {To: Mary Smith <mary@example.net> - Primary recipient(s) RFC 822: 4.5.1; RFC 1123: 5.2.15-16, 5.3.7;}
-    property cc: AnsiString read fcc write fcc; {cc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net> - Secondary, informational recipient(s) RFC 822: 4.5.2; RFC 1123: 5.2.15-16, 5.3.7;}
-    property bcc: AnsiString read fbcc write fbcc; {bcc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net> - Recipient(s) not to be disclosed to other recipients ("blind carbon copy") RFC 822: 4.5.3; RFC 1123: 5.2.15-16, 5.3.7;}
-    property ReplyTo: AnsiString read fReplyTo write fReplyTo; {Reply-To: "Mary Smith: Personal Account" <smith@home.example> - Suggested E-mail address for replies RFC 822: 4.4.3; RFC 1036: 2.2.1}
-    property Subject: AnsiString read fSubject write fSubject; {Subject: Saying Hello - Text that provides a summary, or indicates the nature, of the message RFC 822: 4.7.1; RFC 1036: 2.1.4}
-    property MessageID: AnsiString read fMessageID write fMessageID; {Message-ID: <1234@local.machine.example> -	Unique ID for the message RFC 822: 4.6.1; RFC 1036: 2.1.5}
-    property References: AnsiString read fReferences write fReferences; {References: <1234@local.machine.example> <3456@example.net> - In E-mail: reference to other related messages; in Usenet: reference to replied-to-articles RFC 822: 4.6.3; RFC 1036: 2.2.5}
-    property Comments: AnsiString read fComments write fComments; {Comments: Authenticated sender is gboyd@netcom.com - Text comments added to the message RFC 822: 4.7.2}
-    property Date: AnsiString read fDate write fDate; {Date: Fri, 21 Nov 1997 09:55:06 -0600 - The time when the message was written (or submitted) RFC 822: 5.1; RFC 1123: 5.2.14; RFC 1036: 2.1.2}
-    property ContentType: AnsiString read fContentType write fContentType; {Content-Type: text/plain; charset="iso-8859-1" - Data type and format of content RFC 1049 (historic); RFC 1123: 5.2.13; RFC 2045: 5; RFC 1766: 4.1}
-    property ContentTransferEncoding: AnsiString read fContentTransferEncoding write fContentTransferEncoding; {Content-Transfer-Encoding: 8bit - Coding method used in a MIME message body RFC 2045: 6;}
-    property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
-    property Priority: AnsiString read fPriority write fPriority; {Priority: normal - Priority for message delivery ("normal" / "non-urgent" / "urgent") RFC 2156}
-    property DispositionNotificationTo: AnsiString read fDispositionNotificationTo write fDispositionNotificationTo; {Disposition-Notification-To: boss@nil.test - Requests for notification when the message is received, and specifies the address for them RFC 2298}
-    property CustomHeaders: TALStringsA read FCustomHeaders;
-    Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
+    procedure Clear; virtual;
+    property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
+    property From: AnsiString index 0 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {From: John Doe <jdoe@machine.example>}
+    property Sender: AnsiString index 1 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Sender: Michael Jones <mjones@machine.example>}
+    property &To: AnsiString index 2 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {To: Mary Smith <mary@example.net>}
+    property Cc: AnsiString index 3 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {cc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net>}
+    property Bcc: AnsiString index 4 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {bcc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net>}
+    property ReplyTo: AnsiString index 5 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Reply-To: "Mary Smith: Personal Account" <smith@home.example>}
+    property Subject: AnsiString index 6 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Subject: Saying Hello}
+    property MessageID: AnsiString index 7 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Message-ID: <1234@local.machine.example>}
+    property InReplyTo: AnsiString index 8 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {In-Reply-To: <1234@local.machine.example>}
+    property References: AnsiString index 9 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {References: <1234@local.machine.example> <3456@example.net>}
+    property Comments: AnsiString index 10 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Comments: Authenticated sender is gboyd@netcom.com}
+    property Date: AnsiString index 11 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Date: Fri, 21 Nov 1997 09:55:06 -0600}
+    property ContentType: AnsiString index 12 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Type: text/plain; charset="iso-8859-1"}
+    property ContentTransferEncoding: AnsiString index 13 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Content-Transfer-Encoding: 8bit}
+    property MIMEVersion: AnsiString index 14 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {MIME-Version: 1.0}
+    property Importance: AnsiString index 15 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Importance: normal}
+    property DispositionNotificationTo: AnsiString index 16 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Disposition-Notification-To: boss@nil.test}
+    property UnknownHeaders: TALStringsA read GetUnknownHeaders;
+    property Values[const AName: AnsiString]: AnsiString read GetHeaderValueByName write SetHeaderValueByName; default;
+    property AutoFillDefaults: Boolean read FAutoFillDefaults write FAutoFillDefaults;
   end;
 
 function AlParseEmailAddress(FriendlyEmail: AnsiString; var RealName : AnsiString; Const decodeRealName: Boolean=True): AnsiString;
@@ -71,10 +68,8 @@ uses
   system.Sysutils,
   System.AnsiStrings,
   Alcinoe.Http,
-  {$IF defined(MSWINDOWS)}
-  Alcinoe.WinSock,
-  {$ENDIF}
   Alcinoe.Common,
+  Alcinoe.net,
   Alcinoe.StringUtils;
 
 {***************************************************************************}
@@ -89,11 +84,6 @@ uses
 { (myname) name@domain.com       myname         name@domain.com             }
 { <name@domain.com> "my name"    my name        name@domain.com             }
 function AlParseEmailAddress(FriendlyEmail: AnsiString; var RealName : AnsiString; Const decodeRealName: Boolean=True): AnsiString;
-
-var P1, P2, P3, P4, P5: integer;
-    S1: AnsiString;
-    ln: integer;
-
 begin
 
   //----------
@@ -104,9 +94,10 @@ begin
   RealName := '';
 
   //----------
-  ln := Length(FriendlyEmail);
+  var ln: integer := Length(FriendlyEmail);
 
   //----------
+  var P1: Integer;
   if ALMatchesMaskA(FriendlyEmail, '* <*>') then P1 := Ln-1  // toto <toto@toto.com> | "toto" <toto@toto.com> | (toto) <toto@toto.com>
   else if ALMatchesMaskA(FriendlyEmail, '<*> *') then P1 := 2 // <toto@toto.com> toto.com | <toto@toto.com> "toto" | <toto@toto.com> (toto)
   else if ALMatchesMaskA(FriendlyEmail, '<*>') then P1 := 2 // <toto@toto.com>
@@ -121,14 +112,14 @@ begin
   Result := FriendlyEmail[P1];
 
   //----------
-  P2 := P1-1;
+  var P2: Integer := P1-1;
   While (P2 > 0) and (FriendlyEmail[P2] in ['a'..'z','A'..'Z','0'..'9','_','-','.','@']) do begin
     Result := FriendlyEmail[P2] + Result;
     dec(P2);
   end;
   While (P2 > 0) and (FriendlyEmail[P2] in [' ',#9]) do dec(P2);
 
-  P3 := P1+1;
+  var P3: Integer := P1+1;
   While (P3 <= Ln) and (FriendlyEmail[P3] in ['a'..'z','A'..'Z','0'..'9','_','-','.','@']) do begin
     Result := Result + FriendlyEmail[P3];
     inc(P3);
@@ -143,9 +134,9 @@ begin
       Inc(P3);
     end
     else begin
-      S1 := Result;
+      var S1: AnsiString := Result;
 
-      P4 := P2;
+      var P4: Integer := P2;
       While (P4 > 0) and (FriendlyEmail[P4] <> '<') do
         if (FriendlyEmail[P4] = '>') then begin
           P4 := 0;
@@ -156,7 +147,7 @@ begin
           dec(P4);
         end;
 
-      P5 := P3;
+      var P5: Integer := P3;
       While (P5 <= Ln) and (FriendlyEmail[P5] <> '>') do
         if (FriendlyEmail[P5] = '<') then begin
           P5 := LN + 1;
@@ -205,8 +196,8 @@ end;
 
 {**************************************************************************}
 function AlExtractEmailAddress(const FriendlyEmail: AnsiString): AnsiString;
-Var LRealName: AnsiString;
 Begin
+  Var LRealName: AnsiString;
   Result := AlParseEmailAddress(FriendlyEmail, LRealName, False);
 end;
 
@@ -214,21 +205,19 @@ end;
 {Return a new string with backslashes in str replaced by two backslashes and
  double quotes replaced by backslash-double quote.}
 Function ALEncodeRealName4FriendlyEmailAddress(const aRealName: AnsiString): AnsiString;
-var i, l, x: integer;
-    Buf, P: PAnsiChar;
-    ch: AnsiChar;
 begin
   Result := '';
-  L := Length(aRealName);
+  var L: integer := Length(aRealName);
   if L = 0 then exit;
+  var Buf: PAnsiChar;
   GetMem(Buf, (L * 2) + 2); // to be on the *very* safe side
   try
-    Ch := '"';
-    P := Buf;
+    var Ch: AnsiChar := '"';
+    var P: PAnsiChar := Buf;
     ALMove(Ch, P^, 1);
     inc(P,1);
-    for i := 1 to L do begin
-      x := Ord(aRealName[i]);
+    for var i := 1 to L do begin
+      var x: integer := Ord(aRealName[i]);
       case x of
         34: begin // quot "
               ALStrMove('/"', P, 2);
@@ -264,171 +253,15 @@ end;
 {***********************************************}
 Function AlGenerateInternetMessageID: AnsiString;
 Begin
-  Result := ALStringReplaceA(ALNewGUIDStringA(true{WithoutBracket}),'-','',[rfReplaceAll]) {$IF defined(MSWINDOWS)}+ '@' + ALTrim(AlGetLocalHostName){$ENDIF};
+  Result := ALStringReplaceA(ALNewGUIDStringA(true{WithoutBracket}),'-','',[rfReplaceAll]) {$IF defined(MSWINDOWS)}+ '@' + ALGetLocalDnsIdentityA{$ENDIF};
 end;
 
 {****************************************************************************}
 Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString;
-var LTmpHostName: ansiString;
 Begin
-  LTmpHostName := ALTrim(ahostname);
+  var LTmpHostName: ansiString := ALTrim(ahostname);
   If LTmpHostName <> '' then Result := ALStringReplaceA(ALNewGUIDStringA(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + LTmpHostName
   else Result := AlGenerateInternetMessageID;
-end;
-
-{*****************************}
-procedure TALEmailHeader.Clear;
-begin
-  fSendTo := '';
-  fSender := '';
-  fMessageID := '';
-  fbcc := '';
-  fContentTransferEncoding := '';
-  fComments := '';
-  fMIMEVersion := '';
-  fPriority := '';
-  fReplyTo := '';
-  fSubject := '';
-  fFrom := '';
-  fDate := '';
-  fDispositionNotificationTo := '';
-  fReferences := '';
-  fcc := '';
-  fContentType := '';
-  FCustomHeaders.Clear;
-end;
-
-{********************************}
-constructor TALEmailHeader.Create;
-begin
-  inherited create;
-  FCustomHeaders:= TALStringListA.create;
-  FCustomHeaders.NameValueSeparator := ':';
-  clear;
-  fMessageID := 'AUTO';
-  fMIMEVersion := '1.0';
-  fDate := 'NOW';
-  fContentType := 'text/plain';
-end;
-
-{********************************}
-destructor TALEmailHeader.Destroy;
-begin
-  FCustomHeaders.free;
-  inherited;
-end;
-
-{***************************************************}
-function TALEmailHeader.GetRawHeaderText: AnsiString;
-Var I : integer;
-    Str: AnsiString;
-begin
-  Result := '';
-  If ALTrim(fFrom) <> '' then result := result + 'From: ' + ALTrim(fFrom) + #13#10;
-  If ALTrim(fSender) <> '' then result := result + 'Sender: ' + ALTrim(fSender) + #13#10;
-  If ALTrim(fSendTo) <> '' then result := result + 'To: ' + ALTrim(fSendTo) + #13#10;
-  If ALTrim(fcc) <> '' then result := result + 'cc: ' + ALTrim(fcc) + #13#10;
-  If ALTrim(fbcc) <> '' then result := result + 'bcc: ' + ALTrim(fbcc) + #13#10;
-  If ALTrim(fReplyTo) <> '' then result := result + 'Reply-To: ' + ALTrim(fReplyTo) + #13#10;
-  If ALTrim(fSubject) <> '' then result := result + 'Subject: ' + ALTrim(fSubject) + #13#10;
-  Str := fMessageID;
-  If ALTrim(str) <> '' then begin
-    If ALSameTextA(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
-    result := result + 'Message-ID: ' + ALTrim(str) + #13#10;
-  end;
-  If ALTrim(fReferences) <> '' then result := result + 'References: ' + ALTrim(fReferences) + #13#10;
-  If ALTrim(fComments) <> '' then result := result + 'Comments: ' + ALTrim(fComments) + #13#10;
-  Str := fDate;
-  If ALTrim(str) <> '' then begin
-    If ALSameTextA(Str, 'NOW') then Str := ALLocalDateTimeToRfc1123StrA(Now);
-    result := result + 'Date: ' + ALTrim(str) + #13#10;
-  end;
-  If ALTrim(fContentType) <> '' then result := result + 'Content-Type: ' + ALTrim(fContentType) + #13#10;
-  If ALTrim(fContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + ALTrim(fContentTransferEncoding) + #13#10;
-  If ALTrim(fMIMEVersion) <> '' then result := result + 'MIME-Version: ' + ALTrim(fMIMEVersion) + #13#10;
-  If ALTrim(fPriority) <> '' then result := result + 'Priority: ' + ALTrim(fPriority) + #13#10;
-  If ALTrim(fDispositionNotificationTo) <> '' then result := result + 'Disposition-Notification-To: ' + ALTrim(fDispositionNotificationTo) + #13#10;
-  For I := 0 to FCustomHeaders.count - 1 do
-    if (ALTrim(FCustomHeaders.names[I]) <> '') and (ALTrim(FCustomHeaders.ValueFromIndex[I]) <> '') then
-      result := result + FCustomHeaders.names[I] + ': ' + ALTrim(FCustomHeaders.ValueFromIndex[I]) + #13#10;
-end;
-
-{**************************************************************************}
-procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
-
-Var LRawHeaderLst: TALStringListA;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Function _extractHeader(const aName: AnsiString): AnsiString;
-  Var I: Integer;
-      Str: AnsiString;
-  Begin
-    I := LRawHeaderLst.IndexOfName(aName);
-    If I >= 0 then Begin
-      result := ALTrim(LRawHeaderLst.ValueFromIndex[I]);
-      LRawHeaderLst.Delete(I);
-      While True do begin
-        If I >= LRawHeaderLst.Count then break;
-        str := LRawHeaderLst[I];
-        If (str = '') or
-           (not (str[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-        Result := ALTrim(result + ' ' + ALTrim(str));
-        LRawHeaderLst.Delete(I);
-      end;
-    end
-    else result := '';
-  end;
-
-Var Str1, Str2: AnsiString;
-    J: integer;
-
-begin
-  Clear;
-  LRawHeaderLst := TALStringListA.create;
-  try
-    LRawHeaderLst.NameValueSeparator := ':';
-    LRawHeaderLst.Text := aRawHeaderText;
-
-    fFrom:= _extractHeader('From');
-    fSender:= _extractHeader('Sender');
-    fSendTo:= _extractHeader('To');
-    fcc:= _extractHeader('cc');
-    fbcc:= _extractHeader('bcc');
-    fReplyTo:= _extractHeader('Reply-To');
-    fSubject:= _extractHeader('Subject');
-    fMessageID:= _extractHeader('Message-ID');
-    fReferences:= _extractHeader('References');
-    fComments:= _extractHeader('Comments');
-    fDate:= _extractHeader('Date');
-    fContentType:= _extractHeader('Content-Type');
-    fContentTransferEncoding:= _extractHeader('Content-Transfer-Encoding');
-    fMIMEVersion:= _extractHeader('MIME-Version');
-    fPriority:= _extractHeader('Priority');
-    fDispositionNotificationTo:= _extractHeader('Disposition-Notification-To');
-
-    FCustomHeaders.clear;
-    J := 0;
-    while J <= LRawHeaderLst.count - 1 do begin
-      Str1 := ALTrim(LRawHeaderLst.Names[J]);
-      If (ALTrim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
-        Str1 := ALTrim(Str1) + ': ' + ALTrim(LRawHeaderLst.ValueFromIndex[J]);
-        inc(J);
-        While True do begin
-          If J >= LRawHeaderLst.Count then break;
-          str2 := LRawHeaderLst[J];
-          If (str2 = '') or
-             (not (str2[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-          Str1 := ALTrim(Str1 + ' ' + ALTrim(str2));
-          inc(J);
-        end;
-        FCustomHeaders.Add(Str1);
-      end
-      else inc(J);
-    end;
-
-  finally
-    LRawHeaderLst.Free;
-  end;
 end;
 
 {*********************}
@@ -438,10 +271,9 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
 
  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedName(const s: AnsiString): boolean;
- var I: integer;
  begin
    Result:= false;
-   for I:= low(s) to high(s) do begin
+   for var I := low(s) to high(s) do begin
      // illegal char in s -> no valid address
      if not CharInSet(s[I], ['a'..'z','A'..'Z','0'..'9','_','-','.','+']) then Exit;
    end;
@@ -450,10 +282,9 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
 
  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedHostname(const s: AnsiString): boolean;
- var I: integer;
  begin
    Result:= false;
-   for I:= low(s) to high(s) do begin
+   for var I := low(s) to high(s) do begin
      // illegal char in s -> no valid address
      if not CharInSet(s[I], ['a'..'z','A'..'Z','0'..'9','-','.']) then Exit;
    end;
@@ -462,18 +293,14 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
 
  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedExt(const s: AnsiString): boolean;
- var I: integer;
  begin
    Result:= false;
-   for I:= low(s) to high(s) do begin
+   for var I := low(s) to high(s) do begin
      // illegal char in s -> no valid address
      if not CharInSet(s[I], ['a'..'z','A'..'Z']) then Exit;
    end;
    Result:= true;
  end;
-
-var I, J: integer;
-    namePart, serverPart, extPart: AnsiString;
 
 begin
   Result := false;
@@ -482,7 +309,7 @@ begin
   if length(Value) < 6 then exit;
 
   // must have the '@' char inside
-  I := ALPosA('@', Value);
+  var I: integer := ALPosA('@', Value);
   if (I <= 1) or (I > length(Value)-4) then exit;
 
   //can not have @. or .@
@@ -492,18 +319,18 @@ begin
   If (ALPosA('..', Value) > 0) then Exit;
 
   //extract namePart and serverPart
-  namePart:= AlCopyStr(Value, 1, I - 1);
-  serverPart:= AlCopyStr(Value, I + 1, Length(Value));
+  var namePart: AnsiString := AlCopyStr(Value, 1, I - 1);
+  var serverPart: AnsiString := AlCopyStr(Value, I + 1, Length(Value));
 
   // Extension (.fr, .com, etc..) must be betwen 2 to 6 char
   I:= ALPosA('.', serverPart);
-  J := 0;
+  var J: Integer := 0;
   While I > 0 do begin
     J := I;
     I := ALPosA('.', serverPart, I + 1);
   end;
   if (J <= 1) then Exit; // no dot at all so exit !
-  extPart    := AlCopyStr(ServerPart,J+1,Maxint);
+  var extPart: AnsiString := AlCopyStr(ServerPart,J+1,Maxint);
   serverPart := ALCopyStr(ServerPart, 1, J - 1);
   If not (Length(ExtPart) in [2..6]) then exit;
 
@@ -524,10 +351,9 @@ function AlIsValidEmail(const Value: String): boolean;
 
  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedName(const s: String): boolean;
- var I: integer;
  begin
    Result:= false;
-   for I:= low(s) to high(s) do begin
+   for var I := low(s) to high(s) do begin
      // illegal char in s -> no valid address
      if not CharInSet(s[I], ['a'..'z','A'..'Z','0'..'9','_','-','.','+']) then Exit;
    end;
@@ -536,10 +362,9 @@ function AlIsValidEmail(const Value: String): boolean;
 
  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedHostname(const s: String): boolean;
- var I: integer;
  begin
    Result:= false;
-   for I:= low(s) to high(s) do begin
+   for var I := low(s) to high(s) do begin
      // illegal char in s -> no valid address
      if not CharInSet(s[I], ['a'..'z','A'..'Z','0'..'9','-','.']) then Exit;
    end;
@@ -548,18 +373,14 @@ function AlIsValidEmail(const Value: String): boolean;
 
  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedExt(const s: String): boolean;
- var I: integer;
  begin
    Result:= false;
-   for I:= low(s) to high(s) do begin
+   for var I := low(s) to high(s) do begin
      // illegal char in s -> no valid address
      if not CharInSet(s[I], ['a'..'z','A'..'Z']) then Exit;
    end;
    Result:= true;
  end;
-
-var I, J: integer;
-    namePart, serverPart, extPart: String;
 
 begin
   Result := false;
@@ -568,7 +389,7 @@ begin
   if length(Value) < 6 then exit;
 
   // must have the '@' char inside
-  I := ALPosW('@', Value);
+  var I: Integer := ALPosW('@', Value);
   if (I <= 1) or (I > length(Value)-4) then exit;
 
   //can not have @. or .@
@@ -578,18 +399,18 @@ begin
   If (ALPosW('..', Value) > 0) then Exit;
 
   //extract namePart and serverPart
-  namePart:= ALCopyStr(Value, 1, I - 1);
-  serverPart:= ALCopyStr(Value, I + 1, Length(Value));
+  var namePart: String := ALCopyStr(Value, 1, I - 1);
+  var serverPart: String := ALCopyStr(Value, I + 1, Length(Value));
 
   // Extension (.fr, .com, etc..) must be betwen 2 to 6 char
   I:= ALPosW('.', serverPart);
-  J := 0;
+  var J: Integer := 0;
   While I > 0 do begin
     J := I;
     I := ALPosW('.', serverPart, I + 1);
   end;
   if (J <= 1) then Exit; // no dot at all so exit !
-  extPart    := ALCopyStr(ServerPart,J+1,Maxint);
+  var extPart: String := ALCopyStr(ServerPart,J+1,Maxint);
   serverPart := ALCopyStr(ServerPart, 1, J - 1);
   If not (Length(ExtPart) in [2..6]) then exit;
 
@@ -602,5 +423,200 @@ end;
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
+
+{**********************************************}
+constructor TALMailHeadersA.Create;
+Begin
+  inherited;
+  //for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
+  //  FKnownHeaders[i] := '';
+  FUnknownHeaders := nil;
+  FAutoFillDefaults := True;
+end;
+
+{**********************************************}
+destructor TALMailHeadersA.Destroy;
+begin
+  AlFreeAndNil(FUnknownHeaders);
+  inherited;
+end;
+
+{*************************************************************************************}
+function TALMailHeadersA.PropertyIndexToName(const AIndex: Integer): AnsiString;
+begin
+  Case AIndex of
+    0: Result := 'From';
+    1: Result := 'Sender';
+    2: Result := 'To';
+    3: Result := 'Cc';
+    4: Result := 'Bcc';
+    5: Result := 'Reply-To';
+    6: Result := 'Subject';
+    7: Result := 'Message-ID';
+    8: Result := 'In-Reply-To';
+    9: Result := 'References';
+    10: Result := 'Comments';
+    11: Result := 'Date';
+    12: Result := 'Content-Type';
+    13: Result := 'Content-Transfer-Encoding';
+    14: Result := 'MIME-Version';
+    15: Result := 'Importance';
+    16: Result := 'Disposition-Notification-To';
+    else
+      Raise Exception.Create('Error D5AF7D49-0552-4570-9AA4-9407588DC529')
+  End;
+end;
+
+{************************************************************************************}
+function TALMailHeadersA.NameToPropertyIndex(const AName: AnsiString): Integer;
+begin
+  var LLowerName := ALLowerCase(AName);
+       if LLowerName = 'from' then Result := 0
+  else if LLowerName = 'sender' then Result := 1
+  else if LLowerName = 'to' then Result := 2
+  else if LLowerName = 'cc' then Result := 3
+  else if LLowerName = 'bcc' then Result := 4
+  else if LLowerName = 'reply-to' then Result := 5
+  else if LLowerName = 'subject' then Result := 6
+  else if LLowerName = 'message-id' then Result := 7
+  else if LLowerName = 'in-reply-to' then Result := 8
+  else if LLowerName = 'references' then Result := 9
+  else if LLowerName = 'comments' then Result := 10
+  else if LLowerName = 'date' then Result := 11
+  else if LLowerName = 'content-type' then Result := 12
+  else if LLowerName = 'content-transfer-encoding' then Result := 13
+  else if LLowerName = 'mime-version' then Result := 14
+  else if LLowerName = 'importance' then Result := 15
+  else if LLowerName = 'disposition-notification-to' then Result := 16
+  else Result := -1;
+end;
+
+{****************************************************************************************}
+function TALMailHeadersA.GetHeaderValueByName(const AName: AnsiString): AnsiString;
+begin
+  Var LIndex := NameToPropertyIndex(AName);
+  If LIndex >= 0 then Result := GetHeaderValueByPropertyIndex(LIndex)
+  else Result := UnknownHeaders.Values[AName];
+end;
+
+{*******************************************************************************************************}
+procedure TALMailHeadersA.SetHeaderValueByName(const AName: AnsiString; const AValue: AnsiString);
+begin
+  Var LIndex := NameToPropertyIndex(AName);
+  If LIndex >= 0 then
+    SetHeaderValueByPropertyIndex(LIndex, AValue)
+  else
+    UnknownHeaders.Values[AName] := AValue;
+end;
+
+{************************************************************}
+function TALMailHeadersA.GetContentCharset: AnsiString;
+begin
+  Result := ALExtractHttpCharsetFromContentType(ContentType);
+end;
+
+{*******************************************}
+procedure TALMailHeadersA.Clear;
+begin
+  for var i := Low(FKnownHeaders) to High(FKnownHeaders) do
+    FKnownHeaders[i] := '';
+  if FUnknownHeaders <> nil then FUnknownHeaders.Clear;
+end;
+
+{*******************************************************************}
+function TALMailHeadersA.GetUnknownHeaders: TALStringsA;
+begin
+  if FUnknownHeaders = nil then begin
+    FUnknownHeaders := TALNVStringListA.Create;
+    FUnknownHeaders.NameValueSeparator := ':';
+    FUnknownHeaders.TrailingLineBreak := False;
+  end;
+  Result := FUnknownHeaders;
+end;
+
+{****************************************************************************************************}
+function TALMailHeadersA.GetHeaderValueByPropertyIndex(const Index: Integer): AnsiString;
+begin
+  {$IF defined(DEBUG)}
+  if (Index < Low(FKnownHeaders)) or (Index > High(FKnownHeaders)) then
+    raise EArgumentOutOfRangeException.CreateFmt('Header index (%d) out of range [0..%d]', [Index, High(FKnownHeaders)]);
+  {$ENDIF}
+  Result := FKnownHeaders[Index];
+end;
+
+{******************************************************************************************************************}
+procedure TALMailHeadersA.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
+begin
+  {$IF defined(DEBUG)}
+  if (Index < Low(FKnownHeaders)) or (Index > High(FKnownHeaders)) then
+    raise EArgumentOutOfRangeException.CreateFmt('Header index (%d) out of range [0..%d]', [Index, High(FKnownHeaders)]);
+  {$ENDIF}
+  FKnownHeaders[Index] := Value;
+end;
+
+{*****************************************************************}
+Function TALMailHeadersA.GetRawHeaderText: AnsiString;
+begin
+
+  var LPrevMessageID: ansiString := MessageID;
+  var LPrevMIMEVersion: ansiString := MIMEVersion;
+  var LPrevDate: ansiString := Date;
+  var LPrevSubject: ansiString := Subject;
+  try
+
+    if FAutoFillDefaults then begin
+      if MessageID = '' then MessageID := '<' + AlGenerateInternetMessageID + '>';
+      if MIMEVersion = '' then MIMEVersion := '1.0';
+      if Date = '' then Date := ALLocalDateTimeToRfc1123StrA(Now);
+      if (Subject <> '') and (alposIgnoreCaseA('=?UTF-8?', Subject) <> 1) then
+        Subject := '=?UTF-8?B?' + ALBase64EncodeString(Subject) + '?=';
+    end;
+
+    var SB := TALStringBuilderA.Create(2048);
+    try
+      // 1) Known headers
+      for var I := Low(FKnownHeaders) to High(FKnownHeaders) do begin
+        if FKnownHeaders[i] <> '' then begin
+          SB.Append(PropertyIndexToName(i));
+          SB.Append(': ');
+          SB.AppendLine(FKnownHeaders[i]);
+        end;
+      end;
+
+      // 3) Unknown headers
+      for var I := 0 to UnknownHeaders.Count - 1 do begin
+        SB.Append(UnknownHeaders.Names[I]);
+        SB.Append(': ');
+        SB.AppendLine(UnknownHeaders.ValueFromIndex[I]);
+      end;
+
+      // 4) Produce the final string
+      Result := SB.ToString(true{AUpdateCapacity});
+    finally
+      ALFreeAndNil(SB);
+    end;
+
+  finally
+    MessageID := LPrevMessageID;
+    MIMEVersion := LPrevMIMEVersion;
+    Date := LPrevDate;
+    Subject := LPrevSubject;
+  end;
+end;
+
+{****************************************************************************************}
+procedure TALMailHeadersA.SetRawHeaderText(const ARawHeaderText: AnsiString);
+begin
+  Clear;
+  var LRawHeaders := TALNVStringListA.create;
+  try
+    LRawHeaders.NameValueSeparator := ':';
+    LRawHeaders.Text := ARawHeaderText;
+    For var I := 0 to LRawHeaders.count - 1 do
+      Values[ALTrim(LRawHeaders.Names[I])] := alTrim(LRawHeaders.ValueFromIndex[I]);
+  finally
+    AlFreeAndNil(LRawHeaders);
+  end;
+end;
 
 end.

@@ -3,196 +3,127 @@ unit Alcinoe.SMTP.Client;
 interface
 
 {$I Alcinoe.inc}
-{$SCOPEDENUMS OFF}
 
 Uses
-  Winapi.WinSock2,
-  Alcinoe.StringList,
-  Alcinoe.InternetMessages,
-  Alcinoe.Mime.MultiPart;
+  Alcinoe.Net.TLS.Client;
 
 type
 
-    {--------------------------------------------}
-    TAlSmtpClientAuthType = (AlsmtpClientAuthNone,
-                             alsmtpClientAuthPlain,
-                             AlsmtpClientAuthLogin,
-                             AlsmtpClientAuthCramMD5,
-                             AlsmtpClientAuthCramSha1,
-                             AlsmtpClientAuthAutoSelect);
-
-    {------------------------------------------------------}
-    TAlSmtpClientAuthTypeSet = set of TAlSmtpClientAuthType;
-
     {----------------------------}
     TAlSmtpClient = class(TObject)
+    public
+      type
+        // ---------
+        // TAuthType
+        TAuthType = (
+          Plain,
+          Login);
+        // ----------
+        // TAuthTypes
+        TAuthTypes = set of TAuthType;
     Private
-      Fconnected: Boolean;
-      FSocketDescriptor: TSocket;
-      FAuthTypesSupported: TAlSmtpClientAuthTypeSet;
-      FSendTimeout: Integer;
-      FReceiveTimeout: Integer;
-      fKeepAlive: Boolean;
-      fTCPNoDelay: Boolean;
+      FTSLClient: TALTlsClient;
+      FAuthTypesSupported: TAuthTypes;
+      function GetSendTimeout: integer;
       procedure SetSendTimeout(const Value: integer);
+      function GetReceiveTimeout: integer;
       procedure SetReceiveTimeout(const Value: integer);
+      function GetKeepAlive: boolean;
       procedure SetKeepAlive(const Value: boolean);
+      function GetTCPNoDelay: boolean;
       procedure SetTCPNoDelay(const Value: boolean);
+      function GetConnected: Boolean;
+      Function GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAuthTypes;
     protected
-      procedure CheckError(Error: Boolean);
-      Function SendCmd(const aCmd:AnsiString; const OkResponses: array of Word): AnsiString; virtual;
+      Function SendCmd(const ACmd:AnsiString; const OkResponses: array of Word): AnsiString; virtual;
       Function GetResponse(const OkResponses: array of Word): AnsiString;
-      Function SocketWrite(const Buf; len: Integer): Integer; Virtual;
-      Function SocketRead(var buf; len: Integer): Integer; Virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
-      Function Connect(const aHost: AnsiString; const APort: integer): AnsiString; virtual;
+      Function Connect(const AHost: AnsiString; const APort: integer; const AStartTls: Boolean = true): AnsiString; virtual;
       Function Helo: AnsiString; virtual;
       Function Ehlo: AnsiString; virtual;
-      Function Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString; virtual;
+      Function StartTls: AnsiString; virtual;
+      Function Auth(const AUserName, APassword: AnsiString; const AAuthType: TAuthType): AnsiString; overload; virtual;
+      Function Auth(const AUserName, APassword: AnsiString): AnsiString; overload; virtual;
       Function Vrfy(const aUserName: AnsiString): AnsiString; virtual;
-      Function MailFrom(const aSenderEmail: AnsiString): AnsiString; virtual;
-      Function RcptTo(aRcptNameLst: TALStringsA): AnsiString; virtual;
-      Function Data(const aMailData: AnsiString): AnsiString; overload; virtual;
-      Function Data(const aHeader, aBody: AnsiString): AnsiString; overload; virtual;
-      Function Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString; overload; virtual;
-      (*
-      Function DataMultipartMixed(
-                 aHeader: TALEmailHeader;
-                 const aInlineText, aInlineTextContentType: AnsiString;
-                 aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
-      *)
+      Function MailFrom(const ASenderEmail: AnsiString): AnsiString; virtual;
+      Function RcptTo(const ARcptNames: TArray<AnsiString>): AnsiString; virtual;
+      Function Data(const AData: AnsiString): AnsiString; overload; virtual;
+      Function Data(const AHeader, ABody: AnsiString): AnsiString; overload; virtual;
       Function Quit: AnsiString; virtual;
       Function Rset: AnsiString; virtual;
       procedure SendMail(
-                  const aHost: AnsiString;
-                  APort: integer;
-                  const aSenderEmail: AnsiString;
-                  aRcptNameLst: TALStringsA;
+                  const AHost: AnsiString;
+                  const APort: integer;
+                  const ASenderEmail: AnsiString;
+                  const ARcptNames: TArray<AnsiString>;
                   const AUserName, APassword: AnsiString;
-                  aAuthType: TalSmtpClientAuthType;
-                  const aMailData: AnsiString); overload; virtual;
+                  const AData: AnsiString); overload; virtual;
       procedure SendMail(
-                  const aHost: AnsiString;
-                  APort: integer;
-                  const aSenderEmail: AnsiString;
-                  aRcptNameLst: TALStringsA;
+                  const AHost: AnsiString;
+                  const APort: integer;
+                  const ASenderEmail: AnsiString;
+                  const ARcptNames: TArray<AnsiString>;
                   const AUserName, APassword: AnsiString;
-                  aAuthType: TalSmtpClientAuthType;
-                  const aHeader, aBody: AnsiString); overload; virtual;
-      (*
-      procedure SendMailMultipartMixed(
-                  const aHost: AnsiString;
-                  APort: integer;
-                  const aSenderEmail: AnsiString;
-                  aRcptNameLst: TALStringsA;
-                  const AUserName, APassword: AnsiString;
-                  aAuthType: TalSmtpClientAuthType;
-                  aHeader: TALEmailHeader;
-                  const aInlineText, aInlineTextContentType: AnsiString;
-                  aAttachments: TALMultiPartMixedContents); virtual;
-      *)
+                  const AHeader, ABody: AnsiString); overload; virtual;
       Procedure Disconnect; virtual;
-      Function GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet; virtual;
-      property Connected: Boolean read FConnected;
-      property SendTimeout: Integer read FSendTimeout write SetSendTimeout;
-      property ReceiveTimeout: Integer read FReceiveTimeout write SetReceiveTimeout;
-      property KeepAlive: Boolean read fKeepAlive write SetKeepAlive;
-      property TcpNoDelay: Boolean read fTCPNoDelay write fTCPNoDelay;
+      property Connected: Boolean read GetConnected;
+      property SendTimeout: Integer read GetSendTimeout write SetSendTimeout;
+      property ReceiveTimeout: Integer read GetReceiveTimeout write SetReceiveTimeout;
+      property KeepAlive: Boolean read GetKeepAlive write SetKeepAlive;
+      property TcpNoDelay: Boolean read GetTCPNoDelay write SetTCPNoDelay;
     end;
 
 implementation
 
 Uses
-  Winapi.Windows,
-  System.Classes,
   System.SysUtils,
   System.AnsiStrings,
-  Alcinoe.WinSock,
+  Alcinoe.Net,
+  Alcinoe.StringList,
+  Alcinoe.Net.TLS.Client.SChannel,
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
 {*******************************}
 constructor TAlSmtpClient.Create;
-var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
-  Fconnected:= False;
-  FSocketDescriptor:= INVALID_SOCKET;
+  inherited;
+  FTSLClient := TAlSChannelTlsClient.create;
+  FTSLClient.SendTimeout := 60_000;
+  FTSLClient.ReceiveTimeout := 60_000;
+  FTSLClient.KeepAlive := True;
+  FTSLClient.TCPNoDelay := True;
   FAuthTypesSupported:= [];
-  FSendTimeout := 60000; // 60 seconds
-  FReceiveTimeout := 60000; // 60 seconds
-  FKeepAlive := True;
-  fTCPNoDelay := True;
 end;
 
 {*******************************}
 destructor TAlSmtpClient.Destroy;
 begin
-  If Fconnected then Disconnect;
-  WSACleanup;
+  Disconnect;
+  ALFreeAndNil(FTSLClient);
   inherited;
 end;
 
-{*************************************************}
-procedure TAlSmtpClient.CheckError(Error: Boolean);
+{*************************************************************************************************************************}
+Function TAlSmtpClient.Connect(const AHost: AnsiString; const APort: integer; const AStartTls: Boolean = true): AnsiString;
 begin
-  if Error then RaiseLastOSError;
-end;
-
-{****************************************************************************************}
-Function TAlSmtpClient.Connect(const aHost: AnsiString; const APort: integer): AnsiString;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _CallServer(const Server:AnsiString; const Port:word);
-  var SockAddr:Sockaddr_in;
-      IP: AnsiString;
-  begin
-    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    CheckError(FSocketDescriptor=INVALID_SOCKET);
-    FillChar(SockAddr,SizeOf(SockAddr),0);
-    SockAddr.sin_family:=AF_INET;
-    SockAddr.sin_port:=swap(Port);
-    SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-      checkError(not ALHostToIP(Server, IP));
-      SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
-    end;
-    CheckError(Winapi.WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
-  end;
-
-begin
-
-  if FConnected then raise EALException.Create('SMTP component already connected');
-
+  FTSLClient.Connect(String(AHost), aPort, AStartTls);
   Try
-
-    _CallServer(aHost,aPort);
-    Fconnected := True;
-    SetSendTimeout(FSendTimeout);
-    SetReceiveTimeout(FReceiveTimeout);
-    SetKeepAlive(FKeepAlive);
-    SetTCPNoDelay(fTCPNoDelay);
     FAuthTypesSupported := [];
     Result := GetResponse([220]);
-
   Except
     Disconnect;
     raise;
   end;
-
 end;
 
 {*********************************}
 procedure TAlSmtpClient.Disconnect;
 begin
-  If Fconnected then begin
-    ShutDown(FSocketDescriptor,SD_BOTH);
-    CloseSocket(FSocketDescriptor);
-    FSocketDescriptor := INVALID_SOCKET;
-    Fconnected := False;
-  end;
+  FTSLClient.Disconnect;
+  FAuthTypesSupported := [];
 end;
 
 {********************}
@@ -204,45 +135,35 @@ end;
  250-AUTH LOGIN CRAM-MD5
  250-8BITMIME
  250 SIZE 0}
-Function TAlSmtpClient.GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet;
-var k, J: Integer;
-    Str1, Str2: AnsiString;
-    Lst: TALStringListA;
+Function TAlSmtpClient.GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAuthTypes;
 begin
   Result := [];
-  Lst := TALStringListA.Create;
+  var LEhloResponse := AlUpperCase(EhloResponse);
+  LEhloResponse := ALStringReplaceA(LEhloResponse, '=', ' ', [rfReplaceAll]);
+  LEhloResponse := ALStringReplaceA(LEhloResponse, '250 ', '250-', [rfReplaceAll]);
+  var LLines := TALStringListA.Create;
   Try
-    Lst.Text := AlUpperCase(ALTrim(EhloResponse));
-    For j := 0 to Lst.Count - 1 do begin
-      Str1 := ALTrim(Lst[J]);  //250-AUTH=LOGIN
-      Delete(Str1, 1, 4); //AUTH=LOGIN
-      Str2 := AlCopyStr(Str1, 1, 5); //AUTH=
-      if (str2='AUTH ') or (Str2='AUTH=') then begin
-        Str1 := AlCopyStr(Str1, 6, maxint); //LOGIN
-        Str1 := ALStringReplaceA(Str1, '=', ' ', [rfReplaceAll]); //LOGIN
-        while (str1 <> '') do begin
-
-          K := ALPosA(' ', Str1);
-          if K <= 0 then begin
-            Str2 := ALTrim(Str1);
-            Str1 := '';
-          end
-          else begin
-            Str2 := ALTrim(AlCopyStr(Str1, 1, k - 1));
-            Delete(Str1, 1, k);
+    LLines.Text := LEhloResponse;
+    For var I := 0 to LLines.Count - 1 do begin
+      var LLine := LLines[i];
+      if AlposA('250-AUTH ', LLine) = 1 then begin
+        var LAuthTypes := TALStringListA.Create;
+        try
+          LAuthTypes.LineBreak := ' ';
+          LAuthTypes.Text := ALCopystr(LLine, 10{length('250-AUTH ')+1}, MaxInt);
+          for var J := 0 to LAuthTypes.Count - 1 do begin
+            var LAuthType := LAuthTypes[J];
+            if LAuthType = 'PLAIN' then result := result + [TAuthType.Plain]
+            else if LAuthType = 'LOGIN' then result := result + [TAuthType.Login];
           end;
-
-          if Str2 = ('PLAIN') then result := result + [AlsmtpClientAuthPlain]
-          else if Str2 = ('LOGIN') then result := result + [AlsmtpClientAuthLogin]
-          else if Str2 = ('CRAM-MD5') then result := result + [AlsmtpClientAuthCramMD5]
-          else if Str2 = ('CRAM-SHA1') then result := result + [AlsmtpClientAuthCramSHA1];
-
+        finally
+          ALFreeAndNil(LAuthTypes);
         end;
       end;
     end;
-  finally
-    Lst.free;
-  end;
+  Finally
+    ALFreeAndNil(LLines);
+  End;
 end;
 
 {****************************************************************************************}
@@ -254,14 +175,62 @@ end;
  and buffers are cleared.}
 Function TAlSmtpClient.Helo: AnsiString;
 begin
-  Result := SendCmd('HELO '+AlGetLocalHostName,[250]);
+  Result := SendCmd('HELO '+ALGetLocalDnsIdentityA, [250]);
 end;
 
 {**************************************}
 Function TAlSmtpClient.Ehlo: AnsiString;
 begin
-  result := SendCmd('EHLO '+AlGetLocalHostName,[250]);
+  result := SendCmd('EHLO '+ALGetLocalDnsIdentityA, [250]);
   FAuthTypesSupported := GetAuthTypeFromEhloResponse(Result);
+end;
+
+{******************************************}
+Function TAlSmtpClient.StartTls: AnsiString;
+begin
+  Result := SendCmd('STARTTLS', [220]);
+  FTSLClient.StartTls;
+end;
+
+{**********************************************************************************************************}
+Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; const AAuthType: TAuthType): AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _DoAuthPlain: AnsiString;
+  begin
+    If aUserName='' then raise EALException.Create('Username is empty');
+    If aPassword='' then raise EALException.Create('Password is empty');
+    var LAuthPlain: AnsiString := ALBase64EncodeString(aUserName + #0 + aUserName + #0 + aPassword);
+    Result := SendCmd('AUTH PLAIN ' + LAuthPlain, [235]);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _DoAuthLogin: AnsiString;
+  begin
+    If aUserName='' then raise EALException.Create('Username is empty');
+    If aPassword='' then raise EALException.Create('Password is empty');
+    SendCmd('AUTH LOGIN', [334]);
+    SendCmd(ALBase64EncodeString(aUsername), [334]);
+    Result := SendCmd(ALBase64EncodeString(aPassword), [235]);
+  end;
+
+begin
+  case AAuthType of
+    TAuthType.Plain : Result := _DoAuthPlain;
+    TAuthType.Login : result := _DoAuthLogin;
+    else raise EALException.Create('Error 78930E83-63E5-4CB2-9C20-1B37B46E3EE4');
+  end;
+end;
+
+{******************************************************************************}
+Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString): AnsiString;
+begin
+  var LAuthType: TAuthType;
+  if FAuthTypesSupported = [] then Ehlo;
+  if TAuthType.Plain in FAuthTypesSupported then LAuthType := TAuthType.Plain
+  else if TAuthType.Login in FAuthTypesSupported then LAuthType := TAuthType.Login
+  else raise EALException.Create('No supported authentication scheme found');
+  result := Auth(AUserName, APassword, LAuthType);
 end;
 
 {****************************************************************************}
@@ -277,74 +246,26 @@ end;
  messages (for example, undeliverable mail notifications) the reverse-path may be null.
  This command clears the reverse-path buffer, the forward-path buffer, and the mail data
  buffer; and inserts the reverse-path information from this command into the reverse-path buffer.}
-Function TAlSmtpClient.MailFrom(const aSenderEmail: AnsiString): AnsiString;
+Function TAlSmtpClient.MailFrom(const ASenderEmail: AnsiString): AnsiString;
 begin
-  If aSenderEmail = '' then raise EALException.Create('Sender email is empty');
-  If ALPosA(#13#10,aSenderEmail) > 0 then raise EALException.Create('Sender email is invalid');
-  Result := SendCmd('MAIL From:<'+aSenderEmail+'>',[250]);
-end;
-
-{****************************************************************************************************************}
-Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Function _DoAuthPlain: AnsiString;
-  var LAuthPlain : AnsiString;
-  begin
-    If aUserName='' then raise EALException.Create('UserName is empty');
-    If aPassword='' then raise EALException.Create('Password is empty');
-    LAuthPlain := ALBase64EncodeString(aUserName + #0 + aUserName + #0 + aPassword);
-    Result := SendCmd('AUTH PLAIN ' + LAuthPlain,[235]);
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Function _DoAuthLogin: AnsiString;
-  begin
-    If aUserName='' then raise EALException.Create('UserName is empty');
-    If aPassword='' then raise EALException.Create('Password is empty');
-    SendCmd('AUTH LOGIN',[334]);
-    SendCmd(ALBase64EncodeString(aUsername),[334]);
-    Result := SendCmd(ALBase64EncodeString(aPassword),[235]);
-  end;
-
-var tmpAuthType: TAlSmtpClientAuthType;
-
-begin
-
-  if aAuthType = AlsmtpClientAuthAutoSelect then begin
-    if AlsmtpClientAuthPlain in FAuthTypesSupported then tmpAuthType := AlsmtpClientAuthPlain
-    else if AlsmtpClientAuthLogin in FAuthTypesSupported then tmpAuthType := AlsmtpClientAuthLogin
-    else if AlsmtpClientAuthCramMD5 in FAuthTypesSupported then tmpAuthType := AlsmtpClientAuthCramMD5
-    else if AlsmtpClientAuthCramSHA1 in FAuthTypesSupported then tmpAuthType := AlsmtpClientAuthCramSHA1
-    else tmpAuthType := AlsmtpClientAuthNone
-  end
-  else tmpAuthType := aAuthType;
-
-  case tmpAuthType of
-    alsmtpClientAuthPlain : Result := _DoAuthPlain;
-    alsmtpClientAuthLogin : result := _DoAuthLogin;
-    alsmtpClientAuthCramMD5 : raise EALException.Create('CRAM-MD5 Authentication is not supported yet!');
-    alsmtpClientAuthCramSHA1: raise EALException.Create('CRAM-SHA1 Authentication is not supported yet!');
-    else raise EALException.Create('No Authentication scheme found');
-  end;
-
+  If ASenderEmail = '' then raise EALException.Create('Sender email address is empty');
+  If ALPosA(#13#10, ASenderEmail) > 0 then raise EALException.Create('Sender email address is invalid');
+  Result := SendCmd('MAIL From:<'+ASenderEmail+'>', [250]);
 end;
 
 {*************************************************************************}
 {This command is used to identify an individual recipient of the mail data;
  multiple recipients are specified by multiple use of this command.}
-Function TAlSmtpClient.RcptTo(aRcptNameLst: TALStringsA): AnsiString;
-Var I: integer;
-    LRcptNameValue: AnsiString;
+Function TAlSmtpClient.RcptTo(const ARcptNames: TArray<AnsiString>): AnsiString;
 begin
   Result := '';
-  if aRcptNameLst.Count <= 0 then raise EALException.Create('RcptName list is empty');
-  For I := 0 to aRcptNameLst.Count - 1 do begin
-    LRcptNameValue := ALTrim(aRcptNameLst[I]);
-    If (LRcptNameValue = '') or (ALPosA(#13#10,LRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
-    Result := Result + SendCmd('RCPT To:<'+LRcptNameValue+'>',[250, 251]) + #13#10;
+  if length(ARcptNames) <= 0 then raise EALException.Create('Recipient list is empty');
+  For var I := low(ARcptNames) to high(ARcptNames) do begin
+    var LRcptName := ARcptNames[I];
+    If LRcptName = '' then raise EALException.Create('Recipient email address is empty');
+    If (ALPosA(#13#10, LRcptName) > 0) then raise EALException.Create('Recipient email address is invalid');
+    Result := Result + SendCmd('RCPT To:<'+LRcptName+'>', [250, 251]);
   end;
-  If result <> '' then delete(Result,Length(Result)-1,2);
 end;
 
 {********************************************************************************}
@@ -376,61 +297,19 @@ end;
  message to the originator of the message. Either a single notification which lists all of the recipients that failed
  to get the message, or separate notification messages must be sent for each failed recipient. All undeliverable mail
  notification messages are sent using the MAIL command (even if they result from processing a SEND, SOML, or SAML command).}
-Function TAlSmtpClient.Data(const aMailData: AnsiString): AnsiString;
-Var LTmpMailData: AnsiString;
-    I : Integer;
+Function TAlSmtpClient.Data(const AData: AnsiString): AnsiString;
 begin
-  SendCmd('DATA',[354]);
-
-  i := 2;
-  LTmpMailData := aMailData;
-  while i <= Length(LTmpMailData) Do begin
-    If (LTmpMailData[i] = '.') and (LTmpMailData[i-1] = #10) and (LTmpMailData[i-2] = #13) then Insert('.',LTmpMailData,i);
-    inc(i);
-  end;
-
-  Result := SendCmd(LTmpMailData + #13#10'.'#13#10,[250]);
+  SendCmd('DATA', [354]);
+  var LData := AData;
+  LData := ALStringReplaceA(LData, #13#10'.', #13#10'..', [RFReplaceAll]);
+  Result := SendCmd(LData + #13#10'.'#13#10, [250]);
 end;
 
 {************************************************************************}
-Function TAlSmtpClient.Data(const aHeader, aBody: AnsiString): AnsiString;
+Function TAlSmtpClient.Data(const AHeader, ABody: AnsiString): AnsiString;
 begin
-  result := Data(ALTrim(aHeader) + #13#10#13#10 + aBody);
+  result := Data(ALTrim(AHeader) + #13#10#13#10 + ABody);
 end;
-
-{***************************************************************************************}
-Function TAlSmtpClient.Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString;
-begin
-  result := Data(aHeader.RawHeaderText, aBody);
-end;
-
-{}
-(*
-Function TAlSmtpClient.DataMultipartMixed(
-           aHeader: TALEmailHeader;
-           const aInlineText, aInlineTextContentType: AnsiString;
-           aAttachments: TALMultiPartMixedContents): AnsiString;
-Var LMultipartMixedEncoder: TALMultipartMixedEncoder;
-    Str: AnsiString;
-begin
-  LMultipartMixedEncoder := TALMultipartMixedEncoder.create;
-  try
-    LMultipartMixedEncoder.Encode(
-      aInlineText,
-      aInlineTextContentType,
-      aAttachments);
-    with LMultipartMixedEncoder do begin
-      aHeader.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
-      SetLength(Str,DataStream.size);
-      DataStream.Position := 0;
-      DataStream.ReadBuffer(pointer(str)^,DataStream.Size);
-    end;
-    Result := Data(aHeader.RawHeaderText, Str);
-  finally
-    LMultipartMixedEncoder.free;
-  end;
-end;
-*)
 
 {**************************************************************}
 {This command specifies that the receiver must send an OK reply,
@@ -446,7 +325,7 @@ end;
  received a temporary error (4xx).}
 Function TAlSmtpClient.Quit: AnsiString;
 begin
-  Result := SendCmd('QUIT',[221]);
+  Result := SendCmd('QUIT', [221]);
   Disconnect;
 end;
 
@@ -457,7 +336,7 @@ end;
  reverse-path buffer, the forward-path buffer, or the mail data buffer.}
 Function TAlSmtpClient.Vrfy(const aUserName: AnsiString): AnsiString;
 begin
-  Result := SendCmd('VRFY ' + aUserName,[250]);
+  Result := SendCmd('VRFY ' + aUserName, [250]);
 end;
 
 {*************************************************************}
@@ -467,30 +346,27 @@ end;
  must send an OK reply.}
 Function TAlSmtpClient.Rset: AnsiString;
 begin
-  Result := SendCmd('RSET',[250]);
+  Result := SendCmd('RSET', [250]);
 end;
 
 {*******************************}
 procedure TAlSmtpClient.SendMail(
-            const aHost: AnsiString;
-            APort: integer;
-            const aSenderEmail: AnsiString;
-            aRcptNameLst: TALStringsA;
+            const AHost: AnsiString;
+            const APort: integer;
+            const ASenderEmail: AnsiString;
+            const ARcptNames: TArray<AnsiString>;
             const AUserName, APassword: AnsiString;
-            aAuthType: TalSmtpClientAuthType;
-            const aMailData: AnsiString);
+            const AData: AnsiString);
 begin
-  If Fconnected then Disconnect;
-
-  connect(aHost,APort);
+  If Connected then Disconnect;
+  Connect(AHost,APort);
   Try
 
-    If aAuthType = AlsmtpClientAuthAutoSelect then ehlo
-    else Helo;
-    If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
-    mailFrom(aSenderEmail);
-    RcptTo(aRcptNameLst);
-    Data(aMailData);
+    If (AUserName <> '') or (APassword <> '') then
+      Auth(AUserName, APassword);
+    mailFrom(ASenderEmail);
+    RcptTo(ARcptNames);
+    Data(AData);
     Quit;
 
   Finally
@@ -500,66 +376,28 @@ end;
 
 {*******************************}
 procedure TAlSmtpClient.SendMail(
-            const aHost: AnsiString;
-            APort: integer;
-            const aSenderEmail: AnsiString;
-            aRcptNameLst: TALStringsA;
+            const AHost: AnsiString;
+            const APort: integer;
+            const ASenderEmail: AnsiString;
+            const ARcptNames: TArray<AnsiString>;
             const AUserName, APassword: AnsiString;
-            aAuthType: TalSmtpClientAuthType;
-            const aHeader, aBody: AnsiString);
+            const AHeader, ABody: AnsiString);
 begin
-  If Fconnected then Disconnect;
-
-  connect(aHost,APort);
+  If Connected then Disconnect;
+  Connect(AHost,APort);
   Try
 
-    If aAuthType = AlsmtpClientAuthAutoSelect then ehlo
-    else Helo;
-    If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
-    mailFrom(aSenderEmail);
-    RcptTo(aRcptNameLst);
-    Data(aHeader, aBody);
+    If (AUserName <> '') or (APassword <> '') then
+      Auth(AUserName, APassword);
+    mailFrom(ASenderEmail);
+    RcptTo(ARcptNames);
+    Data(AHeader, ABody);
     Quit;
 
   Finally
     Disconnect;
   end;
 end;
-
-{}
-(*
-procedure TAlSmtpClient.SendMailMultipartMixed(
-            const aHost: AnsiString;
-            APort: integer;
-            const aSenderEmail: AnsiString;
-            aRcptNameLst: TALStringsA;
-            const AUserName, APassword: AnsiString;
-            aAuthType: TalSmtpClientAuthType;
-            aHeader: TALEmailHeader;
-            const aInlineText, aInlineTextContentType: AnsiString;
-            aAttachments: TALMultiPartMixedContents);
-begin
-  If Fconnected then Disconnect;
-  connect(aHost,APort);
-  Try
-
-    If aAuthType = AlsmtpClientAuthAutoSelect then ehlo
-    else Helo;
-    If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
-    mailFrom(aSenderEmail);
-    RcptTo(aRcptNameLst);
-    DataMultipartMixed(
-      aHeader,
-      aInlineText,
-      aInlineTextContentType,
-      aAttachments);
-    Quit;
-
-  Finally
-    Disconnect;
-  end;
-end;
-*)
 
 {******************************************************************************}
 {commands consist of a command code followed by an argument field. Command codes
@@ -589,27 +427,15 @@ end;
             NOOP <CRLF>
             QUIT <CRLF>
             TURN <CRLF>}
-function TAlSmtpClient.SendCmd(const aCmd: AnsiString; const OkResponses: array of Word): AnsiString;
-Var P: PAnsiChar;
-    L: Integer;
-    ByteSent: integer;
-    TmpCmd: AnsiString;
+function TAlSmtpClient.SendCmd(const ACmd: AnsiString; const OkResponses: array of Word): AnsiString;
 begin
+  var LCmd := ACmd;
+  If (length(LCmd) <= 1) or
+     (LCmd[high(LCmd)] <> #10) or
+     (LCmd[high(LCmd) - 1] <> #13)
+  then LCmd := LCmd + #13#10;
 
-  If (length(aCmd) <= 1) or
-     (aCmd[length(aCmd)] <> #10) or
-     (aCmd[length(aCmd) - 1] <> #13)
-  then TmpCmd := aCmd + #13#10
-  else TmpCmd := aCmd;
-
-  p:=@TmpCmd[1]; // pchar
-  l:=length(TmpCmd);
-  while l>0 do begin
-    ByteSent:=SocketWrite(p^,l);
-    if ByteSent<=0 then raise EALException.Create('Connection close gracefully!');
-    inc(p,ByteSent);
-    dec(l,ByteSent);
-  end;
+  FTSLClient.SendAll(LCmd[low(LCmd)], length(LCmd));
 
   Result := GetResponse(OkResponses);
 end;
@@ -630,21 +456,21 @@ end;
  command.}
 function TAlSmtpClient.GetResponse(const OkResponses: array of Word): AnsiString;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _stpblk(PValue : PAnsiChar) : PAnsiChar;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _stpblk(PValue: PAnsiChar): PAnsiChar;
   begin
     Result := PValue;
     while Result^ in [' ', #9, #10, #13] do Inc(Result);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _GetInteger(Data: PAnsiChar; var Number : Integer) : PAnsiChar;
-  var bSign : Boolean;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _GetInteger(Data: PAnsiChar; var Number: Integer): PAnsiChar;
   begin
     Number := 0;
     Result := _StpBlk(Data);
     if (Result = nil) then Exit;
     { Remember the sign }
+    var bSign : Boolean;
     if Result^ in ['-', '+'] then begin
       bSign := (Result^ = '-');
       Inc(Result);
@@ -659,31 +485,23 @@ function TAlSmtpClient.GetResponse(const OkResponses: array of Word): AnsiString
     if bSign then Number := -Number;
   end;
 
-Var LBuffStr: AnsiString;
-    LBuffStrLength: Integer;
-    LResponseLength: Integer;
-    LResponse: AnsiString;
-    LStatusCode: Integer;
-    LGoodResponse: Boolean;
-    LLst : TALStringListA;
-    P: PAnsiChar;
-    i, j: integer;
-
 begin
   Result := '';
-  Setlength(LBuffStr,512); //The maximum total length of a reply line including the reply code and the <CRLF> is 512 characters. (http://www.freesoft.org/CIE/RFC/821/24.htm)
+  Var LBuffStr: AnsiString;
+  // The maximum total length of a reply line including the reply code and
+  // the <CRLF> is 512 characters. (http://www.freesoft.org/CIE/RFC/821/24.htm)
+  Setlength(LBuffStr, 512);
   While true do begin
 
     {Read the response from the socket - end of the response is show by <CRLF>}
-    LResponse := '';
+    var LResponse: AnsiString := '';
     While True do begin
-      LBuffStrLength := SocketRead(pointer(LBuffStr)^, length(LBuffStr));
-      If LBuffStrLength <= 0 then raise EALException.Create('Connection close gracefully!');
-      LResponse := LResponse + AlCopyStr(LBuffStr,1,LBuffStrLength);
-      LResponseLength := length(LResponse);
-      If (LResponseLength > 1) and
-         (LResponse[LResponseLength] = #10) and
-         (LResponse[LResponseLength - 1] = #13) then Break;
+      var LBuffStrLn: Integer := FTSLClient.Receive(Pointer(LBuffStr)^, length(LBuffStr));
+      If LBuffStrLn <= 0 then raise EALException.Create('Connection close gracefully!');
+      LResponse := LResponse + AlCopyStr(LBuffStr, 1, LBuffStrLn);
+      If (length(LResponse) > 1) and
+         (LResponse[High(LResponse)] = #10) and
+         (LResponse[High(LResponse) - 1] = #13) then Break;
     end;
     Result := Result + LResponse;
 
@@ -691,16 +509,16 @@ begin
      begin with the reply code, followed immediately by a hyphen, "-" (also known as minus),
      followed by text. The last line will begin with the reply code, followed immediately
      by <SP>, optionally some text, and <CRLF>.}
-    LLst := TALStringListA.create;
+    var LLst := TALStringListA.create;
     Try
       LLst.Text := LResponse;
       If LLst.count = 0 then raise EALException.Create('Emtpy response');
-      For j := 0 to LLst.count - 1 do begin
+      For var j := 0 to LLst.count - 1 do begin
 
-        LResponse := LLst[j];
-        p := _GetInteger(@LResponse[1], LStatusCode);
-        LGoodResponse := False;
-        for I := 0 to High(OkResponses) do
+        var LStatusCode: Integer;
+        var P: PAnsiChar := _GetInteger(PAnsiChar(LLst[j]), LStatusCode);
+        var LGoodResponse := False;
+        for var I := Low(OkResponses) to High(OkResponses) do
           if OkResponses[I] = LStatusCode then begin
             LGoodResponse := True;
             Break;
@@ -720,64 +538,58 @@ begin
   end;
 end;
 
-{*******************************************************************}
-Function TAlSmtpClient.SocketWrite(const Buf; len: Integer): Integer;
+{*********************************************}
+function TAlSmtpClient.GetSendTimeout: integer;
 begin
-  Result := Send(FSocketDescriptor,Buf,len,0);
-  CheckError(Result =  SOCKET_ERROR);
-end;
-
-{****************************************************************}
-function TAlSmtpClient.SocketRead(var buf; len: Integer): Integer;
-begin
-  Result := Recv(FSocketDescriptor,Buf,len,0);
-  CheckError(Result = SOCKET_ERROR);
+  Result := FTSLClient.SendTimeout;
 end;
 
 {***********************************************************}
 procedure TAlSmtpClient.SetSendTimeout(const Value: integer);
 begin
-  FSendTimeout := Value;
-  if FConnected then CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FSendTimeout),SizeOf(FSendTimeout))=SOCKET_ERROR);
+  FTSLClient.SendTimeout := Value;
+end;
+
+{**************************************************************}
+function TAlSmtpClient.GetReceiveTimeout: integer;
+begin
+  Result := FTSLClient.ReceiveTimeout;
 end;
 
 {**************************************************************}
 procedure TAlSmtpClient.SetReceiveTimeout(const Value: integer);
 begin
-  FReceiveTimeout := Value;
-  if FConnected then CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FReceiveTimeout),SizeOf(FReceiveTimeout))=SOCKET_ERROR);
+  FTSLClient.ReceiveTimeout := Value;
 end;
 
-{*******************************************************************************************************************}
-// http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
+{*********************************************************}
+function TAlSmtpClient.GetKeepAlive: boolean;
+begin
+  Result := FTSLClient.KeepAlive;
+end;
+
+{*********************************************************}
 procedure TAlSmtpClient.SetKeepAlive(const Value: boolean);
-var LIntBool: integer;
 begin
-  FKeepAlive := Value;
-  if FConnected then begin
-    // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
-    // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
-    // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if FKeepAlive then LIntBool := 1
-    else LIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
-  end;
+  FTSLClient.KeepAlive := Value;
 end;
 
-{***************************************************************************************************************************************************************************************************************}
-// https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
-procedure TAlSmtpClient.SetTCPNoDelay(const Value: boolean);
-var LIntBool: integer;
+{**********************************************************}
+function TAlSmtpClient.GetTCPNoDelay: boolean;
 begin
-  fTCPNoDelay := Value;
-  if FConnected then begin
-    // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
-    // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
-    // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if fTCPNoDelay then LIntBool := 1
-    else LIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
-  end;
+  Result := FTSLClient.TCPNoDelay;
+end;
+
+{**********************************************************}
+procedure TAlSmtpClient.SetTCPNoDelay(const Value: boolean);
+begin
+  FTSLClient.TCPNoDelay := Value;
+end;
+
+{*******************************************}
+function TAlSmtpClient.GetConnected: Boolean;
+begin
+  Result := FTSLClient.Connected;
 end;
 
 end.

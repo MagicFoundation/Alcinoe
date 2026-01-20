@@ -73,7 +73,8 @@ uses
   Alcinoe.Net,
   Alcinoe.Url,
   Alcinoe.HTTP.Server,
-  Alcinoe.Winapi.HttpApi;
+  Alcinoe.Winapi.Http,
+  Alcinoe.WinApi.Windows;
 
 type
 
@@ -291,7 +292,6 @@ uses
   System.SysUtils,
   System.Math,
   Winapi.Windows,
-  Alcinoe.WinApi.Windows,
   Alcinoe.Common;
 
 {*********************************************************************************}
@@ -1558,10 +1558,9 @@ begin
           LOverlappedContext^.HttpSysResponse := TALHttpSysServerResponse.Create;
           {$ENDREGION}
 
-          {$REGION 'Call OnRequest'}
+          {$REGION 'Call DoRequest'}
           Try
-            If Assigned(FOwner.OnRequest) then
-              FOwner.OnRequest(LOverlappedContext^.HttpSysRequest, LOverlappedContext^.HttpSysResponse);
+            FOwner.DoRequest(LOverlappedContext^.HttpSysRequest, LOverlappedContext^.HttpSysResponse);
           Except
             On E: Exception do begin
               ALLog('TALHttpSysServer.TWorkerThread.Execute(OnRequest)', E);
@@ -2180,6 +2179,6 @@ initialization
   {$IF defined(DEBUG)}
   ALLog('Alcinoe.HTTP.Server.HttpSys','initialization');
   {$ENDIF}
-  TALHttpSysServer.FHttpApiModuleHandle := GetModuleHandle(HTTPAPI_DLL);
+  TALHttpSysServer.FHttpApiModuleHandle := GetModuleHandle('httpapi.dll');
 
 end.

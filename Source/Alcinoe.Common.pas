@@ -797,9 +797,20 @@ Type
   TALCustomLogMsgProc = procedure(Const Tag: String; Const msg: String; const &Type: TalLogType) of object;
   TALCustomLogExceptionProc = procedure(Const Tag: String; Const E: Exception; const &Type: TalLogType) of object;
 
-var
+Var
+  ALDisableLog: Boolean = False;
+  /// <summary>
+  ///   LogHistory is useful for error reporting, allowing the last printed logs
+  ///   to be included in the report. To enable it, set ALMaxLogHistory > 0.
+  /// </summary>
+  ALMaxLogHistory: integer = 0;
   ALCustomLogMsgProc: TALCustomLogMsgProc = nil;
   ALCustomLogExceptionProc: TALCustomLogExceptionProc = nil;
+  /// <summary>
+  ///   Optional log stream. When not nil, logs are written only to this stream
+  ///   and platform logging is disabled.
+  /// </summary>
+  ALLogStream: TStream = nil;
 
 procedure _ALLog(
             Const Tag: String;
@@ -814,19 +825,7 @@ procedure ALLog(Const Tag: String; const TagArgs: array of const; Const msg: Str
 procedure ALLog(Const Tag: String; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
-
-var ALDisableLog: Boolean = False;
-
-// LogHistory is useful for error reporting, allowing the last printed logs
-// to be included in the report. To enable it, set ALMaxLogHistory > 0.
-var ALMaxLogHistory: integer = 0;
 function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
-
-// This flag allows us to enqueue logs when the device has just started
-// and hasn't yet been connected to the monitoring tool, enabling us
-// to print the logs later.
-Var ALEnqueueLog: Boolean = False;
-procedure ALPrintLogQueue;
 
 {~~}
 type
@@ -3154,7 +3153,6 @@ type
   end;
 
 var
-  _ALLogQueue: TList<_TALLogItem>;
   _ALLogHistory: TList<_TALLogItem>;
   _ALLogHistoryIndex: integer = -1;
 
@@ -3248,72 +3246,91 @@ begin
     End;
   end;
   //--
-  if CanPreserve and ALEnqueueLog then begin
-    Tmonitor.Enter(_ALLogQueue);
-    try
-      _ALLogQueue.Add(
-        _TALLogItem.Create(
-          Tag, // const ATag: String;
-          Msg, // const AMsg: String;
-          &Type, // Const aType: TalLogType
-          ThreadID, // Const AThreadID: TThreadID;
-          Now)); // const ATimeStamp: TDateTime
-    finally
-      Tmonitor.Exit(_ALLogQueue);
-    end;
-    if &Type = TalLogType.ASSERT then ALPrintLogQueue
-  end
-  else begin
-    var LMsg: String;
-    {$IF defined(ALCodeProfiler)}
-    if ALCodeProfilerIsrunning then begin
-      var LMilliseconds: Double := (TStopwatch.GetTimeStamp - ALCodeProfilerAppStartTimeStamp) * ALCodeProfilerMillisecondsPerTick;
-      var LMinutes: integer := Trunc(LMilliseconds) div (1000 * 60);
-      LMilliseconds := LMilliseconds - (LMinutes * 1000 * 60);
-      var LSeconds: integer := Trunc(LMilliseconds) div 1000;
-      LMilliseconds := LMilliseconds - (LSeconds * 1000);
-      var LHundredNanoseconds: integer := Round(Frac(LMilliseconds) * 10000);
-      if Msg <> '' then
-        LMsg := Msg + ALFormatW(' | StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds])
-      else
-        LMsg := ALFormatW('StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds]);
-    end;
-    {$ELSE}
-    LMsg := msg;
-    {$ENDIF}
-    {$IF defined(ANDROID)}
-    if LMsg = '' then LMsg := '<empty>';
-    if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
+  var LMsg: String;
+  {$IF defined(ALCodeProfiler)}
+  if ALCodeProfilerIsrunning then begin
+    var LMilliseconds: Double := (TStopwatch.GetTimeStamp - ALCodeProfilerAppStartTimeStamp) * ALCodeProfilerMillisecondsPerTick;
+    var LMinutes: integer := Trunc(LMilliseconds) div (1000 * 60);
+    LMilliseconds := LMilliseconds - (LMinutes * 1000 * 60);
+    var LSeconds: integer := Trunc(LMilliseconds) div 1000;
+    LMilliseconds := LMilliseconds - (LSeconds * 1000);
+    var LHundredNanoseconds: integer := Round(Frac(LMilliseconds) * 10000);
+    if Msg <> '' then
+      LMsg := Msg + ALFormatW(' | StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds])
+    else
+      LMsg := ALFormatW('StartTimeStamp: %.2d:%.2d:%.3d.%.5d', [{LHours,} LMinutes, LSeconds, Trunc(LMilliseconds), LHundredNanoseconds]);
+  end;
+  {$ELSE}
+  LMsg := msg;
+  {$ENDIF}
+  {$IF defined(ANDROID)}
+  if LMsg = '' then LMsg := '<empty>';
+  if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
+  case &Type of
+    TalLogType.VERBOSE: TJutil_Log.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
+    TalLogType.DEBUG: TJutil_Log.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
+    TalLogType.INFO: TJutil_Log.JavaClass.i(StringToJString(Tag), StringToJString(LMsg));
+    TalLogType.WARN: TJutil_Log.JavaClass.w(StringToJString(Tag), StringToJString(LMsg));
+    TalLogType.ERROR: TJutil_Log.JavaClass.e(StringToJString(Tag), StringToJString(LMsg));
+    TalLogType.ASSERT: TJutil_Log.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
+  end;
+  {$ELSEIF defined(IOS)}
+  if LMsg <> '' then LMsg := Tag + ' | ' + LMsg
+  else LMsg := Tag;
+  var LThreadID: String;
+  if ThreadID <> MainThreadID then LThreadID := '['+ALIntToStrW(ThreadID)+']'
+  else LThreadID := '';
+  //On iOS NSLog is limited to 1024 Bytes so if the
+  //message is > 1024 bytes split it
+  var P: integer := 1;
+  while P <= length(LMsg) do begin
+    var LMsgPart := ALCopyStr(LMsg, P, 950); // to stay safe
+    inc(P, 950);
     case &Type of
-      TalLogType.VERBOSE: TJutil_Log.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.DEBUG: TJutil_Log.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.INFO: TJutil_Log.JavaClass.i(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.WARN: TJutil_Log.JavaClass.w(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.ERROR: TJutil_Log.JavaClass.e(StringToJString(Tag), StringToJString(LMsg));
-      TalLogType.ASSERT: TJutil_Log.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
+      TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
+      TalLogType.DEBUG:   NSLog(StringToID('[D][V]'+LThreadID+' ' + LMsgPart));
+      TalLogType.INFO:    NSLog(StringToID('[I][D][V]'+LThreadID+' ' + LMsgPart));
+      TalLogType.WARN:    NSLog(StringToID('[W][I][D][V]'+LThreadID+' ' + LMsgPart));
+      TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
+      TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
     end;
-    {$ELSEIF defined(IOS)}
-    if LMsg <> '' then LMsg := Tag + ' | ' + LMsg
-    else LMsg := Tag;
+  end;
+  {$ELSEIF defined(MSWINDOWS)}
+  if ALLogStream <> nil then begin
+    If ALPosW(#13#10, LMsg) > 0 then begin
+      var LMsgParts := LMsg.Split([#13#10]);
+      for var I := Low(LMsgParts) to High(LMsgParts) do
+        _ALLog(
+          If I = Low(LMsgParts) then Tag else '', // Const Tag: String;
+          LMsgParts[I], // Const msg: String;
+          &Type, // Const &Type: TalLogType;
+          ThreadID, // Const ThreadID: TThreadID;
+          CanPreserve); // Const CanPreserve: boolean)
+      exit;
+    end;
+    if (Tag <> '') and (LMsg <> '') then LMsg := Tag + ' | ' + LMsg
+    else if LMsg = '' then LMsg := Tag;
     var LThreadID: String;
     if ThreadID <> MainThreadID then LThreadID := '['+ALIntToStrW(ThreadID)+']'
     else LThreadID := '';
-    //On iOS NSLog is limited to 1024 Bytes so if the
-    //message is > 1024 bytes split it
-    var P: integer := 1;
-    while P <= length(LMsg) do begin
-      var LMsgPart := ALCopyStr(LMsg, P, 950); // to stay safe
-      inc(P, 950);
-      case &Type of
-        TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
-        TalLogType.DEBUG:   NSLog(StringToID('[D][V]'+LThreadID+' ' + LMsgPart));
-        TalLogType.INFO:    NSLog(StringToID('[I][D][V]'+LThreadID+' ' + LMsgPart));
-        TalLogType.WARN:    NSLog(StringToID('[W][I][D][V]'+LThreadID+' ' + LMsgPart));
-        TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
-        TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
-      end;
+    case &Type of
+      TalLogType.VERBOSE: LMsg := '[V]'+LThreadID+' ' + LMsg + #13#10;
+      TalLogType.DEBUG:   LMsg := '[D][V]'+LThreadID+' ' + LMsg + #13#10;
+      TalLogType.INFO:    LMsg := '[I][D][V]'+LThreadID+' ' + LMsg + #13#10;
+      TalLogType.WARN:    LMsg := '[W][I][D][V]'+LThreadID+' ' + LMsg + #13#10;
+      TalLogType.ERROR:   LMsg := '[E][W][I][D][V]'+LThreadID+' ' + LMsg + #13#10;
+      TalLogType.ASSERT:  LMsg := '[A][E][W][I][D][V]'+LThreadID+' ' + LMsg + #13#10;
     end;
-    {$ELSEIF defined(MSWINDOWS)}
+    LMsg := ALFormatDatetimeW('yyyy-mm-dd"T"hh:nn:ss.zzz"Z"', ALUtcNow) + ' ' + LMsg;
+    var LBytes := TEncoding.UTF8.GetBytes(LMsg);
+    TMonitor.Enter(ALLogStream);
+    try
+      ALLogStream.WriteBuffer(LBytes, Length(LBytes));
+    finally
+      TMonitor.Exit(ALLogStream);
+    end;
+  end
+  else begin
     if LMsg <> '' then LMsg := Tag + ' | ' + stringReplace(LMsg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
     else LMsg := Tag;
     case &Type of
@@ -3324,8 +3341,8 @@ begin
       TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + LMsg + ' |'));
       TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + LMsg + ' |'));
     end;
-    {$ENDIF}
   end;
+  {$ENDIF}
 end;
 
 {**************************************************************************************************}
@@ -3377,20 +3394,6 @@ end;
 procedure ALLog(Const Tag: String; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR);
 begin
   ALLog(ALFormatW(Tag, Args), E, &Type);
-end;
-
-{************************}
-procedure ALPrintLogQueue;
-begin
-  Tmonitor.Enter(_ALLogQueue);
-  try
-    for var I := 0 to _ALLogQueue.Count - 1 do
-      with _ALLogQueue[i] do
-        _ALLog(Tag, Msg, &Type, ThreadID, False{CanPreserve});
-    _ALLogQueue.Clear;
-  finally
-    Tmonitor.Exit(_ALLogQueue);
-  end;
 end;
 
 {******************************************}
@@ -4203,7 +4206,6 @@ initialization
   {$IF defined(MSWindows)}
   ALPerformanceFrequency := -1;
   {$ENDIF}
-  _ALLogQueue := TList<_TALLogItem>.Create;
   _ALLogHistory := TList<_TALLogItem>.Create;
 
 finalization
@@ -4211,6 +4213,6 @@ finalization
   ALLog('Alcinoe.Common','finalization');
   {$ENDIF}
   ALFreeAndNil(_ALLogHistory);
-  ALFreeAndNil(_ALLogQueue);
+  ALFreeAndNil(ALLogStream);
 
 end.

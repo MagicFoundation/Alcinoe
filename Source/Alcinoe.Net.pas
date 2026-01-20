@@ -51,10 +51,19 @@ Type
     property Port: Word read FPort;
   end;
 
+function ALTryGetLocalDnsFullyQualifiedName(out AName: AnsiString): Boolean; overload;
+function ALTryGetLocalDnsFullyQualifiedName(out AName: String): Boolean; overload;
+function ALTryGetLocalDnsHostName(out AName: AnsiString): Boolean; overload;
+function ALTryGetLocalDnsHostName(out AName: String): Boolean; overload;
+function ALGetLocalDnsIdentityW: String;
+function ALGetLocalDnsIdentityA: AnsiString;
+
+
 implementation
 
 uses
   {$IF defined(MSWindows)}
+  Winapi.Windows,
   Winapi.ShellAPI,
   {$ENDIF}
   System.SysUtils,
@@ -497,5 +506,95 @@ begin
   end;
 end;
 {$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+function ALTryGetComputerNameExA(NameFormat: COMPUTER_NAME_FORMAT; out AName: AnsiString): Boolean;
+begin
+  var LLen: DWORD := 0;
+  GetComputerNameExA(NameFormat, nil, LLen);
+  if (GetLastError <> ERROR_MORE_DATA) or (LLen = 0) then Exit(False);
+  SetLength(AName, LLen);
+  Result := GetComputerNameExA(NameFormat, PAnsiChar(AName), LLen);
+  if (not Result) or (LLen = 0) then Exit(False)
+  else setlength(AName, LLen);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWindows)}
+function ALTryGetComputerNameExW(NameFormat: COMPUTER_NAME_FORMAT; out AName: String): Boolean;
+begin
+  var LLen: DWORD := 0;
+  GetComputerNameExW(NameFormat, nil, LLen);
+  if (GetLastError <> ERROR_MORE_DATA) or (LLen = 0) then Exit(False);
+  SetLength(AName, LLen);
+  Result := GetComputerNameExW(NameFormat, PWideChar(AName), LLen);
+  if (not Result) or (LLen = 0) then Exit(False)
+  else setlength(AName, LLen);
+end;
+{$ENDIF}
+
+{***************************************}
+function ALTryGetLocalDnsFullyQualifiedName(out AName: AnsiString): Boolean;
+begin
+  {$IF defined(MSWindows)}
+  Result := ALTryGetComputerNameExA(ComputerNameDnsFullyQualified, AName);
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+{***************************************}
+function ALTryGetLocalDnsFullyQualifiedName(out AName: String): Boolean;
+begin
+  {$IF defined(MSWindows)}
+  Result := ALTryGetComputerNameExW(ComputerNameDnsFullyQualified, AName);
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+{***************************************}
+function ALTryGetLocalDnsHostName(out AName: AnsiString): Boolean;
+begin
+  {$IF defined(MSWindows)}
+  Result := ALTryGetComputerNameExA(ComputerNameDnsHostname, AName);
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+{***************************************}
+function ALTryGetLocalDnsHostName(out AName: String): Boolean;
+begin
+  {$IF defined(MSWindows)}
+  Result := ALTryGetComputerNameExW(ComputerNameDnsHostname, AName);
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+{**************************************}
+function ALGetLocalDnsIdentityW: String;
+begin
+  // Prefer FQDN
+  if ALTryGetLocalDnsFullyQualifiedName(Result) then Exit;
+  // Then DNS host
+  if ALTryGetLocalDnsHostName(Result) then Exit;
+  // Fallback
+  Result := 'localhost';
+end;
+
+{**************************************}
+function ALGetLocalDnsIdentityA: AnsiString;
+begin
+  // Prefer FQDN
+  if ALTryGetLocalDnsFullyQualifiedName(Result) then Exit;
+  // Then DNS host
+  if ALTryGetLocalDnsHostName(Result) then Exit;
+  // Fallback
+  Result := 'localhost';
+end;
 
 end.

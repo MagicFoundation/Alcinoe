@@ -935,21 +935,23 @@ Learn more at [Demos\ALHttpServer](https://github.com/MagicFoundation/Alcinoe/tr
 TLS Socket Client (SChannel)
 ============================
 
-`TAlSChannelTlsClient` is a high-performance TLS socket client component for  
-Delphi that runs directly on top of the Windows **SChannel** security package,  
-the native TLS/SSL implementation built into the Windows operating system.  
-By leveraging the same kernel-integrated cryptographic stack used by Windows,  
-IIS, WinHTTP, and .NET, it provides production-grade security, compatibility,  
-and performance without requiring any external libraries or DLLs, with **no  
-external dependencies** such as OpenSSL or third-party components and no  
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/TLS1_3.webp?raw=true" width="540" style="width:540px;"/>
+
+`TAlSChannelTlsClient` is a high-performance TLS socket client component for
+Delphi that runs directly on top of the Windows **SChannel** security package,
+the native TLS/SSL implementation built into the Windows operating system.
+By leveraging the same kernel-integrated cryptographic stack used by Windows,
+IIS, WinHTTP, and .NET, it provides production-grade security, compatibility,
+and performance without requiring any external libraries or DLLs, with **no
+external dependencies** such as OpenSSL or third-party components and no
 redistribution or licensing concerns.
 
-`TAlSChannelTlsClient` transparently upgrades an existing TCP socket to TLS  
-and handles encryption, decryption, handshake, renegotiation, and shutdown  
-entirely through the Windows SSPI/SChannel APIs. It supports **TLS 1.2 and  
-TLS 1.3**, automatically negotiating the best protocol version supported by  
-both client and server in accordance with Windows security policy, and is  
-designed for building robust SMTP, HTTPS, WebSocket, or custom protocol  
+`TAlSChannelTlsClient` transparently upgrades an existing TCP socket to TLS
+and handles encryption, decryption, handshake, renegotiation, and shutdown
+entirely through the Windows SSPI/SChannel APIs. It supports **TLS 1.2 and
+TLS 1.3**, automatically negotiating the best protocol version supported by
+both client and server in accordance with Windows security policy, and is
+designed for building robust SMTP, HTTPS, WebSocket, or custom protocol
 clients where full control over the transport layer is required.
 
 Learn more at [Demos\ALTSLClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALTSLClient)
@@ -957,24 +959,28 @@ Learn more at [Demos\ALTSLClient](https://github.com/MagicFoundation/Alcinoe/tre
 <br/>
 
 
-TALSMTPClient
-=============
+Secure SMTP Client (TLS 1.2 / TLS 1.3)
+======================================
     
-Designed for reliable and secure email delivery, `TALSMTPClient` is a Delphi  
-SMTP client component that sends messages directly over the SMTP protocol  
-while leveraging the native Windows TLS stack for transport security. By  
-relying on the operating system’s integrated security infrastructure, it  
-provides production-grade reliability, security, and compatibility without  
+Designed for reliable and secure email delivery, `TALSMTPClient` is a Delphi
+SMTP client component that sends messages directly over the SMTP protocol
+while leveraging the native Windows TLS stack for transport security. By
+relying on the operating system’s integrated security infrastructure, it
+provides production-grade reliability, security, and compatibility without
 requiring any external libraries or additional DLLs to be deployed.
 
-`TALSMTPClient` supports modern email security requirements with full  
-**TLS 1.2 and TLS 1.3** support, automatically negotiating the best protocol  
-version supported by both client and server in accordance with Windows  
-security policy. It works seamlessly with the **Multipart Alternative** and  
-**Multipart Mixed** encoders, enabling the creation of emails with plain-text  
-and HTML alternatives as well as file attachments, while giving developers  
+`TALSMTPClient` supports modern email security requirements with full
+**TLS 1.2 and TLS 1.3** support, automatically negotiating the best protocol
+version supported by both client and server in accordance with Windows
+security policy. It works seamlessly with the **Multipart Alternative** and
+**Multipart Mixed** encoders, enabling the creation of emails with plain-text
+and HTML alternatives as well as file attachments, while giving developers
 full control over the SMTP session and message composition.
 
+Learn more at [Demos\ALSMTPClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSMTPClient)
+<br/>
+<br/>
+  
 
 Json Parser
 ===========

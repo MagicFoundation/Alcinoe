@@ -375,6 +375,7 @@ Call :BUILD_PROJECT "%ALBaseDir%\Tools\ImageMagickWrapperGenerator" "_Source" "I
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\PlatformApiInterfaceDiff" "_Source" "PlatformApiInterfaceDiff.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\WinApiWrapperGenerator" "_Source" "WinApiWrapperGenerator.dproj" "Win64" || GOTO ERROR
 if "%DXVCL%"=="" goto BUILD_DEMOS
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeProfiler" "_Source" "CodeProfiler.dproj" "Win64" || GOTO ERROR
 
@@ -423,12 +424,11 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHttpServer" "_Source" "ALHttpServerDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALImageMagick" "_Source" "ALImageMagickDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPOP3Client" "_Source" "ALPOP3ClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_Source" "ALRTTIDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSMTPClient" "_Source" "ALSMTPClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSortedListBenchmark.dproj" || PAUSE
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALTSLClient" "_Source" "ALTSLClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_Source" "ALXmlDocDemo.dproj" || PAUSE
 if "%DXVCL%"=="" goto DEPLOY_TO_APP_STORE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj" || PAUSE

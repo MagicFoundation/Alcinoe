@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 485
   Top = 214
   Caption = 'SMTP Test'
-  ClientHeight = 563
-  ClientWidth = 589
+  ClientHeight = 695
+  ClientWidth = 857
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,14 +16,16 @@ object Form1: TForm1
   TextHeight = 13
   object MsgMemo: TMemo
     Left = 0
-    Top = 191
-    Width = 589
+    Top = 241
+    Width = 857
     Height = 120
     Hint = 'Enter the message text in this memo'
     Align = alTop
+    EditMargins.Left = 6
+    EditMargins.Right = 6
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = 16
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
@@ -31,384 +33,598 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
+    ExplicitWidth = 800
   end
   object DisplayMemo: TMemo
     Left = 0
-    Top = 394
-    Width = 589
-    Height = 169
+    Top = 456
+    Width = 857
+    Height = 239
     Hint = 'This memo shows info messages'
     Align = alClient
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
+    BorderStyle = bsNone
+    Color = clMenu
+    Ctl3D = False
+    EditMargins.Left = 6
+    EditMargins.Right = 6
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = 16
     Font.Name = 'Courier New'
     Font.Style = []
+    ParentCtl3D = False
     ParentFont = False
     ParentShowHint = False
     ReadOnly = True
-    ScrollBars = ssBoth
+    ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 2
+    ExplicitWidth = 800
   end
   object ToolsPanel: TPanel
     Left = 0
     Top = 0
-    Width = 589
-    Height = 191
+    Width = 857
+    Height = 241
     Align = alTop
     TabOrder = 3
+    ExplicitWidth = 800
     object Label1: TLabel
-      Left = 22
-      Top = 11
-      Width = 55
-      Height = 13
+      Left = 23
+      Top = 19
+      Width = 69
+      Height = 16
       Caption = 'SMTP Host'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label2: TLabel
-      Left = 54
-      Top = 36
-      Width = 23
-      Height = 13
+      Left = 61
+      Top = 49
+      Width = 31
+      Height = 16
       Caption = 'From'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label3: TLabel
-      Left = 222
-      Top = 36
-      Width = 13
-      Height = 13
+      Left = 361
+      Top = 49
+      Width = 17
+      Height = 16
       Caption = 'To'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Subject: TLabel
-      Left = 41
-      Top = 82
-      Width = 36
-      Height = 13
+      Left = 47
+      Top = 105
+      Width = 45
+      Height = 16
       Caption = 'Subject'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label4: TLabel
-      Left = 216
-      Top = 11
-      Width = 19
-      Height = 13
+      Left = 354
+      Top = 19
+      Width = 24
+      Height = 16
       Caption = 'Port'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label5: TLabel
       Left = 12
-      Top = 174
-      Width = 66
-      Height = 13
+      Top = 220
+      Width = 83
+      Height = 16
       Caption = 'Message text:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label9: TLabel
       Left = 29
-      Top = 108
-      Width = 48
-      Height = 13
+      Top = 136
+      Width = 63
+      Height = 16
       Caption = 'Username'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label10: TLabel
-      Left = 212
-      Top = 108
-      Width = 23
-      Height = 13
+      Left = 347
+      Top = 136
+      Width = 31
+      Height = 16
       Caption = 'Pass'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label11: TLabel
       Left = 9
-      Top = 132
-      Width = 68
-      Height = 13
+      Top = 165
+      Width = 83
+      Height = 16
       Caption = 'Authentication'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label12: TLabel
-      Left = 64
-      Top = 60
-      Width = 13
-      Height = 13
+      Left = 76
+      Top = 78
+      Width = 16
+      Height = 16
       Caption = 'Cc'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label13: TLabel
-      Left = 216
-      Top = 60
-      Width = 19
-      Height = 13
+      Left = 355
+      Top = 78
+      Width = 23
+      Height = 16
       Caption = 'Bcc'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object Label14: TLabel
-      Left = 204
-      Top = 84
-      Width = 31
-      Height = 13
-      Caption = 'Priority'
+      Left = 311
+      Top = 105
+      Width = 67
+      Height = 16
+      Caption = 'Importance'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
     object HostEdit: TEdit
-      Left = 80
-      Top = 8
-      Width = 121
-      Height = 21
+      Left = 100
+      Top = 16
+      Width = 197
+      Height = 24
       Hint = 'Mail server hostname or IP address'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      Text = 'smtp.mail.yahoo.fr'
+      Text = 'smtp.gmail.com'
     end
     object FromEdit: TEdit
-      Left = 80
-      Top = 32
-      Width = 121
-      Height = 21
+      Left = 100
+      Top = 45
+      Width = 197
+      Height = 24
       Hint = 'Author'#39's EMail'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
-      Text = 'alcinoe.alcinoe@yahoo.com'
+      Text = 'alsmtpclientdemo@gmail.com'
     end
     object ToEdit: TEdit
-      Left = 240
-      Top = 32
-      Width = 121
-      Height = 21
+      Left = 387
+      Top = 45
+      Width = 197
+      Height = 24
       Hint = 'Destinators, delimited by semicolons'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 3
-      Text = 'alcinoe.alcinoe@yahoo.com'
     end
     object SubjectEdit: TEdit
-      Left = 80
-      Top = 80
-      Width = 121
-      Height = 21
+      Left = 100
+      Top = 103
+      Width = 197
+      Height = 24
       Hint = 'Message subject'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 6
       Text = 'Test'
     end
     object PortEdit: TEdit
-      Left = 240
-      Top = 8
-      Width = 121
-      Height = 21
+      Left = 387
+      Top = 16
+      Width = 197
+      Height = 24
       Hint = 'Mail server port (should be smtp)'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
-      Text = '25'
+      Text = '465'
     end
-    object ClearDisplayButton: TButton
-      Left = 472
-      Top = 104
-      Width = 96
-      Height = 20
-      Hint = 'Clear info message memo'
-      Caption = 'Clear &Info'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 20
-      OnClick = ClearDisplayButtonClick
-    end
-    object ConnectButton: TButton
-      Left = 368
-      Top = 8
-      Width = 96
+    object ConnectPlainButton: TButton
+      Left = 614
+      Top = 24
+      Width = 115
       Height = 20
       Hint = 'Connect to the mail server'
-      Caption = 'Connect'
+      Caption = 'Connect (Plain)'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 12
-      OnClick = ConnectButtonClick
+      OnClick = ConnectPlainButtonClick
     end
     object HeloButton: TButton
-      Left = 368
-      Top = 32
-      Width = 96
+      Left = 614
+      Top = 74
+      Width = 115
       Height = 20
       Hint = 'Send the signon message'
       Caption = 'Helo'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 13
       OnClick = HeloButtonClick
     end
     object MailFromButton: TButton
-      Left = 368
-      Top = 104
+      Left = 735
+      Top = 49
       Width = 96
       Height = 20
       Hint = 'Send the mail originator'
       Caption = 'MailFrom'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 16
       OnClick = MailFromButtonClick
     end
     object RcptToButton: TButton
-      Left = 472
-      Top = 8
+      Left = 735
+      Top = 74
       Width = 96
       Height = 20
       Hint = 'Send the mail recipents'
       Caption = 'RcptTo'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 17
       OnClick = RcptToButtonClick
     end
     object DataButton: TButton
-      Left = 472
-      Top = 32
+      Left = 735
+      Top = 99
       Width = 96
       Height = 20
       Hint = 'Send mail text and attached files'
       Caption = 'Data'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 18
       OnClick = DataButtonClick
     end
     object QuitButton: TButton
-      Left = 472
-      Top = 56
+      Left = 735
+      Top = 124
       Width = 96
       Height = 20
       Hint = 'Quit mail server'
       Caption = 'Quit'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 19
       OnClick = QuitButtonClick
     end
     object UsernameEdit: TEdit
-      Left = 80
-      Top = 104
-      Width = 121
-      Height = 21
+      Left = 100
+      Top = 132
+      Width = 197
+      Height = 24
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 8
-      Text = 'alcinoe.alcinoe@yahoo.com'
+      Text = 'alsmtpclientdemo@gmail.com'
     end
     object PasswordEdit: TEdit
-      Left = 240
-      Top = 104
-      Width = 121
-      Height = 21
+      Left = 387
+      Top = 132
+      Width = 197
+      Height = 24
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 9
-      Text = 'alcinoe2012'
+      Text = 'bnjn fovp etjq biwz'
     end
     object AuthComboBox: TComboBox
-      Left = 80
-      Top = 128
-      Width = 121
-      Height = 21
+      Left = 100
+      Top = 161
+      Width = 197
+      Height = 24
       Style = csDropDownList
-      ItemIndex = 1
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ItemIndex = 0
+      ParentFont = False
       TabOrder = 10
       Text = 'Plain'
       Items.Strings = (
-        'None'
         'Plain'
-        'Login'
-        'CramMD5'
-        'CarmSHA1'
-        'AutoSelect')
+        'Login')
     end
     object EhloButton: TButton
-      Left = 368
-      Top = 56
-      Width = 96
+      Left = 614
+      Top = 99
+      Width = 115
       Height = 20
       Caption = 'Ehlo'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 14
       OnClick = EhloButtonClick
     end
     object AuthButton: TButton
-      Left = 368
-      Top = 80
+      Left = 735
+      Top = 24
       Width = 96
       Height = 20
       Caption = 'Auth'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 15
       OnClick = AuthButtonClick
     end
     object CcEdit: TEdit
-      Left = 80
-      Top = 56
-      Width = 121
-      Height = 21
+      Left = 100
+      Top = 74
+      Width = 197
+      Height = 24
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 4
     end
     object BccEdit: TEdit
-      Left = 240
-      Top = 56
-      Width = 121
-      Height = 21
+      Left = 387
+      Top = 74
+      Width = 197
+      Height = 24
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 5
     end
-    object AllInOneButton: TButton
-      Left = 472
-      Top = 80
-      Width = 96
-      Height = 20
-      Hint = 
-        'Connect, Helo, MailFrom, RcptTo, Data and Quit all chained in a ' +
-        'single action.'
-      Caption = 'All In One'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 21
-      OnClick = AllInOneButtonClick
-    end
     object PriorityComboBox: TComboBox
-      Left = 240
-      Top = 80
-      Width = 121
-      Height = 21
+      Left = 387
+      Top = 103
+      Width = 197
+      Height = 24
       Style = csDropDownList
-      ItemIndex = 2
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ItemIndex = 1
+      ParentFont = False
       TabOrder = 7
       Text = 'normal'
       Items.Strings = (
-        ''
-        'urgent'
+        'low'
         'normal'
-        'non-urgent')
+        'high')
     end
     object ConfirmCheckBox: TCheckBox
-      Left = 240
-      Top = 130
-      Width = 55
+      Left = 387
+      Top = 165
+      Width = 102
       Height = 17
       Caption = 'Confirm'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
       TabOrder = 11
+    end
+    object ConnectTslButton: TButton
+      Left = 614
+      Top = 49
+      Width = 115
+      Height = 20
+      Hint = 'Connect to the mail server'
+      Caption = 'Connect (TSL)'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 20
+      OnClick = ConnectTslButtonClick
+    end
+    object StartTLSButton: TButton
+      Left = 614
+      Top = 124
+      Width = 115
+      Height = 20
+      Caption = 'StartTLS'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 21
+      OnClick = StartTLSButtonClick
     end
   end
   object AttachPanel: TPanel
     Left = 0
-    Top = 311
-    Width = 589
-    Height = 17
+    Top = 361
+    Width = 857
+    Height = 23
     Align = alTop
     TabOrder = 4
+    ExplicitWidth = 800
     object Label6: TLabel
       Left = 16
       Top = 2
-      Width = 67
-      Height = 13
+      Width = 83
+      Height = 16
       Caption = 'Attached files:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
   end
   object FileAttachMemo: TMemo
     Left = 0
-    Top = 328
-    Width = 589
+    Top = 384
+    Width = 857
     Height = 49
     Hint = 'Enter the attached file path, one per line'
     Align = alTop
+    EditMargins.Left = 6
+    EditMargins.Right = 6
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = 16
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
@@ -416,20 +632,28 @@ object Form1: TForm1
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
+    ExplicitWidth = 800
   end
   object InfoPanel: TPanel
     Left = 0
-    Top = 377
-    Width = 589
-    Height = 17
+    Top = 433
+    Width = 857
+    Height = 23
     Align = alTop
     TabOrder = 5
+    ExplicitWidth = 800
     object Label7: TLabel
       Left = 16
       Top = 2
-      Width = 71
-      Height = 13
+      Width = 91
+      Height = 16
       Caption = 'Info messages:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = 16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
     end
   end
 end

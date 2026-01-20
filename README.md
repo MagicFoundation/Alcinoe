@@ -886,13 +886,14 @@ With **TALColorAdjustEffect**, you can effortlessly apply stunning
 photo filters to enhance your images with just a single tap. 
 Transform your photos into beautiful and expressive works of art in minutes! 
 
-Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
-
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter2.jpg?raw=true" width="320" style="width:320px;"/>
 </p>
+  
+Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
+<br/>
 <br/>
   
 
@@ -1200,6 +1201,26 @@ undesired conversions.
 
 History
 =======
+
+## 20/01/2026 – Networking & Messaging Stack Modernization
+
+- Added **TAlSChannelTlsClient** (native Windows SChannel TLS 1.2 / 1.3 support)
+- Added **TALWinSocketClient**
+- Added service management helpers:
+  - `ALInstallService`
+  - `ALUninstallService`
+  - `ALStartService`
+  - `ALStopService`
+  - `ALStartServiceCtrlDispatcher`  
+  to fully manage Windows services
+- Archived `Alcinoe.Winsock.pas` (functions moved to `Alcinoe.Net`)
+- Renamed `Alcinoe.Winapi.HttpApi` to `Alcinoe.Winapi.Http`
+- Rebuilt **TALSMTPClient** with native **TLS 1.2 / TLS 1.3** support
+- Added **TALMultipartMixedEncoderA** and **TALMultipartAlternativeEncoderA**
+- Renamed and rebuilt **TALEMailHeadersA** to **TALMailHeadersA**
+- Archived `Alcinoe.Sqlite3.Client` and `Alcinoe.Sqlite3.Wrapper`
+- Archived `Alcinoe.POP3.Client`
+- Archived `Alcinoe.MemCached.Client`
 
 ## 24/12/2025 – Versioning Alignment, API Additions & Behavior Updates
 

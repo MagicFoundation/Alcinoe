@@ -962,6 +962,8 @@ Learn more at [Demos\ALTSLClient](https://github.com/MagicFoundation/Alcinoe/tre
 Secure SMTP Client (TLS 1.2 / TLS 1.3)
 ======================================
     
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/smtp.webp?raw=true" width="540" style="width:540px;"/>
+    
 Designed for reliable and secure email delivery, `TALSMTPClient` is a Delphi
 SMTP client component that sends messages directly over the SMTP protocol
 while leveraging the native Windows TLS stack for transport security. By

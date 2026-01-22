@@ -1016,6 +1016,7 @@ begin
       ALFreeAndNil(FBodyStream)
   end;
   FBodyStream := TALStringStreamA.Create(AValue);
+  FOwnsBodyStream := True;
 end;
 
 {***********************************************************}

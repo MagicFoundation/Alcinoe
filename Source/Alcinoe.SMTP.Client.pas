@@ -264,7 +264,7 @@ begin
     var LRcptName := ARcptNames[I];
     If LRcptName = '' then raise EALException.Create('Recipient email address is empty');
     If (ALPosA(#13#10, LRcptName) > 0) then raise EALException.Create('Recipient email address is invalid');
-    Result := Result + SendCmd('RCPT To:<'+LRcptName+'>', [250, 251]);
+    Result := Result + ALIfThenA(Result <> '', #13#10) + SendCmd('RCPT To:<'+LRcptName+'>', [250, 251]);
   end;
 end;
 
@@ -524,9 +524,10 @@ begin
             Break;
           end;
 
-        If not LGoodResponse then Raise EALException.Create(LResponse);
+        If not LGoodResponse then Raise EALException.Create(ALTrim(LResponse));
         if p^ <> '-' then Begin
-          If J <> LLst.count - 1 then Raise EALException.Create(LResponse);
+          If J <> LLst.count - 1 then Raise EALException.Create(AlTrim(LResponse));
+          Result := ALTrim(Result);
           Exit;
         end;
 

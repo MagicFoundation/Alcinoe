@@ -61,6 +61,7 @@ Function AlGenerateInternetMessageID: AnsiString; overload;
 Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString; overload;
 function AlIsValidEmail(const Value: AnsiString): boolean; overload;
 function AlIsValidEmail(const Value: String): boolean; overload;
+procedure ALParseEmlMessage(const AFileName: String; const AHeaders: TALMailHeadersA; out ABody: AnsiString);
 
 implementation
 
@@ -423,6 +424,16 @@ end;
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
+
+{**********************************************************************************************************}
+procedure ALParseEmlMessage(const AFileName: String; const AHeaders: TALMailHeadersA; out ABody: AnsiString);
+begin
+  Var LEml := ALGetStringFromFile(AFileName);
+  var P1 := ALPosA(#13#10#13#10, LEml);
+  If P1 <= 0 then raise Exception.Create('Invalid EML format: header/body separator not found');
+  AHeaders.RawHeaderText := AlCopystr(LEml, 1, P1-1);
+  ABody := AlCopystr(LEml, P1+4, MaxInt);
+end;
 
 {*********************************}
 constructor TALMailHeadersA.Create;

@@ -6156,7 +6156,7 @@ begin
   if LVersionObject <> nil then Result := NSStrToStr(TNSString.Wrap(LVersionObject)) // 1.0.8
   else Result := 'x.x.x';
   {$ELSEIF defined(MSWINDOWS)}
-  Result := AlGetFileVersion(ALGetModulePathW+ALGetModuleNameW);
+  Result := AlGetFileVersionW(ALGetModulePathW+ALGetModuleNameW);
   {$ELSE}
   Result := 'x.x.x';
   {$ENDIF}

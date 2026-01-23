@@ -425,7 +425,7 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$ENDIF}
 
-{**********************************************************************************************************}
+{***********************************************************************************************************}
 procedure ALParseEmlMessage(const AFileName: String; const AHeaders: TALMailHeadersA; out ABody: AnsiString);
 begin
   Var LEml := ALGetStringFromFile(AFileName);

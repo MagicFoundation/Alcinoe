@@ -5,6 +5,7 @@ interface
 {$I Alcinoe.inc}
 
 uses
+  System.Messaging,
   System.Generics.Collections,
   System.UITypes,
   FMX.Controls,
@@ -345,6 +346,9 @@ Type
     FDynamicScrollBarStyles: TDictionary<String, TDynamicScrollBarStyleInfo>;
     //--
     FIsDarkMode: Boolean;
+    {$IF defined(IOS)}
+    procedure ApplicationEventHandler(const Sender: TObject; const M: TMessage);
+    {$ENDIF}
     function GetSystemIsDarkMode: Boolean;
     function GetDarkModeBehavior: TDarkModeBehavior;
     procedure SetDarkModeBehavior(const AValue: TDarkModeBehavior);
@@ -27043,12 +27047,16 @@ begin
     else raise Exception.Create('Error 888B969C-A83E-4717-838E-6A830DB0B7D6');
   end;
   if LSystemIsDarkMode <> FIsDarkMode then begin
-    var LWindow := TiOSHelper.SharedApplication.keyWindow;
-    if Assigned(LWindow) then begin
-      if not FIsDarkMode then LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleLight)
-      else LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleDark);
-    end
+    var LSharedApplication := TiOSHelper.SharedApplication;
+    if LSharedApplication <> nil then begin
+      var LWindow := TiOSHelper.SharedApplication.keyWindow;
+      if Assigned(LWindow) then begin
+        if not FIsDarkMode then LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleLight)
+        else LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleDark);
+      end;
+    end;
   end;
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   {$ELSEIF defined(MSWindows) or defined(ALMacOS)}
   case DarkModeBehavior of
     TDarkModeBehavior.FollowSystem: FIsDarkMode := GetSystemIsDarkMode;
@@ -27070,6 +27078,10 @@ end;
 {*********************************}
 destructor TALStyleManager.Destroy;
 begin
+  {$IF defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  {$ENDIF}
+  //--
   ALFreeAndNil(FLightColors);
   ALFreeAndNil(FDarkColors);
   AlFreeAndNil(fColors);
@@ -28146,6 +28158,27 @@ class function TALStyleManager.HasInstance: Boolean;
 begin
   result := FInstance <> nil;
 end;
+
+{****************}
+{$IF defined(ios)}
+procedure TALStyleManager.ApplicationEventHandler(const Sender: TObject; const M: TMessage);
+begin
+  if (M is TApplicationEventMessage) then begin
+    if TApplicationEventMessage(M).Value.Event = TApplicationEvent.FinishedLaunching then begin
+      if GetSystemIsDarkMode <> FIsDarkMode then begin
+        var LSharedApplication := TiOSHelper.SharedApplication;
+        if LSharedApplication <> nil then begin
+          var LWindow := TiOSHelper.SharedApplication.keyWindow;
+          if Assigned(LWindow) then begin
+            if not FIsDarkMode then LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleLight)
+            else LWindow.setOverrideUserInterfaceStyle(UIUserInterfaceStyleDark);
+          end;
+        end;
+      end;
+    end
+  end;
+end;
+{$ENDIF}
 
 {****************************************************}
 function TALStyleManager.GetSystemIsDarkMode: boolean;

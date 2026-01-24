@@ -146,7 +146,7 @@ type
   TALStringBuilderA = class
   private const
     DefaultCapacity = $10;
-    LineBreak: AnsiString = sLineBreak;
+    LineBreak: AnsiString = #13#10;
   private
     function GetCapacity: Integer; inline;
     procedure SetCapacity(const AValue: Integer);
@@ -183,7 +183,7 @@ type
   TALStringBuilderW = class
   private const
     DefaultCapacity = $10;
-    LineBreak: string = sLineBreak;
+    LineBreak: string = #13#10;
   private
     function GetCapacity: Integer; inline;
     procedure SetCapacity(const AValue: Integer);
@@ -224,6 +224,8 @@ function  ALGUIDToStringA(const Guid: TGUID; const WithoutBracket: boolean = fal
 function  ALGUIDToStringW(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
 Function  ALNewGUIDStringA(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): AnsiString;
 Function  ALNewGUIDStringW(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
+function  ALAdjustLineBreaks(const S: string; const Style: TTextLineBreakStyle = tlbsCRLF): string; inline; overload;
+function  ALAdjustLineBreaks(const S: Ansistring; const Style: TTextLineBreakStyle = tlbsCRLF): Ansistring; inline; overload;
 function  ALFormatA(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettingsA): AnsiString; overload;
 procedure ALFormatA(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettingsA; var Result: ansiString); overload;
 function  ALFormatA(const Format: AnsiString; const Args: array of const): AnsiString; overload;
@@ -945,6 +947,18 @@ Begin
   if CreateGUID(LGUID) <> S_OK then RaiseLastOSError;
   Result := ALGUIDToStringW(LGUID, WithoutBracket, WithoutHyphen);
 End;
+
+{*************************************************************************************************}
+function  ALAdjustLineBreaks(const S: string; const Style: TTextLineBreakStyle = tlbsCRLF): string;
+begin
+  Result := AdjustLineBreaks(S, Style);
+end;
+
+{*********************************************************************************************************}
+function  ALAdjustLineBreaks(const S: Ansistring; const Style: TTextLineBreakStyle = tlbsCRLF): Ansistring;
+begin
+  Result := AdjustLineBreaks(S, Style);
+end;
 
 {$IFNDEF ALCompilerVersionSupported130}
   {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}

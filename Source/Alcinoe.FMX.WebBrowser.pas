@@ -790,10 +790,16 @@ end;
 
 {********************************************************************************************************************************************************************************************}
 procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; shouldGoToBackForwardListItem: WKBackForwardListItem; willUseInstantBack: Boolean; completionHandler: Pointer);
+var
+  // completionHandler:(void (^)(BOOL shouldGoToItem))completionHandler
+  LBlockImp: procedure(shouldGoToItem: Boolean); cdecl;
 begin
   {$IF defined(DEBUG)}
   //ALLog('TNavigationDelegate.webView:shouldGoToBackForwardListItem:willUseInstantBack:completionHandler');
   {$ENDIF}
+  @LBlockImp := imp_implementationWithBlock(completionHandler);
+  LBlockImp(true{shouldGoToItem});
+  imp_removeBlock(@LBlockImp);
 end;
 
 {************************************************************************************************************************************************************}
@@ -813,10 +819,20 @@ end;
 
 {***********************************************************************************************************************************************************************************************}
 procedure TALIosWebBrowserView.TNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; preferences: WKWebpagePreferences; decisionHandler: Pointer);
+var
+  // No idea why ignored parameter is needed, but removing it makes everything crash.
+  // https://stackoverflow.com/questions/79827070/how-to-correctly-call-an-ios-completionhandler-block-from-delphi-without-crashin?noredirect=1#comment140867316_79827070
+  // (WK_SWIFT_UI_ACTOR void (^)(WKNavigationActionPolicy, WKWebpagePreferences *))decisionHandler
+  LBlockImp: procedure(policy: WKNavigationActionPolicy; ignored: pointer; preferences: Pointer{WKWebpagePreferences}); cdecl;
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TNavigationDelegate.webView:decidePolicyForNavigationAction:preferences');
+  ALLog('TNavigationDelegate.webView:decidePolicyForNavigationAction:preferences:decisionHandler');
   {$ENDIF}
+  var LShouldStartLoadUrl := FWebBrowserView.Control.ShouldStartLoadUrl(NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString));
+  @LBlockImp := imp_implementationWithBlock(decisionHandler);
+  if LShouldStartLoadUrl then LBlockImp(WKNavigationActionPolicyAllow, nil, NSObjectToID(preferences))
+  else LBlockImp(WKNavigationActionPolicyCancel, nil, NSObjectToID(preferences));
+  imp_removeBlock(@LBlockImp);
 end;
 
 {****************************************************************************************************************************************************************}

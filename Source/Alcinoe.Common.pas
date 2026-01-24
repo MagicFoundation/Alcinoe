@@ -3153,7 +3153,7 @@ type
   end;
 
 var
-  _ALLogHistory: TList<_TALLogItem>;
+  _ALLogHistory: TList<_TALLogItem> = nil;
   _ALLogHistoryIndex: integer = -1;
 
 {********************************}
@@ -3201,6 +3201,7 @@ function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
 
 begin
   Result := '';
+  if _ALLogHistory = nil then exit;
   Tmonitor.enter(_ALLogHistory);
   Try
     for var i := _ALLogHistoryIndex downto 0 do
@@ -3227,7 +3228,7 @@ begin
   // ignore all verbose logs.
   if &Type = TalLogType.VERBOSE then exit;
   {$ENDIF}
-  if CanPreserve and (ALMaxLogHistory > 0) then begin
+  if CanPreserve and (ALMaxLogHistory > 0) and (_ALLogHistory <> nil) then begin
     var LLogItem := _TALLogItem.Create(
                       Tag, // const ATag: String;
                       Msg, // const AMsg: String;

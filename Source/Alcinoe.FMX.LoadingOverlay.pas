@@ -128,7 +128,6 @@ type
     FFrozenNativeControls: TArray<TALNativeControl>;
     procedure FreezeNativeViews;
     procedure UnfreezeNativeViews;
-    procedure SyncSystemBarsColor;
     { IFreeNotification }
     procedure FreeNotification(AObject: TObject);
   protected
@@ -144,6 +143,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure AfterConstruction; override;
+    procedure SyncSystemBarsColor;
     procedure RequestLoadingOverlay(const ALoadingOverlay: TALLoadingOverlay);
     property DefaultScrim: TALRectangle read FDefaultScrim;
     property DefaultContainer: TALRectangle read FDefaultContainer;

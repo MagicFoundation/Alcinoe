@@ -395,7 +395,6 @@ type
     FFrozenNativeControls: TArray<TALNativeControl>;
     procedure FreezeNativeViews;
     procedure UnfreezeNativeViews;
-    procedure SyncSystemBarsColor;
     { IFreeNotification }
     procedure FreeNotification(AObject: TObject);
   protected
@@ -411,6 +410,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure AfterConstruction; override;
+    procedure SyncSystemBarsColor;
     procedure RequestSheet(const ASheet: TALSheet);
     property DefaultScrim: TALRectangle read FDefaultScrim;
     property DefaultLeftSheetContainer: TALRectangle read FDefaultLeftSheetContainer;
@@ -2065,6 +2065,7 @@ begin
      (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
   var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentSheet.Fill.Color{AOverlayColor});
   var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentSheet.Fill.Color{AOverlayColor});
+  // Duplicated in TALDialogManager.SyncSystemBarsColor
   If FCurrentSheet.DockEdge = TALSheet.TDockEdge.Bottom then LNavigationBarColor := FCurrentSheet.Container.Fill.Color;
   ALSetSystemBarsColor(
     LStatusBarColor,

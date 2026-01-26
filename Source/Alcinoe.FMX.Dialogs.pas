@@ -229,7 +229,6 @@ type
     FFrozenNativeControls: TArray<TALNativeControl>;
     procedure FreezeNativeViews;
     procedure UnfreezeNativeViews;
-    procedure SyncSystemBarsColor;
     { IFreeNotification }
     procedure FreeNotification(AObject: TObject);
   protected
@@ -245,6 +244,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure AfterConstruction; override;
+    procedure SyncSystemBarsColor;
     /// <summary>
     ///   If a dialog is already being shown and <c>AForceImmediateShow</c> is <c>false</c>,
     ///   the new dialog will be queued and displayed after the current one is closed.
@@ -281,6 +281,7 @@ uses
   System.Types,
   Fmx.Controls,
   FMX.Forms,
+  Alcinoe.FMX.Sheets,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Styles,
@@ -1231,8 +1232,23 @@ procedure TALDialogManager.SyncSystemBarsColor;
 begin
   if (FCurrentDialog = nil) or
      (TALCapturedSystemBarsColor.StatusBarColor = TAlphaColors.Null) then exit;
-  var LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, FCurrentDialog.Fill.Color{AOverlayColor});
-  var LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, FCurrentDialog.Fill.Color{AOverlayColor});
+
+  var LStatusBarColor: TAlphaColor;
+  var LNavigationBarColor: TAlphaColor;
+  if TALSheet.Current <> nil then begin
+    LStatusBarColor := ALBlendColor(TALCapturedSystemBarsColor.StatusBarColor{ABaseColor}, TALSheet.Current.Fill.Color{AOverlayColor});
+    LNavigationBarColor := ALBlendColor(TALCapturedSystemBarsColor.NavigationBarColor{ABaseColor}, TALSheet.Current.Fill.Color{AOverlayColor});
+    // Duplicated in TALSheetManager.SyncSystemBarsColor
+    If (TALSheet.Current is TALBottomSheet) then LNavigationBarColor := TALSheet.Current.Container.Fill.Color;
+  end
+  else begin
+    LStatusBarColor := TALCapturedSystemBarsColor.StatusBarColor;
+    LNavigationBarColor := TALCapturedSystemBarsColor.NavigationBarColor;
+  end;
+
+  LStatusBarColor := ALBlendColor(LStatusBarColor{ABaseColor}, FCurrentDialog.Fill.Color{AOverlayColor});
+  LNavigationBarColor := ALBlendColor(LNavigationBarColor{ABaseColor}, FCurrentDialog.Fill.Color{AOverlayColor});
+
   ALSetSystemBarsColor(
     LStatusBarColor,
     LNavigationBarColor,

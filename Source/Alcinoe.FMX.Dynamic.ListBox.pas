@@ -1921,10 +1921,14 @@ begin
   //--
   FControlsCount := FControlsCount + LItemsLength;
   //--
-  if AIndex <= Owner.FFirstVisibleItemIndex then inc(Owner.FFirstVisibleItemIndex, LItemsLength);
-  if AIndex <= Owner.FLastVisibleItemIndex then inc(Owner.FLastVisibleItemIndex, LItemsLength);
-  if AIndex <= Owner.FFirstPreloadedItemIndex then inc(Owner.FFirstPreloadedItemIndex, LItemsLength);
-  if AIndex <= Owner.FLastPreloadedItemIndex then inc(Owner.FLastPreloadedItemIndex, LItemsLength);
+  if Owner.FLastVisibleItemIndex >= 0 then begin
+    if AIndex <= Owner.FFirstVisibleItemIndex then inc(Owner.FFirstVisibleItemIndex, LItemsLength);
+    if AIndex <= Owner.FLastVisibleItemIndex then inc(Owner.FLastVisibleItemIndex, LItemsLength);
+  end;
+  if Owner.FLastPreloadedItemIndex >= 0 then begin
+    if AIndex <= Owner.FFirstPreloadedItemIndex then inc(Owner.FFirstPreloadedItemIndex, LItemsLength);
+    if AIndex <= Owner.FLastPreloadedItemIndex then inc(Owner.FLastPreloadedItemIndex, LItemsLength);
+  end;
   if AIndex <= Owner.FTriggerDownloadItemsAtIndex then inc(Owner.FTriggerDownloadItemsAtIndex, LItemsLength);
   //--
   for var i := 0 to LItemsLength - 1 do

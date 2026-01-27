@@ -153,6 +153,7 @@ Type
     function getLineHeight: Single; override; // It includes the line spacing
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
+    function getSelectionStart: Integer; override;
   end;
 
 {$endif}
@@ -282,6 +283,7 @@ Type
     function getLineHeight: Single; override; // It includes the line spacing
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
+    function getSelectionStart: Integer; override;
   end;
 
 {$endif}
@@ -1029,6 +1031,12 @@ begin
   View.setSelectedRange(NSMakeRange(AIndex, 0));
 end;
 
+{*************************************************}
+function TALIosMemoView.getSelectionStart: Integer;
+begin
+  Result := Integer(View.selectedRange.location);
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -1519,6 +1527,12 @@ end;
 Procedure TALMacMemoView.setSelection(const AIndex: integer);
 begin
   FTextView.View.setSelectedRange(NSMakeRange(AIndex, 0));
+end;
+
+{*************************************************}
+function TALMacMemoView.getSelectionStart: Integer;
+begin
+  Result := Integer(FTextView.View.selectedRange.location);
 end;
 
 {$endif}

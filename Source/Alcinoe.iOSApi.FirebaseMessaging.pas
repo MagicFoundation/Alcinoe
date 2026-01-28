@@ -8,7 +8,7 @@ interface
 {$I Alcinoe.inc}
 
 {$IFNDEF ALCompilerVersionSupported130}
-  //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
+  //Pleast update <Alcinoe>\Libraries\ios\Firebase\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FirebaseMessaging.pas to build
   //the compare source file. Then make a diff compare between the new generated

@@ -87,11 +87,11 @@ https://developers.facebook.com/docs/ios/getting-started
 
 2) In project > option > Building > Delphi Compiler > FRAMEWORK search path
    you need to add the following path:
-   <Alcinoe>\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64
-   <Alcinoe>\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Facebook\FBSDKLoginKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Facebook\FBSDKShareKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Facebook\FBSDKCoreKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\Facebook\FBAEMKit.xcframework\ios-arm64
 
 3) https://developers.facebook.com/docs/ios/getting-started
    Configure the Info.plist file with an XML snippet that contains data about

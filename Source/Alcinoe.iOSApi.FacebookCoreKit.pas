@@ -8,7 +8,7 @@ interface
 {$I Alcinoe.inc}
 
 {$IFNDEF ALCompilerVersionSupported130}
-  //Pleast update <Alcinoe>\Libraries\ios\facebook\ to the last one and then run
+  //Pleast update <Alcinoe>\Libraries\ios\Facebook\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FacebookCoreKit.pas to build
   //the compare source file. Then make a diff compare between the new generated

@@ -24,19 +24,11 @@ Copy the extracted content of:
 
 ---
 
-## 3) Copy the `include` folder
-
-(x86)/include/ → Alcinoe/References/ImageMagick/win32/include/
-(x64)/include/ → Alcinoe/References/ImageMagick/win64/include/
-
----
-
 ## 4) Remove unnecessary files and folders
 
 Delete these directories from both `win32` and `win64`:
 
 images  
-include  
 lib  
 Magick++_Demo  
 uninstall  

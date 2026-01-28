@@ -163,6 +163,7 @@ Type
     function getLineHeight: Single; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
+    function getSelectionStart: Integer; virtual;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType;
@@ -215,6 +216,7 @@ Type
     function getLineHeight: Single; virtual; abstract;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
     Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
+    function getSelectionStart: Integer; virtual; abstract;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType;
@@ -316,6 +318,7 @@ Type
     function getLineHeight: Single; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
+    function getSelectionStart: Integer; override;
   end;
 
 {$endif}
@@ -356,6 +359,7 @@ Type
     function getLineHeight: Single; virtual; abstract;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
     Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
+    function getSelectionStart: Integer; virtual; abstract;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType;
@@ -452,6 +456,7 @@ Type
     function getLineHeight: Single; override;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
     Procedure SetSelection(const AIndex: integer); overload; override;
+    function getSelectionStart: Integer; override;
   end;
 
 {$endif}
@@ -523,6 +528,7 @@ Type
     function getLineHeight: Single; virtual;
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
+    function getSelectionStart: Integer; virtual;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType;
@@ -892,6 +898,7 @@ Type
     FDummyPassword: Boolean;
     FDummyMaxLength: Integer;
     FDummyText: String;
+    FDummyCaretPosition: Integer;
     //--
     fBufPromptTextDrawable: TALDrawable;
     fBufPromptTextDrawableRect: TRectF;
@@ -973,6 +980,8 @@ Type
     procedure InitNativeView; override;
     procedure RecreateNativeView; override;
     procedure DoChange; virtual;
+    function GetCaretPosition: Integer; virtual;
+    procedure SetCaretPosition(const Value: Integer); virtual;
     procedure DoReturnKey; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -1037,6 +1046,7 @@ Type
     {$ENDIF}
     Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
     Procedure SetSelection(const AIndex: integer); overload; virtual;
+    procedure SetTextNoChange(const AText: string);
     function getLineCount: integer;
     function getLineHeight: Single;
     procedure MakeBufDrawable; override;
@@ -1124,6 +1134,7 @@ Type
     /// </summary>
     property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColors.null;
     property TintColorKey: String read GetTintColorKey write setTintColorKey;
+    property CaretPosition: Integer read GetCaretPosition write SetCaretPosition;
     property TouchTargetExpansion;
     property Visible;
     property Width;
@@ -1902,6 +1913,12 @@ begin
   View.setSelection(aStart, aStop);
 end;
 
+{*****************************************************}
+function TALAndroidEditView.getSelectionStart: Integer;
+begin
+  Result := View.getSelectionStart;
+end;
+
 {***************************************************************}
 Procedure TALAndroidEditView.setSelection(const AIndex: integer);
 begin
@@ -2397,6 +2414,16 @@ begin
   View.setSelectedTextRange(View.textRangeFromPosition(LStartPosition, LEndPosition));
 end;
 
+{*************************************************}
+function TALIosEditView.getSelectionStart: Integer;
+var
+  R: UITextRange;
+begin
+  R := View.selectedTextRange;
+  if R = nil then Exit(0);
+  Result := View.offsetFromPosition(View.beginningOfDocument, R.start);
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -2785,6 +2812,15 @@ end;
 Procedure TALMacEditView.setSelection(const AIndex: integer);
 begin
   View.currentEditor.setSelectedRange(NSMakeRange(AIndex, 0));
+end;
+
+{*************************************************}
+function TALMacEditView.getSelectionStart: Integer;
+begin
+  if (View.currentEditor <> nil) then
+    Result := View.currentEditor.selectedRange.location
+  else
+    Result := 0;
 end;
 
 {$endif}
@@ -3268,6 +3304,15 @@ end;
 Procedure TALWinEditView.SetSelection(const AIndex: integer);
 begin
   SendMessage(Handle, EM_SETSEL, AIndex, AIndex);
+end;
+
+{*************************************************}
+function TALWinEditView.getSelectionStart: Integer;
+var
+  LStart, LEnd: Cardinal;
+begin
+  SendMessage(Handle, EM_GETSEL, WPARAM(@LStart), LPARAM(@LEnd));
+  Result := Integer(LStart);
 end;
 
 {$endif}
@@ -5071,6 +5116,18 @@ begin
   end;
 end;
 
+{*********************************************************}
+procedure TALBaseEdit.SetTextNoChange(const AText: string);
+begin
+  var LPrevOnChange := fOnChange;
+  fOnChange := nil;
+  try
+    SetText(AText);
+  finally
+    fOnChange := LPrevOnChange;
+  end;
+end;
+
 {***********************************}
 function TALBaseEdit.getText: String;
 begin
@@ -5269,12 +5326,29 @@ begin
 end;
 
 {***********************************************************}
+procedure TALBaseEdit.SetCaretPosition(const Value: Integer);
+begin
+  FDummyCaretPosition := Value;
+  if NativeView <> nil then
+    GetNativeView.SetSelection(Value);
+end;
+
+{***********************************************************}
 procedure TALBaseEdit.SetCheckSpelling(const Value: Boolean);
 begin
   if NativeView <> nil then
     NativeView.CheckSpelling := Value
   else
     FDummyCheckSpelling := Value
+end;
+
+{*********************************************}
+function TALBaseEdit.GetCaretPosition: Integer;
+begin
+  if NativeView <> nil then
+    Result := GetNativeView.getSelectionStart
+  else
+    Result := FDummyCaretPosition;
 end;
 
 {*********************************************}

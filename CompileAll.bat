@@ -375,7 +375,7 @@ Call :BUILD_PROJECT "%ALBaseDir%\Tools\ImageMagickWrapperGenerator" "_Source" "I
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64" || GOTO ERROR
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\PlatformApiInterfaceDiff" "_Source" "PlatformApiInterfaceDiff.dproj" "Win64" || GOTO ERROR
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\WinApiWrapperGenerator" "_Source" "WinApiWrapperGenerator.dproj" "Win64" || GOTO ERROR
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\CHeaderWrapperGenerator" "_Source" "CHeaderWrapperGenerator.dproj" "Win64" || GOTO ERROR
 if "%DXVCL%"=="" goto BUILD_DEMOS
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeProfiler" "_Source" "CodeProfiler.dproj" "Win64" || GOTO ERROR
 

@@ -353,9 +353,9 @@ begin
 
     //Create the ImageMagick Library
     {$IFDEF WIN32}
-    alCreateImageMagickLibrary(TPath.GetAppPath + '\..\..\Libraries\dll\imagemagick\win32\');
+    alCreateImageMagickLibrary(TPath.GetAppPath + '\..\..\Libraries\dll\ImageMagick\Win32\');
     {$ELSE}
-    alCreateImageMagickLibrary(TPath.GetAppPath + '\..\..\Libraries\dll\imagemagick\win64\');
+    alCreateImageMagickLibrary(TPath.GetAppPath + '\..\..\Libraries\dll\ImageMagick\Win64\');
     {$ENDIF}
     try
 

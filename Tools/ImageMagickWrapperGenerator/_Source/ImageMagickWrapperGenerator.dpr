@@ -947,7 +947,7 @@ begin
           //
           // This wrapper was automagically generated from ImageMagick version 7.1.2-8
           // using Alcinoe\Tools\ImageMagickWrapperGenerator\.
-          // DLLs: /Libraries/dll/imagemagick
+          // DLLs: /Libraries/dll/ImageMagick
           //
           // IMPORTANT:
           // Whenever the ImageMagick version is updated, this unit must be regenerated

@@ -1,4 +1,4 @@
-﻿program WinApiWrapperGenerator;
+﻿program CHeaderWrapperGenerator;
 
 {$APPTYPE CONSOLE}
 
@@ -2113,14 +2113,16 @@ begin
           LSrc := ALStringReplaceA(LSrc,'// #define BSON_BEGIN_DECLS extern "C" {','');
           LSrc := ALStringReplaceA(LSrc,'// #define BSON_END_DECLS }','');
 
-          LSrc := ALStringReplaceA(LSrc,
+          LSrc := ALStringReplaceA(
+                    LSrc,
                     '{$if defined(Win32)}'#13#10+
                     '// #include <stddef.h>'#13#10+
                     '{$else}'#13#10+
                     '// #include <sys/uio.h>'#13#10+
                     '{$endif}',
                     '');
-          LSrc := ALStringReplaceA(LSrc,
+          LSrc := ALStringReplaceA(
+                    LSrc,
                     '// typedef struct _mongoc_client_encryption_rewrap_many_datakey_result_t'#13#10+
                     '// mongoc_client_encryption_rewrap_many_datakey_result_t;',
                     '// typedef struct _mongoc_client_encryption_rewrap_many_datakey_result_t mongoc_client_encryption_rewrap_many_datakey_result_t;');
@@ -2335,7 +2337,8 @@ begin
         while ALposA(#13#10#13#10#13#10, LSrc) > 0 do
           LSrc := ALStringReplaceA(LSrc,#13#10#13#10#13#10,#13#10#13#10,[RfReplaceALL]);
 
-        LSrc := ALStringReplaceA(LSrc,
+        LSrc := ALStringReplaceA(
+                  LSrc,
                   '{$if defined(Win32)}'#13#10+
                   #13#10+
                   '{$else}'#13#10+
@@ -2343,7 +2346,8 @@ begin
                   '{$endif}'#13#10,
                   '');
 
-        LSrc := ALStringReplaceA(LSrc,
+        LSrc := ALStringReplaceA(
+                  LSrc,
                   '{$if defined(Win64)}'#13#10+
                   #13#10+
                   '{$else}'#13#10+

@@ -49,8 +49,8 @@ Dcu
 /Embarcadero/Athens/fmx
 /Embarcadero/Florence/fmx
 /Libraries/bpl
-/Libraries/ios/firebase
-/Libraries/ios/facebook
+/Libraries/ios/Firebase
+/Libraries/ios/Facebook
 /Libraries/jar/*
 !/Libraries/jar/org
 /Libraries/jar/org/*

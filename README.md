@@ -106,6 +106,7 @@ forced to apply patches to the original Delphi source files:
 * [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
 * [FMX.VirtualKeyboard.Android: Unused variable and unnecessary logic in Delphi 13 update](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4311)
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
+* [Support configuration-specific deployment templates (AndroidManifest / Info.plist / Entitlements)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4922)
 * [Replace Pointer-based signatures in iOS/macOS bridges with strongly typed wrappers](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4433)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
@@ -143,6 +144,7 @@ forced to apply patches to the original Delphi source files:
 * [Missing Functions in Macapi.QuartzCore.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4346)
 * [macOS: Add missing NSTextField APIs (delegate getter/setter + placeholder getters/setter)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4353)
 * [iOS vs macOS mismatch in CGImageDestinationFinalize declaration (Boolean vs Integer return type)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4714)
+* [Delphi language enhancement: allow multiple inline variant parts inside records (not only trailing)](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-4920)
 
 
 Install Alcinoe
@@ -1081,7 +1083,7 @@ Example :
 
 ```
     //Create the ImageMagick Library
-    ALCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\imagemagick\win32\imagemagick');
+    ALCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\ImageMagick\Win64');
     try
     
       //create the wand pointer

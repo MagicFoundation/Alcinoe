@@ -32,6 +32,7 @@ uses
   Alcinoe.ImageMagick,
   Alcinoe.IniFiles,
   Alcinoe.MongoDB.Client,
+  Alcinoe.MongoDB.Wrapper,
   Alcinoe.Net.Socket.Client.Win,
   Alcinoe.Net.TLS.Client.SChannel,
   Alcinoe.SMTP.Client,

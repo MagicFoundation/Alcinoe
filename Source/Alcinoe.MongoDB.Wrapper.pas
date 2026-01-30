@@ -433,7 +433,7 @@ const PRIu64 = 'I64u';
 // * Derive the maximum representable value of signed_integer type T using the
 // * formula 2^(N - 1) - 1 where N is the number of bits in type T. This assumes
 // * T is represented using two's complement.
-// #define BSON_NUMERIC_LIMITS_MAX_SIGNED(T) ((T)((((size_t)0x01u) shl (sizeof(T) * (size_t)CHAR_BIT - 1u)) - 1u))
+// #define BSON_NUMERIC_LIMITS_MAX_SIGNED(T) ((T)((((size_t)0x01u) << (sizeof(T) * (size_t)CHAR_BIT - 1u)) - 1u))
 
 // * Derive the minimum representable value of signed_integer type T as one less
 // * than the negation of its maximum representable value. This assumes T is

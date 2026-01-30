@@ -1,9 +1,9 @@
 {**************************************************************************
-A simple wrapper around the Intel Threading Building Blocks (oneTBB) memory 
-allocator (tbbmalloc.dll). It provides a Delphi memory manager implemented 
+A simple wrapper around the Intel Threading Building Blocks (oneTBB) memory
+allocator (tbbmalloc.dll). It provides a Delphi memory manager implemented
 on top of the TBB scalable allocator.
 
-Usage 
+Usage
 Place this unit first in your project’s uses clause, for example:
 
   uses

@@ -1,3 +1,22 @@
+
+
+/*++
+
+Copyright (c) 1998-2002 Microsoft Corporation
+
+Module Name:
+
+    Http.h
+
+Abstract:
+
+    This header corresponds to the HTTP API specification
+
+Revision History:
+
+--*/
+
+
 #ifndef __HTTP_H__
 #define __HTTP_H__
 

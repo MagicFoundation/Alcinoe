@@ -1,3 +1,18 @@
+//+---------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 1992-1999.
+//
+//  File:       sspi.h
+//
+//  Contents:   Security Support Provider Interface
+//              Prototypes and structure definitions
+//
+//  Functions:  Security Support Provider API
+//
+//
+//----------------------------------------------------------------------------
+
 #include <sdkddkver.h>
 #include <winapifamily.h>
 

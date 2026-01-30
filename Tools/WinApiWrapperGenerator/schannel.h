@@ -1,3 +1,20 @@
+﻿//+---------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 1992-1999.
+//
+//  File:       schannel.h
+//
+//  Contents:   Public Definitions for SCHANNEL Security Provider
+//
+//  Classes:
+//
+//  Functions:
+//
+//----------------------------------------------------------------------------
+
+
+
 #ifndef __SCHANNEL_H__
 #define __SCHANNEL_H__
 

@@ -1,3 +1,11 @@
+/************************************************************************
+*                                                                       *
+*   winerror.h --  error code definitions for the Win32 API functions   *
+*                                                                       *
+*   Copyright (c) Microsoft Corp. All rights reserved.                  *
+*                                                                       *
+************************************************************************/
+
 #ifndef _WINERROR_
 #define _WINERROR_
 

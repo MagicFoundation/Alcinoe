@@ -1241,7 +1241,7 @@ type
     Argument1: ULONG_PTR;
     Argument2: ULONG_PTR;
     UserData: SecBuffer;
-    ReturnToLsa: BOOLEAN;
+    ReturnToLsa: ByteBool;
   end;
   SECPKG_APP_MODE_INFO = _SECPKG_APP_MODE_INFO;
   PSECPKG_APP_MODE_INFO = ^_SECPKG_APP_MODE_INFO;
@@ -1388,7 +1388,7 @@ function ChangeAccountPasswordW(
            pszAccountName: PSEC_WCHAR;
            pszOldPassword: PSEC_WCHAR;
            pszNewPassword: PSEC_WCHAR;
-           bImpersonating: BOOLEAN;
+           bImpersonating: ByteBool;
            dwReserved: ULONG;
            pOutput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
@@ -1399,7 +1399,7 @@ type
     param2: PSEC_WCHAR;
     param3: PSEC_WCHAR;
     param4: PSEC_WCHAR;
-    param5: BOOLEAN;
+    param5: ByteBool;
     param6: ULONG;
     param7: PSecBufferDesc): SECURITY_STATUS; stdcall;
 
@@ -1409,7 +1409,7 @@ function ChangeAccountPasswordA(
            pszAccountName: PSEC_CHAR;
            pszOldPassword: PSEC_CHAR;
            pszNewPassword: PSEC_CHAR;
-           bImpersonating: BOOLEAN;
+           bImpersonating: ByteBool;
            dwReserved: ULONG;
            pOutput: PSecBufferDesc): SECURITY_STATUS; stdcall; external 'secur32.dll';
 
@@ -1420,7 +1420,7 @@ type
     param2: PSEC_CHAR;
     param3: PSEC_CHAR;
     param4: PSEC_CHAR;
-    param5: BOOLEAN;
+    param5: ByteBool;
     param6: ULONG;
     param7: PSecBufferDesc): SECURITY_STATUS; stdcall;
 
@@ -2780,7 +2780,7 @@ function SspiDecryptAuthIdentityEx(
            EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): SECURITY_STATUS; stdcall; external 'sspicli.dll';
 
 function SspiIsAuthIdentityEncrypted(
-           EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): BOOLEAN; stdcall; external 'secur32.dll';
+           EncryptedAuthData: PSEC_WINNT_AUTH_IDENTITY_OPAQUE): ByteBool; stdcall; external 'secur32.dll';
 
 // begin_ntifs
 

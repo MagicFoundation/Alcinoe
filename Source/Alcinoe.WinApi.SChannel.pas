@@ -864,20 +864,20 @@ const SP_PROT_X_SERVERS = (SP_PROT_SERVERS or SP_PROT_TLS1_X_SERVER or SP_PROT_D
 type
   SSL_EMPTY_CACHE_FN_A = function (
     pszTargetName: LPSTR;
-    dwFlags: DWORD): BOOL; stdcall;
+    dwFlags: DWORD): LongBool; stdcall;
 
 function SslEmptyCacheA(
            pszTargetName: LPSTR;
-           dwFlags: DWORD): BOOL; stdcall; external 'schannel.dll';
+           dwFlags: DWORD): LongBool; stdcall; external 'schannel.dll';
 
 type
   SSL_EMPTY_CACHE_FN_W = function (
     pszTargetName: LPWSTR;
-    dwFlags: DWORD): BOOL; stdcall;
+    dwFlags: DWORD): LongBool; stdcall;
 
 function SslEmptyCacheW(
            pszTargetName: LPWSTR;
-           dwFlags: DWORD): BOOL; stdcall; external 'schannel.dll';
+           dwFlags: DWORD): LongBool; stdcall; external 'schannel.dll';
 
 // #define SSL_EMPTY_CACHE_FN SSL_EMPTY_CACHE_FN_W
 // #define SslEmptyCache SslEmptyCacheW
@@ -1002,7 +1002,7 @@ function SslCrackCertificate(
            pbCertificate: PUCHAR;
            cbCertificate: DWORD;
            dwFlags: DWORD;
-           ppCertificate: PPX509Certificate): BOOL; stdcall; external 'schannel.dll';
+           ppCertificate: PPX509Certificate): LongBool; stdcall; external 'schannel.dll';
 
 // Pre NT4.0 SP2 calls. Call CAPI1 or CAPI2
 // to get the same functionality instead.
@@ -1027,8 +1027,8 @@ type
   SSL_CRACK_CERTIFICATE_FN = function (
     pbCertificate: PUCHAR;
     cbCertificate: DWORD;
-    VerifySignature: BOOL;
-    ppCertificate: PPX509Certificate): BOOL; stdcall;
+    VerifySignature: LongBool;
+    ppCertificate: PPX509Certificate): LongBool; stdcall;
 
 // Pre NT4.0 SP2 calls. Call CAPI1 or CAPI2
 // to get the same functionality instead.

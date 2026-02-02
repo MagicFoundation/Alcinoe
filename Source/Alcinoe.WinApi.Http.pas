@@ -301,7 +301,7 @@ type
 type
   _HTTP_LISTEN_ENDPOINT_INFO = record
     Flags: HTTP_PROPERTY_FLAGS;
-    EnableSharing: BOOLEAN;
+    EnableSharing: ByteBool;
   end;
   HTTP_LISTEN_ENDPOINT_INFO = _HTTP_LISTEN_ENDPOINT_INFO;
   PHTTP_LISTEN_ENDPOINT_INFO = ^_HTTP_LISTEN_ENDPOINT_INFO;
@@ -309,7 +309,7 @@ type
 type
   _HTTP_FAST_FORWARD_INFO = record
     Flags: HTTP_PROPERTY_FLAGS;
-    EnableFastForwarding: BOOLEAN;
+    EnableFastForwarding: ByteBool;
   end;
   HTTP_FAST_FORWARD_INFO = _HTTP_FAST_FORWARD_INFO;
   PHTTP_FAST_FORWARD_INFO = ^_HTTP_FAST_FORWARD_INFO;
@@ -355,9 +355,9 @@ type
   _HTTP_SERVER_AUTHENTICATION_INFO = record
     Flags: HTTP_PROPERTY_FLAGS;
     AuthSchemes: ULONG;
-    ReceiveMutualAuth: BOOLEAN;
-    ReceiveContextHandle: BOOLEAN;
-    DisableNTLMCredentialCaching: BOOLEAN;
+    ReceiveMutualAuth: ByteBool;
+    ReceiveContextHandle: ByteBool;
+    DisableNTLMCredentialCaching: ByteBool;
     ExFlags: UCHAR;
     DigestParams: HTTP_SERVER_AUTHENTICATION_DIGEST_PARAMS;
     BasicParams: HTTP_SERVER_AUTHENTICATION_BASIC_PARAMS;
@@ -1302,7 +1302,7 @@ type
     CertEncodedSize: ULONG;
     pCertEncoded: PUCHAR;
     Token: HANDLE;
-    CertDeniedByMapper: BOOLEAN;
+    CertDeniedByMapper: ByteBool;
   end;
   HTTP_SSL_CLIENT_CERT_INFO = _HTTP_SSL_CLIENT_CERT_INFO;
   PHTTP_SSL_CLIENT_CERT_INFO = ^_HTTP_SSL_CLIENT_CERT_INFO;
@@ -2825,7 +2825,7 @@ function HttpWaitForDemandStart(
            Overlapped: LPOVERLAPPED): ULONG; stdcall; external 'httpapi.dll';
 
 function HttpIsFeatureSupported(
-           FeatureId: HTTP_FEATURE_ID): BOOL; stdcall; external 'httpapi.dll';
+           FeatureId: HTTP_FEATURE_ID): LongBool; stdcall; external 'httpapi.dll';
 
 function HttpDelegateRequestEx(
            RequestQueueHandle: HANDLE;

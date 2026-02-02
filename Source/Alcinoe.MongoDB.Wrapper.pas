@@ -747,7 +747,7 @@ function bson_writer_get_length(
            writer: Pbson_writer_t): size_t; cdecl; external 'bson2.dll';
 function bson_writer_begin(
            writer: Pbson_writer_t;
-           bson: PPbson_t): bool; cdecl; external 'bson2.dll';
+           bson: PPbson_t): ByteBool; cdecl; external 'bson2.dll';
 procedure bson_writer_end(
             writer: Pbson_writer_t); cdecl; external 'bson2.dll';
 procedure bson_writer_rollback(
@@ -996,7 +996,7 @@ type
         2:(v_int32: int32_t);
         3:(v_int8: int8_t);
         4:(v_double: double);
-        5:(v_bool: bool);
+        5:(v_bool: ByteBool);
         6:(v_datetime: int64_t);
         7:(
           v_timestamp: record
@@ -1124,36 +1124,36 @@ type
 type
   bson_visitor_t = record
     (* run before / after descending into a document *)
-    visit_before: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_after: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): bool; cdecl;
+    visit_before: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_after: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): ByteBool; cdecl;
     (* corrupt BSON, or unsupported type and visit_unsupported_type not set *)
     visit_corrupt: procedure(iter: Pbson_iter_t; data: Pvoid); cdecl;
     (* normal bson field callbacks *)
-    visit_double: function(iter: Pbson_iter_t; key: PAnsiChar; v_double: double; data: Pvoid): bool; cdecl;
-    visit_utf8: function(iter: Pbson_iter_t; key: PAnsiChar; v_utf8_len: size_t; v_utf8: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_document: function(iter: Pbson_iter_t; key: PAnsiChar; v_document: Pbson_t; data: Pvoid): bool; cdecl;
-    visit_array: function(iter: Pbson_iter_t; key: PAnsiChar; v_array: Pbson_t; data: Pvoid): bool; cdecl;
-    visit_binary: function(iter: Pbson_iter_t; key: PAnsiChar; v_subtype: bson_subtype_t; v_binary_len: size_t; v_binary: Puint8_t; data: Pvoid): bool; cdecl;
+    visit_double: function(iter: Pbson_iter_t; key: PAnsiChar; v_double: double; data: Pvoid): ByteBool; cdecl;
+    visit_utf8: function(iter: Pbson_iter_t; key: PAnsiChar; v_utf8_len: size_t; v_utf8: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_document: function(iter: Pbson_iter_t; key: PAnsiChar; v_document: Pbson_t; data: Pvoid): ByteBool; cdecl;
+    visit_array: function(iter: Pbson_iter_t; key: PAnsiChar; v_array: Pbson_t; data: Pvoid): ByteBool; cdecl;
+    visit_binary: function(iter: Pbson_iter_t; key: PAnsiChar; v_subtype: bson_subtype_t; v_binary_len: size_t; v_binary: Puint8_t; data: Pvoid): ByteBool; cdecl;
     (* normal field with deprecated "Undefined" BSON type *)
-    visit_undefined: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_oid: function(iter: Pbson_iter_t; key: PAnsiChar; v_oid: Pbson_oid_t; data: Pvoid): bool; cdecl;
-    visit_bool: function(iter: Pbson_iter_t; key: PAnsiChar; v_bool: bool; data: Pvoid): bool; cdecl;
-    visit_date_time: function(iter: Pbson_iter_t; key: PAnsiChar; msec_since_epoch: int64_t; data: Pvoid): bool; cdecl;
-    visit_null: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_regex: function(iter: Pbson_iter_t; key: PAnsiChar; v_regex: PAnsiChar; v_options: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_dbpointer: function(iter: Pbson_iter_t; key: PAnsiChar; v_collection_len: size_t; v_collection: PAnsiChar; v_oid: Pbson_oid_t; data: Pvoid): bool; cdecl;
-    visit_code: function(iter: Pbson_iter_t; key: PAnsiChar; v_code_len: size_t; v_code: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_symbol: function(iter: Pbson_iter_t; key: PAnsiChar; v_symbol_len: size_t; v_symbol: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_codewscope: function(iter: Pbson_iter_t; key: PAnsiChar; v_code_len: size_t; v_code: PAnsiChar; v_scope: Pbson_t; data: Pvoid): bool; cdecl;
-    visit_int32: function(iter: Pbson_iter_t; key: PAnsiChar; v_int32: int32_t; data: Pvoid): bool; cdecl;
-    visit_timestamp: function(iter: Pbson_iter_t; key: PAnsiChar; v_timestamp: uint32_t; v_increment: uint32_t; data: Pvoid): bool; cdecl;
-    visit_int64: function(iter: Pbson_iter_t; key: PAnsiChar; v_int64: int64_t; data: Pvoid): bool; cdecl;
-    visit_maxkey: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): bool; cdecl;
-    visit_minkey: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): bool; cdecl;
+    visit_undefined: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_oid: function(iter: Pbson_iter_t; key: PAnsiChar; v_oid: Pbson_oid_t; data: Pvoid): ByteBool; cdecl;
+    visit_bool: function(iter: Pbson_iter_t; key: PAnsiChar; v_bool: ByteBool; data: Pvoid): ByteBool; cdecl;
+    visit_date_time: function(iter: Pbson_iter_t; key: PAnsiChar; msec_since_epoch: int64_t; data: Pvoid): ByteBool; cdecl;
+    visit_null: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_regex: function(iter: Pbson_iter_t; key: PAnsiChar; v_regex: PAnsiChar; v_options: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_dbpointer: function(iter: Pbson_iter_t; key: PAnsiChar; v_collection_len: size_t; v_collection: PAnsiChar; v_oid: Pbson_oid_t; data: Pvoid): ByteBool; cdecl;
+    visit_code: function(iter: Pbson_iter_t; key: PAnsiChar; v_code_len: size_t; v_code: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_symbol: function(iter: Pbson_iter_t; key: PAnsiChar; v_symbol_len: size_t; v_symbol: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_codewscope: function(iter: Pbson_iter_t; key: PAnsiChar; v_code_len: size_t; v_code: PAnsiChar; v_scope: Pbson_t; data: Pvoid): ByteBool; cdecl;
+    visit_int32: function(iter: Pbson_iter_t; key: PAnsiChar; v_int32: int32_t; data: Pvoid): ByteBool; cdecl;
+    visit_timestamp: function(iter: Pbson_iter_t; key: PAnsiChar; v_timestamp: uint32_t; v_increment: uint32_t; data: Pvoid): ByteBool; cdecl;
+    visit_int64: function(iter: Pbson_iter_t; key: PAnsiChar; v_int64: int64_t; data: Pvoid): ByteBool; cdecl;
+    visit_maxkey: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): ByteBool; cdecl;
+    visit_minkey: function(iter: Pbson_iter_t; key: PAnsiChar; data: Pvoid): ByteBool; cdecl;
     (* if set, called instead of visit_corrupt when an apparently valid BSON
      * includes an unrecognized field type (reading future version of BSON) *)
     visit_unsupported_type: procedure(iter: Pbson_iter_t; key: PAnsiChar; type_code: uint32_t; data: Pvoid); cdecl;
-    visit_decimal128: function(iter: Pbson_iter_t; key: PAnsiChar; v_decimal128: Pbson_decimal128_t; data: Pvoid): bool; cdecl;
+    visit_decimal128: function(iter: Pbson_iter_t; key: PAnsiChar; v_decimal128: Pbson_decimal128_t; data: Pvoid): ByteBool; cdecl;
     padding: array[0..7-1] of Pvoid;
   end;
   Pbson_visitor_t = ^bson_visitor_t;
@@ -1240,12 +1240,12 @@ procedure bson_decimal128_to_string(
 // * Note: @string must be ASCII characters only!
 function bson_decimal128_from_string(
            &string: PAnsiChar;
-           dec: Pbson_decimal128_t): bool; cdecl; external 'bson2.dll';
+           dec: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_decimal128_from_string_w_len(
            &string: PAnsiChar;
            len: Integer;
-           dec: Pbson_decimal128_t): bool; cdecl; external 'bson2.dll';
+           dec: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
 
 ///////////////
 // bson-json //
@@ -1289,7 +1289,7 @@ procedure bson_json_opts_destroy(
             opts: Pbson_json_opts_t); cdecl; external 'bson2.dll';
 procedure bson_json_opts_set_outermost_array(
             opts: Pbson_json_opts_t;
-            is_outermost_array: bool); cdecl; external 'bson2.dll';
+            is_outermost_array: ByteBool); cdecl; external 'bson2.dll';
 
 type
   bson_json_reader_cb = function (
@@ -1304,11 +1304,11 @@ function bson_json_reader_new(
            data: Pvoid;
            cb: bson_json_reader_cb;
            dcb: bson_json_destroy_cb;
-           allow_multiple: bool;
+           allow_multiple: ByteBool;
            buf_size: size_t): Pbson_json_reader_t; cdecl; external 'bson2.dll';
 function bson_json_reader_new_from_fd(
            fd: Integer;
-           close_on_destroy: bool): Pbson_json_reader_t; cdecl; external 'bson2.dll';
+           close_on_destroy: ByteBool): Pbson_json_reader_t; cdecl; external 'bson2.dll';
 function bson_json_reader_new_from_file(
            filename: PAnsiChar;
            error: Pbson_error_t): Pbson_json_reader_t; cdecl; external 'bson2.dll';
@@ -1319,7 +1319,7 @@ function bson_json_reader_read(
            bson: Pbson_t;
            error: Pbson_error_t): Integer; cdecl; external 'bson2.dll';
 function bson_json_data_reader_new(
-           allow_multiple: bool;
+           allow_multiple: ByteBool;
            size: size_t): Pbson_json_reader_t; cdecl; external 'bson2.dll';
 procedure bson_json_data_reader_ingest(
             reader: Pbson_json_reader_t;
@@ -1387,7 +1387,7 @@ function bson_strcasecmp(
            s2: PAnsiChar): Integer; cdecl; external 'bson2.dll';
 
 function bson_isspace(
-           c: Integer): bool; cdecl; external 'bson2.dll';
+           c: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 ///////////////
 // bson-utf8 //
@@ -1396,7 +1396,7 @@ function bson_isspace(
 function bson_utf8_validate(
            utf8: PAnsiChar;
            utf8_len: size_t;
-           allow_null: bool): bool; cdecl; external 'bson2.dll';
+           allow_null: ByteBool): ByteBool; cdecl; external 'bson2.dll';
 function bson_utf8_escape_for_json(
            utf8: PAnsiChar;
            utf8_len: ssize_t): PAnsiChar; cdecl; external 'bson2.dll';
@@ -1430,7 +1430,7 @@ function bson_get_version(): PAnsiChar; cdecl; external 'bson2.dll';
 function bson_check_version(
            required_major: Integer;
            required_minor: Integer;
-           required_micro: Integer): bool; cdecl; external 'bson2.dll';
+           required_micro: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 ///////////////
 // bson-bcon //
@@ -1561,7 +1561,7 @@ type
 type
   bcon_append_ctx_frame = record
     i: Integer;
-    is_array: bool;
+    is_array: ByteBool;
     bson: bson_t;
   end;
   bcon_append_ctx_frame_t = bcon_append_ctx_frame;
@@ -1569,7 +1569,7 @@ type
 type
   bcon_extract_ctx_frame = record
     i: Integer;
-    is_array: bool;
+    is_array: ByteBool;
     iter: bson_iter_t;
   end;
   bcon_extract_ctx_frame_t = bcon_extract_ctx_frame;
@@ -1612,10 +1612,10 @@ procedure bcon_extract_ctx(
 function bcon_extract_ctx_va(
            bson: Pbson_t;
            ctx: Pbcon_extract_ctx_t;
-           ap: Pva_list): bool; cdecl; external 'bson2.dll';
+           ap: Pva_list): ByteBool; cdecl; external 'bson2.dll';
 
 function bcon_extract(
-           bson: Pbson_t): bool; cdecl; varargs; external 'bson2.dll';
+           bson: Pbson_t): ByteBool; cdecl; varargs; external 'bson2.dll';
 
 // bool __CALLCONV__
 // bcon_extract_va(bson_t * bson, bcon_extract_ctx_t * ctx, ...);
@@ -1714,7 +1714,7 @@ function bson_reader_new_from_handle(
            df: bson_reader_destroy_func_t): Pbson_reader_t; cdecl; external 'bson2.dll';
 function bson_reader_new_from_fd(
            fd: Integer;
-           close_on_destroy: bool): Pbson_reader_t; cdecl; external 'bson2.dll';
+           close_on_destroy: ByteBool): Pbson_reader_t; cdecl; external 'bson2.dll';
 function bson_reader_new_from_file(
            path: PAnsiChar;
            error: Pbson_error_t): Pbson_reader_t; cdecl; external 'bson2.dll';
@@ -1731,7 +1731,7 @@ procedure bson_reader_set_destroy_func(
             func: bson_reader_destroy_func_t); cdecl; external 'bson2.dll';
 function bson_reader_read(
            reader: Pbson_reader_t;
-           reached_eof: Pbool): Pbson_t; cdecl; external 'bson2.dll';
+           reached_eof: PByteBool): Pbson_t; cdecl; external 'bson2.dll';
 function bson_reader_tell(
            reader: Pbson_reader_t): off_t; cdecl; external 'bson2.dll';
 procedure bson_reader_reset(
@@ -1749,10 +1749,10 @@ procedure bson_oid_copy(
             dst: Pbson_oid_t); cdecl; external 'bson2.dll';
 function bson_oid_equal(
            oid1: Pbson_oid_t;
-           oid2: Pbson_oid_t): bool; cdecl; external 'bson2.dll';
+           oid2: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
 function bson_oid_is_valid(
            str: PAnsiChar;
-           length: size_t): bool; cdecl; external 'bson2.dll';
+           length: size_t): ByteBool; cdecl; external 'bson2.dll';
 function bson_oid_get_time_t(
            oid: Pbson_oid_t): time_t; cdecl; external 'bson2.dll';
 function bson_oid_hash(
@@ -1964,7 +1964,7 @@ function bson_iter_binary_subtype(
 
 function bson_iter_binary_equal(
            iter_a: Pbson_iter_t;
-           iter_b: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter_b: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_code(
            iter: Pbson_iter_t;
@@ -2018,35 +2018,35 @@ function bson_iter_as_double(
 
 function bson_iter_init(
            iter: Pbson_iter_t;
-           bson: Pbson_t): bool; cdecl; external 'bson2.dll';
+           bson: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_init_from_data(
            iter: Pbson_iter_t;
            data: Puint8_t;
-           length: size_t): bool; cdecl; external 'bson2.dll';
+           length: size_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_init_find(
            iter: Pbson_iter_t;
            bson: Pbson_t;
-           key: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_init_find_w_len(
            iter: Pbson_iter_t;
            bson: Pbson_t;
            key: PAnsiChar;
-           keylen: Integer): bool; cdecl; external 'bson2.dll';
+           keylen: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_init_find_case(
            iter: Pbson_iter_t;
            bson: Pbson_t;
-           key: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_init_from_data_at_offset(
            iter: Pbson_iter_t;
            data: Puint8_t;
            length: size_t;
            offset: uint32_t;
-           keylen: uint32_t): bool; cdecl; external 'bson2.dll';
+           keylen: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_int32(
            iter: Pbson_iter_t): int32_t; cdecl; external 'bson2.dll';
@@ -2081,24 +2081,24 @@ function bson_iter_as_int64(
 
 function bson_iter_find(
            iter: Pbson_iter_t;
-           key: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_find_w_len(
            iter: Pbson_iter_t;
            key: PAnsiChar;
-           keylen: Integer): bool; cdecl; external 'bson2.dll';
+           keylen: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_find_case(
            iter: Pbson_iter_t;
-           key: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_find_descendant(
            iter: Pbson_iter_t;
            dotkey: PAnsiChar;
-           descendant: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           descendant: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_next(
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_oid(
            iter: Pbson_iter_t): Pbson_oid_t; cdecl; external 'bson2.dll';
@@ -2116,7 +2116,7 @@ function bson_iter_oid(
 
 function bson_iter_decimal128(
            iter: Pbson_iter_t;
-           dec: Pbson_decimal128_t): bool; cdecl; external 'bson2.dll';
+           dec: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_iter_decimal128_unsafe:
@@ -2202,7 +2202,7 @@ procedure bson_iter_timestamp(
             increment: Puint32_t); cdecl; external 'bson2.dll';
 
 function bson_iter_bool(
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_iter_bool_unsafe:
@@ -2216,7 +2216,7 @@ function bson_iter_bool(
 // bson_iter_bool_unsafe(const bson_iter_t * iter)
 
 function bson_iter_as_bool(
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_regex(
            iter: Pbson_iter_t;
@@ -2242,7 +2242,7 @@ function bson_iter_type(
 
 function bson_iter_recurse(
            iter: Pbson_iter_t;
-           child: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 procedure bson_iter_overwrite_int32(
             iter: Pbson_iter_t;
@@ -2262,7 +2262,7 @@ procedure bson_iter_overwrite_decimal128(
 
 procedure bson_iter_overwrite_bool(
             iter: Pbson_iter_t;
-            value: bool); cdecl; external 'bson2.dll';
+            value: ByteBool); cdecl; external 'bson2.dll';
 
 procedure bson_iter_overwrite_oid(
             iter: Pbson_iter_t;
@@ -2280,7 +2280,7 @@ procedure bson_iter_overwrite_date_time(
 function bson_iter_visit_all(
            iter: Pbson_iter_t;
            visitor: Pbson_visitor_t;
-           data: Pvoid): bool; cdecl; external 'bson2.dll';
+           data: Pvoid): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_iter_offset(
            iter: Pbson_iter_t): uint32_t; cdecl; external 'bson2.dll';
@@ -2383,79 +2383,79 @@ type
 function bson_vector_int8_view_init(
            view_out: Pbson_vector_int8_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): bool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_int8_const_view_init(
            view_out: Pbson_vector_int8_const_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): bool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_float32_view_init(
            view_out: Pbson_vector_float32_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): bool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_float32_const_view_init(
            view_out: Pbson_vector_float32_const_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): bool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_packed_bit_view_init(
            view_out: Pbson_vector_packed_bit_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): bool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_packed_bit_const_view_init(
            view_out: Pbson_vector_packed_bit_const_view_t;
            binary_data: Puint8_t;
-           binary_data_len: uint32_t): bool; cdecl; external 'bson2.dll';
+           binary_data_len: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_int8_view_from_iter(
            view_out: Pbson_vector_int8_view_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_int8_const_view_from_iter(
            view_out: Pbson_vector_int8_const_view_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_float32_view_from_iter(
            view_out: Pbson_vector_float32_view_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_float32_const_view_from_iter(
            view_out: Pbson_vector_float32_const_view_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_packed_bit_view_from_iter(
            view_out: Pbson_vector_packed_bit_view_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_vector_packed_bit_const_view_from_iter(
            view_out: Pbson_vector_packed_bit_const_view_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_vector_int8_elements(
            builder: P_bson_array_builder_t;
-           view: bson_vector_int8_const_view_t): bool; cdecl; external 'bson2.dll';
+           view: bson_vector_int8_const_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_vector_float32_elements(
            builder: P_bson_array_builder_t;
-           view: bson_vector_float32_const_view_t): bool; cdecl; external 'bson2.dll';
+           view: bson_vector_float32_const_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_vector_packed_bit_elements(
            builder: P_bson_array_builder_t;
-           view: bson_vector_packed_bit_const_view_t): bool; cdecl; external 'bson2.dll';
+           view: bson_vector_packed_bit_const_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_vector_elements(
            builder: P_bson_array_builder_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_append_vector_int8_uninit(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
            element_count: size_t;
-           view_out: Pbson_vector_int8_view_t): bool; cdecl; external 'bson2.dll';
+           view_out: Pbson_vector_int8_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VECTOR_INT8_UNINIT(b, key, count, view) bson_append_vector_int8_uninit(b, key, (int)strlen(key), count, view)
 
@@ -2464,7 +2464,7 @@ function bson_append_vector_float32_uninit(
            key: PAnsiChar;
            key_length: Integer;
            element_count: size_t;
-           view_out: Pbson_vector_float32_view_t): bool; cdecl; external 'bson2.dll';
+           view_out: Pbson_vector_float32_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VECTOR_FLOAT32_UNINIT(b, key, count, view) bson_append_vector_float32_uninit(b, key, (int)strlen(key), count, view)
 
@@ -2473,7 +2473,7 @@ function bson_append_vector_packed_bit_uninit(
            key: PAnsiChar;
            key_length: Integer;
            element_count: size_t;
-           view_out: Pbson_vector_packed_bit_view_t): bool; cdecl; external 'bson2.dll';
+           view_out: Pbson_vector_packed_bit_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VECTOR_PACKED_BIT_UNINIT(b, key, count, view) bson_append_vector_packed_bit_uninit(b, key, (int)strlen(key), count, view)
 
@@ -2482,7 +2482,7 @@ function bson_append_vector_int8_from_array(
            key: PAnsiChar;
            key_length: Integer;
            iter: Pbson_iter_t;
-           error: Pbson_error_t): bool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VECTOR_INT8_FROM_ARRAY(b, key, iter, err) bson_append_vector_int8_from_array(b, key, (int)strlen(key), iter, err)
 
@@ -2491,7 +2491,7 @@ function bson_append_vector_float32_from_array(
            key: PAnsiChar;
            key_length: Integer;
            iter: Pbson_iter_t;
-           error: Pbson_error_t): bool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VECTOR_FLOAT32_FROM_ARRAY(b, key, iter, err) bson_append_vector_float32_from_array(b, key, (int)strlen(key), iter, err)
 
@@ -2500,7 +2500,7 @@ function bson_append_vector_packed_bit_from_array(
            key: PAnsiChar;
            key_length: Integer;
            iter: Pbson_iter_t;
-           error: Pbson_error_t): bool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VECTOR_PACKED_BIT_FROM_ARRAY(b, key, iter, err) bson_append_vector_packed_bit_from_array(b, key, (int)strlen(key), iter, err)
 
@@ -2508,7 +2508,7 @@ function bson_append_array_from_vector_int8(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           view: bson_vector_int8_const_view_t): bool; cdecl; external 'bson2.dll';
+           view: bson_vector_int8_const_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR_INT8(b, key, view) bson_append_array_from_vector_int8(b, key, (int)strlen(key), view)
 
@@ -2516,7 +2516,7 @@ function bson_append_array_from_vector_float32(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           view: bson_vector_float32_const_view_t): bool; cdecl; external 'bson2.dll';
+           view: bson_vector_float32_const_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR_FLOAT32(b, key, view) bson_append_array_from_vector_float32(b, key, (int)strlen(key), view)
 
@@ -2524,7 +2524,7 @@ function bson_append_array_from_vector_packed_bit(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           view: bson_vector_packed_bit_const_view_t): bool; cdecl; external 'bson2.dll';
+           view: bson_vector_packed_bit_const_view_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR_PACKED_BIT(b, key, view) bson_append_array_from_vector_packed_bit(b, key, (int)strlen(key), view)
 
@@ -2764,7 +2764,7 @@ function bson_init_from_json(
            bson: Pbson_t;
            data: PAnsiChar;
            len: ssize_t;
-           error: Pbson_error_t): bool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_init_static:
@@ -2781,7 +2781,7 @@ function bson_init_from_json(
 function bson_init_static(
            b: Pbson_t;
            data: Puint8_t;
-           length: size_t): bool; cdecl; external 'bson2.dll';
+           length: size_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_init:
@@ -2915,7 +2915,7 @@ function bson_reserve_buffer(
 
 function bson_steal(
            dst: Pbson_t;
-           src: Pbson_t): bool; cdecl; external 'bson2.dll';
+           src: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_destroy_with_steal:
@@ -2938,7 +2938,7 @@ function bson_steal(
 // *
 function bson_destroy_with_steal(
            bson: Pbson_t;
-           steal: bool;
+           steal: ByteBool;
            length: Puint32_t): Puint8_t; cdecl; external 'bson2.dll';
 
 // * *
@@ -2974,7 +2974,7 @@ function bson_count_keys(
 // *
 function bson_has_field(
            bson: Pbson_t;
-           key: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_compare:
@@ -3001,7 +3001,7 @@ function bson_compare(
 // *
 function bson_equal(
            bson: Pbson_t;
-           other: Pbson_t): bool; cdecl; external 'bson2.dll';
+           other: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_validate:
@@ -3016,7 +3016,7 @@ function bson_equal(
 function bson_validate(
            bson: Pbson_t;
            flags: bson_validate_flags_t;
-           offset: Psize_t): bool; cdecl; external 'bson2.dll';
+           offset: Psize_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_validate_with_error:
@@ -3031,7 +3031,7 @@ function bson_validate(
 function bson_validate_with_error(
            bson: Pbson_t;
            flags: bson_validate_flags_t;
-           error: Pbson_error_t): bool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_validate_with_error_and_offset:
@@ -3049,7 +3049,7 @@ function bson_validate_with_error_and_offset(
            bson: Pbson_t;
            flags: bson_validate_flags_t;
            offset: Psize_t;
-           error: Pbson_error_t): bool; cdecl; external 'bson2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_as_json_with_opts:
@@ -3171,7 +3171,7 @@ function bson_array_builder_new(): Pbson_array_builder_t; cdecl; external 'bson2
 // `bab` may be reused and will start appending a new array at index "0".
 function bson_array_builder_build(
            bab: Pbson_array_builder_t;
-           param1: Pbson_t): bool; cdecl; external 'bson2.dll';
+           param1: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 procedure bson_array_builder_destroy(
             bab: Pbson_array_builder_t); cdecl; external 'bson2.dll';
@@ -3180,13 +3180,13 @@ function bson_append_value(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Pbson_value_t): bool; cdecl; external 'bson2.dll';
+           value: Pbson_value_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_VALUE(b, key, val) bson_append_value(b, key, (int)strlen(key), (val))
 
 function bson_array_builder_append_value(
            bab: Pbson_array_builder_t;
-           value: Pbson_value_t): bool; cdecl; external 'bson2.dll';
+           value: Pbson_value_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_array:
@@ -3204,13 +3204,13 @@ function bson_append_array(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           &array: Pbson_t): bool; cdecl; external 'bson2.dll';
+           &array: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY(b, key, val) bson_append_array(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_array(
            bab: Pbson_array_builder_t;
-           &array: Pbson_t): bool; cdecl; external 'bson2.dll';
+           &array: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_array_from_vector:
@@ -3227,13 +3227,13 @@ function bson_append_array_from_vector(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY_FROM_VECTOR(b, key, iter) bson_append_array_from_vector(b, key, (int)strlen(key), iter)
 
 function bson_array_builder_append_array_from_vector(
            bab: Pbson_array_builder_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_binary:
@@ -3254,7 +3254,7 @@ function bson_append_binary(
            key_length: Integer;
            subtype: bson_subtype_t;
            binary: Puint8_t;
-           length: uint32_t): bool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_BINARY(b, key, subtype, val, len) bson_append_binary(b, key, (int)strlen(key), subtype, val, len)
 
@@ -3262,7 +3262,7 @@ function bson_array_builder_append_binary(
            bab: Pbson_array_builder_t;
            subtype: bson_subtype_t;
            binary: Puint8_t;
-           length: uint32_t): bool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_binary_uninit:
@@ -3281,7 +3281,7 @@ function bson_append_binary_uninit(
            key_length: Integer;
            subtype: bson_subtype_t;
            binary: PPuint8_t;
-           length: uint32_t): bool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_BINARY_UNINIT(b, key, subtype, val, len) bson_append_binary_uninit(b, key, (int)strlen(key), subtype, val, len)
 
@@ -3289,7 +3289,7 @@ function bson_array_builder_append_binary_uninit(
            bab: Pbson_array_builder_t;
            subtype: bson_subtype_t;
            binary: PPuint8_t;
-           length: uint32_t): bool; cdecl; external 'bson2.dll';
+           length: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_bool:
@@ -3305,13 +3305,13 @@ function bson_append_bool(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: bool): bool; cdecl; external 'bson2.dll';
+           value: ByteBool): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_BOOL(b, key, val) bson_append_bool(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_bool(
            bab: Pbson_array_builder_t;
-           value: bool): bool; cdecl; external 'bson2.dll';
+           value: ByteBool): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_code:
@@ -3328,13 +3328,13 @@ function bson_append_code(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           javascript: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           javascript: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_CODE(b, key, val) bson_append_code(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_code(
            bab: Pbson_array_builder_t;
-           javascript: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           javascript: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_code_with_scope:
@@ -3353,14 +3353,14 @@ function bson_append_code_with_scope(
            key: PAnsiChar;
            key_length: Integer;
            javascript: PAnsiChar;
-           scope: Pbson_t): bool; cdecl; external 'bson2.dll';
+           scope: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_CODE_WITH_SCOPE(b, key, val, scope) bson_append_code_with_scope(b, key, (int)strlen(key), val, scope)
 
 function bson_array_builder_append_code_with_scope(
            bab: Pbson_array_builder_t;
            javascript: PAnsiChar;
-           scope: Pbson_t): bool; cdecl; external 'bson2.dll';
+           scope: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_dbpointer:
@@ -3379,14 +3379,14 @@ function bson_append_dbpointer(
            key: PAnsiChar;
            key_length: Integer;
            collection: PAnsiChar;
-           oid: Pbson_oid_t): bool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_DBPOINTER(b, key, coll, oid) bson_append_dbpointer(b, key, (int)strlen(key), coll, oid)
 
 function bson_array_builder_append_dbpointer(
            bab: Pbson_array_builder_t;
            collection: PAnsiChar;
-           oid: Pbson_oid_t): bool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_double:
@@ -3401,13 +3401,13 @@ function bson_append_double(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: double): bool; cdecl; external 'bson2.dll';
+           value: double): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_DOUBLE(b, key, val) bson_append_double(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_double(
            bab: Pbson_array_builder_t;
-           value: double): bool; cdecl; external 'bson2.dll';
+           value: double): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_document:
@@ -3424,13 +3424,13 @@ function bson_append_document(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Pbson_t): bool; cdecl; external 'bson2.dll';
+           value: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_DOCUMENT(b, key, val) bson_append_document(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_document(
            bab: Pbson_array_builder_t;
-           value: Pbson_t): bool; cdecl; external 'bson2.dll';
+           value: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_document_begin:
@@ -3453,13 +3453,13 @@ function bson_append_document_begin(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           child: Pbson_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_DOCUMENT_BEGIN(b, key, child) bson_append_document_begin(b, key, (int)strlen(key), child)
 
 function bson_array_builder_append_document_begin(
            bab: Pbson_array_builder_t;
-           child: Pbson_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_document_end:
@@ -3473,11 +3473,11 @@ function bson_array_builder_append_document_begin(
 // *
 function bson_append_document_end(
            bson: Pbson_t;
-           child: Pbson_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_document_end(
            bab: Pbson_array_builder_t;
-           child: Pbson_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_array_begin:
@@ -3503,7 +3503,7 @@ function bson_append_array_begin(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           child: Pbson_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY_BEGIN(b, key, child) bson_append_array_begin(b, key, (int)strlen(key), child)
 
@@ -3519,7 +3519,7 @@ function bson_append_array_begin(
 // *
 function bson_append_array_end(
            bson: Pbson_t;
-           child: Pbson_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_int32:
@@ -3535,13 +3535,13 @@ function bson_append_int32(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: int32_t): bool; cdecl; external 'bson2.dll';
+           value: int32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_INT32(b, key, val) bson_append_int32(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_int32(
            bab: Pbson_array_builder_t;
-           value: int32_t): bool; cdecl; external 'bson2.dll';
+           value: int32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_int64:
@@ -3557,13 +3557,13 @@ function bson_append_int64(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: int64_t): bool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_INT64(b, key, val) bson_append_int64(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_int64(
            bab: Pbson_array_builder_t;
-           value: int64_t): bool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_decimal128:
@@ -3579,13 +3579,13 @@ function bson_append_decimal128(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Pbson_decimal128_t): bool; cdecl; external 'bson2.dll';
+           value: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_DECIMAL128(b, key, val) bson_append_decimal128(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_decimal128(
            bab: Pbson_array_builder_t;
-           value: Pbson_decimal128_t): bool; cdecl; external 'bson2.dll';
+           value: Pbson_decimal128_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_iter:
@@ -3603,13 +3603,13 @@ function bson_append_iter(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ITER(b, key, val) bson_append_iter(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_iter(
            bab: Pbson_array_builder_t;
-           iter: Pbson_iter_t): bool; cdecl; external 'bson2.dll';
+           iter: Pbson_iter_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_minkey:
@@ -3626,12 +3626,12 @@ function bson_array_builder_append_iter(
 function bson_append_minkey(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): bool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_MINKEY(b, key) bson_append_minkey(b, key, (int)strlen(key))
 
 function bson_array_builder_append_minkey(
-           bab: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_maxkey:
@@ -3648,12 +3648,12 @@ function bson_array_builder_append_minkey(
 function bson_append_maxkey(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): bool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_MAXKEY(b, key) bson_append_maxkey(b, key, (int)strlen(key))
 
 function bson_array_builder_append_maxkey(
-           bab: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_null:
@@ -3667,12 +3667,12 @@ function bson_array_builder_append_maxkey(
 function bson_append_null(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): bool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_NULL(b, key) bson_append_null(b, key, (int)strlen(key))
 
 function bson_array_builder_append_null(
-           bab: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_oid:
@@ -3689,13 +3689,13 @@ function bson_append_oid(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           oid: Pbson_oid_t): bool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_OID(b, key, val) bson_append_oid(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_oid(
            bab: Pbson_array_builder_t;
-           oid: Pbson_oid_t): bool; cdecl; external 'bson2.dll';
+           oid: Pbson_oid_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_regex:
@@ -3725,14 +3725,14 @@ function bson_append_regex(
            key: PAnsiChar;
            key_length: Integer;
            regex: PAnsiChar;
-           options: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_REGEX(b, key, val, opt) bson_append_regex(b, key, (int)strlen(key), val, opt)
 
 function bson_array_builder_append_regex(
            bab: Pbson_array_builder_t;
            regex: PAnsiChar;
-           options: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_regex:
@@ -3765,13 +3765,13 @@ function bson_append_regex_w_len(
            key_length: Integer;
            regex: PAnsiChar;
            regex_length: Integer;
-           options: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_regex_w_len(
            bab: Pbson_array_builder_t;
            regex: PAnsiChar;
            regex_length: Integer;
-           options: PAnsiChar): bool; cdecl; external 'bson2.dll';
+           options: PAnsiChar): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_utf8:
@@ -3793,14 +3793,14 @@ function bson_append_utf8(
            key: PAnsiChar;
            key_length: Integer;
            value: PAnsiChar;
-           length: Integer): bool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_UTF8(b, key, val) bson_append_utf8(b, key, (int)strlen(key), val, (int)strlen(val))
 
 function bson_array_builder_append_utf8(
            bab: Pbson_array_builder_t;
            value: PAnsiChar;
-           length: Integer): bool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_symbol:
@@ -3821,14 +3821,14 @@ function bson_append_symbol(
            key: PAnsiChar;
            key_length: Integer;
            value: PAnsiChar;
-           length: Integer): bool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_SYMBOL(b, key, val) bson_append_symbol(b, key, (int)strlen(key), val, (int)strlen(val))
 
 function bson_array_builder_append_symbol(
            bab: Pbson_array_builder_t;
            value: PAnsiChar;
-           length: Integer): bool; cdecl; external 'bson2.dll';
+           length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_time_t:
@@ -3845,13 +3845,13 @@ function bson_append_time_t(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: time_t): bool; cdecl; external 'bson2.dll';
+           value: time_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_TIME_T(b, key, val) bson_append_time_t(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_time_t(
            bab: Pbson_array_builder_t;
-           value: time_t): bool; cdecl; external 'bson2.dll';
+           value: time_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_timeval:
@@ -3868,13 +3868,13 @@ function bson_append_timeval(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: Ptimeval): bool; cdecl; external 'bson2.dll';
+           value: Ptimeval): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_TIMEVAL(b, key, val) bson_append_timeval(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_timeval(
            bab: Pbson_array_builder_t;
-           value: Ptimeval): bool; cdecl; external 'bson2.dll';
+           value: Ptimeval): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_date_time:
@@ -3891,13 +3891,13 @@ function bson_append_date_time(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           value: int64_t): bool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_DATE_TIME(b, key, val) bson_append_date_time(b, key, (int)strlen(key), val)
 
 function bson_array_builder_append_date_time(
            bab: Pbson_array_builder_t;
-           value: int64_t): bool; cdecl; external 'bson2.dll';
+           value: int64_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_now_utc:
@@ -3913,12 +3913,12 @@ function bson_array_builder_append_date_time(
 function bson_append_now_utc(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): bool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_NOW_UTC(b, key) bson_append_now_utc(b, key, (int)strlen(key))
 
 function bson_array_builder_append_now_utc(
-           bab: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_timestamp:
@@ -3941,14 +3941,14 @@ function bson_append_timestamp(
            key: PAnsiChar;
            key_length: Integer;
            timestamp: uint32_t;
-           increment: uint32_t): bool; cdecl; external 'bson2.dll';
+           increment: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_TIMESTAMP(b, key, val, inc) bson_append_timestamp(b, key, (int)strlen(key), val, inc)
 
 function bson_array_builder_append_timestamp(
            bab: Pbson_array_builder_t;
            timestamp: uint32_t;
-           increment: uint32_t): bool; cdecl; external 'bson2.dll';
+           increment: uint32_t): ByteBool; cdecl; external 'bson2.dll';
 
 // * *
 // * bson_append_undefined:
@@ -3964,36 +3964,36 @@ function bson_array_builder_append_timestamp(
 function bson_append_undefined(
            bson: Pbson_t;
            key: PAnsiChar;
-           key_length: Integer): bool; cdecl; external 'bson2.dll';
+           key_length: Integer): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_UNDEFINED(b, key) bson_append_undefined(b, key, (int)strlen(key))
 
 function bson_array_builder_append_undefined(
-           bab: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           bab: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_concat(
            dst: Pbson_t;
-           src: Pbson_t): bool; cdecl; external 'bson2.dll';
+           src: Pbson_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_append_array_builder_begin(
            bson: Pbson_t;
            key: PAnsiChar;
            key_length: Integer;
-           child: PPbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           child: PPbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 // #define BSON_APPEND_ARRAY_BUILDER_BEGIN(b, key, child) bson_append_array_builder_begin(b, key, (int)strlen(key), child)
 
 function bson_array_builder_append_array_builder_begin(
            bab: Pbson_array_builder_t;
-           child: PPbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           child: PPbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_append_array_builder_end(
            bson: Pbson_t;
-           child: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 function bson_array_builder_append_array_builder_end(
            bab: Pbson_array_builder_t;
-           child: Pbson_array_builder_t): bool; cdecl; external 'bson2.dll';
+           child: Pbson_array_builder_t): ByteBool; cdecl; external 'bson2.dll';
 
 ////////////////////
 // mongoc-prelude //
@@ -4500,14 +4500,14 @@ procedure mongoc_write_concern_destroy(
             write_concern: Pmongoc_write_concern_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_get_journal(
-           write_concern: Pmongoc_write_concern_t): bool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_journal_is_set(
-           write_concern: Pmongoc_write_concern_t): bool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_write_concern_set_journal(
             write_concern: Pmongoc_write_concern_t;
-            journal: bool); cdecl; external 'mongoc2.dll';
+            journal: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_get_w(
            write_concern: Pmongoc_write_concern_t): int32_t; cdecl; external 'mongoc2.dll';
@@ -4538,24 +4538,24 @@ procedure mongoc_write_concern_set_wtimeout_int64(
             wtimeout_msec: int64_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_get_wmajority(
-           write_concern: Pmongoc_write_concern_t): bool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_write_concern_set_wmajority(
             write_concern: Pmongoc_write_concern_t;
             wtimeout_msec: int32_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_is_acknowledged(
-           write_concern: Pmongoc_write_concern_t): bool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_is_valid(
-           write_concern: Pmongoc_write_concern_t): bool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_append(
            write_concern: Pmongoc_write_concern_t;
-           doc: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           doc: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_write_concern_is_default(
-           write_concern: Pmongoc_write_concern_t): bool; cdecl; external 'mongoc2.dll';
+           write_concern: Pmongoc_write_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 /////////////////////////
 // mongoc-read-concern //
@@ -4582,12 +4582,12 @@ function mongoc_read_concern_get_level(
            read_concern: Pmongoc_read_concern_t): PAnsiChar; cdecl; external 'mongoc2.dll';
 function mongoc_read_concern_set_level(
            read_concern: Pmongoc_read_concern_t;
-           level: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           level: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 function mongoc_read_concern_append(
            read_concern: Pmongoc_read_concern_t;
-           doc: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           doc: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 function mongoc_read_concern_is_default(
-           read_concern: Pmongoc_read_concern_t): bool; cdecl; external 'mongoc2.dll';
+           read_concern: Pmongoc_read_concern_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 /////////////////////
 // mongoc-optional //
@@ -4595,8 +4595,8 @@ function mongoc_read_concern_is_default(
 
 type
   mongoc_optional_t = record
-    value: bool;
-    is_set: bool;
+    value: ByteBool;
+    is_set: ByteBool;
   end;
   Pmongoc_optional_t = ^mongoc_optional_t;
 
@@ -4604,14 +4604,14 @@ procedure mongoc_optional_init(
             opt: Pmongoc_optional_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_optional_is_set(
-           opt: Pmongoc_optional_t): bool; cdecl; external 'mongoc2.dll';
+           opt: Pmongoc_optional_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_optional_value(
-           opt: Pmongoc_optional_t): bool; cdecl; external 'mongoc2.dll';
+           opt: Pmongoc_optional_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_optional_set_value(
             opt: Pmongoc_optional_t;
-            val: bool); cdecl; external 'mongoc2.dll';
+            val: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_optional_copy(
             source: Pmongoc_optional_t;
@@ -4713,7 +4713,7 @@ type
 
 function mongoc_error_has_label(
            reply: Pbson_t;
-           &label: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           &label: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 ////////////////////////////
 // mongoc-find-and-modify //
@@ -4736,7 +4736,7 @@ function mongoc_find_and_modify_opts_new(): Pmongoc_find_and_modify_opts_t; cdec
 
 function mongoc_find_and_modify_opts_set_sort(
            opts: Pmongoc_find_and_modify_opts_t;
-           sort: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           sort: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_find_and_modify_opts_get_sort(
             opts: Pmongoc_find_and_modify_opts_t;
@@ -4744,7 +4744,7 @@ procedure mongoc_find_and_modify_opts_get_sort(
 
 function mongoc_find_and_modify_opts_set_update(
            opts: Pmongoc_find_and_modify_opts_t;
-           update: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           update: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_find_and_modify_opts_get_update(
             opts: Pmongoc_find_and_modify_opts_t;
@@ -4752,7 +4752,7 @@ procedure mongoc_find_and_modify_opts_get_update(
 
 function mongoc_find_and_modify_opts_set_fields(
            opts: Pmongoc_find_and_modify_opts_t;
-           fields: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           fields: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_find_and_modify_opts_get_fields(
             opts: Pmongoc_find_and_modify_opts_t;
@@ -4760,28 +4760,28 @@ procedure mongoc_find_and_modify_opts_get_fields(
 
 function mongoc_find_and_modify_opts_set_flags(
            opts: Pmongoc_find_and_modify_opts_t;
-           flags: mongoc_find_and_modify_flags_t): bool; cdecl; external 'mongoc2.dll';
+           flags: mongoc_find_and_modify_flags_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_find_and_modify_opts_get_flags(
            opts: Pmongoc_find_and_modify_opts_t): mongoc_find_and_modify_flags_t; cdecl; external 'mongoc2.dll';
 
 function mongoc_find_and_modify_opts_set_bypass_document_validation(
            opts: Pmongoc_find_and_modify_opts_t;
-           bypass: bool): bool; cdecl; external 'mongoc2.dll';
+           bypass: ByteBool): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_find_and_modify_opts_get_bypass_document_validation(
-           opts: Pmongoc_find_and_modify_opts_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_find_and_modify_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_find_and_modify_opts_set_max_time_ms(
            opts: Pmongoc_find_and_modify_opts_t;
-           max_time_ms: uint32_t): bool; cdecl; external 'mongoc2.dll';
+           max_time_ms: uint32_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_find_and_modify_opts_get_max_time_ms(
            opts: Pmongoc_find_and_modify_opts_t): uint32_t; cdecl; external 'mongoc2.dll';
 
 function mongoc_find_and_modify_opts_append(
            opts: Pmongoc_find_and_modify_opts_t;
-           extra: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           extra: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_find_and_modify_opts_get_extra(
             opts: Pmongoc_find_and_modify_opts_t;
@@ -4799,7 +4799,7 @@ const MONGOC_HANDSHAKE_APPNAME_MAX = 128;
 function mongoc_handshake_data_append(
            driver_name: PAnsiChar;
            driver_version: PAnsiChar;
-           platform: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           platform: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 /////////////////
 // mongoc-init //
@@ -5065,7 +5065,7 @@ procedure mongoc_read_prefs_set_hedge(
             hedge: Pbson_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_read_prefs_is_valid(
-           read_prefs: Pmongoc_read_prefs_t): bool; cdecl; external 'mongoc2.dll';
+           read_prefs: Pmongoc_read_prefs_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////////
 // mongoc-server-api //
@@ -5087,7 +5087,7 @@ function mongoc_server_api_version_to_string(
 
 function mongoc_server_api_version_from_string(
            version: PAnsiChar;
-           param1: Pmongoc_server_api_version_t): bool; cdecl; external 'mongoc2.dll';
+           param1: Pmongoc_server_api_version_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_server_api_new(
            version: mongoc_server_api_version_t): Pmongoc_server_api_t; cdecl; external 'mongoc2.dll';
@@ -5100,11 +5100,11 @@ procedure mongoc_server_api_destroy(
 
 procedure mongoc_server_api_strict(
             api: Pmongoc_server_api_t;
-            strict: bool); cdecl; external 'mongoc2.dll';
+            strict: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_server_api_deprecation_errors(
             api: Pmongoc_server_api_t;
-            deprecation_errors: bool); cdecl; external 'mongoc2.dll';
+            deprecation_errors: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_server_api_get_deprecation_errors(
            api: Pmongoc_server_api_t): Pmongoc_optional_t; cdecl; external 'mongoc2.dll';
@@ -5252,7 +5252,7 @@ function mongoc_socket_sendv(
            iovcnt: size_t;
            expire_at: int64_t): ssize_t; cdecl; external 'mongoc2.dll';
 function mongoc_socket_check_closed(
-           sock: Pmongoc_socket_t): bool; cdecl; external 'mongoc2.dll';
+           sock: Pmongoc_socket_t): ByteBool; cdecl; external 'mongoc2.dll';
 procedure mongoc_socket_inet_ntop(
             rp: Paddrinfo;
             buf: PAnsiChar;
@@ -5352,11 +5352,11 @@ function mongoc_stream_setsockopt(
            optval: Pvoid;
            optlen: mongoc_socklen_t): Integer; cdecl; external 'mongoc2.dll';
 function mongoc_stream_check_closed(
-           stream: Pmongoc_stream_t): bool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
 function mongoc_stream_timed_out(
-           stream: Pmongoc_stream_t): bool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
 function mongoc_stream_should_retry(
-           stream: Pmongoc_stream_t): bool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // * *
 // * @brief Poll a set of streams
@@ -5466,14 +5466,14 @@ procedure mongoc_structured_log_opts_set_handler(
 function mongoc_structured_log_opts_set_max_level_for_component(
            opts: Pmongoc_structured_log_opts_t;
            component: mongoc_structured_log_component_t;
-           level: mongoc_structured_log_level_t): bool; cdecl; external 'mongoc2.dll';
+           level: mongoc_structured_log_level_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_opts_set_max_level_for_all_components(
            opts: Pmongoc_structured_log_opts_t;
-           level: mongoc_structured_log_level_t): bool; cdecl; external 'mongoc2.dll';
+           level: mongoc_structured_log_level_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_opts_set_max_levels_from_env(
-           opts: Pmongoc_structured_log_opts_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_opts_get_max_level_for_component(
            opts: Pmongoc_structured_log_opts_t;
@@ -5483,11 +5483,11 @@ function mongoc_structured_log_opts_get_max_document_length(
            opts: Pmongoc_structured_log_opts_t): size_t; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_opts_set_max_document_length_from_env(
-           opts: Pmongoc_structured_log_opts_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_opts_set_max_document_length(
            opts: Pmongoc_structured_log_opts_t;
-           max_document_length: size_t): bool; cdecl; external 'mongoc2.dll';
+           max_document_length: size_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_entry_message_as_bson(
            entry: Pmongoc_structured_log_entry_t): Pbson_t; cdecl; external 'mongoc2.dll';
@@ -5506,14 +5506,14 @@ function mongoc_structured_log_get_level_name(
 
 function mongoc_structured_log_get_named_level(
            name: PAnsiChar;
-           param1: Pmongoc_structured_log_level_t): bool; cdecl; external 'mongoc2.dll';
+           param1: Pmongoc_structured_log_level_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_get_component_name(
            component: mongoc_structured_log_component_t): PAnsiChar; cdecl; external 'mongoc2.dll';
 
 function mongoc_structured_log_get_named_component(
            name: PAnsiChar;
-           param1: Pmongoc_structured_log_component_t): bool; cdecl; external 'mongoc2.dll';
+           param1: Pmongoc_structured_log_component_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 //////////////////////////////
 // mongoc-version-functions //
@@ -5526,7 +5526,7 @@ function mongoc_get_version(): PAnsiChar; cdecl; external 'mongoc2.dll';
 function mongoc_check_version(
            required_major: Integer;
            required_minor: Integer;
-           required_micro: Integer): bool; cdecl; external 'mongoc2.dll';
+           required_micro: Integer): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////
 // mongoc-cursor //
@@ -5548,20 +5548,20 @@ procedure mongoc_cursor_destroy(
             cursor: Pmongoc_cursor_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_cursor_more(
-           cursor: Pmongoc_cursor_t): bool; cdecl; external 'mongoc2.dll';
+           cursor: Pmongoc_cursor_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_cursor_next(
            cursor: Pmongoc_cursor_t;
-           bson: PPbson_t): bool; cdecl; external 'mongoc2.dll';
+           bson: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_cursor_error(
            cursor: Pmongoc_cursor_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_cursor_error_document(
            cursor: Pmongoc_cursor_t;
            error: Pbson_error_t;
-           doc: PPbson_t): bool; cdecl; external 'mongoc2.dll';
+           doc: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_cursor_get_host(
             cursor: Pmongoc_cursor_t;
@@ -5579,7 +5579,7 @@ function mongoc_cursor_get_batch_size(
 
 function mongoc_cursor_set_limit(
            cursor: Pmongoc_cursor_t;
-           limit: int64_t): bool; cdecl; external 'mongoc2.dll';
+           limit: int64_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_cursor_get_limit(
            cursor: Pmongoc_cursor_t): int64_t; cdecl; external 'mongoc2.dll';
@@ -5590,7 +5590,7 @@ function mongoc_cursor_get_limit(
 
 function mongoc_cursor_set_server_id(
            cursor: Pmongoc_cursor_t;
-           server_id: uint32_t): bool; cdecl; external 'mongoc2.dll';
+           server_id: uint32_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // `mongoc_cursor_get_hint` is deprecated for more aptly named `mongoc_cursor_get_server_id`.
 // BSON_DEPRECATED_FOR(mongoc_cursor_get_server_id)
@@ -5632,12 +5632,12 @@ function mongoc_change_stream_get_resume_token(
 
 function mongoc_change_stream_next(
            param0: Pmongoc_change_stream_t;
-           param1: PPbson_t): bool; cdecl; external 'mongoc2.dll';
+           param1: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_change_stream_error_document(
            param0: Pmongoc_change_stream_t;
            param1: Pbson_error_t;
-           param2: PPbson_t): bool; cdecl; external 'mongoc2.dll';
+           param2: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////////////
 // mongoc-bulk-operation //
@@ -5675,7 +5675,7 @@ function mongoc_bulk_operation_insert_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
 
 procedure mongoc_bulk_operation_remove(
             bulk: Pmongoc_bulk_operation_t;
@@ -5685,7 +5685,7 @@ function mongoc_bulk_operation_remove_many_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
 
 procedure mongoc_bulk_operation_remove_one(
             bulk: Pmongoc_bulk_operation_t;
@@ -5695,50 +5695,50 @@ function mongoc_bulk_operation_remove_one_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
 
 procedure mongoc_bulk_operation_replace_one(
             bulk: Pmongoc_bulk_operation_t;
             selector: Pbson_t;
             document: Pbson_t;
-            upsert: bool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_bulk_operation_replace_one_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
 
 procedure mongoc_bulk_operation_update(
             bulk: Pmongoc_bulk_operation_t;
             selector: Pbson_t;
             document: Pbson_t;
-            upsert: bool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_bulk_operation_update_many_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
 
 procedure mongoc_bulk_operation_update_one(
             bulk: Pmongoc_bulk_operation_t;
             selector: Pbson_t;
             document: Pbson_t;
-            upsert: bool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_bulk_operation_update_one_with_opts(
            bulk: Pmongoc_bulk_operation_t;
            selector: Pbson_t;
            document: Pbson_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll'; (* OUT *)
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll'; (* OUT *)
 
 procedure mongoc_bulk_operation_set_bypass_document_validation(
             bulk: Pmongoc_bulk_operation_t;
-            bypass: bool); cdecl; external 'mongoc2.dll';
+            bypass: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_bulk_operation_set_comment(
             bulk: Pmongoc_bulk_operation_t;
@@ -5755,7 +5755,7 @@ procedure mongoc_bulk_operation_set_let(
 // *
 
 function mongoc_bulk_operation_new(
-           ordered: bool): Pmongoc_bulk_operation_t; cdecl; external 'mongoc2.dll';
+           ordered: ByteBool): Pmongoc_bulk_operation_t; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_bulk_operation_set_write_concern(
             bulk: Pmongoc_bulk_operation_t;
@@ -5825,7 +5825,7 @@ type
     userdata: Pvoid;
     params: Pbson_t;
     param2: Pbson_t;
-    error: Pbson_error_t): bool; cdecl;
+    error: Pbson_error_t): ByteBool; cdecl;
 
 function mongoc_auto_encryption_opts_new(): Pmongoc_auto_encryption_opts_t; cdecl; external 'mongoc2.dll';
 
@@ -5867,11 +5867,11 @@ procedure mongoc_auto_encryption_opts_set_encrypted_fields_map(
 
 procedure mongoc_auto_encryption_opts_set_bypass_auto_encryption(
             opts: Pmongoc_auto_encryption_opts_t;
-            bypass_auto_encryption: bool); cdecl; external 'mongoc2.dll';
+            bypass_auto_encryption: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_auto_encryption_opts_set_bypass_query_analysis(
             opts: Pmongoc_auto_encryption_opts_t;
-            bypass_query_analysis: bool); cdecl; external 'mongoc2.dll';
+            bypass_query_analysis: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_auto_encryption_opts_set_extra(
             opts: Pmongoc_auto_encryption_opts_t;
@@ -5984,7 +5984,7 @@ function mongoc_client_encryption_create_datakey(
            kms_provider: PAnsiChar;
            opts: Pmongoc_client_encryption_datakey_opts_t;
            keyid: Pbson_value_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_rewrap_many_datakey(
            client_encryption: Pmongoc_client_encryption_t;
@@ -5992,19 +5992,19 @@ function mongoc_client_encryption_rewrap_many_datakey(
            provider: PAnsiChar;
            master_key: Pbson_t;
            result: Pmongoc_client_encryption_rewrap_many_datakey_result_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_delete_key(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_get_key(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            key_doc: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_encrypt_text_prefix_opts_new(): Pmongoc_client_encryption_encrypt_text_prefix_opts_t; cdecl; external 'mongoc2.dll';
 
@@ -6075,40 +6075,40 @@ function mongoc_client_encryption_add_key_alt_name(
            keyid: Pbson_value_t;
            keyaltname: PAnsiChar;
            key_doc: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_remove_key_alt_name(
            client_encryption: Pmongoc_client_encryption_t;
            keyid: Pbson_value_t;
            keyaltname: PAnsiChar;
            key_doc: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_get_key_by_alt_name(
            client_encryption: Pmongoc_client_encryption_t;
            keyaltname: PAnsiChar;
            key_doc: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_encrypt(
            client_encryption: Pmongoc_client_encryption_t;
            value: Pbson_value_t;
            opts: Pmongoc_client_encryption_encrypt_opts_t;
            ciphertext: Pbson_value_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_encrypt_expression(
            client_encryption: Pmongoc_client_encryption_t;
            expr: Pbson_t;
            opts: Pmongoc_client_encryption_encrypt_opts_t;
            expr_out: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_decrypt(
            client_encryption: Pmongoc_client_encryption_t;
            ciphertext: Pbson_value_t;
            value: Pbson_value_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_encryption_encrypt_opts_new(): Pmongoc_client_encryption_encrypt_opts_t; cdecl; external 'mongoc2.dll';
 
@@ -6137,11 +6137,11 @@ procedure mongoc_client_encryption_encrypt_opts_set_text_opts(
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_case_sensitive(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            case_sensitive: bool); cdecl; external 'mongoc2.dll';
+            case_sensitive: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_encryption_encrypt_text_opts_set_diacritic_sensitive(
             opts: Pmongoc_client_encryption_encrypt_text_opts_t;
-            diacritic_sensitive: bool); cdecl; external 'mongoc2.dll';
+            diacritic_sensitive: ByteBool); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_encryption_encrypt_opts_set_query_type(
             opts: Pmongoc_client_encryption_encrypt_opts_t;
@@ -6222,13 +6222,13 @@ function mongoc_stream_tls_handshake(
            host: PAnsiChar;
            timeout_msec: int32_t;
            events: PInteger;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_stream_tls_handshake_block(
            stream: Pmongoc_stream_t;
            host: PAnsiChar;
            timeout_msec: int32_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_stream_tls_new_with_hostname(
            base_stream: Pmongoc_stream_t;
@@ -6261,10 +6261,10 @@ function mongoc_topology_description_new_copy(
 
 function mongoc_topology_description_has_readable_server(
            td: Pmongoc_topology_description_t;
-           prefs: Pmongoc_read_prefs_t): bool; cdecl; external 'mongoc2.dll';
+           prefs: Pmongoc_read_prefs_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_topology_description_has_writable_server(
-           td: Pmongoc_topology_description_t): bool; cdecl; external 'mongoc2.dll';
+           td: Pmongoc_topology_description_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_topology_description_type(
            td: Pmongoc_topology_description_t): PAnsiChar; cdecl; external 'mongoc2.dll';
@@ -6564,7 +6564,7 @@ function mongoc_apm_server_heartbeat_started_get_context(
            event: Pmongoc_apm_server_heartbeat_started_t): Pvoid; cdecl; external 'mongoc2.dll';
 
 function mongoc_apm_server_heartbeat_started_get_awaited(
-           event: Pmongoc_apm_server_heartbeat_started_t): bool; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_started_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // * heartbeat-succeeded event fields
 
@@ -6581,7 +6581,7 @@ function mongoc_apm_server_heartbeat_succeeded_get_context(
            event: Pmongoc_apm_server_heartbeat_succeeded_t): Pvoid; cdecl; external 'mongoc2.dll';
 
 function mongoc_apm_server_heartbeat_succeeded_get_awaited(
-           event: Pmongoc_apm_server_heartbeat_succeeded_t): bool; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_succeeded_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // * heartbeat-failed event fields
 
@@ -6599,7 +6599,7 @@ function mongoc_apm_server_heartbeat_failed_get_context(
            event: Pmongoc_apm_server_heartbeat_failed_t): Pvoid; cdecl; external 'mongoc2.dll';
 
 function mongoc_apm_server_heartbeat_failed_get_awaited(
-           event: Pmongoc_apm_server_heartbeat_failed_t): bool; cdecl; external 'mongoc2.dll';
+           event: Pmongoc_apm_server_heartbeat_failed_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // *
 // * callbacks
@@ -6793,7 +6793,7 @@ function mongoc_uri_get_database(
 
 function mongoc_uri_set_database(
            uri: Pmongoc_uri_t;
-           database: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           database: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_compressors(
            uri: Pmongoc_uri_t): Pbson_t; cdecl; external 'mongoc2.dll';
@@ -6806,23 +6806,23 @@ function mongoc_uri_get_password(
 
 function mongoc_uri_set_password(
            uri: Pmongoc_uri_t;
-           password: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           password: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_has_option(
            uri: Pmongoc_uri_t;
-           key: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_option_is_int32(
-           key: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_option_is_int64(
-           key: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_option_is_bool(
-           key: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_option_is_utf8(
-           key: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           key: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_option_as_int32(
            uri: Pmongoc_uri_t;
@@ -6837,7 +6837,7 @@ function mongoc_uri_get_option_as_int64(
 function mongoc_uri_get_option_as_bool(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           fallback: bool): bool; cdecl; external 'mongoc2.dll';
+           fallback: ByteBool): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_option_as_utf8(
            uri: Pmongoc_uri_t;
@@ -6847,22 +6847,22 @@ function mongoc_uri_get_option_as_utf8(
 function mongoc_uri_set_option_as_int32(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: int32_t): bool; cdecl; external 'mongoc2.dll';
+           value: int32_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_option_as_int64(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: int64_t): bool; cdecl; external 'mongoc2.dll';
+           value: int64_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_option_as_bool(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: bool): bool; cdecl; external 'mongoc2.dll';
+           value: ByteBool): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_option_as_utf8(
            uri: Pmongoc_uri_t;
            option: PAnsiChar;
-           value: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_replica_set(
            uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
@@ -6875,7 +6875,7 @@ function mongoc_uri_get_username(
 
 function mongoc_uri_set_username(
            uri: Pmongoc_uri_t;
-           username: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           username: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_credentials(
            uri: Pmongoc_uri_t): Pbson_t; cdecl; external 'mongoc2.dll';
@@ -6885,36 +6885,36 @@ function mongoc_uri_get_auth_source(
 
 function mongoc_uri_set_auth_source(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_appname(
            uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_appname(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_compressors(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_auth_mechanism(
            uri: Pmongoc_uri_t): PAnsiChar; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_auth_mechanism(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_mechanism_properties(
            uri: Pmongoc_uri_t;
-           properties: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           properties: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_set_mechanism_properties(
            uri: Pmongoc_uri_t;
-           properties: Pbson_t): bool; cdecl; external 'mongoc2.dll';
+           properties: Pbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_get_tls(
-           uri: Pmongoc_uri_t): bool; cdecl; external 'mongoc2.dll';
+           uri: Pmongoc_uri_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_uri_unescape(
            escaped_string: PAnsiChar): PAnsiChar; cdecl; external 'mongoc2.dll';
@@ -6945,7 +6945,7 @@ function mongoc_uri_get_server_monitoring_mode(
 
 function mongoc_uri_set_server_monitoring_mode(
            uri: Pmongoc_uri_t;
-           value: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           value: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////////
 // mongoc-collection //
@@ -6976,14 +6976,14 @@ function mongoc_collection_read_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_write_command_with_opts(
            collection: Pmongoc_collection_t;
            command: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_read_write_command_with_opts(
            collection: Pmongoc_collection_t;
@@ -6991,7 +6991,7 @@ function mongoc_collection_read_write_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t; // IGNORED
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_command_with_opts(
            collection: Pmongoc_collection_t;
@@ -6999,34 +6999,34 @@ function mongoc_collection_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_command_simple(
            collection: Pmongoc_collection_t;
            command: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_drop(
            collection: Pmongoc_collection_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_drop_with_opts(
            collection: Pmongoc_collection_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_drop_index(
            collection: Pmongoc_collection_t;
            index_name: PAnsiChar;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_drop_index_with_opts(
            collection: Pmongoc_collection_t;
            index_name: PAnsiChar;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_find_indexes_with_opts(
            collection: Pmongoc_collection_t;
@@ -7052,7 +7052,7 @@ function mongoc_collection_create_indexes_with_opts(
            n_models: size_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_find_with_opts(
            collection: Pmongoc_collection_t;
@@ -7065,14 +7065,14 @@ function mongoc_collection_insert(
            flags: mongoc_insert_flags_t;
            document: Pbson_t;
            write_concern: Pmongoc_write_concern_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_insert_one(
            collection: Pmongoc_collection_t;
            document: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_insert_many(
            collection: Pmongoc_collection_t;
@@ -7080,7 +7080,7 @@ function mongoc_collection_insert_many(
            n_documents: size_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_update(
            collection: Pmongoc_collection_t;
@@ -7088,7 +7088,7 @@ function mongoc_collection_update(
            selector: Pbson_t;
            update: Pbson_t;
            write_concern: Pmongoc_write_concern_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_update_one(
            collection: Pmongoc_collection_t;
@@ -7096,7 +7096,7 @@ function mongoc_collection_update_one(
            update: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_update_many(
            collection: Pmongoc_collection_t;
@@ -7104,7 +7104,7 @@ function mongoc_collection_update_many(
            update: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_replace_one(
            collection: Pmongoc_collection_t;
@@ -7112,50 +7112,50 @@ function mongoc_collection_replace_one(
            replacement: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_remove(
            collection: Pmongoc_collection_t;
            flags: mongoc_remove_flags_t;
            selector: Pbson_t;
            write_concern: Pmongoc_write_concern_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_delete_one(
            collection: Pmongoc_collection_t;
            selector: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_delete_many(
            collection: Pmongoc_collection_t;
            selector: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_rename(
            collection: Pmongoc_collection_t;
            new_db: PAnsiChar;
            new_name: PAnsiChar;
-           drop_target_before_rename: bool;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           drop_target_before_rename: ByteBool;
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_rename_with_opts(
            collection: Pmongoc_collection_t;
            new_db: PAnsiChar;
            new_name: PAnsiChar;
-           drop_target_before_rename: bool;
+           drop_target_before_rename: ByteBool;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_find_and_modify_with_opts(
            collection: Pmongoc_collection_t;
            query: Pbson_t;
            opts: Pmongoc_find_and_modify_opts_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_find_and_modify(
            collection: Pmongoc_collection_t;
@@ -7163,11 +7163,11 @@ function mongoc_collection_find_and_modify(
            sort: Pbson_t;
            update: Pbson_t;
            fields: Pbson_t;
-           _remove: bool;
-           upsert: bool;
-           _new: bool;
+           _remove: ByteBool;
+           upsert: ByteBool;
+           _new: ByteBool;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_collection_create_bulk_operation_with_opts(
            collection: Pmongoc_collection_t;
@@ -7236,11 +7236,11 @@ function mongoc_database_get_name(
 function mongoc_database_remove_user(
            database: Pmongoc_database_t;
            username: PAnsiChar;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_remove_all_users(
            database: Pmongoc_database_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_add_user(
            database: Pmongoc_database_t;
@@ -7248,7 +7248,7 @@ function mongoc_database_add_user(
            password: PAnsiChar;
            roles: Pbson_t;
            custom_data: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_database_destroy(
             database: Pmongoc_database_t); cdecl; external 'mongoc2.dll';
@@ -7268,14 +7268,14 @@ function mongoc_database_read_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_write_command_with_opts(
            database: Pmongoc_database_t;
            command: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_read_write_command_with_opts(
            database: Pmongoc_database_t;
@@ -7283,7 +7283,7 @@ function mongoc_database_read_write_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t; // IGNORED
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_command_with_opts(
            database: Pmongoc_database_t;
@@ -7291,28 +7291,28 @@ function mongoc_database_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_command_simple(
            database: Pmongoc_database_t;
            command: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_drop(
            database: Pmongoc_database_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_drop_with_opts(
            database: Pmongoc_database_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_has_collection(
            database: Pmongoc_database_t;
            name: PAnsiChar;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_database_create_collection(
            database: Pmongoc_database_t;
@@ -7427,21 +7427,21 @@ function mongoc_gridfs_file_tell(
 function mongoc_gridfs_file_set_id(
            &file: Pmongoc_gridfs_file_t;
            id: Pbson_value_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_file_save(
-           &file: Pmongoc_gridfs_file_t): bool; cdecl; external 'mongoc2.dll';
+           &file: Pmongoc_gridfs_file_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_gridfs_file_destroy(
             &file: Pmongoc_gridfs_file_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_file_error(
            &file: Pmongoc_gridfs_file_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_file_remove(
            &file: Pmongoc_gridfs_file_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 /////////////////////////////
 // mongoc-gridfs-file-list //
@@ -7459,7 +7459,7 @@ procedure mongoc_gridfs_file_list_destroy(
             list: Pmongoc_gridfs_file_list_t); cdecl; external 'mongoc2.dll';
 function mongoc_gridfs_file_list_error(
            list: Pmongoc_gridfs_file_list_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 /////////////////////////////
 // mongoc-gridfs-file-page //
@@ -7506,7 +7506,7 @@ function mongoc_gridfs_bucket_upload_from_stream(
            source: Pmongoc_stream_t;
            opts: Pbson_t;
            file_id: Pbson_value_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_bucket_upload_from_stream_with_id(
            bucket: Pmongoc_gridfs_bucket_t;
@@ -7514,7 +7514,7 @@ function mongoc_gridfs_bucket_upload_from_stream_with_id(
            filename: PAnsiChar;
            source: Pmongoc_stream_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_bucket_open_download_stream(
            bucket: Pmongoc_gridfs_bucket_t;
@@ -7525,12 +7525,12 @@ function mongoc_gridfs_bucket_download_to_stream(
            bucket: Pmongoc_gridfs_bucket_t;
            file_id: Pbson_value_t;
            destination: Pmongoc_stream_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_bucket_delete_by_id(
            bucket: Pmongoc_gridfs_bucket_t;
            file_id: Pbson_value_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_bucket_find(
            bucket: Pmongoc_gridfs_bucket_t;
@@ -7539,13 +7539,13 @@ function mongoc_gridfs_bucket_find(
 
 function mongoc_gridfs_bucket_stream_error(
            stream: Pmongoc_stream_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_gridfs_bucket_destroy(
             bucket: Pmongoc_gridfs_bucket_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_gridfs_bucket_abort_upload(
-           stream: Pmongoc_stream_t): bool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_stream_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////
 // mongoc-gridfs //
@@ -7584,7 +7584,7 @@ function mongoc_gridfs_find_one_by_filename(
 
 function mongoc_gridfs_drop(
            gridfs: Pmongoc_gridfs_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_gridfs_destroy(
             gridfs: Pmongoc_gridfs_t); cdecl; external 'mongoc2.dll';
@@ -7598,7 +7598,7 @@ function mongoc_gridfs_get_chunks(
 function mongoc_gridfs_remove_by_filename(
            gridfs: Pmongoc_gridfs_t;
            filename: PAnsiChar;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 //////////////////////////
 // mongoc-stream-gridfs //
@@ -7706,7 +7706,7 @@ function mongoc_client_command_simple(
            command: Pbson_t;
            read_prefs: Pmongoc_read_prefs_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_read_command_with_opts(
            client: Pmongoc_client_t;
@@ -7715,7 +7715,7 @@ function mongoc_client_read_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_write_command_with_opts(
            client: Pmongoc_client_t;
@@ -7723,7 +7723,7 @@ function mongoc_client_write_command_with_opts(
            command: Pbson_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_read_write_command_with_opts(
            client: Pmongoc_client_t;
@@ -7732,7 +7732,7 @@ function mongoc_client_read_write_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t; // IGNORED
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_command_with_opts(
            client: Pmongoc_client_t;
@@ -7741,7 +7741,7 @@ function mongoc_client_command_with_opts(
            read_prefs: Pmongoc_read_prefs_t;
            opts: Pbson_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_command_simple_with_server_id(
            client: Pmongoc_client_t;
@@ -7750,7 +7750,7 @@ function mongoc_client_command_simple_with_server_id(
            read_prefs: Pmongoc_read_prefs_t;
            server_id: uint32_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_destroy(
             client: Pmongoc_client_t); cdecl; external 'mongoc2.dll';
@@ -7825,11 +7825,11 @@ procedure mongoc_client_set_ssl_opts(
 function mongoc_client_set_apm_callbacks(
            client: Pmongoc_client_t;
            callbacks: Pmongoc_apm_callbacks_t;
-           context: Pvoid): bool; cdecl; external 'mongoc2.dll';
+           context: Pvoid): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_set_structured_log_opts(
            client: Pmongoc_client_t;
-           opts: Pmongoc_structured_log_opts_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_get_server_description(
            client: Pmongoc_client_t;
@@ -7845,17 +7845,17 @@ procedure mongoc_server_descriptions_destroy_all(
 
 function mongoc_client_select_server(
            client: Pmongoc_client_t;
-           for_writes: bool;
+           for_writes: ByteBool;
            prefs: Pmongoc_read_prefs_t;
            error: Pbson_error_t): Pmongoc_server_description_t; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_set_error_api(
            client: Pmongoc_client_t;
-           version: int32_t): bool; cdecl; external 'mongoc2.dll';
+           version: int32_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_set_appname(
            client: Pmongoc_client_t;
-           appname: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           appname: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_watch(
            client: Pmongoc_client_t;
@@ -7868,7 +7868,7 @@ procedure mongoc_client_reset(
 function mongoc_client_enable_auto_encryption(
            client: Pmongoc_client_t;
            opts: Pmongoc_auto_encryption_opts_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_get_crypt_shared_version(
            client: Pmongoc_client_t): PAnsiChar; cdecl; external 'mongoc2.dll';
@@ -7876,7 +7876,7 @@ function mongoc_client_get_crypt_shared_version(
 function mongoc_client_set_server_api(
            client: Pmongoc_client_t;
            api: Pmongoc_server_api_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_get_handshake_description(
            client: Pmongoc_client_t;
@@ -7886,7 +7886,7 @@ function mongoc_client_get_handshake_description(
 
 function mongoc_client_set_oidc_callback(
            client: Pmongoc_client_t;
-           callback: Pmongoc_oidc_callback_t): bool; cdecl; external 'mongoc2.dll';
+           callback: Pmongoc_oidc_callback_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 ////////////////////////
 // mongoc-client-pool //
@@ -7929,33 +7929,33 @@ procedure mongoc_client_pool_set_ssl_opts(
 function mongoc_client_pool_set_apm_callbacks(
            pool: Pmongoc_client_pool_t;
            callbacks: Pmongoc_apm_callbacks_t;
-           context: Pvoid): bool; cdecl; external 'mongoc2.dll';
+           context: Pvoid): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_pool_set_error_api(
            pool: Pmongoc_client_pool_t;
-           version: int32_t): bool; cdecl; external 'mongoc2.dll';
+           version: int32_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_pool_set_appname(
            pool: Pmongoc_client_pool_t;
-           appname: PAnsiChar): bool; cdecl; external 'mongoc2.dll';
+           appname: PAnsiChar): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_pool_enable_auto_encryption(
            pool: Pmongoc_client_pool_t;
            opts: Pmongoc_auto_encryption_opts_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_pool_set_server_api(
            pool: Pmongoc_client_pool_t;
            api: Pmongoc_server_api_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_pool_set_structured_log_opts(
            pool: Pmongoc_client_pool_t;
-           opts: Pmongoc_structured_log_opts_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_structured_log_opts_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_pool_set_oidc_callback(
            pool: Pmongoc_client_pool_t;
-           callback: Pmongoc_oidc_callback_t): bool; cdecl; external 'mongoc2.dll';
+           callback: Pmongoc_oidc_callback_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////////////
 // mongoc-client-session //
@@ -7969,7 +7969,7 @@ type
     session: Pmongoc_client_session_t;
     ctx: Pvoid;
     reply: PPbson_t;
-    error: Pbson_error_t): bool; cdecl;
+    error: Pbson_error_t): ByteBool; cdecl;
 
 type
   mongoc_transaction_state_t = (
@@ -8021,17 +8021,17 @@ function mongoc_session_opts_new(): Pmongoc_session_opt_t; cdecl; external 'mong
 
 procedure mongoc_session_opts_set_causal_consistency(
             opts: Pmongoc_session_opt_t;
-            causal_consistency: bool); cdecl; external 'mongoc2.dll';
+            causal_consistency: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_session_opts_get_causal_consistency(
-           opts: Pmongoc_session_opt_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_session_opt_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_session_opts_set_snapshot(
             opts: Pmongoc_session_opt_t;
-            snapshot: bool); cdecl; external 'mongoc2.dll';
+            snapshot: ByteBool); cdecl; external 'mongoc2.dll';
 
 function mongoc_session_opts_get_snapshot(
-           opts: Pmongoc_session_opt_t): bool; cdecl; external 'mongoc2.dll';
+           opts: Pmongoc_session_opt_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_session_opts_set_default_transaction_opts(
             opts: Pmongoc_session_opt_t;
@@ -8084,15 +8084,15 @@ function mongoc_client_session_with_transaction(
            opts: Pmongoc_transaction_opt_t;
            ctx: Pvoid;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_session_start_transaction(
            session: Pmongoc_client_session_t;
            opts: Pmongoc_transaction_opt_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_session_in_transaction(
-           session: Pmongoc_client_session_t): bool; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_session_get_transaction_state(
            session: Pmongoc_client_session_t): mongoc_transaction_state_t; cdecl; external 'mongoc2.dll';
@@ -8100,16 +8100,16 @@ function mongoc_client_session_get_transaction_state(
 function mongoc_client_session_commit_transaction(
            session: Pmongoc_client_session_t;
            reply: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_session_abort_transaction(
            session: Pmongoc_client_session_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_client_session_append(
            client_session: Pmongoc_client_session_t;
            opts: Pbson_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // * There is no mongoc_client_session_end, only mongoc_client_session_destroy.
 // * Driver Sessions Spec: "In languages that have idiomatic ways of disposing of
@@ -8121,7 +8121,7 @@ procedure mongoc_client_session_destroy(
             session: Pmongoc_client_session_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_client_session_get_dirty(
-           session: Pmongoc_client_session_t): bool; cdecl; external 'mongoc2.dll';
+           session: Pmongoc_client_session_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 //////////////////////
 // mongoc-bulkwrite //
@@ -8135,10 +8135,10 @@ type
 function mongoc_bulkwriteopts_new(): Pmongoc_bulkwriteopts_t; cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwriteopts_set_ordered(
             self: Pmongoc_bulkwriteopts_t;
-            ordered: bool); cdecl; external 'mongoc2.dll';
+            ordered: ByteBool); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwriteopts_set_bypassdocumentvalidation(
             self: Pmongoc_bulkwriteopts_t;
-            bypassdocumentvalidation: bool); cdecl; external 'mongoc2.dll';
+            bypassdocumentvalidation: ByteBool); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwriteopts_set_let(
             self: Pmongoc_bulkwriteopts_t;
             let: Pbson_t); cdecl; external 'mongoc2.dll';
@@ -8150,7 +8150,7 @@ procedure mongoc_bulkwriteopts_set_comment(
             comment: Pbson_value_t); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwriteopts_set_verboseresults(
             self: Pmongoc_bulkwriteopts_t;
-            verboseresults: bool); cdecl; external 'mongoc2.dll';
+            verboseresults: ByteBool); cdecl; external 'mongoc2.dll';
 // `mongoc_bulkwriteopts_set_extra` appends `extra` to bulkWrite command.
 // It is intended to support future server options.
 procedure mongoc_bulkwriteopts_set_extra(
@@ -8222,7 +8222,7 @@ type
 // Returns true if there was a top-level error.
 function mongoc_bulkwriteexception_error(
            self: Pmongoc_bulkwriteexception_t;
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 // `mongoc_bulkwriteexception_writeerrors` returns a BSON document mapping model indexes to write errors.
 // Example:
 // {
@@ -8268,7 +8268,7 @@ function mongoc_bulkwrite_append_insertone(
            ns: PAnsiChar;
            document: Pbson_t;
            opts: Pmongoc_bulkwrite_insertoneopts_t; // May be NULL
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 type
   _mongoc_bulkwrite_updateoneopts_t = record
@@ -8287,7 +8287,7 @@ procedure mongoc_bulkwrite_updateoneopts_set_hint(
             hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwrite_updateoneopts_set_upsert(
             self: Pmongoc_bulkwrite_updateoneopts_t;
-            upsert: bool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwrite_updateoneopts_set_sort(
             self: Pmongoc_bulkwrite_updateoneopts_t;
             sort: Pbson_t); cdecl; external 'mongoc2.dll';
@@ -8299,7 +8299,7 @@ function mongoc_bulkwrite_append_updateone(
            filter: Pbson_t;
            update: Pbson_t;
            opts: Pmongoc_bulkwrite_updateoneopts_t; // May be NULL
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 type
   _mongoc_bulkwrite_updatemanyopts_t = record
@@ -8318,7 +8318,7 @@ procedure mongoc_bulkwrite_updatemanyopts_set_hint(
             hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwrite_updatemanyopts_set_upsert(
             self: Pmongoc_bulkwrite_updatemanyopts_t;
-            upsert: bool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwrite_updatemanyopts_destroy(
             self: Pmongoc_bulkwrite_updatemanyopts_t); cdecl; external 'mongoc2.dll';
 function mongoc_bulkwrite_append_updatemany(
@@ -8327,7 +8327,7 @@ function mongoc_bulkwrite_append_updatemany(
            filter: Pbson_t;
            update: Pbson_t;
            opts: Pmongoc_bulkwrite_updatemanyopts_t; // May be NULL
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 type
   _mongoc_bulkwrite_replaceoneopts_t = record
@@ -8343,7 +8343,7 @@ procedure mongoc_bulkwrite_replaceoneopts_set_hint(
             hint: Pbson_value_t); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwrite_replaceoneopts_set_upsert(
             self: Pmongoc_bulkwrite_replaceoneopts_t;
-            upsert: bool); cdecl; external 'mongoc2.dll';
+            upsert: ByteBool); cdecl; external 'mongoc2.dll';
 procedure mongoc_bulkwrite_replaceoneopts_set_sort(
             self: Pmongoc_bulkwrite_replaceoneopts_t;
             sort: Pbson_t); cdecl; external 'mongoc2.dll';
@@ -8355,7 +8355,7 @@ function mongoc_bulkwrite_append_replaceone(
            filter: Pbson_t;
            replacement: Pbson_t;
            opts: Pmongoc_bulkwrite_replaceoneopts_t; // May be NULL
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 type
   _mongoc_bulkwrite_deleteoneopts_t = record
@@ -8376,7 +8376,7 @@ function mongoc_bulkwrite_append_deleteone(
            ns: PAnsiChar;
            filter: Pbson_t;
            opts: Pmongoc_bulkwrite_deleteoneopts_t; // May be NULL
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 type
   _mongoc_bulkwrite_deletemanyopts_t = record
@@ -8397,7 +8397,7 @@ function mongoc_bulkwrite_append_deletemany(
            ns: PAnsiChar;
            filter: Pbson_t;
            opts: Pmongoc_bulkwrite_deletemanyopts_t; // May be NULL
-           error: Pbson_error_t): bool; cdecl; external 'mongoc2.dll';
+           error: Pbson_error_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 // `mongoc_bulkwritereturn_t` may outlive `mongoc_bulkwrite_t`.
 type
@@ -8425,8 +8425,8 @@ function mongoc_bulkwrite_execute(
 
 type
   mongoc_bulkwrite_check_acknowledged_t = record
-    is_ok: bool; // true if no error
-    is_acknowledged: bool; // true if the previous call to `mongoc_bulkwrite_execute` used an acknowledged write concern
+    is_ok: ByteBool; // true if no error
+    is_acknowledged: ByteBool; // true if the previous call to `mongoc_bulkwrite_execute` used an acknowledged write concern
   end;
 
 // `mongoc_bulkwrite_check_acknowledged` checks whether or not the previous call to `mongoc_bulkwrite_execute` used an
@@ -8437,7 +8437,7 @@ function mongoc_bulkwrite_check_acknowledged(
 
 type
   mongoc_bulkwrite_serverid_t = record
-    is_ok: bool; // true if no error
+    is_ok: ByteBool; // true if no error
     serverid: uint32_t; // the server ID last used in `mongoc_bulkwrite_execute`
   end;
 

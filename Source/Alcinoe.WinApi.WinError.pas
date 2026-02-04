@@ -9,6 +9,7 @@ interface
 
 {$I Alcinoe.inc}
 
+{$WARN SYMBOL_PLATFORM OFF}
 {$SCOPEDENUMS OFF}
 {$MINENUMSIZE 4}
 {$A+}

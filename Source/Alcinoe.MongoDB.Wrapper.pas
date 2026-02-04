@@ -9,13 +9,15 @@ interface
 
 {$I Alcinoe.inc}
 
+{$WARN SYMBOL_PLATFORM OFF}
 {$SCOPEDENUMS OFF}
 {$MINENUMSIZE 4}
 {$A+}
 
 uses
   WinApi.Windows,
-  Winapi.Winsock2;
+  Winapi.Winsock2,
+  Alcinoe.WinApi.Windows;
 
 type
   uint8_t = UInt8;
@@ -5625,19 +5627,19 @@ type
   Pmongoc_change_stream_t = ^mongoc_change_stream_t;
 
 procedure mongoc_change_stream_destroy(
-            param0: Pmongoc_change_stream_t); cdecl; external 'mongoc2.dll';
+            stream: Pmongoc_change_stream_t); cdecl; external 'mongoc2.dll';
 
 function mongoc_change_stream_get_resume_token(
-           param0: Pmongoc_change_stream_t): Pbson_t; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_change_stream_t): Pbson_t; cdecl; external 'mongoc2.dll';
 
 function mongoc_change_stream_next(
-           param0: Pmongoc_change_stream_t;
-           param1: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_change_stream_t;
+           bson: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 function mongoc_change_stream_error_document(
-           param0: Pmongoc_change_stream_t;
-           param1: Pbson_error_t;
-           param2: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
+           stream: Pmongoc_change_stream_t;
+           err: Pbson_error_t;
+           bson: PPbson_t): ByteBool; cdecl; external 'mongoc2.dll';
 
 ///////////////////////////
 // mongoc-bulk-operation //
@@ -6013,13 +6015,13 @@ function mongoc_client_encryption_encrypt_text_suffix_opts_new(): Pmongoc_client
 function mongoc_client_encryption_encrypt_text_substring_opts_new(): Pmongoc_client_encryption_encrypt_text_substring_opts_t; cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_encryption_encrypt_text_prefix_opts_destroy(
-            param0: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_encryption_encrypt_text_suffix_opts_destroy(
-            param0: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_text_suffix_opts_t); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_encryption_encrypt_text_substring_opts_destroy(
-            param0: Pmongoc_client_encryption_encrypt_text_substring_opts_t); cdecl; external 'mongoc2.dll';
+            opts: Pmongoc_client_encryption_encrypt_text_substring_opts_t); cdecl; external 'mongoc2.dll';
 
 procedure mongoc_client_encryption_encrypt_text_prefix_opts_set_str_max_query_length(
             opts: Pmongoc_client_encryption_encrypt_text_prefix_opts_t;

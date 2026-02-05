@@ -10,6 +10,7 @@ uses
   system.AnsiStrings,
   System.SysUtils,
   System.IOUtils,
+  System.Classes,
   WinApi.Windows,
   Alcinoe.files,
   Alcinoe.StringList,
@@ -33,8 +34,12 @@ var
 function AddDllDirectory(NewDirectory: PWideChar): THandle; stdcall; external 'kernel32.dll';
 function SetDefaultDllDirectories(DirectoryFlags: DWORD): BOOL; stdcall; stdcall; external 'kernel32.dll';
 
-{***************************************************************************************************************}
-function ConvertFunctions(const ACSource: AnsiString; const ACallingConvention: AnsiString): AnsiString; forward;
+{************************}
+function ConvertFunctions(
+           const ACSource: AnsiString;
+           const ACallingConvention: AnsiString;
+           const ADelayed: Boolean;
+           const ALibraryDLLEntryPoints: TALStringListA): AnsiString; forward;
 
 {***********************************************************************************************************************}
 function ReplaceSection(const ACSource: AnsiString; const ADefine: AnsiString; const ANewDefine: AnsiString): AnsiString;
@@ -272,7 +277,10 @@ begin
     inc(LPCount);
   end;
 
-  if ALSameTextA(Result, 'char') then Result := 'AnsiChar'
+  if Result = 'BOOLEAN' then Result := 'ByteBool'
+  else if Result = 'BOOL' then Result := 'LongBool'
+  else if Result = 'bool' then Result := 'ByteBool'
+  else if ALSameTextA(Result, 'char') then Result := 'AnsiChar'
   else if ALSameTextA(Result, 'pchar') then Result := 'PAnsiChar'
   else if ALSameTextA(Result, 'float') then Result := 'Single'
   else if ALSameTextA(Result, 'int') then Result := 'Integer'
@@ -307,6 +315,7 @@ begin
   else if ALSameTextA(AVarName, 'set') then Result := '&'+AVarName
   else if ALSameTextA(AVarName, 'string') then Result := '&'+AVarName
   else if ALSameTextA(AVarName, 'type') then Result := '&'+AVarName
+  else if ALSameTextA(AVarName, 'result') then Result := '_'+AVarName
   else Result := AVarName;
 end;
 
@@ -531,8 +540,8 @@ begin
 
 end;
 
-{*****************************************************************************************************************************************************************}
-function ConvertCParamsToDelphi(const ACParams: AnsiString; Const AIsFromStruct: Boolean; const ACallingConvention: AnsiString; out AVarArgs: Boolean): AnsiString;
+{******************************************************************************************************************************************************************************************}
+function ConvertCParamsToDelphi(const ACParams: AnsiString; Const AIsFromStruct: Boolean; const ACallingConvention: AnsiString; const ADelayed: Boolean; out AVarArgs: Boolean): AnsiString;
 begin
 
   AVarArgs := False;
@@ -687,13 +696,17 @@ begin
         Insert(#13#10'// ', LLine, P1); // // typedef bool
                                         // // (__CALLCONV__ * visit_before)
                                         // // (const bson_iter_t * iter, char * key, void * data)
-        LLine := ConvertFunctions(';' + LLine, ACallingConvention); // ;
-                                                                    // type
-                                                                    //   visit_before = function (
-                                                                    //     iter: Pbson_iter_t;
-                                                                    //     key: PAnsiChar;
-                                                                    //     data: Pvoid
-                                                                    //   ): bool; stdcall;
+        LLine := ConvertFunctions(
+                   ';' + LLine,
+                   ACallingConvention,
+                   ADelayed,
+                   nil{ALibraryDLLEntryPoints}); // ;
+                                                 // type
+                                                 //   visit_before = function (
+                                                 //     iter: Pbson_iter_t;
+                                                 //     key: PAnsiChar;
+                                                 //     data: Pvoid
+                                                 //   ): bool; stdcall;
         LLine := ALStringReplaceA(LLine, #13#10, ' ');
         while alposA('  ', LLine) > 0 do
           LLine := ALStringReplaceA(LLine,'  ', ' ');
@@ -917,8 +930,8 @@ begin
 
 end;
 
-{**********************************************************************************************************************************}
-function _ConvertEnumsOrRecords(const ACSource: AnsiString; Const AEnum: Boolean; const ACallingConvention: AnsiString): AnsiString;
+{***********************************************************************************************************************************************************}
+function _ConvertEnumsOrRecords(const ACSource: AnsiString; Const AEnum: Boolean; const ACallingConvention: AnsiString; const ADelayed: Boolean): AnsiString;
 begin
 
   //
@@ -1068,7 +1081,7 @@ begin
         LFirstLine := LTypeDef[0];
         LTypeDef.Delete(0);
         var LVarArgs: Boolean;
-        LTypeDef.Text := ConvertCParamsToDelphi(LTypeDef.Text, true{AIsFromStruct}, ACallingConvention, LVarArgs);
+        LTypeDef.Text := ConvertCParamsToDelphi(LTypeDef.Text, true{AIsFromStruct}, ACallingConvention, ADelayed, LVarArgs);
         if LVarArgs then raise Exception.Create('Error B4CF6110-A482-41CC-B08C-EE76B311BAE8');
         LTypeDef.Insert(0, LFirstLine);
         if LInheritedTypeName <> '' then begin
@@ -1184,16 +1197,16 @@ begin
 
 end;
 
-{**************************************************************************************************}
-function ConvertEnums(const ACSource: AnsiString; const ACallingConvention: AnsiString): AnsiString;
+{***************************************************************************************************************************}
+function ConvertEnums(const ACSource: AnsiString; const ACallingConvention: AnsiString; const ADelayed: Boolean): AnsiString;
 begin
-  Result := _ConvertEnumsOrRecords(ACSource, true{AEnum}, ACallingConvention);
+  Result := _ConvertEnumsOrRecords(ACSource, true{AEnum}, ACallingConvention, ADelayed);
 end;
 
-{****************************************************************************************************}
-function ConvertRecords(const ACSource: AnsiString; const ACallingConvention: AnsiString): AnsiString;
+{*****************************************************************************************************************************}
+function ConvertRecords(const ACSource: AnsiString; const ACallingConvention: AnsiString; const ADelayed: Boolean): AnsiString;
 begin
-  Result := _ConvertEnumsOrRecords(ACSource, false{AEnum}, ACallingConvention);
+  Result := _ConvertEnumsOrRecords(ACSource, false{AEnum}, ACallingConvention, ADelayed);
 end;
 
 {*************************************************************}
@@ -1208,8 +1221,12 @@ begin
   Result := '';
 end;
 
-{******************************************************************************************************}
-function ConvertFunctions(const ACSource: AnsiString; const ACallingConvention: AnsiString): AnsiString;
+{************************}
+function ConvertFunctions(
+           const ACSource: AnsiString;
+           const ACallingConvention: AnsiString;
+           const ADelayed: Boolean;
+           const ALibraryDLLEntryPoints: TALStringListA): AnsiString;
 begin
 
   //
@@ -1350,7 +1367,7 @@ begin
 
       if LParamsLst.Count = 0 then raise Exception.Create('Error 69AA76EB-8AF2-4446-8B08-F13B554D522E');
       var LVarArgs: Boolean;
-      LParamsLst.Text := ConvertCParamsToDelphi(LParamsLst.Text, False{AIsFromStruct}, ACallingConvention, LVarArgs);
+      LParamsLst.Text := ConvertCParamsToDelphi(LParamsLst.Text, False{AIsFromStruct}, ACallingConvention, ADelayed, LVarArgs);
       if LVarArgs and LIsCallbackFunctionPointer then
         Raise Exception.Create('Error C22E2578-3E6F-4F1C-920B-F0C3171CB710');
 
@@ -1362,16 +1379,47 @@ begin
         LParamsLst[I] := '  ' + ALIfThenA(LIsCallbackFunctionPointer, '  ', LIdent) + ALTrim(LParamsLst[I]);
 
       var LRoutineDefinition := aLTrim(LParamsLst.Text);
-      LRoutineDefinition := LRoutinePrefix +
-                            ALIfThenA(
-                              LRoutineDefinition <> '',
-                              '('#13#10'  ' + ALIfThenA(LIsCallbackFunctionPointer, '  ', LIdent) + ALTrim(LParamsLst.Text) + #13#10+ ALIfThenA(LIsCallbackFunctionPointer, '  ') +')',
-                              '()') +
-                            LRoutineSuffix +
-                            '; '+ACallingConvention+';'+ALIfThenA(LVarArgs, ' varargs;')+ALIfThenA(not LIsCallbackFunctionPointer, ' external '''+LDllImport+''';');
+      if (ALibraryDLLEntryPoints <> nil) and (not LIsCallbackFunctionPointer) then begin
+        LRoutineDefinition := LRoutinePrefix +
+                              ALIfThenA(
+                                LRoutineDefinition <> '',
+                                '('#13#10'  ' + LIdent + ALTrim(LParamsLst.Text) + #13#10 +')',
+                                '()') +
+                              LRoutineSuffix +
+                              '; '+{ACallingConvention+';'+}{ALIfThenA(LVarArgs, ' varargs; ')+}'inline;';
 
-      delete(Result,P2, P4-P2+2{);});
-      insert(#13#10+LRoutineDefinition,Result,P2);
+        delete(Result,P2, P4-P2+2{);});
+        insert(#13#10+LRoutineDefinition,Result,P2);
+
+        for var I := LParamsLst.Count - 1 downto 0 do begin
+          LParamsLst[I] := ALTrim(LParamsLst[I]);
+          P3 := ALPosA('//',LParamsLst[I]);
+          If P3 > 0 then LParamsLst[I] := ALTrim(AlCopyStr(LParamsLst[I], 1, P3-1));
+          if LParamsLst[I] = '' then LParamsLst.Delete(I);
+        end;
+        LParamsLst.LineBreak := ' ';
+        LParamsLst.TrailingLineBreak := False;
+        LRoutineDefinition := LRoutinePrefix +
+                              ALIfThenA(
+                                LRoutineDefinition <> '',
+                                '('+ALTrim(LParamsLst.Text)+')',
+                                '()') +
+                              LRoutineSuffix +
+                              '; '+ACallingConvention+';'{+ALIfThenA(LVarArgs, ' varargs;')}; // bson_zero_free: procedure(mem: Pvoid; size: size_t); cdecl;
+        ALibraryDLLEntryPoints.AddNameValue(LDllImport, LRoutineDefinition);
+      end
+      else begin
+        LRoutineDefinition := LRoutinePrefix +
+                              ALIfThenA(
+                                LRoutineDefinition <> '',
+                                '('#13#10'  ' + ALIfThenA(LIsCallbackFunctionPointer, '  ', LIdent) + ALTrim(LParamsLst.Text) + #13#10+ ALIfThenA(LIsCallbackFunctionPointer, '  ') +')',
+                                '()') +
+                              LRoutineSuffix +
+                              '; '+ACallingConvention+';'+ALIfThenA(LVarArgs, ' varargs;')+ALIfThenA(not LIsCallbackFunctionPointer, ' external '''+LDllImport+ALIfThenA(ADelayed, ''' delayed;', ''';'));
+
+        delete(Result,P2, P4-P2+2{);});
+        insert(#13#10+LRoutineDefinition,Result,P2);
+      end;
 
     finally
       ALFReeAndNil(LParamsLst);
@@ -1380,6 +1428,201 @@ begin
     P1 := alposA('__CALLCONV__',Result, P2);
   end;
 
+end;
+
+{**************************************************************************************}
+Function MakeLibraryInterface(const ALibraryClassName: AnsiString; const ALibraryDLLEntryPoints: TALStringListA): AnsiString;
+begin
+  if ALibraryDLLEntryPoints = nil then exit('');
+
+  Result := '///'+AnsiString(StringOfChar('/', length(ALibraryClassName)))+'///'#13#10 +
+            '// '+ALibraryClassName+' //'#13#10 +
+            '///'+AnsiString(StringOfChar('/', length(ALibraryClassName)))+'///'#13#10 +
+            #13#10;
+
+  Var LDlls := TALStringListA.Create;
+  try
+    LDlls.Sorted := True;
+    LDlls.Duplicates := TDuplicates.dupignore;
+    for var I := 0 to ALibraryDLLEntryPoints.Count - 1 do
+      LDlls.Add(ALibraryDLLEntryPoints.Names[i]);
+    Result := Result +
+              'type'#13#10+
+              '  ' + ALibraryClassName + ' = class(TObject)'#13#10+
+              '  private'#13#10;
+    for var I := 0 to LDlls.Count - 1 do begin
+      var LLibName := LDlls[I]; // Mongoc2.dll
+      LLibName := 'F' + ALStringReplaceA(LLibName, '.dll', 'Lib'); // FMongoc2Lib
+      Result := Result + '    ' + LLibName + ': THandle;'#13#10;
+    end;
+    Result := Result +
+              '  public'#13#10;
+    for var I := 0 to ALibraryDLLEntryPoints.Count - 1 do begin
+      var LMethod := ALibraryDLLEntryPoints.ValueFromIndex[I]; // procedure mongoc_usleep_default_impl(usec: int64_t; user_data: Pvoid); cdecl;
+      if AlposA('procedure ', LMethod) = 1 then begin
+        LMethod := ALTrim(AlStringReplaceA(LMethod, 'procedure ', '')); // mongoc_usleep_default_impl(usec: int64_t; user_data: Pvoid); cdecl;
+        var P1 := AlPosA('(',LMethod);
+        if P1 <= 0 then raise Exception.Create('Error A73BAEA7-A92A-4A07-A77D-F0964FDD6D23');
+        insert(': procedure', LMethod, P1);
+      end
+      else if AlposA('function ', LMethod) = 1 then begin
+        LMethod := ALTrim(AlStringReplaceA(LMethod, 'function ', ''));
+        var P1 := AlPosA('(',LMethod);
+        if P1 <= 0 then raise Exception.Create('Error A73BAEA7-A92A-4A07-A77D-F0964FDD6D23');
+        insert(': function', LMethod, P1);
+      end
+      else
+        raise Exception.Create('Error 0343AEB5-2F5E-4A68-B162-E16FCF4381B7');
+      Result := Result + '    ' + LMethod+#13#10;
+    end;
+    Result := Result +
+              '  public'#13#10+
+              '    constructor Create(const ALibraryDir: String); virtual;'#13#10+
+              '    destructor Destroy; override;'#13#10+
+              '  end;'#13#10+
+              #13#10;
+    Result := Result +
+              'var'#13#10+
+              '  '+ALcopyStr(ALibraryClassName, 2, Maxint) + ': ' + ALibraryClassName + ';'#13#10+
+              #13#10+
+              'procedure ALCreate'+ALcopyStr(ALibraryClassName, 2, Maxint)+'(const ALibraryDir: String);'#13#10+
+              'procedure ALFree'+ALcopyStr(ALibraryClassName, 2, Maxint)+';';
+  finally
+    AlFreeAndNil(LDlls);
+  end;
+end;
+
+{************************************************************************************************************************************************************}
+Function MakeLibraryImplementation(const ALibraryClassName: AnsiString; const ALibraryDLLEntryPoints: TALStringListA; const ADstfileName: String): AnsiString;
+begin
+  if ALibraryDLLEntryPoints = nil then exit('');
+  Var LDlls := TALStringListA.Create;
+  try
+    LDlls.Sorted := True;
+    LDlls.Duplicates := TDuplicates.dupignore;
+    for var I := 0 to ALibraryDLLEntryPoints.Count - 1 do
+      LDlls.Add(ALibraryDLLEntryPoints.Names[i]);
+    Result := 'uses'#13#10 +
+              '  System.SysUtils,'#13#10 +
+              '  System.IOUtils,'#13#10 +
+              '  Alcinoe.Common;'#13#10 +
+              #13#10 +
+              '{' + AnsiString(StringOfChar('*', length('constructor '+ALibraryClassName+'.Create(const ALibraryDir: String);') - 2)) +'}' + #13#10 +
+              'constructor '+ALibraryClassName+'.Create(const ALibraryDir: String);'#13#10+
+              #13#10+
+              '  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}'#13#10+
+              '  function GetProcAddress(const AModule: HMODULE; const AProcName: PAnsiChar): Pointer;'#13#10+
+              '  begin'#13#10+
+              '    Result := Winapi.Windows.GetProcAddress(AModule, AProcName);'#13#10+
+              '    if Result = nil then'#13#10+
+              '      raise Exception.CreateFmt(''Function "%s" was not found in the given DLL'', [AProcName]);'#13#10+
+              '  end;'#13#10+
+              #13#10+
+              'begin'#13#10+
+              #13#10+
+              '  inherited Create;'#13#10+
+              #13#10;
+    for var I := 0 to LDlls.Count - 1 do begin
+      var LLibName := LDlls[I]; // Mongoc2.dll
+      LLibName := 'F' + ALStringReplaceA(LLibName, '.dll', 'Lib'); // FMongoc2Lib
+      Result := Result +
+                '  '+LLibName+' := LoadLibrary(PChar(TPath.Combine(ALibraryDir, '''+LDlls[I]+''')));'#13#10+
+                '  if '+LLibName+' = 0 then raiseLastOsError;'#13#10+
+                #13#10;
+    end;
+    Result := Result +
+              #13#10;
+    for var I := 0 to ALibraryDLLEntryPoints.Count - 1 do begin
+      var LLibName := ALibraryDLLEntryPoints.Names[I]; // Mongoc2.dll
+      LLibName := 'F' + ALStringReplaceA(LLibName, '.dll', 'Lib'); // FMongoc2Lib
+      var LMethodName := ALibraryDLLEntryPoints.ValueFromIndex[I];
+      LMethodName := ALStringReplaceA(LMethodName, '; cdecl;', ';');
+      LMethodName := ALStringReplaceA(LMethodName, 'function ', '');
+      LMethodName := ALStringReplaceA(LMethodName, 'procedure ', '');
+      var P1 := AlposA('(', LMethodName);
+      If P1 <= 0 then raise Exception.Create('Error F71BE3A1-728F-4131-8A1C-280162809909');
+      LMethodName := AlTrim(AlCopyStr(LMethodName, 1, P1-1));
+      Result := Result +
+                '  ' + LMethodName+' := GetProcAddress('+LLibName+','''+LMethodName+''');'#13#10;
+    end;
+    Result := Result +
+              #13#10 +
+              '  __LibraryConstructor__'#13#10+
+              #13#10+
+              'end;'#13#10+
+              #13#10+
+              '{' + AnsiString(StringOfChar('*', length('destructor '+ALibraryClassName+'.Destroy;') - 2)) +'}' + #13#10 +
+              'destructor '+ALibraryClassName+'.Destroy;'#13#10+
+              'begin'#13#10+
+              #13#10+
+              '  __LibraryDestructor__'#13#10+
+              #13#10;
+    for var I := 0 to LDlls.Count - 1 do begin
+      var LLibName := LDlls[I]; // Mongoc2.dll
+      LLibName := 'F' + ALStringReplaceA(LLibName, '.dll', 'Lib'); // FMongoc2Lib
+      Result := Result +
+      '  if ('+LLibName+' <> 0) and'#13#10+
+      '     (not FreeLibrary('+LLibName+')) then'#13#10+
+      '    raiseLastOsError;'#13#10+
+      #13#10;
+    end;
+    Result := Result +
+              #13#10+
+              '  inherited Destroy;'#13#10+
+              #13#10+
+              'end;'#13#10+
+              #13#10;
+    for var I := 0 to ALibraryDLLEntryPoints.Count - 1 do begin
+      var LMethodHeader := ALibraryDLLEntryPoints.ValueFromIndex[I];
+      LMethodHeader := ALStringReplaceA(LMethodHeader, '; cdecl;', ';');
+      var LMethodImplementation := LMethodHeader;
+      if ALPosA('function ', LMethodImplementation) = 1 then
+        LMethodImplementation := ALStringReplaceA(LMethodImplementation, 'function ', 'Result !=! ' + ALcopyStr(ALibraryClassName, 2, Maxint)+'.')
+      else if ALPosA('procedure ', LMethodImplementation) = 1 then
+        LMethodImplementation := ALStringReplaceA(LMethodImplementation, 'procedure ', ALcopyStr(ALibraryClassName, 2, Maxint)+'.')
+      else Raise Exception.Create('Error 9D1739EC-F105-4015-8B5C-D53302A20AEC');
+      var P1 := AlposA(':', LMethodImplementation);
+      While P1 > 0 do begin
+        var P2 := AlPosA(';', LMethodImplementation, P1);
+        IF P2 <= 0 then raise Exception.Create('Error AB7BDA4E-A690-4A43-BA48-AAD7161FFAC9');
+        var P3 := AlPosA(')', LMethodImplementation, P1);
+        If (P3 > 0) and (P3 < P2) then P2 := P3;
+        delete(LMethodImplementation, P1, P2-P1);
+        P1 := AlposA(':', LMethodImplementation);
+      end;
+      LMethodImplementation := ALStringReplaceA(LMethodImplementation, ';', ',');
+      LMethodImplementation := ALStringReplaceA(LMethodImplementation, '),', ');');
+      LMethodImplementation := ALStringReplaceA(LMethodImplementation, 'Result !=! ', 'Result := ');
+      Result := Result +
+                '{' + AnsiString(StringOfChar('*', length(LMethodHeader) - 2)) +'}' + #13#10 +
+                LMethodHeader + #13#10+
+                'begin'#13#10 +
+                '  ' + LMethodImplementation +#13#10+
+                'end;'#13#10#13#10;
+    end;
+    Result := result +
+              '{' + AnsiString(StringOfChar('*', length('procedure ALCreate'+ALcopyStr(ALibraryClassName, 2, Maxint)+'(const ALibraryDir: String);') - 2)) +'}' + #13#10 +
+              'procedure ALCreate'+ALcopyStr(ALibraryClassName, 2, Maxint)+'(const ALibraryDir: String);'#13#10 +
+              'begin'#13#10 +
+              '  if assigned('+ALcopyStr(ALibraryClassName, 2, Maxint)+') then exit;'#13#10 +
+              '  '+ALcopyStr(ALibraryClassName, 2, Maxint)+' := '+ALibraryClassName+'.Create(ALibraryDir);'#13#10 +
+              'end;'#13#10 +
+              ''#13#10 +
+              '{' + AnsiString(StringOfChar('*', length('procedure ALFree'+ALcopyStr(ALibraryClassName, 2, Maxint)+';') - 2)) +'}' + #13#10 +
+              'procedure ALFree'+ALcopyStr(ALibraryClassName, 2, Maxint)+';'#13#10 +
+              'begin'#13#10 +
+              '  ALFreeAndNil('+ALcopyStr(ALibraryClassName, 2, Maxint)+');'#13#10 +
+              'end;'#13#10 +
+              ''#13#10 +
+              'initialization'#13#10 +
+              '  {$IF defined(DEBUG)}'#13#10 +
+              '  ALLog('''+AnsiString(ALExtractFileName(ADstfileName, true{RemoveFileExt}))+''',''initialization'');'#13#10 +
+              '  {$ENDIF}'#13#10 +
+              '  '+ALcopyStr(ALibraryClassName, 2, Maxint)+' := nil;'#13#10;
+
+  finally
+    AlFreeAndNil(LDlls);
+  end;
 end;
 
 begin
@@ -1420,945 +1663,994 @@ begin
         var LSrc: AnsiString;
         var LDstfileName: String;
         var LCallingConvention: AnsiString;
+        var LDelayed: Boolean;
+        var LLibraryClassName: AnsiString;
+        var LLibraryDLLEntryPoints: TALStringListA;
         var LExtraUses: AnsiString;
         var LExtraTypes: AnsiString;
 
-        {$REGION 'sspi.h'}
-        if LChoice = 1 then begin
-          Writeln('Converting sspi.h -> Alcinoe.WinApi.SSPI.pas');
-          LSrc := ALGetStringFromFile(ALGetModulePathW + 'sspi.h');
-          LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.SSPI.pas';
-          LCallingConvention := 'stdcall';
-          LExtraUses := '''
-              Winapi.WinCred,
-              Alcinoe.WinApi.Windows;
-            ''';
-          LExtraTypes := '';
-        end;
-        {$ENDREGION}
+        try
 
-        {$REGION 'schannel.h'}
-        if LChoice = 2 then begin
-          Writeln('Converting schannel.h -> Alcinoe.WinApi.SChannel.pas');
-          LSrc := ALGetStringFromFile(ALGetModulePathW + 'schannel.h');
-          LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.SChannel.pas';
-          LCallingConvention := 'stdcall';
-          LExtraUses := '''
-              Alcinoe.WinApi.SSPI,
-              Alcinoe.WinApi.Windows;
-            ''';
-          LExtraTypes := '''
-            type
-              ALG_ID = UINT;
-              PALG_ID = ^ALG_ID;
-              PPCCERT_CONTEXT = ^PCCERT_CONTEXT;
-              HCRYPTPROV = ULONG_PTR;
-            ''';
-        end;
-        {$ENDREGION}
+          {$REGION 'sspi.h'}
+          if LChoice = 1 then begin
+            Writeln('Converting sspi.h -> Alcinoe.WinApi.SSPI.pas');
+            LSrc := ALGetStringFromFile(ALGetModulePathW + 'sspi.h');
+            LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.SSPI.pas';
+            LCallingConvention := 'stdcall';
+            LDelayed := False;
+            LLibraryClassName := '';
+            LLibraryDLLEntryPoints := nil;
+            LExtraUses := '''
+                Winapi.WinCred,
+                Alcinoe.WinApi.Windows;
+              ''';
+            LExtraTypes := '';
+          end;
+          {$ENDREGION}
 
-        {$REGION 'http.h'}
-        if LChoice = 3 then begin
-          Writeln('Converting http.h -> Alcinoe.WinApi.Http.pas');
-          LSrc := ALGetStringFromFile(ALGetModulePathW + 'http.h');
-          LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.Http.pas';
-          LCallingConvention := 'stdcall';
-          LExtraUses := '''
-              Winapi.Winsock2,
-              Alcinoe.WinApi.Windows;
-            ''';
-          LExtraTypes := '';
-        end;
-        {$ENDREGION}
+          {$REGION 'schannel.h'}
+          if LChoice = 2 then begin
+            Writeln('Converting schannel.h -> Alcinoe.WinApi.SChannel.pas');
+            LSrc := ALGetStringFromFile(ALGetModulePathW + 'schannel.h');
+            LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.SChannel.pas';
+            LCallingConvention := 'stdcall';
+            LDelayed := False;
+            LLibraryClassName := '';
+            LLibraryDLLEntryPoints := nil;
+            LExtraUses := '''
+                Alcinoe.WinApi.SSPI,
+                Alcinoe.WinApi.Windows;
+              ''';
+            LExtraTypes := '''
+              type
+                ALG_ID = UINT;
+                PALG_ID = ^ALG_ID;
+                PPCCERT_CONTEXT = ^PCCERT_CONTEXT;
+                HCRYPTPROV = ULONG_PTR;
+              ''';
+          end;
+          {$ENDREGION}
 
-        {$REGION 'winerror.h'}
-        if LChoice = 4 then begin
-          Writeln('Converting winerror.h -> Alcinoe.WinApi.WinError.pas');
-          LSrc := ALGetStringFromFile(ALGetModulePathW + 'winerror.h');
-          LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.WinError.pas';
-          LCallingConvention := 'stdcall';
-          LExtraUses := '';
-          LExtraTypes := '';
-        end;
-        {$ENDREGION}
+          {$REGION 'http.h'}
+          if LChoice = 3 then begin
+            Writeln('Converting http.h -> Alcinoe.WinApi.Http.pas');
+            LSrc := ALGetStringFromFile(ALGetModulePathW + 'http.h');
+            LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.Http.pas';
+            LCallingConvention := 'stdcall';
+            LDelayed := False;
+            LLibraryClassName := '';
+            LLibraryDLLEntryPoints := nil;
+            LExtraUses := '''
+                Winapi.Winsock2,
+                Alcinoe.WinApi.Windows;
+              ''';
+            LExtraTypes := '';
+          end;
+          {$ENDREGION}
 
-        {$REGION 'mongodb*.h'}
-        if LChoice = 5 then begin
-          Writeln('Converting mongodb*.h -> Alcinoe.MongoDB.Wrapper.pas');
-          var LFiles := TDirectory.GetFiles(ALGetModulePathW + '..\..\Libraries\dll\MongoDB\Win64\include\', '*.h', TSearchOption.soAllDirectories);
-          var LSortedList := TALStringListW.create;
-          Try
-            LSortedList.add('config.h');
-            LSortedList.add('version.h');
-            LSortedList.add('macros.h');
-            LSortedList.add('bson_t.h');
-            LSortedList.add('compat.h');
-            LSortedList.add('error.h');
-            LSortedList.add('memory.h');
-            LSortedList.add('bson-prelude.h');
-            LSortedList.add('bson-endian.h');
-            LSortedList.add('bson-writer.h');
-            LSortedList.add('bson-types.h');
-            LSortedList.add('bson-context.h');
-            LSortedList.add('bson-clock.h');
-            LSortedList.add('bson-decimal128.h');
-            LSortedList.add('bson-json.h');
-            LSortedList.add('bson-keys.h');
-            LSortedList.add('bson-string.h');
-            LSortedList.add('bson-utf8.h');
-            LSortedList.add('bson-value.h');
-            LSortedList.add('bson-version-functions.h');
-            LSortedList.add('bson-bcon.h');
-            LSortedList.add('bson-reader.h');
-            LSortedList.add('bson-oid.h');
-            LSortedList.add('bson-iter.h');
-            LSortedList.add('bson-vector.h');
-            LSortedList.add('bson.h');
-            LSortedList.add('mongoc-prelude.h');
-            LSortedList.add('mongoc-macros.h');
-            LSortedList.add('mongoc-config.h');
-            LSortedList.add('mongoc-host-list.h');
-            LSortedList.add('mongoc-flags.h');
-            LSortedList.add('mongoc-iovec.h');
-            LSortedList.add('mongoc-opcode.h');
-            LSortedList.add('mongoc-version.h');
-            LSortedList.add('mongoc-write-concern.h');
-            LSortedList.add('mongoc-read-concern.h');
-            LSortedList.add('mongoc-optional.h');
-            LSortedList.add('mongoc-error.h');
-            LSortedList.add('mongoc-find-and-modify.h');
-            LSortedList.add('mongoc-handshake.h');
-            LSortedList.add('mongoc-init.h');
-            LSortedList.add('mongoc-log.h');
-            LSortedList.add('mongoc-oidc-callback.h');
-            LSortedList.add('mongoc-rand.h');
-            LSortedList.add('mongoc-read-prefs.h');
-            LSortedList.add('mongoc-server-api.h');
-            LSortedList.add('mongoc-server-description.h');
-            LSortedList.add('mongoc-ssl.h');
-            LSortedList.add('mongoc-socket.h');
-            LSortedList.add('mongoc-stream.h');
-            LSortedList.add('mongoc-stream-buffered.h');
-            LSortedList.add('mongoc-stream-file.h');
-            LSortedList.add('mongoc-stream-socket.h');
-            LSortedList.add('mongoc-structured-log.h');
-            LSortedList.add('mongoc-version-functions.h');
-            LSortedList.add('mongoc-cursor.h');
-            LSortedList.add('mongoc-change-stream.h');
-            LSortedList.add('mongoc-bulk-operation.h');
-            LSortedList.add('mongoc-client-side-encryption.h');
-            LSortedList.add('mongoc-stream-tls.h');
-            LSortedList.add('mongoc-stream-tls-openssl.h');
-            LSortedList.add('mongoc-topology-description.h');
-            LSortedList.add('mongoc-apm.h');
-            LSortedList.add('mongoc-uri.h');
-            LSortedList.add('mongoc-collection.h');
-            LSortedList.add('mongoc-database.h');
-            LSortedList.add('mongoc-gridfs-file.h');
-            LSortedList.add('mongoc-gridfs-file-list.h');
-            LSortedList.add('mongoc-gridfs-file-page.h');
-            LSortedList.add('mongoc-gridfs-bucket.h');
-            LSortedList.add('mongoc-gridfs.h');
-            LSortedList.add('mongoc-stream-gridfs.h');
-            LSortedList.add('mongoc-client.h');
-            LSortedList.add('mongoc-client-pool.h');
-            LSortedList.add('mongoc-client-session.h');
-            LSortedList.add('mongoc-bulkwrite.h');
-            LSortedList.add('mongoc-sleep.h');
-            LSortedList.add('mongoc.h');
+          {$REGION 'winerror.h'}
+          if LChoice = 4 then begin
+            Writeln('Converting winerror.h -> Alcinoe.WinApi.WinError.pas');
+            LSrc := ALGetStringFromFile(ALGetModulePathW + 'winerror.h');
+            LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.WinError.pas';
+            LCallingConvention := 'stdcall';
+            LDelayed := False;
+            LLibraryClassName := '';
+            LLibraryDLLEntryPoints := nil;
+            LExtraUses := '';
+            LExtraTypes := '';
+          end;
+          {$ENDREGION}
 
-            TArray.Sort<string>(LFiles,
-              TComparer<string>.Construct(
-                function(const L, R: string): Integer
-                  function GetRank(const S: String): Integer;
-                  begin
-                    Result := LSortedList.IndexOf(S);
-                    if Result < 0 then begin
-                      if AlposW('bson', S) = 1 then Result := 1000
-                      else Result := 10000;
+          {$REGION 'mongodb*.h'}
+          if LChoice = 5 then begin
+            Writeln('Converting mongodb*.h -> Alcinoe.MongoDB.Wrapper.pas');
+            var LFiles := TDirectory.GetFiles(ALGetModulePathW + '..\..\Libraries\dll\MongoDB\Win64\include\', '*.h', TSearchOption.soAllDirectories);
+            var LSortedList := TALStringListW.create;
+            Try
+              LSortedList.add('config.h');
+              LSortedList.add('version.h');
+              LSortedList.add('macros.h');
+              LSortedList.add('bson_t.h');
+              LSortedList.add('compat.h');
+              LSortedList.add('error.h');
+              LSortedList.add('memory.h');
+              LSortedList.add('bson-prelude.h');
+              LSortedList.add('bson-endian.h');
+              LSortedList.add('bson-writer.h');
+              LSortedList.add('bson-types.h');
+              LSortedList.add('bson-context.h');
+              LSortedList.add('bson-clock.h');
+              LSortedList.add('bson-decimal128.h');
+              LSortedList.add('bson-json.h');
+              LSortedList.add('bson-keys.h');
+              LSortedList.add('bson-string.h');
+              LSortedList.add('bson-utf8.h');
+              LSortedList.add('bson-value.h');
+              LSortedList.add('bson-version-functions.h');
+              LSortedList.add('bson-bcon.h');
+              LSortedList.add('bson-reader.h');
+              LSortedList.add('bson-oid.h');
+              LSortedList.add('bson-iter.h');
+              LSortedList.add('bson-vector.h');
+              LSortedList.add('bson.h');
+              LSortedList.add('mongoc-prelude.h');
+              LSortedList.add('mongoc-macros.h');
+              LSortedList.add('mongoc-config.h');
+              LSortedList.add('mongoc-host-list.h');
+              LSortedList.add('mongoc-flags.h');
+              LSortedList.add('mongoc-iovec.h');
+              LSortedList.add('mongoc-opcode.h');
+              LSortedList.add('mongoc-version.h');
+              LSortedList.add('mongoc-write-concern.h');
+              LSortedList.add('mongoc-read-concern.h');
+              LSortedList.add('mongoc-optional.h');
+              LSortedList.add('mongoc-error.h');
+              LSortedList.add('mongoc-find-and-modify.h');
+              LSortedList.add('mongoc-handshake.h');
+              LSortedList.add('mongoc-init.h');
+              LSortedList.add('mongoc-log.h');
+              LSortedList.add('mongoc-oidc-callback.h');
+              LSortedList.add('mongoc-rand.h');
+              LSortedList.add('mongoc-read-prefs.h');
+              LSortedList.add('mongoc-server-api.h');
+              LSortedList.add('mongoc-server-description.h');
+              LSortedList.add('mongoc-ssl.h');
+              LSortedList.add('mongoc-socket.h');
+              LSortedList.add('mongoc-stream.h');
+              LSortedList.add('mongoc-stream-buffered.h');
+              LSortedList.add('mongoc-stream-file.h');
+              LSortedList.add('mongoc-stream-socket.h');
+              LSortedList.add('mongoc-structured-log.h');
+              LSortedList.add('mongoc-version-functions.h');
+              LSortedList.add('mongoc-cursor.h');
+              LSortedList.add('mongoc-change-stream.h');
+              LSortedList.add('mongoc-bulk-operation.h');
+              LSortedList.add('mongoc-client-side-encryption.h');
+              LSortedList.add('mongoc-stream-tls.h');
+              LSortedList.add('mongoc-stream-tls-openssl.h');
+              LSortedList.add('mongoc-topology-description.h');
+              LSortedList.add('mongoc-apm.h');
+              LSortedList.add('mongoc-uri.h');
+              LSortedList.add('mongoc-collection.h');
+              LSortedList.add('mongoc-database.h');
+              LSortedList.add('mongoc-gridfs-file.h');
+              LSortedList.add('mongoc-gridfs-file-list.h');
+              LSortedList.add('mongoc-gridfs-file-page.h');
+              LSortedList.add('mongoc-gridfs-bucket.h');
+              LSortedList.add('mongoc-gridfs.h');
+              LSortedList.add('mongoc-stream-gridfs.h');
+              LSortedList.add('mongoc-client.h');
+              LSortedList.add('mongoc-client-pool.h');
+              LSortedList.add('mongoc-client-session.h');
+              LSortedList.add('mongoc-bulkwrite.h');
+              LSortedList.add('mongoc-sleep.h');
+              LSortedList.add('mongoc.h');
+
+              TArray.Sort<string>(LFiles,
+                TComparer<string>.Construct(
+                  function(const L, R: string): Integer
+                    function GetRank(const S: String): Integer;
+                    begin
+                      Result := LSortedList.IndexOf(S);
+                      if Result < 0 then begin
+                        if AlposW('bson', S) = 1 then Result := 1000
+                        else Result := 10000;
+                      end;
                     end;
-                  end;
-                begin
-                  Result := GetRank(ALExtractFilename(L)) - GetRank(ALExtractFilename(R));
-                  If Result = 0 then Result := CompareText(L, R);
-                end));
+                  begin
+                    Result := GetRank(ALExtractFilename(L)) - GetRank(ALExtractFilename(R));
+                    If Result = 0 then Result := CompareText(L, R);
+                  end));
 
-          Finally
-            ALFreeAndNil(LSortedList);
-          End;
+            Finally
+              ALFreeAndNil(LSortedList);
+            End;
 
-          LSrc := '';
-          For var I := low(LFiles) to high(Lfiles) do begin
-            var LFilename := ansiString(ALExtractFilename(LFiles[i], true));
-            var LFileSrc := ALTrim(ALGetStringFromFile(LFiles[i]));
-            LFileSrc := ALStringReplaceA(LFileSrc, '#if !'+ALStringReplaceA(LFilename,'-','_')+'_H', '#if !__FILENAME__');
-            LFileSrc := ALStringReplaceA(LFileSrc, '#ifndef '+ALStringReplaceA(LFilename,'-','_')+'_H', '#ifndef __FILENAME__');
-            LFileSrc := ALStringReplaceA(LFileSrc, '#define '+ALStringReplaceA(LFilename,'-','_')+'_H'#13#10, '#define __FILENAME__'#13#10);
-            LFileSrc := ALStringReplaceA(LFileSrc, '#define '+ALStringReplaceA(LFilename,'-','_')+'_H'#10, '#define __FILENAME__'#10);
-            var P1 := AlPosA('/*', LFileSrc);
-            if P1 = 1 then begin
-              var P2 := AlPosA('*/', LFileSrc);
-              If P2 <= 0 then raise Exception.Create('Error 72935AAE-4B6C-4C3E-B7A9-BE6A522B41DC');
-              LFileSrc := ALTrim(AlCopyStr(LFileSrc, P2 + 2, maxint));
+            LSrc := '';
+            For var I := low(LFiles) to high(Lfiles) do begin
+              var LFilename := ansiString(ALExtractFilename(LFiles[i], true));
+              var LFileSrc := ALTrim(ALGetStringFromFile(LFiles[i]));
+              LFileSrc := ALStringReplaceA(LFileSrc, '#if !'+ALStringReplaceA(LFilename,'-','_')+'_H', '#if !__FILENAME__');
+              LFileSrc := ALStringReplaceA(LFileSrc, '#ifndef '+ALStringReplaceA(LFilename,'-','_')+'_H', '#ifndef __FILENAME__');
+              LFileSrc := ALStringReplaceA(LFileSrc, '#define '+ALStringReplaceA(LFilename,'-','_')+'_H'#13#10, '#define __FILENAME__'#13#10);
+              LFileSrc := ALStringReplaceA(LFileSrc, '#define '+ALStringReplaceA(LFilename,'-','_')+'_H'#10, '#define __FILENAME__'#10);
+              var P1 := AlPosA('/*', LFileSrc);
+              if P1 = 1 then begin
+                var P2 := AlPosA('*/', LFileSrc);
+                If P2 <= 0 then raise Exception.Create('Error 72935AAE-4B6C-4C3E-B7A9-BE6A522B41DC');
+                LFileSrc := ALTrim(AlCopyStr(LFileSrc, P2 + 2, maxint));
+              end;
+              P1 := AlPosA('/*    Copyright 2009', LFileSrc);
+              if P1 > 0 then begin
+                var P2 := AlPosA('*/', LFileSrc, P1);
+                If P2 <= 0 then raise Exception.Create('Error B84F9508-8815-4C09-ADD2-387C90D22FC9');
+                delete(LFileSrc, P1, P2 + 2 - P1);
+              end;
+              LSrc := LSrc + #13#10 + #13#10 +
+                      '///'+StringOfchar(AnsiChar('/'), length(LFilename))+'///' + #13#10 +
+                      '// ' + LFilename + ' //' + #13#10 +
+                      '///'+StringOfchar(AnsiChar('/'), length(LFilename))+'///' + #13#10 +
+                      #13#10 +
+                      LFileSrc;
             end;
-            P1 := AlPosA('/*    Copyright 2009', LFileSrc);
-            if P1 > 0 then begin
-              var P2 := AlPosA('*/', LFileSrc, P1);
-              If P2 <= 0 then raise Exception.Create('Error B84F9508-8815-4C09-ADD2-387C90D22FC9');
-              delete(LFileSrc, P1, P2 + 2 - P1);
-            end;
-            LSrc := LSrc + #13#10 + #13#10 +
-                    '///'+StringOfchar(AnsiChar('/'), length(LFilename))+'///' + #13#10 +
-                    '// ' + LFilename + ' //' + #13#10 +
-                    '///'+StringOfchar(AnsiChar('/'), length(LFilename))+'///' + #13#10 +
-                    #13#10 +
-                    LFileSrc;
+            LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.MongoDB.Wrapper.pas';
+            LCallingConvention := 'cdecl';
+            LDelayed := False;
+            LLibraryClassName := 'TALMongoDBLibrary';
+            LLibraryDLLEntryPoints := TALStringListA.Create;
+            LExtraUses := '''
+                Winapi.Winsock2,
+                Alcinoe.WinApi.Windows;
+              ''';
+            // https://learn.microsoft.com/en-us/cpp/c-runtime-library/standard-types?view=msvc-170
+            LExtraTypes := '''
+              type
+                uint8_t = UInt8;
+                Puint8_t = ^uint8_t;
+                PPuint8_t = ^Puint8_t;
+                uint16_t = UInt16;
+                Puint16_t = ^uint16_t;
+                uint32_t = UInt32;
+                Puint32_t = ^uint32_t;
+                uint64_t = UInt64;
+                Puint64_t = ^uint64_t;
+                int8_t = Int8;
+                Pint8_t = ^int8_t;
+                int16_t = Int16;
+                Pint16_t = ^int16_t;
+                int32_t = Int32;
+                Pint32_t = ^int32_t;
+                int64_t = Int64;
+                Pint64_t = ^int64_t;
+                size_t = NativeUInt;
+                Psize_t = ^size_t;
+                socklen_t = Int32;
+                Psocklen_t = ^socklen_t;
+                Pva_list = ^va_list;
+                off_t = LongInt;
+                time_t = Int64;
+                TCharArray6 = array[0..6-1] of AnsiChar;
+                TCharArray25 = array[0..25-1] of AnsiChar;
+                P_bson_array_builder_t = pointer; // forward decl
+                P_mongoc_client_t = pointer; // forward decl
+                P_mongoc_client_session_t = pointer; // forward decl
+                P_mongoc_client_pool_t = pointer; // forward decl
+                P_mongoc_cursor_t = pointer; // forward decl
+                P_mongoc_database_t = pointer; // forward decl
+                P_mongoc_collection_t = pointer; // forward decl
+              ''';
           end;
-          LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.MongoDB.Wrapper.pas';
-          LCallingConvention := 'cdecl';
-          LExtraUses := '''
-              Winapi.Winsock2;
-            ''';
-          // https://learn.microsoft.com/en-us/cpp/c-runtime-library/standard-types?view=msvc-170
-          LExtraTypes := '''
-            type
-              uint8_t = UInt8;
-              Puint8_t = ^uint8_t;
-              PPuint8_t = ^Puint8_t;
-              uint16_t = UInt16;
-              Puint16_t = ^uint16_t;
-              uint32_t = UInt32;
-              Puint32_t = ^uint32_t;
-              uint64_t = UInt64;
-              Puint64_t = ^uint64_t;
-              int8_t = Int8;
-              Pint8_t = ^int8_t;
-              int16_t = Int16;
-              Pint16_t = ^int16_t;
-              int32_t = Int32;
-              Pint32_t = ^int32_t;
-              int64_t = Int64;
-              Pint64_t = ^int64_t;
-              size_t = NativeUInt;
-              Psize_t = ^size_t;
-              socklen_t = Int32;
-              Psocklen_t = ^socklen_t;
-              Pva_list = ^va_list;
-              off_t = LongInt;
-              time_t = Int64;
-              TCharArray6 = array[0..6-1] of AnsiChar;
-              TCharArray25 = array[0..25-1] of AnsiChar;
-              P_bson_array_builder_t = pointer; // forward decl
-              P_mongoc_client_t = pointer; // forward decl
-              P_mongoc_client_session_t = pointer; // forward decl
-              P_mongoc_client_pool_t = pointer; // forward decl
-              P_mongoc_cursor_t = pointer; // forward decl
-              P_mongoc_database_t = pointer; // forward decl
-              P_mongoc_collection_t = pointer; // forward decl
-            ''';
-        end;
-        {$ENDREGION}
+          {$ENDREGION}
 
-        {$REGION 'wincrypt.h'}
-        //LSrc := ALGetStringFromFile(ALGetModulePathW + 'wincrypt.h');
-        //LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.WinCrypt.pas';
-        //LCallingConvention := 'stdcall';
-        //LExtraUses := '';
-        //LExtraTypes := '';
-        {$ENDREGION}
+          {$REGION 'wincrypt.h'}
+          //LSrc := ALGetStringFromFile(ALGetModulePathW + 'wincrypt.h');
+          //LDstfileName := ALGetModulePathW + '..\..\Source\Alcinoe.WinApi.WinCrypt.pas';
+          //LCallingConvention := 'stdcall';
+          //LDelayed := False;
+          //LLibraryClassName := '';
+          //LLibraryDLLEntryPoints := nil;
+          //LExtraUses := '';
+          //LExtraTypes := '';
+          {$ENDREGION}
 
-        LSrc := ALTrim(LSrc);
-        LSrc := AlUTF8removeBOM(LSrc);
+          LSrc := ALTrim(LSrc);
+          LSrc := AlUTF8removeBOM(LSrc);
 
-        var LLst := TALStringListA.Create;
-        try
-          LLst.Text := LSrc;
-          var LbracketCount := 0;
-          For var i := 2 to LLst.Count - 1 do begin
-            if (LLst[I] = '{') and ((AlposA(' static ', ' ' + LLst[I-1]) > 0) or (AlposA(' static ', ' ' + LLst[I-2]) > 0) or
-                                    (AlposA(' static ', ' ' + LLst[I-3]) > 0) or (AlposA(' static ', ' ' + LLst[I-4]) > 0) or
-                                    (AlposA(' static ', ' ' + LLst[I-5]) > 0) or (AlposA(' static ', ' ' + LLst[I-5]) > 0)) then begin
-              inc(LbracketCount);
-              LLst[I] := '';
+          var LLst := TALStringListA.Create;
+          try
+            LLst.Text := LSrc;
+            var LbracketCount := 0;
+            For var i := 2 to LLst.Count - 1 do begin
+              if (LLst[I] = '{') and ((AlposA(' static ', ' ' + LLst[I-1]) > 0) or (AlposA(' static ', ' ' + LLst[I-2]) > 0) or
+                                      (AlposA(' static ', ' ' + LLst[I-3]) > 0) or (AlposA(' static ', ' ' + LLst[I-4]) > 0) or
+                                      (AlposA(' static ', ' ' + LLst[I-5]) > 0) or (AlposA(' static ', ' ' + LLst[I-5]) > 0)) then begin
+                inc(LbracketCount);
+                LLst[I] := '';
+              end;
+              if (AlposA('}', LLst[I]) = 1) and (LbracketCount > 0) then begin
+                Dec(LbracketCount);
+                LLst[I] := '';
+              end;
+              if LbracketCount > 0 then LLst[I] := '';
             end;
-            if (AlposA('}', LLst[I]) = 1) and (LbracketCount > 0) then begin
-              Dec(LbracketCount);
-              LLst[I] := '';
-            end;
-            if LbracketCount > 0 then LLst[I] := '';
+            LSrc := ALTrim(LLst.Text);
+          finally
+            AlFreeAndNil(LLst);
           end;
-          LSrc := ALTrim(LLst.Text);
-        finally
-          AlFreeAndNil(LLst);
-        end;
 
-        var P1 := AlPosA('/*', LSrc);
-        if P1 = 1 then begin
-          var P2 := AlPosA('*/', LSrc);
-          If P2 <= 0 then raise Exception.Create('Error 28C67A89-F0E7-44B0-9D74-C44580B4DA03');
-          LSrc := ALTrim(AlCopyStr(LSrc, P2 + 2, maxint));
-        end
-        else begin
-          P1 := AlPosA('//+', LSrc);
+          var P1 := AlPosA('/*', LSrc);
           if P1 = 1 then begin
-            var P2 := AlPosA('//-', LSrc);
-            If P2 <= 0 then raise Exception.Create('Error 0B153ECD-5D9E-418C-8625-93F97ECB5379');
-            P2 := AlPosA('-'#13#10, LSrc, P2);
-            If P2 <= 0 then raise Exception.Create('Error 7115E9FD-893A-441E-ABB1-3B805CC76119');
-            LSrc := ALTrim(AlCopyStr(LSrc, P2 + 3, maxint));
-          end;
-        end;
-
-        LSrc := ALStringReplaceA(LSrc, #9, ' ');
-        LSrc := ALStringReplaceA(LSrc, #13, '');
-        LSrc := ALStringReplaceA(LSrc, #10, #13#10);
-        if alposA(#1, LSrc) > 0 then raise Exception.Create('Error 84E23D4F-94B3-4540-923C-6CA3F200F578');
-        if alposA(#2, LSrc) > 0 then raise Exception.Create('Error 84E23D4F-94B3-4540-923C-6CA3F200F578');
-        LSrc := ALStringReplaceA(LSrc, '/*', #1);
-        LSrc := ALStringReplaceA(LSrc, '*/', #2);
-        LSrc := ALStringReplaceA(LSrc, '*', ' * ');
-        LSrc := ALStringReplaceA(LSrc, '//', ' // ');
-        while alposA(' '#13#10, LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,' '#13#10, #13#10);
-        while alposA('  ', LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,'  ', ' ');
-        while alposA('# ', LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,'# ', '#');  // #  define  =>  #define
-                                                     // #  ifdef WIN32_CHICAGO  =>  #ifdef WIN32_CHICAGO
-                                                     // #  elif  =>  #elif
-        LSrc := ALStringReplaceA(LSrc, ' [', '[');
-        LSrc := ALStringReplaceA(LSrc, #1, '(*');
-        LSrc := ALStringReplaceA(LSrc, #2, '*)');
-
-        LSrc := ALStringReplaceA(LSrc,'#ifndef ', '#if !');
-        LSrc := ALStringReplaceA(LSrc,'#ifdef ', '#if ');
-        LSrc := ALStringReplaceA(LSrc,'#elif ', '#endif'#13#10'#if ');
-
-        LSrc := ALStringReplaceA(LSrc, 'signed int', 'signed_int');
-        LSrc := ALStringReplaceA(LSrc, 'signed short', 'signed_short');
-        LSrc := ALStringReplaceA(LSrc, 'unsigned char', 'unsigned_char');
-        LSrc := ALStringReplaceA(LSrc, 'unsigned short', 'unsigned_short');
-        LSrc := ALStringReplaceA(LSrc, 'unsigned short int', 'unsigned_short_int');
-        LSrc := ALStringReplaceA(LSrc, 'unsigned int', 'unsigned_int');
-        LSrc := ALStringReplaceA(LSrc, 'unsigned long long','unsigned_long_long');
-        LSrc := ALStringReplaceA(LSrc, 'unsigned long', 'unsigned_long');
-        LSrc := ALStringReplaceA(LSrc, 'long double', 'long_double');
-
-        LSrc := ALStringReplaceA(LSrc,'\'#13#10, ' ');
-        LSrc := ALStringReplaceA(LSrc,' * const ',' * ');
-        LSrc := ALStringReplaceA(LSrc,#13#10'_Check_return_'#13#10, #13#10);
-        LSrc := ALStringReplaceA(LSrc,#13#10'_Must_inspect_result_'#13#10, #13#10);
-        LSrc := ALStringReplaceA(LSrc,#13#10'EXTERN_C'#13#10, #13#10);
-        LSrc := ALStringReplaceA(LSrc,#13#10' union'#13#10' {', #13#10' union {');
-        LSrc := ALStringReplaceA(LSrc,#13#10' struct'#13#10' {', #13#10' struct {');
-        LSrc := ALStringReplaceA(LSrc,#13#10'extern "C" {'#13#10, #13#10);
-        LSrc := ALStringReplaceA(LSrc,#13#10'} // extern "C"'#13#10, #13#10);
-
-        // typedef enum { MONGOC_SERVER_API_V1 } mongoc_server_api_version_t;
-        // =>
-        // typedef enum
-        // {
-        //   MONGOC_SERVER_API_V1
-        // } mongoc_server_api_version_t;
-        LLst := TalStringListA.Create;
-        try
-          LLst.Text := LSrc;
-          For var I := LLst.Count - 1 downto 0 do begin
-            var LLine := LLst[I];
-            if (AlposA('typedef ', LLine) = 1) and (ALposA('{', LLine) > 0) then begin
-              LLine := ALStringReplaceA(LLine, '{', #13#10'{'#13#10);
-              LLine := ALStringReplaceA(LLine, '}', #13#10'}');
-              LLst[I] := ALTrim(LLine);
+            var P2 := AlPosA('*/', LSrc);
+            If P2 <= 0 then raise Exception.Create('Error 28C67A89-F0E7-44B0-9D74-C44580B4DA03');
+            LSrc := ALTrim(AlCopyStr(LSrc, P2 + 2, maxint));
+          end
+          else begin
+            P1 := AlPosA('//+', LSrc);
+            if P1 = 1 then begin
+              var P2 := AlPosA('//-', LSrc);
+              If P2 <= 0 then raise Exception.Create('Error 0B153ECD-5D9E-418C-8625-93F97ECB5379');
+              P2 := AlPosA('-'#13#10, LSrc, P2);
+              If P2 <= 0 then raise Exception.Create('Error 7115E9FD-893A-441E-ABB1-3B805CC76119');
+              LSrc := ALTrim(AlCopyStr(LSrc, P2 + 3, maxint));
             end;
           end;
-          LSrc := ALTrim(LLst.Text);
-        finally
-          ALFreeAndNil(LLst);
-        end;
 
-        LSrc := '//' + ALStringReplaceA(#13#10 + LSrc, #13#10, #13#10'// ');
+          LSrc := ALStringReplaceA(LSrc, #9, ' ');
+          LSrc := ALStringReplaceA(LSrc, #13, '');
+          LSrc := ALStringReplaceA(LSrc, #10, #13#10);
+          if alposA(#1, LSrc) > 0 then raise Exception.Create('Error 84E23D4F-94B3-4540-923C-6CA3F200F578');
+          if alposA(#2, LSrc) > 0 then raise Exception.Create('Error 84E23D4F-94B3-4540-923C-6CA3F200F578');
+          LSrc := ALStringReplaceA(LSrc, '/*', #1);
+          LSrc := ALStringReplaceA(LSrc, '*/', #2);
+          LSrc := ALStringReplaceA(LSrc, '*', ' * ');
+          LSrc := ALStringReplaceA(LSrc, '//', ' // ');
+          while alposA(' '#13#10, LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,' '#13#10, #13#10);
+          while alposA('  ', LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,'  ', ' ');
+          while alposA('# ', LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,'# ', '#');  // #  define  =>  #define
+                                                       // #  ifdef WIN32_CHICAGO  =>  #ifdef WIN32_CHICAGO
+                                                       // #  elif  =>  #elif
+          LSrc := ALStringReplaceA(LSrc, ' [', '[');
+          LSrc := ALStringReplaceA(LSrc, #1, '(*');
+          LSrc := ALStringReplaceA(LSrc, #2, '*)');
 
-        while alposA('  ', LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,'  ', ' ');
+          LSrc := ALStringReplaceA(LSrc,'#ifndef ', '#if !');
+          LSrc := ALStringReplaceA(LSrc,'#ifdef ', '#if ');
+          LSrc := ALStringReplaceA(LSrc,'#elif ', '#endif'#13#10'#if ');
 
-        LSrc := RemoveSalAnnotation(LSrc, '_Field_size_bytes_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Field_size_');
-        LSrc := RemoveSalAnnotation(LSrc, '_In_reads_bytes_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_In_reads_bytes_');
-        LSrc := RemoveSalAnnotation(LSrc, '_In_reads_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_In_reads_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Outptr_opt_result_maybenull_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Outptr_result_bytebuffer_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Outptr_result_maybenull_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Outptr_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_to_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_to_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_to_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Out_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_bytes_to_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_bytes_to_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_bytes_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Inout_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Inout_');
-        LSrc := RemoveSalAnnotation(LSrc, '_In_opt_');
-        LSrc := RemoveSalAnnotation(LSrc, '_In_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Return_type_success_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Field_range_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Success_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Reserved_');
-        LSrc := RemoveSalAnnotation(LSrc, '_Post_');
-        LSrc := RemoveSalAnnotation(LSrc, '_NullNull_terminated_');
-        LSrc := RemoveSalAnnotation(LSrc, '_When_');
-        LSrc := RemoveSalAnnotation(LSrc, '_At_');
-        LSrc := RemoveSalAnnotation(LSrc, '__bcount');
-        LSrc := RemoveSalAnnotation(LSrc, '__in');
-        LSrc := RemoveSalAnnotation(LSrc, '__out');
-        LSrc := RemoveSalAnnotation(LSrc, '__drv_freesMem');
-        LSrc := RemoveSalAnnotation(LSrc, '__callback');
+          LSrc := ALStringReplaceA(LSrc, 'signed int', 'signed_int');
+          LSrc := ALStringReplaceA(LSrc, 'signed short', 'signed_short');
+          LSrc := ALStringReplaceA(LSrc, 'unsigned char', 'unsigned_char');
+          LSrc := ALStringReplaceA(LSrc, 'unsigned short', 'unsigned_short');
+          LSrc := ALStringReplaceA(LSrc, 'unsigned short int', 'unsigned_short_int');
+          LSrc := ALStringReplaceA(LSrc, 'unsigned int', 'unsigned_int');
+          LSrc := ALStringReplaceA(LSrc, 'unsigned long long','unsigned_long_long');
+          LSrc := ALStringReplaceA(LSrc, 'unsigned long', 'unsigned_long');
+          LSrc := ALStringReplaceA(LSrc, 'long double', 'long_double');
 
-        LSrc := RemoveSection(LSrc, '!_MSC_VER');
-        LSrc := RemoveSection(LSrc, '!defined(_MSC_VER)');
-        LSrc := RemoveSection(LSrc, '!__cplusplus');
-        LSrc := RemoveSection(LSrc, '!defined(__cplusplus)');
-        LSrc := RemoveSection(LSrc, '!defined(__cplusplus) && !defined(SORTPP_PASS)');
-        LSrc := RemoveSection(LSrc, '!defined(__cplusplus) && (__cplusplus >= 201103L || defined(_MSVC_LANG))');
-        LSrc := RemoveSection(LSrc, 'defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L');
-        LSrc := RemoveSection(LSrc, 'defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L');
-        LSrc := RemoveSection(LSrc, '!defined (_MSC_VER)');
-        LSrc := RemoveSection(LSrc, '!( _MSC_VER >= 800 )');
-        LSrc := RemoveSection(LSrc, '!!defined(_MSC_VER) || (_MSC_VER >= 1800)');
-        LSrc := RemoveSection(LSrc, '!_MSC_VER > 1000');
-        LSrc := RemoveSection(LSrc, '!(_MSC_VER > 1020)');
-        LSrc := RemoveSection(LSrc, '!_MSC_VER >= 1200');
-        LSrc := RemoveSection(LSrc, '!UNICODE');
-        LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)');
-        LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_PHONE_RESTRICTED | WINAPI_PARTITION_GAMES)');
-        LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)');
-        LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP|WINAPI_PARTITION_PHONE_RESTRICTED | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)');
-        LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM)');
-        LSrc := RemoveSection(LSrc, '!NTDDI_VERSION > NTDDI_WS03SP1');
-        LSrc := RemoveSection(LSrc, '!NTDDI_VERSION > NTDDI_WS03');
-        LSrc := RemoveSection(LSrc, '!NTDDI_VERSION > NTDDI_WINBLUE');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN10_19H1)');
-        LSrc := RemoveSection(LSrc, '!(OSVER(NTDDI_VERSION) > NTDDI_WIN2K)');
-        LSrc := RemoveSection(LSrc, '!OSVER(NTDDI_VERSION) > NTDDI_WIN2K');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN7)');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN8)');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_VISTA)');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WINXP)');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION > NTDDI_WINXPSP2)');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN10_RS1)');
-        LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WS03)');
-        LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= 0x0600');
-        LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN7');
-        LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN8');
-        LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN10');
-        LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= 0x0501');
-        LSrc := RemoveSection(LSrc, '!defined(_WIN32) && !defined(_MAC)');
-        LSrc := RemoveSection(LSrc, '_WIN32_WINNT < 0x0600');
-        LSrc := RemoveSection(LSrc, 'defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x0601)');
-        LSrc := RemoveSection(LSrc, '!_WIN32_WINNT');
+          LSrc := ALStringReplaceA(LSrc,'\'#13#10, ' ');
+          LSrc := ALStringReplaceA(LSrc,' * const ',' * ');
+          LSrc := ALStringReplaceA(LSrc,#13#10'_Check_return_'#13#10, #13#10);
+          LSrc := ALStringReplaceA(LSrc,#13#10'_Must_inspect_result_'#13#10, #13#10);
+          LSrc := ALStringReplaceA(LSrc,#13#10'EXTERN_C'#13#10, #13#10);
+          LSrc := ALStringReplaceA(LSrc,#13#10' union'#13#10' {', #13#10' union {');
+          LSrc := ALStringReplaceA(LSrc,#13#10' struct'#13#10' {', #13#10' struct {');
+          LSrc := ALStringReplaceA(LSrc,#13#10'extern "C" {'#13#10, #13#10);
+          LSrc := ALStringReplaceA(LSrc,#13#10'} // extern "C"'#13#10, #13#10);
 
-        {$REGION 'sspi.h'}
-        if LChoice = 1 then begin
-          LSrc := RemoveSection(LSrc, '__SSPI_H__');
-          LSrc := RemoveSection(LSrc, 'defined(_NO_KSECDD_IMPORT_)');
-          LSrc := RemoveSection(LSrc, 'WIN32_CHICAGO');
-          LSrc := RemoveSection(LSrc, '__SECHANDLE_DEFINED__');
-          LSrc := RemoveSection(LSrc, '__SECSTATUS_DEFINED__');
-          LSrc := RemoveSection(LSrc, '!defined(_NTDEF_) || defined(_WINNT_)');
-          LSrc := RemoveSection(LSrc, '_NTDEF_');
-          LSrc := RemoveSection(LSrc, 'MIDL_PASS');
-          LSrc := RemoveSection(LSrc, '!ISSP_LEVEL');
-          LSrc := RemoveSection(LSrc, 'ISSP_MODE == 0');
-          LSrc := RemoveSection(LSrc, '!ISSP_MODE != 0');
-          LSrc := RemoveSection(LSrc, '!SECURITY_WIN32');
-          LSrc := RemoveSection(LSrc, 'SECURITY_MAC');
-          LSrc := RemoveSection(LSrc, 'SECURITY_KERNEL');
-          LSrc := RemoveSection(LSrc, 'SECURITY_DOS');
-          LSrc := RemoveSection(LSrc, '_AUTH_IDENTITY_DEFINED');
-          LSrc := RemoveSection(LSrc, '_AUTH_IDENTITY_EX2_DEFINED');
-          LSrc := RemoveSection(LSrc, '_AUTH_IDENTITY_INFO_DEFINED');
-          LSrc := RemoveSection(LSrc, 'SEC_WINNT_AUTH_IDENTITY_VERSION');
-          LSrc := RemoveSection(LSrc, '_SSPIPFC_NONE_');
-          LSrc := RemoveSection(LSrc, '!_CREDUI_INFO_DEFINED');
-          LSrc := RemoveSection(LSrc, '!_SEC_WINNT_AUTH_TYPES');
+          // typedef enum { MONGOC_SERVER_API_V1 } mongoc_server_api_version_t;
+          // =>
+          // typedef enum
+          // {
+          //   MONGOC_SERVER_API_V1
+          // } mongoc_server_api_version_t;
+          LLst := TalStringListA.Create;
+          try
+            LLst.Text := LSrc;
+            For var I := LLst.Count - 1 downto 0 do begin
+              var LLine := LLst[I];
+              if (AlposA('typedef ', LLine) = 1) and (ALposA('{', LLine) > 0) then begin
+                LLine := ALStringReplaceA(LLine, '{', #13#10'{'#13#10);
+                LLine := ALStringReplaceA(LLine, '}', #13#10'}');
+                LLst[I] := ALTrim(LLine);
+              end;
+            end;
+            LSrc := ALTrim(LLst.Text);
+          finally
+            ALFreeAndNil(LLst);
+          end;
 
-          LSrc := ALStringReplaceA(LSrc,'SEC_TEXT("InitSecurityInterfaceW")','"InitSecurityInterfaceW"');
-          LSrc := ALStringReplaceA(LSrc,'SEC_TEXT("InitSecurityInterfaceA")','"InitSecurityInterfaceA"');
-          LSrc := ALStringReplaceA(LSrc,'#define KSECDDDECLSPEC __declspec(dllimport)','');
-          LSrc := ALStringReplaceA(LSrc,#13#10'// KSECDDDECLSPEC'#13#10,#13#10);
-          LSrc := ALStringReplaceA(LSrc,'#define SEC_TEXT TEXT','');
-          LSrc := ALStringReplaceA(LSrc,'#define SEC_FAR','');
-          LSrc := ALStringReplaceA(LSrc,'#define SEC_ENTRY __stdcall','');
-          LSrc := ALStringReplaceA(LSrc,' SEC_ENTRY'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,'(SEC_ENTRY * ','(__CALLCONV__ * ');
-          LSrc := ALStringReplaceA(LSrc,'#define __SEC_FAR SEC_FAR','');
-          LSrc := ALStringReplaceA(LSrc,' SEC_FAR * ',' * ');
-        end;
-        {$ENDREGION}
+          LSrc := '//' + ALStringReplaceA(#13#10 + LSrc, #13#10, #13#10'// ');
 
-        {$REGION 'schannel.h'}
-        if LChoice = 2 then begin
-          LSrc := RemoveSection(LSrc, '__SCHANNEL_H__');
-          LSrc := RemoveSection(LSrc, '!SCHANNEL_USE_BLACKLISTS');
-          LSrc := ALStringReplaceA(LSrc,' WINAPI'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,'(WINAPI * ','(__CALLCONV__ * ');
+          while alposA('  ', LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,'  ', ' ');
 
-          LSrc := ALStringReplaceA(
-                    LSrc,
-                    '// struct _HMAPPER;',
-                    '// typedef struct _HMAPPER'#13#10+
-                    '// {'#13#10+
-                    '// } * P_HMAPPER, * * PP_HMAPPER;', []);
-        end;
-        {$ENDREGION}
+          LSrc := RemoveSalAnnotation(LSrc, '_Field_size_bytes_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Field_size_');
+          LSrc := RemoveSalAnnotation(LSrc, '_In_reads_bytes_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_In_reads_bytes_');
+          LSrc := RemoveSalAnnotation(LSrc, '_In_reads_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_In_reads_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Outptr_opt_result_maybenull_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Outptr_result_bytebuffer_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Outptr_result_maybenull_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Outptr_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_to_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_to_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_to_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_writes_bytes_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Out_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_bytes_to_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_bytes_to_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_bytes_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Inout_updates_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Inout_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Inout_');
+          LSrc := RemoveSalAnnotation(LSrc, '_In_opt_');
+          LSrc := RemoveSalAnnotation(LSrc, '_In_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Return_type_success_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Field_range_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Success_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Reserved_');
+          LSrc := RemoveSalAnnotation(LSrc, '_Post_');
+          LSrc := RemoveSalAnnotation(LSrc, '_NullNull_terminated_');
+          LSrc := RemoveSalAnnotation(LSrc, '_When_');
+          LSrc := RemoveSalAnnotation(LSrc, '_At_');
+          LSrc := RemoveSalAnnotation(LSrc, '__bcount');
+          LSrc := RemoveSalAnnotation(LSrc, '__in');
+          LSrc := RemoveSalAnnotation(LSrc, '__out');
+          LSrc := RemoveSalAnnotation(LSrc, '__drv_freesMem');
+          LSrc := RemoveSalAnnotation(LSrc, '__callback');
 
-        {$REGION 'http.h'}
-        if LChoice = 3 then begin
-          LSrc := RemoveSection(LSrc, '__HTTP_H__');
-          LSrc := RemoveSection(LSrc, 'HTTP_VERSION');
-          LSrc := RemoveSection(LSrc, '!defined(HTTPAPI_LINKAGE)');
-          LSrc := RemoveSection(LSrc, '__SECSTATUS_DEFINED__');
-          LSrc := ALStringReplaceA(LSrc,' HTTPAPI_LINKAGE'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,' WINAPI'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,'(WINAPI * ','(__CALLCONV__ * ');
-          LSrc := ALStringReplaceA(LSrc,'ULONG Present:1;','ULONG Present;');
-          LSrc := ALStringReplaceA(LSrc,'[HttpHeaderRequestMaximum]','[Ord(HttpHeaderRequestMaximum)]');
-          LSrc := ALStringReplaceA(LSrc,'[HttpHeaderResponseMaximum]','[Ord(HttpHeaderResponseMaximum)]');
-          LSrc := ALStringReplaceA(LSrc,'[HttpRequestSizingTypeMax]','[Ord(HttpRequestSizingTypeMax)]');
-          LSrc := ALStringReplaceA(LSrc,'[HttpRequestTimingTypeMax]','[Ord(HttpRequestTimingTypeMax)]');
-          LSrc := ALStringReplaceA(LSrc,'HttpFeaturemax = 0xFFFFFFFF,','HttpFeaturemax = Integer($FFFFFFFF),');
-          LSrc := ALStringReplaceA(LSrc,'// #define HTTPAPI_VERSION_2 { 2, 0 }','const HTTPAPI_VERSION_2: HTTPAPI_VERSION = (HttpApiMajorVersion:2; HttpApiMinorVersion:0);');
-          LSrc := ALStringReplaceA(LSrc,'// #define HTTPAPI_VERSION_1 { 1, 0 }','const HTTPAPI_VERSION_1: HTTPAPI_VERSION = (HttpApiMajorVersion:1; HttpApiMinorVersion:0);');
-        end;
-        {$ENDREGION}
+          LSrc := RemoveSection(LSrc, '!_MSC_VER');
+          LSrc := RemoveSection(LSrc, '!defined(_MSC_VER)');
+          LSrc := RemoveSection(LSrc, '!__cplusplus');
+          LSrc := RemoveSection(LSrc, '!defined(__cplusplus)');
+          LSrc := RemoveSection(LSrc, '!defined(__cplusplus) && !defined(SORTPP_PASS)');
+          LSrc := RemoveSection(LSrc, '!defined(__cplusplus) && (__cplusplus >= 201103L || defined(_MSVC_LANG))');
+          LSrc := RemoveSection(LSrc, 'defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L');
+          LSrc := RemoveSection(LSrc, 'defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L');
+          LSrc := RemoveSection(LSrc, '!defined (_MSC_VER)');
+          LSrc := RemoveSection(LSrc, '!( _MSC_VER >= 800 )');
+          LSrc := RemoveSection(LSrc, '!!defined(_MSC_VER) || (_MSC_VER >= 1800)');
+          LSrc := RemoveSection(LSrc, '!_MSC_VER > 1000');
+          LSrc := RemoveSection(LSrc, '!(_MSC_VER > 1020)');
+          LSrc := RemoveSection(LSrc, '!_MSC_VER >= 1200');
+          LSrc := RemoveSection(LSrc, '!UNICODE');
+          LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)');
+          LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_PHONE_RESTRICTED | WINAPI_PARTITION_GAMES)');
+          LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)');
+          LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP|WINAPI_PARTITION_PHONE_RESTRICTED | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)');
+          LSrc := RemoveSection(LSrc, '!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM)');
+          LSrc := RemoveSection(LSrc, '!NTDDI_VERSION > NTDDI_WS03SP1');
+          LSrc := RemoveSection(LSrc, '!NTDDI_VERSION > NTDDI_WS03');
+          LSrc := RemoveSection(LSrc, '!NTDDI_VERSION > NTDDI_WINBLUE');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN10_19H1)');
+          LSrc := RemoveSection(LSrc, '!(OSVER(NTDDI_VERSION) > NTDDI_WIN2K)');
+          LSrc := RemoveSection(LSrc, '!OSVER(NTDDI_VERSION) > NTDDI_WIN2K');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN7)');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN8)');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_VISTA)');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WINXP)');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION > NTDDI_WINXPSP2)');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WIN10_RS1)');
+          LSrc := RemoveSection(LSrc, '!(NTDDI_VERSION >= NTDDI_WS03)');
+          LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= 0x0600');
+          LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN7');
+          LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN8');
+          LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= _WIN32_WINNT_WIN10');
+          LSrc := RemoveSection(LSrc, '!_WIN32_WINNT >= 0x0501');
+          LSrc := RemoveSection(LSrc, '!defined(_WIN32) && !defined(_MAC)');
+          LSrc := RemoveSection(LSrc, '_WIN32_WINNT < 0x0600');
+          LSrc := RemoveSection(LSrc, 'defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x0601)');
+          LSrc := RemoveSection(LSrc, '!_WIN32_WINNT');
 
-        {$REGION 'winerror.h'}
-        if LChoice = 4 then begin
-          LSrc := RemoveSection(LSrc, '_WINERROR_');
-          LSrc := RemoveSection(LSrc, '!defined (_MSC_VER) && (_MSC_VER >= 1020) && !defined(__midl)');
-          LSrc := RemoveSection(LSrc, '!FORCEINLINE');
-          LSrc := RemoveSection(LSrc, 'WSABASEERR');
-          LSrc := RemoveSection(LSrc, '!defined(_HRESULT_DEFINED) && !defined(__midl)');
-          LSrc := RemoveSection(LSrc, '!__midl');
-          LSrc := RemoveSection(LSrc, '!RC_INVOKED');
-          LSrc := RemoveSection(LSrc, 'WIN_OMIT_TSS_TPM_RETURN_CODES');
-          LSrc := ALStringReplaceA(LSrc,' WINAPI'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,'(WINAPI * ','(__CALLCONV__ * ');
-        end;
-        {$ENDREGION}
+          {$REGION 'sspi.h'}
+          if LChoice = 1 then begin
+            LSrc := RemoveSection(LSrc, '__SSPI_H__');
+            LSrc := RemoveSection(LSrc, 'defined(_NO_KSECDD_IMPORT_)');
+            LSrc := RemoveSection(LSrc, 'WIN32_CHICAGO');
+            LSrc := RemoveSection(LSrc, '__SECHANDLE_DEFINED__');
+            LSrc := RemoveSection(LSrc, '__SECSTATUS_DEFINED__');
+            LSrc := RemoveSection(LSrc, '!defined(_NTDEF_) || defined(_WINNT_)');
+            LSrc := RemoveSection(LSrc, '_NTDEF_');
+            LSrc := RemoveSection(LSrc, 'MIDL_PASS');
+            LSrc := RemoveSection(LSrc, '!ISSP_LEVEL');
+            LSrc := RemoveSection(LSrc, 'ISSP_MODE == 0');
+            LSrc := RemoveSection(LSrc, '!ISSP_MODE != 0');
+            LSrc := RemoveSection(LSrc, '!SECURITY_WIN32');
+            LSrc := RemoveSection(LSrc, 'SECURITY_MAC');
+            LSrc := RemoveSection(LSrc, 'SECURITY_KERNEL');
+            LSrc := RemoveSection(LSrc, 'SECURITY_DOS');
+            LSrc := RemoveSection(LSrc, '_AUTH_IDENTITY_DEFINED');
+            LSrc := RemoveSection(LSrc, '_AUTH_IDENTITY_EX2_DEFINED');
+            LSrc := RemoveSection(LSrc, '_AUTH_IDENTITY_INFO_DEFINED');
+            LSrc := RemoveSection(LSrc, 'SEC_WINNT_AUTH_IDENTITY_VERSION');
+            LSrc := RemoveSection(LSrc, '_SSPIPFC_NONE_');
+            LSrc := RemoveSection(LSrc, '!_CREDUI_INFO_DEFINED');
+            LSrc := RemoveSection(LSrc, '!_SEC_WINNT_AUTH_TYPES');
 
-        {$REGION 'mongodb*.h'}
-        if LChoice = 5 then begin
-          LSrc := RemoveSection(LSrc, '__FILENAME__');
-          LSrc := ALStringReplaceA(LSrc, '// #define __FILENAME__'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BCON_H_');
-          LSrc := ALStringReplaceA(LSrc, '// #define BCON_H_'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_BSON_T_H_INCLUDED');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_BSON_T_H_INCLUDED'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_COMPAT_H');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_COMPAT_H'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_CONFIG_H');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_CONFIG_H'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_ERROR_T_INCLUDED');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_ERROR_T_INCLUDED'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_MACROS_H');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_MACROS_H'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_MEMORY_H_INCLUDED');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_MEMORY_H_INCLUDED'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'BSON_VERSION_H');
-          LSrc := ALStringReplaceA(LSrc, '// #define BSON_VERSION_H'#13#10, '');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ERRORS_H');
-          LSrc := ALStringReplaceA(LSrc, '// #define MONGOC_ERRORS_H'#13#10, '');
+            LSrc := ALStringReplaceA(LSrc,'SEC_TEXT("InitSecurityInterfaceW")','"InitSecurityInterfaceW"');
+            LSrc := ALStringReplaceA(LSrc,'SEC_TEXT("InitSecurityInterfaceA")','"InitSecurityInterfaceA"');
+            LSrc := ALStringReplaceA(LSrc,'#define KSECDDDECLSPEC __declspec(dllimport)','');
+            LSrc := ALStringReplaceA(LSrc,#13#10'// KSECDDDECLSPEC'#13#10,#13#10);
+            LSrc := ALStringReplaceA(LSrc,'#define SEC_TEXT TEXT','');
+            LSrc := ALStringReplaceA(LSrc,'#define SEC_FAR','');
+            LSrc := ALStringReplaceA(LSrc,'#define SEC_ENTRY __stdcall','');
+            LSrc := ALStringReplaceA(LSrc,' SEC_ENTRY'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,'(SEC_ENTRY * ','(__CALLCONV__ * ');
+            LSrc := ALStringReplaceA(LSrc,'#define __SEC_FAR SEC_FAR','');
+            LSrc := ALStringReplaceA(LSrc,' SEC_FAR * ',' * ');
+          end;
+          {$ENDREGION}
 
-          LSrc := RemoveSection(LSrc, '!_SSIZE_T_DEFINED');
-          LSrc := RemoveSection(LSrc, 'defined(__clang__)');
-          LSrc := RemoveSection(LSrc, 'defined(__clang__) && defined(__clang_major__) && defined(__clang_minor__) && (__clang_major__ >= 3) && (__clang_minor__ >= 1)');
-          LSrc := RemoveSection(LSrc, 'defined(__GNUC__) || defined(__clang__)');
-          LSrc := RemoveSection(LSrc, 'defined(__GNUC__) && (__GNUC__ >= 4)');
-          LSrc := RemoveSection(LSrc, 'defined(__GNUC__) && 2 < __GNUC__ + (8 <= __GNUC_MINOR__)');
-          LSrc := RemoveSection(LSrc, 'defined(__GNUC__)');
-          LSrc := RemoveSection(LSrc, 'defined(__MINGW32__)');
-          LSrc := RemoveSection(LSrc, 'defined(__MINGW32__) && !defined(INIT_ONCE_STATIC_INIT)');
-          LSrc := RemoveSection(LSrc, '!BSON_UINT16_SWAP_LE_BE');
-          LSrc := RemoveSection(LSrc, '!BSON_UINT32_SWAP_LE_BE');
-          LSrc := RemoveSection(LSrc, '!BSON_UINT64_SWAP_LE_BE');
-          LSrc := RemoveSection(LSrc, '!BSON_BYTE_ORDER == BSON_LITTLE_ENDIAN');
-          LSrc := RemoveSection(LSrc, 'BSON_BYTE_ORDER == BSON_BIG_ENDIAN');
-          LSrc := RemoveSection(LSrc, 'BSON_OS == 1');
-          LSrc := RemoveSection(LSrc, '!BSON_OS == 2');
-          LSrc := RemoveSection(LSrc, '!BSON_OS_WIN32');
-          LSrc := RemoveSection(LSrc, '!defined(BSON_INSIDE) && !defined(BSON_COMPILATION)');
-          LSrc := RemoveSection(LSrc, '!defined(MONGOC_INSIDE) && !defined(MONGOC_COMPILATION)');
-          LSrc := RemoveSection(LSrc, 'defined(BSON_COMPILATION)');
-          LSrc := RemoveSection(LSrc, '!NOMINMAX');
-          LSrc := RemoveSection(LSrc, '!WIN32_LEAN_AND_MEAN');
-          LSrc := RemoveSection(LSrc, 'BSON_OS_UNIX');
-          LSrc := RemoveSection(LSrc, 'defined(BSON_OS_UNIX)');
-          LSrc := RemoveSection(LSrc, 'PRIi32');
-          LSrc := RemoveSection(LSrc, 'PRId32');
-          LSrc := RemoveSection(LSrc, 'PRIu32');
-          LSrc := RemoveSection(LSrc, 'PRIi64');
-          LSrc := RemoveSection(LSrc, 'PRId64');
-          LSrc := RemoveSection(LSrc, 'PRIu64');
-          LSrc := RemoveSection(LSrc, 'SSIZE_MAX');
-          LSrc := RemoveSection(LSrc, 'SSIZE_MIN');
-          LSrc := RemoveSection(LSrc, 'defined(va_copy) && defined(__va_copy)');
-          LSrc := RemoveSection(LSrc, 'defined(va_copy)');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_STDBOOL_H != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_CLOCK_GETTIME != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_STRINGS_H != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_STRNLEN != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_SNPRINTF != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_GMTIME_R != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_TIMESPEC != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_RAND_R != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_STRLCPY != 1');
-          LSrc := RemoveSection(LSrc, '!BSON_HAVE_ALIGNED_ALLOC != 1');
-          LSrc := RemoveSection(LSrc, 'BSON_STATIC');
-          LSrc := RemoveSection(LSrc, 'MIN');
-          LSrc := RemoveSection(LSrc, 'MAX');
-          LSrc := RemoveSection(LSrc, 'ABS');
-          LSrc := RemoveSection(LSrc, 'BSON_GNUC_CHECK_VERSION(4, 0) && !defined(_WIN32)');
-          LSrc := RemoveSection(LSrc, 'BSON_GNUC_CHECK_VERSION(4, 4)');
-          LSrc := RemoveSection(LSrc, 'defined(__GNUC__) && (defined(__clang__) || BSON_GNUC_CHECK_VERSION(4, 5))');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL');
-          LSrc := RemoveSection(LSrc, 'MONGOC_DEFAULT_CONNECTTIMEOUTMS');
-          LSrc := RemoveSection(LSrc, 'MONGOC_DEFAULT_SOCKETTIMEOUTMS');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SSL_SECURE_CHANNEL != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_CRYPTO_CNG != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_HAVE_BCRYPT_PBKDF2 != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL_SECURE_TRANSPORT != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CRYPTO_COMMON_CRYPTO != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL_OPENSSL != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL_OPENSSL');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CRYPTO_LIBCRYPTO != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SSL != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_CRYPTO != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CRYPTO_SYSTEM_PROFILE != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_ASN1_STRING_GET0_DATA != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SASL != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SASL_CYRUS != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SASL_SSPI != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_SASL_CLIENT_DONE != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_HAVE_SOCKLEN != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_HAVE_DNSAPI != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_NSEARCH != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_NDESTROY != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_NCLOSE != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_SEARCH != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_COMPRESSION != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_COMPRESSION_SNAPPY != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_COMPRESSION_ZLIB != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_COMPRESSION_ZSTD != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SHM_COUNTERS != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_RDTSCP != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_SCHED_GETCPU != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CLIENT_SIDE_ENCRYPTION != 1');
-          LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_SS_FAMILY != 1');
-          LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_MONGODB_AWS_AUTH != 1');
-          LSrc := RemoveSection(LSrc, '_POSIX_HOST_NAME_MAX');
-          LSrc := RemoveSection(LSrc, 'MONGOC_LOG_DOMAIN');
-          LSrc := RemoveSection(LSrc, 'MONGOC_STATIC');
-          LSrc := RemoveSection(LSrc, 'defined(MONGOC_COMPILATION)');
-          LSrc := RemoveSection(LSrc, 'defined(_AIX) && !defined(MONGOC_HAVE_SS_FAMILY)');
-          LSrc := RemoveSection(LSrc, 'MONGOC_DEFAULT_PORT');
+          {$REGION 'schannel.h'}
+          if LChoice = 2 then begin
+            LSrc := RemoveSection(LSrc, '__SCHANNEL_H__');
+            LSrc := RemoveSection(LSrc, '!SCHANNEL_USE_BLACKLISTS');
+            LSrc := ALStringReplaceA(LSrc,' WINAPI'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,'(WINAPI * ','(__CALLCONV__ * ');
 
-          LSrc := ReplaceSection(LSrc, '_WIN32', 'defined(Win32)');
-          LSrc := ReplaceSection(LSrc, '_WIN64', 'defined(Win64)');
-          LSrc := ReplaceSection(LSrc, 'defined(__LP64__) || defined(_LP64)', 'defined(CPUX64) or defined(CPUARM64)');
-          LSrc := ReplaceSection(LSrc, 'BSON_WORD_SIZE == 64', 'defined(CPUX64) or defined(CPUARM64)');
+            LSrc := ALStringReplaceA(
+                      LSrc,
+                      '// struct _HMAPPER;',
+                      '// typedef struct _HMAPPER'#13#10+
+                      '// {'#13#10+
+                      '// } * P_HMAPPER, * * PP_HMAPPER;', []);
+          end;
+          {$ENDREGION}
 
-          LSrc := ALStringReplaceA(LSrc,#13#10'// BSON_BEGIN_DECLS'#13#10,#13#10);
-          LSrc := ALStringReplaceA(LSrc,#13#10'// BSON_END_DECLS'#13#10,#13#10);
-          LSrc := ALStringReplaceA(LSrc,'// #define BSON_API'#13#10,'');
-          LSrc := ALStringReplaceA(LSrc,'// #define BSON_CALL'#13#10,'');
-          LSrc := ALStringReplaceA(LSrc,'// #define BSON_EXPORT(type) BSON_API type BSON_CALL'#13#10,'');
-          LSrc := ALStringReplaceA(LSrc,' BSON_CALL'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,'(BSON_CALL * ','(__CALLCONV__ * ');
-          LSrc := ALStringReplaceA(LSrc,'// #define MONGOC_API'#13#10,'');
-          LSrc := ALStringReplaceA(LSrc,'// #define MONGOC_CALL'#13#10,'');
-          LSrc := ALStringReplaceA(LSrc,'// #define MONGOC_EXPORT(type) MONGOC_API type MONGOC_CALL'#13#10,'');
-          LSrc := ALStringReplaceA(LSrc,' MONGOC_CALL'#13#10,' __CALLCONV__'#13#10);
-          LSrc := ALStringReplaceA(LSrc,'(MONGOC_CALL * ','(__CALLCONV__ * ');
-          LSrc := ALStringReplaceA(LSrc,'(1U << 31)','(NativeUInt(1) << 31)');
-          LSrc := ALStringReplaceA(LSrc,'(10 * 1000L)','(10 * 1000)');
-          LSrc := ALStringReplaceA(LSrc,'(1000L * 60L * 5L)','(1000 * 60 * 5)');
-          LSrc := ALStringReplaceA(LSrc,'#define BSON_PRERELEASE_VERSION (','// #define BSON_PRERELEASE_VERSION (');
-          LSrc := ALStringReplaceA(LSrc,'#define BSON_VERSION (','// #define BSON_VERSION (');
-          LSrc := ALStringReplaceA(LSrc,'#define MONGOC_PRERELEASE_VERSION (','// #define MONGOC_PRERELEASE_VERSION (');
-          LSrc := ALStringReplaceA(LSrc,'#define MONGOC_VERSION (','// #define MONGOC_VERSION (');
-          LSrc := ALStringReplaceA(LSrc,'#define MONGOC_SOCKET_ARG3 socklen_t','typedef socklen_t MONGOC_SOCKET_ARG3;');
-          LSrc := ALStringReplaceA(LSrc,'// (* * < private > * *)','// // private');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_WARN_UNUSED_RESULT;',');');
-          LSrc := ALStringReplaceA(LSrc,')'#13#10'// BSON_GNUC_WARN_UNUSED_RESULT;',');');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_NULL_TERMINATED;',');');
-          LSrc := ALStringReplaceA(LSrc,')'#13#10'// BSON_GNUC_NULL_TERMINATED;',');');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PURE;',');');
-          LSrc := ALStringReplaceA(LSrc,')'#13#10'// BSON_GNUC_PURE;',');');
-          LSrc := ALStringReplaceA(LSrc,' (* IGNORED *),',', // IGNORED');
-          LSrc := ALStringReplaceA(LSrc,' (* May be NULL *),',', // May be NULL');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(1, 0);',');');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(1, 2);',');');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(3, 0);',');');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(3, 4);',');');
-          LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(4, 5);',');');
-          LSrc := ALStringReplaceA(LSrc,', char utf8[6],',', TCharArray6 utf8,');
-          LSrc := ALStringReplaceA(LSrc,', char str[25])',', TCharArray25 str)');
-          LSrc := ALStringReplaceA(LSrc,'// #define BSON_BEGIN_DECLS extern "C" {','');
-          LSrc := ALStringReplaceA(LSrc,'// #define BSON_END_DECLS }','');
+          {$REGION 'http.h'}
+          if LChoice = 3 then begin
+            LSrc := RemoveSection(LSrc, '__HTTP_H__');
+            LSrc := RemoveSection(LSrc, 'HTTP_VERSION');
+            LSrc := RemoveSection(LSrc, '!defined(HTTPAPI_LINKAGE)');
+            LSrc := RemoveSection(LSrc, '__SECSTATUS_DEFINED__');
+            LSrc := ALStringReplaceA(LSrc,' HTTPAPI_LINKAGE'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,' WINAPI'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,'(WINAPI * ','(__CALLCONV__ * ');
+            LSrc := ALStringReplaceA(LSrc,'ULONG Present:1;','ULONG Present;');
+            LSrc := ALStringReplaceA(LSrc,'[HttpHeaderRequestMaximum]','[Ord(HttpHeaderRequestMaximum)]');
+            LSrc := ALStringReplaceA(LSrc,'[HttpHeaderResponseMaximum]','[Ord(HttpHeaderResponseMaximum)]');
+            LSrc := ALStringReplaceA(LSrc,'[HttpRequestSizingTypeMax]','[Ord(HttpRequestSizingTypeMax)]');
+            LSrc := ALStringReplaceA(LSrc,'[HttpRequestTimingTypeMax]','[Ord(HttpRequestTimingTypeMax)]');
+            LSrc := ALStringReplaceA(LSrc,'HttpFeaturemax = 0xFFFFFFFF,','HttpFeaturemax = Integer($FFFFFFFF),');
+            LSrc := ALStringReplaceA(LSrc,'// #define HTTPAPI_VERSION_2 { 2, 0 }','const HTTPAPI_VERSION_2: HTTPAPI_VERSION = (HttpApiMajorVersion:2; HttpApiMinorVersion:0);');
+            LSrc := ALStringReplaceA(LSrc,'// #define HTTPAPI_VERSION_1 { 1, 0 }','const HTTPAPI_VERSION_1: HTTPAPI_VERSION = (HttpApiMajorVersion:1; HttpApiMinorVersion:0);');
+          end;
+          {$ENDREGION}
+
+          {$REGION 'winerror.h'}
+          if LChoice = 4 then begin
+            LSrc := RemoveSection(LSrc, '_WINERROR_');
+            LSrc := RemoveSection(LSrc, '!defined (_MSC_VER) && (_MSC_VER >= 1020) && !defined(__midl)');
+            LSrc := RemoveSection(LSrc, '!FORCEINLINE');
+            LSrc := RemoveSection(LSrc, 'WSABASEERR');
+            LSrc := RemoveSection(LSrc, '!defined(_HRESULT_DEFINED) && !defined(__midl)');
+            LSrc := RemoveSection(LSrc, '!__midl');
+            LSrc := RemoveSection(LSrc, '!RC_INVOKED');
+            LSrc := RemoveSection(LSrc, 'WIN_OMIT_TSS_TPM_RETURN_CODES');
+            LSrc := ALStringReplaceA(LSrc,' WINAPI'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,'(WINAPI * ','(__CALLCONV__ * ');
+          end;
+          {$ENDREGION}
+
+          {$REGION 'mongodb*.h'}
+          if LChoice = 5 then begin
+            LSrc := RemoveSection(LSrc, '__FILENAME__');
+            LSrc := ALStringReplaceA(LSrc, '// #define __FILENAME__'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BCON_H_');
+            LSrc := ALStringReplaceA(LSrc, '// #define BCON_H_'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_BSON_T_H_INCLUDED');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_BSON_T_H_INCLUDED'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_COMPAT_H');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_COMPAT_H'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_CONFIG_H');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_CONFIG_H'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_ERROR_T_INCLUDED');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_ERROR_T_INCLUDED'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_MACROS_H');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_MACROS_H'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_MEMORY_H_INCLUDED');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_MEMORY_H_INCLUDED'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'BSON_VERSION_H');
+            LSrc := ALStringReplaceA(LSrc, '// #define BSON_VERSION_H'#13#10, '');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ERRORS_H');
+            LSrc := ALStringReplaceA(LSrc, '// #define MONGOC_ERRORS_H'#13#10, '');
+
+            LSrc := RemoveSection(LSrc, '!_SSIZE_T_DEFINED');
+            LSrc := RemoveSection(LSrc, 'defined(__clang__)');
+            LSrc := RemoveSection(LSrc, 'defined(__clang__) && defined(__clang_major__) && defined(__clang_minor__) && (__clang_major__ >= 3) && (__clang_minor__ >= 1)');
+            LSrc := RemoveSection(LSrc, 'defined(__GNUC__) || defined(__clang__)');
+            LSrc := RemoveSection(LSrc, 'defined(__GNUC__) && (__GNUC__ >= 4)');
+            LSrc := RemoveSection(LSrc, 'defined(__GNUC__) && 2 < __GNUC__ + (8 <= __GNUC_MINOR__)');
+            LSrc := RemoveSection(LSrc, 'defined(__GNUC__)');
+            LSrc := RemoveSection(LSrc, 'defined(__MINGW32__)');
+            LSrc := RemoveSection(LSrc, 'defined(__MINGW32__) && !defined(INIT_ONCE_STATIC_INIT)');
+            LSrc := RemoveSection(LSrc, '!BSON_UINT16_SWAP_LE_BE');
+            LSrc := RemoveSection(LSrc, '!BSON_UINT32_SWAP_LE_BE');
+            LSrc := RemoveSection(LSrc, '!BSON_UINT64_SWAP_LE_BE');
+            LSrc := RemoveSection(LSrc, '!BSON_BYTE_ORDER == BSON_LITTLE_ENDIAN');
+            LSrc := RemoveSection(LSrc, 'BSON_BYTE_ORDER == BSON_BIG_ENDIAN');
+            LSrc := RemoveSection(LSrc, 'BSON_OS == 1');
+            LSrc := RemoveSection(LSrc, '!BSON_OS == 2');
+            LSrc := RemoveSection(LSrc, '!BSON_OS_WIN32');
+            LSrc := RemoveSection(LSrc, '!defined(BSON_INSIDE) && !defined(BSON_COMPILATION)');
+            LSrc := RemoveSection(LSrc, '!defined(MONGOC_INSIDE) && !defined(MONGOC_COMPILATION)');
+            LSrc := RemoveSection(LSrc, 'defined(BSON_COMPILATION)');
+            LSrc := RemoveSection(LSrc, '!NOMINMAX');
+            LSrc := RemoveSection(LSrc, '!WIN32_LEAN_AND_MEAN');
+            LSrc := RemoveSection(LSrc, 'BSON_OS_UNIX');
+            LSrc := RemoveSection(LSrc, 'defined(BSON_OS_UNIX)');
+            LSrc := RemoveSection(LSrc, 'PRIi32');
+            LSrc := RemoveSection(LSrc, 'PRId32');
+            LSrc := RemoveSection(LSrc, 'PRIu32');
+            LSrc := RemoveSection(LSrc, 'PRIi64');
+            LSrc := RemoveSection(LSrc, 'PRId64');
+            LSrc := RemoveSection(LSrc, 'PRIu64');
+            LSrc := RemoveSection(LSrc, 'SSIZE_MAX');
+            LSrc := RemoveSection(LSrc, 'SSIZE_MIN');
+            LSrc := RemoveSection(LSrc, 'defined(va_copy) && defined(__va_copy)');
+            LSrc := RemoveSection(LSrc, 'defined(va_copy)');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_STDBOOL_H != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_CLOCK_GETTIME != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_STRINGS_H != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_STRNLEN != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_SNPRINTF != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_GMTIME_R != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_TIMESPEC != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_RAND_R != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_STRLCPY != 1');
+            LSrc := RemoveSection(LSrc, '!BSON_HAVE_ALIGNED_ALLOC != 1');
+            LSrc := RemoveSection(LSrc, 'BSON_STATIC');
+            LSrc := RemoveSection(LSrc, 'MIN');
+            LSrc := RemoveSection(LSrc, 'MAX');
+            LSrc := RemoveSection(LSrc, 'ABS');
+            LSrc := RemoveSection(LSrc, 'BSON_GNUC_CHECK_VERSION(4, 0) && !defined(_WIN32)');
+            LSrc := RemoveSection(LSrc, 'BSON_GNUC_CHECK_VERSION(4, 4)');
+            LSrc := RemoveSection(LSrc, 'defined(__GNUC__) && (defined(__clang__) || BSON_GNUC_CHECK_VERSION(4, 5))');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL');
+            LSrc := RemoveSection(LSrc, 'MONGOC_DEFAULT_CONNECTTIMEOUTMS');
+            LSrc := RemoveSection(LSrc, 'MONGOC_DEFAULT_SOCKETTIMEOUTMS');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SSL_SECURE_CHANNEL != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_CRYPTO_CNG != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_HAVE_BCRYPT_PBKDF2 != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL_SECURE_TRANSPORT != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CRYPTO_COMMON_CRYPTO != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL_OPENSSL != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SSL_OPENSSL');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CRYPTO_LIBCRYPTO != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SSL != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_CRYPTO != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CRYPTO_SYSTEM_PROFILE != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_ASN1_STRING_GET0_DATA != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SASL != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SASL_CYRUS != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_SASL_SSPI != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_SASL_CLIENT_DONE != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_HAVE_SOCKLEN != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_HAVE_DNSAPI != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_NSEARCH != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_NDESTROY != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_NCLOSE != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_RES_SEARCH != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_COMPRESSION != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_COMPRESSION_SNAPPY != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_COMPRESSION_ZLIB != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_COMPRESSION_ZSTD != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_SHM_COUNTERS != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_RDTSCP != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_SCHED_GETCPU != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_ENABLE_CLIENT_SIDE_ENCRYPTION != 1');
+            LSrc := RemoveSection(LSrc, '!MONGOC_HAVE_SS_FAMILY != 1');
+            LSrc := RemoveSection(LSrc, 'MONGOC_ENABLE_MONGODB_AWS_AUTH != 1');
+            LSrc := RemoveSection(LSrc, '_POSIX_HOST_NAME_MAX');
+            LSrc := RemoveSection(LSrc, 'MONGOC_LOG_DOMAIN');
+            LSrc := RemoveSection(LSrc, 'MONGOC_STATIC');
+            LSrc := RemoveSection(LSrc, 'defined(MONGOC_COMPILATION)');
+            LSrc := RemoveSection(LSrc, 'defined(_AIX) && !defined(MONGOC_HAVE_SS_FAMILY)');
+            LSrc := RemoveSection(LSrc, 'MONGOC_DEFAULT_PORT');
+
+            LSrc := ReplaceSection(LSrc, '_WIN32', 'defined(Win32)');
+            LSrc := ReplaceSection(LSrc, '_WIN64', 'defined(Win64)');
+            LSrc := ReplaceSection(LSrc, 'defined(__LP64__) || defined(_LP64)', 'defined(CPUX64) or defined(CPUARM64)');
+            LSrc := ReplaceSection(LSrc, 'BSON_WORD_SIZE == 64', 'defined(CPUX64) or defined(CPUARM64)');
+
+            LSrc := ALStringReplaceA(LSrc,#13#10'// BSON_BEGIN_DECLS'#13#10,#13#10);
+            LSrc := ALStringReplaceA(LSrc,#13#10'// BSON_END_DECLS'#13#10,#13#10);
+            LSrc := ALStringReplaceA(LSrc,'// #define BSON_API'#13#10,'');
+            LSrc := ALStringReplaceA(LSrc,'// #define BSON_CALL'#13#10,'');
+            LSrc := ALStringReplaceA(LSrc,'// #define BSON_EXPORT(type) BSON_API type BSON_CALL'#13#10,'');
+            LSrc := ALStringReplaceA(LSrc,' BSON_CALL'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,'(BSON_CALL * ','(__CALLCONV__ * ');
+            LSrc := ALStringReplaceA(LSrc,'// #define MONGOC_API'#13#10,'');
+            LSrc := ALStringReplaceA(LSrc,'// #define MONGOC_CALL'#13#10,'');
+            LSrc := ALStringReplaceA(LSrc,'// #define MONGOC_EXPORT(type) MONGOC_API type MONGOC_CALL'#13#10,'');
+            LSrc := ALStringReplaceA(LSrc,' MONGOC_CALL'#13#10,' __CALLCONV__'#13#10);
+            LSrc := ALStringReplaceA(LSrc,'(MONGOC_CALL * ','(__CALLCONV__ * ');
+            LSrc := ALStringReplaceA(LSrc,'(1U << 31)','(NativeUInt(1) << 31)');
+            LSrc := ALStringReplaceA(LSrc,'(10 * 1000L)','(10 * 1000)');
+            LSrc := ALStringReplaceA(LSrc,'(1000L * 60L * 5L)','(1000 * 60 * 5)');
+            LSrc := ALStringReplaceA(LSrc,'#define BSON_PRERELEASE_VERSION (','// #define BSON_PRERELEASE_VERSION (');
+            LSrc := ALStringReplaceA(LSrc,'#define BSON_VERSION (','// #define BSON_VERSION (');
+            LSrc := ALStringReplaceA(LSrc,'#define MONGOC_PRERELEASE_VERSION (','// #define MONGOC_PRERELEASE_VERSION (');
+            LSrc := ALStringReplaceA(LSrc,'#define MONGOC_VERSION (','// #define MONGOC_VERSION (');
+            LSrc := ALStringReplaceA(LSrc,'#define MONGOC_SOCKET_ARG3 socklen_t','typedef socklen_t MONGOC_SOCKET_ARG3;');
+            LSrc := ALStringReplaceA(LSrc,'// (* * < private > * *)','// // private');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_WARN_UNUSED_RESULT;',');');
+            LSrc := ALStringReplaceA(LSrc,')'#13#10'// BSON_GNUC_WARN_UNUSED_RESULT;',');');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_NULL_TERMINATED;',');');
+            LSrc := ALStringReplaceA(LSrc,')'#13#10'// BSON_GNUC_NULL_TERMINATED;',');');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PURE;',');');
+            LSrc := ALStringReplaceA(LSrc,')'#13#10'// BSON_GNUC_PURE;',');');
+            LSrc := ALStringReplaceA(LSrc,' (* IGNORED *),',', // IGNORED');
+            LSrc := ALStringReplaceA(LSrc,' (* May be NULL *),',', // May be NULL');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(1, 0);',');');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(1, 2);',');');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(3, 0);',');');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(3, 4);',');');
+            LSrc := ALStringReplaceA(LSrc,') BSON_GNUC_PRINTF(4, 5);',');');
+            LSrc := ALStringReplaceA(LSrc,', char utf8[6],',', TCharArray6 utf8,');
+            LSrc := ALStringReplaceA(LSrc,', char str[25])',', TCharArray25 str)');
+            LSrc := ALStringReplaceA(LSrc,'// #define BSON_BEGIN_DECLS extern "C" {','');
+            LSrc := ALStringReplaceA(LSrc,'// #define BSON_END_DECLS }','');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_change_stream_destroy(mongoc_change_stream_t * );','mongoc_change_stream_destroy(mongoc_change_stream_t * stream);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_change_stream_get_resume_token(mongoc_change_stream_t * );','mongoc_change_stream_get_resume_token(mongoc_change_stream_t * stream);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_change_stream_next(mongoc_change_stream_t * , const bson_t * * );','mongoc_change_stream_next(mongoc_change_stream_t * stream, const bson_t * * bson);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_change_stream_error_document(const mongoc_change_stream_t * , bson_error_t * , const bson_t * * );','mongoc_change_stream_error_document(const mongoc_change_stream_t * stream, bson_error_t * err, const bson_t * * bson);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_client_encryption_encrypt_text_prefix_opts_destroy(mongoc_client_encryption_encrypt_text_prefix_opts_t * );','mongoc_client_encryption_encrypt_text_prefix_opts_destroy(mongoc_client_encryption_encrypt_text_prefix_opts_t * opts);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_client_encryption_encrypt_text_suffix_opts_destroy(mongoc_client_encryption_encrypt_text_suffix_opts_t * );','mongoc_client_encryption_encrypt_text_suffix_opts_destroy(mongoc_client_encryption_encrypt_text_suffix_opts_t * opts);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_client_encryption_encrypt_text_substring_opts_destroy(mongoc_client_encryption_encrypt_text_substring_opts_t * );','mongoc_client_encryption_encrypt_text_substring_opts_destroy(mongoc_client_encryption_encrypt_text_substring_opts_t * opts);');
+            LSrc := ALStringReplaceA(LSrc,'mongoc_find_and_modify_opts_set_flags(mongoc_find_and_modify_opts_t * opts, const mongoc_find_and_modify_flags_t flags);','mongoc_find_and_modify_opts_set_flags(mongoc_find_and_modify_opts_t * opts, const UInt32 flags);');
+
+            LSrc := ALStringReplaceA(
+                      LSrc,
+                      '{$if defined(Win32)}'#13#10+
+                      '// #include <stddef.h>'#13#10+
+                      '{$else}'#13#10+
+                      '// #include <sys/uio.h>'#13#10+
+                      '{$endif}',
+                      '');
+            LSrc := ALStringReplaceA(
+                      LSrc,
+                      '// typedef struct _mongoc_client_encryption_rewrap_many_datakey_result_t'#13#10+
+                      '// mongoc_client_encryption_rewrap_many_datakey_result_t;',
+                      '// typedef struct _mongoc_client_encryption_rewrap_many_datakey_result_t mongoc_client_encryption_rewrap_many_datakey_result_t;');
+            LSrc := ALStringReplaceA(LSrc, 'BSON_ALIGNED_BEGIN(BSON_ALIGN_OF_PTR) ', '');
+            LSrc := ALStringReplaceA(LSrc, 'BSON_ALIGNED_BEGIN(BSON_ALIGN_OF_PTR)', '');
+            LSrc := ALStringReplaceA(LSrc, ' BSON_ALIGNED_END(BSON_ALIGN_OF_PTR);', ';');
+
+            LSrc := ALStringReplaceA(LSrc, 'BSON_EXPORT(const ', 'BSON_EXPORT(');
+            P1 := AlPosA('BSON_EXPORT(', LSrc);
+            While P1 > 0 do begin
+              Delete(LSrc, P1, length('BSON_EXPORT('));
+              var P2 := AlposA(')', LSrc, P1);
+              If P2 <= 0 then
+                raise Exception.Create('Error 6FB459CF-9953-4F53-B174-D21C84512B71');
+              Delete(LSrc, P2, length(')'));
+              insert(' __CALLCONV__ ', LSrc, P2);
+              P1 := AlPosA('BSON_EXPORT(', LSrc);
+            end;
+
+            LSrc := ALStringReplaceA(LSrc, 'MONGOC_EXPORT(const ', 'MONGOC_EXPORT(');
+            P1 := AlPosA('MONGOC_EXPORT(', LSrc);
+            While P1 > 0 do begin
+              Delete(LSrc, P1, length('MONGOC_EXPORT('));
+              var P2 := AlposA(')', LSrc, P1);
+              If P2 <= 0 then
+                raise Exception.Create('Error 6FB459CF-9953-4F53-B174-D21C84512B71');
+              Delete(LSrc, P2, length(')'));
+              insert(' __CALLCONV__ ', LSrc, P2);
+              P1 := AlPosA('MONGOC_EXPORT(', LSrc);
+            end;
+
+          end;
+          {$ENDREGION}
+
+          {$REGION 'wincrypt.h'}
+          //LSrc := ALStringReplaceA(LSrc,' WINADVAPI'#13#10,' __CALLCONV__'#13#10);
+          //LSrc := ALStringReplaceA(LSrc,' WINCRYPT32API'#13#10,' __CALLCONV__'#13#10);
+          //LSrc := ALStringReplaceA(LSrc,' WINCRYPT32STRINGAPI'#13#10,' __CALLCONV__'#13#10);
+          //LSrc := RemoveSection(LSrc, '__WINCRYPT_H__');
+          //LSrc := RemoveSection(LSrc, '_HRESULT_DEFINED');
+          //LSrc := RemoveSection(LSrc, '!defined(WINCRYPT32API)');
+          //LSrc := RemoveSection(LSrc, '!defined(_CRYPT32_)');
+          //LSrc := RemoveSection(LSrc, '!defined(WINCRYPT32STRINGAPI)');
+          //LSrc := RemoveSection(LSrc, '!WINADVAPI');
+          //LSrc := RemoveSection(LSrc, '!WINAPI');
+          //LSrc := RemoveSection(LSrc, '!CALLBACK');
+          //LSrc := RemoveSection(LSrc, '!DECLSPEC_IMPORT');
+          //LSrc := RemoveSection(LSrc, '!CONST');
+          //LSrc := RemoveSection(LSrc, '!IN');
+          //LSrc := RemoveSection(LSrc, '!OUT');
+          //LSrc := RemoveSection(LSrc, '!OPTIONAL');
+          //LSrc := RemoveSection(LSrc, '!CMSG_ENVELOPED_ENCODE_INFO_HAS_CMS_FIELDS');
+          //LSrc := RemoveSection(LSrc, 'defined(_DDK_DRIVER_)');
+          //LSrc := ALStringReplaceA(
+          //          LSrc,
+          //          '// typedef struct _CMSG_RECIPIENT_ENCODE_INFO CMSG_RECIPIENT_ENCODE_INFO,'#13#10+
+          //          '// * PCMSG_RECIPIENT_ENCODE_INFO;',
+          //          '// typedef struct _CMSG_RECIPIENT_ENCODE_INFO'#13#10+
+          //          '// {'#13#10+
+          //          '// } CMSG_RECIPIENT_ENCODE_INFO, * PCMSG_RECIPIENT_ENCODE_INFO;', []);
+          //LSrc := ALStringReplaceA(
+          //          LSrc,
+          //          '// typedef struct _CERT_REVOCATION_CHAIN_PARA'#13#10+
+          //          '// CERT_REVOCATION_CHAIN_PARA,'#13#10+
+          //          '// * PCERT_REVOCATION_CHAIN_PARA;',
+          //          '// typedef struct _CERT_REVOCATION_CHAIN_PARA'#13#10+
+          //          '// {'#13#10+
+          //          '// } CERT_REVOCATION_CHAIN_PARA, * PCERT_REVOCATION_CHAIN_PARA;', []);
+          //LSrc := ALStringReplaceA(
+          //          LSrc,
+          //          '// typedef struct _CERT_CHAIN_CONTEXT CERT_CHAIN_CONTEXT, * PCERT_CHAIN_CONTEXT;',
+          //          '// typedef struct _CERT_CHAIN_CONTEXT'#13#10+
+          //          '// {'#13#10+
+          //          '// } CERT_CHAIN_CONTEXT, * PCERT_CHAIN_CONTEXT;');
+          //LSrc := ALStringReplaceA(
+          //          LSrc,
+          //          '// typedef struct _CERT_SERVER_OCSP_RESPONSE_CONTEXT'#13#10+
+          //          '// CERT_SERVER_OCSP_RESPONSE_CONTEXT,'#13#10+
+          //          '// * PCERT_SERVER_OCSP_RESPONSE_CONTEXT;',
+          //          '// typedef struct _CERT_SERVER_OCSP_RESPONSE_CONTEXT'#13#10+
+          //          '// {'#13#10+
+          //          '// } CERT_SERVER_OCSP_RESPONSE_CONTEXT, * PCERT_SERVER_OCSP_RESPONSE_CONTEXT;');
+          //LSrc := ALStringReplaceA(LSrc, '#define AUTHTYPE_CLIENT 1','// #define AUTHTYPE_CLIENT 1');
+          //LSrc := ALStringReplaceA(LSrc, '#define AUTHTYPE_SERVER 2','// #define AUTHTYPE_SERVER 2');
+          //LSrc := ALStringReplaceA(LSrc,'(CALLBACK * ','(__CALLCONV__ * ');
+          {$ENDREGION}
+
+          while alposA('  ', LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,'  ', ' ');
+
+          {$IF defined(debug)}
+          ALSaveStringTofile(LSrc, ALGetModulePathW + 'debug_src.txt');
+          {$ENDIF}
+
+          LSrc := ConvertDefine(LSrc);
+          LSrc := ConvertEnums(LSrc, LCallingConvention, LDelayed);
+          LSrc := ConvertSimpleType(LSrc);
+          LSrc := ConvertRecords(LSrc, LCallingConvention, LDelayed);
+
+          LSrc := ALStringReplaceA(LSrc,#13#10'// (__CALLCONV__ * ',#13#10'// (#1 * ');
+          LSrc := ALStringReplaceA(LSrc,'(__CALLCONV__ * ',#13#10'// (__CALLCONV__ * ');
+          LSrc := ALStringReplaceA(LSrc,#13#10'// (#1 * ',#13#10'// (__CALLCONV__ * ');
+
+          LSrc := Convertfunctions(LSrc, LCallingConvention, LDelayed, LLibraryDLLEntryPoints);
+
+          LSrc := AlStringReplaceA(LSrc, #13#10'// (*', #13#10'// *');
+          LSrc := AlStringReplaceA(LSrc, #13#10'// *)', #13#10'// *');
+
+          LSrc := '''
+            unit
+            ''' +
+            ' ' + ALExtractFileName(AnsiString(LDstfileName), true{RemoveFileExt}) + ';' + #13#10 +
+            '''
+
+            //*******************************************************************//
+            // This unit was automatically generated by CHeaderWrapperGenerator. //
+            // Do not edit manually.                                             //
+            //*******************************************************************//
+
+            interface
+
+            {$I Alcinoe.inc}
+
+            {$WARN SYMBOL_PLATFORM OFF}
+            {$SCOPEDENUMS OFF}
+            {$MINENUMSIZE 4}
+            {$A+}
+            '''+
+            #13#10+
+            #13#10+
+            'uses'#13#10+
+            '  WinApi.Windows' + ALIfThenA(LExtraUses <> '', ','#13#10, ';'#13#10) +
+            LExtraUses + #13#10 +
+            #13#10+
+            LExtraTypes + #13#10+
+            #13#10+
+            '' + LSrc + #13#10 +
+            #13#10 +
+            MakeLibraryInterface(LLibraryClassName, LLibraryDLLEntryPoints)+#13#10 +
+            #13#10 +
+            'implementation'#13#10 +
+            #13#10 +
+            MakeLibraryImplementation(LLibraryClassName, LLibraryDLLEntryPoints, LDstfileName)+#13#10 +
+            'end.';
+
+
+          {$REGION 'mongodb*.h'}
+          if LChoice = 5 then begin
+            LSrc := ALStringReplaceA(LSrc,'__LibraryConstructor__', 'mongoc_init;');
+            LSrc := ALStringReplaceA(LSrc,'__LibraryDestructor__','mongoc_cleanup;');
+          end;
+          {$ENDREGION}
+
+          LSrc := ALStringReplaceA(LSrc,'__LibraryConstructor__', '');
+          LSrc := ALStringReplaceA(LSrc,'__LibraryDestructor__','');
+
+          LLst := TALStringListA.Create;
+          try
+            LLst.Text := LSrc;
+            For var i := LLst.Count - 1 downto 0 do begin
+              LLst[I] := ALTrimRight(LLst[I]);
+              if ALTrim(LLst[I]) = '//' then LLst[I] := ''
+              else if ALPosA('// #pragma ', ALTrim(LLst[I])) = 1 then LLst[I] := ''
+              else if ALPosA('// #include ', ALTrim(LLst[I])) = 1 then LLst[I] := ''
+              else if ALPosA('// #undef ', ALTrim(LLst[I])) = 1 then LLst[I] := ''
+              else if (I > 0) and (AlposA('): ', ALTrim(LLst[I])) = 1) then begin
+                var LStr := LLst[I-1];
+                var LComment: AnsiString := '';
+                P1 := AlposA(' //', LStr, 4);
+                if P1 <= 0 then P1 := AlposA(' (*', LStr, 4);
+                if P1 > 0 then begin
+                  LComment := ALTrim(AlcopyStr(LStr, P1, ALMaxInt));
+                  LStr := ALTrimRight(AlcopyStr(LStr, 1, P1-1));
+                end;
+                LLst[I-1] := LStr + ALTrim(LLst[I]) + ALIfThenA(LComment <> '', ' ') + LComment;
+                LLst.Delete(i);
+              end
+              else if (I > 0) and (AlposA(');', ALTrim(LLst[I])) = 1) then begin
+                var LStr := LLst[I-1];
+                var LComment: AnsiString := '';
+                P1 := AlposA(' //', LStr, 4);
+                if P1 <= 0 then P1 := AlposA(' (*', LStr, 4);
+                if P1 > 0 then begin
+                  LComment := ALTrim(AlcopyStr(LStr, P1, ALMaxInt));
+                  LStr := ALTrimRight(AlcopyStr(LStr, 1, P1-1));
+                end;
+                if (LStr <> '') and (LStr[high(LStr)] <> ';') then begin
+                  LLst[I-1] := LStr + ALTrim(LLst[I]) + ALIfThenA(LComment <> '', ' ') + LComment;
+                  LLst.Delete(i);
+                end;
+              end;
+            end;
+            LSrc := ALTrim(LLst.Text);
+          finally
+            AlFreeAndNil(LLst);
+          end;
+          LSrc := ALStringReplaceA(LSrc,#13#10'// //',#13#10'//',[RfReplaceALL]);
+          while ALposA('/ /', LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,'/ /','//',[RfReplaceALL]);
+
+          LLst := TALStringListA.Create;
+          try
+            LLst.Text := LSrc;
+            For var i := LLst.Count - 1 downto 0 do begin
+              LLst[I] := ALTrimRight(LLst[I]);
+              if (alposA('// ', LLst[I]) = 1) and (alposA(' *)', LLst[I]) = length(LLst[I]) - 2) then
+                LLst[I] := ALcopyStr(LLst[I], 1, length(LLst[I]) - 3);
+            end;
+            LSrc := ALTrim(LLst.Text);
+          finally
+            AlFreeAndNil(LLst);
+          end;
+
+          LLst := TALStringListA.Create;
+          try
+            LLst.Text := LSrc;
+            For var i := LLst.Count - 1 downto 0 do
+              if (alposA('//[', LLst[I]) = 1) then
+                LLst[I] := ALStringReplaceA(LLst[I], '//[', '// [', []);
+            LSrc := ALTrim(LLst.Text);
+          finally
+            AlFreeAndNil(LLst);
+          end;
+
+          while ALposA(#13#10#13#10#13#10, LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,#13#10#13#10#13#10,#13#10#13#10,[RfReplaceALL]);
 
           LSrc := ALStringReplaceA(
                     LSrc,
                     '{$if defined(Win32)}'#13#10+
-                    '// #include <stddef.h>'#13#10+
+                    #13#10+
                     '{$else}'#13#10+
-                    '// #include <sys/uio.h>'#13#10+
-                    '{$endif}',
+                    #13#10+
+                    '{$endif}'#13#10,
                     '');
+
           LSrc := ALStringReplaceA(
                     LSrc,
-                    '// typedef struct _mongoc_client_encryption_rewrap_many_datakey_result_t'#13#10+
-                    '// mongoc_client_encryption_rewrap_many_datakey_result_t;',
-                    '// typedef struct _mongoc_client_encryption_rewrap_many_datakey_result_t mongoc_client_encryption_rewrap_many_datakey_result_t;');
-          LSrc := ALStringReplaceA(LSrc, 'BSON_ALIGNED_BEGIN(BSON_ALIGN_OF_PTR) ', '');
-          LSrc := ALStringReplaceA(LSrc, 'BSON_ALIGNED_BEGIN(BSON_ALIGN_OF_PTR)', '');
-          LSrc := ALStringReplaceA(LSrc, ' BSON_ALIGNED_END(BSON_ALIGN_OF_PTR);', ';');
+                    '{$if defined(Win64)}'#13#10+
+                    #13#10+
+                    '{$else}'#13#10+
+                    #13#10+
+                    '{$endif}'#13#10,
+                    '');
 
-          LSrc := ALStringReplaceA(LSrc, 'BSON_EXPORT(const ', 'BSON_EXPORT(');
-          P1 := AlPosA('BSON_EXPORT(', LSrc);
-          While P1 > 0 do begin
-            Delete(LSrc, P1, length('BSON_EXPORT('));
-            var P2 := AlposA(')', LSrc, P1);
-            If P2 <= 0 then
-              raise Exception.Create('Error 6FB459CF-9953-4F53-B174-D21C84512B71');
-            Delete(LSrc, P2, length(')'));
-            insert(' __CALLCONV__ ', LSrc, P2);
-            P1 := AlPosA('BSON_EXPORT(', LSrc);
-          end;
+          while ALposA(#13#10#13#10#13#10, LSrc) > 0 do
+            LSrc := ALStringReplaceA(LSrc,#13#10#13#10#13#10,#13#10#13#10,[RfReplaceALL]);
 
-          LSrc := ALStringReplaceA(LSrc, 'MONGOC_EXPORT(const ', 'MONGOC_EXPORT(');
-          P1 := AlPosA('MONGOC_EXPORT(', LSrc);
-          While P1 > 0 do begin
-            Delete(LSrc, P1, length('MONGOC_EXPORT('));
-            var P2 := AlposA(')', LSrc, P1);
-            If P2 <= 0 then
-              raise Exception.Create('Error 6FB459CF-9953-4F53-B174-D21C84512B71');
-            Delete(LSrc, P2, length(')'));
-            insert(' __CALLCONV__ ', LSrc, P2);
-            P1 := AlPosA('MONGOC_EXPORT(', LSrc);
-          end;
+          ALSaveStringToFile(LSrc, LDstfileName);
 
-        end;
-        {$ENDREGION}
-
-        {$REGION 'wincrypt.h'}
-        //LSrc := ALStringReplaceA(LSrc,' WINADVAPI'#13#10,' __CALLCONV__'#13#10);
-        //LSrc := ALStringReplaceA(LSrc,' WINCRYPT32API'#13#10,' __CALLCONV__'#13#10);
-        //LSrc := ALStringReplaceA(LSrc,' WINCRYPT32STRINGAPI'#13#10,' __CALLCONV__'#13#10);
-        //LSrc := RemoveSection(LSrc, '__WINCRYPT_H__');
-        //LSrc := RemoveSection(LSrc, '_HRESULT_DEFINED');
-        //LSrc := RemoveSection(LSrc, '!defined(WINCRYPT32API)');
-        //LSrc := RemoveSection(LSrc, '!defined(_CRYPT32_)');
-        //LSrc := RemoveSection(LSrc, '!defined(WINCRYPT32STRINGAPI)');
-        //LSrc := RemoveSection(LSrc, '!WINADVAPI');
-        //LSrc := RemoveSection(LSrc, '!WINAPI');
-        //LSrc := RemoveSection(LSrc, '!CALLBACK');
-        //LSrc := RemoveSection(LSrc, '!DECLSPEC_IMPORT');
-        //LSrc := RemoveSection(LSrc, '!CONST');
-        //LSrc := RemoveSection(LSrc, '!IN');
-        //LSrc := RemoveSection(LSrc, '!OUT');
-        //LSrc := RemoveSection(LSrc, '!OPTIONAL');
-        //LSrc := RemoveSection(LSrc, '!CMSG_ENVELOPED_ENCODE_INFO_HAS_CMS_FIELDS');
-        //LSrc := RemoveSection(LSrc, 'defined(_DDK_DRIVER_)');
-        //LSrc := ALStringReplaceA(
-        //          LSrc,
-        //          '// typedef struct _CMSG_RECIPIENT_ENCODE_INFO CMSG_RECIPIENT_ENCODE_INFO,'#13#10+
-        //          '// * PCMSG_RECIPIENT_ENCODE_INFO;',
-        //          '// typedef struct _CMSG_RECIPIENT_ENCODE_INFO'#13#10+
-        //          '// {'#13#10+
-        //          '// } CMSG_RECIPIENT_ENCODE_INFO, * PCMSG_RECIPIENT_ENCODE_INFO;', []);
-        //LSrc := ALStringReplaceA(
-        //          LSrc,
-        //          '// typedef struct _CERT_REVOCATION_CHAIN_PARA'#13#10+
-        //          '// CERT_REVOCATION_CHAIN_PARA,'#13#10+
-        //          '// * PCERT_REVOCATION_CHAIN_PARA;',
-        //          '// typedef struct _CERT_REVOCATION_CHAIN_PARA'#13#10+
-        //          '// {'#13#10+
-        //          '// } CERT_REVOCATION_CHAIN_PARA, * PCERT_REVOCATION_CHAIN_PARA;', []);
-        //LSrc := ALStringReplaceA(
-        //          LSrc,
-        //          '// typedef struct _CERT_CHAIN_CONTEXT CERT_CHAIN_CONTEXT, * PCERT_CHAIN_CONTEXT;',
-        //          '// typedef struct _CERT_CHAIN_CONTEXT'#13#10+
-        //          '// {'#13#10+
-        //          '// } CERT_CHAIN_CONTEXT, * PCERT_CHAIN_CONTEXT;');
-        //LSrc := ALStringReplaceA(
-        //          LSrc,
-        //          '// typedef struct _CERT_SERVER_OCSP_RESPONSE_CONTEXT'#13#10+
-        //          '// CERT_SERVER_OCSP_RESPONSE_CONTEXT,'#13#10+
-        //          '// * PCERT_SERVER_OCSP_RESPONSE_CONTEXT;',
-        //          '// typedef struct _CERT_SERVER_OCSP_RESPONSE_CONTEXT'#13#10+
-        //          '// {'#13#10+
-        //          '// } CERT_SERVER_OCSP_RESPONSE_CONTEXT, * PCERT_SERVER_OCSP_RESPONSE_CONTEXT;');
-        //LSrc := ALStringReplaceA(LSrc, '#define AUTHTYPE_CLIENT 1','// #define AUTHTYPE_CLIENT 1');
-        //LSrc := ALStringReplaceA(LSrc, '#define AUTHTYPE_SERVER 2','// #define AUTHTYPE_SERVER 2');
-        //LSrc := ALStringReplaceA(LSrc,'(CALLBACK * ','(__CALLCONV__ * ');
-        {$ENDREGION}
-
-        while alposA('  ', LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,'  ', ' ');
-
-        {$IF defined(debug)}
-        ALSaveStringTofile(LSrc, ALGetModulePathW + 'debug_src.txt');
-        {$ENDIF}
-
-        LSrc := ConvertDefine(LSrc);
-        LSrc := ConvertEnums(LSrc, LCallingConvention);
-        LSrc := ConvertSimpleType(LSrc);
-        LSrc := ConvertRecords(LSrc, LCallingConvention);
-
-        LSrc := ALStringReplaceA(LSrc,#13#10'// (__CALLCONV__ * ',#13#10'// (#1 * ');
-        LSrc := ALStringReplaceA(LSrc,'(__CALLCONV__ * ',#13#10'// (__CALLCONV__ * ');
-        LSrc := ALStringReplaceA(LSrc,#13#10'// (#1 * ',#13#10'// (__CALLCONV__ * ');
-
-        LSrc := Convertfunctions(LSrc, LCallingConvention);
-
-        LSrc := AlStringReplaceA(LSrc, #13#10'// (*', #13#10'// *');
-        LSrc := AlStringReplaceA(LSrc, #13#10'// *)', #13#10'// *');
-
-        LSrc := '''
-          unit
-          ''' +
-          ' ' + ALExtractFileName(AnsiString(LDstfileName), true{RemoveFileExt}) + ';' + #13#10 +
-          '''
-
-          //*******************************************************************//
-          // This unit was automatically generated by CHeaderWrapperGenerator. //
-          // Do not edit manually.                                             //
-          //*******************************************************************//
-
-          interface
-
-          {$I Alcinoe.inc}
-
-          {$SCOPEDENUMS OFF}
-          {$MINENUMSIZE 4}
-          {$A+}
-          '''+
-          #13#10+
-          #13#10+
-          'uses'#13#10+
-          '  WinApi.Windows' + ALIfThenA(LExtraUses <> '', ','#13#10, ';'#13#10) +
-          LExtraUses + #13#10 +
-          #13#10+
-          LExtraTypes + #13#10+
-          #13#10+
-          '' + LSrc + #13#10 +
-          '''
-
-          implementation
-
-          end.
-          ''';
-
-        LLst := TALStringListA.Create;
-        try
-          LLst.Text := LSrc;
-          For var i := LLst.Count - 1 downto 0 do begin
-            LLst[I] := ALTrimRight(LLst[I]);
-            if ALTrim(LLst[I]) = '//' then LLst[I] := ''
-            else if ALPosA('// #pragma ', ALTrim(LLst[I])) = 1 then LLst[I] := ''
-            else if ALPosA('// #include ', ALTrim(LLst[I])) = 1 then LLst[I] := ''
-            else if ALPosA('// #undef ', ALTrim(LLst[I])) = 1 then LLst[I] := ''
-            else if (I > 0) and (AlposA('): ', ALTrim(LLst[I])) = 1) then begin
-              var LStr := LLst[I-1];
-              var LComment: AnsiString := '';
-              P1 := AlposA(' //', LStr, 4);
-              if P1 <= 0 then P1 := AlposA(' (*', LStr, 4);
-              if P1 > 0 then begin
-                LComment := ALTrim(AlcopyStr(LStr, P1, ALMaxInt));
-                LStr := ALTrimRight(AlcopyStr(LStr, 1, P1-1));
-              end;
-              LLst[I-1] := LStr + ALTrim(LLst[I]) + ALIfThenA(LComment <> '', ' ') + LComment;
-              LLst.Delete(i);
-            end
-            else if (I > 0) and (AlposA(');', ALTrim(LLst[I])) = 1) then begin
-              var LStr := LLst[I-1];
-              var LComment: AnsiString := '';
-              P1 := AlposA(' //', LStr, 4);
-              if P1 <= 0 then P1 := AlposA(' (*', LStr, 4);
-              if P1 > 0 then begin
-                LComment := ALTrim(AlcopyStr(LStr, P1, ALMaxInt));
-                LStr := ALTrimRight(AlcopyStr(LStr, 1, P1-1));
-              end;
-              if (LStr <> '') and (LStr[high(LStr)] <> ';') then begin
-                LLst[I-1] := LStr + ALTrim(LLst[I]) + ALIfThenA(LComment <> '', ' ') + LComment;
-                LLst.Delete(i);
-              end;
-            end;
-          end;
-          LSrc := ALTrim(LLst.Text);
         finally
-          AlFreeAndNil(LLst);
+          ALFreeAndNil(LLibraryDLLEntryPoints);
         end;
-        LSrc := ALStringReplaceA(LSrc,#13#10'// //',#13#10'//',[RfReplaceALL]);
-        while ALposA('/ /', LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,'/ /','//',[RfReplaceALL]);
-
-        LLst := TALStringListA.Create;
-        try
-          LLst.Text := LSrc;
-          For var i := LLst.Count - 1 downto 0 do begin
-            LLst[I] := ALTrimRight(LLst[I]);
-            if (alposA('// ', LLst[I]) = 1) and (alposA(' *)', LLst[I]) = length(LLst[I]) - 2) then
-              LLst[I] := ALcopyStr(LLst[I], 1, length(LLst[I]) - 3);
-          end;
-          LSrc := ALTrim(LLst.Text);
-        finally
-          AlFreeAndNil(LLst);
-        end;
-
-        LLst := TALStringListA.Create;
-        try
-          LLst.Text := LSrc;
-          For var i := LLst.Count - 1 downto 0 do
-            if (alposA('//[', LLst[I]) = 1) then
-              LLst[I] := ALStringReplaceA(LLst[I], '//[', '// [', []);
-          LSrc := ALTrim(LLst.Text);
-        finally
-          AlFreeAndNil(LLst);
-        end;
-
-        while ALposA(#13#10#13#10#13#10, LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,#13#10#13#10#13#10,#13#10#13#10,[RfReplaceALL]);
-
-        LSrc := ALStringReplaceA(
-                  LSrc,
-                  '{$if defined(Win32)}'#13#10+
-                  #13#10+
-                  '{$else}'#13#10+
-                  #13#10+
-                  '{$endif}'#13#10,
-                  '');
-
-        LSrc := ALStringReplaceA(
-                  LSrc,
-                  '{$if defined(Win64)}'#13#10+
-                  #13#10+
-                  '{$else}'#13#10+
-                  #13#10+
-                  '{$endif}'#13#10,
-                  '');
-
-        while ALposA(#13#10#13#10#13#10, LSrc) > 0 do
-          LSrc := ALStringReplaceA(LSrc,#13#10#13#10#13#10,#13#10#13#10,[RfReplaceALL]);
-
-        ALSaveStringToFile(LSrc, LDstfileName);
 
       end;
 

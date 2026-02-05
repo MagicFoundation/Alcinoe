@@ -809,7 +809,7 @@ begin
                                           '{' + AnsiString(StringOfChar('*', length(LFctHeader) - 2)) +'}' + #13#10 +
                                           LFctHeader + #13#10 +
                                           LFctHidden + 'begin'+#13#10 +
-                                          LFctHidden + '  ALImageMagickLib.' + LFctName + '(';
+                                          LFctHidden + '  ALImageMagickLibrary.' + LFctName + '(';
         for var I := 0 to LDelphiParamsLst.Count - 1 do
           ADelphiFunctionsImplementation := ADelphiFunctionsImplementation + ALStringReplaceA(LDelphiParamsLst.Names[i], 'const ', '') + ALIfThenA(I < LDelphiParamsLst.Count - 1, ', ');
         ADelphiFunctionsImplementation := ADelphiFunctionsImplementation +');'+#13#10 +
@@ -825,7 +825,7 @@ begin
                                           '{' + AnsiString(StringOfChar('*', length(LFctHeader) - 2)) +'}' + #13#10 +
                                           LFctHeader + #13#10 +
                                           LFctHidden + 'begin'+#13#10+
-                                          LFctHidden + '  Result := ALImageMagickLib.' + LFctName + '(';
+                                          LFctHidden + '  Result := ALImageMagickLibrary.' + LFctName + '(';
         for var I := 0 to LDelphiParamsLst.Count - 1 do
           ADelphiFunctionsImplementation := ADelphiFunctionsImplementation + ALStringReplaceA(LDelphiParamsLst.Names[i], 'const ', '') + ALIfThenA(I < LDelphiParamsLst.Count - 1, ', ');
         ADelphiFunctionsImplementation := ADelphiFunctionsImplementation +');'+#13#10 +
@@ -1282,7 +1282,7 @@ begin
             end;
 
           Var
-            ALImageMagickLib: TALImageMagickLibrary;
+            ALImageMagickLibrary: TALImageMagickLibrary;
 
           %s
 
@@ -1322,6 +1322,8 @@ begin
             end;
 
           begin
+
+            inherited Create;
 
             // http://www.imagemagick.org/script/resources.php
             AImageMagickHome := ExcludeTrailingPathDelimiter(AImageMagickHome);
@@ -1366,7 +1368,7 @@ begin
               if not FreeLibrary(FMagickWandlib) then
                 raiseLastOsError;
             end;
-            if (FMagickCorelib > 0) and
+            if (FMagickCorelib <> 0) and
                (not FreeLibrary(FMagickCorelib)) then
               raiseLastOsError;
             inherited Destroy;
@@ -1378,9 +1380,9 @@ begin
           procedure ALRaiseLastMagickWandError(const AWand: PMagickWand);
           begin
             var LSeverity: ExceptionType;
-            var LPAnsiChar: PAnsiChar := ALImageMagickLib.MagickGetException(AWand, @LSeverity);
+            var LPAnsiChar: PAnsiChar := ALImageMagickLibrary.MagickGetException(AWand, @LSeverity);
             var LDescription: ansiString := LPAnsiChar;
-            ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+            ALImageMagickLibrary.MagickRelinquishMemory(LPAnsiChar);
             raise Exception.create(string(LDescription));
           end;
 
@@ -1388,9 +1390,9 @@ begin
           procedure ALRaiseLastPixelWandError(const AWand: PPixelWand);
           begin
             var LSeverity: ExceptionType;
-            var LPAnsiChar: PAnsiChar := ALImageMagickLib.PixelGetException(AWand, @LSeverity);
+            var LPAnsiChar: PAnsiChar := ALImageMagickLibrary.PixelGetException(AWand, @LSeverity);
             var LDescription: ansiString := LPAnsiChar;
-            ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+            ALImageMagickLibrary.MagickRelinquishMemory(LPAnsiChar);
             raise Exception.create(string(LDescription));
           end;
 
@@ -1398,9 +1400,9 @@ begin
           procedure ALRaiseLastDrawingWandError(const AWand: PDrawingWand);
           begin
             var LSeverity: ExceptionType;
-            var LPAnsiChar: PAnsiChar := ALImageMagickLib.DrawGetException(AWand, @LSeverity);
+            var LPAnsiChar: PAnsiChar := ALImageMagickLibrary.DrawGetException(AWand, @LSeverity);
             var LDescription: ansiString := LPAnsiChar;
-            ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+            ALImageMagickLibrary.MagickRelinquishMemory(LPAnsiChar);
             raise Exception.create(string(LDescription));
           end;
 
@@ -1446,21 +1448,21 @@ begin
           {****************************************************************************************************}
           procedure ALCreateImageMagickLibrary(const AImageMagickHome: String; const AThreadLimit: integer = 0);
           begin
-            if assigned(ALImageMagickLib) then exit;
-            ALImageMagickLib := TALImageMagickLibrary.Create(AImageMagickHome, AThreadLimit);
+            if assigned(ALImageMagickLibrary) then exit;
+            ALImageMagickLibrary := TALImageMagickLibrary.Create(AImageMagickHome, AThreadLimit);
           end;
 
           {*********************************}
           procedure ALFreeImageMagickLibrary;
           begin
-            alFreeAndNil(ALImageMagickLib);
+            ALFreeAndNil(ALImageMagickLibrary);
           end;
 
           initialization
             {$IF defined(DEBUG)}
             ALLog('Alcinoe.ImageMagick','initialization');
             {$ENDIF}
-            ALImageMagickLib := nil;
+            ALImageMagickLibrary := nil;
 
           end.
           ''';

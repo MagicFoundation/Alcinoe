@@ -422,6 +422,7 @@ Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxMediaPicker" "_Source" "ALFmxMediaP
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxNotificationService" "_Source" "ALFmxNotificationServiceDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALHttpServer" "_Source" "ALHttpServerDemo.dproj" || PAUSE
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALMongoDBClient" "_Source" "ALMongoDBClientDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALImageMagick" "_Source" "ALImageMagickDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj" || PAUSE
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_Source" "ALRTTIDemo.dproj" || PAUSE

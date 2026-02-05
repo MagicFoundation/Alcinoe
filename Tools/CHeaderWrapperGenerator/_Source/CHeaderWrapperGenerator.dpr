@@ -1430,7 +1430,7 @@ begin
 
 end;
 
-{**************************************************************************************}
+{***************************************************************************************************************************}
 Function MakeLibraryInterface(const ALibraryClassName: AnsiString; const ALibraryDLLEntryPoints: TALStringListA): AnsiString;
 begin
   if ALibraryDLLEntryPoints = nil then exit('');

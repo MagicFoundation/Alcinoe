@@ -1,0 +1,2 @@
+To import the sample data, run this command in Command Prompt:
+"C:\Program Files\MongoDB\bin\mongoimport.exe" --uri "mongodb://127.0.0.1:27017" --db "test" --collection "zipcodes" --file "zipcodes.json"
